@@ -1,4 +1,4 @@
-﻿using System.Reactive.Disposables;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -10,7 +10,6 @@ namespace PoeShared.UI
     internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
     {
         private readonly bool initialIsEnabled;
-        private bool activated;
     
         public HotkeyListener(IHotkeyTracker hotkeyTracker)
         {
@@ -54,10 +53,6 @@ namespace PoeShared.UI
     
         private IFluentLog Log { get; }
     
-        public bool Activated
-        {
-            get => activated;
-            private set => RaiseAndSetIfChanged(ref activated, value);
-        }
+        public bool Activated { get; private set; }
     }
 }

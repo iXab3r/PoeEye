@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Disposables;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -11,7 +11,6 @@ namespace PoeShared.Services
         private static readonly IFluentLog Log = typeof(SharedResource<T>).PrepareLogger();
 
         private readonly Func<T> factory;
-        private T instance;
 
         public SharedResource(Func<T> factory)
         {
@@ -23,11 +22,7 @@ namespace PoeShared.Services
                 .AddTo(Anchors);
         }
 
-        private T Instance
-        {
-            get => instance;
-            set => RaiseAndSetIfChanged(ref instance, value);
-        }
+        private T Instance { get; set; }
 
         public T RentOrCreate()
         {

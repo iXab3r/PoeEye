@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -20,8 +20,6 @@ namespace PoeShared.Services
         private static readonly IFluentLog Log = typeof(FolderCleanerService).PrepareLogger();
 
         private readonly SourceList<DirectoryInfo> directoriesSource = new SourceList<DirectoryInfo>();
-        private TimeSpan? fileTimeToLive;
-        private TimeSpan? cleanupTimeout;
 
         public FolderCleanerService(IClock clock)
         {
@@ -37,11 +35,11 @@ namespace PoeShared.Services
                     directoriesSource.Connect().CountChanged().ToUnit())
                 .Select(_ =>
                 {
-                    Log.Debug($"Cleanup period updated to {cleanupTimeout} with TTL set to {fileTimeToLive} with {directoriesSource.Count} target directories");
-                    return cleanupTimeout > TimeSpan.Zero && fileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? ObservableEx.BlockingTimer(cleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
+                    Log.Debug($"Cleanup period updated to {CleanupTimeout} with TTL set to {FileTimeToLive} with {directoriesSource.Count} target directories");
+                    return CleanupTimeout > TimeSpan.Zero && FileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? ObservableEx.BlockingTimer(CleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
                 })
                 .Switch()
-                .Subscribe(() => HandleCleanupTimerTick(clock, fileTimeToLive ?? TimeSpan.MaxValue, directoriesSource.Items.ToArray()))
+                .Subscribe(() => HandleCleanupTimerTick(clock, FileTimeToLive ?? TimeSpan.MaxValue, directoriesSource.Items.ToArray()))
                 .AddTo(Anchors);
         }
 
@@ -125,17 +123,9 @@ namespace PoeShared.Services
 
         public ReadOnlyObservableCollection<DirectoryInfo> TargetDirectories { get; }
 
-        public TimeSpan? FileTimeToLive
-        {
-            get => fileTimeToLive;
-            set => RaiseAndSetIfChanged(ref fileTimeToLive, value);
-        }
+        public TimeSpan? FileTimeToLive { get; set; }
 
-        public TimeSpan? CleanupTimeout
-        {
-            get => cleanupTimeout;
-            set => RaiseAndSetIfChanged(ref cleanupTimeout, value);
-        }
+        public TimeSpan? CleanupTimeout { get; set; }
 
         public IDisposable AddDirectory(DirectoryInfo directoryInfo)
         {

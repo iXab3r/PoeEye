@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -25,12 +25,7 @@ namespace PoeShared.Audio.ViewModels
         
         private readonly IAudioNotificationsManager notificationsManager;
         private readonly ObservableAsPropertyHelper<string> previousSelectedValueSupplier;
-
-        private bool audioEnabled;
         private float volume = 1;
-        private string lastOpenedDirectory;
-        private NotificationTypeWrapperViewModel selectedItem;
-        private string selectedValue;
 
         public AudioNotificationSelectorViewModel(IAudioNotificationsManager notificationsManager)
         {
@@ -96,7 +91,7 @@ namespace PoeShared.Audio.ViewModels
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()
                 .Where(x => x)
-                .Where(x => DisabledNotification.Equals(selectedValue, StringComparison.OrdinalIgnoreCase))
+                .Where(x => DisabledNotification.Equals(SelectedValue, StringComparison.OrdinalIgnoreCase))
                 .SubscribeSafe(() => SelectedValue = PreviousSelectedValue ?? DefaultNotification, Log.HandleUiException)
                 .AddTo(Anchors);
 
@@ -111,11 +106,7 @@ namespace PoeShared.Audio.ViewModels
                 .AddTo(Anchors);        
         }
 
-        public bool AudioEnabled
-        {
-            get => audioEnabled;
-            set => this.RaiseAndSetIfChanged(ref audioEnabled, value);
-        }
+        public bool AudioEnabled { get; set; }
 
         public ICommand SelectNotificationCommand { get; }
 
@@ -123,11 +114,7 @@ namespace PoeShared.Audio.ViewModels
         
         public ICommand AddSoundCommand { get; }
 
-        public string LastOpenedDirectory
-        {
-            get => lastOpenedDirectory;
-            private set => RaiseAndSetIfChanged(ref lastOpenedDirectory, value);
-        }
+        public string LastOpenedDirectory { get; private set; }
 
         public float Volume
         {
@@ -135,17 +122,9 @@ namespace PoeShared.Audio.ViewModels
             set => RaiseAndSetIfChanged(ref volume, value);
         }
         
-        public NotificationTypeWrapperViewModel SelectedItem
-        {
-            get => selectedItem;
-            set => RaiseAndSetIfChanged(ref selectedItem, value);
-        }
+        public NotificationTypeWrapperViewModel SelectedItem { get; set; }
 
-        public string SelectedValue
-        {
-            get => selectedValue;
-            set => RaiseAndSetIfChanged(ref selectedValue, value);
-        }
+        public string SelectedValue { get; set; }
 
         public string PreviousSelectedValue => previousSelectedValueSupplier.Value;
 
@@ -184,8 +163,8 @@ namespace PoeShared.Audio.ViewModels
             var op = new OpenFileDialog
             {
                 Title = "Select an image", 
-                InitialDirectory = !string.IsNullOrEmpty(lastOpenedDirectory) && Directory.Exists(lastOpenedDirectory) 
-                    ? lastOpenedDirectory
+                InitialDirectory = !string.IsNullOrEmpty(LastOpenedDirectory) && Directory.Exists(LastOpenedDirectory) 
+                    ? LastOpenedDirectory
                     : Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic),
                 CheckPathExists = true,
                 Multiselect = false,

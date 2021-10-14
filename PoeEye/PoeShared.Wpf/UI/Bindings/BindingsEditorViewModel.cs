@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
@@ -13,14 +13,6 @@ namespace PoeShared.UI.Bindings
     internal sealed class BindingsEditorViewModel : DisposableReactiveObject, IBindingsEditorViewModel
     {
         private static readonly IFluentLog Log = typeof(BindingsEditorViewModel).PrepareLogger();
-
-        private string valueSourceExpression;
-
-        private DisposableReactiveObject valueSource;
-
-        private BindableReactiveObject source;
-
-        private string targetProperty;
 
         public BindingsEditorViewModel()
         {
@@ -69,37 +61,21 @@ namespace PoeShared.UI.Bindings
 
         public ReadOnlyObservableCollection<PropertyInfo> BindableProperties { get; }
 
-        public DisposableReactiveObject ValueSource
-        {
-            get => valueSource;
-            set => RaiseAndSetIfChanged(ref valueSource, value);
-        }
+        public DisposableReactiveObject ValueSource { get; set; }
 
-        public string TargetProperty
-        {
-            get => targetProperty;
-            set => RaiseAndSetIfChanged(ref targetProperty, value);
-        }
+        public string TargetProperty { get; set; }
 
-        public string ValueSourceExpression
-        {
-            get => valueSourceExpression;
-            set => RaiseAndSetIfChanged(ref valueSourceExpression, value);
-        }
+        public string ValueSourceExpression { get; set; }
 
         public CommandWrapper AddBindingCommand { get; }
 
         public CommandWrapper RemoveBindingCommand { get; }
 
-        public BindableReactiveObject Source
-        {
-            get => source;
-            set => RaiseAndSetIfChanged(ref source, value);
-        }
+        public BindableReactiveObject Source { get; set; }
 
         private void AddBinding()
         {
-            var binding = Source.AddOrUpdateBinding(targetProperty, ValueSource, string.IsNullOrEmpty(valueSourceExpression) ? targetProperty : valueSourceExpression);
+            var binding = Source.AddOrUpdateBinding(TargetProperty, ValueSource, string.IsNullOrEmpty(ValueSourceExpression) ? TargetProperty : ValueSourceExpression);
         }
     }
 }

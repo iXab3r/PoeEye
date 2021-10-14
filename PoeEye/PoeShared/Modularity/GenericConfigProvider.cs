@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -23,7 +23,6 @@ namespace PoeShared.Modularity
 
         private readonly IComparisonService comparisonService;
         private readonly IConfigProvider configProvider;
-        private TConfig actualConfig;
         
         private int saveCommandCounter = 0;
         private int loadCommandCounter = 0;
@@ -78,11 +77,7 @@ namespace PoeShared.Modularity
             configProvider.Save();
         }
 
-        public TConfig ActualConfig
-        {
-            get => actualConfig;
-            private set => this.RaiseAndSetIfChanged(ref actualConfig, value);
-        }
+        public TConfig ActualConfig { get; private set; }
 
         public IObservable<TConfig> WhenChanged { get; }
 

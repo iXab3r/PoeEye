@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Wpf.Scaffolding;
@@ -12,10 +12,6 @@ namespace PoeShared.UI
         private static readonly Binder<RandomPeriodSelector> Binder = new();
 
         private readonly IRandomNumberGenerator rng;
-
-        private TimeSpan upperValue;
-        private TimeSpan lowerValue;
-        private bool randomizeValue;
 
         private TimeSpan minimum = TimeSpan.Zero;
         private TimeSpan maximum = TimeSpan.MaxValue;
@@ -36,7 +32,7 @@ namespace PoeShared.UI
             this.rng = rng;
             
             this.ValidationRule(x => x.UpperValue,
-                x => !randomizeValue || x >= lowerValue, x => $"Must be greater than {lowerValue}");
+                x => !RandomizeValue || x >= LowerValue, x => $"Must be greater than {LowerValue}");
             
             Binder.Attach(this).AddTo(Anchors);
         }
@@ -53,36 +49,24 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref maximum, value);
         }
 
-        public TimeSpan LowerValue
-        {
-            get => lowerValue;
-            set => this.RaiseAndSetIfChanged(ref lowerValue, value);
-        }
+        public TimeSpan LowerValue { get; set; }
 
-        public TimeSpan UpperValue
-        {
-            get => upperValue;
-            set => RaiseAndSetIfChanged(ref upperValue, value);
-        }
+        public TimeSpan UpperValue { get; set; }
         
-        public bool RandomizeValue
-        {
-            get => randomizeValue;
-            set => RaiseAndSetIfChanged(ref randomizeValue, value);
-        }
+        public bool RandomizeValue { get; set; }
 
         public TimeSpan GetValue()
         {
-            if (randomizeValue && upperValue < lowerValue)
+            if (RandomizeValue && UpperValue < LowerValue)
             {
-                throw new InvalidOperationException($"Invalid range: [{lowerValue}; {upperValue}]");
+                throw new InvalidOperationException($"Invalid range: [{LowerValue}; {UpperValue}]");
             }
-            return randomizeValue ? rng.GenerateDelay(lowerValue, upperValue) : lowerValue;
+            return RandomizeValue ? rng.GenerateDelay(LowerValue, UpperValue) : LowerValue;
         }
 
         public override string ToString()
         {
-            return $"RandomSelector([{lowerValue};{upperValue}], randomize: {randomizeValue})";
+            return $"RandomSelector([{LowerValue};{UpperValue}], randomize: {RandomizeValue})";
         }
     }
 }

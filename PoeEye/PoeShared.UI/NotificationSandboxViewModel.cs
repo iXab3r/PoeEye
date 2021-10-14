@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Media.Imaging;
@@ -13,19 +13,9 @@ namespace PoeShared.UI
     {
         private readonly INotificationsService notificationsService;
 
-        private bool closeable;
-
         private bool interactive = true;
 
-        private BitmapImage notificationImage;
-
-        private string notificationText;
-
         private TimeSpan notificationTimeout = TimeSpan.Zero;
-
-        private string notificationTitle;
-
-        private bool withIcon;
 
         public NotificationSandboxViewModel(INotificationsService notificationsService)
         {
@@ -45,29 +35,13 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref notificationTimeout, value);
         }
 
-        public string NotificationTitle
-        {
-            get => notificationTitle;
-            set => RaiseAndSetIfChanged(ref notificationTitle, value);
-        }
+        public string NotificationTitle { get; set; }
 
-        public BitmapImage NotificationImage
-        {
-            get => notificationImage;
-            set => RaiseAndSetIfChanged(ref notificationImage, value);
-        }
+        public BitmapImage NotificationImage { get; set; }
 
-        public string NotificationText
-        {
-            get => notificationText;
-            set => RaiseAndSetIfChanged(ref notificationText, value);
-        }
+        public string NotificationText { get; set; }
 
-        public bool WithIcon
-        {
-            get => withIcon;
-            set => RaiseAndSetIfChanged(ref withIcon, value);
-        }
+        public bool WithIcon { get; set; }
 
         public bool Interactive
         {
@@ -75,23 +49,19 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref interactive, value);
         }
 
-        public bool Closeable
-        {
-            get => closeable;
-            set => RaiseAndSetIfChanged(ref closeable, value);
-        }
+        public bool Closeable { get; set; }
 
         private void AddTextNotificationExecuted()
         {
             var rng = new Random();
             var notification = new TextNotificationViewModel()
             {
-                Text = string.IsNullOrEmpty(notificationText) ? Enumerable.Repeat("a", (int)rng.Next(10, 60)).JoinStrings(" ") : notificationText,
+                Text = string.IsNullOrEmpty(NotificationText) ? Enumerable.Repeat("a", (int)rng.Next(10, 60)).JoinStrings(" ") : NotificationText,
                 TimeToLive = NotificationTimeout,
-                Title = notificationTitle,
-                Icon = withIcon ? NotificationImage : default,
+                Title = NotificationTitle,
+                Icon = WithIcon ? NotificationImage : default,
                 Interactive = interactive,
-                Closeable = closeable
+                Closeable = Closeable
             };
 
             notificationsService.AddNotification(notification);

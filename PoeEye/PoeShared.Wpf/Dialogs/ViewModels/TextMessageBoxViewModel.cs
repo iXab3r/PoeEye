@@ -1,13 +1,10 @@
-﻿using PoeShared.Native;
+using PoeShared.Native;
 using PoeShared.Scaffolding.WPF;
 
 namespace PoeShared.Dialogs.ViewModels
 {
     internal sealed class TextMessageBoxViewModel : MessageBoxViewModelBase, ITextMessageBoxViewModel
     {
-        private string content;
-        private string contentHint;
-        private bool isReadOnly;
 
         public TextMessageBoxViewModel(IClipboardManager clipboardManager) 
         {
@@ -16,22 +13,10 @@ namespace PoeShared.Dialogs.ViewModels
         
         public CommandWrapper CopyAllCommand { get; }
         
-        public string ContentHint
-        {
-            get => contentHint;
-            set => RaiseAndSetIfChanged(ref contentHint, value);
-        }
+        public string ContentHint { get; set; }
 
-        public string Content
-        {
-            get => content;
-            set => RaiseAndSetIfChanged(ref content, value);
-        }
+        public string Content { get; set; }
 
-        public bool IsReadOnly
-        {
-            get => isReadOnly;
-            set => RaiseAndSetIfChanged(ref isReadOnly, value);
-        }
+        public bool IsReadOnly { get; set; }
     }
 }

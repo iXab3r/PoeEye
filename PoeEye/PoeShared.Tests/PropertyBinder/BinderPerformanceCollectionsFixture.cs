@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
@@ -165,8 +165,6 @@ namespace PoeShared.Tests.PropertyBinder
         public sealed class BinderTestCollection : TestCollectionBase
         {
             private static readonly Binder<BinderTestCollection> Binder = new();
-            private int count;
-            private int sum;
 
             static BinderTestCollection()
             {
@@ -179,17 +177,9 @@ namespace PoeShared.Tests.PropertyBinder
                 Binder.Attach(this).AddTo(Anchors);
             }
 
-            public override int Sum
-            {
-                get => sum;
-                protected set => RaiseAndSetIfChanged(ref sum, value);
-            }
+            public override int Sum { get; protected set; }
 
-            public override int Count
-            {
-                get => count;
-                protected set => RaiseAndSetIfChanged(ref count, value);
-            }
+            public override int Count { get; protected set; }
             
             public override string ToString()
             {
@@ -199,8 +189,6 @@ namespace PoeShared.Tests.PropertyBinder
         
         public sealed class ReactiveTestCollection : TestCollectionBase
         {
-            private int count;
-            private int sum;
 
             public ReactiveTestCollection()
             {
@@ -215,17 +203,9 @@ namespace PoeShared.Tests.PropertyBinder
                     .AddTo(Anchors);
             }
 
-            public override int Sum
-            {
-                get => sum;
-                protected set => RaiseAndSetIfChanged(ref sum, value);
-            }
+            public override int Sum { get; protected set; }
 
-            public override int Count
-            {
-                get => count;
-                protected set => RaiseAndSetIfChanged(ref count, value);
-            }
+            public override int Count { get; protected set; }
             
             public override string ToString()
             {

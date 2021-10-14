@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -25,13 +25,6 @@ namespace PoeShared.UI
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
         private readonly IScreenRegionSelectorService regionSelectorService;
-        private DisposableReactiveObject fakeDelay;
-        private TimeSpan randomPeriod;
-
-        private RegionSelectorResult selectedRegion;
-        private Rect selectionRect;
-
-        private Rectangle selectionRectangle;
 
         public MainWindowViewModel(
             IAudioNotificationSelectorViewModel audioNotificationSelector,
@@ -97,17 +90,9 @@ namespace PoeShared.UI
         public ICommand StartSelectionCommand { get; }
 
 
-        public Rectangle SelectionRectangle
-        {
-            get => selectionRectangle;
-            set => RaiseAndSetIfChanged(ref selectionRectangle, value);
-        }
+        public Rectangle SelectionRectangle { get; set; }
 
-        public Rect SelectionRect
-        {
-            get => selectionRect;
-            set => RaiseAndSetIfChanged(ref selectionRect, value);
-        }
+        public Rect SelectionRect { get; set; }
 
         public ISelectionAdornerViewModel SelectionAdorner { get; }
 
@@ -129,23 +114,11 @@ namespace PoeShared.UI
 
         public ICommand SelectRegionCommnad { get; }
 
-        public RegionSelectorResult SelectedRegion
-        {
-            get => selectedRegion;
-            private set => RaiseAndSetIfChanged(ref selectedRegion, value);
-        }
+        public RegionSelectorResult SelectedRegion { get; private set; }
 
-        public DisposableReactiveObject FakeDelay
-        {
-            get => fakeDelay;
-            set => RaiseAndSetIfChanged(ref fakeDelay, value);
-        }
+        public DisposableReactiveObject FakeDelay { get; set; }
 
-        public TimeSpan RandomPeriod
-        {
-            get => randomPeriod;
-            set => RaiseAndSetIfChanged(ref randomPeriod, value);
-        }
+        public TimeSpan RandomPeriod { get; set; }
 
         private async Task HandleSelectionCommandExecuted()
         {

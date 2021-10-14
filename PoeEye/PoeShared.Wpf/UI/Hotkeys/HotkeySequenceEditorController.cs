@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Disposables;
@@ -32,25 +32,12 @@ namespace PoeShared.UI
         private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
         private readonly CommandWrapper startRecording;
         private readonly CommandWrapper stopRecording;
-
-        private bool atLeastOneRecordingTypeEnabled;
-        private bool canAddItem;
         private bool enableKeyboardRecording = true;
         private bool enableMouseClicksRecording = true;
         private MousePositionRecordingType enableMousePositionRecording;
 
-        private bool isBusy;
-        private bool isRecording;
-
-        private Point? mouseLocation;
         private TimeSpan mousePositionRecordingResolution = TimeSpan.FromMilliseconds(250);
-
-        private DateTimeOffset? recordStartTime;
-
-        private IWindowHandle targetWindow;
         private Fallback<HotkeyGesture> toggleRecordingHotkey = new((actualHotkey, defaultHotkey) => actualHotkey == null || actualHotkey.IsEmpty || actualHotkey.Equals(defaultHotkey));
-
-        private TimeSpan totalDuration;
 
         static HotkeySequenceEditorController()
         {
@@ -99,33 +86,17 @@ namespace PoeShared.UI
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        public bool AtLeastOneRecordingTypeEnabled
-        {
-            get => atLeastOneRecordingTypeEnabled;
-            private set => RaiseAndSetIfChanged(ref atLeastOneRecordingTypeEnabled, value);
-        }
+        public bool AtLeastOneRecordingTypeEnabled { get; private set; }
 
-        public bool CanAddItem
-        {
-            get => canAddItem;
-            private set => RaiseAndSetIfChanged(ref canAddItem, value);
-        }
+        public bool CanAddItem { get; private set; }
 
         public TimeSpan RecordingDuration => recordDuration.Value;
 
-        public DateTimeOffset? RecordStartTime
-        {
-            get => recordStartTime;
-            private set => RaiseAndSetIfChanged(ref recordStartTime, value);
-        }
+        public DateTimeOffset? RecordStartTime { get; private set; }
 
         public ICommand StartRecording => startRecording;
 
-        public TimeSpan TotalDuration
-        {
-            get => totalDuration;
-            private set => RaiseAndSetIfChanged(ref totalDuration, value);
-        }
+        public TimeSpan TotalDuration { get; private set; }
 
         public IHotkeySequenceEditorViewModel Owner { get; }
 
@@ -149,11 +120,7 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref enableKeyboardRecording, value);
         }
 
-        public bool IsRecording
-        {
-            get => isRecording;
-            private set => RaiseAndSetIfChanged(ref isRecording, value);
-        }
+        public bool IsRecording { get; private set; }
 
         public TimeSpan MousePositionRecordingResolution
         {
@@ -161,11 +128,7 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref mousePositionRecordingResolution, value);
         }
 
-        public bool IsBusy
-        {
-            get => isBusy;
-            set => RaiseAndSetIfChanged(ref isBusy, value);
-        }
+        public bool IsBusy { get; set; }
 
         public Fallback<HotkeyGesture> ToggleRecordingHotkey
         {
@@ -173,17 +136,9 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref toggleRecordingHotkey, value);
         }
 
-        public IWindowHandle TargetWindow
-        {
-            get => targetWindow;
-            set => RaiseAndSetIfChanged(ref targetWindow, value);
-        }
+        public IWindowHandle TargetWindow { get; set; }
 
-        public Point? MouseLocation
-        {
-            get => mouseLocation;
-            private set => RaiseAndSetIfChanged(ref mouseLocation, value);
-        }
+        public Point? MouseLocation { get; private set; }
 
         private void StopRecordingExecuted()
         {
@@ -205,7 +160,7 @@ namespace PoeShared.UI
             IsRecording = true;
 
             var initialWindow = UnsafeNative.GetForegroundWindow();
-            var windowToRecord = targetWindow;
+            var windowToRecord = TargetWindow;
             using var recordingAnchors = new CompositeDisposable();
             Disposable.Create(StopRecordingExecuted).AddTo(recordingAnchors);
 
@@ -270,7 +225,7 @@ namespace PoeShared.UI
             Observable.Merge(
                     windowToRecord == null ? Observable.Empty<string>() : mainWindowTracker.WhenAnyValue(x => x.ActiveWindowHandle).Where(x => x != windowToRecord.Handle).Select(x => $"Active window changed ! Expected {windowToRecord}, got: {x.ToHexadecimal()} ({UnsafeNative.GetWindowTitle(x)})"),
                     tracker.WhenAnyValue(x => x.IsActive).Where(x => x).Select(x => $"Hotkey {tracker} detected"),
-                    this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).Select(x => $"Cannot add more items: {totalDuration} / {Owner.MaxDuration}, {Owner.TotalCount} / {Owner.MaxItemsCount}"))
+                    this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).Select(x => $"Cannot add more items: {TotalDuration} / {Owner.MaxDuration}, {Owner.TotalCount} / {Owner.MaxItemsCount}"))
                 .Take(1)
                 .SubscribeSafe(reason =>
                 {

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PropertyBinder;
@@ -123,9 +123,6 @@ namespace PoeShared.Tests.PropertyBinder
         public abstract class BaseViewModel : DisposableReactiveObject
         {
             private int? data = 3;
-            private int? data1;
-            private int? data2;
-            private int? data3;
 
             public int? Data
             {
@@ -137,30 +134,16 @@ namespace PoeShared.Tests.PropertyBinder
 
             public abstract int? Sum { get; protected set; }
 
-            public int? Data1
-            {
-                get => data1;
-                set => RaiseAndSetIfChanged(ref data1, value);
-            }
+            public int? Data1 { get; set; }
 
-            public int? Data2
-            {
-                get => data2;
-                set => RaiseAndSetIfChanged(ref data2, value);
-            }
+            public int? Data2 { get; set; }
 
-            public int? Data3
-            {
-                get => data3;
-                set => RaiseAndSetIfChanged(ref data3, value);
-            }
+            public int? Data3 { get; set; }
         }
         
         public sealed class BinderViewModel : BaseViewModel
         {
             private static readonly Binder<BinderViewModel> Binder = new();
-            private int? dataPlusOne;
-            private int? sum;
 
             static BinderViewModel()
             {
@@ -168,17 +151,9 @@ namespace PoeShared.Tests.PropertyBinder
                 Binder.Bind(x => x.Data + x.Data1 + x.Data2 + x.Data3).To(x => x.Sum);
             }
 
-            public override int? DataPlusOne
-            {
-                get => dataPlusOne;
-                protected set => RaiseAndSetIfChanged(ref dataPlusOne, value);
-            }
+            public override int? DataPlusOne { get; protected set; }
 
-            public override int? Sum
-            {
-                get => sum;
-                protected set => RaiseAndSetIfChanged(ref sum, value);
-            }
+            public override int? Sum { get; protected set; }
             
             public BinderViewModel()
             {
@@ -229,8 +204,6 @@ namespace PoeShared.Tests.PropertyBinder
         
         public sealed class ReactiveViewModel : BaseViewModel
         {
-            private int? dataPlusOne;
-            private int? sum;
             
             public ReactiveViewModel()
             {
@@ -243,17 +216,9 @@ namespace PoeShared.Tests.PropertyBinder
                     .AddTo(Anchors);
             }
             
-            public override int? DataPlusOne
-            {
-                get => dataPlusOne;
-                protected set => RaiseAndSetIfChanged(ref dataPlusOne, value);
-            }
+            public override int? DataPlusOne { get; protected set; }
 
-            public override int? Sum
-            {
-                get => sum;
-                protected set => RaiseAndSetIfChanged(ref sum, value);
-            }
+            public override int? Sum { get; protected set; }
             
             public override string ToString()
             {

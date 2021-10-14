@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -18,9 +18,6 @@ namespace PoeShared.Scaffolding.WPF
         private readonly ISubject<bool> isExecuting = new Subject<bool>();
         private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
         private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
-        private string description;
-        private string error;
-        private bool isBusy;
 
         private CommandWrapper(DelegateCommandBase command)
         {
@@ -48,23 +45,11 @@ namespace PoeShared.Scaffolding.WPF
             InnerCommand = command;
         }
 
-        public bool IsBusy
-        {
-            get => isBusy;
-            set => RaiseAndSetIfChanged(ref isBusy, value);
-        }
+        public bool IsBusy { get; set; }
 
-        public string Error
-        {
-            get => error;
-            private set => RaiseAndSetIfChanged(ref error, value);
-        }
+        public string Error { get; private set; }
 
-        public string Description
-        {
-            get => description;
-            set => RaiseAndSetIfChanged(ref description, value);
-        }
+        public string Description { get; set; }
 
         private ICommand InnerCommand { get; }
 

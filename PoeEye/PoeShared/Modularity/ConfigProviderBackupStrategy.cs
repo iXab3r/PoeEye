@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using PoeShared.Logging;
@@ -12,7 +12,7 @@ namespace PoeShared.Modularity
 
         private readonly IClock clock;
         private DateTime lastBackup;
-        private ConfigProviderBackupStrategyConfig properties;
+ 
 
         public ConfigProviderBackupStrategy(
             IClock clock)
@@ -21,25 +21,21 @@ namespace PoeShared.Modularity
             Properties = new ConfigProviderBackupStrategyConfig();
         }
 
-        public ConfigProviderBackupStrategyConfig Properties
-        {
-            get => properties;
-            set => RaiseAndSetIfChanged(ref properties, value);
-        }
+        public ConfigProviderBackupStrategyConfig Properties { get; set; }
         
         public void HandleConfigSave(FileInfo configFile)
         {
-            if (properties == null)
+            if (Properties == null)
             {
                 Log.Warn($"Properties are not set");
                 return;
             }
-            if (properties.BackupTimeout <= TimeSpan.Zero)
+            if (Properties.BackupTimeout <= TimeSpan.Zero)
             {
                 Log.Warn($"Backup timeout is not set");
                 return;
             }
-            if (string.IsNullOrEmpty(properties.BackupDirectoryName))
+            if (string.IsNullOrEmpty(Properties.BackupDirectoryName))
             {
                 Log.Warn($"Backup directory is not set");
                 return;
@@ -62,14 +58,14 @@ namespace PoeShared.Modularity
             var timeSinceBackup = now - lastBackup;
             Log.Debug($"Configuration file saved, last backup was made {timeSinceBackup} ago");
 
-            if (timeSinceBackup < properties.BackupTimeout)
+            if (timeSinceBackup < Properties.BackupTimeout)
             {
-                Log.Debug($"Backup timeout has not passed yet: {timeSinceBackup} < {properties.BackupTimeout}");
+                Log.Debug($"Backup timeout has not passed yet: {timeSinceBackup} < {Properties.BackupTimeout}");
                 return;
             }
 
             var timestampedBackupDirectory = now.ToString(@"yyyy-MM-dd HHmmss");
-            var backupsStorageDirectoryPath = Path.Combine(configFileDirectory, properties.BackupDirectoryName);
+            var backupsStorageDirectoryPath = Path.Combine(configFileDirectory, Properties.BackupDirectoryName);
             var backupDirectory = new DirectoryInfo(Path.Combine(backupsStorageDirectoryPath, timestampedBackupDirectory));
             var backupConfigPath = Path.Combine(backupDirectory.FullName, configFileName);
 
@@ -94,7 +90,7 @@ namespace PoeShared.Modularity
 
             try
             {
-                CleanupStorage(new DirectoryInfo(backupsStorageDirectoryPath), clock.Now, properties.BackupStorageMinSize, properties.BackupStoragePeriod);
+                CleanupStorage(new DirectoryInfo(backupsStorageDirectoryPath), clock.Now, Properties.BackupStorageMinSize, Properties.BackupStoragePeriod);
             }
             catch (Exception e)
             {

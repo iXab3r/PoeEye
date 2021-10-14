@@ -1,4 +1,4 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using System.Windows;
 using DynamicData.Annotations;
 using PoeShared.Scaffolding; 
@@ -11,11 +11,6 @@ namespace PoeShared.Native
     {
         private readonly ObservableAsPropertyHelper<double> glassFrameThickness;
 
-        private bool showWireframes;
-        private double resizeThumbSize;
-        private IOverlayViewModel content;
-        private DataTemplate contentTemplate;
-
         public OverlayWindowViewModel()
         {
             this.WhenAnyValue(x => x.Content.IsLocked)
@@ -24,31 +19,15 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
         }
 
-        public bool ShowWireframes
-        {
-            get => showWireframes;
-            set => this.RaiseAndSetIfChanged(ref showWireframes, value);
-        }
+        public bool ShowWireframes { get; set; }
 
-        public double ResizeThumbSize
-        {
-            get => resizeThumbSize;
-            set => RaiseAndSetIfChanged(ref resizeThumbSize, value);
-        }
+        public double ResizeThumbSize { get; set; }
 
         public double GlassFrameThickness => glassFrameThickness.Value;
 
-        public IOverlayViewModel Content
-        {
-            get => content;
-            set => RaiseAndSetIfChanged(ref content, value);
-        }
+        public IOverlayViewModel Content { get; set; }
 
-        public DataTemplate ContentTemplate
-        {
-            get => contentTemplate;
-            set => RaiseAndSetIfChanged(ref contentTemplate, value);
-        }
+        public DataTemplate ContentTemplate { get; set; }
 
         public override string ToString()
         {

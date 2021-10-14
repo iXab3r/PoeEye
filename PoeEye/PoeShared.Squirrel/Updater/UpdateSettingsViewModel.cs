@@ -17,9 +17,6 @@ namespace PoeShared.Squirrel.Updater
 
         private readonly IUpdateSourceProvider updateSourceProvider;
         private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
-        private bool checkForUpdates;
-        private UpdateSourceInfo updateSource;
-        private bool ignoreDeltaUpdates;
 
         public UpdateSettingsViewModel(
             IUpdateSourceProvider updateSourceProvider,
@@ -33,23 +30,11 @@ namespace PoeShared.Squirrel.Updater
 
         public string ModuleName { get; } = "Update Settings";
 
-        public bool CheckForUpdates
-        {
-            get => checkForUpdates;
-            set => this.RaiseAndSetIfChanged(ref checkForUpdates, value);
-        }
+        public bool CheckForUpdates { get; set; }
 
-        public UpdateSourceInfo UpdateSource
-        {
-            get => updateSource;
-            set => this.RaiseAndSetIfChanged(ref updateSource, value);
-        }
+        public UpdateSourceInfo UpdateSource { get; set; }
 
-        public bool IgnoreDeltaUpdates
-        {
-            get => ignoreDeltaUpdates;
-            set => RaiseAndSetIfChanged(ref ignoreDeltaUpdates, value);
-        }
+        public bool IgnoreDeltaUpdates { get; set; }
         
         public ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         
@@ -66,8 +51,8 @@ namespace PoeShared.Squirrel.Updater
             var updatedConfig = configProvider.ActualConfig.CloneJson();
             updatedConfig.AutoUpdateTimeout =
                 CheckForUpdates ? UpdateSettingsConfig.DefaultAutoUpdateTimeout : TimeSpan.Zero;
-            updatedConfig.UpdateSource = updateSource;
-            updatedConfig.IgnoreDeltaUpdates = ignoreDeltaUpdates;
+            updatedConfig.UpdateSource = UpdateSource;
+            updatedConfig.IgnoreDeltaUpdates = IgnoreDeltaUpdates;
             return updatedConfig;
         }
     }

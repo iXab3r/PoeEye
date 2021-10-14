@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,7 +9,6 @@ namespace PoeShared.Scaffolding
 {
     public sealed class BinderConfig : DisposableReactiveObject
     {
-        private object propertyValue;
 
         public BinderConfig(
             BindableReactiveObject owner,
@@ -43,11 +42,7 @@ namespace PoeShared.Scaffolding
 
         public Type TargetPropertyType { get; }
 
-        public object PropertyValue
-        {
-            get => propertyValue;
-            private set => RaiseAndSetIfChanged(ref propertyValue, value);
-        }
+        public object PropertyValue { get; private set; }
 
         private IDisposable Attach()
         {

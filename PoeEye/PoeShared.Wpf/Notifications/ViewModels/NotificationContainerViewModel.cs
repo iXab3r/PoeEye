@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -21,11 +21,6 @@ namespace PoeShared.Notifications.ViewModels
         private static readonly Binder<NotificationContainerViewModel> Binder = new();
         private readonly IClock clock;
         private readonly IScheduler uiScheduler;
-
-        private ImageSource icon;
-        private TimeSpan timeLeft;
-        private string title;
-        private DateTimeOffset timeToLiveChangeTimestamp;
         private double opacity = 1;
 
         static NotificationContainerViewModel()
@@ -95,29 +90,13 @@ namespace PoeShared.Notifications.ViewModels
 
         public DateTimeOffset CreatedAt { get; }
 
-        public DateTimeOffset TimeToLiveChangeTimestamp
-        {
-            get => timeToLiveChangeTimestamp;
-            private set => RaiseAndSetIfChanged(ref timeToLiveChangeTimestamp, value);
-        }
+        public DateTimeOffset TimeToLiveChangeTimestamp { get; private set; }
 
-        public TimeSpan TimeLeft
-        {
-            get => timeLeft;
-            private set => RaiseAndSetIfChanged(ref timeLeft, value);
-        }
+        public TimeSpan TimeLeft { get; private set; }
 
-        public string Title
-        {
-            get => title;
-            private set => RaiseAndSetIfChanged(ref title, value);
-        }
+        public string Title { get; private set; }
 
-        public ImageSource Icon
-        {
-            get => icon;
-            private set => RaiseAndSetIfChanged(ref icon, value);
-        }
+        public ImageSource Icon { get; private set; }
 
         public double Opacity
         {

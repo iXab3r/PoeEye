@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -35,7 +35,6 @@ namespace PoeShared.UI
         private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
 
         private readonly ISourceList<ISettingsViewModel> moduleSettings = new SourceList<ISettingsViewModel>();
-        private bool isOpen;
         
         public GenericSettingsViewModel(
             [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
@@ -84,11 +83,7 @@ namespace PoeShared.UI
 
         public ReadOnlyObservableCollection<ISettingsViewModel> ModulesSettings { get; } 
 
-        public bool IsOpen
-        {
-            get => isOpen;
-            set => this.RaiseAndSetIfChanged(ref isOpen, value);
-        }
+        public bool IsOpen { get; set; }
 
         public ICommand SaveConfigCommand { get; }
 

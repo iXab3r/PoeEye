@@ -21,7 +21,6 @@ namespace PoeShared.Native
         private static readonly IFluentLog Log = typeof(WindowViewController).PrepareLogger();
 
         private readonly Window owner;
-        private bool topmost;
 
         public WindowViewController(Window owner)
         {
@@ -49,7 +48,7 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             WhenDeactivated
-                .Where(_ => topmost)
+                .Where(_ => Topmost)
                 .SubscribeSafe(() =>
                 {
                     Log.Debug($"[{owner}.{owner.Title}] Window is deactivated, reactivating {nameof(Topmost)} style");
@@ -79,11 +78,7 @@ namespace PoeShared.Native
             owner.Close();
         }
 
-        public bool Topmost
-        {
-            get => topmost;
-            set => this.RaiseAndSetIfChanged(ref topmost, value);
-        }
+        public bool Topmost { get; set; }
 
         public void Hide()
         {
@@ -96,7 +91,7 @@ namespace PoeShared.Native
             Log.Debug($"[{owner}.{owner.Title}] Showing window");
             UnsafeNative.ShowWindow(owner);
             //FIXME Mahapps window resets topmost after minimize/maximize operations
-            owner.Topmost = topmost;
+            owner.Topmost = Topmost;
         }
 
         public void TakeScreenshot(string fileName)

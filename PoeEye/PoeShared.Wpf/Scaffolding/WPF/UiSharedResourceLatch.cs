@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -29,10 +29,6 @@ namespace PoeShared.Scaffolding.WPF
         private readonly ISharedResourceLatch isBusyLatch;
         private readonly ISharedResourceLatch pauseLatch;
         private readonly SerialDisposable isBusyAnchor;
-
-        private bool isBusy;
-        private string name;
-        private bool isPaused;
 
         public UiSharedResourceLatch(
             ISharedResourceLatch pauseLatch,
@@ -71,23 +67,11 @@ namespace PoeShared.Scaffolding.WPF
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        public bool IsBusy
-        {
-            get => isBusy;
-            private set => RaiseAndSetIfChanged(ref isBusy, value);
-        }
+        public bool IsBusy { get; private set; }
 
-        public bool IsPaused
-        {
-            get => isPaused;
-            private set => RaiseAndSetIfChanged(ref isPaused, value);
-        }
+        public bool IsPaused { get; private set; }
 
-        public string Name
-        {
-            get => name;
-            set => RaiseAndSetIfChanged(ref name, value);
-        }
+        public string Name { get; set; }
        
         public IDisposable Rent()
         {

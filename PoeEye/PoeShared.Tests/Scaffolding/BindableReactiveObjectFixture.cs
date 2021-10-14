@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using PoeShared.Scaffolding;
 using Shouldly;
 
@@ -47,69 +47,27 @@ namespace PoeShared.Tests.Scaffolding
         
         private sealed class Stub : BindableReactiveObject
         {
-            private int doubleProperty;
-            private Stub inner;
-            private OtherStub innerOther;
-            private int intProperty;
-            private string stringProperty;
 
-            public int IntProperty
-            {
-                get => intProperty;
-                set => RaiseAndSetIfChanged(ref intProperty, value);
-            }
+            public int IntProperty { get; set; }
 
-            public string StringProperty
-            {
-                get => stringProperty;
-                set => RaiseAndSetIfChanged(ref stringProperty, value);
-            }
+            public string StringProperty { get; set; }
 
-            public int DoubleProperty
-            {
-                get => doubleProperty;
-                set => RaiseAndSetIfChanged(ref doubleProperty, value);
-            }
+            public int DoubleProperty { get; set; }
 
-            public OtherStub InnerOther
-            {
-                get => innerOther;
-                set => RaiseAndSetIfChanged(ref innerOther, value);
-            }
+            public OtherStub InnerOther { get; set; }
 
-            public Stub Inner
-            {
-                get => inner;
-                set => RaiseAndSetIfChanged(ref inner, value);
-            }
+            public Stub Inner { get; set; }
         }
 
         private sealed class OtherStub : BindableReactiveObject
         {
-            private int doubleProperty;
 
-            private Stub inner;
-
-            private OtherStub innerOther;
-
-            public int DoubleProperty
-            {
-                get => doubleProperty;
-                set => RaiseAndSetIfChanged(ref doubleProperty, value);
-            }
+            public int DoubleProperty { get; set; }
 
 
-            public OtherStub InnerOther
-            {
-                get => innerOther;
-                set => RaiseAndSetIfChanged(ref innerOther, value);
-            }
+            public OtherStub InnerOther { get; set; }
 
-            public Stub Inner
-            {
-                get => inner;
-                set => RaiseAndSetIfChanged(ref inner, value);
-            }
+            public Stub Inner { get; set; }
         }
     }
 }

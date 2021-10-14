@@ -18,7 +18,6 @@ namespace PoeShared.Squirrel.Updater
 
         private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
         private readonly ISourceCache<UpdateSourceInfo, string> knownSources = new SourceCache<UpdateSourceInfo, string>(x => x.Uri);
-        private UpdateSourceInfo updateSource;
 
         public UpdateSourceProviderFromConfig(IConfigProvider<UpdateSettingsConfig> configProvider)
         {
@@ -78,7 +77,7 @@ namespace PoeShared.Squirrel.Updater
                 .Merge(knownSources.CountChanged.ToUnit())
                 .Merge(knownSources.Connect().ToUnit())
                 .Where(_ => knownSources.Items.Any(x => x.IsValid))
-                .Where(_ => !updateSource.IsValid)
+                .Where(_ => !UpdateSource.IsValid)
                 .SubscribeSafe(() =>
                 {
                     Log.Debug($"Update source is not set - loading first available our of {knownSources.Items.DumpToString()}");
@@ -91,23 +90,19 @@ namespace PoeShared.Squirrel.Updater
                 .OnItemUpdated((curr, prev) =>
                 {
                     Log.Debug($"UpdateSource updated(duh): {prev} => {curr}");
-                    if (curr.Uri != updateSource.Uri)
+                    if (curr.Uri != UpdateSource.Uri)
                     {
                         return;
                     }
 
-                    Log.Debug($"Replacing current update source: {updateSource} => {curr}");
+                    Log.Debug($"Replacing current update source: {UpdateSource} => {curr}");
                     UpdateSource = curr;
                 })
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
-        public UpdateSourceInfo UpdateSource
-        {
-            get => updateSource;
-            set => this.RaiseAndSetIfChanged(ref updateSource, value);
-        }
+        public UpdateSourceInfo UpdateSource { get; set; }
 
         public ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using PoeShared.Logging;
 using PropertyBinder;
 using ReactiveUI;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding
 {
@@ -13,12 +14,6 @@ namespace PoeShared.Scaffolding
         private static readonly Binder<Fallback<T>> Binder = new Binder<Fallback<T>>();
         private static readonly Func<T, T, bool> DefaultFallbackCondition = (_, __) => false;
         private readonly Func<T, T, bool> fallbackCondition;
-
-        private T actualValue;
-
-        private T defaultValue;
-
-        private bool hasActualValue;
 
         static Fallback()
         {
@@ -45,29 +40,17 @@ namespace PoeShared.Scaffolding
         {
         }
 
-        public bool HasActualValue
-        {
-            get => hasActualValue;
-            private set => RaiseAndSetIfChanged(ref hasActualValue, value);
-        }
+        public bool HasActualValue { get; [UsedImplicitly] private set; }
 
         public T Value
         {
-            get => hasActualValue ? actualValue : defaultValue;
+            get => HasActualValue ? ActualValue : DefaultValue;
             set => ActualValue = value;
         }
 
-        public T ActualValue
-        {
-            get => actualValue;
-            set => RaiseAndSetIfChanged(ref actualValue, value);
-        }
+        public T ActualValue { get; set; }
 
-        public T DefaultValue
-        {
-            get => defaultValue;
-            set => RaiseAndSetIfChanged(ref defaultValue, value);
-        }
+        public T DefaultValue { get; set; }
 
         public Fallback<T> SetValue(T value)
         {

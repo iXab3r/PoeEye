@@ -1,22 +1,12 @@
-﻿using System;
+using System;
 
 namespace PoeShared.UI
 {
     public sealed class HotkeySequenceDelay : HotkeySequenceItem
     {
-        private TimeSpan delay;
-        private bool isKeypress;
 
-        public TimeSpan Delay
-        {
-            get => delay;
-            set => RaiseAndSetIfChanged(ref delay, value);
-        }
+        public TimeSpan Delay { get; set; }
 
-        public bool IsKeypress
-        {
-            get => isKeypress;
-            set => RaiseAndSetIfChanged(ref isKeypress, value);
-        }
+        public bool IsKeypress { get; set; }
     }
 }

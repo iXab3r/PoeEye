@@ -13,10 +13,6 @@ namespace PoeShared.Dialogs.ViewModels
     {
         private static readonly IFluentLog Log = typeof(MessageBoxViewModelBase).PrepareLogger();
 
-        private bool isOpen;
-        private string title;
-        private MessageBoxElement result;
-
         public MessageBoxViewModelBase()
         {
             CloseMessageBoxCommand = CommandWrapper.Create<MessageBoxElement?>(x =>
@@ -36,23 +32,11 @@ namespace PoeShared.Dialogs.ViewModels
 
         public CommandWrapper CloseMessageBoxCommand { get; }
 
-        public string Title
-        {
-            get => title;
-            set => RaiseAndSetIfChanged(ref title, value);
-        }
+        public string Title { get; set; }
 
-        public bool IsOpen
-        {
-            get => isOpen;
-            set => RaiseAndSetIfChanged(ref isOpen, value);
-        }
+        public bool IsOpen { get; set; }
 
-        public MessageBoxElement Result
-        {
-            get => result;
-            private set => RaiseAndSetIfChanged(ref result, value);
-        }
+        public MessageBoxElement Result { get; private set; }
         
         public ObservableCollection<MessageBoxElement> AvailableCommands { get; } = new();
 

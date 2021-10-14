@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -15,47 +15,24 @@ namespace PoeShared
     public class AppOptions : DisposableReactiveObject
     {
         protected const string AutostartFlagValue = "autostart";
-
-        private bool isDebugMode;
-        private bool isLazyMode;
-        private bool isAutostart;
-        private IEnumerable<string> prismModules;
         public string AutostartFlag => $"--{AutostartFlagValue}";
 
         [Option(AutostartFlagValue, Default = false)]
-        public bool IsAutostart
-        {
-            get => isAutostart;
-            set => this.RaiseAndSetIfChanged(ref isAutostart, value);
-        }
+        public bool IsAutostart { get; set; }
 
         [Option('d', "debugMode", Default = false)]
-        public bool IsDebugMode
-        {
-            get => isDebugMode;
-            set => this.RaiseAndSetIfChanged(ref isDebugMode, value);
-        }
+        public bool IsDebugMode { get; set; }
 
         [Option('l', "lazyMode", Default = false, HelpText = "Lazy mode - Prism modules will be loaded on-demand")]
-        public bool IsLazyMode
-        {
-            get => isLazyMode;
-            set => this.RaiseAndSetIfChanged(ref isLazyMode, value);
-        }
+        public bool IsLazyMode { get; set; }
         
         [Option('m', "modules", HelpText = "Prism modules - Space-separated list of modules that will be loaded")]
-        public IEnumerable<string> PrismModules
-        {
-            get => prismModules;
-            set => this.RaiseAndSetIfChanged(ref prismModules, value);
-        }
+        public IEnumerable<string> PrismModules { get; set; }
     }
 
     public class AppArguments : AppOptions, IAppArguments
     {
         private static readonly IFluentLog Log = typeof(AppArguments).PrepareLogger();
-
-        private bool isElevated;
         private string appName;
 
         public string AppName
@@ -108,11 +85,7 @@ namespace PoeShared
 
         public int ProcessId { get; }
 
-        public bool IsElevated
-        {
-            get => isElevated;
-            set => this.RaiseAndSetIfChanged(ref isElevated, value);
-        }
+        public bool IsElevated { get; set; }
 
         public string ApplicationExecutablePath { get; }
 

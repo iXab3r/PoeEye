@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DynamicData;
@@ -17,7 +17,6 @@ namespace PoeShared.Dialogs.Services
 
         private readonly IFactory<TextMessageBoxViewModel> textMessageBoxFactory;
         private readonly IFactory<MessageBoxWithContentViewModelBase> messageBoxFactory;
-        private IMessageBoxViewModel messageBox;
 
         public MessageBoxService(
             IFactory<TextMessageBoxViewModel> textMessageBoxFactory,
@@ -27,11 +26,7 @@ namespace PoeShared.Dialogs.Services
             this.messageBoxFactory = messageBoxFactory;
         }
 
-        public IMessageBoxViewModel MessageBox
-        {
-            get => messageBox;
-            private set => RaiseAndSetIfChanged(ref messageBox, value);
-        }
+        public IMessageBoxViewModel MessageBox { get; private set; }
 
         public async Task<MessageBoxElement> ShowDialog(string title, object content, params MessageBoxElement[] buttons)
         {
@@ -82,9 +77,9 @@ namespace PoeShared.Dialogs.Services
 
         private async Task<MessageBoxElement> Show(IMessageBoxViewModel newMessageBox)
         {
-            if (this.messageBox != null)
+            if (this.MessageBox != null)
             {
-                Log.Warn($"Currently showing message box {new {this.messageBox.Title}}");
+                Log.Warn($"Currently showing message box {new {this.MessageBox.Title}}");
                 throw new NotSupportedException($"Multiple message boxes are not supported yet, please report this bug");
             }
             

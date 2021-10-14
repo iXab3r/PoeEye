@@ -33,12 +33,6 @@ namespace PoeShared.RegionSelector.ViewModels
         private static readonly double MinSelectionArea = 20;
         private readonly TaskWindowSeeker windowSeeker;
 
-        private bool isBusy;
-
-        private RegionSelectorResult selectionCandidate;
-
-        private Rect selectionCandidateBounds;
-
         public RegionSelectorViewModel(
             IFactory<TaskWindowSeeker> taskWindowSeekerFactory,
             [NotNull] ISelectionAdornerViewModel selectionAdorner,
@@ -114,23 +108,11 @@ namespace PoeShared.RegionSelector.ViewModels
 
         public ISelectionAdornerViewModel SelectionAdorner { get; }
 
-        public bool IsBusy
-        {
-            get => isBusy;
-            private set => RaiseAndSetIfChanged(ref isBusy, value);
-        }
+        public bool IsBusy { get; private set; }
 
-        public Rect SelectionCandidateBounds
-        {
-            get => selectionCandidateBounds;
-            private set => RaiseAndSetIfChanged(ref selectionCandidateBounds, value);
-        }
+        public Rect SelectionCandidateBounds { get; private set; }
 
-        public RegionSelectorResult SelectionCandidate
-        {
-            get => selectionCandidate;
-            private set => this.RaiseAndSetIfChanged(ref selectionCandidate, value);
-        }
+        public RegionSelectorResult SelectionCandidate { get; private set; }
 
         public async Task<RegionSelectorResult> StartSelection(WinSize minSelection)
         {

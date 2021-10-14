@@ -27,16 +27,7 @@ namespace PoeShared.UI
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
         private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
         private readonly IScheduler uiScheduler;
-        private bool canSuppressHotkey;
-        private bool handleApplicationKeys;
-        private bool hasModifiers;
-
-        private HotkeyGesture hotkey;
-        private HotkeyMode hotkeyMode;
-        private bool ignoreModifiers;
-        private bool isActive;
         private bool isEnabled = true;
-        private bool suppressKey;
 
         static HotkeyTracker()
         {
@@ -127,27 +118,27 @@ namespace PoeShared.UI
                         var mainWindowIsActive = mainWindowTracker.ActiveProcessId == mainWindowTracker.ExecutingProcessId;
                         if (mainWindowIsActive)
                         {
-                            if (!handleApplicationKeys)
+                            if (!HandleApplicationKeys)
                             {
                                 if (HotkeyMode == HotkeyMode.Click)
                                 {
-                                    Log.Debug($"Skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                                    Log.Debug($"Skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                                     return false;
                                 }
 
-                                Log.Debug($"Application is active, but mode is {hotkeyMode}, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                                Log.Debug($"Application is active, but mode is {HotkeyMode}, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                             }
                             else
                             {
-                                Log.Debug($"Application is active, but {nameof(HandleApplicationKeys)} is set to true, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                                Log.Debug($"Application is active, but {nameof(HandleApplicationKeys)} is set to true, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                             }
                         }
                         else
                         {
-                            Log.Debug($"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            Log.Debug($"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         }
 
-                        if (suppressKey)
+                        if (SuppressKey)
                         {
                             if (KeyToModifier(hotkeyData.Hotkey.Key) != ModifierKeys.None)
                             {
@@ -184,7 +175,7 @@ namespace PoeShared.UI
                         }
 
                         var hotkeyData = hotkeysPair.Current;
-                        Log.Debug($"Updating tracker state, hotkey {hotkeyData.Hotkey} pressed(isMouseWheel: {isMouseWheelEvent}), state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {suppressKey}, ignoreModifiers: {ignoreModifiers}");
+                        Log.Debug($"Updating tracker state, hotkey {hotkeyData.Hotkey} pressed(isMouseWheel: {isMouseWheelEvent}), state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}");
 
                         if (isMouseWheelEvent)
                         {
@@ -230,25 +221,13 @@ namespace PoeShared.UI
 
         private IFluentLog Log { get; }
 
-        public bool IsActive
-        {
-            get => isActive;
-            private set => this.RaiseAndSetIfChanged(ref isActive, value);
-        }
+        public bool IsActive { get; private set; }
 
-        public HotkeyGesture Hotkey
-        {
-            get => hotkey;
-            set => RaiseAndSetIfChanged(ref hotkey, value);
-        }
+        public HotkeyGesture Hotkey { get; set; }
 
         public ReadOnlyObservableCollection<HotkeyGesture> Hotkeys { get; }
 
-        public HotkeyMode HotkeyMode
-        {
-            get => hotkeyMode;
-            set => RaiseAndSetIfChanged(ref hotkeyMode, value);
-        }
+        public HotkeyMode HotkeyMode { get; set; }
 
         public bool IsEnabled
         {
@@ -256,35 +235,15 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref isEnabled, value);
         }
 
-        public bool IgnoreModifiers
-        {
-            get => ignoreModifiers;
-            set => RaiseAndSetIfChanged(ref ignoreModifiers, value);
-        }
+        public bool IgnoreModifiers { get; set; }
 
-        public bool HasModifiers
-        {
-            get => hasModifiers;
-            private set => RaiseAndSetIfChanged(ref hasModifiers, value);
-        }
+        public bool HasModifiers { get; private set; }
 
-        public bool SuppressKey
-        {
-            get => suppressKey;
-            set => RaiseAndSetIfChanged(ref suppressKey, value);
-        }
+        public bool SuppressKey { get; set; }
 
-        public bool CanSuppressHotkey
-        {
-            get => canSuppressHotkey;
-            private set => RaiseAndSetIfChanged(ref canSuppressHotkey, value);
-        }
+        public bool CanSuppressHotkey { get; private set; }
 
-        public bool HandleApplicationKeys
-        {
-            get => handleApplicationKeys;
-            set => RaiseAndSetIfChanged(ref handleApplicationKeys, value);
-        }
+        public bool HandleApplicationKeys { get; set; }
 
         public void Add(HotkeyGesture hotkeyToAdd)
         {
@@ -328,7 +287,7 @@ namespace PoeShared.UI
                 return false;
             }
 
-            var isMatch = hotkeysSource.Items.Any(x => x.Equals(data.Hotkey, ignoreModifiers || hotkeyMode == HotkeyMode.Hold && !data.KeyDown));
+            var isMatch = hotkeysSource.Items.Any(x => x.Equals(data.Hotkey, IgnoreModifiers || HotkeyMode == HotkeyMode.Hold && !data.KeyDown));
             if (isMatch)
             {
                 if (data.IsHandled)
@@ -459,7 +418,7 @@ namespace PoeShared.UI
 
         public override string ToString()
         {
-            return $"{(IsEnabled ? default : "DISABLED ")}Hotkey {hotkeyMode} {hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR ")}{(IsActive ? " Active" : default)}";
+            return $"{(IsEnabled ? default : "DISABLED ")}Hotkey {HotkeyMode} {hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR ")}{(IsActive ? " Active" : default)}";
         }
 
         private static ModifierKeys KeyToModifier(Key key)

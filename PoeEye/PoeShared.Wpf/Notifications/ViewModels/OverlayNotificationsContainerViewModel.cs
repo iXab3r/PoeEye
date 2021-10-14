@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Reactive.Linq;
@@ -19,10 +19,6 @@ namespace PoeShared.Notifications.ViewModels
     {
         private static readonly IFluentLog Log = typeof(OverlayNotificationsContainerViewModel).PrepareLogger();
 
-        private ReadOnlyObservableCollection<INotificationContainerViewModel> items;
-
-        private WinPoint offset;
-
         public OverlayNotificationsContainerViewModel()
         {
             Title = "NotificationsContainer";
@@ -40,17 +36,9 @@ namespace PoeShared.Notifications.ViewModels
                 .AddTo(Anchors);
         }
 
-        public ReadOnlyObservableCollection<INotificationContainerViewModel> Items
-        {
-            get => items;
-            set => RaiseAndSetIfChanged(ref items, value);
-        }
+        public ReadOnlyObservableCollection<INotificationContainerViewModel> Items { get; set; }
 
-        public WinPoint Offset
-        {
-            get => offset;
-            set => RaiseAndSetIfChanged(ref offset, value);
-        }
+        public WinPoint Offset { get; set; }
 
         private static Rectangle CalculateBounds(Rectangle currentBounds, WinSize actualSize, WinPoint offset)
         {

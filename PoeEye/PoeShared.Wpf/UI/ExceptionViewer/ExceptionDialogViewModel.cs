@@ -31,13 +31,6 @@ namespace PoeShared.UI
         private readonly IAppArguments appArguments;
         private readonly ICloseController closeController;
 
-        private string comment;
-        private ExceptionDialogConfig config;
-
-        private string lastSavedFile;
-
-        private ExceptionDialogSelectableItem selectedItem;
-
         public ExceptionDialogViewModel(
             IClock clock,
             IAppArguments appArguments,
@@ -69,43 +62,27 @@ namespace PoeShared.UI
                 .AddTo(Anchors);
         }
 
-        public ExceptionDialogConfig Config
-        {
-            get => config;
-            set => this.RaiseAndSetIfChanged(ref config, value);
-        }
+        public ExceptionDialogConfig Config { get; set; }
 
         public ReadOnlyObservableCollection<ExceptionDialogSelectableItem> Attachments { get; }
 
-        public string Title => config?.Title;
+        public string Title => Config?.Title;
 
-        public string AppName => config?.AppName;
+        public string AppName => Config?.AppName;
 
-        public string Comment
-        {
-            get => comment;
-            set => RaiseAndSetIfChanged(ref comment, value);
-        }
+        public string Comment { get; set; }
 
-        public ExceptionDialogSelectableItem SelectedItem
-        {
-            get => selectedItem;
-            set => RaiseAndSetIfChanged(ref selectedItem, value);
-        }
+        public ExceptionDialogSelectableItem SelectedItem { get; set; }
 
         public ICommand CloseCommand { get; }
 
         public CommandWrapper PrepareReportCommand { get; }
 
-        public string LastSavedFile
-        {
-            get => lastSavedFile;
-            set => RaiseAndSetIfChanged(ref lastSavedFile, value);
-        }
+        public string LastSavedFile { get; set; }
 
         private async Task PrepareReportCommandExecuted()
         {
-            var initialDirectory = Path.GetDirectoryName(lastSavedFile);
+            var initialDirectory = Path.GetDirectoryName(LastSavedFile);
             var defaultFileName = $"{appArguments.AppName} {appArguments.Version}{(appArguments.IsDebugMode ? " DEBUG" : string.Empty)} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}";
 
             var op = new SaveFileDialog
@@ -136,10 +113,10 @@ namespace PoeShared.UI
             Directory.CreateDirectory(tempDirectory);
             using var removeOnClose = Disposable.Create(() => Directory.Delete(tempDirectory, true));
 
-            if (!string.IsNullOrEmpty(comment))
+            if (!string.IsNullOrEmpty(Comment))
             {
                 var fileWithComment = Path.Combine(tempDirectory, "comment.txt");
-                await File.WriteAllTextAsync(fileWithComment, comment);
+                await File.WriteAllTextAsync(fileWithComment, Comment);
                 filesToAttach.Add(fileWithComment);
             }
 

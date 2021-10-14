@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using AutoFixture;
 using System;
 using System.Collections.Generic;
@@ -161,52 +161,22 @@ namespace PoeShared.Tests.Scaffolding
 
         private sealed class OtherStub : DisposableReactiveObject
         {
-            private int intProperty;
-            private double doubleProperty;
 
-            public int IntProperty
-            {
-                get => intProperty;
-                set => RaiseAndSetIfChanged(ref intProperty, value);
-            }
+            public int IntProperty { get; set; }
             
-            public double DoubleProperty
-            {
-                get => doubleProperty;
-                set => RaiseAndSetIfChanged(ref doubleProperty, value);
-            }
+            public double DoubleProperty { get; set; }
         }
 
         private sealed class TestStub : DisposableReactiveObject
         {
-            private TestStub innerValue;
-            private int intProperty;
-            private int otherIntProperty;
-            private string stringProperty;
 
-            public int IntProperty
-            {
-                get => intProperty;
-                set => RaiseAndSetIfChanged(ref intProperty, value);
-            }
+            public int IntProperty { get; set; }
             
-            public int OtherIntProperty
-            {
-                get => otherIntProperty;
-                set => RaiseAndSetIfChanged(ref otherIntProperty, value);
-            }
+            public int OtherIntProperty { get; set; }
 
-            public string StringProperty
-            {
-                get => stringProperty;
-                set => RaiseAndSetIfChanged(ref stringProperty, value);
-            }
+            public string StringProperty { get; set; }
 
-            public TestStub InnerValue
-            {
-                get => innerValue;
-                set => RaiseAndSetIfChanged(ref innerValue, value);
-            }
+            public TestStub InnerValue { get; set; }
         }
     }
 }

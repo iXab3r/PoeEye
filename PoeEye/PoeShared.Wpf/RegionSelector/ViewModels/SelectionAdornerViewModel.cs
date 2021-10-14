@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -32,17 +32,8 @@ namespace PoeShared.RegionSelector.ViewModels
         private readonly IWindowTracker mainWindowTracker;
         private readonly IScheduler uiScheduler;
 
-        private readonly ObservableAsPropertyHelper<bool> ownerIsVisibleSource;
+        private readonly ObservableAsPropertyHelper<bool> OwnerIsVisibleSource;
         private readonly ObservableAsPropertyHelper<bool> selectionIsNotEmptySource;
-
-        private Point anchorPoint;
-        private Point mousePosition;
-        private Rect selection;
-        private UIElement owner;
-        private bool stopWhenFocusLost;
-        private WinPoint screenMousePosition;
-        private WinRectangle screenSelection;
-        private bool isVisible;
         private bool showCrosshair = false;
         private bool showBackground = true;
         private double backgroundOpacity = 0.5;
@@ -56,7 +47,7 @@ namespace PoeShared.RegionSelector.ViewModels
             this.mainWindowTracker = mainWindowTracker;
             this.uiScheduler = uiScheduler;
 
-            ownerIsVisibleSource = this.WhenAnyValue(x => x.Owner)
+            OwnerIsVisibleSource = this.WhenAnyValue(x => x.Owner)
                 .Select(x => x == null ? Observable.Return(false) : x.Observe(UIElement.IsVisibleProperty, x => x.IsVisible))
                 .Switch()
                 .ToProperty(this, x => x.OwnerIsVisible)
@@ -77,40 +68,28 @@ namespace PoeShared.RegionSelector.ViewModels
                     this.WhenAnyValue(x => x.Owner).ToUnit())
                 .SubscribeSafe(x =>
                 {
-                    if (owner == null || !OwnerIsVisible)
+                    if (Owner == null || !OwnerIsVisible)
                     {
                         return;
                     }
-                    var topLeft = owner.PointToScreen(new Point(0, 0));
-                    var absoluteMousePosition = owner.PointToScreen(mousePosition);
+                    var topLeft = Owner.PointToScreen(new Point(0, 0));
+                    var absoluteMousePosition = Owner.PointToScreen(MousePosition);
                     absoluteMousePosition.Offset(-topLeft.X, -topLeft.Y);
                     ScreenMousePosition = absoluteMousePosition.ToWinPoint();
-                    ScreenSelection = selection.ScaleToScreen();
+                    ScreenSelection = Selection.ScaleToScreen();
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
-        public Rect Selection
-        {
-            get => selection;
-            private set => RaiseAndSetIfChanged(ref selection, value);
-        }
+        public Rect Selection { get; private set; }
 
-        public WinRectangle ScreenSelection
-        {
-            get => screenSelection;
-            private set => RaiseAndSetIfChanged(ref screenSelection, value);
-        }
+        public WinRectangle ScreenSelection { get; private set; }
 
         public bool SelectionIsNotEmpty => selectionIsNotEmptySource.Value;
 
-        public bool OwnerIsVisible => ownerIsVisibleSource.Value;
+        public bool OwnerIsVisible => OwnerIsVisibleSource.Value;
 
-        public bool StopWhenFocusLost
-        {
-            get => stopWhenFocusLost;
-            set => this.RaiseAndSetIfChanged(ref stopWhenFocusLost, value);
-        }
+        public bool StopWhenFocusLost { get; set; }
         
         public bool ShowCrosshair
         {
@@ -134,39 +113,19 @@ namespace PoeShared.RegionSelector.ViewModels
 
         public Brush Stroke { get; } = Brushes.Lime;
         
-        public Size RenderSize => owner?.RenderSize ?? Size.Empty;
+        public Size RenderSize => Owner?.RenderSize ?? Size.Empty;
         
-        public WinSize ScreenRenderSize => owner == null ? WinSize.Empty : RenderSize.ToScreen(owner);
+        public WinSize ScreenRenderSize => Owner == null ? WinSize.Empty : RenderSize.ToScreen(Owner);
 
-        public Point AnchorPoint
-        {
-            get => anchorPoint;
-            private set => RaiseAndSetIfChanged(ref anchorPoint, value);
-        }
+        public Point AnchorPoint { get; private set; }
 
-        public Point MousePosition
-        {
-            get => mousePosition;
-            private set => RaiseAndSetIfChanged(ref mousePosition, value);
-        }
+        public Point MousePosition { get; private set; }
 
-        public WinPoint ScreenMousePosition
-        {
-            get => screenMousePosition;
-            private set => RaiseAndSetIfChanged(ref screenMousePosition, value);
-        }
+        public WinPoint ScreenMousePosition { get; private set; }
 
-        public UIElement Owner
-        {
-            get => owner;
-            set => RaiseAndSetIfChanged(ref owner, value);
-        }
+        public UIElement Owner { get; set; }
 
-        public bool IsVisible
-        {
-            get => isVisible;
-            private set => RaiseAndSetIfChanged(ref isVisible, value);
-        }
+        public bool IsVisible { get; private set; }
 
         public IObservable<Rect> StartSelection()
         {
@@ -212,9 +171,9 @@ namespace PoeShared.RegionSelector.ViewModels
                         .Where(x => x.LeftButton == MouseButtonState.Pressed)
                         .SelectSafeOrDefault(x =>
                         {
-                            var coords = x.GetPosition(owner);
+                            var coords = x.GetPosition(Owner);
                             AnchorPoint = coords;
-                            var region = new Rect(anchorPoint.X, anchorPoint.Y, 1, 1);
+                            var region = new Rect(AnchorPoint.X, AnchorPoint.Y, 1, 1);
                             Selection = region;
                             return keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ToUnit();
                         })
@@ -236,8 +195,8 @@ namespace PoeShared.RegionSelector.ViewModels
 
         private void UpdatePosition(Point pt)
         {
-            var coords = owner.PointFromScreen(pt);
-            var renderSize = owner.RenderSize;
+            var coords = Owner.PointFromScreen(pt);
+            var renderSize = Owner.RenderSize;
             MousePosition = new Point(
                 Math.Max(0, Math.Min(coords.X, renderSize.Width)),
                 Math.Max(0, Math.Min(coords.Y, renderSize.Height)));
@@ -246,21 +205,21 @@ namespace PoeShared.RegionSelector.ViewModels
         private void HandleMouseMove(MouseEventExtArgs e)
         {
             UpdatePosition(e.Location.ToWpfPoint());
-            var renderSize = owner.RenderSize;
+            var renderSize = Owner.RenderSize;
             if (e.Button == MouseButtons.Left)
             {
                 var destinationRect = new Rect(0, 0, renderSize.Width, renderSize.Height);
 
                 var newSelection = new Rect
                 {
-                    X = mousePosition.X < anchorPoint.X
-                        ? mousePosition.X
-                        : anchorPoint.X,
-                    Y = mousePosition.Y < anchorPoint.Y
-                        ? mousePosition.Y
-                        : anchorPoint.Y,
-                    Width = Math.Max(1, Math.Abs(mousePosition.X - anchorPoint.X)),
-                    Height = Math.Max(1, Math.Abs(mousePosition.Y - anchorPoint.Y))
+                    X = MousePosition.X < AnchorPoint.X
+                        ? MousePosition.X
+                        : AnchorPoint.X,
+                    Y = MousePosition.Y < AnchorPoint.Y
+                        ? MousePosition.Y
+                        : AnchorPoint.Y,
+                    Width = Math.Max(1, Math.Abs(MousePosition.X - AnchorPoint.X)),
+                    Height = Math.Max(1, Math.Abs(MousePosition.Y - AnchorPoint.Y))
                 };
                 newSelection.Intersect(destinationRect);
                 Selection = newSelection;

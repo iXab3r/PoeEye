@@ -28,7 +28,6 @@ namespace PoeShared.Audio.ViewModels
         private readonly ISourceCache<WaveOutDevice, string> devicesSource = new SourceCache<WaveOutDevice, string>(x => x.Id);
         private readonly MultimediaNotificationClient notificationClient = new MultimediaNotificationClient();
         private readonly MMDeviceEnumerator deviceEnumerator;
-        private WaveOutDevice selectedItem;
 
         public WaveOutDeviceSelectorViewModel(
             IAudioPlayer audioPlayer,
@@ -78,17 +77,13 @@ namespace PoeShared.Audio.ViewModels
                 .AddTo(Anchors);
         }
 
-        public WaveOutDevice SelectedItem
-        {
-            get => selectedItem;
-            set => RaiseAndSetIfChanged(ref selectedItem, value);
-        }
+        public WaveOutDevice SelectedItem { get; set; }
 
         public ReadOnlyObservableCollection<WaveOutDevice> Devices { get; }
         
         public void SelectById(string deviceId)
         {
-            if (string.IsNullOrEmpty(deviceId) || selectedItem?.Id == deviceId)
+            if (string.IsNullOrEmpty(deviceId) || SelectedItem?.Id == deviceId)
             {
                 return;
             }

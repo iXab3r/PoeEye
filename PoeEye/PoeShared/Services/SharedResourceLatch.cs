@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Disposables;
 using System.Threading;
 using log4net;
@@ -13,15 +13,10 @@ namespace PoeShared.Services
         private static readonly IFluentLog Log = typeof(SharedResourceLatch).PrepareLogger();
 
         private long counter = 0;
-        private string name;
 
         public bool IsBusy => counter > 0;
 
-        public string Name
-        {
-            get => name;
-            set => RaiseAndSetIfChanged(ref name, value);
-        }
+        public string Name { get; set; }
 
         public IDisposable Rent()
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -23,11 +23,6 @@ namespace PoeShared.Squirrel.Updater
         private static readonly IFluentLog Log = typeof(ApplicationUpdaterViewModel).PrepareLogger();
 
         private readonly IApplicationUpdaterModel updaterModel;
-
-        private bool isOpen;
-        private string statusText;
-        private bool isInErrorStatus;
-        private bool checkForUpdates;
 
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
@@ -151,29 +146,13 @@ namespace PoeShared.Squirrel.Updater
 
         public CommandWrapper ApplyUpdate { get; }
 
-        public bool IsInErrorStatus
-        {
-            get => isInErrorStatus;
-            private set => RaiseAndSetIfChanged(ref isInErrorStatus, value);
-        }
+        public bool IsInErrorStatus { get; private set; }
 
-        public string StatusText
-        {
-            get => statusText;
-            private set => RaiseAndSetIfChanged(ref statusText, value);
-        }
+        public string StatusText { get; private set; }
 
-        public bool IsOpen
-        {
-            get => isOpen;
-            set => RaiseAndSetIfChanged(ref isOpen, value);
-        }
+        public bool IsOpen { get; set; }
 
-        public bool CheckForUpdates
-        {
-            get => checkForUpdates;
-            set => this.RaiseAndSetIfChanged(ref checkForUpdates, value);
-        }
+        public bool CheckForUpdates { get; set; }
 
         public Version UpdatedVersion => updaterModel.UpdatedVersion;
 

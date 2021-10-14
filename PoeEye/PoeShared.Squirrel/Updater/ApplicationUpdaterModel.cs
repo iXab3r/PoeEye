@@ -27,18 +27,12 @@ namespace PoeShared.Squirrel.Updater
         private static readonly string UpdaterExecutableName = "update.exe";
         private readonly IAppArguments appArguments;
         private readonly IApplicationAccessor applicationAccessor;
-        private bool ignoreDeltaUpdates;
-        private bool isBusy;
-
-        private IPoeUpdateInfo latestVersion;
         private Version mostRecentVersion;
-        private DirectoryInfo mostRecentVersionAppFolder;
-        private int progressPercent;
-        private UpdateSourceInfo updateSource;
+ 
 
         public ApplicationUpdaterModel(
             IApplicationAccessor applicationAccessor,
-            IUpdateSourceProvider updateSourceProvider,
+            IUpdateSourceProvider UpdateSourceProvider,
             IAppArguments appArguments)
         {
             this.applicationAccessor = applicationAccessor;
@@ -47,7 +41,7 @@ namespace PoeShared.Squirrel.Updater
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             UpdatedVersion = null;
             
-            updateSourceProvider
+            UpdateSourceProvider
                 .WhenAnyValue(x => x.UpdateSource)
                 .WithPrevious()
                 .SubscribeSafe(x =>
@@ -81,23 +75,11 @@ namespace PoeShared.Squirrel.Updater
 
         public string ApplicationExecutableFileName { get; }
 
-        public DirectoryInfo MostRecentVersionAppFolder
-        {
-            get => mostRecentVersionAppFolder;
-            set => RaiseAndSetIfChanged(ref mostRecentVersionAppFolder, value);
-        }
+        public DirectoryInfo MostRecentVersionAppFolder { get; set; }
 
-        public UpdateSourceInfo UpdateSource
-        {
-            get => updateSource;
-            set => RaiseAndSetIfChanged(ref updateSource, value);
-        }
+        public UpdateSourceInfo UpdateSource { get; set; }
 
-        public bool IgnoreDeltaUpdates
-        {
-            get => ignoreDeltaUpdates;
-            set => RaiseAndSetIfChanged(ref ignoreDeltaUpdates, value);
-        }
+        public bool IgnoreDeltaUpdates { get; set; }
 
         public Version UpdatedVersion
         {
@@ -105,23 +87,11 @@ namespace PoeShared.Squirrel.Updater
             private set => RaiseAndSetIfChanged(ref mostRecentVersion, value);
         }
 
-        public IPoeUpdateInfo LatestVersion
-        {
-            get => latestVersion;
-            private set => RaiseAndSetIfChanged(ref latestVersion, value);
-        }
+        public IPoeUpdateInfo LatestVersion { get; private set; }
 
-        public int ProgressPercent
-        {
-            get => progressPercent;
-            private set => RaiseAndSetIfChanged(ref progressPercent, value);
-        }
+        public int ProgressPercent { get; private set; }
 
-        public bool IsBusy
-        {
-            get => isBusy;
-            private set => RaiseAndSetIfChanged(ref isBusy, value);
-        }
+        public bool IsBusy { get; private set; }
 
         public async Task ApplyRelease(IPoeUpdateInfo updateInfo)
         {
@@ -198,9 +168,9 @@ namespace PoeShared.Squirrel.Updater
             Reset();
 
             using var mgr = await CreateManager();
-            Log.Debug($"Checking for updates @ {updateSource}, {nameof(IgnoreDeltaUpdates)}: {ignoreDeltaUpdates}...");
+            Log.Debug($"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
 
-            var updateInfo = await mgr.CheckForUpdate(ignoreDeltaUpdates, CheckUpdateProgress);
+            var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
 
             Log.Debug($"UpdateInfo:\r\n{updateInfo?.DumpToText()}");
             if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
@@ -229,7 +199,7 @@ namespace PoeShared.Squirrel.Updater
             
             var executable = GetLatestExecutable();
             Log.Debug(
-                $"Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
+                $"Restarting app, folder: {MostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
 
             var squirrelUpdater = GetSquirrelUpdateExeOrThrow();
             var squirrelArgs = new StringBuilder($"--processStartAndWait {executable.FullName}");
@@ -257,8 +227,8 @@ namespace PoeShared.Squirrel.Updater
 
         public FileInfo GetLatestExecutable()
         {
-            var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-            Log.Debug($"Most recent version folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
+            var appExecutable = new FileInfo(Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
+            Log.Debug($"Most recent version folder: {MostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
 
             if (!appExecutable.Exists)
             {
@@ -279,17 +249,17 @@ namespace PoeShared.Squirrel.Updater
 
             Log.Debug($"AppName: {appName}, root directory: {rootDirectory}");
 
-            Log.Debug($"Using update source: {updateSource.DumpToTextRaw()}");
+            Log.Debug($"Using update source: {UpdateSource.DumpToTextRaw()}");
             var downloader = new BasicAuthFileDownloader(
                 new NetworkCredential(
-                    updateSource.Username?.ToUnsecuredString(),
-                    updateSource.Password?.ToUnsecuredString()));
-            if (updateSource.Uri.Contains("github"))
+                    UpdateSource.Username?.ToUnsecuredString(),
+                    UpdateSource.Password?.ToUnsecuredString()));
+            if (UpdateSource.Uri.Contains("github"))
             {
-                Log.Debug($"Using GitHub source: {updateSource.DumpToTextRaw()}");
+                Log.Debug($"Using GitHub source: {UpdateSource.DumpToTextRaw()}");
 
                 var mgr = PoeUpdateManager.GitHubUpdateManager(
-                    updateSource.Uri,
+                    UpdateSource.Uri,
                     downloader,
                     appName,
                     rootDirectory);
@@ -297,8 +267,8 @@ namespace PoeShared.Squirrel.Updater
             }
             else
             {
-                Log.Debug($"Using BasicHTTP source: {updateSource.DumpToTextRaw()}");
-                var mgr = new PoeUpdateManager(updateSource.Uri, downloader, appName, rootDirectory);
+                Log.Debug($"Using BasicHTTP source: {UpdateSource.DumpToTextRaw()}");
+                var mgr = new PoeUpdateManager(UpdateSource.Uri, downloader, appName, rootDirectory);
                 return mgr;
             }
         }

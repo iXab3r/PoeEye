@@ -19,11 +19,8 @@ namespace PoeShared.UI
         private readonly SourceList<TreeViewItemViewModel> children = new();
 
         private bool isExpanded = true;
-        private bool isSelected;
         private bool isEnabled = true;
         private bool isVisible = true;
-        private ITreeViewItemViewModel parent;
-        private IComparer<ITreeViewItemViewModel> sortComparer;
         private Func<ITreeViewItemViewModel, IObservable<Unit>> resortWhen;
 
         protected TreeViewItemViewModel()
@@ -71,11 +68,7 @@ namespace PoeShared.UI
 
         public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; } 
 
-        public bool IsSelected
-        {
-            get => isSelected;
-            set => RaiseAndSetIfChanged(ref isSelected, value);
-        }
+        public bool IsSelected { get; set; }
 
         public bool IsExpanded
         {
@@ -95,17 +88,9 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref isVisible, value);
         }
 
-        public ITreeViewItemViewModel Parent
-        {
-            get => parent;
-            set => RaiseAndSetIfChanged(ref parent, value);
-        }
+        public ITreeViewItemViewModel Parent { get; set; }
 
-        public IComparer<ITreeViewItemViewModel> SortComparer 
-        {
-            get => sortComparer;
-            set => RaiseAndSetIfChanged(ref sortComparer, value);
-        }
+        public IComparer<ITreeViewItemViewModel> SortComparer { get; set; }
 
         public Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen
         {

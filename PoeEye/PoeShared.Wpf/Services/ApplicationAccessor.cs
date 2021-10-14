@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -20,7 +20,6 @@ namespace PoeShared.Services
         private readonly Application application;
 
         private readonly IObservable<ExitEventArgs> whenExit;
-        private bool isExiting;
 
         public ApplicationAccessor()
         {
@@ -44,18 +43,14 @@ namespace PoeShared.Services
 
         public IObservable<Unit> WhenExit => whenExit.ToUnit();
 
-        public bool IsExiting
-        {
-            get => isExiting;
-            private set => RaiseAndSetIfChanged(ref isExiting, value);
-        }
+        public bool IsExiting { get; private set; }
 
         public async Task Exit()
         {
-            Log.Debug($"Attempting to gracefully shutdown application, IsExiting: {isExiting}");
+            Log.Debug($"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
             lock (application)
             {
-                if (isExiting)
+                if (IsExiting)
                 {
                     Log.Warn("Shutdown is already in progress");
                     return;

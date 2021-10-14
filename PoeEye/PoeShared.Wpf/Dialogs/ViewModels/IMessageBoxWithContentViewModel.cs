@@ -7,12 +7,7 @@ namespace PoeShared.Dialogs.ViewModels
 
     internal sealed class MessageBoxWithContentViewModelBase : MessageBoxViewModelBase, IMessageBoxWithContentViewModel
     {
-        private object content;
 
-        public object Content
-        {
-            get => content;
-            set => RaiseAndSetIfChanged(ref content, value);
-        }
+        public object Content { get; set; }
     }
 }

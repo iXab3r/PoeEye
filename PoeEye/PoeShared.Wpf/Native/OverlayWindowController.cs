@@ -29,10 +29,7 @@ namespace PoeShared.Native
         private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
         private readonly IWindowTracker windowTracker;
         private readonly string uniqueControllerId = Guid.NewGuid().ToString();
-
-        private bool isVisible;
         private bool isEnabled = true;
-        private bool showWireframes;
 
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
@@ -77,17 +74,9 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
         }
 
-        public bool ShowWireframes
-        {
-            get => showWireframes;
-            set => this.RaiseAndSetIfChanged(ref showWireframes, value);
-        }
+        public bool ShowWireframes { get; set; }
 
-        public bool IsVisible
-        {
-            get => isVisible;
-            private set => this.RaiseAndSetIfChanged(ref isVisible, value);
-        }
+        public bool IsVisible { get; private set; }
 
         public bool IsEnabled
         {
@@ -145,7 +134,7 @@ namespace PoeShared.Native
 
             this.WhenAnyValue(x => x.ShowWireframes)
                 .ObserveOn(uiScheduler)
-                .SubscribeSafe(() => overlayWindowViewModel.ShowWireframes = showWireframes, Log.HandleUiException)
+                .SubscribeSafe(() => overlayWindowViewModel.ShowWireframes = ShowWireframes, Log.HandleUiException)
                 .AddTo(childAnchors);
 
             overlayWindow.WhenLoaded
@@ -213,7 +202,7 @@ namespace PoeShared.Native
         {
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
            
-            if (isVisible && viewModel.IsVisible)
+            if (IsVisible && viewModel.IsVisible)
             {
                 Log.Debug($"[#{overlayWindow.Name}] Showing overlay {overlayWindow}");
                 if (overlayWindow.Visibility != Visibility.Visible)

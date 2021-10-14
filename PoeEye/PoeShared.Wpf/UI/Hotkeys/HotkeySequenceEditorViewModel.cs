@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -30,16 +30,9 @@ namespace PoeShared.UI
 
         private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
         private readonly ObservableAsPropertyHelper<int> totalItemsCount;
-
-        private HotkeySequenceDelay defaultItemDelay;
         private TimeSpan defaultKeyPressDuration = TimeSpan.FromMilliseconds(50);
-
-        private bool hideKeypressDelays;
         private TimeSpan maxDuration = TimeSpan.FromSeconds(10);
-        private bool maxDurationExceeded;
         private int maxItemsCount = 250;
-        private bool maxItemsExceeded;
-        private UIElement owner;
 
         static HotkeySequenceEditorViewModel()
         {
@@ -77,19 +70,11 @@ namespace PoeShared.UI
 
         public ICommand MouseMoveCommand { get; }
 
-        public HotkeySequenceDelay DefaultItemDelay
-        {
-            get => defaultItemDelay;
-            private set => RaiseAndSetIfChanged(ref defaultItemDelay, value);
-        }
+        public HotkeySequenceDelay DefaultItemDelay { get; private set; }
 
         public HotkeySequenceText DefaultItemText { get; } = new() {Text = "text"};
 
-        public UIElement Owner
-        {
-            get => owner;
-            set => RaiseAndSetIfChanged(ref owner, value);
-        }
+        public UIElement Owner { get; set; }
 
         public TimeSpan TotalDuration => totalDuration.Value;
 
@@ -99,25 +84,13 @@ namespace PoeShared.UI
 
         public ICommand RemoveItem { get; }
 
-        public bool MaxItemsExceeded
-        {
-            get => maxItemsExceeded;
-            private set => RaiseAndSetIfChanged(ref maxItemsExceeded, value);
-        }
+        public bool MaxItemsExceeded { get; private set; }
 
-        public bool MaxDurationExceeded
-        {
-            get => maxDurationExceeded;
-            private set => RaiseAndSetIfChanged(ref maxDurationExceeded, value);
-        }
+        public bool MaxDurationExceeded { get; private set; }
 
         public int TotalCount => totalItemsCount.Value;
 
-        public bool HideKeypressDelays
-        {
-            get => hideKeypressDelays;
-            set => RaiseAndSetIfChanged(ref hideKeypressDelays, value);
-        }
+        public bool HideKeypressDelays { get; set; }
 
         public int MaxItemsCount
         {

@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PropertyBinder;
@@ -8,13 +8,6 @@ namespace PoeShared.UI
     public sealed class HotkeySequenceHotkey : HotkeySequenceItem
     {
         private static readonly Binder<HotkeySequenceHotkey> Binder = new();
-        private bool hasMousePosition;
-        private HotkeyGesture hotkey;
-        private bool? isDown;
-        private bool isMouse;
-
-        private bool isRelative;
-        private Point? mousePosition;
 
         static HotkeySequenceHotkey()
         {
@@ -27,40 +20,16 @@ namespace PoeShared.UI
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        public HotkeyGesture Hotkey
-        {
-            get => hotkey;
-            set => RaiseAndSetIfChanged(ref hotkey, value);
-        }
+        public HotkeyGesture Hotkey { get; set; }
 
-        public bool IsRelative
-        {
-            get => isRelative;
-            set => RaiseAndSetIfChanged(ref isRelative, value);
-        }
+        public bool IsRelative { get; set; }
 
-        public Point? MousePosition
-        {
-            get => mousePosition;
-            set => RaiseAndSetIfChanged(ref mousePosition, value);
-        }
+        public Point? MousePosition { get; set; }
 
-        public bool HasMousePosition
-        {
-            get => hasMousePosition;
-            private set => RaiseAndSetIfChanged(ref hasMousePosition, value);
-        }
+        public bool HasMousePosition { get; private set; }
 
-        public bool IsMouse
-        {
-            get => isMouse;
-            private set => RaiseAndSetIfChanged(ref isMouse, value);
-        }
+        public bool IsMouse { get; private set; }
 
-        public bool? IsDown
-        {
-            get => isDown;
-            set => RaiseAndSetIfChanged(ref isDown, value);
-        }
+        public bool? IsDown { get; set; }
     }
 }
