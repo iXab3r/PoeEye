@@ -191,6 +191,22 @@ namespace PoeShared.Scaffolding
             SyncListWithCache(list4, instance).AddTo(anchors);
             return anchors;
         }
+        
+        public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4, T5>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4, IObservableList<T5> list5)
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+            where T5 : T
+        {
+            var anchors = new CompositeDisposable();
+            SyncListWithCache(list1, instance).AddTo(anchors);
+            SyncListWithCache(list2, instance).AddTo(anchors);
+            SyncListWithCache(list3, instance).AddTo(anchors);
+            SyncListWithCache(list4, instance).AddTo(anchors);
+            SyncListWithCache(list5, instance).AddTo(anchors);
+            return anchors;
+        }
 
         private static IDisposable SyncListWithCache<TSrc, TDst, TKey>(IObservableList<TSrc> list, ISourceCache<TDst, TKey> destination) where TSrc : TDst
         {

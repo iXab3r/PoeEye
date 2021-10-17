@@ -10,9 +10,9 @@ namespace PoeShared.Scaffolding
     {
         private static readonly ConcurrentDictionary<(Type type, string propertyName), PropertyInfo> PropertyAccessorByName = new ConcurrentDictionary<(Type type, string propertyName), PropertyInfo>();
 
-        public static T GetPropertyValue<T>(this object model, string propertyName)
+        public static T GetPropertyValue<T>(this object model, string propertyPath)
         {
-            var propertyInfo = GetProperty(model, propertyName);
+            var propertyInfo = GetProperty(model, propertyPath);
             var result = propertyInfo.propertyInfo.GetValue(propertyInfo.owner);
             try
             {
@@ -28,37 +28,49 @@ namespace PoeShared.Scaffolding
                 throw new InvalidCastException($"Failed to cast value {result} of type {(result?.GetType().Name ?? "Null")} to {typeof(T)}", e);
             }
         }
-        
-        public static object SetPropertyValue<T>(this object model, string propertyName, T value)
+
+        public static PropertyInfo GetPropertyInfo(this Type type, string propertyPath)
+        {
+            var propertyParts = propertyPath.Split('.');
+            if (propertyParts.Length > 1)
+            {
+                var rootProperty = GetPropertyInfo(type, propertyParts[0]);
+                return GetPropertyInfo(rootProperty.PropertyType, propertyParts.Skip(1).JoinStrings("."));
+            }
+            
+            return PropertyAccessorByName.GetOrAdd(
+                (type, propertyPath),
+                x =>
+                {
+                    var property = x.type.GetProperties().FirstOrDefault(y => string.Compare(x.propertyName, y.Name, StringComparison.OrdinalIgnoreCase) == 0);
+                    if (property == null)
+                    {
+                        throw new ArgumentException($"Failed to find property {propertyPath} in type {type}");
+                    }
+
+                    return property;
+                });
+        }
+
+        public static object SetPropertyValue<T>(this object model, string propertyPath, T value)
         {
             Guard.ArgumentNotNull(model, nameof(model));
-            var property = GetProperty(model, propertyName);
+            var property = GetProperty(model, propertyPath);
             property.propertyInfo.SetValue(property.owner, value);
             return model;
         }
         
-        private static (object owner, PropertyInfo propertyInfo) GetProperty(object model, string propertyName)
+        private static (object owner, PropertyInfo propertyInfo) GetProperty(object model, string propertyPath)
         {
             Guard.ArgumentNotNull(model, nameof(model));
-            Guard.ArgumentNotNull(propertyName, nameof(propertyName));
+            Guard.ArgumentNotNull(propertyPath, nameof(propertyPath));
 
-            var propertyParts = propertyName.Split('.');
+            var propertyParts = propertyPath.Split('.');
             if (propertyParts.Length <= 1)
             {
-                return (model, PropertyAccessorByName.GetOrAdd(
-                    (model.GetType(), propertyName),
-                    x =>
-                    {
-                        var property = x.type.GetProperties().FirstOrDefault(y => string.Compare(x.propertyName, y.Name, StringComparison.OrdinalIgnoreCase) == 0);
-                        if (property == null)
-                        {
-                            throw new ArgumentException($"Failed to find property {propertyName} in model {model} of type {model.GetType()}");
-                        }
-
-                        return property;
-                    }));
-            }
-
+                return (model, GetPropertyInfo(model.GetType(), propertyPath));
+            } 
+            
             var rootProperty = GetProperty(model, propertyParts[0]);
             var root = rootProperty.propertyInfo.GetValue(model);
             return GetProperty(root, propertyParts.Skip(1).JoinStrings("."));

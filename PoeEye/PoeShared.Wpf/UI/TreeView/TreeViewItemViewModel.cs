@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text;
 using DynamicData;
 using log4net;
 using PoeShared.Scaffolding; 
@@ -17,10 +18,29 @@ namespace PoeShared.UI
         private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
 
         private readonly SourceList<TreeViewItemViewModel> children = new();
- 
+        private readonly ObservableAsPropertyHelper<string> pathSupplier;
+        protected readonly Fallback<string> TabName = new();
 
         protected TreeViewItemViewModel()
         {
+            pathSupplier = Observable.Merge(
+                    this.WhenAnyValue(x => x.Parent)
+                        .Select(x => x is IDirectoryTreeViewItemViewModel eyeItem ? eyeItem.WhenAnyValue(y => y.Path) : Observable.Return(string.Empty))
+                        .Switch()
+                        .Select(_ => "Parent directory path changed"),
+                    this.WhenAnyValue(x => x.Name).Select(_ => "Directory name changed"))
+                .Select(x => FindPath(this))
+                .WithPrevious((prev, curr) => new {prev, curr})
+                .Where(x => x.prev != x.curr)
+                .DistinctUntilChanged()
+                .Select(x =>
+                {
+                    Log.Debug($"[{this}] Changing Directory Path {x.prev} => {x.curr}");
+                    return x.curr;
+                })
+                .ToProperty(this, x => x.Path)
+                .AddTo(Anchors);
+            
             this.WhenAnyValue(x => x.Parent.ResortWhen)
                 .SubscribeSafe(x => ResortWhen = x, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -62,15 +82,17 @@ namespace PoeShared.UI
                 .AddTo(Anchors);
         }
 
-        public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; } 
-
-        public bool IsSelected { get; set; }
-
-        public bool IsExpanded { get; set; } = true;
-
         public bool IsEnabled { get; set; } = true;
 
         public bool IsVisible { get; set; } = true;
+
+        public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
+
+        public bool IsSelected { get; set; }
+
+        public string Path => pathSupplier.Value;
+
+        public bool IsExpanded { get; set; } = true;
 
         public ITreeViewItemViewModel Parent { get; set; }
 
@@ -78,9 +100,43 @@ namespace PoeShared.UI
 
         public Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen { get; set; }
 
+        public string Name
+        {
+            get => TabName.Value;
+            set => TabName.SetValue(value);
+        }
+
         public void Clear()
         {
             Children.ForEach(x => x.Parent = null);
+        }
+
+        public static ITreeViewItemViewModel FindRoot(ITreeViewItemViewModel node)
+        {
+            var result = node;
+            while (result.Parent != null)
+            {
+                result = result.Parent;
+            }
+            return result;
+        }
+
+        public static string FindPath(ITreeViewItemViewModel node)
+        {
+            var resultBuilder = new StringBuilder();
+
+            while (node != null)
+            {
+                if (node is IDirectoryTreeViewItemViewModel parentDir)
+                {
+                    resultBuilder.Insert(0, parentDir.Name + System.IO.Path.DirectorySeparatorChar);
+                }
+
+                node = node.Parent;
+            }
+
+            var result = resultBuilder.ToString().Trim(System.IO.Path.DirectorySeparatorChar);
+            return string.IsNullOrEmpty(result) ? null : result;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using DynamicData;
+using PoeShared.Bindings;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;

@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using PoeShared.Scaffolding;
+using PoeShared.Bindings;
 using Shouldly;
 
-namespace PoeShared.Tests.Scaffolding
+namespace PoeShared.Tests.Bindings
 {
     [TestFixture]
     public class AuraModelFixture : FixtureBase
@@ -44,10 +44,25 @@ namespace PoeShared.Tests.Scaffolding
             //Then
             source.DoubleProperty.ShouldBe(5);
         }
+
+        [Test]
+        public void ShouldBindOnExpression()
+        {
+            //Given
+            var source = new Stub();
+            var target = new OtherStub();
+            target.AddOrUpdateBinding(x => x.IntProperty, source, x => x.IntProperty + 1);
+            target.IntProperty.ShouldBe(1);
+
+            //When
+            source.IntProperty = 2;
+
+            //Then
+            target.IntProperty.ShouldBe(3);
+        }
         
         private sealed class Stub : BindableReactiveObject
         {
-
             public int IntProperty { get; set; }
 
             public string StringProperty { get; set; }
@@ -61,9 +76,7 @@ namespace PoeShared.Tests.Scaffolding
 
         private sealed class OtherStub : BindableReactiveObject
         {
-
-            public int DoubleProperty { get; set; }
-
+            public int IntProperty { get; set; }
 
             public OtherStub InnerOther { get; set; }
 

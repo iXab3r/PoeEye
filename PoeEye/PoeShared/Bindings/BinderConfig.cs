@@ -2,10 +2,11 @@ using System;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
+using PoeShared.Scaffolding;
 using PropertyBinder;
 using Binder = PropertyBinder.Binder;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Bindings
 {
     public sealed class BinderConfig : DisposableReactiveObject
     {

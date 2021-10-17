@@ -10,6 +10,10 @@ namespace PoeShared.UI
 {
     public interface ITreeViewItemViewModel : IDisposableReactiveObject
     {
+        public string Name { get; set; }
+     
+        string Path { get; }
+        
         public bool IsExpanded { get; set; }
 
         public bool IsSelected { get; set; }

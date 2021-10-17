@@ -3,7 +3,8 @@
                              xmlns:bindings="clr-namespace:PoeShared.UI.Bindings"
                              xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
                              xmlns:st="http://schemas.spicytaco.io/"
-                             xmlns:ui="clr-namespace:PoeShared.UI">
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:scaffolding1="clr-namespace:PoeShared.Bindings;assembly=PoeShared">
 
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
@@ -33,7 +34,7 @@
 
             <ItemsControl ItemsSource="{Binding Source.Bindings}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type scaffolding:BinderConfig}">
+                    <DataTemplate DataType="{x:Type scaffolding1:BinderConfig}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition SharedSizeGroup="TargetProperty" />

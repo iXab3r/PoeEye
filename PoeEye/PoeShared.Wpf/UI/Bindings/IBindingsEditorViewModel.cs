@@ -1,4 +1,5 @@
-﻿using PoeShared.Scaffolding;
+﻿using PoeShared.Bindings;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Bindings
 {
