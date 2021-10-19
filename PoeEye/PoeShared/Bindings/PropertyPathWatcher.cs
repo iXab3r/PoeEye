@@ -11,8 +11,7 @@ namespace PoeShared.Bindings
 
         static PropertyPathWatcher()
         {
-            Binder.BindIf(x => x.SourceType != null && !string.IsNullOrEmpty(x.PropertyPath), x => x.SourceType.GetPropertyInfo(x.PropertyPath).PropertyType)
-                .Else(x => default)
+            Binder.Bind( x => x.SourceType.GetPropertyTypeOrDefault(x.PropertyPath))
                 .To(x => x.PropertyType);
             
             Binder.Bind(x => !string.IsNullOrEmpty(x.PropertyPath) ? $@"x.{x.PropertyPath}" : default ).To(x => x.SourceExpression);

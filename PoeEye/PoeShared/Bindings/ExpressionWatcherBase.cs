@@ -57,7 +57,7 @@ namespace PoeShared.Bindings
 
         protected string ConditionExpression { get; set; } = "x => x != null";
 
-        public Type PropertyType { get; set; }
+        public Type PropertyType { get; protected set; }
 
         public Type SourceType { get; [JetBrains.Annotations.UsedImplicitly] private set; }
 
@@ -99,7 +99,7 @@ namespace PoeShared.Bindings
             var config = new ParsingConfig
             {
                 ResolveTypesBySimpleName = true,
-                CustomTypeProvider = new DynamicLinkCustomTypeProvider(typeof(TSource), typeof(TProperty))
+                CustomTypeProvider = new PassthroughLinkCustomTypeProvider(typeof(TSource), typeof(TProperty))
             };
 
             var sourceBinderExpr = (Expression<Func<TSource, TProperty>>) DynamicExpressionParser.ParseLambda(config, false, new[] { sourceParameter }, typeof (TProperty), sourceExprText);
@@ -108,12 +108,14 @@ namespace PoeShared.Bindings
             return new ExpressionWatcher<TSource, TProperty>(sourceBinderExpr, conditionBinderExpr);
         }
 
-        private sealed class DynamicLinkCustomTypeProvider : IDynamicLinkCustomTypeProvider
+        private sealed class PassthroughLinkCustomTypeProvider : IDynamicLinkCustomTypeProvider
         {
             private readonly HashSet<Type> customTypes;
+            private IDynamicLinkCustomTypeProvider fallback;
             
-            public DynamicLinkCustomTypeProvider(params Type[] customType)
+            public PassthroughLinkCustomTypeProvider(params Type[] customType)
             {
+                fallback = new DynamicLinqCustomTypeProvider();
                 customTypes = new HashSet<Type>(customType);
             }
 
@@ -124,17 +126,17 @@ namespace PoeShared.Bindings
 
             public Dictionary<Type, List<MethodInfo>> GetExtensionMethods()
             {
-                throw new NotImplementedException();
+                return fallback.GetExtensionMethods();
             }
 
             public Type ResolveType(string typeName)
             {
-                throw new NotImplementedException();
+                return fallback.ResolveType(typeName);
             }
 
             public Type ResolveTypeBySimpleName(string simpleTypeName)
             {
-                throw new NotImplementedException();
+                return fallback.ResolveTypeBySimpleName(simpleTypeName);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
@@ -14,12 +15,16 @@ namespace PoeShared.Bindings
         {
             bindings.Connect()
                 .OnItemRemoved(x => x.Dispose())
+                .Bind(out var bindingsList)
                 .Subscribe()
                 .AddTo(Anchors);
+            BindingsList = bindingsList;
             Bindings = bindings;
         }
 
         public IObservableCache<IReactiveBinding, string> Bindings { get; }
+        
+        public ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
 
         public void RemoveBinding(string targetPropertyName)
         {

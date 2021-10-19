@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PoeShared.Scaffolding
 {
@@ -9,6 +10,8 @@ namespace PoeShared.Scaffolding
     public static class ObjectReflectionExtensions
     {
         private static readonly ConcurrentDictionary<(Type type, string propertyName), PropertyInfo> PropertyAccessorByName = new ConcurrentDictionary<(Type type, string propertyName), PropertyInfo>();
+
+        private static readonly Regex PropertyPathRegexValidator = new Regex(@"^[\w\.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static T GetPropertyValue<T>(this object model, string propertyPath)
         {
@@ -29,8 +32,48 @@ namespace PoeShared.Scaffolding
             }
         }
 
+        public static Type GetPropertyTypeOrDefault(this object instance, string propertyPath)
+        {
+            if (instance == null || string.IsNullOrEmpty(propertyPath))
+            {
+                return default;
+            }
+
+            var type = instance.GetType();
+            if (!IsValidPropertyPath(propertyPath))
+            {
+                throw new ArgumentException($"Invalid property format: {propertyPath}, type: {type}");
+            }
+
+            return type.GetPropertyTypeOrDefault(propertyPath);
+        }
+
+        private static bool IsValidPropertyPath(string propertyPath)
+        {
+            return PropertyPathRegexValidator.IsMatch(propertyPath);
+        }
+
+        public static Type GetPropertyTypeOrDefault(this Type type, string propertyPath)
+        {
+            if (type == null || string.IsNullOrEmpty(propertyPath))
+            {
+                return default;
+            }
+            
+            if (!IsValidPropertyPath(propertyPath))
+            {
+                throw new ArgumentException($"Invalid property format: {propertyPath}, type: {type}");
+            }
+            
+            return type.GetPropertyInfo(propertyPath).PropertyType;
+        }
+
         public static PropertyInfo GetPropertyInfo(this Type type, string propertyPath)
         {
+            if (!IsValidPropertyPath(propertyPath))
+            {
+                throw new ArgumentException($"Invalid property format: {propertyPath}, type: {type}");
+            }
             var propertyParts = propertyPath.Split('.');
             if (propertyParts.Length > 1)
             {
@@ -42,7 +85,7 @@ namespace PoeShared.Scaffolding
                 (type, propertyPath),
                 x =>
                 {
-                    var property = x.type.GetProperties().FirstOrDefault(y => string.Compare(x.propertyName, y.Name, StringComparison.OrdinalIgnoreCase) == 0);
+                    var property = x.type.GetAllProperties(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(y => string.Compare(x.propertyName, y.Name, StringComparison.OrdinalIgnoreCase) == 0);
                     if (property == null)
                     {
                         throw new ArgumentException($"Failed to find property {propertyPath} in type {type}");
@@ -52,6 +95,11 @@ namespace PoeShared.Scaffolding
                 });
         }
 
+        public static bool IsIndexedProperty(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.GetIndexParameters().Length > 0;
+        }
+
         public static object SetPropertyValue<T>(this object model, string propertyPath, T value)
         {
             Guard.ArgumentNotNull(model, nameof(model));
@@ -59,7 +107,7 @@ namespace PoeShared.Scaffolding
             property.propertyInfo.SetValue(property.owner, value);
             return model;
         }
-        
+
         private static (object owner, PropertyInfo propertyInfo) GetProperty(object model, string propertyPath)
         {
             Guard.ArgumentNotNull(model, nameof(model));

@@ -17,6 +17,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.Wpf.Scaffolding;
+using PropertyBinder;
 
 namespace PoeShared.UI
 {
@@ -61,17 +62,19 @@ namespace PoeShared.UI
                 .AddTo(Anchors);
 
             SharedLog.Instance.AddAppender(appender).AddTo(Anchors);
+            
+            Binder.SetExceptionHandler(BinderExceptionHandler);
 
             SharedLog.Instance.Errors.SubscribeSafe(
                 ex =>
                 {
-                    if (appArguments.IsDebugMode || Debugger.IsAttached)
-                    {
-                        Debugger.Break();
-                    }
-
                     ReportCrash(ex);
                 }, Log.HandleException).AddTo(Anchors);
+        }
+
+        private void BinderExceptionHandler(object? sender, ExceptionEventArgs e)
+        {
+            ReportCrash(e.Exception, $"BinderException, sender: {sender}");
         }
 
         public Task<ExceptionDialogConfig> PrepareConfig()
@@ -102,6 +105,11 @@ namespace PoeShared.UI
         private void ReportCrash(Exception exception, string developerMessage = "")
         {
             Log.Error($"Unhandled application exception({developerMessage})", exception);
+            
+            if (appArguments.IsDebugMode || Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
 
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
             TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;

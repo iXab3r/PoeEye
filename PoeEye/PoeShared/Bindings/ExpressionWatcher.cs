@@ -95,8 +95,6 @@ namespace PoeShared.Bindings
 
         public TProperty Value { get; private set; }
 
-        public string Key { get; protected set; }
-        
         public bool HasValue { get; private set; }
         
         public bool CanSetValue { get; }

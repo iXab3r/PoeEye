@@ -32,7 +32,7 @@
                              Command="{Binding AddBindingCommand}" />
             </Grid>
 
-            <ItemsControl ItemsSource="{Binding Source.Bindings}">
+            <!--<ItemsControl ItemsSource="{Binding Source.Bindings}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type scaffolding1:BinderConfig}">
                         <Grid>
@@ -78,7 +78,7 @@
                         </DataTemplate.Triggers>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            </ItemsControl>-->
         </st:StackPanel>
     </DataTemplate>
 </ui:SharedResourceDictionary>

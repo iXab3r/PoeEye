@@ -39,7 +39,6 @@ namespace PoeShared
         public static void HandleUiException(this IFluentLog logger, [NotNull] Exception exception)
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
-
             logger.Error($"UI Exception occurred", exception);
             SharedLog.Instance.Errors.OnNext(exception);
         }

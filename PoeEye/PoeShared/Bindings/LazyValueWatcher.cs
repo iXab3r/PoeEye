@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Reactive.Linq;
+using System.Reflection;
 using DynamicData.Annotations;
 using PoeShared.Scaffolding;
 using PropertyBinder;
@@ -29,5 +32,6 @@ namespace PoeShared.Bindings
         public bool IsValueLoaded { get; [UsedImplicitly] private set; }
 
         public long Revision { get; [UsedImplicitly] private set; }
+        
     }
 }
