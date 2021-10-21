@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Reactive.Linq;
-using System.Reflection;
 using DynamicData.Annotations;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
 namespace PoeShared.Bindings
 {
-    public class LazyValueWatcher<T> : DisposableReactiveObject
+    internal sealed class ObservableValueWatcher<T> : DisposableReactiveObject
     {
-        private static readonly Binder<LazyValueWatcher<T>> Binder = new();
+        private static readonly Binder<ObservableValueWatcher<T>> Binder = new();
 
-        static LazyValueWatcher()
+        static ObservableValueWatcher()
         {
-            Binder.Bind(x => x.Value != null).To(x => x.IsValueLoaded);
         }
 
-        public LazyValueWatcher(IObservable<T> valueSource)
+        public ObservableValueWatcher(IObservable<T> valueSource)
         {
             valueSource.Subscribe(x =>
             {
@@ -29,9 +25,11 @@ namespace PoeShared.Bindings
 
         public T Value { get; [UsedImplicitly] private set; }
 
-        public bool IsValueLoaded { get; [UsedImplicitly] private set; }
-
         public long Revision { get; [UsedImplicitly] private set; }
-        
+
+        public override string ToString()
+        {
+            return $"ObservableValue, value: {Value}, revision: {Revision}";
+        }
     }
 }

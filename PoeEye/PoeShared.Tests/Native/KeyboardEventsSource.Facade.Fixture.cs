@@ -72,34 +72,6 @@ namespace PoeShared.Tests.Native
         }
 
         [Test]
-        public void ShouldPropagateKeyboard()
-        {
-            //Given
-            var eventsSource = new Mock<IKeyboardMouseEvents>();
-            eventsFactory.Setup(x => x.System).Returns(Observable.Return(eventsSource.Object));
-            
-            var instance = CreateInstance();
-            var readyToCapture = new ManualResetEvent(false);
-            var captured = new ManualResetEvent(false);
-            var processingTask = Task.Run(() =>
-            {
-                Log.Debug("Awaiting for input event");
-                instance.WhenKeyDown.Where(x => x.KeyCode == Keys.A).Take(1).Subscribe(x => captured.Set());
-                readyToCapture.Set();
-                captured.WaitOne();
-                Log.Debug("Completing task");
-            });
-
-            //When
-            readyToCapture.WaitOne();
-            Log.Debug("Raising input event");
-            eventsSource.Raise(x => x.KeyDown -= null, new KeyEventArgs(Keys.A));
-
-            //Then
-            processingTask.Wait(3000).ShouldBe(true);
-        }
-
-        [Test]
         public void ShouldNotDoMultipleSubscriptionsForSameEvent()
         {
             //Given

@@ -9,17 +9,23 @@ using DynamicData;
 using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PropertyBinder;
 using ReactiveUI;
 
 namespace PoeShared.UI
 {
     public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeViewItemViewModel
     {
+        private static readonly Binder<TreeViewItemViewModel> Binder = new();
         private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
 
         private readonly SourceList<TreeViewItemViewModel> children = new();
         private readonly ObservableAsPropertyHelper<string> pathSupplier;
         protected readonly Fallback<string> TabName = new();
+
+        static TreeViewItemViewModel()
+        {
+        }
 
         protected TreeViewItemViewModel()
         {
@@ -80,6 +86,8 @@ namespace PoeShared.UI
                     x.curr?.children.Add(this);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
+            
+            Binder.Attach(this).AddTo(Anchors);
         }
 
         public bool IsEnabled { get; set; } = true;
@@ -108,7 +116,7 @@ namespace PoeShared.UI
 
         public void Clear()
         {
-            Children.ForEach(x => x.Parent = null);
+            children.Items.ForEach(x => x.Parent = null);
         }
 
         public static ITreeViewItemViewModel FindRoot(ITreeViewItemViewModel node)

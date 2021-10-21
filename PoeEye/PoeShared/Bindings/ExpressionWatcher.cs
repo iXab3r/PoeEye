@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -10,12 +11,13 @@ using Binder = PropertyBinder.Binder;
 
 namespace PoeShared.Bindings
 {
-    public sealed class ExpressionWatcher : ExpressionWatcherBase
+    public class ExpressionWatcher : ExpressionWatcherBase
     {
-        private static readonly Binder<ExpressionWatcher> Binder = new();
+        private new static readonly Binder<ExpressionWatcher> Binder;
 
         static ExpressionWatcher()
         {
+            Binder = ExpressionWatcherBase.Binder.Clone<ExpressionWatcher>();
             Binder.Bind(x => x.SourceExpression).To(x => x.SourceExpression);
             Binder.Bind(x => x.ConditionExpression).To(x => x.ConditionExpression);
         }
@@ -37,15 +39,27 @@ namespace PoeShared.Bindings
             get => base.ConditionExpression;
             set => base.ConditionExpression = value;
         }
+
+        public override string ToString()
+        {
+            return $"ExpressionWatcher, source: {SourceExpression}, condition: {ConditionExpression}";
+        }
     }
 
     public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveObject, IValueWatcher where TSource : class
     {
+        private static readonly Binder<ExpressionWatcher<TSource, TProperty>> Binder = new();
+
         private readonly Expression<Func<TSource, TProperty>> sourceAccessor;
         private readonly Expression<Func<TSource, bool>> condition;
         private readonly Binder<TSource> sourceBinder;
         private readonly SerialDisposable sourceBinderAnchors;
         private readonly Lazy<Action<TSource, TProperty>> assignmentActionSupplier;
+
+        static ExpressionWatcher()
+        {
+            Binder.Bind(x => x.SupportsSetValue && x.Source != null).To(x => x.CanSetValue);
+        }
 
         public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor, Expression<Func<TSource, bool>> condition)
         {
@@ -56,19 +70,23 @@ namespace PoeShared.Bindings
             sourceBinderAnchors = new SerialDisposable().AddTo(Anchors);
             SourceExpression = sourceAccessor.ToString();
             
-            sourceBinder = new Binder<TSource>();
+            sourceBinder = new Binder<TSource>().WithExceptionHandler(HandleBinderException);
             sourceBinder
                 .BindIf(condition, sourceAccessor)
                 .Else(x => default)
-                .To((x, v) => Value = v);
+                .To((x, v) =>
+                {
+                    Error = default;
+                    Value = v;
+                });
             
             sourceBinder
                 .BindIf(condition, x => true)
                 .Else(x => false)
                 .To((x, v) => HasValue = v);
 
-            CanSetValue = CanPrepareSetter(sourceAccessor);
-            assignmentActionSupplier = new Lazy<Action<TSource, TProperty>>(() => CanSetValue ? PrepareSetter(sourceAccessor) : throw new NotSupportedException($"Assignment is not supported for {sourceAccessor}"));
+            SupportsSetValue = CanPrepareSetter(sourceAccessor);
+            assignmentActionSupplier = new Lazy<Action<TSource, TProperty>>(() => SupportsSetValue ? PrepareSetter(sourceAccessor) : throw new NotSupportedException($"Assignment is not supported for {sourceAccessor}"));
             
             this.WhenAnyValue(x => x.Source)
                 .WithPrevious()
@@ -80,11 +98,30 @@ namespace PoeShared.Bindings
                         sourceBinderAnchors.Disposable = default;
                     }
                     Log.Debug($"Binding to {(x.Current == null ? $"NULL of type {typeof(TSource)}" : $"instance {x.Current}")}");
+                    Error = default;
                     sourceBinderAnchors.Disposable = sourceBinder.Attach(x.Current);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
+
+            Disposable.Create(() =>
+            {
+                Log.Debug("Instance disposed, resetting all values");
+                CanSetValue = false;
+                Value = default;
+                HasValue = false;
+                Source = default;
+            }).AddTo(Anchors);
+            
+            Binder.Attach(this).AddTo(Anchors);
         }
-        
+
+        private void HandleBinderException(object sender, ExceptionEventArgs e)
+        {
+            Error = e.Exception;
+            e.Handled = true;
+            Log.Warn($"Binder encountered exception: {e}", e.Exception);
+        }
+
         public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor) : this(sourceAccessor, x => x != null)
         {
         }
@@ -94,16 +131,20 @@ namespace PoeShared.Bindings
         public string SourceExpression { get; }
 
         public TProperty Value { get; private set; }
+        
+        public Exception Error { get; private set; }
 
         public bool HasValue { get; private set; }
         
-        public bool CanSetValue { get; }
+        public bool CanSetValue { get; private set; }
+        
+        public bool SupportsSetValue { get; }
 
         public TSource Source { get; set; }
         
         public void SetCurrentValue(object newValue)
         {
-            var typedNewValue = (TProperty)newValue;
+            var typedNewValue = newValue == null ? default : (TProperty)newValue;
             SetCurrentValue(typedNewValue);
         }
 
@@ -115,7 +156,16 @@ namespace PoeShared.Bindings
             }
 
             Log.Debug($"Updating value: {Value} => {newValue}");
-            assignmentActionSupplier.Value(Source, newValue);
+            try
+            {
+                Error = default;
+                assignmentActionSupplier.Value(Source, newValue);
+            }
+            catch (Exception e)
+            {
+                Error = new BindingException($"Failed to set value {newValue}, watcher: {this} - {e}", e);
+                Log.Warn($"Failed to change value of {Source} from {Value} to {newValue}", e);
+            }
         }
 
         object IValueWatcher.Value => Value;
@@ -137,7 +187,13 @@ namespace PoeShared.Bindings
             {
                 return false;
             }
-            return memberExpression.Member.MemberType == MemberTypes.Property;
+
+            if (memberExpression.Member is not PropertyInfo propertyInfo)
+            {
+                return false;
+            }
+
+            return propertyInfo.CanWrite;
         }
 
         private static Action<TSource, TProperty> PrepareSetter(Expression<Func<TSource, TProperty>> propertyAccessor)
@@ -151,7 +207,7 @@ namespace PoeShared.Bindings
 
             var memberExp = (MemberExpression)propertyAccessor.Body;
             var assign = Expression.Assign(memberExp, valueExp);
-            var setter = Binder.ExpressionCompiler.Compile(Expression.Lambda<Action<TSource, TProperty>>(assign, targetExp, valueExp));
+            var setter = PropertyBinder.Binder.ExpressionCompiler.Compile(Expression.Lambda<Action<TSource, TProperty>>(assign, targetExp, valueExp));
             return setter;
         }
     }

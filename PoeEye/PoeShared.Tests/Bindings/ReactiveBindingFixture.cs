@@ -43,10 +43,28 @@ namespace PoeShared.Tests.Bindings
             //Then
             instance.Target.IntProperty.ShouldBe(2);
         }
+
+        [Test]
+        public void ShouldNotThrowWhenInvalidSetter()
+        {
+            //Given
+            //When
+            var instance = new ReactiveBinding<SourceContainer, SourceContainer, int>(x => x.IntProperty + 1, x => x.ReadOnlyIntProperty);
+            instance.Source = new SourceContainer();
+            instance.Target = new SourceContainer();
+
+            //Then
+            instance.SourceWatcher.HasValue.ShouldBe(true);
+            instance.TargetWatcher.HasValue.ShouldBe(true);
+            instance.TargetWatcher.SupportsSetValue.ShouldBe(false);
+            instance.TargetWatcher.CanSetValue.ShouldBe(false);
+        }
         
         public sealed class SourceContainer : DisposableReactiveObject
         {
             public int IntProperty { get; set; }
+            
+            public int ReadOnlyIntProperty { get; }
 
             public SourceContainer Inner { get; set; }
         }

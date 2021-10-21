@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reflection;
 using DynamicData;
 using PoeShared.Scaffolding;
 
@@ -9,7 +12,7 @@ namespace PoeShared.Bindings
 {
     public abstract class BindableReactiveObject : DisposableReactiveObject, IBindableReactiveObject
     {
-        private readonly SourceCache<IReactiveBinding, string> bindings = new SourceCache<IReactiveBinding, string>(x => x.TargetPropertyPath);
+        private readonly SourceCache<IReactiveBinding, string> bindings = new SourceCache<IReactiveBinding, string>(x => x.Key);
 
         protected BindableReactiveObject()
         {
@@ -25,7 +28,7 @@ namespace PoeShared.Bindings
         public IObservableCache<IReactiveBinding, string> Bindings { get; }
         
         public ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
-
+        
         public void RemoveBinding(string targetPropertyName)
         {
             var binding = ResolveBinding(targetPropertyName);
@@ -60,6 +63,7 @@ namespace PoeShared.Bindings
             bindings.AddOrUpdateIfNeeded(binding);
             return Disposable.Create(() => bindings.Remove(binding));
         }
+
 
         private IReactiveBinding ResolveBinding(string targetPropertyName)
         {

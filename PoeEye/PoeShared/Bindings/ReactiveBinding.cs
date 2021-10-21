@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -9,44 +10,44 @@ namespace PoeShared.Bindings
 {
     public class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
     {
-        private static readonly Binder<ReactiveBinding> Binder = new Binder<ReactiveBinding>();
+        private static readonly Binder<ReactiveBinding> Binder = new();
 
         static ReactiveBinding()
         {
-            Binder.BindIf(x => x.TargetWatcher.HasValue && x.SourceWatcher.HasValue, x => x.SourceWatcher.Value)
+            Binder.BindIf(x => x.IsActive, x => x.SourceWatcher.Value)
                 .ElseIf(x => x.TargetWatcher.HasValue, x => default)
                 .To((x, v) =>
                 {
-                    if (x.TargetWatcher != null)
-                    {
-                        x.TargetWatcher.SetCurrentValue(v);
-                    }
+                    x.TargetWatcher?.SetCurrentValue(v);
                 });
             
             Binder
                 .Bind(x => x.SourceWatcher.HasValue && x.TargetWatcher.HasValue)
                 .To(x => x.IsActive);
+            
+            Binder.Bind(x => new[]
+            {
+                x.TargetWatcher.Error == null ? null : $"Target Watcher error: {x.TargetWatcher.Error}",
+                x.SourceWatcher.Error == null ? null : $"Source Watcher error: {x.SourceWatcher.Error}"
+            }.Where(y => y != null).JoinStrings(Environment.NewLine)).To((x, v) => x.Error = string.IsNullOrEmpty(v) ? default : v);
         }
 
         public ReactiveBinding(IValueWatcher sourceWatcher, IValueWatcher targetWatcher) : this(sourceWatcher, targetWatcher, targetWatcher.ToString())
         {
         }
         
-        public ReactiveBinding(IValueWatcher sourceWatcher, IValueWatcher targetWatcher, string targetPropertyPath)
+        public ReactiveBinding(IValueWatcher sourceWatcher, IValueWatcher targetWatcher, string key)
         {
             SourceWatcher = sourceWatcher.AddTo(Anchors);
             TargetWatcher = targetWatcher.AddTo(Anchors);
-            TargetPropertyPath = targetPropertyPath;
-            if (!TargetWatcher.CanSetValue)
-            {
-                throw new ArgumentException($"Invalid target property expression - can not set value: {sourceWatcher} => {targetWatcher}");
-            }
-
+            Key = key;
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        public string TargetPropertyPath { get; }
+        public string Key { get; }
         
+        public string Error { get; private set; }
+
         public IValueWatcher SourceWatcher { get; }
         
         public IValueWatcher TargetWatcher { get; }

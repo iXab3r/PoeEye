@@ -7,15 +7,16 @@ namespace PoeShared.Bindings
 {
     public sealed class PropertyPathWatcher : ExpressionWatcherBase
     {
-        private static readonly Binder<PropertyPathWatcher> Binder = new();
+        private new static readonly Binder<PropertyPathWatcher> Binder;
 
         static PropertyPathWatcher()
         {
+            Binder = ExpressionWatcherBase.Binder.Clone<PropertyPathWatcher>();
             Binder.Bind( x => x.SourceType.GetPropertyTypeOrDefault(x.PropertyPath))
                 .To(x => x.PropertyType);
             
             Binder.Bind(x => !string.IsNullOrEmpty(x.PropertyPath) ? $@"x.{x.PropertyPath}" : default ).To(x => x.SourceExpression);
-            Binder.Bind(x => x.BuildCondition(x.PropertyPath)).To(x => x.ConditionExpression);
+            Binder.Bind(x => BuildCondition(x.PropertyPath)).To(x => x.ConditionExpression);
         }
 
         public string PropertyPath { get; set; }
@@ -25,7 +26,7 @@ namespace PoeShared.Bindings
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        private string BuildCondition(string propertyPath)
+        private static string BuildCondition(string propertyPath)
         {
             if (string.IsNullOrEmpty(propertyPath))
             {
@@ -53,6 +54,11 @@ namespace PoeShared.Bindings
             }
             
             return result.ToString();
+        }
+
+        public override string ToString()
+        {
+            return $"PropertyPathWatcher for {PropertyPath}, source: {Source}, sourceType: {SourceType}";
         }
     }
 }

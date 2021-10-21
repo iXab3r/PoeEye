@@ -33,6 +33,18 @@ namespace PoeShared.Scaffolding
             return result.Or().ToSourceList();
         }
 
+        public static IObservable<T> WatchCurrentValue<T, TKey>(this IConnectableCache<T, TKey> cache, TKey key)
+        {
+            return cache.Watch(key).Select(x => x.Reason switch
+            {
+                ChangeReason.Add => x.Current,
+                ChangeReason.Update => x.Current,
+                ChangeReason.Refresh => x.Current,
+                //ChangeReason.Remove x.Current contains removed element, which seems wrong
+                _ => default
+            });
+        }
+
         public static void MoveItemToTop<T>(this ISourceList<T> collection, T item)
         {
             collection.Edit(list =>

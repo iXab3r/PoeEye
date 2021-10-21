@@ -16,6 +16,20 @@ namespace PoeShared.Modularity
         [ComparisonIgnore]
         public JToken ConfigValue { get; set; }
 
+        public PoeConfigMetadata()
+        {
+        }
+
+        public PoeConfigMetadata(Type type) 
+        {
+            if (type == null)
+            {
+                return;
+            }
+            AssemblyName = type.Assembly.GetName().Name;
+            TypeName = type.FullName;
+        }
+
         public override string ToString()
         {
             return $"({nameof(PoeConfigMetadata)} {nameof(AssemblyName)}: {AssemblyName}, {nameof(TypeName)}: {TypeName}, {nameof(Version)}: {Version})";
@@ -28,17 +42,13 @@ namespace PoeShared.Modularity
         {
         }
 
-        public PoeConfigMetadata(T value) : this()
+        public PoeConfigMetadata(T value) : base(value?.GetType())
         {
             if (value == null)
             {
                 return;
             }
-            
             Value = value;
-            var valueType = value.GetType();
-            AssemblyName = valueType.Assembly.GetName().Name;
-            TypeName = valueType.FullName;
             if (value is IPoeEyeConfigVersioned configVersioned)
             {
                 Version = configVersioned.Version;

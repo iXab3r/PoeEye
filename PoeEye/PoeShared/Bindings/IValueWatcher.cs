@@ -1,4 +1,6 @@
-﻿using PoeShared.Scaffolding;
+﻿using System;
+using JetBrains.Annotations;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Bindings
 {
@@ -6,11 +8,15 @@ namespace PoeShared.Bindings
     {
         bool HasValue { get; }
         
-        object Source { get; set; }
+        object Source { [UsedImplicitly] get; set; }
         
         object Value { get; }
         
+        Exception Error { get; }
+        
         bool CanSetValue { get; }
+        
+        bool SupportsSetValue { get; }
         
         void SetCurrentValue(object newValue);
     }

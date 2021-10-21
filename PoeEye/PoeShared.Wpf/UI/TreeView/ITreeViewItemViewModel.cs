@@ -17,6 +17,8 @@ namespace PoeShared.UI
         public bool IsExpanded { get; set; }
 
         public bool IsSelected { get; set; }
+        
+        public bool IsVisible { get; }
 
         public ITreeViewItemViewModel Parent { [CanBeNull] get; [CanBeNull] set; }
         

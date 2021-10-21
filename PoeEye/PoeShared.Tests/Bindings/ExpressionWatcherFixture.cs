@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using PoeShared.Bindings;
 using PoeShared.Scaffolding;
+using PropertyBinder;
 using Shouldly;
 
 namespace PoeShared.Tests.Bindings
@@ -31,7 +32,7 @@ namespace PoeShared.Tests.Bindings
             instance.HasValue.ShouldBe(false);
 
             //When
-            instance.Source = new TestContainer() { IntProperty = 1 };
+            instance.Source = new TestObject() { IntProperty = 1 };
 
             //Then
             instance.Value.ShouldBe(1);
@@ -42,8 +43,8 @@ namespace PoeShared.Tests.Bindings
         public void ShouldWatchExpression()
         {
             //Given
-            var instance = new ExpressionWatcher<TestContainer, int>(x => x.Inner.IntProperty + 1);
-            instance.Source = new TestContainer() { Inner = new TestContainer() { IntProperty = 1 }};
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.Inner.IntProperty + 1);
+            instance.Source = new TestObject() { Inner = new TestObject() { IntProperty = 1 }};
             instance.Value.ShouldBe(2);
             instance.HasValue.ShouldBe(true);
             
@@ -60,7 +61,18 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             //When
-            var instance = new ExpressionWatcher<TestContainer, int>(x => x.intField);
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.intField);
+
+            //Then
+            instance.CanSetValue.ShouldBeFalse();
+        }
+        
+        [Test]
+        public void ShouldNotSupportSettingGetOnlyProperties()
+        {
+            //Given
+            //When
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.ReadOnlyIntProperty);
 
             //Then
             instance.CanSetValue.ShouldBeFalse();
@@ -71,7 +83,7 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = CreateInstance();
-            instance.Source = new TestContainer() { IntProperty = 1 };
+            instance.Source = new TestObject() { IntProperty = 1 };
             instance.Value.ShouldBe(1);
             instance.HasValue.ShouldBe(true);
 
@@ -88,7 +100,7 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = CreateInstance();
-            instance.Source = new TestContainer() { IntProperty = 1 };
+            instance.Source = new TestObject() { IntProperty = 1 };
             instance.Value.ShouldBe(1);
             instance.HasValue.ShouldBe(true);
 
@@ -104,10 +116,10 @@ namespace PoeShared.Tests.Bindings
         public void ShouldSupportExpressions()
         {
             //Given
-            var instance = new ExpressionWatcher<TestContainer, int>(x => x.IntProperty + 1);
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.IntProperty + 1);
             
             //When
-            instance.Source = new TestContainer() { IntProperty = 1 };
+            instance.Source = new TestObject() { IntProperty = 1 };
 
             //Then
             instance.Value.ShouldBe(2);
@@ -121,12 +133,12 @@ namespace PoeShared.Tests.Bindings
             var instance = new ExpressionWatcher<TestReactiveContainer, int>(x => x.Containers.Where(y => y.Id == "b").Select(y => y.IntProperty + 1).FirstOrDefault());
             instance.Source = new TestReactiveContainer();
             
-            instance.Source.Containers.Add(new TestContainer() { IntProperty = 1, Id = "a" });
+            instance.Source.Containers.Add(new TestObject() { IntProperty = 1, Id = "a" });
             instance.Value.ShouldBe(0);
             instance.HasValue.ShouldBe(true);
             
             //When
-            instance.Source.Containers.Add(new TestContainer() { IntProperty = 2, Id = "b" });
+            instance.Source.Containers.Add(new TestObject() { IntProperty = 2, Id = "b" });
 
 
             //Then
@@ -146,7 +158,7 @@ namespace PoeShared.Tests.Bindings
             instance.HasValue.ShouldBe(false);
             
             //When
-            instance.Source.Containers.Add(new TestContainer() { IntProperty = 2, Id = "b" });
+            instance.Source.Containers.Add(new TestObject() { IntProperty = 2, Id = "b" });
 
             //Then
             instance.Value.ShouldBe(3);
@@ -167,7 +179,7 @@ namespace PoeShared.Tests.Bindings
             instance.CanSetValue.ShouldBe(false);
             
             //When
-            source.Containers.Add(new TestContainer() { IntProperty = 2, Id = "b" });
+            source.Containers.Add(new TestObject() { IntProperty = 2, Id = "b" });
 
             //Then
             instance.Value.ShouldBe(3);
@@ -183,7 +195,7 @@ namespace PoeShared.Tests.Bindings
             instance.SourceExpression = @"x.Containers.Where(y => y.Id == ""b"").Select(y => y.Id).First()";
             instance.ConditionExpression = @"x != null && x.Containers.Any(y => y.Id == ""b"")";
             var source = new TestReactiveContainer();
-            source.Containers.Add(new TestContainer() { Id = "b" });
+            source.Containers.Add(new TestObject() { Id = "b" });
             instance.Value.ShouldBe(default);
             instance.HasValue.ShouldBe(false);
             instance.CanSetValue.ShouldBe(false);
@@ -210,7 +222,7 @@ namespace PoeShared.Tests.Bindings
             instance.Value.ShouldBe(default);
             instance.HasValue.ShouldBe(false);
             instance.CanSetValue.ShouldBe(false);
-            source.Containers.Add(new TestContainer() { IntProperty = 2, Id = "b" });
+            source.Containers.Add(new TestObject() { IntProperty = 2, Id = "b" });
             instance.Value.ShouldBe(2);
             instance.HasValue.ShouldBe(true);
             instance.CanSetValue.ShouldBe(true);
@@ -223,9 +235,177 @@ namespace PoeShared.Tests.Bindings
             instance.HasValue.ShouldBe(true);
         }
 
-        private ExpressionWatcher<TestContainer, int> CreateInstance()
+        [Test]
+        public void ShouldNotThrowWhenInvalidExpression()
         {
-            return new ExpressionWatcher<TestContainer, int>(x => x.IntProperty);
+            //Given
+            var instance = new ExpressionWatcher(typeof(int));
+            instance.SourceExpression = @"x.Containers.Where(y => y.Id == ""b"").First().IntProperty";
+
+            //When
+            Action action = () => instance.Source = new TestObject();
+
+            //Then
+            action.ShouldNotThrow();
+            instance.Error.ShouldBeOfType<BindingException>();
+        }
+        
+        [Test]
+        public void ShouldNotThrowWhenUnknownProperty()
+        {
+            //Given
+            var instance = new ExpressionWatcher(typeof(int));
+            instance.SourceExpression = @"x.Containers.Where(y => y.Id == ""b"").First().MISSING";
+
+            //When
+            Action action = () => instance.Source = new TestObject();
+
+            //Then
+            action.ShouldNotThrow();
+            instance.Error.ShouldBeOfType<BindingException>();
+        }
+
+        [Test]
+        public void ShouldResetErrorWhenExpressionIsFixed()
+        {
+            //Given
+            var instance = new ExpressionWatcher(typeof(int));
+            instance.Source = new TestObject() { IntProperty = 1 };
+            instance.SourceExpression = @"x.Containers.Where(y => y.Id == ""b"").First().MISSING";
+            instance.Error.ShouldBeOfType<BindingException>();
+
+            //When
+            instance.SourceExpression = @"x.IntProperty";
+
+
+            //Then
+            instance.Error.ShouldBeNull();
+            instance.Value.ShouldBe(1);
+        }
+
+        [Test]
+        public void ShouldBindToPropertyFromString()
+        {
+            //Given
+            var instance = new ExpressionWatcher(typeof(int));
+            instance.SourceExpression = @"x.IntProperty";
+
+            //When
+            instance.Source = new TestObject() { IntProperty = 1 };
+
+            //Then
+            instance.Error.ShouldBeNull();
+            instance.Value.ShouldBe(1);
+            instance.HasValue.ShouldBe(true);
+        }
+
+        [Test]
+        public void ShouldNotThrowWhenCannotGetValue()
+        {
+            //Given
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.PropertyThatThrows);
+
+            //When
+            Action action = () => instance.Source = new TestObject();
+
+            //Then
+            action.ShouldNotThrow();
+            instance.Error.ShouldBeOfType<BindingException>();
+        }
+
+        [Test]
+        public void ShouldResetErrorOnRebind()
+        {
+            //Given
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.PropertyThatThrows);
+            instance.Source = new TestObject();
+            instance.Error.ShouldBeOfType<BindingException>();
+
+            //When
+            instance.Source = new TestObject() { Throw = false };
+
+            //Then
+            instance.Error.ShouldBeNull();
+            instance.HasValue.ShouldBe(true);
+        }
+
+        [Test]
+        public void ShouldNotThrowWhenCannotSet()
+        {
+            //Given
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.PropertyThatThrows);
+            instance.Source = new TestObject();
+            instance.CanSetValue.ShouldBe(true);
+
+            //When
+            Action action = () => instance.SetCurrentValue(1);
+
+            //Then
+            action.ShouldNotThrow();
+            instance.Error.ShouldBeOfType<BindingException>();
+        }
+
+        [Test]
+        public void ShouldResetErrorOnSet()
+        {
+            //Given
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.PropertyThatThrows);
+            instance.Source = new TestObject();
+            instance.SetCurrentValue(1);
+            instance.Error.ShouldBeOfType<BindingException>();
+            instance.Source.Throw = false;
+
+            //When
+            instance.SetCurrentValue(2);
+
+            //Then
+            instance.Error.ShouldBeNull();
+            instance.Value.ShouldBe(2);
+        }
+
+        [Test]
+        public void ShouldResetValueAfterDisposal()
+        {
+            //Given
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.IntProperty);
+            instance.Source = new TestObject();
+            instance.Source.IntProperty = 1;
+            instance.Value.ShouldBe(1);
+            instance.HasValue.ShouldBe(true);
+
+            //When
+            instance.Dispose();
+
+            //Then
+            instance.Source.ShouldBe(default);
+            instance.CanSetValue.ShouldBe(false);
+            instance.HasValue.ShouldBe(false);
+            instance.Value.ShouldBe(default);
+        }
+        
+        [Test]
+        public void ShouldNotTrackValuesAfterDisposal()
+        {
+            //Given
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.IntProperty);
+            var source = new TestObject();
+            instance.Source = source;
+            instance.Source.IntProperty = 1;
+            instance.Value.ShouldBe(1);
+            instance.HasValue.ShouldBe(true);
+            instance.Dispose();
+
+            //When
+            source.IntProperty = 2;
+
+            //Then
+            instance.HasValue.ShouldBe(false);
+            instance.Value.ShouldBe(default);
+        }
+
+        private ExpressionWatcher<TestObject, int> CreateInstance()
+        {
+            return new ExpressionWatcher<TestObject, int>(x => x.IntProperty);
         }
     }
 }

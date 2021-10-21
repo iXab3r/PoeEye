@@ -14,12 +14,12 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = new PropertyPathWatcher();
-            instance.PropertyPath = nameof(TestContainer.IntProperty);
+            instance.PropertyPath = nameof(TestObject.IntProperty);
             instance.HasValue.ShouldBe(false);
             instance.Value.ShouldBe(default);
 
             //When
-            instance.Source = new TestContainer() { IntProperty = 1 };
+            instance.Source = new TestObject() { IntProperty = 1 };
 
             //Then
             instance.HasValue.ShouldBe(true);
@@ -31,8 +31,8 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = new PropertyPathWatcher();
-            instance.PropertyPath = nameof(TestContainer.IntProperty);
-            instance.Source = new TestContainer() { IntProperty = 1 };
+            instance.PropertyPath = nameof(TestObject.IntProperty);
+            instance.Source = new TestObject() { IntProperty = 1 };
             instance.HasValue.ShouldBe(true);
             instance.Value.ShouldBe(1);
             
@@ -49,16 +49,16 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = new PropertyPathWatcher();
-            instance.PropertyPath = $"{nameof(TestContainer.Inner)}.{nameof(TestContainer.IntProperty)}";
+            instance.PropertyPath = $"{nameof(TestObject.Inner)}.{nameof(TestObject.IntProperty)}";
 
-            var source = new TestContainer() { IntProperty = 1 };
+            var source = new TestObject() { IntProperty = 1 };
             instance.Source = source;
 
             instance.HasValue.ShouldBe(false);
             instance.Value.ShouldBe(default);
 
             //When
-            source.Inner = new TestContainer() { IntProperty = 2 };
+            source.Inner = new TestObject() { IntProperty = 2 };
 
             //Then
             instance.HasValue.ShouldBe(true);
@@ -70,13 +70,13 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = new PropertyPathWatcher();
-            instance.Source = new TestContainer() { IntProperty = 1, Inner = new TestContainer() { IntProperty = 2}};
-            instance.PropertyPath = nameof(TestContainer.IntProperty);
+            instance.Source = new TestObject() { IntProperty = 1, Inner = new TestObject() { IntProperty = 2}};
+            instance.PropertyPath = nameof(TestObject.IntProperty);
             instance.HasValue.ShouldBe(true);
             instance.Value.ShouldBe(1);
             
             //When
-            instance.PropertyPath = $"{nameof(TestContainer.Inner)}.{nameof(TestContainer.IntProperty)}";
+            instance.PropertyPath = $"{nameof(TestObject.Inner)}.{nameof(TestObject.IntProperty)}";
 
             //Then
             instance.HasValue.ShouldBe(true);
@@ -88,8 +88,8 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var instance = new PropertyPathWatcher();
-            instance.Source = new TestContainer() { IntProperty = 1, Inner = new TestContainer() { IntProperty = 2}};
-            instance.PropertyPath = $"{nameof(TestContainer.Inner)}.{nameof(TestContainer.IntProperty)}";
+            instance.Source = new TestObject() { IntProperty = 1, Inner = new TestObject() { IntProperty = 2}};
+            instance.PropertyPath = $"{nameof(TestObject.Inner)}.{nameof(TestObject.IntProperty)}";
             instance.HasValue.ShouldBe(true);
             instance.Value.ShouldBe(2);
             

@@ -26,7 +26,6 @@ namespace PoeShared.Modularity
             .GetMethod(nameof(SetMetadataTypedValue), BindingFlags.Instance | BindingFlags.NonPublic);
         
         private readonly ConcurrentDictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new ConcurrentDictionary<Type, IPoeEyeConfigVersioned>();
-        private readonly ConcurrentDictionary<string, Assembly> loadedAssemblyByName = new ConcurrentDictionary<string, Assembly>();
         private readonly ConcurrentDictionary<Type, MethodInfo> getMetadataValueByType = new ConcurrentDictionary<Type, MethodInfo>();
         private readonly ConcurrentDictionary<Type, MethodInfo> setMetadataValueByType = new ConcurrentDictionary<Type, MethodInfo>();
         
@@ -106,7 +105,7 @@ namespace PoeShared.Modularity
                 return metadata;
             }
 
-            var innerType = ResolveType(metadata);
+            var innerType = AssemblyHelper.Instance.ResolveType(metadata);
             if (innerType == null)
             {
                 Log.Warn($"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {metadata.AssemblyName}, returning wrapper object {metadata}");
@@ -123,39 +122,7 @@ namespace PoeShared.Modularity
             return value;
         }
 
-        private Type ResolveType(PoeConfigMetadata metadata)
-        {
-            var loadedType = Type.GetType(metadata.TypeName, false);
-            if (loadedType != null)
-            {
-                return loadedType;
-            }
-            
-            if (string.IsNullOrEmpty(metadata.AssemblyName))
-            {
-                throw new FormatException($"Metadata is not valid(assembly is not defined), returning empty object instead, metadata: {metadata}");
-            }
-            
-            Log.Debug($"Type {metadata.TypeName} is not loaded, trying to read type from assembly {metadata.AssemblyName}");
-            if (!loadedAssemblyByName.TryGetValue(metadata.AssemblyName, out var assembly))
-            {
-                assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == metadata.AssemblyName);
-                if (assembly == null)
-                {
-                    Log.Warn($"Assembly {metadata.AssemblyName} is not loaded, could not convert type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())})");
-                    return null;
-                }
-
-                loadedAssemblyByName[metadata.AssemblyName] = assembly;
-            }
-            
-            loadedType = assembly.GetType(metadata.TypeName, throwOnError: false);
-            if (loadedType == null)
-            {
-                Log.Warn($"Assembly {metadata.AssemblyName} is loaded but does not contain type {metadata.TypeName}, (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())})");
-            }
-            return loadedType;
-        }
+     
 
         private object DeserializeInnerValue(PoeConfigMetadata metadata, JsonSerializer serializer, Type innerType)
         {

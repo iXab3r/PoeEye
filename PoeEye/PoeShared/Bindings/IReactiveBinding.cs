@@ -1,10 +1,13 @@
-﻿using PoeShared.Scaffolding;
+﻿using System;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Bindings
 {
     public interface IReactiveBinding : IDisposableReactiveObject
     {
-        string TargetPropertyPath { get; }
+        string Key { get; }
+        
+        string Error { get; }
         
         IValueWatcher SourceWatcher { get; }
         
