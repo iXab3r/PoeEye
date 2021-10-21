@@ -4,6 +4,5 @@
     {
         public const string AllWindows = "AllWindows";
         public const string MainWindow = "Main";
-        public const string PathOfExileWindow = "PathOfExile";
     }
 }

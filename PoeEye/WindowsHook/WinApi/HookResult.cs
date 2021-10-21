@@ -57,6 +57,7 @@ namespace WindowsHook.WinApi
             }
 
             var lastHookResult = CallNextHookEx(nCode, wParam, lParam);
+
             return lastHookResult;
         }
     }

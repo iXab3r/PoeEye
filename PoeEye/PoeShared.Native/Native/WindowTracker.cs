@@ -21,17 +21,16 @@ namespace PoeShared.Native
         private static readonly IFluentLog Log = typeof(WindowTracker).PrepareLogger();
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
-        private readonly IStringMatcher titleMatcher;
- 
+        private readonly IWindowTrackerMatcher windowMatcher;
 
         public WindowTracker(
             IFactory<IWinEventHookWrapper, WinEventHookArguments> hookFactory,
-            IStringMatcher titleMatcher,
+            IWindowTrackerMatcher windowMatcher,
             [Unity.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(titleMatcher, nameof(titleMatcher));
+            Guard.ArgumentNotNull(windowMatcher, nameof(windowMatcher));
 
-            this.titleMatcher = titleMatcher;
+            this.windowMatcher = windowMatcher;
 
             var timerObservable = ObservableEx
                 .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
@@ -80,7 +79,7 @@ namespace PoeShared.Native
             ActiveWindowHandle = hwnd;
             ActiveWindowTitle = title;
             ActiveProcessId = processId;
-            IsActive = titleMatcher.IsMatch(ActiveWindowTitle);
+            IsActive = windowMatcher.IsMatch(title, hwnd, processId);
             MatchingWindowHandle = IsActive ? hwnd : IntPtr.Zero;
 
             if (previousState.ActiveWindowHandle != ActiveWindowHandle)

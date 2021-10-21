@@ -61,19 +61,9 @@ namespace PoeShared.Prism
                         }
                     )),new ContainerControlledLifetimeManager());
 
-            Container.RegisterWindowTracker(WellKnownWindows.AllWindows, () => ".*");
-            Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () =>
-            {
-                //TODO Optimize MainWindowTitle resolution
-                var mainWindowTitle = Process.GetCurrentProcess().MainWindowTitle;
-                if (string.IsNullOrEmpty(mainWindowTitle))
-                {
-                    return string.Empty;
-                }
-                var regex = $"^{Regex.Escape(mainWindowTitle)}$";
-                return regex;
-            });
-            Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
+            Container.RegisterWindowTracker<PassthroughWindowTrackerTitleMatcher>(WellKnownWindows.AllWindows);
+            Container.RegisterWindowTracker<MainWindowTrackerTitleMatcher>(WellKnownWindows.MainWindow);
+            Container.RegisterFactory<IWindowTracker>(x => x.Resolve<IWindowTracker>(WellKnownWindows.AllWindows));
         }
     }
 }

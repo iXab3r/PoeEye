@@ -15,6 +15,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Prism;
+using PoeShared.UI;
 using PoeShared.WindowSeekers;
 using ReactiveUI;
 using Unity;
@@ -54,8 +55,9 @@ namespace PoeShared.RegionSelector.ViewModels
                 .Merge(refreshRequest)
                 .Select(x => new { SelectionAdorner.MousePosition, SelectionAdorner.Owner })
                 .Where(x => x.Owner != null)
-                .Sample(ThrottlingPeriod, uiScheduler)
                 .Select(x => x.MousePosition.ToScreen(x.Owner))
+                .Sample(UiConstants.UiThrottlingDelay)
+                .ObserveOn(uiScheduler)
                 .Select(x => new Rectangle(x.X, x.Y, 1, 1))
                 .Select(ToRegionResult)
                 .Do(x => Log.Debug($"Selection candidate: {x}"))

@@ -27,13 +27,18 @@ namespace WindowsHook.WinApi
         public HookProcedureHandle(User32.SafeHookHandle hookHandle)
             : base(true)
         {
+            Log.Debug($"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
             this.hookHandle = hookHandle;
-            Log.Debug("Creating hook handle");
+            if (hookHandle.IsClosed || hookHandle.IsInvalid)
+            {
+                return;
+            }
+            SetHandle(hookHandle.DangerousGetHandle());
         }
 
         protected override bool ReleaseHandle()
         {
-            //NOTE Calling Unhook during processexit causes deley
+            //NOTE Calling Unhook during processexit causes delay
             if (ApplicationIsClosing)
             {
                 Log.Debug("Application is closing - do not need to release the hook");

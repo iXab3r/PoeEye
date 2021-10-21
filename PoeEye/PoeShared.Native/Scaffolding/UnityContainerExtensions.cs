@@ -1,5 +1,6 @@
 using System;
 using PoeShared.Native;
+using PoeShared.Prism;
 using Unity;
 using Unity.Injection;
 using Unity.Lifetime;
@@ -9,49 +10,19 @@ namespace PoeShared.Native.Scaffolding
 {
     public static class UnityContainerExtensions
     {
-        public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName,
-            Func<string> windowNameFunc)
+        public static IUnityContainer RegisterWindowTracker<T>(this IUnityContainer instance, string dependencyName) 
+        where T : IWindowTrackerMatcher
         {
             return instance.RegisterFactory<IWindowTracker>(
                 dependencyName,
                 unity =>
                 {
-                    var result = unity.Resolve<WindowTracker>(
-                        new DependencyOverride<IStringMatcher>(
-                            new RegexStringMatcher().WithLazyWhitelistItem(windowNameFunc)));
-                    result.Name = $"{dependencyName} (Lazy'{windowNameFunc()}')";
+                    var factory = unity.Resolve<IFactory<WindowTracker, IWindowTrackerMatcher>>();
+                    var windowTrackerMatcher = unity.Resolve<T>();
+                    var result = factory.Create(windowTrackerMatcher);
+                    result.Name = $"{dependencyName} (Lazy'{windowTrackerMatcher}')";
                     return result;
                 }, new ContainerControlledLifetimeManager());
-        }
-
-        public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName,
-            string windowNamePattern)
-        {
-            return instance.RegisterFactory<IWindowTracker>(
-                    dependencyName,
-                    unity =>
-                    {
-                        var result = unity.Resolve<WindowTracker>(
-                            new DependencyOverride<IStringMatcher>(
-                                new RegexStringMatcher().AddToWhitelist(windowNamePattern)));
-                        result.Name = $"{dependencyName} ('{windowNamePattern}')";
-                        return result;
-                    },
-                    new ContainerControlledLifetimeManager());
-        }
-
-        public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName,
-            IStringMatcher matcher)
-        {
-            return instance.RegisterFactory<IWindowTracker>(
-                    dependencyName,
-                    unity =>
-                    {
-                        var result = unity.Resolve<WindowTracker>(
-                            new DependencyOverride<IStringMatcher>(matcher));
-                        result.Name = $"{dependencyName}";
-                        return result;
-                    },new ContainerControlledLifetimeManager());
         }
     }
 }

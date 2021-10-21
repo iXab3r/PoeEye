@@ -14,6 +14,7 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.UI;
 using ReactiveUI;
 using Unity;
 using WindowsHook;
@@ -137,6 +138,7 @@ namespace PoeShared.RegionSelector.ViewModels
                     this.WhenAnyValue(x => x.Owner, x => x.OwnerIsVisible)
                         .Select(x => x.Item1 != null && x.Item2
                                 ? keyboardEventsSource.WhenMouseMove
+                                    .Sample(UiConstants.UiAnimationDelay)
                                     .StartWith(new MouseEventExtArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
                                     : Observable.Empty<MouseEventExtArgs>())
                         .Switch()
