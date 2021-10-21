@@ -60,10 +60,9 @@ namespace PoeShared.Bindings
 
         public IDisposable AddOrUpdateBinding(IReactiveBinding binding)
         {
-            bindings.AddOrUpdateIfNeeded(binding);
+            bindings.AddOrUpdate(binding);
             return Disposable.Create(() => bindings.Remove(binding));
         }
-
 
         private IReactiveBinding ResolveBinding(string targetPropertyName)
         {

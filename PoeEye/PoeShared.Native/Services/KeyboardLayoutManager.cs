@@ -130,7 +130,7 @@ namespace PoeShared.Services
             if (addedLayouts.Any())
             {
                 Log.Info($"Adding new keyboard layouts from known layouts list: {addedLayouts.DumpToString()}, known layouts: {layoutByLocaleId.Items.DumpToString()}");
-                layoutByLocaleId.AddOrUpdateIfNeeded(addedLayouts);
+                layoutByLocaleId.AddOrUpdate(addedLayouts);
             }
 
             var removedLayouts = layoutByLocaleId.Items.Where(x => !layouts.Contains(x)).ToArray();

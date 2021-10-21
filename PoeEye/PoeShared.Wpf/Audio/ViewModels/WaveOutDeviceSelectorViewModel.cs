@@ -106,7 +106,7 @@ namespace PoeShared.Audio.ViewModels
             {
                 devicesSource.RemoveKeys(devicesToRemove.Select(x => x.Id));
             }
-            devicesSource.AddOrUpdateIfNeeded(devices.Values);
+            devicesSource.EditDiff(devices.Values);
         }
     }
 }
