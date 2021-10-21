@@ -55,21 +55,15 @@ namespace PoeShared.Scaffolding
 
         public static Type GetPropertyTypeOrDefault(this Type type, string propertyPath)
         {
+            return GetPropertyInfoOrDefault(type, propertyPath)?.PropertyType;
+        }
+
+        public static PropertyInfo GetPropertyInfoOrDefault(this Type type, string propertyPath)
+        {
             if (type == null || string.IsNullOrEmpty(propertyPath))
             {
                 return default;
             }
-            
-            if (!IsValidPropertyPath(propertyPath))
-            {
-                throw new ArgumentException($"Invalid property format: {propertyPath}, type: {type}");
-            }
-            
-            return type.GetPropertyInfo(propertyPath).PropertyType;
-        }
-
-        public static PropertyInfo GetPropertyInfo(this Type type, string propertyPath)
-        {
             if (!IsValidPropertyPath(propertyPath))
             {
                 throw new ArgumentException($"Invalid property format: {propertyPath}, type: {type}");
@@ -77,8 +71,8 @@ namespace PoeShared.Scaffolding
             var propertyParts = propertyPath.Split('.');
             if (propertyParts.Length > 1)
             {
-                var rootProperty = GetPropertyInfo(type, propertyParts[0]);
-                return GetPropertyInfo(rootProperty.PropertyType, propertyParts.Skip(1).JoinStrings("."));
+                var rootProperty = GetPropertyInfoOrDefault(type, propertyParts[0]);
+                return GetPropertyInfoOrDefault(rootProperty?.PropertyType, propertyParts.Skip(1).JoinStrings("."));
             }
             
             return PropertyAccessorByName.GetOrAdd(
@@ -86,13 +80,24 @@ namespace PoeShared.Scaffolding
                 x =>
                 {
                     var property = x.type.GetAllProperties(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(y => string.Compare(x.propertyName, y.Name, StringComparison.OrdinalIgnoreCase) == 0);
-                    if (property == null)
-                    {
-                        throw new ArgumentException($"Failed to find property {propertyPath} in type {type}");
-                    }
-
                     return property;
-                });
+                });;
+        }
+        
+        public static PropertyInfo GetPropertyInfo(this Type type, string propertyPath)
+        {
+            if (!IsValidPropertyPath(propertyPath))
+            {
+                throw new ArgumentException($"Invalid property format: {propertyPath}, type: {type}");
+            }
+
+            var propertyInfo = GetPropertyInfoOrDefault(type, propertyPath);
+            if (propertyInfo == null)
+            {
+                throw new ArgumentException($"Failed to find property {propertyPath} in type {type}");
+            }
+
+            return propertyInfo;
         }
 
         public static bool IsIndexedProperty(this PropertyInfo propertyInfo)
