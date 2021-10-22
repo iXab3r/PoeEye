@@ -87,7 +87,7 @@ namespace PoeShared.Bindings
 
         public bool HasValue { get; [JetBrains.Annotations.UsedImplicitly] private set; }
 
-        public Exception Error { get; protected set; }
+        public Exception Error { get; private set; }
 
         public void SetCurrentValue(object newValue)
         {

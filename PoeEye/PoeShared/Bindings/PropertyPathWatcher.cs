@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using PoeShared.Scaffolding;
 using PropertyBinder;
@@ -20,10 +21,51 @@ namespace PoeShared.Bindings
         }
 
         public string PropertyPath { get; set; }
+        
+        private long ResolvedSourceRevision { get; set; }
 
         public PropertyPathWatcher()
         {
             Binder.Attach(this).AddTo(Anchors);
+        }
+
+        private static Type ResolveTypeByPathOrDefault(object source, string propertyPath)
+        {
+            if (source == null || string.IsNullOrEmpty(propertyPath))
+            {
+                return default;
+            }
+
+            var result = GetPropertyTypeOrDefault(source, propertyPath);
+            return result;
+        }
+        
+        
+        private static Type GetPropertyTypeOrDefault(object model, string propertyPath)
+        {
+            if (model == null || string.IsNullOrEmpty(propertyPath))
+            {
+                return default;
+            }
+
+            var propertyParts = propertyPath.Split('.');
+            var rootProperty = model.GetType().GetPropertyInfoOrDefault(propertyParts[0]);
+            if (rootProperty == null)
+            {
+                return default;
+            }
+
+            if (propertyParts.Length <= 1)
+            {
+                return rootProperty.PropertyType;
+            }
+            
+            var root = rootProperty.GetValue(model);
+            if (root == null)
+            {
+                return default;
+            }
+            return GetPropertyTypeOrDefault(root, propertyParts.Skip(1).JoinStrings("."));
         }
 
         private static string BuildCondition(string propertyPath)
