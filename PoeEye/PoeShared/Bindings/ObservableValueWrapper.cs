@@ -53,6 +53,11 @@ namespace PoeShared.Bindings
             }
             
             public T Value { get; set; }
+
+            public override string ToString()
+            {
+                return Equals(default(T), Value) ? "NULL" : Value.ToString();
+            }
         }
         
         private sealed class ObservableValueWatcher<T> : DisposableReactiveObject
