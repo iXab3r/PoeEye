@@ -39,7 +39,6 @@ namespace PoeShared.Native
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
         private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
         private bool isLocked = true;
- 
 
         protected OverlayViewModelBase()
         {
@@ -157,7 +156,7 @@ namespace PoeShared.Native
         public bool IsLocked
         {
             get => isLocked;
-            private set
+            set
             {
                 if (!value && !IsUnlockable)
                 {

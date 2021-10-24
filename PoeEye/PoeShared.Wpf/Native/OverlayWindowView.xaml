@@ -22,7 +22,7 @@
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}" 
                       CornerRadius="0" CaptionHeight="0" 
-                      ResizeBorderThickness="{Binding ResizeThumbSize, Mode=OneWay, Converter={StaticResource DoubleDivideByTwoConverter}}" />
+                      ResizeBorderThickness="{Binding ResizeBorderThickness, Mode=OneWay}" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <eye:SharedResourceDictionary>
