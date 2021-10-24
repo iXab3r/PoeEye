@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI
 {
@@ -16,6 +17,11 @@ namespace PoeShared.UI
         public static IEnumerable<T> FindParentsOfType<T>(this ITreeViewItemViewModel instance) where T : ITreeViewItemViewModel
         {
             return FindParents(instance, x => x is T, instance).OfType<T>();
+        }
+
+        public static void ExpandParentDirectories(this ITreeViewItemViewModel instance)
+        {
+            instance.FindParentsOfType<IDirectoryTreeViewItemViewModel>().Where(x => x.IsExpanded == false).ForEach(x => x.IsExpanded = true);
         }
 
         public static IEnumerable<ITreeViewItemViewModel> FindParents(this ITreeViewItemViewModel instance, Predicate<ITreeViewItemViewModel> predicate, ITreeViewItemViewModel node)
