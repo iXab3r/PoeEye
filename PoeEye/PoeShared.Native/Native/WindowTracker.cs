@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Text;
 using System.Windows.Forms;
 using JetBrains.Annotations;
 using log4net;
@@ -44,11 +45,10 @@ namespace PoeShared.Native
             });
 
             timerObservable
-                .Select(_ => "Timer")
-                .Merge(objectFocusHook.WhenWindowEventTriggered.Select(_ => $"{nameof( User32.WindowsEventHookType.EVENT_OBJECT_FOCUS)}"))
-                .Sample(SamplePeriod, bgScheduler)
-                .Select(_ => UnsafeNative.GetForegroundWindow())
-                .Select(hwnd => new { ActiveWindow = hwnd, Title = UnsafeNative.GetWindowTitle(hwnd), ProcessId = UnsafeNative.GetProcessIdByWindowHandle(this.ActiveWindowHandle) })
+                .Select(_ => new { Reason = "Timer", ForegroundWindow = UnsafeNative.GetForegroundWindow() })
+                .Merge(objectFocusHook.WhenWindowEventTriggered.Select(x => new { Reason =  nameof( User32.WindowsEventHookType.EVENT_OBJECT_FOCUS), ForegroundWindow = x.WindowHandle }))
+                .Select(x => x.ForegroundWindow)
+                .Select(hwnd => new { ActiveWindow = hwnd, Title = UnsafeNative.GetWindowTitle(hwnd), ProcessId = UnsafeNative.GetProcessIdByWindowHandle(hwnd) })
                 .DistinctUntilChanged()
                 .SubscribeSafe(x => WindowActivated(x.ActiveWindow, x.Title, x.ProcessId), Log.HandleUiException)
                 .AddTo(Anchors);
