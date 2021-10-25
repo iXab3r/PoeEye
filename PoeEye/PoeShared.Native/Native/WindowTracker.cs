@@ -47,8 +47,7 @@ namespace PoeShared.Native
             timerObservable
                 .Select(_ => new { Reason = "Timer", ForegroundWindow = UnsafeNative.GetForegroundWindow() })
                 .Merge(objectFocusHook.WhenWindowEventTriggered.Select(x => new { Reason =  nameof( User32.WindowsEventHookType.EVENT_OBJECT_FOCUS), ForegroundWindow = x.WindowHandle }))
-                .Select(x => x.ForegroundWindow)
-                .Select(hwnd => new { ActiveWindow = hwnd, Title = UnsafeNative.GetWindowTitle(hwnd), ProcessId = UnsafeNative.GetProcessIdByWindowHandle(hwnd) })
+                .Select(x => new { ActiveWindow = x.ForegroundWindow, Title = UnsafeNative.GetWindowTitle(x.ForegroundWindow), ProcessId = UnsafeNative.GetProcessIdByWindowHandle(x.ForegroundWindow), Reason = x.Reason })
                 .DistinctUntilChanged()
                 .SubscribeSafe(x => WindowActivated(x.ActiveWindow, x.Title, x.ProcessId), Log.HandleUiException)
                 .AddTo(Anchors);
