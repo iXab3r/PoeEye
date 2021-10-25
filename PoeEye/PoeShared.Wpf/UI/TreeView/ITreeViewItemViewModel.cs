@@ -18,7 +18,11 @@ namespace PoeShared.UI
 
         public bool IsSelected { get; set; }
         
-        public bool IsVisible { get; }
+        public AnnotatedBoolean IsVisible { get; }
+        
+        public bool IsEnabled { get; }
+        
+        public bool ParentIsExpanded { get; }
 
         public ITreeViewItemViewModel Parent { [CanBeNull] get; [CanBeNull] set; }
         
@@ -33,6 +37,5 @@ namespace PoeShared.UI
     
     public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel
     {
-        public bool ParentIsExpanded { get; }
     }
 }

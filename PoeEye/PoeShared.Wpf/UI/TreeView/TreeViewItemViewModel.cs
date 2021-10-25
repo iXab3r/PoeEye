@@ -22,6 +22,7 @@ namespace PoeShared.UI
         private readonly SourceList<TreeViewItemViewModel> children = new();
         private readonly ObservableAsPropertyHelper<string> pathSupplier;
         protected readonly Fallback<string> TabName = new();
+        private readonly ObservableAsPropertyHelper<bool> parentIsExpanded;
 
         static TreeViewItemViewModel()
         {
@@ -87,12 +88,24 @@ namespace PoeShared.UI
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
             
+            parentIsExpanded = this.WhenAnyValue(x => x.Parent)
+                .Select(x => x is IDirectoryTreeViewItemViewModel eyeItem 
+                    ? eyeItem.WhenAnyValue(y => y.ParentIsExpanded).CombineLatest(eyeItem.WhenAnyValue(y => y.IsExpanded), (parentIsExpanded, isExpanded) => parentIsExpanded && isExpanded) 
+                    : Observable.Return(true))
+                .Switch()
+                .ToProperty(this, x => x.ParentIsExpanded)
+                .AddTo(Anchors);
+            
             Binder.Attach(this).AddTo(Anchors);
         }
 
         public bool IsEnabled { get; set; } = true;
 
-        public bool IsVisible { get; set; } = true;
+        public AnnotatedBoolean IsVisible { get; set; } = new(true, "Visible by default");
+        
+        public AnnotatedBoolean IsExpandable { get; set; } = new(true, "Expandable by default");
+        
+        public bool ParentIsExpanded => parentIsExpanded.Value;
 
         public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
 

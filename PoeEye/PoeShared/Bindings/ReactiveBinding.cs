@@ -14,13 +14,6 @@ namespace PoeShared.Bindings
 
         static ReactiveBinding()
         {
-            Binder.BindIf(x => x.IsActive, x => x.SourceWatcher.Value)
-                .ElseIf(x => x.TargetWatcher.HasValue, x => default)
-                .To((x, v) =>
-                {
-                    x.TargetWatcher?.SetCurrentValue(v);
-                });
-            
             Binder
                 .Bind(x => x.SourceWatcher.HasValue && x.TargetWatcher.HasValue)
                 .To(x => x.IsActive);
@@ -30,6 +23,13 @@ namespace PoeShared.Bindings
                 x.TargetWatcher.Error == null ? null : $"Target Watcher error: {x.TargetWatcher.Error}",
                 x.SourceWatcher.Error == null ? null : $"Source Watcher error: {x.SourceWatcher.Error}"
             }.Where(y => y != null).JoinStrings(Environment.NewLine)).To((x, v) => x.Error = string.IsNullOrEmpty(v) ? default : v);
+            
+            Binder.BindIf(x => x.IsActive, x => x.SourceWatcher.Value)
+                .ElseIf(x => x.TargetWatcher.HasValue, x => default)
+                .To((x, v) =>
+                {
+                    x.TargetWatcher?.SetCurrentValue(v);
+                });
         }
 
         public ReactiveBinding(IValueWatcher sourceWatcher, IValueWatcher targetWatcher) : this(sourceWatcher, targetWatcher, targetWatcher.ToString())

@@ -127,6 +127,7 @@
                                       Style="{StaticResource MaterialDesignExpandCollapseToggleStyle}"
                                       Foreground="{TemplateBinding Foreground}"
                                       Margin="8 0 8 0"
+                                      Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(eye:TreeViewAssist.IsExpandable), Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                                       VerticalAlignment="Center"/>
                         
                         <Border x:Name="MouseOverBorder"
@@ -152,7 +153,7 @@
                             </wpf:Ripple>
                         </Grid>
 
-                        <ContentControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                        <eye:CachedContentControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
                                         x:Name="AdditionalContentControl"
                                         Content="{TemplateBinding Header}"
                                         ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:TreeViewAssist.AdditionalTemplate)}"
@@ -170,6 +171,16 @@
                         </StackPanel>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger SourceName="Expander" Property="Visibility" Value="Collapsed">
+                            <Setter TargetName="ItemsPanel" Property="Margin" Value="0 0 0 0"></Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="HasItems" Value="False"></Condition>
+                                <Condition Property="eye:TreeViewAssist.IsExpandable" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                        </MultiTrigger>
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:TreeViewAssist.AdditionalTemplate), Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}" 
                                      Value="Visible">
                             <Setter TargetName="AdditionalContentControl" Property="Visibility" Value="Visible" />
@@ -178,9 +189,6 @@
                                      Value="Visible">
                             <Setter TargetName="AdditionalContentControl" Property="Visibility" Value="Visible" />
                         </DataTrigger>
-                        <Trigger Property="HasItems" Value="false">
-                            <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
-                        </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" Value=".56"/>
                         </Trigger>

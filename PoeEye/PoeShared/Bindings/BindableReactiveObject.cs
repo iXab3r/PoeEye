@@ -26,9 +26,9 @@ namespace PoeShared.Bindings
         }
 
         public IObservableCache<IReactiveBinding, string> Bindings { get; }
-        
+
         public ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
-        
+
         public void RemoveBinding(string targetPropertyName)
         {
             var binding = ResolveBinding(targetPropertyName);
@@ -64,7 +64,7 @@ namespace PoeShared.Bindings
             return Disposable.Create(() => bindings.Remove(binding));
         }
 
-        private IReactiveBinding ResolveBinding(string targetPropertyName)
+        public IReactiveBinding ResolveBinding(string targetPropertyName)
         {
             var result = bindings.Lookup(targetPropertyName);
             return result.HasValue ? result.Value : default;

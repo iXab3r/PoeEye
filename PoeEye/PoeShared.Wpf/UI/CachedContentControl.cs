@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Markup;
 
 namespace PoeShared.UI
@@ -18,9 +19,18 @@ namespace PoeShared.UI
         public static readonly DependencyProperty CachedContentProperty = DependencyProperty.Register(
             "CachedContent", typeof(object), typeof(CachedContentControl), new PropertyMetadata(default(object)));
 
+        public static readonly DependencyProperty ContentTemplateSelectorProperty = DependencyProperty.Register(
+            "ContentTemplateSelector", typeof(DataTemplateSelector), typeof(CachedContentControl), new PropertyMetadata(default(DataTemplateSelector)));
+
         static CachedContentControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CachedContentControl), new FrameworkPropertyMetadata(typeof(CachedContentControl)));
+        }
+
+        public DataTemplateSelector ContentTemplateSelector
+        {
+            get { return (DataTemplateSelector)GetValue(ContentTemplateSelectorProperty); }
+            set { SetValue(ContentTemplateSelectorProperty, value); }
         }
 
         public object CachedContent

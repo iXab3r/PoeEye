@@ -22,8 +22,6 @@ namespace PoeShared.Bindings
 
         public string PropertyPath { get; set; }
         
-        private long ResolvedSourceRevision { get; set; }
-
         public PropertyPathWatcher()
         {
             Binder.Attach(this).AddTo(Anchors);

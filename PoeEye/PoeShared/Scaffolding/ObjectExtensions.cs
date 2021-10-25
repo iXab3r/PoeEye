@@ -226,5 +226,15 @@ namespace PoeShared.Scaffolding
             var json = JsonConvert.SerializeObject(source, deserializeSettings);
             return JsonConvert.DeserializeObject<T>(json, deserializeSettings);
         }
+
+        public static TValue Eval<T, TValue>(this T instance, Func<T, TValue> extractor) where T : class
+        {
+            if (instance == default)
+            {
+                return default;
+            }
+
+            return extractor(instance);
+        }
     }
 }

@@ -34,7 +34,7 @@
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Text="{Binding Title}" />
             </DockPanel>
 
-            <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding Content}"/>
+            <ui:CachedContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding Content}"/>
 
             <DockPanel Grid.Column="1" Grid.Row="3" Margin="0,5,0,0" VerticalAlignment="Center">
                 <ItemsControl ItemsSource="{Binding AvailableCommands}"

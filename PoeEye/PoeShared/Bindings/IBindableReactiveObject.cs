@@ -13,5 +13,6 @@ namespace PoeShared.Bindings
         void ClearBindings();
         IDisposable AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject;
         IDisposable AddOrUpdateBinding(IReactiveBinding binding);
+        IReactiveBinding ResolveBinding(string targetPropertyName);
     }
 }

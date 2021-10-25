@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
+using PropertyBinder;
 using PropertyChanged;
 using ReactiveUI;
 using Point = System.Windows.Point;
@@ -27,7 +29,8 @@ namespace PoeShared.Native
 {
     public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayViewModel
     {
-        private static readonly IFluentLog Log = typeof(OverlayViewModelBase).PrepareLogger();
+        private static readonly Binder<OverlayViewModelBase> Binder = new();
+        private static long GlobalWindowId = 0;
 
         private readonly ObservableAsPropertyHelper<PointF> dpi;
         private readonly object gate = new();
@@ -40,19 +43,28 @@ namespace PoeShared.Native
         private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
         private bool isLocked = true;
 
+        private readonly long windowId = Interlocked.Increment(ref GlobalWindowId);
+
+        static OverlayViewModelBase()
+        {
+            Binder.BindAction(x => x.Log.Info($"Title updated to {x.Title}"));
+        }
+
         protected OverlayViewModelBase()
         {
+            Log = typeof(OverlayViewModelBase).PrepareLogger().WithSuffix(this.ToString).WithSuffix($"#{windowId}");
             Title = GetType().ToString();
             uiDispatcher = Dispatcher.CurrentDispatcher;
+            Log.Info("Created new overlay window");
 
             lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
             makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
             makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
-
+            
             dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi).StartWith(OverlayWindow.Dpi))
                 .Switch()
-                .Do(x => Log.Debug(() => $"[{this}] DPI updated to {x}"))
+                .Do(x => Log.Debug(() => $"DPI updated to {x}"))
                 .ToProperty(this, x => x.Dpi)
                 .AddTo(Anchors);
             
@@ -88,17 +100,16 @@ namespace PoeShared.Native
                     }
                     
                     // WARNING - SetWindowRect is blocking as it awaits for WndProc to process the corresponding WM_* messages
-                    Log.Debug(() => $"[#{this}] Native bounds changed to {NativeBounds}, setting windows rect");
+                    Log.Debug(() => $"Native bounds changed to {NativeBounds}, setting windows rect");
                     UnsafeNative.SetWindowRect(x.hwnd.Value, x.NativeBounds);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             windowPositionSource
                 .Where(x => x != NativeBounds)
-                .ObserveOnDispatcher(DispatcherPriority.DataBind)
                 .SubscribeSafe(x =>
                 {
-                    Log.Debug(() => $"[#{this}] Updating native bounds {NativeBounds} => {x}");
+                    Log.Debug(() => $"Updating native bounds {NativeBounds} => {x}");
                     NativeBounds = x;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -112,9 +123,13 @@ namespace PoeShared.Native
                     hwndSource.AddHook(WndProc);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
+            
+            Binder.Attach(this).AddTo(Anchors);
         }
 
         protected IObservable<Unit> WhenLoaded => whenLoaded;
+        
+        protected IFluentLog Log { get; }
 
         public bool GrowUpwards { get; set; }
 
@@ -214,7 +229,7 @@ namespace PoeShared.Native
             }
             OverlayWindow = owner;
             var interopHelper = new WindowInteropHelper(OverlayWindow);
-            Log.Debug(() => $"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
+            Log.Debug(() => $"Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -227,7 +242,7 @@ namespace PoeShared.Native
                 {
                     var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
                     var bounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
-                    Log.Debug(() => $"[#{this}] Windows position changed to {bounds}, notifying position source, native bounds: {NativeBounds}");
+                    Log.Debug(() => $"Windows position changed to {bounds}, notifying position source, native bounds: {NativeBounds}");
                     windowPositionSource.OnNext(bounds);
                 }
             }
@@ -249,7 +264,7 @@ namespace PoeShared.Native
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"[{this}] Failed to execute operation on dispatcher", e);
+                    Log.Warn($"Failed to execute operation on dispatcher", e);
                 }
             });
         }

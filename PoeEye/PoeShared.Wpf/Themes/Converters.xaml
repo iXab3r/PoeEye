@@ -4,7 +4,8 @@
                     xmlns:eyeConverters="clr-namespace:PoeShared.Converters"
                     xmlns:kent="http://schemas.kent.boogaart.com/converters"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
-                    xmlns:eye="clr-namespace:PoeShared.UI">
+                    xmlns:eye="clr-namespace:PoeShared.UI"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
     
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -15,6 +16,8 @@
     
     <eyeConverters:BitmapImageOrNullConverter x:Key="NonBitmapImageToNullConverter" />
     <eyeConverters:BitmapImageOrNullConverter x:Key="BitmapImageToNullConverter" IsInverted="True" />
+    <eyeConverters:AnnotatedBooleanToBooleanConverter x:Key="AnnotatedBooleanToBooleanConverter" />
+    <wpf:IgnoreMouseClickBehavior x:Key="IgnoreMouseLeftDoubleClickBehavior" MinClickCount="2" ChangedButton="Left" />
     
     <blue:MultiplyDoubleConverter x:Key="DoubleToPercentConverter" Factor="100" />
     <blue:MultiplyDoubleConverter x:Key="DoubleFromPercentConverter" Factor="0.01" />
