@@ -51,26 +51,26 @@
                     
                     <TextBlock Text="Cached content control" />
                     <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                        <TextBlock Text="LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NullToCollapsedConverter}}"/>
-                        <TextBlock Text="NOT LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NotNullToCollapsedConverter}}"/>
-                        <eye:CachedContentControl Content="{Binding FakeDelay}"/>
-                        <eye:ButtonEx Content="NULL" Command="{Binding SetCachedControlContentCommand}" CommandParameter="{x:Null}"/>
-                        <eye:ButtonEx Content="Alpha" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Alpha"/>
-                        <eye:ButtonEx Content="Beta" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Beta"/>
-                        <eye:ButtonEx Content="#1" Command="{Binding SetCachedControlContentCommand}">
-                            <eye:ButtonEx.CommandParameter>
+                        <eye:CachedContentControl Content="{Binding FakeDelay}" BorderBrush="Red" BorderThickness="1" Width="100"/>
+                        <TextBlock Text="LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NullToCollapsedConverter}}" Width="120"/>
+                        <TextBlock Text="NOT LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NotNullToCollapsedConverter}}" Width="120"/>
+                        <Button Content="NULL" Command="{Binding SetCachedControlContentCommand}" CommandParameter="{x:Null}" Width="80"/>
+                        <Button Content="Alpha" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Alpha" Width="80"/>
+                        <Button Content="Beta" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Beta" Width="80"/>
+                        <Button Content="#1" Command="{Binding SetCachedControlContentCommand}">
+                            <Button.CommandParameter>
                                 <system:Int32>
                                     1
                                 </system:Int32>
-                            </eye:ButtonEx.CommandParameter>
-                        </eye:ButtonEx>
-                        <eye:ButtonEx Content="#2" Command="{Binding SetCachedControlContentCommand}">
-                            <eye:ButtonEx.CommandParameter>
+                            </Button.CommandParameter>
+                        </Button>
+                        <Button Content="#2" Command="{Binding SetCachedControlContentCommand}" Width="80">
+                            <Button.CommandParameter>
                                 <system:Int32>
                                     2
                                 </system:Int32>
-                            </eye:ButtonEx.CommandParameter>
-                        </eye:ButtonEx>
+                            </Button.CommandParameter>
+                        </Button>
                     </st:StackPanel>
                     
                     <TextBlock Text="Combobox" />

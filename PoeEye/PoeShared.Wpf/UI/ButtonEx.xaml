@@ -67,7 +67,7 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.66" />
+                            <Setter Property="Opacity" Value="0.77" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="ContentLabel" Property="TextElement.Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
@@ -214,7 +214,7 @@
                             </MultiDataTrigger.ExitActions>
                         </MultiDataTrigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.66" />
+                            <Setter Property="Opacity" Value="0.77" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />

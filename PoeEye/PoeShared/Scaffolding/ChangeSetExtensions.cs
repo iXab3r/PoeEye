@@ -223,8 +223,8 @@ namespace PoeShared.Scaffolding
         private static IDisposable SyncListWithCache<TSrc, TDst, TKey>(IObservableList<TSrc> list, ISourceCache<TDst, TKey> destination) where TSrc : TDst
         {
             var anchors = new CompositeDisposable();
-            list.Connect().OnItemAdded(newObject => destination.AddOrUpdate(newObject)).Subscribe().AddTo(anchors);
             list.Connect().OnItemRemoved(newObject => destination.Remove(newObject)).Subscribe().AddTo(anchors);
+            list.Connect().OnItemAdded(newObject => destination.AddOrUpdate(newObject)).Subscribe().AddTo(anchors);
             Disposable.Create(() =>
             {
                 list.Items.ForEach(x => destination.Remove(x));

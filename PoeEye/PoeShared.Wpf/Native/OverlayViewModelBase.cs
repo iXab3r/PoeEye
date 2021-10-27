@@ -40,7 +40,6 @@ namespace PoeShared.Native
         private readonly Dispatcher uiDispatcher;
         private readonly CommandWrapper unlockWindowCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
-        private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
         private bool isLocked = true;
 
         private readonly long windowId = Interlocked.Increment(ref GlobalWindowId);
@@ -90,7 +89,7 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NativeBounds)
-                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (targetBounds, hwnd) => new { NativeBounds = targetBounds, hwnd })
+                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (targetBounds, hwnd) => new { TargetBounds = targetBounds, hwnd })
                 .SubscribeSafe(x =>
                 {
                     if (x.hwnd == null)
@@ -100,17 +99,11 @@ namespace PoeShared.Native
                     }
                     
                     // WARNING - SetWindowRect is blocking as it awaits for WndProc to process the corresponding WM_* messages
-                    Log.Debug(() => $"Native bounds changed to {NativeBounds}, setting windows rect");
-                    UnsafeNative.SetWindowRect(x.hwnd.Value, x.NativeBounds);
-                }, Log.HandleUiException)
-                .AddTo(Anchors);
+                    Log.Info(() => $"Native bounds changed, setting windows rect: {NativeBounds} = {x.TargetBounds}");
+                    UnsafeNative.SetWindowRect(x.hwnd.Value, x.TargetBounds);
+                    var actualBounds = UnsafeNative.GetWindowRect(x.hwnd.Value);
+                    Log.Info(() => $"Native bounds changed to {actualBounds} (expected {x.TargetBounds}), native: {NativeBounds}");
 
-            windowPositionSource
-                .Where(x => x != NativeBounds)
-                .SubscribeSafe(x =>
-                {
-                    Log.Debug(() => $"Updating native bounds {NativeBounds} => {x}");
-                    NativeBounds = x;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
@@ -242,8 +235,11 @@ namespace PoeShared.Native
                 {
                     var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
                     var bounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
-                    Log.Debug(() => $"Windows position changed to {bounds}, notifying position source, native bounds: {NativeBounds}");
-                    windowPositionSource.OnNext(bounds);
+                    if (NativeBounds != bounds)
+                    {
+                        Log.Info(() => $"Updating native bounds: {NativeBounds} => {bounds}");
+                        NativeBounds = bounds;
+                    }
                 }
             }
             return IntPtr.Zero;

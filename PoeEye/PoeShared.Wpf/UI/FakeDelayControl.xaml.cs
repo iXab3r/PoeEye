@@ -20,7 +20,7 @@ namespace PoeShared.UI
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             Log.Warn("Starting fake delay");
-            Thread.Sleep(25000);
+            Thread.Sleep(5000);
             Log.Warn("Fake delay ended");
         }
     }

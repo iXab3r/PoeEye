@@ -5,59 +5,18 @@ using System.Windows.Markup;
 
 namespace PoeShared.UI
 {
+    /// <summary>
+    ///   Default content control reloads template when bound to some value, then to NULL and then back.
+    ///   This one does not - it hides itself via Visibility when Content is changed to NULL thus making WPF to keep loaded template
+    /// </summary>
     [DefaultProperty("Content")]
     [ContentProperty("Content")]
     [Localizability(LocalizationCategory.None, Readability = Readability.Unreadable)]
-    public class CachedContentControl : ReactiveControl
+    public class CachedContentControl : ContentControl
     {
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
-            "Content", typeof(object), typeof(CachedContentControl), new FrameworkPropertyMetadata(null, OnContentChanged));
-
-        public static readonly DependencyProperty ContentTemplateProperty = DependencyProperty.Register(
-            "ContentTemplate", typeof(DataTemplate), typeof(CachedContentControl), new PropertyMetadata(default(DataTemplate)));
-
-        public static readonly DependencyProperty CachedContentProperty = DependencyProperty.Register(
-            "CachedContent", typeof(object), typeof(CachedContentControl), new PropertyMetadata(default(object)));
-
-        public static readonly DependencyProperty ContentTemplateSelectorProperty = DependencyProperty.Register(
-            "ContentTemplateSelector", typeof(DataTemplateSelector), typeof(CachedContentControl), new PropertyMetadata(default(DataTemplateSelector)));
-
         static CachedContentControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CachedContentControl), new FrameworkPropertyMetadata(typeof(CachedContentControl)));
-        }
-
-        public DataTemplateSelector ContentTemplateSelector
-        {
-            get { return (DataTemplateSelector)GetValue(ContentTemplateSelectorProperty); }
-            set { SetValue(ContentTemplateSelectorProperty, value); }
-        }
-
-        public object CachedContent
-        {
-            get => GetValue(CachedContentProperty);
-            set => SetValue(CachedContentProperty, value);
-        }
-
-        public object Content
-        {
-            get => GetValue(ContentProperty);
-            set => SetValue(ContentProperty, value);
-        }
-
-        public DataTemplate ContentTemplate
-        {
-            get => (DataTemplate) GetValue(ContentTemplateProperty);
-            set => SetValue(ContentTemplateProperty, value);
-        }
-
-        private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var ctrl = (CachedContentControl) d;
-            if (e.NewValue != null)
-            {
-                d.SetValue(CachedContentProperty, e.NewValue);
-            }
         }
     }
 }

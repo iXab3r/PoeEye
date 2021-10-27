@@ -96,6 +96,38 @@
         </DrawingBrush.Drawing>
     </DrawingBrush>
     
+    
+    <DrawingBrush x:Key="DashedPositiveBorderBrush" Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile" ice:Freeze="True">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource PositiveBrush}">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="0,0,50,50" />
+                            <RectangleGeometry Rect="50,50,50,50" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    
+    
+    <DrawingBrush x:Key="DashedNegativeBorderBrush" Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile" ice:Freeze="True">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource NegativeBrush}">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="0,0,50,50" />
+                            <RectangleGeometry Rect="50,50,50,50" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    
     <BitmapImage x:Key="MouseDeviceLeftImage" UriSource="../Resources/mouse-device-left-click-control.png" />
     <BitmapImage x:Key="MouseDeviceRightImage" UriSource="../Resources/mouse-device-right-click-control.png" />
     <BitmapImage x:Key="MouseDeviceMiddleImage" UriSource="../Resources/mouse-device-middle-click-control.png" />

@@ -1,5 +1,8 @@
+using System.Linq;
+using Moq;
 using NUnit.Framework;
 using PoeShared.Bindings;
+using PoeShared.Tests.Scaffolding;
 using Shouldly;
 
 namespace PoeShared.Tests.Bindings
@@ -59,6 +62,91 @@ namespace PoeShared.Tests.Bindings
 
             //Then
             target.IntProperty.ShouldBe(3);
+        }
+
+        [Test]
+        public void ShouldDisposeBindingOnRemovel()
+        {
+            //Given
+            var source = new Stub();
+            var initialBinding = Mock.Of<IReactiveBinding>(x => x.Key == "key");
+            source.AddOrUpdateBinding(initialBinding);
+            source.Bindings.Items.ShouldContain(initialBinding);
+
+            //When
+            source.RemoveBinding(initialBinding);
+
+            //Then
+            initialBinding.GetMock().Verify(x => x.Dispose());
+            source.Bindings.Items.ShouldNotContain(initialBinding);
+        }
+
+        [Test]
+        public void ShouldUpdateBinding()
+        {
+            //Given
+            var source = new Stub();
+
+            var initialBinding = Mock.Of<IReactiveBinding>(x => x.Key == "key");
+            var updatedBinding = Mock.Of<IReactiveBinding>(x => x.Key == "key");
+            source.AddOrUpdateBinding(initialBinding);
+            source.Bindings.Items.ShouldContain(initialBinding);
+
+            //When
+            source.AddOrUpdateBinding(updatedBinding);
+
+            //Then
+            initialBinding.GetMock().Verify(x => x.Dispose());
+            source.Bindings.Items.ShouldNotContain(initialBinding);
+            source.Bindings.Items.ShouldContain(updatedBinding);
+        }
+
+        [Test]
+        [TestCase("1", "1")]
+        [TestCase("1.1", "1")]
+        [TestCase("1", "1.1")]
+        public void ShouldOverwriteIfParentIsBinding(string initial, string updated)
+        {
+            //Given
+            var source = new Stub();
+
+            var initialBinding = Mock.Of<IReactiveBinding>(x => x.Key == initial);
+            var updatedBinding = Mock.Of<IReactiveBinding>(x => x.Key == updated);
+            source.AddOrUpdateBinding(initialBinding);
+            source.Bindings.Items.ShouldContain(initialBinding);
+
+            //When
+            source.AddOrUpdateBinding(updatedBinding);
+
+            //Then
+            initialBinding.GetMock().Verify(x => x.Dispose());
+            source.Bindings.Items.ShouldNotContain(initialBinding);
+            source.Bindings.Items.ShouldContain(updatedBinding);
+        }
+
+        [Test]
+        [TestCase("", "1 2.1.1 3.2")]
+        [TestCase("4", "1 2.1.1 3.2")]
+        [TestCase("1", "2.1.1 3.2")]
+        [TestCase("2", "1 3.2")]
+        [TestCase("2.1", "1 3.2")]
+        [TestCase("2.1.1", "1 3.2")]
+        [TestCase("3", "1 2.1.1")]
+        public void ShouldRemoveNestedBindings(string whatToRemove, string expected)
+        {
+            //Given
+            var source = new Stub();
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "1"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "2"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "2.1.1"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "3.2"));
+
+            //When
+            source.RemoveBinding(whatToRemove);
+
+            //Then
+            var items = string.Join(" ",  source.BindingsList.Select(x => x.Key).OrderBy(x => x));
+            items.ShouldBe(expected);
         }
         
         private sealed class Stub : BindableReactiveObject
