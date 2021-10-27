@@ -21,9 +21,15 @@ namespace PoeShared.Scaffolding
         
         public string Annotation { [UsedImplicitly] get; }
         
-        public static implicit operator bool(AnnotatedBoolean source) => source.Value;
         
-        public static implicit operator AnnotatedBoolean(bool value) => new(value, $"Implicit conversion of {value.GetType()} {value}");
+        public static bool operator true(AnnotatedBoolean x) => x.Value == true;
+        public static bool operator false(AnnotatedBoolean x) => x.Value == false;
+         
+        public static AnnotatedBoolean operator &(AnnotatedBoolean a, AnnotatedBoolean b)
+            => new AnnotatedBoolean(a.Value & b.Value, $"{a.Value}({a.Annotation}) && {b.Value}({b.Annotation})");
+        
+        public static AnnotatedBoolean operator |(AnnotatedBoolean a, AnnotatedBoolean b)
+            => new AnnotatedBoolean(a.Value | b.Value, $"{a.Value}({a.Annotation}) && {b.Value}({b.Annotation})");
 
         public TypeCode GetTypeCode()
         {
