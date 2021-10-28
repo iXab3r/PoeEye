@@ -144,6 +144,14 @@ namespace PoeShared.Bindings
         
         public void SetCurrentValue(object newValue)
         {
+            if (newValue != null && newValue is not TProperty)
+            {
+                var error = new BindingException($"Failed to set current value value of {Source} from {Value} to {newValue} - invalid property type, expected {typeof(TProperty)}, got {newValue.GetType()}");
+                Log.Warn($"Could not set current value of watcher {this}", error);
+                Error = error;
+                return;
+            }
+            
             var typedNewValue = newValue == null ? default : (TProperty)newValue;
             SetCurrentValue(typedNewValue);
         }

@@ -20,6 +20,12 @@ namespace PoeShared.Tests.Bindings
             get => Throw ? throw new NotSupportedException() : intField;
             set => intField = Throw ? throw new NotSupportedException() : value;
         }
+        
+        public int PropertyThatThrowsOnSet
+        {
+            get => intField;
+            set => intField = Throw ? throw new NotSupportedException() : value;
+        }
 
         public bool Throw { get; set; } = true;
     }

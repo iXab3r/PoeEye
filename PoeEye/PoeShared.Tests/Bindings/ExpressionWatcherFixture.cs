@@ -164,6 +164,54 @@ namespace PoeShared.Tests.Bindings
             instance.Value.ShouldBe(3);
             instance.HasValue.ShouldBe(true);
         }
+
+        [Test]
+        public void ShouldNotThrowWhenInvalidTypeOfSourceIsSet()
+        {
+            var instance = CreateInstance();
+            instance.Source = new TestObject() { IntProperty = 1 };
+            instance.Value.ShouldBe(1);
+            instance.HasValue.ShouldBe(true);
+            instance.Error.ShouldBeNull();
+
+            //When
+            instance.SetCurrentValue("test");
+
+            //Then
+            instance.Error.ShouldNotBeNull();
+        }
+        
+        [Test]
+        public void ShouldNotThrowWhenNullForStructIsSet()
+        {
+            var instance = CreateInstance();
+            instance.Source = new TestObject() { IntProperty = 1 };
+            instance.Value.ShouldBe(1);
+            instance.HasValue.ShouldBe(true);
+            instance.Error.ShouldBeNull();
+
+            //When
+            instance.SetCurrentValue(null);
+
+            //Then
+            instance.Error.ShouldBeNull();
+            instance.Value.ShouldBe(default);
+        }
+        
+        [Test]
+        public void ShouldNotThrowWhenSetterThrows()
+        {
+            var instance = new ExpressionWatcher<TestObject, int>(x => x.PropertyThatThrowsOnSet);
+            instance.Source = new TestObject();
+            instance.HasValue.ShouldBe(true);
+            instance.Error.ShouldBeNull();
+
+            //When
+            instance.SetCurrentValue(2);
+
+            //Then
+            instance.Error.ShouldNotBeNull();
+        }
         
         [Test]
         public void ShouldBindToCollectionsFromString()
