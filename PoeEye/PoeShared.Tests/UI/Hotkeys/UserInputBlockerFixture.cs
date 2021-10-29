@@ -2,6 +2,7 @@
 using AutoFixture;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
@@ -23,7 +24,6 @@ namespace PoeShared.Tests.UI.Hotkeys
     public class UserInputBlockerFixture : FixtureBase
     {
         private Mock<IKeyboardEventsSource> eventSource;
-        private Mock<ISharedResourceLatch> resourceLatch;
         private ISubject<KeyEventArgsExt> whenKey;
         private ISubject<MouseEventExtArgs> whenMouse;
         
@@ -33,15 +33,25 @@ namespace PoeShared.Tests.UI.Hotkeys
             whenKey = eventSource.SetupGet(x => x.WhenKeyRaw).ReturnsPublisher();
             whenMouse = eventSource.SetupGet(x => x.WhenMouseRaw).ReturnsPublisher();
 
-            resourceLatch = new Mock<ISharedResourceLatch>();
-            var latchState = false;
-            resourceLatch.SetupGet(x => x.IsBusy).Returns(() => latchState);
-            resourceLatch.Setup(x => x.Rent())
-                .Callback(() => latchState = true)
-                .Returns(() => Disposable.Create(() => latchState = false));
-
             Container.Register(() => eventSource.Object);
-            Container.Register(() => resourceLatch.Object);
+            Container.Register(() =>
+            {
+                var resourceLatch = new Mock<ISharedResourceLatch>();
+                var latchState = false;
+                resourceLatch.SetupGet(x => x.IsBusy).Returns(() => latchState);
+                resourceLatch.Setup(x => x.Rent())
+                    .Callback(() =>
+                    {
+                        latchState = true;
+                        resourceLatch.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs(nameof(resourceLatch.Object.IsBusy)));
+                    })
+                    .Returns(() => Disposable.Create(() =>
+                    {
+                        latchState = false;
+                        resourceLatch.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs(nameof(resourceLatch.Object.IsBusy)));
+                    }));
+                return resourceLatch.Object;
+            });
         }
 
         [Test]
@@ -224,6 +234,55 @@ namespace PoeShared.Tests.UI.Hotkeys
             keyDown.Handled.ShouldBe(true);
             keyUp.Handled.ShouldBe(true);
             modUp.Handled.ShouldBe(true);
+        }
+
+        [Test]
+        [TestCase(UserInputBlockType.All, true)]
+        [TestCase(UserInputBlockType.Keyboard, true)]
+        [TestCase(UserInputBlockType.None, false)]
+        public void ShouldCalculateKeyboardIsActive(UserInputBlockType type, bool expected)
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.IsKeyboardBlockActive.ShouldBeFalse();
+            
+            //When
+            using var block = instance.Block(type);
+
+            //Then
+            instance.IsKeyboardBlockActive.ShouldBe(expected);
+            eventSource.VerifyGet(x => x.WhenKeyRaw, type != UserInputBlockType.None ? Times.Once : Times.Never);
+        }
+        
+        [Test]
+        [TestCase(UserInputBlockType.All, true)]
+        [TestCase(UserInputBlockType.Mouse, true)]
+        [TestCase(UserInputBlockType.MouseMove, true)]
+        [TestCase(UserInputBlockType.None, false)]
+        public void ShouldCalculateMouseIsActive(UserInputBlockType type, bool expected)
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.IsMouseBlockActive.ShouldBeFalse();
+            
+            //When
+            using var block = instance.Block(type);
+
+            //Then
+            instance.IsMouseBlockActive.ShouldBe(expected);
+            eventSource.VerifyGet(x => x.WhenMouseRaw, type != UserInputBlockType.None ? Times.Once : Times.Never);
+        }
+
+        [Test]
+        public void ShouldNotSubscribeUntilBlock()
+        {
+            //Given
+            //When
+            var instance = CreateInstance();
+
+            //Then
+            eventSource.VerifyGet(x => x.WhenKeyRaw, Times.Never);
+            eventSource.VerifyGet(x => x.WhenMouseRaw, Times.Never);
         }
         
         private static HotkeyGesture CreateGesture(Key? key, MouseButton? mouseButton, MouseWheelAction? mouseWheelAction, ModifierKeys modifierKeys)

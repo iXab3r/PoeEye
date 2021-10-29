@@ -1,9 +1,15 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
+using PropertyBinder;
+using ReactiveUI;
 using WindowsHook;
 
 namespace PoeShared.UI
@@ -17,6 +23,14 @@ namespace PoeShared.UI
         private readonly ISharedResourceLatch mouseMoveLatch;
         private readonly ConcurrentDictionary<HotkeyGesture, EventArgs> pressedKeys = new();
 
+        private static readonly Binder<UserInputBlocker> Binder = new();
+
+        static UserInputBlocker()
+        {
+            Binder.Bind(x => x.allInputLatch.IsBusy || x.keyboardLatch.IsBusy).To(x => x.IsKeyboardBlockActive);
+            Binder.Bind(x => x.allInputLatch.IsBusy || x.mouseMoveLatch.IsBusy || x.mouseLatch.IsBusy).To(x => x.IsMouseBlockActive);
+        }
+
         public UserInputBlocker(
             IKeyboardEventsSource keyboardEventsSource,
             ISharedResourceLatch allInputLatch,
@@ -24,17 +38,37 @@ namespace PoeShared.UI
             ISharedResourceLatch mouseLatch,
             ISharedResourceLatch keyboardLatch)
         {
+            Log.Debug("Initializing user input controller");
             this.mouseMoveLatch = mouseMoveLatch.AddTo(Anchors);
             this.allInputLatch = allInputLatch.AddTo(Anchors);
             this.mouseLatch = mouseLatch.AddTo(Anchors);
             this.keyboardLatch = keyboardLatch.AddTo(Anchors);
 
-            keyboardEventsSource.WhenKeyRaw.SubscribeSafe(HandleKeyboard, Log.HandleUiException).AddTo(Anchors);
-            keyboardEventsSource.WhenMouseRaw.SubscribeSafe(HandleMouse, Log.HandleUiException).AddTo(Anchors);
+            this.WhenAnyValue(x => x.IsKeyboardBlockActive)
+                .Select(x => x ? keyboardEventsSource.WhenKeyRaw : Observable.Empty<KeyEventArgsExt>())
+                .Switch()
+                .SubscribeSafe(HandleKeyboard, Log.HandleUiException)
+                .AddTo(Anchors);
+            
+            this.WhenAnyValue(x => x.IsMouseBlockActive)
+                .Select(x => x ? keyboardEventsSource.WhenMouseRaw : Observable.Empty<MouseEventExtArgs>())
+                .Switch()
+                .SubscribeSafe(HandleMouse, Log.HandleUiException)
+                .AddTo(Anchors);
+            
+            Binder.Attach(this).AddTo(Anchors);
         }
+        
+        public bool IsKeyboardBlockActive { get; private set; }
+        
+        public bool IsMouseBlockActive { get; private set; }
 
         public IDisposable Block(UserInputBlockType userInputBlockType)
         {
+            if (userInputBlockType == UserInputBlockType.None)
+            {
+                return Disposable.Empty;
+            }
             var latch = userInputBlockType switch
             {
                 UserInputBlockType.All => allInputLatch,
