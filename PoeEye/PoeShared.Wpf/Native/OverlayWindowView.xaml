@@ -16,8 +16,7 @@
     ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
     DpiAware="True"
-    UseLayoutRounding="True"
-    SizeChanged="OverlayChildWindow_OnSizeChanged">
+    UseLayoutRounding="True">
 
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}" 

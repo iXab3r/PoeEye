@@ -76,34 +76,5 @@ namespace PoeShared.Native
                     break;
             }
         }
-        
-        private void OverlayChildWindow_OnSizeChanged(object sender, SizeChangedEventArgs sizeInfo)
-        {
-            var window = sender as Window;
-            var windowViewModel = window?.DataContext as OverlayWindowViewModel;
-            var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
-            if (window == null || windowViewModel == null || overlayViewModel == null || sizeInfo == null)
-            {
-                return;
-            }
-
-            try
-            {
-                if (sizeInfo.HeightChanged)
-                {
-                    overlayViewModel.ActualHeight = sizeInfo.NewSize.Height;
-                }
-
-                if (sizeInfo.WidthChanged)
-                {
-                    overlayViewModel.ActualWidth = sizeInfo.NewSize.Width;
-                }
-            }
-            catch (Exception exception)
-            {
-                Log.HandleUiException(exception);
-            }
-        }
     }
-    
 }

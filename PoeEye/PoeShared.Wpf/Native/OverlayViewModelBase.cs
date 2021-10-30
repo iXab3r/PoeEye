@@ -144,13 +144,9 @@ namespace PoeShared.Native
 
         public ICommand LockWindowCommand => lockWindowCommand;
 
-        public double ActualHeight { get; set; }
-
         public TransparentWindow OverlayWindow { get; private set; }
 
         public bool IsVisible { get; set; } = true;
-
-        public double ActualWidth { get; set; }
 
         public PointF Dpi => dpi.Value;
 

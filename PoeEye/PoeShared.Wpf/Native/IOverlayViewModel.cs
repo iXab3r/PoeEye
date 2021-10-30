@@ -17,10 +17,6 @@ namespace PoeShared.Native
         
         PointF Dpi { get; }
 
-        double ActualWidth { get; }
-
-        double ActualHeight { get; }
-
         float Opacity { get; set; }
 
         Size MinSize { get; set; }

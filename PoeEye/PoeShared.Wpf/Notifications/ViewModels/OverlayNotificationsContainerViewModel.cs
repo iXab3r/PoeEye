@@ -17,8 +17,6 @@ namespace PoeShared.Notifications.ViewModels
 {
     internal sealed class OverlayNotificationsContainerViewModel : OverlayViewModelBase
     {
-        private static readonly IFluentLog Log = typeof(OverlayNotificationsContainerViewModel).PrepareLogger();
-
         public OverlayNotificationsContainerViewModel()
         {
             Title = "NotificationsContainer";
@@ -27,12 +25,15 @@ namespace PoeShared.Notifications.ViewModels
             IsUnlockable = false;
             EnableHeader = false;
 
-            this.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Offset, x => x.NativeBounds)
-                .Select(x => new { ActualSize = new Size(ActualWidth, ActualHeight).ScaleToScreen(Dpi), Offset, NativeBounds })
+            this.WhenAnyValue(x => x.Offset, x => x.NativeBounds)
+                .Select(x => new { Offset, NativeBounds })
                 .DistinctUntilChanged()
-                .ObserveOnDispatcher()
-                .Select(x => CalculateBounds(x.NativeBounds, x.ActualSize, x.Offset))
-                .SubscribeSafe(x => NativeBounds = x, Log.HandleUiException)
+                .Select(x => new { DesiredBounds = CalculateBounds(x.NativeBounds, x.Offset), x.Offset, x.NativeBounds })
+                .SubscribeSafe(x =>
+                {
+                    Log.Debug($"Resizing notification container: {NativeBounds}, params: {x}");
+                    NativeBounds = x.DesiredBounds;
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -40,14 +41,13 @@ namespace PoeShared.Notifications.ViewModels
 
         public WinPoint Offset { get; set; }
 
-        private static Rectangle CalculateBounds(Rectangle currentBounds, WinSize actualSize, WinPoint offset)
+        private static Rectangle CalculateBounds(Rectangle currentBounds, WinPoint offset)
         {
+            //FIXME Show not only on primary
             var primaryMonitorSize = SystemInformation.PrimaryMonitorSize;
-
             var anchorPoint = new Point((float)primaryMonitorSize.Width / 2, (float) primaryMonitorSize.Height / 16);
-            var anchorOffset = new Point(- (float)actualSize.Width / 2, 0);
+            var anchorOffset = new Point(- (float)currentBounds.Width / 2, 0);
             var topLeft = new Point(anchorPoint.X + anchorOffset.X + offset.X, anchorPoint.Y + anchorOffset.Y + offset.Y).ToWinPoint();
-
             return new Rectangle(topLeft, currentBounds.Size);
         }
     }
