@@ -69,7 +69,7 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var source = new Stub();
-            var initialBinding = Mock.Of<IReactiveBinding>(x => x.Key == "key");
+            var initialBinding = Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "key");
             source.AddOrUpdateBinding(initialBinding);
             source.Bindings.Items.ShouldContain(initialBinding);
 
@@ -87,8 +87,8 @@ namespace PoeShared.Tests.Bindings
             //Given
             var source = new Stub();
 
-            var initialBinding = Mock.Of<IReactiveBinding>(x => x.Key == "key");
-            var updatedBinding = Mock.Of<IReactiveBinding>(x => x.Key == "key");
+            var initialBinding = Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "key");
+            var updatedBinding = Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "key");
             source.AddOrUpdateBinding(initialBinding);
             source.Bindings.Items.ShouldContain(initialBinding);
 
@@ -110,8 +110,8 @@ namespace PoeShared.Tests.Bindings
             //Given
             var source = new Stub();
 
-            var initialBinding = Mock.Of<IReactiveBinding>(x => x.Key == initial);
-            var updatedBinding = Mock.Of<IReactiveBinding>(x => x.Key == updated);
+            var initialBinding = Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == initial);
+            var updatedBinding = Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == updated);
             source.AddOrUpdateBinding(initialBinding);
             source.Bindings.Items.ShouldContain(initialBinding);
 
@@ -136,16 +136,16 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             var source = new Stub();
-            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "1"));
-            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "2"));
-            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "2.1.1"));
-            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.Key == "3.2"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "1"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "2"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "2.1.1"));
+            source.AddOrUpdateBinding(Mock.Of<IReactiveBinding>(x => x.TargetPropertyPath == "3.2"));
 
             //When
             source.RemoveBinding(whatToRemove);
 
             //Then
-            var items = string.Join(" ",  source.BindingsList.Select(x => x.Key).OrderBy(x => x));
+            var items = string.Join(" ",  source.BindingsList.Select(x => x.TargetPropertyPath).OrderBy(x => x));
             items.ShouldBe(expected);
         }
         

@@ -40,9 +40,9 @@ namespace PoeShared.Native
         private readonly Dispatcher uiDispatcher;
         private readonly CommandWrapper unlockWindowCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
+        private readonly string windowId = $"Overlay-{Interlocked.Increment(ref GlobalWindowId)}";
+        
         private bool isLocked = true;
-
-        private readonly long windowId = Interlocked.Increment(ref GlobalWindowId);
 
         static OverlayViewModelBase()
         {
@@ -51,7 +51,7 @@ namespace PoeShared.Native
 
         protected OverlayViewModelBase()
         {
-            Log = typeof(OverlayViewModelBase).PrepareLogger().WithSuffix(this.ToString).WithSuffix($"#{windowId}");
+            Log = typeof(OverlayViewModelBase).PrepareLogger().WithSuffix(windowId).WithSuffix(this.ToString);
             Title = GetType().ToString();
             uiDispatcher = Dispatcher.CurrentDispatcher;
             Log.Info("Created new overlay window");
@@ -121,7 +121,7 @@ namespace PoeShared.Native
         }
 
         protected IObservable<Unit> WhenLoaded => whenLoaded;
-        
+
         protected IFluentLog Log { get; }
 
         public bool GrowUpwards { get; set; }

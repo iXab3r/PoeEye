@@ -15,14 +15,14 @@ namespace PoeShared.Bindings
 {
     public abstract class BindableReactiveObject : DisposableReactiveObject, IBindableReactiveObject
     {
-        private static long BindableObjectId = 0;
+        private static long GlobalIdx = 0;
         
-        private readonly SourceCache<IReactiveBinding, string> bindings = new(x => x.Key);
-        private long bindableObjectId = Interlocked.Increment(ref BindableObjectId);
+        private readonly SourceCache<IReactiveBinding, string> bindings = new(x => x.TargetPropertyPath);
+        private readonly string bindableObjectId = $"O-{Interlocked.Increment(ref GlobalIdx)}";
 
         protected BindableReactiveObject()
         {
-            Log = this.PrepareLogger(nameof(BindableReactiveObject)).WithSuffix("Id " + bindableObjectId);
+            Log = this.PrepareLogger(nameof(BindableReactiveObject)).WithSuffix(bindableObjectId).WithSuffix(ToString);
             bindings.Connect()
                 .OnItemRemoved(x => x.Dispose())
                 .Bind(out var bindingsList)
@@ -44,16 +44,11 @@ namespace PoeShared.Bindings
             {
                 return;
             }
-            Log.Debug(() => $"Trying to remove binding '{targetPropertyName}'");
-            var existingBindingsToRemove = bindings.Items.Where(x => x.Key.StartsWith(targetPropertyName)).ToArray();
+            var existingBindingsToRemove = bindings.Items.Where(x => x.TargetPropertyPath.StartsWith(targetPropertyName)).ToArray();
             if (existingBindingsToRemove.Any())
             {
-                Log.Debug(() => $"Cleaning up existing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyName}:\n\t{existingBindingsToRemove.ToStringTable()}");
+                Log.Debug(() => $"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyName}:\n\t{existingBindingsToRemove.ToStringTable()}");
                 existingBindingsToRemove.ForEach(RemoveBinding);
-            }
-            else
-            {
-                Log.Debug(() => $"No matching bindings for '{targetPropertyName}', bindings: {(bindings.Count > 0? $"\n\t{bindings.Items.ToStringTable()}" : "NO")}");
             }
         }
 
@@ -69,21 +64,34 @@ namespace PoeShared.Bindings
             bindings.Clear();
         }
 
-        public IDisposable AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject
+        public IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject
         {
             Log.Debug(() => $"Adding binding for '{targetPropertyName}', source path: {sourcePath}, source: {source}");
             
             var sourceWatcher = new PropertyPathWatcher() { Source = source, PropertyPath = sourcePath };
             var targetWatcher = new PropertyPathWatcher() { Source = this, PropertyPath = targetPropertyName };
-            var newBinding = new ReactiveBinding(sourceWatcher, targetWatcher);
+            var newBinding = new ReactiveBinding(targetPropertyName, sourceWatcher, targetWatcher);
             return AddOrUpdateBinding(newBinding);
         }
 
-        public IDisposable AddOrUpdateBinding(IReactiveBinding binding)
+        public IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyName)
         {
-            Log.Debug(() => $"Adding binding with key {binding.Key}: {binding}");
+            var targetWatcher = new PropertyPathWatcher
+            {
+                PropertyPath = targetPropertyName,
+            };
+
+            var binding = new ReactiveBinding(targetPropertyName, valueSource, targetWatcher);
+            var anchor = AddOrUpdateBinding(binding);
+            targetWatcher.Source = this;
+            return anchor;
+        }
+
+        internal IReactiveBinding AddOrUpdateBinding(IReactiveBinding binding)
+        {
+            Log.Debug(() => $"Adding binding with key {binding.TargetPropertyPath}: {binding}");
             
-            foreach (var propertyPathPart in IteratePath(binding.Key))
+            foreach (var propertyPathPart in IteratePath(binding.TargetPropertyPath))
             {
                 if (bindings.Lookup(propertyPathPart).HasValue)
                 {
@@ -91,14 +99,10 @@ namespace PoeShared.Bindings
                     break;
                 }
             }
-            
-            RemoveBinding(binding.Key);
+            RemoveBinding(binding.TargetPropertyPath);
+
             bindings.AddOrUpdate(binding);
-            return Disposable.Create(() =>
-            {
-                Log.Debug(() => $"Binding creating anchor was disposed - cleaning up binding {binding}");
-                RemoveBinding(binding);
-            });
+            return binding;
         }
 
         public IReactiveBinding ResolveBinding(string targetPropertyName)

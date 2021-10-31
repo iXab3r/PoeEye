@@ -11,8 +11,8 @@ namespace PoeShared.Bindings
         ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
         void RemoveBinding(string targetPropertyName);
         void ClearBindings();
-        IDisposable AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject;
-        IDisposable AddOrUpdateBinding(IReactiveBinding binding);
+        IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject;
+        IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyName);
         IReactiveBinding ResolveBinding(string targetPropertyName);
     }
 }

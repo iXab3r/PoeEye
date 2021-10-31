@@ -8,11 +8,11 @@ namespace PoeShared.Bindings
         /// <summary>
         ///  Currently it's property path - could be nested
         /// </summary>
-        string Key { get; }
+        string TargetPropertyPath { get; }
         
         string Error { get; }
         
-        IValueWatcher SourceWatcher { get; }
+        IValueProvider SourceWatcher { get; }
         
         IValueWatcher TargetWatcher { get; }
         

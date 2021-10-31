@@ -32,7 +32,7 @@ namespace PoeShared.Tests.Bindings
         public void ShouldBindToExpression()
         {
             //Given
-            var instance = new ReactiveBinding<SourceContainer, TargetContainer, int>(x => x.IntProperty + 1, x => x.IntProperty);
+            var instance = new ReactiveBinding<SourceContainer, TargetContainer, int>(x => x.IntProperty, x => x.IntProperty + 1);
             instance.Source = new SourceContainer();
             instance.Target = new TargetContainer();
             instance.Target.IntProperty.ShouldBe(1);
@@ -49,7 +49,7 @@ namespace PoeShared.Tests.Bindings
         {
             //Given
             //When
-            var instance = new ReactiveBinding<SourceContainer, SourceContainer, int>(x => x.IntProperty + 1, x => x.ReadOnlyIntProperty);
+            var instance = new ReactiveBinding<SourceContainer, SourceContainer, int>(x => x.ReadOnlyIntProperty, x => x.IntProperty + 1);
             instance.Source = new SourceContainer();
             instance.Target = new SourceContainer();
 

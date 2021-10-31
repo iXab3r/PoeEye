@@ -8,7 +8,7 @@ using PropertyChanged;
 
 namespace PoeShared.Bindings
 {
-    public class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
+    internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
     {
         private static readonly Binder<ReactiveBinding> Binder = new();
 
@@ -31,34 +31,36 @@ namespace PoeShared.Bindings
                     x.TargetWatcher?.SetCurrentValue(v);
                 });
         }
-
-        public ReactiveBinding(IValueWatcher sourceWatcher, IValueWatcher targetWatcher) : this(sourceWatcher, targetWatcher, targetWatcher.ToString())
-        {
-        }
         
-        public ReactiveBinding(IValueWatcher sourceWatcher, IValueWatcher targetWatcher, string key)
+        public ReactiveBinding(string targetPropertyPath, IValueProvider sourceWatcher, IValueWatcher targetWatcher)
         {
+            TargetPropertyPath = targetPropertyPath;
             SourceWatcher = sourceWatcher.AddTo(Anchors);
             TargetWatcher = targetWatcher.AddTo(Anchors);
-            Key = key;
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        public string Key { get; }
+        public string TargetPropertyPath { get; }
         
         public string Error { get; private set; }
 
-        public IValueWatcher SourceWatcher { get; }
+        public IValueProvider SourceWatcher { get; }
         
         public IValueWatcher TargetWatcher { get; }
         
         public bool IsActive { get; private set; }
     }
     
-    public sealed class ReactiveBinding<TSource, TTarget, TProperty> : ReactiveBinding, IReactiveBinding where TSource : class where TTarget : class
+    internal sealed class ReactiveBinding<TSource, TTarget, TProperty> : ReactiveBinding, IReactiveBinding where TSource : class where TTarget : class
     {
-        public ReactiveBinding(Expression<Func<TSource, TProperty>> sourceAccessor, Expression<Func<TTarget, TProperty>> targetPropertyAccessor) 
-         : base(new ExpressionWatcher<TSource, TProperty>(sourceAccessor), new ExpressionWatcher<TTarget, TProperty>(targetPropertyAccessor))
+        public ReactiveBinding(Expression<Func<TTarget, TProperty>> targetPropertyAccessor, Expression<Func<TSource, TProperty>> sourceAccessor) 
+            : this(targetPropertyAccessor.GetMemberName(), targetPropertyAccessor, sourceAccessor)
+        {
+            
+        }
+        
+        public ReactiveBinding(string targetPropertyPath, Expression<Func<TTarget, TProperty>> targetPropertyAccessor, Expression<Func<TSource, TProperty>> sourceAccessor) 
+         : base(targetPropertyPath, new ExpressionWatcher<TSource, TProperty>(sourceAccessor), new ExpressionWatcher<TTarget, TProperty>(targetPropertyAccessor))
         {
             SourceWatcher = (ExpressionWatcher<TSource, TProperty>)base.SourceWatcher;
             TargetWatcher = (ExpressionWatcher<TTarget, TProperty>)base.TargetWatcher;
@@ -82,7 +84,7 @@ namespace PoeShared.Bindings
 
         public new ExpressionWatcher<TTarget, TProperty> TargetWatcher { get; }
 
-        IValueWatcher IReactiveBinding.SourceWatcher => SourceWatcher;
+        IValueProvider IReactiveBinding.SourceWatcher => SourceWatcher;
 
         IValueWatcher IReactiveBinding.TargetWatcher => TargetWatcher;
     }

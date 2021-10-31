@@ -4,15 +4,18 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Bindings
 {
-    public interface IValueWatcher : IDisposableReactiveObject
+    public interface IValueProvider : IDisposableReactiveObject
     {
         bool HasValue { get; }
-        
-        object Source { [UsedImplicitly] get; set; }
         
         object Value { get; }
         
         Exception Error { get; }
+    }
+    
+    public interface IValueWatcher : IValueProvider
+    {
+        object Source { [UsedImplicitly] get; set; }
         
         bool CanSetValue { get; }
         
