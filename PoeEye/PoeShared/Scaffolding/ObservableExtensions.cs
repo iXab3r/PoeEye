@@ -109,7 +109,19 @@ namespace PoeShared.Scaffolding
             this IObservable<TIn> observable,
             [NotNull] Func<TIn, TOut> onNext)
         {
-            return observable.SelectSafe<TIn, TOut, Exception>(onNext, ex => default);
+            return observable.SelectSafeOrDefault(onNext, _ => { });
+        }
+        
+        public static IObservable<TOut> SelectSafeOrDefault<TIn, TOut>(
+            this IObservable<TIn> observable,
+            [NotNull] Func<TIn, TOut> onNext,
+            [NotNull] Action<Exception> onError)
+        {
+            return observable.SelectSafe<TIn, TOut, Exception>(onNext, ex =>
+            {
+                onError(ex);
+                return default;
+            });
         }
 
         public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(

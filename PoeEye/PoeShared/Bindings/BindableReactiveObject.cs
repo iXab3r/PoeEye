@@ -18,11 +18,11 @@ namespace PoeShared.Bindings
         private static long GlobalIdx = 0;
         
         private readonly SourceCache<IReactiveBinding, string> bindings = new(x => x.TargetPropertyPath);
-        private readonly string bindableObjectId = $"O-{Interlocked.Increment(ref GlobalIdx)}";
+        private readonly string bindableObjectId = $"O#{Interlocked.Increment(ref GlobalIdx)}";
 
         protected BindableReactiveObject()
         {
-            Log = this.PrepareLogger(nameof(BindableReactiveObject)).WithSuffix(bindableObjectId).WithSuffix(ToString);
+            Log = typeof(BindableReactiveObject).PrepareLogger("Bindable").WithSuffix(bindableObjectId).WithSuffix(ToString);
             bindings.Connect()
                 .OnItemRemoved(x => x.Dispose())
                 .Bind(out var bindingsList)

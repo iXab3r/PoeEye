@@ -40,7 +40,7 @@ namespace PoeShared.Native
         private readonly Dispatcher uiDispatcher;
         private readonly CommandWrapper unlockWindowCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
-        private readonly string windowId = $"Overlay-{Interlocked.Increment(ref GlobalWindowId)}";
+        private readonly string windowId = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
         
         private bool isLocked = true;
 
@@ -51,10 +51,10 @@ namespace PoeShared.Native
 
         protected OverlayViewModelBase()
         {
-            Log = typeof(OverlayViewModelBase).PrepareLogger().WithSuffix(windowId).WithSuffix(this.ToString);
+            Log = GetType().PrepareLogger().WithSuffix(windowId).WithSuffix(ToString);
             Title = GetType().ToString();
             uiDispatcher = Dispatcher.CurrentDispatcher;
-            Log.Info("Created new overlay window");
+            Log.Info("Created overlay window view model");
 
             lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
@@ -116,7 +116,8 @@ namespace PoeShared.Native
                     hwndSource.AddHook(WndProc);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
-            
+            Log.Info("Initialized overlay window view model");
+
             Binder.Attach(this).AddTo(Anchors);
         }
 
@@ -243,7 +244,7 @@ namespace PoeShared.Native
 
         public override string ToString()
         {
-            return $"{Title}";
+            return string.IsNullOrEmpty(Title) ? "Title not set" : $"Ovm Title: {Title}";
         }
 
         public DispatcherOperation BeginInvoke(Action dispatcherAction)

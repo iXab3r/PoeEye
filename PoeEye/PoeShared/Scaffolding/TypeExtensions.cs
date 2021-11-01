@@ -8,18 +8,11 @@ namespace PoeShared.Scaffolding
 {
     public static class TypeExtensions
     {
-        public static IFluentLog PrepareLogger(this Type type)
+        public static IFluentLog PrepareLogger(this Type type, string name = default)
         {
-            return LogManager.GetLogger(type.GetTypeInfo().Assembly, type.ToString()).ToFluent();
-        }
-        
-        public static IFluentLog PrepareLogger(this object instance, [CallerMemberName] string caller = default)
-        {
-            if (string.IsNullOrEmpty(caller))
-            {
-                throw new ArgumentException($"Caller must be specified, but was not, instance: {instance}");
-            }
-            return LogManager.GetLogger(Assembly.GetExecutingAssembly(), caller).ToFluent();
+            return LogManager.GetLogger(type.GetTypeInfo().Assembly, string.IsNullOrEmpty(name) 
+                ? type.ToString() 
+                : $"{type.Namespace}.{name}").ToFluent();
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using DynamicData;
@@ -20,15 +21,15 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
-        private static readonly IFluentLog Log = typeof(OverlayWindowController).PrepareLogger();
-        private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
+        private static long GlobalIdx = 0;
+        private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
+        private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new(IntPtr.Zero);
+        private readonly string overlayId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
 
         private readonly IScheduler uiScheduler;
 
         private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
-        private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
         private readonly IWindowTracker windowTracker;
-        private readonly string uniqueControllerId = Guid.NewGuid().ToString();
 
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
@@ -36,6 +37,8 @@ namespace PoeShared.Native
         {
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+
+            Log = typeof(OverlayWindowController).PrepareLogger().WithSuffix(overlayId);
 
             this.windowTracker = windowTracker;
             this.uiScheduler = uiScheduler;
@@ -73,6 +76,8 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
         }
 
+        private IFluentLog Log { get; }
+
         public bool ShowWireframes { get; set; }
 
         public bool IsVisible { get; private set; }
@@ -108,14 +113,14 @@ namespace PoeShared.Native
             var overlayName = $"{viewModel.GetType().Name}";
             var overlayWindow = new OverlayWindowView
             {
-                Title = $"[PoeEye.Overlay] {uniqueControllerId} {windowTracker} #{overlayName} #{windows.Count + 1}",
+                Title = $"[PoeEye.Overlay] {overlayId} {windowTracker} #{overlayName} #{windows.Count + 1}",
                 Visibility = Visibility.Collapsed,
                 ShowInTaskbar = false,
                 ShowActivated = false,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"
             };
-            Log.Debug($"[#{overlayName}] Created Overlay window({windowTracker})");
+            Log.Info($"[#{overlayName}] Created Overlay window({windowTracker})");
             sw.Step($"Initialized overlay window: {overlayWindow.Title}");
             overlayWindow.DataContext = overlayWindowViewModel;
             sw.Step($"Initialized overlay data context: {overlayWindowViewModel}");

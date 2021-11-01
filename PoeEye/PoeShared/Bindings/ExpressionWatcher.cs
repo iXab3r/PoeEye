@@ -58,7 +58,7 @@ namespace PoeShared.Bindings
         private readonly Binder<TSource> sourceBinder;
         private readonly SerialDisposable sourceBinderAnchors;
 
-        private readonly string watcherId = $"EW-{Interlocked.Increment(ref ExpressionWatcherHelper.GlobalIdx)}";
+        private readonly string watcherId = $"EW#{Interlocked.Increment(ref ExpressionWatcherHelper.GlobalIdx)}";
 
         static ExpressionWatcher()
         {
@@ -68,6 +68,7 @@ namespace PoeShared.Bindings
         public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor, Expression<Func<TSource, bool>> condition)
         {
             Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger().WithSuffix(watcherId).WithSuffix(ToString);
+            Log.Debug($"Expression created, source: {sourceAccessor}, condition: {condition}");
 
             this.sourceAccessor = sourceAccessor;
             this.condition = condition;
@@ -96,7 +97,7 @@ namespace PoeShared.Bindings
                 .WithPrevious()
                 .SubscribeSafe(x =>
                 {
-                    if (sourceBinderAnchors.Disposable != null)
+                    if (sourceBinderAnchors.Disposable != null && x.Previous != null)
                     {
                         Log.Debug($"Unbinding from existing source {x.Previous}");
                         sourceBinderAnchors.Disposable = default;
@@ -194,7 +195,7 @@ namespace PoeShared.Bindings
 
         public override string ToString()
         {
-            return $"Watcher: {SourceExpression}, source: {(Source == default ? "not set" : Source.ToString())}";
+            return $"EW: {SourceExpression}, source: {(Source == default ? "not set" : Source.ToString())}, {(HasValue ? $"value: {Value}" : $"hasValue: {HasValue}")}";
         }
 
         private static bool CanPrepareSetter(Expression<Func<TSource, TProperty>> propertyAccessor)

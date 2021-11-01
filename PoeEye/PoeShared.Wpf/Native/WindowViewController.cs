@@ -18,15 +18,14 @@ namespace PoeShared.Native
 {
     public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
     {
-        private static readonly IFluentLog Log = typeof(WindowViewController).PrepareLogger();
-
         private readonly Window owner;
 
         public WindowViewController(Window owner)
         {
             this.owner = owner;
-            Log.Debug($"[{owner}.{owner.Title}] Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
             Handle = new WindowInteropHelper(owner).EnsureHandle();
+            Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}, title: {owner.Title}");
+            Log.Debug($"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
             WhenRendered = Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
@@ -51,12 +50,14 @@ namespace PoeShared.Native
                 .Where(_ => Topmost)
                 .SubscribeSafe(() =>
                 {
-                    Log.Debug($"[{owner}.{owner.Title}] Window is deactivated, reactivating {nameof(Topmost)} style");
+                    Log.Debug($"Window is deactivated, reactivating {nameof(Topmost)} style");
                     owner.Topmost = false;
                     owner.Topmost = true;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
+        
+        private IFluentLog Log { get; }
 
         public IObservable<Unit> WhenLoaded { get; }
         
@@ -74,7 +75,7 @@ namespace PoeShared.Native
 
         public void Close()
         {
-            Log.Debug($"[{owner}.{owner.Title}] Closing window");
+            Log.Debug($"Closing window");
             owner.Close();
         }
 
@@ -82,13 +83,13 @@ namespace PoeShared.Native
 
         public void Hide()
         {
-            Log.Debug($"[{owner}.{owner.Title}] Hiding window");
+            Log.Debug($"Hiding window");
             UnsafeNative.HideWindow(owner);
         }
 
         public void Show()
         {
-            Log.Debug($"[{owner}.{owner.Title}] Showing window");
+            Log.Debug($"Showing window");
             UnsafeNative.ShowWindow(owner);
             //FIXME Mahapps window resets topmost after minimize/maximize operations
             owner.Topmost = Topmost;
@@ -101,7 +102,7 @@ namespace PoeShared.Native
 
         public void Minimize()
         {
-            Log.Debug($"[{owner}.{owner.Title}] Minimizing window");
+            Log.Debug($"Minimizing window");
             owner.WindowState = WindowState.Minimized;
         }
         

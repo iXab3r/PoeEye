@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using PropertyChanged;
@@ -24,21 +25,25 @@ namespace PoeShared.Bindings
                 x.SourceWatcher.Error == null ? null : $"Source Watcher error: {x.SourceWatcher.Error}"
             }.Where(y => y != null).JoinStrings(Environment.NewLine)).To((x, v) => x.Error = string.IsNullOrEmpty(v) ? default : v);
             
-            Binder.BindIf(x => x.IsActive, x => x.SourceWatcher.Value)
+            Binder.BindIf(x => x.IsActive && x.SourceWatcher.HasValue && x.TargetWatcher.HasValue, x => x.SourceWatcher.Value)
                 .ElseIf(x => x.TargetWatcher.HasValue, x => default)
                 .To((x, v) =>
                 {
-                    x.TargetWatcher?.SetCurrentValue(v);
+                    x.Log.Debug(() => $"Propagating value {v ?? "NULL"}");
+                    x.TargetWatcher.SetCurrentValue(v);
                 });
         }
         
         public ReactiveBinding(string targetPropertyPath, IValueProvider sourceWatcher, IValueWatcher targetWatcher)
         {
+            Log = typeof(ReactiveBinding).PrepareLogger().WithSuffix(ToString);
             TargetPropertyPath = targetPropertyPath;
             SourceWatcher = sourceWatcher.AddTo(Anchors);
             TargetWatcher = targetWatcher.AddTo(Anchors);
             Binder.Attach(this).AddTo(Anchors);
         }
+        
+        private IFluentLog Log { get; }
 
         public string TargetPropertyPath { get; }
         
@@ -49,6 +54,11 @@ namespace PoeShared.Bindings
         public IValueWatcher TargetWatcher { get; }
         
         public bool IsActive { get; private set; }
+
+        public override string ToString()
+        {
+            return $"Binding({(IsActive ? "active" : "NOT active")}) {SourceWatcher} => {TargetWatcher} ({TargetPropertyPath})";
+        }
     }
     
     internal sealed class ReactiveBinding<TSource, TTarget, TProperty> : ReactiveBinding, IReactiveBinding where TSource : class where TTarget : class

@@ -98,7 +98,7 @@ namespace PoeShared.Bindings
 
         public override string ToString()
         {
-            return $"PropertyPathWatcher for {PropertyPath}, source: {Source}, sourceType: {SourceType}";
+            return $"PPW {PropertyPath}, src: {(Source == default ? "not set" : Source.ToString())}, {(HasValue ? $"value: {Value}" : $"hasValue: {HasValue}")}";
         }
     }
 }
