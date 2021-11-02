@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
@@ -54,7 +55,7 @@ namespace PoeShared.Native
             Log = GetType().PrepareLogger().WithSuffix(windowId).WithSuffix(ToString);
             Title = GetType().ToString();
             uiDispatcher = Dispatcher.CurrentDispatcher;
-            Log.Info("Created overlay window view model");
+            Log.Info("Created overlay view model");
 
             lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
@@ -116,9 +117,11 @@ namespace PoeShared.Native
                     hwndSource.AddHook(WndProc);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
-            Log.Info("Initialized overlay window view model");
+            Log.Info("Initialized overlay view model");
 
             Binder.Attach(this).AddTo(Anchors);
+            
+            Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
         }
 
         protected IObservable<Unit> WhenLoaded => whenLoaded;

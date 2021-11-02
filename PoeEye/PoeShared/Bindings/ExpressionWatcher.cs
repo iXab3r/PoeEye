@@ -67,7 +67,7 @@ namespace PoeShared.Bindings
 
         public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor, Expression<Func<TSource, bool>> condition)
         {
-            Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger().WithSuffix(watcherId).WithSuffix(ToString);
+            Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger("ExpressionWatcher").WithSuffix(watcherId).WithSuffix(ToString);
             Log.Debug($"Expression created, source: {sourceAccessor}, condition: {condition}");
 
             this.sourceAccessor = sourceAccessor;
@@ -122,6 +122,7 @@ namespace PoeShared.Bindings
             }).AddTo(Anchors);
             
             Binder.Attach(this).AddTo(Anchors);
+            Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
         }
 
         public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor) : this(sourceAccessor, x => x != null)

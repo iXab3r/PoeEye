@@ -12,7 +12,7 @@ namespace PoeShared.Scaffolding
         {
             return LogManager.GetLogger(type.GetTypeInfo().Assembly, string.IsNullOrEmpty(name) 
                 ? type.ToString() 
-                : $"{type.Namespace}.{name}").ToFluent();
+                : name).ToFluent();
         }
     }
 }

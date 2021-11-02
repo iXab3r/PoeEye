@@ -184,16 +184,6 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock
                         Margin="5,0"
-                        Text="{Binding Content.ActualWidth, StringFormat='ActualWidth: {0:F0}'}" />
-
-                    <TextBlock
-                        Margin="5,0"
-                        Text="{Binding Content.ActualHeight, StringFormat='ActualHeight: {0:F0}'}" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock
-                        Margin="5,0"
                         Text="{Binding Content.MinSize.Width, StringFormat='MinWidth: {0:F0}'}" />
 
                     <TextBlock

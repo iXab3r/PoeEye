@@ -112,7 +112,7 @@ namespace PoeShared.Prism
                 {
                     var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
                     Log.Debug($"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
-                    return new DispatcherScheduler(uiDispatcher, DispatcherPriority.ApplicationIdle);
+                    return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Background);
                 })
                 .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler)
                 .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)

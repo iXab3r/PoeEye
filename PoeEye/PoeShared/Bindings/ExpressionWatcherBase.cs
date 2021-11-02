@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.CustomTypeProviders;
 using System.Linq.Expressions;
+using System.Reactive.Disposables;
 using System.Reflection;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;

@@ -32,6 +32,13 @@ namespace PoeShared.Bindings
                     x.Log.Debug(() => $"Propagating value {v ?? "NULL"}");
                     x.TargetWatcher.SetCurrentValue(v);
                 });
+            
+            
+            Binder.BindIf(x => x.TargetWatcher.HasValue, x => x.TargetWatcher.Value)
+                .To((x, v) =>
+                {
+                    x.Log.Debug(() => $"Target value has changed to {v}");
+                });
         }
         
         public ReactiveBinding(string targetPropertyPath, IValueProvider sourceWatcher, IValueWatcher targetWatcher)

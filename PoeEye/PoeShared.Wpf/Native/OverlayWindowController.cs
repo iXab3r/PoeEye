@@ -38,7 +38,8 @@ namespace PoeShared.Native
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            Log = typeof(OverlayWindowController).PrepareLogger().WithSuffix(overlayId);
+            Log = typeof(OverlayWindowController).PrepareLogger().WithSuffix(overlayId).WithSuffix(ToString);
+            Log.Info($"Creating overlay window controller using {windowTracker}");
 
             this.windowTracker = windowTracker;
             this.uiScheduler = uiScheduler;
@@ -74,6 +75,8 @@ namespace PoeShared.Native
                 .Where(x => x != IntPtr.Zero && !IsPairedOverlay(windowTracker.ActiveWindowHandle))
                 .SubscribeSafe(lastActiveWindowHandle)
                 .AddTo(Anchors);
+
+            Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
         }
 
         private IFluentLog Log { get; }
@@ -113,7 +116,7 @@ namespace PoeShared.Native
             var overlayName = $"{viewModel.GetType().Name}";
             var overlayWindow = new OverlayWindowView
             {
-                Title = $"[PoeEye.Overlay] {overlayId} {windowTracker} #{overlayName} #{windows.Count + 1}",
+                Title = $"{overlayId} {windowTracker} #{overlayName} #{windows.Count + 1}",
                 Visibility = Visibility.Collapsed,
                 ShowInTaskbar = false,
                 ShowActivated = false,
@@ -170,7 +173,7 @@ namespace PoeShared.Native
 
             Disposable.Create(() =>
             {
-                Log.Debug($"[#{overlayWindow.Name}] Closing overlay");
+                Log.Info($"[#{overlayWindow.Name}] Closing overlay");
                 overlayWindow.Close();
             }).AddTo(childAnchors);
             Disposable.Create(() =>
