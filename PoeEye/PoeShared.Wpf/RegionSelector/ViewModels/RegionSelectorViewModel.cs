@@ -28,7 +28,6 @@ namespace PoeShared.RegionSelector.ViewModels
 {
     internal sealed class RegionSelectorViewModel : OverlayViewModelBase, IRegionSelectorViewModel
     {
-        private static readonly IFluentLog Log = typeof(RegionSelectorViewModel).PrepareLogger();
         private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
         private static readonly double MinSelectionArea = 20;

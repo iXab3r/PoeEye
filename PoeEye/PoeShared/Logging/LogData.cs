@@ -66,7 +66,7 @@ namespace PoeShared.Logging
         {
             var result = this;
             var initialSuffixProvider = this.SuffixProvider;
-            result.SuffixProvider = () => $"{initialSuffixProvider?.Invoke()}{provider()}";
+            result.SuffixProvider = () => $"{provider()}{initialSuffixProvider?.Invoke()}";
             return result;
         }
         
