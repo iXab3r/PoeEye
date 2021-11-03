@@ -65,6 +65,7 @@ namespace PoeShared.UI
                 Log.Debug("Initializing housekeeping");
                 var cleanupService = Container.Resolve<IFolderCleanerService>();
                 cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
+                cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
                 cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
                 cleanupService.FileTimeToLive = TimeSpan.FromDays(14);
                 

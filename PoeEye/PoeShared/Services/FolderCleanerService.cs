@@ -17,7 +17,7 @@ namespace PoeShared.Services
 {
     internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCleanerService
     {
-        private static readonly IFluentLog Log = typeof(FolderCleanerService).PrepareLogger();
+        private static readonly IFluentLog Log = typeof(FolderCleanerService).PrepareLogger("FolderCleaner");
 
         private readonly SourceList<DirectoryInfo> directoriesSource = new SourceList<DirectoryInfo>();
 
@@ -67,7 +67,7 @@ namespace PoeShared.Services
                         }
                         else
                         {
-                            var allFiles = directoryInfo.EnumerateFiles().ToArray();
+                            var allFiles = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories).ToArray();
                             var filesToRemove = allFiles.Where(x => CheckThatFileMustBeRemoved(x, clock, ttl)).ToArray();
 
                             var totalCleanedSize = 0L;

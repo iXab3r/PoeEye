@@ -147,7 +147,7 @@ namespace PoeShared.UI
             catch (Exception ex)
             {
                 Log.Error($"Failed to send report to {Config.ReportHandler}", ex);
-                Status = "Failed to send report";
+                Status = $"Failed to send report - {ex.Message}";
                 throw;
             }
             finally
