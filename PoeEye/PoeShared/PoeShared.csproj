@@ -14,6 +14,7 @@
         <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" />
         <PackageReference Include="ReactiveUI" Version="10.4.1" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+        <PackageReference Include="shortid" Version="3.0.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.12" />
         <PackageReference Include="System.Reactive" Version="4.2.0" />
         <PackageReference Include="Unity" Version="5.10.3" />

@@ -142,7 +142,7 @@ namespace PoeShared.UI
             var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
             SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
             SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
-            Container.Resolve<ExceptionReportingService>().AddTo(Anchors);
+            Container.Resolve<IExceptionReportingService>();
         }
         
         protected override void OnExit(ExitEventArgs e)

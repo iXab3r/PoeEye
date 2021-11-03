@@ -14,7 +14,9 @@ namespace PoeShared.UI
         
         public Exception Exception { get; init; }
         
-        public ExceptionReportItem[] FilesToAttach { get; init; }
+        public IExceptionReportHandler ReportHandler { get; init; }
+        
+        public IExceptionReportItemProvider[] ItemProviders { get; init; }
     }
 
     public sealed record ExceptionReportItem

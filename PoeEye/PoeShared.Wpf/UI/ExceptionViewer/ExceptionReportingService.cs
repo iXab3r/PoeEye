@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using log4net.Appender;
-using log4net.Core;
+using DynamicData;
 using Microsoft.VisualBasic.Logging;
 using PoeShared.Logging;
 using PoeShared.Modularity;
-using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -23,58 +21,45 @@ namespace PoeShared.UI
 {
     internal sealed class ExceptionReportingService : DisposableReactiveObject, IExceptionReportingService
     {
-        private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
         private static readonly IFluentLog Log = typeof(ExceptionReportingService).PrepareLogger();
         private readonly IAppArguments appArguments;
         private readonly IClock clock;
-        private readonly IFactory<IConfigProvider> configProviderFactory;
         private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
-        private readonly CircularBuffer<LoggingEvent> lastEvents = new(1000);
+        private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
+        private IExceptionReportHandler reportHandler;
 
         public ExceptionReportingService(
             IClock clock,
             IFolderCleanerService cleanupService,
-            IFactory<IConfigProvider> configProviderFactory,
             IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer,
+            IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
+            IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
+            IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
+            IFactory<ReportLastLogEventsProvider> lastLogEventsReportProviderFactory,
             IAppArguments appArguments)
         {
             this.clock = clock;
-            this.configProviderFactory = configProviderFactory;
             this.exceptionDialogDisplayer = exceptionDialogDisplayer;
             this.appArguments = appArguments;
-            
+
             Log.Debug("Initializing crashes housekeeping");
             cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
             cleanupService.CleanupTimeout = TimeSpan.FromHours(1);
             cleanupService.FileTimeToLive = TimeSpan.FromDays(2);
-            
+
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             Dispatcher.CurrentDispatcher.UnhandledException += DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
-            
-            var appender = new ObservableAppender();
-            appender.Events
-                .SubscribeSafe(
-                    evt =>
-                    {
-                        lastEvents.PushBack(evt);
-                    }, Log.HandleUiException)
-                .AddTo(Anchors);
 
-            SharedLog.Instance.AddAppender(appender).AddTo(Anchors);
-            
             Binder.SetExceptionHandler(BinderExceptionHandler);
 
             SharedLog.Instance.Errors.SubscribeSafe(
-                ex =>
-                {
-                    ReportCrash(ex);
-                }, Log.HandleException).AddTo(Anchors);
-        }
+                ex => { ReportCrash(ex); }, Log.HandleException).AddTo(Anchors);
 
-        private void BinderExceptionHandler(object? sender, ExceptionEventArgs e)
-        {
-            ReportCrash(e.Exception, $"BinderException, sender: {sender}");
+            AddReportItemProvider(lastLogEventsReportProviderFactory.Create()).AddTo(Anchors);
+            AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
+            AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);
+            AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);
         }
 
         public Task<ExceptionDialogConfig> PrepareConfig()
@@ -82,9 +67,30 @@ namespace PoeShared.UI
             return Task.Run(() => PrepareConfigSafe(null));
         }
 
-        public async Task<IReadOnlyList<ExceptionReportItem>> PrepareReportItems(Exception exception)
+        public void SetReportConsumer(IExceptionReportHandler reportHandler)
         {
-            return await Task.Run(() => PrepareReportItemsInternal(exception));
+            if (this.reportHandler != null)
+            {
+                throw new InvalidOperationException($"Report consumer is already configured to {this.reportHandler}");
+            }
+            Log.Debug($"Setting report consumer to {this.reportHandler}");
+            this.reportHandler = reportHandler;
+        }
+
+        public IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider)
+        {
+            Log.Debug($"Registering new report item provider: {reportItemProvider}");
+            reportItemProviders.Add(reportItemProvider);
+            return Disposable.Create(() =>
+            {
+                Log.Debug($"Removing report item provider: {reportItemProvider}");
+                reportItemProviders.Remove(reportItemProvider);
+            });
+        }
+
+        private void BinderExceptionHandler(object? sender, ExceptionEventArgs e)
+        {
+            ReportCrash(e.Exception, $"BinderException, sender: {sender}");
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -105,7 +111,7 @@ namespace PoeShared.UI
         private void ReportCrash(Exception exception, string developerMessage = "")
         {
             Log.Error($"Unhandled application exception({developerMessage})", exception);
-            
+
             if (appArguments.IsDebugMode || Debugger.IsAttached)
             {
                 Debugger.Break();
@@ -119,7 +125,7 @@ namespace PoeShared.UI
 
             var reporter = exceptionDialogDisplayer.Create();
             reporter.ShowDialog(config);
-            
+
             Log.Warn("Shutting down...");
             Environment.Exit(-1);
         }
@@ -131,264 +137,21 @@ namespace PoeShared.UI
                 AppName = appArguments.AppName,
                 Title = $"{appArguments.AppTitle} Error Report",
                 Timestamp = clock.Now,
+                ReportHandler = reportHandler,
                 Exception = exception
             };
-            
+
             try
             {
-                var itemsToAttach = PrepareReportItemsInternal(exception);
                 return basicConfig with
                 {
-                   FilesToAttach = itemsToAttach.ToArray()
+                    ItemProviders = reportItemProviders.Items.ToArray()
                 };
             }
             catch (Exception e)
             {
                 Log.Warn("Failed to prepare extended exception config", e);
                 return basicConfig;
-            }
-        }
-
-        private void TryToFormatException(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems, Exception exception)
-        {
-            try
-            {
-                Log.Debug("Preparing exception stacktrace for crash report...");
-
-                var destinationFileName = Path.Combine(outputDirectory.FullName, $"stacktrace.txt");
-                var description = $"Exception: {exception}\n\nMessage:\n\n{exception.Message}StackTrace:\n\n{exception.StackTrace}";
-                File.WriteAllText(destinationFileName, description);
-                
-                reportItems.Add(new ExceptionReportItem()
-                {
-                    Description = description,
-                    Attachment = new FileInfo(destinationFileName)
-                });
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to prepare exception trace", e);
-            }
-        }
-
-        private void TryToCopyLogs(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
-        {
-            const int logsToInclude = 5;
-            const int logsToAttach = 2;
-            try
-            {
-                Log.Debug("Preparing log files for crash report...");
-                var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
-                var logFilesToInclude = new DirectoryInfo(logFilesRoot)
-                    .GetFiles("*.log", SearchOption.AllDirectories)
-                    .OrderByDescending(x => x.LastWriteTime)
-                    .Take(logsToInclude)
-                    .ToArray();
-
-                for (var idx = 0; idx < logFilesToInclude.Length; idx++)
-                {
-                    var logFile = logFilesToInclude[idx];
-                    var logFileName = logFile.FullName.Substring(logFilesRoot.Length).TrimStart('\\', '/');
-                    var destinationFileName = Path.Combine(outputDirectory.FullName, logFileName);
-                    try
-                    {
-                        Log.Debug($"Copying {logFile.FullName} ({logFile.Length}b) to {destinationFileName}");
-
-                        var destinationDirectory = Path.GetDirectoryName(destinationFileName);
-                        if (destinationDirectory == null)
-                        {
-                            Log.Warn($"Failed to get directory path from destination file name {destinationFileName}");
-                            continue;
-                        }
-
-                        Directory.CreateDirectory(destinationDirectory);
-                        logFile.CopyTo(destinationFileName, true);
-                        reportItems.Add(new ExceptionReportItem
-                        {
-                            Description = $"Created: {logFile.CreationTime}\nLast Modified: {logFile.LastWriteTime}",
-                            Attachment = new FileInfo(destinationFileName),
-                            Attached = idx < logsToAttach
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Warn($"Failed to copy log file {logFile} to {destinationFileName}", e);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to prepare log files", e);
-            }
-        }
-        
-        private void TryToSaveLastLogEvents(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
-        {
-            try
-            {
-                var configProvider = configProviderFactory.Create();
-                if (configProvider is not ConfigProviderFromFile configProviderFromFile)
-                {
-                    return;
-                }
-
-                Log.Debug("Preparing log dump for crash report...");
-                if (lastEvents.IsEmpty)
-                {
-                    Log.Debug("Log is empty");
-                    return;
-                }
-                var lastLogEvents = new FileInfo(Path.Combine(outputDirectory.FullName, "logDump.log"));
-
-                var head = lastEvents.Front();
-                var tail = lastEvents.Back();
-                Log.Debug($"Saving log dump to {lastLogEvents} [{head.TimeStamp};{tail.TimeStamp}]");
-                using (var rw = lastLogEvents.OpenWrite())
-                using (var writer = new StreamWriter(rw))
-                {
-                    foreach (var loggingEvent in lastEvents)
-                    {
-                        writer.WriteLine(loggingEvent.RenderedMessage);
-                    }
-                }
-                
-                reportItems.Add(new ExceptionReportItem()
-                {
-                    Description = $"Last {lastEvents.Size} log records\nFirst: {head.TimeStamp}\nLast: {tail.TimeStamp}",
-                    Attachment = lastLogEvents
-                });
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to perform log dump", e);
-            }
-        }
-
-        private void TryToCopyConfigFromMemory(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
-        {
-            try
-            {
-                var configProvider = configProviderFactory.Create();
-                if (configProvider is not ConfigProviderFromFile configProviderFromFile)
-                {
-                    return;
-                }
-
-                Log.Debug("Preparing config dump for crash report...");
-                var configFromMemoryPath = new FileInfo(Path.Combine(outputDirectory.FullName, "configDump.cfg"));
-                Log.Debug($"Saving configuration to {configFromMemoryPath}");
-                configProviderFromFile.SaveToFile(configFromMemoryPath);
-                reportItems.Add(new ExceptionReportItem()
-                {
-                    Description = $"In-memory config",
-                    Attachment = configFromMemoryPath
-                });
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to copy config from memory", e);
-            }
-        }
-
-        private void TryToScreenshotDesktop(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
-        {
-            try
-            {
-                var screen = System.Windows.Forms.SystemInformation.VirtualScreen;
-                var destinationFileName = Path.Combine(outputDirectory.FullName, $"Screen {screen.Width}x{screen.Height}.png");
-                var image = UnsafeNative.GetDesktopImageViaCopyFromScreen(screen);
-                image.Save(destinationFileName);
-                reportItems.Add(new ExceptionReportItem()
-                {
-                    Description = $"Desktop screenshot",
-                    Attachment = new FileInfo(destinationFileName),
-                    Attached = false
-                });
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to get desktop screenshot");
-            }
-        }
-
-        private void TryToCopyExistingConfig(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
-        {
-            try
-            {
-                var configProvider = configProviderFactory.Create();
-                if (configProvider is not ConfigProviderFromFile configProviderFromFile)
-                {
-                    return;
-                }
-
-                var existingConfig = configProviderFromFile.ConfigFilePath;
-                try
-                {
-                    if (!File.Exists(existingConfig))
-                    {
-                        return;
-                    }
-
-                    Log.Debug("Preparing config copy for crash report");
-
-                    var configCopy = new FileInfo(Path.Combine(outputDirectory.FullName, Path.GetFileName(existingConfig)));
-                    Log.Debug($"Copying existing configuration to {configCopy}");
-                    File.Copy(existingConfig, configCopy.FullName);
-                    reportItems.Add(new ExceptionReportItem()
-                    {
-                        Description = $"Copy of {existingConfig}",
-                        Attachment = configCopy
-                    });
-                }
-                catch (Exception e)
-                {
-                    Log.Warn($"Failed to copy existing configuration from config provider {configProvider}, config: {existingConfig}");
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to copy existing config", e);
-            }
-        }
-
-        private IReadOnlyList<ExceptionReportItem> PrepareReportItemsInternal(Exception exception)
-        {
-            var crashReportDirectoryPath = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes", $"{appArguments.AppName} {appArguments.Version}{(appArguments.IsDebugMode ? " DEBUG" : string.Empty)} Id{CurrentProcessId} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}"));
-            if (crashReportDirectoryPath.Exists)
-            {
-                Log.Warn($"Removing existing directory with crash data {crashReportDirectoryPath.FullName}");
-                crashReportDirectoryPath.Delete(true);
-            }
-
-            Log.Debug($"Creating directory {crashReportDirectoryPath.FullName}");
-            crashReportDirectoryPath.Create();
-
-            var itemsToAttach = new List<ExceptionReportItem>();
-
-
-            if (exception != null)
-            {
-                TryToFormatException(crashReportDirectoryPath, itemsToAttach, exception);
-            }
-
-            TryToSaveLastLogEvents(crashReportDirectoryPath, itemsToAttach);
-            TryToCopyConfigFromMemory(crashReportDirectoryPath, itemsToAttach);
-            TryToCopyExistingConfig(crashReportDirectoryPath, itemsToAttach);
-            TryToCopyLogs(crashReportDirectoryPath, itemsToAttach);
-            TryToScreenshotDesktop(crashReportDirectoryPath, itemsToAttach);
-            return itemsToAttach;
-        }
-        
-        
-        internal class ObservableAppender : AppenderSkeleton
-        {
-            private readonly ISubject<LoggingEvent> events = new Subject<LoggingEvent>();
-
-            public IObservable<LoggingEvent> Events => events;
-
-            protected override void Append(LoggingEvent loggingEvent)
-            {
-                events.OnNext(loggingEvent);
             }
         }
     }
