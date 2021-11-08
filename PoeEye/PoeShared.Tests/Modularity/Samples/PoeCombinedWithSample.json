@@ -1,0 +1,15 @@
+﻿{
+  "AssemblyName": "PoeShared.Tests",
+  "TypeName": "PoeShared.Tests.Modularity.SampleCombinedConfig",
+  "ConfigValue": {
+    "Configs": [
+      {
+        "AssemblyName": "PoeShared.Tests",
+        "TypeName": "PoeShared.Tests.Modularity.SampleConfig",
+        "ConfigValue": {
+          "Value": "value"
+        }
+      }
+    ]
+  }
+}

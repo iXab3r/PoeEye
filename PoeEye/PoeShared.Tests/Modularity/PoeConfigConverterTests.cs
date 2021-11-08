@@ -1,82 +1,43 @@
+using System.IO;
 using log4net;
+using Moq;
 using NUnit.Framework;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using PoeShared.Tests.Helpers;
 using Shouldly;
 
 namespace PoeShared.Tests.Modularity
 {
     [TestFixture]
-    public class PoeConfigConverterTests
+    public class PoeConfigConverterTests : FixtureBase
     {
         private static readonly IFluentLog Log = typeof(PoeConfigConverterTests).PrepareLogger();
-        
-        private static readonly string SerializedUnknownType = @"{
-  'AssemblyName': '" + typeof(SampleVersionedConfig).Assembly.GetName().Name + @"',
-  'TypeName': 'Unknown',
-  'ConfigValue': {
-    'Value': 'value'
-  },
-  'Version': 12
-}";
-        
-        private static readonly string SerializedUnknownAssembly = @"{
-  'AssemblyName': 'UnknownAssembly',
-  'TypeName': 'Unknown',
-  'ConfigValue': {
-    'Value': 'value'
-  },
-  'Version': 12
-}";
-        
-        private static readonly string SerializedWellKnownVersioned = @"{
-  'AssemblyName': '" + typeof(SampleVersionedConfig).Assembly.GetName().Name + @"',
-  'TypeName': '" + typeof(SampleVersionedConfig).FullName + @"',
-  'ConfigValue': {
-    'Value': 'Version#1'
-  },
-  'Version': 1
-}";
-        
-        private static readonly string SerializedWellKnown = @"{
-  'AssemblyName': '" + typeof(SampleConfig).Assembly.GetName().Name + @"',
-  'TypeName': '" + typeof(SampleConfig).FullName + @"',
-  'ConfigValue': {
-    'Value': 'Version#1'
-  },
-  'Version': 1
-}";
 
-        public interface IPoeEyeConfigInherited : IPoeEyeConfig
+        private Mock<IPoeConfigConverterMigrationService> migrationService;
+        private PoeConfigConverter configConverter;
+
+        protected override void SetUp()
         {
+            migrationService = new Mock<IPoeConfigConverterMigrationService>();
+            configConverter = new PoeConfigConverter(migrationService.Object);
         }
 
-        public sealed class CombinedConfig : IPoeEyeConfig
+        [Test]
+        public void ShouldLoadUnknownMetadata()
         {
-            public IPoeEyeConfig[] Configs { get; set; }
-        }
+            //Given
+            var instance = CreateInstance();
 
-        public sealed class SampleConfig : IPoeEyeConfig
-        {
-            public string Value { get; set; }
-        }
-        
-        public sealed class SampleInheritedConfig : IPoeEyeConfigInherited
-        {
-            public string InheritedValue { get; set; }
-        }
+            //When
+            var result = instance.Deserialize<PoeConfigMetadata>(PrepareSerialized("UnknownType.json"));
 
-        public sealed class SampleVersionedConfig : IPoeEyeConfigVersioned
-        {
-            public string Value { get; set; } = "Version#2";
-
-            public int Version { get; set; } = 2;
-        }
-
-        public sealed class SampleNestedConfig : IPoeEyeConfig
-        {
-            public IPoeEyeConfig InnerConfig { get; set; }
+            //Then
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<PoeConfigMetadata>();
+            result.TypeName.ShouldBe("Unknown");
+            result.Version.ShouldBe(12);
         }
 
         [Test]
@@ -86,14 +47,14 @@ namespace PoeShared.Tests.Modularity
             var instance = CreateInstance();
 
             //When
-            var result = instance.Deserialize<IPoeEyeConfig>(SerializedUnknownType);
+            var result = instance.Deserialize<IPoeEyeConfig>(PrepareSerialized("UnknownType.json"));
 
             //Then
             result.ShouldNotBeNull();
             result.ShouldBeAssignableTo<IPoeEyeConfig>();
             result.ShouldBeAssignableTo<PoeConfigMetadata>();
         }
-        
+
         [Test]
         public void ShouldLoadUnknownAssembly()
         {
@@ -101,30 +62,14 @@ namespace PoeShared.Tests.Modularity
             var instance = CreateInstance();
 
             //When
-            var result = instance.Deserialize<IPoeEyeConfig>(SerializedUnknownAssembly);
+            var result = instance.Deserialize<IPoeEyeConfig>(PrepareSerialized("UnknownAssembly.json"));
 
             //Then
             result.ShouldNotBeNull();
             result.ShouldBeAssignableTo<IPoeEyeConfig>();
             result.ShouldBeAssignableTo<PoeConfigMetadata>();
         }
-        
-        [Test]
-        public void ShouldLoadUnknownMetadata()
-        {
-            //Given
-            var instance = CreateInstance();
 
-            //When
-            var result = instance.Deserialize<PoeConfigMetadata>(SerializedUnknownType);
-
-            //Then
-            result.ShouldNotBeNull();
-            result.ShouldBeOfType<PoeConfigMetadata>();
-            result.TypeName.ShouldBe("Unknown");
-            result.Version.ShouldBe(12);
-        }
-        
         [Test]
         public void ShouldLoadUnknownGenericMetadata()
         {
@@ -132,7 +77,7 @@ namespace PoeShared.Tests.Modularity
             var instance = CreateInstance();
 
             //When
-            var result = instance.Deserialize<PoeConfigMetadata<SampleConfig>>(SerializedUnknownType);
+            var result = instance.Deserialize<PoeConfigMetadata<SampleConfig>>(PrepareSerialized("UnknownType.json"));
 
             //Then
             result.ShouldNotBeNull();
@@ -144,7 +89,7 @@ namespace PoeShared.Tests.Modularity
             result.ConfigValue["Value"].ShouldBe("value");
             result.Value.ShouldBeNull();
         }
-        
+
         [Test]
         public void ShouldLoadGenericMetadata()
         {
@@ -152,25 +97,65 @@ namespace PoeShared.Tests.Modularity
             var instance = CreateInstance();
 
             //When
-            var result = instance.Deserialize<PoeConfigMetadata<SampleConfig>>(SerializedWellKnown);
+            var result = instance.Deserialize<PoeConfigMetadata<SampleConfig>>(PrepareSerialized("SampleConfig.json"));
 
             //Then
             result.ShouldNotBeNull();
             result.ShouldBeAssignableTo<PoeConfigMetadata>();
             result.ShouldBeOfType<PoeConfigMetadata<SampleConfig>>();
             
-            result.Version.ShouldBe(1);
+            result.Version.ShouldBeNull();
             result.ConfigValue["Value"].ShouldBe("Version#1");
             result.Value.ShouldNotBeNull();
             result.Value.Value.ShouldBe("Version#1");
         }
         
         [Test]
+        public void ShouldLoadGenericVersionedMetadata()
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Deserialize<PoeConfigMetadata<SampleVersionedConfig>>(PrepareSerialized("SampleConfigVersioned.json"));
+
+            //Then
+            result.ShouldNotBeNull();
+            result.ShouldBeAssignableTo<PoeConfigMetadata>();
+            result.ShouldBeOfType<PoeConfigMetadata<SampleVersionedConfig>>();
+            
+            result.Version.ShouldBe(2);
+            result.ConfigValue["Value"].ShouldBe("Version#1");
+            result.Value.ShouldNotBeNull();
+            result.Value.Value.ShouldBe("Version#1");
+        }
+        
+        [Test]
+        public void ShouldLoadGenericVersionedMetadataWithUnknownVersion()
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Deserialize<PoeConfigMetadata<SampleVersionedConfig>>(PrepareSerialized("SampleConfigWrongVersion.json"));
+
+            //Then
+            result.ShouldNotBeNull();
+            result.ShouldBeAssignableTo<PoeConfigMetadata>();
+            result.ShouldBeOfType<PoeConfigMetadata<SampleVersionedConfig>>();
+            
+            result.Version.ShouldBe(1);
+            result.ConfigValue["Value"].ShouldBe("Version#1");
+            result.Value.ShouldNotBeNull();
+            result.Value.Value.ShouldBe("Version#2");
+        }
+
+        [Test]
         public void ShouldSerializeLoadedUnknownTypes()
         {
             //Given
             var instance = CreateInstance();
-            var deserializedValue = instance.Deserialize<IPoeEyeConfig>(SerializedUnknownType);
+            var deserializedValue = instance.Deserialize<IPoeEyeConfig>(PrepareSerialized("UnknownType.json"));
 
             //When
             var secondarySerializedValue = instance.Serialize(deserializedValue);
@@ -188,7 +173,24 @@ namespace PoeShared.Tests.Modularity
             var instance = CreateInstance();
 
             //When
-            var result = instance.Deserialize<IPoeEyeConfig>(SerializedWellKnownVersioned);
+            var result = instance.Deserialize<IPoeEyeConfig>(PrepareSerialized("SampleConfigVersioned.json"));
+
+            //Then
+            result.ShouldNotBeNull();
+            result.ShouldBeAssignableTo<SampleVersionedConfig>();
+            ((SampleVersionedConfig) result).Version.ShouldBe(2);
+            ((SampleVersionedConfig) result).Value.ShouldBe("Version#1");
+        }
+        
+        
+        [Test]
+        public void ShouldLoadVersionedTypesWithWrongVersion()
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Deserialize<IPoeEyeConfig>(PrepareSerialized("SampleConfigWrongVersion.json"));
 
             //Then
             result.ShouldNotBeNull();
@@ -218,14 +220,14 @@ namespace PoeShared.Tests.Modularity
             //Given
             var instance = CreateInstance();
             var sampleConfig = new SampleConfig {Value = "value"};
-            var valueToSerialize = new CombinedConfig
+            var valueToSerialize = new SampleCombinedConfig
             {
                 Configs = new IPoeEyeConfig[] {sampleConfig}
             };
 
             //When
             var serializedValue = instance.Serialize(valueToSerialize);
-            var result = instance.Deserialize<CombinedConfig>(serializedValue);
+            var result = instance.Deserialize<SampleCombinedConfig>(serializedValue);
 
             //Then
             result.Configs.Length.ShouldBe(1, () => $"Serialized value:\n{serializedValue}");
@@ -238,14 +240,14 @@ namespace PoeShared.Tests.Modularity
         {
             //Given
             var instance = CreateInstance();
-            var value = new SampleNestedConfig {InnerConfig = new SampleConfig {Value = "value"}};
+            var value = new SampleContainerConfig {InnerConfig = new SampleConfig {Value = "value"}};
 
             //When
             var serializedValue = instance.Serialize(value);
-            var result = instance.Deserialize<SampleNestedConfig>(serializedValue);
+            var result = instance.Deserialize<SampleContainerConfig>(serializedValue);
 
             //Then
-            result.ShouldBeOfType<SampleNestedConfig>();
+            result.ShouldBeOfType<SampleContainerConfig>();
             result.InnerConfig.ShouldBeOfType<SampleConfig>();
             ((SampleConfig) result.InnerConfig).Value.ShouldBe("value");
         }
@@ -266,26 +268,15 @@ namespace PoeShared.Tests.Modularity
             result.ShouldBe(serializedMetadata);
         }
         
-        [Test]
-        public void ShouldSaveGenericMetadata()
+        private static string PrepareSerialized(string fileName)
         {
-            //Given
-            var instance = CreateInstance();
-            var sampleConfig = new SampleConfig {Value = "value"};
-            var serializedMetadata = instance.Serialize(sampleConfig);
-            var metadata = instance.Deserialize<PoeConfigMetadata<SampleConfig>>(serializedMetadata);
-
-            //When
-            var result = instance.Serialize(metadata);
-
-            //Then
-            result.ShouldBe(serializedMetadata);
+            var filePath = Path.Combine(@"Modularity\\Samples", fileName);
+            return File.ReadAllText(filePath);
         }
         
         private JsonConfigSerializer CreateInstance()
         {
-            var result = new JsonConfigSerializer();
-            return result;
+            return new JsonConfigSerializer(configConverter);
         }
     }
 }

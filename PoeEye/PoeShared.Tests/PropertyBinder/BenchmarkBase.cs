@@ -23,6 +23,7 @@ namespace PoeShared.Tests.PropertyBinder
                             targetFrameworkMoniker: targetFrameworkMoniker,
                             runtimeFrameworkVersion: null,
                             name: "5.0")))
+                .WithArguments(new Argument[]{ new MsBuildArgument("/p:ValidateExecutableReferencesMatchSelfContained=false") })
                 .AsDefault();
             return job;
         }

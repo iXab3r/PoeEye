@@ -1,0 +1,7 @@
+﻿{
+  "AssemblyName": "PoeShared.Tests",
+  "TypeName": "PoeShared.Tests.Modularity.SampleConfig",
+  "ConfigValue": {
+    "Value": "Version#1"
+  }
+}

@@ -17,6 +17,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IAppArguments, AppArguments>()
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
+                .RegisterSingleton<IPoeConfigConverterMigrationService, PoeConfigConverterMigrationService>()
                 .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
                 .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
 

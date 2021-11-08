@@ -4,13 +4,10 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using DynamicData;
-
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity
@@ -19,15 +16,15 @@ namespace PoeShared.Modularity
     {
         private static readonly IFluentLog Log = typeof(JsonConfigSerializer).PrepareLogger();
 
-        private readonly SourceList<JsonConverter> converters = new SourceList<JsonConverter>();
+        private readonly SourceList<JsonConverter> converters = new();
         private readonly int MaxCharsToLog = 1024;
 
         private JsonSerializerSettings jsonSerializerSettings;
         private readonly ISubject<ErrorContext> thrownExceptions = new Subject<ErrorContext>();
 
-        public JsonConfigSerializer()
+        public JsonConfigSerializer(PoeConfigConverter configConverter)
         {
-            RegisterConverter(new PoeConfigConverter());
+            RegisterConverter(configConverter);
             converters
                 .Connect()
                 .ToUnit()
@@ -110,15 +107,16 @@ namespace PoeShared.Modularity
 
         private void ReinitializeSerializerSettings()
         {
-            jsonSerializerSettings = new JsonSerializerSettings
+            var newSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.Auto,
                 Error = HandleSerializerError,
                 NullValueHandling = NullValueHandling.Ignore,
             };
+            converters.Items.ForEach(newSettings.Converters.Add);
 
-            converters.Items.ForEach(jsonSerializerSettings.Converters.Add);
+            jsonSerializerSettings = newSettings;
         }
 
         private void HandleSerializerError(object sender, ErrorEventArgs args)
