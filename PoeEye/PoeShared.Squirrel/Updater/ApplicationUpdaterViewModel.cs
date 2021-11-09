@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using DynamicData;
 using DynamicData.Binding;
 using PoeShared.Modularity;
@@ -138,10 +139,10 @@ namespace PoeShared.Squirrel.Updater
                 .SubscribeSafe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
 
+            ShowUpdaterCommand = CommandWrapper.Create<object>(ShowUpdaterCommandExecuted);
             ApplyUpdateCommand = CommandWrapper.Create(
                 ApplyUpdateCommandExecuted,
                 this.WhenAnyValue(x => x.LatestUpdate).ObserveOn(uiScheduler).Select(x => x != null));
-             ShowUpdaterCommand = CommandWrapper.Create(ShowUpdaterCommandExecuted);
 
             OpenUri = CommandWrapper.Create<string>(OpenUriCommandExecuted);
             Binder.Attach(this).AddTo(Anchors);
@@ -160,6 +161,7 @@ namespace PoeShared.Squirrel.Updater
         public CommandWrapper RestartCommand { get; }
 
         public CommandWrapper ApplyUpdateCommand { get; }
+        
         public CommandWrapper ShowUpdaterCommand { get; }
 
         public bool IsInErrorStatus { get; private set; }
@@ -199,11 +201,20 @@ namespace PoeShared.Squirrel.Updater
             SetStatus($"Ready to update to v{LatestVersion}");
         }
 
-        private void ShowUpdaterCommandExecuted()
+        private void ShowUpdaterCommandExecuted(object arg)
         {
-            Log.Debug("Show updater command executed");
+            Log.Debug($"Show updater command executed, arg: {arg}");
+            var owner = arg switch
+            {
+                Window wnd => wnd,
+                _ => default,
+            };
             var displayer = updateWindowDisplayer.Create();
-            displayer.ShowDialog(new UpdaterWindowArgs());
+            displayer.ShowDialog(new UpdaterWindowArgs()
+            {
+                AllowTermination = false,
+                Owner = owner
+            });
         }
 
         private async Task OpenUriCommandExecuted(string uri)

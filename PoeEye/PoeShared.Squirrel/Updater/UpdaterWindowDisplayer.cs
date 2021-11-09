@@ -21,9 +21,10 @@ namespace PoeShared.Squirrel.Updater
         {
             var window = windowFactory.Create();
             var viewController = new WindowViewController(window);
+            window.Owner = args.Owner;
             using var updaterWindowViewModel = updaterWindowFactory.Create(viewController, args);
             {
-                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                window.WindowStartupLocation = window.Owner == null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner;
                 window.DataContext = updaterWindowViewModel;
                 return window.ShowDialog();
             }
