@@ -3,7 +3,7 @@ using Unity;
 
 namespace PoeShared.Prism
 {
-    internal sealed class Factory<T> : IFactory<T>
+    internal sealed class Factory<T> : IFactory<T>, INamedFactory<T>
     {
         private readonly IUnityContainer container;
 
@@ -17,6 +17,11 @@ namespace PoeShared.Prism
         public T Create()
         {
             return container.Resolve<T>();
+        }
+
+        public T Create(string name)
+        {
+            return container.Resolve<T>(name);
         }
     }
 }

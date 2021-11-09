@@ -73,10 +73,16 @@ namespace PoeShared.Native
         
         public IntPtr Handle { get; }
 
+        public void Close(bool? result)
+        {
+            Log.Debug($"Closing window, result: {result}");
+            owner.DialogResult = result;
+            owner.Close();
+        }
+
         public void Close()
         {
-            Log.Debug($"Closing window");
-            owner.Close();
+            Close(null);
         }
 
         public bool Topmost { get; set; }

@@ -22,6 +22,8 @@ namespace PoeShared.Native
         
         void Minimize();
 
+        void Close(bool? result);
+        
         void Close();
         
         bool Topmost { get; set; }

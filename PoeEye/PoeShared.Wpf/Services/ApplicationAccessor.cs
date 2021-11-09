@@ -1,49 +1,86 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
-using log4net;
+using System.Windows.Navigation;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Modularity;
+using PoeShared.Native;
+using PoeShared.Prism;
 using ReactiveUI;
+using Unity;
 
 namespace PoeShared.Services
 {
     internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicationAccessor
     {
+        private static readonly Process CurrentProcess = Process.GetCurrentProcess();
         private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger();
         private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
+        private readonly IAppArguments appArguments;
         private readonly Application application;
 
-        private readonly IObservable<ExitEventArgs> whenExit;
-
-        public ApplicationAccessor()
+        public ApplicationAccessor(
+            Application application,
+            IAppArguments appArguments,
+            [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler)
         {
-            Log.Debug("Initializing Application accessor");
-            application = Application.Current;
+            this.application = application;
+            this.appArguments = appArguments;
+            Log.Debug($"Initializing Application accessor for {application}");
             if (application == null)
             {
                 throw new ApplicationException("Application is not initialized");
             }
             
             Log.Debug($"Binding to application {application}");
-            whenExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
+            WhenExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
                 .Select(x => x.EventArgs)
-                .Replay(1);
-            whenExit.SubscribeSafe(x =>
+                .Replay(1)
+                .AutoConnect();
+            WhenExit.SubscribeSafe(x =>
             {
                 Log.Info($"Application exit requested, exit code: {x.ApplicationExitCode}");
                 IsExiting = true;
             }, Log.HandleException).AddTo(Anchors);
+            LastExitWasGraceful = InitializeRunningLockFile();
+            LastLoadWasSuccessful = InitializeLoadingLockFile();
+            Disposable.Create(() => Log.Debug("Disposed")).AddTo(Anchors);
         }
 
-        public IObservable<Unit> WhenExit => whenExit.ToUnit();
+        public bool IsLoaded { get; private set; }
+        
+        public bool LastExitWasGraceful { get; }
+        
+        public bool LastLoadWasSuccessful { get; }
+        
+        public void ReportIsLoaded()
+        {
+            if (IsLoaded)
+            {
+                throw new InvalidOperationException("Application is already loaded");
+            }
+
+            Log.Debug("Marking application as loaded");
+            IsLoaded = true;
+        }
+
+        public IObservable<ExitEventArgs> WhenExit { get; }
 
         public bool IsExiting { get; private set; }
+
+        public void Terminate(int exitCode)
+        {
+            Log.Warn($"Closing application via Environment.Exit with code {exitCode}");
+            Environment.Exit(exitCode);
+        }
 
         public async Task Exit()
         {
@@ -63,7 +100,7 @@ namespace PoeShared.Services
                 Shutdown();
 
                 Log.Info($"Awaiting for application termination for {TerminationTimeout}");
-                var closeEvent = await whenExit.Take(1).Timeout(TerminationTimeout);
+                var closeEvent = await WhenExit.Take(1).Timeout(TerminationTimeout);
                 
                 Log.Info($"Application termination signal was processed, exit code: {closeEvent.ApplicationExitCode}");
 
@@ -73,8 +110,8 @@ namespace PoeShared.Services
             }
             catch (Exception e)
             {
-                Log.Warn("Failed to terminate app gracefully, forcing Environment.Exit", e);
-                Environment.Exit(0);
+                Log.Warn("Failed to terminate app gracefully, forcing Terminate", e);
+                Terminate(-1);
             }
         }
 
@@ -95,6 +132,74 @@ namespace PoeShared.Services
             {
                 Log.Debug($"Closing app via Shutdown");
                 application.Shutdown(0);
+            }
+        }
+
+        private bool InitializeLoadingLockFile()
+        {
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $".loading{(appArguments.IsDebugMode ? null : $"DebugMode")}");
+            var fileExists = File.Exists(filePath);
+            Log.Debug($"Application .loading lock file path: {filePath}, exists: {LastLoadWasSuccessful}");
+            PrepareLockFile(filePath);
+            this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
+            {
+                Log.Debug($"Application is loaded - cleaning up .loading lock file {filePath}");
+                CleanupLockFile(filePath);
+            }, Log.HandleException).AddTo(Anchors);
+            return !fileExists;
+        }
+
+        private bool InitializeRunningLockFile()
+        {
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $".running{(appArguments.IsDebugMode ? null : $"DebugMode")}");
+            var fileExists = File.Exists(filePath);
+            Log.Debug($"Application .running lock file path: {filePath}, exists: {fileExists}");
+            if (!LastExitWasGraceful)
+            {
+                Log.Warn("Seems that last application start was not graceful - lock file is still present");
+            }
+            PrepareLockFile(filePath);
+            WhenExit.SubscribeSafe(x =>
+            {
+                if (x.ApplicationExitCode == 0)
+                {
+                    Log.Debug("Graceful exit - cleaning up lock file");
+                    CleanupLockFile(filePath);
+                }
+                else
+                {
+                    Log.Warn($"Erroneous exit detected, code: {x.ApplicationExitCode} - leaving lock file intact @ {filePath}");
+                }
+            }, Log.HandleException).AddTo(Anchors);
+            return !fileExists;
+        }
+
+        private static void PrepareLockFile(string lockFilePath)
+        {
+            Log.Debug($"Creating lock file: {lockFilePath}");
+            var lockFileData = $"pid: {CurrentProcess.Id}, start time: {CurrentProcess.StartTime}, args: {UnsafeNative.GetCommandLine(CurrentProcess.Id)}";
+            using var lockFileStream = new StreamWriter(new FileStream(lockFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite));
+            Log.Debug($"Filling lock file with data: {lockFileData}");
+            lockFileStream.Write(lockFileData);
+        }
+
+        private static void CleanupLockFile(string lockFilePath)
+        {
+            Log.Debug($"Preparing to remove lock file: {lockFilePath}");
+            var lockFileExists = File.Exists(lockFilePath);
+            if (lockFileExists)
+            {
+                Log.Warn($"Removing lock file {lockFilePath}");
+                File.Delete(lockFilePath);
+            }
+            else
+            {
+                Log.Warn($"Lock file {lockFilePath} does not exist for some reason");
+            }
+            
+            if (File.Exists(lockFilePath))
+            {
+                throw new ApplicationException($"Failed to remove lock file");
             }
         }
     }

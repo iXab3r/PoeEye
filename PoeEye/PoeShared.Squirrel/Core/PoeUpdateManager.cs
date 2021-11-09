@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using JetBrains.Annotations;
 using log4net;
 using Microsoft.Win32;
 using NuGet;
@@ -34,7 +35,6 @@ namespace PoeShared.Squirrel.Core
             string applicationName = null,
             string rootDirectory = null)
         {
-            Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), nameof(urlOrPath));
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), "!string.IsNullOrEmpty(urlOrPath)");
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(applicationName), "!string.IsNullOrEmpty(applicationName)");
 
@@ -50,6 +50,15 @@ namespace PoeShared.Squirrel.Core
         public string RootAppDirectory { get; }
 
         public bool IsInstalledApp => Assembly.GetExecutingAssembly().Location.StartsWith(RootAppDirectory, StringComparison.OrdinalIgnoreCase);
+
+        public async Task<IPoeUpdateInfo> PrepareUpdate(
+            bool ignoreDeltaUpdates, 
+            IReadOnlyCollection<IReleaseEntry> localReleases, 
+            IReadOnlyCollection<IReleaseEntry> remoteReleases)
+        {
+            var checkForUpdate = new CheckForUpdateImpl(urlDownloader, RootAppDirectory);
+            return checkForUpdate.DetermineUpdateInfo(localReleases, remoteReleases, ignoreDeltaUpdates);
+        }
 
         public async Task<IPoeUpdateInfo> CheckForUpdate(bool ignoreDeltaUpdates, Action<int> progress = null)
         {

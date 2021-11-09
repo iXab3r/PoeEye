@@ -1,40 +1,57 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using log4net;
+using DynamicData;
+using DynamicData.Binding;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.Squirrel.Core;
 using PoeShared.UI;
+using PropertyBinder;
 using ReactiveUI;
+using Squirrel;
 using Unity;
 
 namespace PoeShared.Squirrel.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IApplicationUpdaterViewModel
     {
+        private static readonly Binder<ApplicationUpdaterViewModel> Binder = new();
         private static readonly IFluentLog Log = typeof(ApplicationUpdaterViewModel).PrepareLogger();
-
+        private readonly SourceCache<IReleaseEntry, string> availableReleasesSource = new(x => x.EntryAsString);
+        private readonly IScheduler uiScheduler;
+        private readonly IFactory<IUpdaterWindowDisplayer> updateWindowDisplayer;
         private readonly IApplicationUpdaterModel updaterModel;
 
-        public ApplicationUpdaterViewModel(
-            [NotNull] IApplicationUpdaterModel updaterModel,
-            [NotNull] IConfigProvider<UpdateSettingsConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+        static ApplicationUpdaterViewModel()
         {
+            Binder.Bind(x => x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
+        }
+
+        public ApplicationUpdaterViewModel(
+            IFactory<IUpdaterWindowDisplayer> updateWindowDisplayer,
+            IApplicationUpdaterModel updaterModel,
+            IConfigProvider<UpdateSettingsConfig> configProvider,
+            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+        {
+            Guard.ArgumentNotNull(updateWindowDisplayer, nameof(updateWindowDisplayer));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
+            this.updateWindowDisplayer = updateWindowDisplayer;
             this.updaterModel = updaterModel;
+            this.uiScheduler = uiScheduler;
 
             CheckForUpdatesCommand = CommandWrapper
                 .Create(CheckForUpdatesCommandExecuted, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid));
@@ -48,6 +65,16 @@ namespace PoeShared.Squirrel.Updater
                 .ObserveOn(uiScheduler)
                 .SubscribeSafe(x => CheckForUpdates = x > TimeSpan.Zero, Log.HandleUiException)
                 .AddTo(Anchors);
+
+            availableReleasesSource
+                .Connect()
+                .Filter(x => x.IsDelta == false)
+                .Sort(new SortExpressionComparer<IReleaseEntry>().ThenByDescending(x => x.Version))
+                .Top(10)
+                .Bind(out var availableReleases)
+                .SubscribeToErrors(Log.HandleUiException)
+                .AddTo(Anchors);
+            AvailableReleases = availableReleases;
 
             this.ObservableForProperty(x => x.CheckForUpdates, skipInitial: true).ToUnit()
                 .ObserveOn(uiScheduler)
@@ -66,14 +93,15 @@ namespace PoeShared.Squirrel.Updater
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
-            this.RaiseWhenSourceValue(x => x.UpdatedVersion, updaterModel, x => x.UpdatedVersion, uiScheduler).AddTo(Anchors);
-            this.RaiseWhenSourceValue(x => x.LatestVersion, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
-            this.RaiseWhenSourceValue(x => x.UpdateInfo, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
-            this.RaiseWhenSourceValue(x => x.IsDeltaUpdate, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
-            this.RaiseWhenSourceValue(x => x.TotalUpdateSize, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
+            
+            this.RaiseWhenSourceValue(x => x.LatestVersion, this, x => x.LatestUpdate, uiScheduler).AddTo(Anchors);
+            this.RaiseWhenSourceValue(x => x.UpdateInfo, this, x => x.LatestUpdate, uiScheduler).AddTo(Anchors);
+            this.RaiseWhenSourceValue(x => x.IsDeltaUpdate, this, x => x.LatestUpdate, uiScheduler).AddTo(Anchors);
+            this.RaiseWhenSourceValue(x => x.TotalUpdateSize, this, x => x.LatestUpdate, uiScheduler).AddTo(Anchors);
+            
+            this.RaiseWhenSourceValue(x => x.LatestAppliedVersion, updaterModel, x => x.LatestAppliedVersion, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.IgnoreDeltaUpdates, updaterModel, x => x.IgnoreDeltaUpdates, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.ProgressPercent, updaterModel, x => x.ProgressPercent, uiScheduler).AddTo(Anchors);
-            this.RaiseWhenSourceValue(x => x.IsBusy, updaterModel, x => x.IsBusy, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.UpdateSource, updaterModel, x => x.UpdateSource, uiScheduler).AddTo(Anchors);
 
             RestartCommand = CommandWrapper
@@ -110,11 +138,72 @@ namespace PoeShared.Squirrel.Updater
                 .SubscribeSafe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
 
-            ApplyUpdate = CommandWrapper.Create(
+            ApplyUpdateCommand = CommandWrapper.Create(
                 ApplyUpdateCommandExecuted,
-                this.updaterModel.WhenAnyValue(x => x.LatestVersion).ObserveOn(uiScheduler).Select(x => x != null));
+                this.WhenAnyValue(x => x.LatestUpdate).ObserveOn(uiScheduler).Select(x => x != null));
+             ShowUpdaterCommand = CommandWrapper.Create(ShowUpdaterCommandExecuted);
 
             OpenUri = CommandWrapper.Create<string>(OpenUriCommandExecuted);
+            Binder.Attach(this).AddTo(Anchors);
+        }
+
+        public string UpdateInfo => LatestUpdate?.ReleasesToApply.EmptyIfNull().Select(x => $"{x.Version} (delta: {x.IsDelta})").JoinStrings(" => ");
+
+        public bool IsDeltaUpdate => LatestUpdate?.ReleasesToApply?.EmptyIfNull().Any(x => x.IsDelta) ?? false;
+
+        public long TotalUpdateSize => LatestUpdate?.ReleasesToApply?.EmptyIfNull().Sum(x => x.Filesize) ?? 0;
+
+        public bool IgnoreDeltaUpdates => updaterModel.IgnoreDeltaUpdates;
+
+        public CommandWrapper CheckForUpdatesCommand { get; }
+
+        public CommandWrapper RestartCommand { get; }
+
+        public CommandWrapper ApplyUpdateCommand { get; }
+        public CommandWrapper ShowUpdaterCommand { get; }
+
+        public bool IsInErrorStatus { get; private set; }
+
+        public string StatusText { get; private set; }
+
+        public bool IsOpen { get; set; }
+
+        public ReadOnlyObservableCollection<IReleaseEntry> AvailableReleases { get; }
+
+        public bool CheckForUpdates { get; set; }
+
+        public IPoeUpdateInfo LatestUpdate { get; private set; }
+
+        public Version LatestAppliedVersion => updaterModel.LatestAppliedVersion;
+
+        public Version LatestVersion => LatestUpdate?.FutureReleaseEntry?.Version?.Version;
+
+        public UpdateSourceInfo UpdateSource => updaterModel.UpdateSource;
+
+        public int ProgressPercent => updaterModel.ProgressPercent;
+
+        public bool IsBusy { get; private set; }
+
+        public CommandWrapper OpenUri { get; }
+
+        public FileInfo GetLatestExecutable()
+        {
+            return updaterModel.GetLatestExecutable();
+        }
+
+        public async Task PrepareForceUpdate(IReleaseEntry targetRelease)
+        {
+            Log.Debug($"Force update preparation requested, target: {new { targetRelease.Version, targetRelease.Filename, targetRelease.Filesize }}");
+            LatestUpdate = await updaterModel.PrepareForceUpdate(targetRelease);
+            updaterModel.Reset();
+            SetStatus($"Ready to update to v{LatestVersion}");
+        }
+
+        private void ShowUpdaterCommandExecuted()
+        {
+            Log.Debug("Show updater command executed");
+            var displayer = updateWindowDisplayer.Create();
+            displayer.ShowDialog(new UpdaterWindowArgs());
         }
 
         private async Task OpenUriCommandExecuted(string uri)
@@ -140,49 +229,10 @@ namespace PoeShared.Squirrel.Updater
             });
         }
 
-        public CommandWrapper CheckForUpdatesCommand { get; }
-
-        public CommandWrapper RestartCommand { get; }
-
-        public CommandWrapper ApplyUpdate { get; }
-
-        public bool IsInErrorStatus { get; private set; }
-
-        public string StatusText { get; private set; }
-
-        public bool IsOpen { get; set; }
-
-        public bool CheckForUpdates { get; set; }
-
-        public Version UpdatedVersion => updaterModel.UpdatedVersion;
-
-        public Version LatestVersion => updaterModel.LatestVersion?.FutureReleaseEntry?.Version?.Version;
-        
-        public string UpdateInfo => updaterModel.LatestVersion?.ReleasesToApply.EmptyIfNull().Select(x => $"{x.Version} (delta: {x.IsDelta})").JoinStrings(" => ");
-
-        public bool IsDeltaUpdate => updaterModel.LatestVersion?.ReleasesToApply?.EmptyIfNull().Any(x => x.IsDelta) ?? false;
-        
-        public long TotalUpdateSize => updaterModel.LatestVersion?.ReleasesToApply?.EmptyIfNull().Sum(x => x.Filesize) ?? 0;
-        
-        public UpdateSourceInfo UpdateSource => updaterModel.UpdateSource;
-
-        public bool IgnoreDeltaUpdates => updaterModel.IgnoreDeltaUpdates;
-        
-        public int ProgressPercent => updaterModel.ProgressPercent;
-        
-        public bool IsBusy => updaterModel.IsBusy;
-        
-        public CommandWrapper OpenUri { get; }
-
-        public FileInfo GetLatestExecutable()
-        {
-            return updaterModel.GetLatestExecutable();
-        }
-
         private async Task CheckForUpdatesCommandExecuted()
         {
             Log.Debug($"Update check requested, source: {updaterModel.UpdateSource}");
-            if (CheckForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
+            if (CheckForUpdatesCommand.IsBusy || ApplyUpdateCommand.IsBusy)
             {
                 Log.Debug("Update is already in progress");
                 IsOpen = true;
@@ -190,23 +240,36 @@ namespace PoeShared.Squirrel.Updater
             }
 
             SetStatus("Checking for updates...");
+            var sw = Stopwatch.StartNew();
+            LatestUpdate = default;
             updaterModel.Reset();
-
-            // delaying update so the user could see the progress ring
-            await Task.Delay(UiConstants.ArtificialLongDelay);
 
             try
             {
-                var newVersion = await updaterModel.CheckForUpdates();
+                await updaterModel.CheckForUpdates();
 
-                if (newVersion != null)
+                var timeToWait = sw.Elapsed - UiConstants.ArtificialShortDelay;
+                if (timeToWait > TimeSpan.Zero)
+                {
+                    // delaying update so the user could see the progress ring
+                    await Task.Delay(UiConstants.ArtificialShortDelay);
+                }
+                
+                var newVersion = updaterModel.LatestUpdate;
+                if (newVersion == null)
+                {
+                    throw new ApplicationException($"Something went wrong - failed to get latest update info");
+                }
+                availableReleasesSource.EditDiff(newVersion.RemoteReleases);
+                LatestUpdate = newVersion;
+                if (newVersion.ReleasesToApply.Any())
                 {
                     IsOpen = true;
-                    SetStatus($"New version is available");
+                    SetStatus($"New version v{LatestVersion} is available");
                 }
                 else
                 {
-                    SetStatus("Latest version is already installed");
+                    SetStatus("No updates found");
                 }
             }
             catch (Exception ex)
@@ -219,34 +282,35 @@ namespace PoeShared.Squirrel.Updater
 
         private async Task ApplyUpdateCommandExecuted()
         {
-            Log.Debug($"Applying latest update {LatestVersion} (updated: {UpdatedVersion})");
-            if (CheckForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
+            Log.Debug($"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
+            if (CheckForUpdatesCommand.IsBusy || ApplyUpdateCommand.IsBusy)
             {
                 Log.Debug("Already in progress");
                 IsOpen = true;
                 return;
             }
 
-            SetStatus($"Downloading and Applying update {LatestVersion}...");
+            SetStatus($"Preparing update v{LatestVersion}...");
 
-            if (updaterModel.LatestVersion == null)
+            if (LatestUpdate == null)
             {
-                throw new ApplicationException("Latest version must be specified");
+                throw new ApplicationException("Latest update must be specified");
             }
 
             await Task.Delay(UiConstants.ArtificialLongDelay);
 
             try
             {
-                await updaterModel.ApplyRelease(updaterModel.LatestVersion);
+                await updaterModel.ApplyRelease(LatestUpdate);
                 IsOpen = true;
-                SetStatus($"Successfully updated to the version {LatestVersion}");
+                SetStatus($"Successfully updated to v{LatestVersion}");
+                LatestUpdate = default;
             }
             catch (Exception ex)
             {
                 Log.HandleException(ex);
                 IsOpen = true;
-                SetError($"Failed to apply update {LatestVersion}, UpdateSource: {UpdateSource} - {ex.Message}");
+                SetError($"Failed to apply update to v{LatestVersion}, UpdateSource: {UpdateSource} - {ex.Message}");
             }
         }
 
@@ -262,7 +326,7 @@ namespace PoeShared.Squirrel.Updater
             StatusText = text;
             updaterModel.Reset();
         }
-        
+
         private async Task RestartCommandExecuted()
         {
             Log.Debug("Restart application requested");

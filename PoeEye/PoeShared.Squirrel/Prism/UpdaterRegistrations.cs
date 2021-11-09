@@ -10,8 +10,13 @@ namespace PoeShared.Squirrel.Prism
         {
             Container
                 .RegisterSingleton<IUpdateSourceProvider, UpdateSourceProviderFromConfig>()
+                .RegisterSingleton<IUpdaterWindowDisplayer, UpdaterWindowDisplayer>()
+                .RegisterSingleton<ISquirrelEventsHandler, SquirrelEventsHandler>()
                 .RegisterSingleton<IApplicationUpdaterViewModel, ApplicationUpdaterViewModel>()
                 .RegisterSingleton<IApplicationUpdaterModel, ApplicationUpdaterModel>();
+
+            Container
+                .RegisterType<IUpdaterWindowViewModel, UpdaterWindowViewModel>();
         }
     }
 }

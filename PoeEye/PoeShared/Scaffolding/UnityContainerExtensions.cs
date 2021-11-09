@@ -23,6 +23,16 @@ namespace PoeShared.Scaffolding
             
             return instance;
         }
+        
+        public static IUnityContainer RegisterType<TTo>(this IUnityContainer instance, params Type[] types)
+        {
+            foreach (var type in types)
+            {
+                instance.RegisterType(type, typeof(TTo));
+            }
+            
+            return instance;
+        }
 
         public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, Func<IUnityContainer, object> func)
         {

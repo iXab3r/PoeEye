@@ -101,7 +101,7 @@ namespace PoeShared.UI
                     return;
                 }
                 
-                Log.Debug($"Showing custom ExceptionViewer, exception: {config.Exception}, config: {config.DumpToTextRaw()}");
+                Log.Debug($"Showing custom ExceptionViewer, exception: {config.Exception}, config: {new { config.Title, config.AppName, config.Timestamp, config.Exception }}");
 
                 var windowAnchors = new CompositeDisposable();
                 Window window = null;

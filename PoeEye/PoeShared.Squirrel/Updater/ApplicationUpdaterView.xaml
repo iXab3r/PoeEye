@@ -1,76 +1,60 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:fa="http://schemas.fontawesome.io/icons/"
+                              xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:st="http://schemas.spicytaco.io/">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type updater1:ApplicationUpdaterViewModel}">
-        <DockPanel>
-            <fa:FontAwesome Icon="Warning"
-                            Margin="5,0"
-                            Visibility="{Binding IsInErrorStatus, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                            Foreground="{StaticResource WarningBrush}"
-                            VerticalAlignment="Center"
-                            ToolTip="{Binding StatusText}"
-                            FontSize="32" />
+        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                         Value="0"
+                         Width="40" Height="40"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         RenderTransformOrigin="0.5, 0.5"
+                         IsIndeterminate="True"
+                         Visibility="{Binding  IsBusy, Converter={StaticResource TrueToVisibleFalseToHiddenConverter}}" />
 
-            <fa:FontAwesome Icon="Refresh"
-                            Margin="5,0"
-                            Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                            Foreground="{StaticResource MouseOverAccentBrushKey}"
-                            VerticalAlignment="Center"
-                            FontSize="32" />
-
-            <fa:FontAwesome Icon="ArrowCircleUp"
-                            Margin="5,0"
-                            Visibility="{Binding LatestVersion, Converter={StaticResource NullToCollapsedConverter}}"
-                            Foreground="{StaticResource MouseOverAccentBrushKey}"
-                            VerticalAlignment="Center"
-                            FontSize="32" />
-
-            <fa:FontAwesome Icon="CheckCircle"
-                            Margin="5,0"
-                            Visibility="{Binding UpdatedVersion, Converter={StaticResource NullToCollapsedConverter}}"
-                            Foreground="{StaticResource PositiveBrush}"
-                            VerticalAlignment="Center"
-                            FontSize="32" />
-            <DockPanel>
+            <DockPanel st:StackPanel.Fill="Fill">
 
                 <Grid Margin="10,0" DockPanel.Dock="Bottom">
                     <eye:ButtonEx
                         MinHeight="30"
                         Command="{Binding RestartCommand}"
-                        Icon="&#xf2d0;"
-                        Content="{Binding UpdatedVersion, StringFormat='Restart application to migrate to v{0}'}">
+                        Icon="&#xf2d0;">
+                        <eye:ButtonEx.Content>
+                            <TextBlock Text="Restart application" />
+                        </eye:ButtonEx.Content>
                         <eye:ButtonEx.Visibility>
                             <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
                                 <MultiBinding.Bindings>
-                                    <Binding Path="UpdatedVersion" Converter="{StaticResource NullToFalseConverter}" />
+                                    <Binding Path="LatestAppliedVersion" Converter="{StaticResource NullToFalseConverter}" />
                                     <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
                                 </MultiBinding.Bindings>
                             </MultiBinding>
                         </eye:ButtonEx.Visibility>
                     </eye:ButtonEx>
-                    
+
                     <eye:ButtonEx
                         MinHeight="30"
-                        Command="{Binding ApplyUpdate}"
+                        Command="{Binding ApplyUpdateCommand}"
                         Icon="&#xF0ED;"
                         ToolTip="{Binding UpdateInfo}">
                         <eye:ButtonEx.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding LatestVersion, StringFormat='Download and apply v{0}'}"/>
+                                <TextBlock Text="Install" />
                                 <StackPanel Orientation="Horizontal" Margin="15,0,0,0"
                                             Visibility="{Binding TotalUpdateSize, Converter={StaticResource GreaterThanZero64BitToVisibleConverter}}">
                                     <fa:FontAwesome Icon="Download"
                                                     Margin="5,0"
                                                     VerticalAlignment="Center"
                                                     FontSize="14" />
-                                    <TextBlock Text="{Binding TotalUpdateSize, Converter={StaticResource DataSizeToHumanReadableStringConverter}}"/>
+                                    <TextBlock Text="{Binding TotalUpdateSize, Converter={StaticResource DataSizeToHumanReadableStringConverter}}" />
                                 </StackPanel>
                                 <fa:FontAwesome Icon="Certificate"
                                                 Margin="5,0"
@@ -83,15 +67,15 @@
                         <eye:ButtonEx.Visibility>
                             <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
                                 <MultiBinding.Bindings>
-                                    <Binding Path="LatestVersion" Converter="{StaticResource NullToFalseConverter}" />
+                                    <Binding Path="LatestUpdate" Converter="{StaticResource NullToFalseConverter}" />
                                     <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
                                 </MultiBinding.Bindings>
                             </MultiBinding>
                         </eye:ButtonEx.Visibility>
                     </eye:ButtonEx>
 
-                    <ProgressBar Margin="5, 10" 
-                                 VerticalAlignment="Center" 
+                    <ProgressBar Margin="5, 10"
+                                 VerticalAlignment="Center"
                                  Value="{Binding ProgressPercent, Mode=OneWay}"
                                  Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
                 </Grid>
@@ -104,17 +88,37 @@
                         TextWrapping="WrapWithOverflow"
                         TextTrimming="CharacterEllipsis"
                         HorizontalAlignment="Center"
+                        IsHitTestVisible="True"
                         Foreground="{StaticResource NegativeBrush}"
                         Text="{Binding StatusText}" />
 
                     <TextBlock Visibility="{Binding IsInErrorStatus, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"
+                               IsHitTestVisible="True"
                                ToolTip="{Binding StatusText}"
                                TextWrapping="WrapWithOverflow"
                                Text="{Binding StatusText}" />
                 </Grid>
             </DockPanel>
-        </DockPanel>
+
+            <fa:FontAwesome Icon="Refresh"
+                            Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                            Foreground="{StaticResource MouseOverAccentBrushKey}"
+                            VerticalAlignment="Center"
+                            FontSize="32" />
+
+            <fa:FontAwesome Icon="ArrowCircleUp"
+                            Visibility="{Binding LatestUpdate, Converter={StaticResource NullToCollapsedConverter}}"
+                            Foreground="{StaticResource MouseOverAccentBrushKey}"
+                            VerticalAlignment="Center"
+                            FontSize="32" />
+
+            <fa:FontAwesome Icon="CheckCircle"
+                            Visibility="{Binding LatestAppliedVersion, Converter={StaticResource NullToCollapsedConverter}}"
+                            Foreground="{StaticResource PositiveBrush}"
+                            VerticalAlignment="Center"
+                            FontSize="32" />
+        </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>

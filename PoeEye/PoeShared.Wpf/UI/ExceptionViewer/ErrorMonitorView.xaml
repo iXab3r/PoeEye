@@ -1,0 +1,19 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:ui="clr-namespace:PoeShared.UI">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+    
+    <DataTemplate DataType="{x:Type ui:ErrorMonitorViewModel}">
+        <st:StackPanel Orientation="Horizontal">
+            <ui:ButtonEx Command="{Binding ReportProblemCommand}"
+                          Icon="&#xf071;"
+                          Content="Report a problem"/>
+            <ui:ButtonEx Command="{Binding ThrowExceptionCommand}" 
+                          Visibility="{Binding ThrowExceptionCommand, Converter={StaticResource NullToCollapsedConverter}}"
+                          Content="Throw"/>
+        </st:StackPanel>
+    </DataTemplate>
+</ui:SharedResourceDictionary>

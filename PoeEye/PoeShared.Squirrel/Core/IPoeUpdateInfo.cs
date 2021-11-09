@@ -7,7 +7,11 @@ namespace PoeShared.Squirrel.Core
     {
         public IReleaseEntry CurrentlyInstalledVersion { get; }
 
-        public IReleaseEntry FutureReleaseEntry { get;  }
+        public IReadOnlyCollection<IReleaseEntry> LocalReleases { get; }
+        
+        public IReadOnlyCollection<IReleaseEntry> RemoteReleases { get; }
+
+        public IReleaseEntry FutureReleaseEntry { get; }
 
         public IReadOnlyCollection<IReleaseEntry> ReleasesToApply { get; }
 

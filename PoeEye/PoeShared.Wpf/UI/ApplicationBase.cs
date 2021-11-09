@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 using log4net;
 using PInvoke;
@@ -20,6 +21,7 @@ using PoeShared.Wpf.Scaffolding;
 using ReactiveUI;
 using SevenZip;
 using Unity;
+using Unity.Lifetime;
 
 namespace PoeShared.UI
 {
@@ -32,10 +34,11 @@ namespace PoeShared.UI
             try
             {
                 Container = new UnityContainer();
+                Container.RegisterInstance<Application>(this, new ContainerControlledLifetimeManager());
                 Container.AddNewExtensionIfNotExists<Diagnostic>();
-                Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
-                Container.AddNewExtensionIfNotExists<NativeRegistrations>();
                 Container.AddNewExtensionIfNotExists<CommonRegistrations>();
+                Container.AddNewExtensionIfNotExists<NativeRegistrations>();
+                Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
 
                 var arguments = Environment.GetCommandLineArgs();
                 appArguments = Container.Resolve<IAppArguments>();
@@ -145,12 +148,19 @@ namespace PoeShared.UI
             SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
             Container.Resolve<IExceptionReportingService>();
         }
-        
+
         protected override void OnExit(ExitEventArgs e)
         {
-            Log.Debug("Application exit detected");
+            Log.Debug($"Application exit detected, exit code: {e.ApplicationExitCode}");
             base.OnExit(e);
+            Log.Debug("Disposing application resources");
             Anchors.Dispose();
+            Log.Debug("Disposed application resources");
+        }
+
+        public override string ToString()
+        {
+            return $"App#{Environment.ProcessId}";
         }
     }
 }

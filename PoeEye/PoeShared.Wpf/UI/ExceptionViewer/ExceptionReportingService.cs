@@ -24,12 +24,14 @@ namespace PoeShared.UI
         private static readonly IFluentLog Log = typeof(ExceptionReportingService).PrepareLogger();
         private readonly IAppArguments appArguments;
         private readonly IClock clock;
+        private readonly IApplicationAccessor applicationAccessor;
         private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
         private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
         private IExceptionReportHandler reportHandler;
 
         public ExceptionReportingService(
             IClock clock,
+            IApplicationAccessor applicationAccessor,
             IFolderCleanerService cleanupService,
             IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer,
             IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
@@ -39,6 +41,7 @@ namespace PoeShared.UI
             IAppArguments appArguments)
         {
             this.clock = clock;
+            this.applicationAccessor = applicationAccessor;
             this.exceptionDialogDisplayer = exceptionDialogDisplayer;
             this.appArguments = appArguments;
 
@@ -127,7 +130,7 @@ namespace PoeShared.UI
             reporter.ShowDialog(config);
 
             Log.Warn("Shutting down...");
-            Environment.Exit(-1);
+            applicationAccessor.Terminate(-1);
         }
 
         private ExceptionDialogConfig PrepareConfigSafe(Exception exception)

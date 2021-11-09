@@ -56,6 +56,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IMicrophoneProvider, MicrophoneProvider>()
                 .RegisterSingleton<IMessageBoxService, MessageBoxService>()
                 .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
+                .RegisterSingleton<IErrorMonitorViewModel, ErrorMonitorViewModel>()
                 .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);

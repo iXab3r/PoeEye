@@ -28,6 +28,8 @@ namespace PoeShared.Modularity
         
         bool IsLazyMode { get; }
         
+        bool ShowUpdater { get; }
+        
         IEnumerable<string> PrismModules { get; }
         
         bool IsElevated { get; }

@@ -13,7 +13,7 @@ namespace PoeShared.UI
         private static readonly IFluentLog Log = typeof(CopyConfigReportItemProvider).PrepareLogger();
         private readonly IFactory<IConfigProvider> configProviderFactory;
 
-        public CopyConfigReportItemProvider( IFactory<IConfigProvider> configProviderFactory)
+        public CopyConfigReportItemProvider(IFactory<IConfigProvider> configProviderFactory)
         {
             this.configProviderFactory = configProviderFactory;
         }

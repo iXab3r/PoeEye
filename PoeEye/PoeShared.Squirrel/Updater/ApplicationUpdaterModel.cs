@@ -7,8 +7,6 @@ using System.Reactive.Disposables;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using log4net;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -28,19 +26,18 @@ namespace PoeShared.Squirrel.Updater
         private readonly IAppArguments appArguments;
         private readonly IApplicationAccessor applicationAccessor;
  
-
         public ApplicationUpdaterModel(
             IApplicationAccessor applicationAccessor,
-            IUpdateSourceProvider UpdateSourceProvider,
+            IUpdateSourceProvider updateSourceProvider,
             IAppArguments appArguments)
         {
             this.applicationAccessor = applicationAccessor;
             this.appArguments = appArguments;
 
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            UpdatedVersion = null;
+            LatestAppliedVersion = null;
             
-            UpdateSourceProvider
+            updateSourceProvider
                 .WhenAnyValue(x => x.UpdateSource)
                 .WithPrevious()
                 .SubscribeSafe(x =>
@@ -76,13 +73,13 @@ namespace PoeShared.Squirrel.Updater
 
         public DirectoryInfo MostRecentVersionAppFolder { get; set; }
 
-        public UpdateSourceInfo UpdateSource { get; set; }
+        public UpdateSourceInfo UpdateSource { get; private set; }
 
         public bool IgnoreDeltaUpdates { get; set; }
 
-        public Version UpdatedVersion { get; private set; }
+        public Version LatestAppliedVersion { get; private set; }
 
-        public IPoeUpdateInfo LatestVersion { get; private set; }
+        public IPoeUpdateInfo LatestUpdate { get; private set; }
 
         public int ProgressPercent { get; private set; }
 
@@ -101,7 +98,8 @@ namespace PoeShared.Squirrel.Updater
             await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => UpdateProgress(x, "DownloadRelease"));
 
             string newVersionFolder;
-            if (string.IsNullOrWhiteSpace(GetSquirrelUpdateExe()))
+            var squirrelExe = GetSquirrelUpdateExe();
+            if (string.IsNullOrWhiteSpace(squirrelExe))
             {
                 Log.Warn("Not a Squirrel-app or debug mode detected, skipping update");
                 newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
@@ -113,7 +111,7 @@ namespace PoeShared.Squirrel.Updater
             }
             else
             {
-                Log.Debug("Applying releases...");
+                Log.Debug($"Applying releases, squirrel executable: {squirrelExe}");
                 newVersionFolder = await mgr.ApplyReleases(updateInfo, x => UpdateProgress(x, "ApplyRelease"));
             }
 
@@ -128,53 +126,46 @@ namespace PoeShared.Squirrel.Updater
             }
 
             MostRecentVersionAppFolder = new DirectoryInfo(newVersionFolder);
-            UpdatedVersion = lastAppliedRelease.Version.Version;
-            LatestVersion = null;
+            LatestAppliedVersion = lastAppliedRelease.Version.Version;
+            LatestUpdate = null;
             ProgressPercent = 0;
         }
 
         public void Reset()
         {
-            LatestVersion = null;
-            UpdatedVersion = null;
+            LatestUpdate = null;
+            LatestAppliedVersion = null;
             IsBusy = false;
             ProgressPercent = 0;
         }
 
-        public void HandleSquirrelEvents()
+        public async Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry releaseEntry)
         {
-            Log.Debug("Handling Squirrel events");
-            SquirrelAwareApp.HandleEvents(
-                OnInitialInstall,
-                OnAppUpdate,
-                onAppUninstall: OnAppUninstall,
-                onFirstRun: OnFirstRun);
-            Log.Debug("Squirrel events were handled successfully");
+            Log.Debug(() => $"Force update to {new { releaseEntry.Version, releaseEntry.Filename, releaseEntry.Filesize }} requested");
+
+            using var mgr = await CreateManager();
+            var updateInfo = await mgr.PrepareUpdate(IgnoreDeltaUpdates, ArraySegment<IReleaseEntry>.Empty, new[] { releaseEntry });
+            Log.Debug(() => $"Force UpdateInfo:\r\n{updateInfo.DumpToText().TakeChars(300)}");
+            return updateInfo;
         }
 
         /// <summary>
         ///     Checks whether update exist and if so, downloads it
         /// </summary>
         /// <returns>True if application was updated</returns>
-        public async Task<IPoeUpdateInfo> CheckForUpdates()
+        public async Task CheckForUpdates()
         {
-            Log.Debug("Update check requested");
+            Log.Debug(() => "Update check requested");
             using var unused = CreateIsBusyAnchor();
             Reset();
 
             using var mgr = await CreateManager();
-            Log.Debug($"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
+            Log.Debug(() => $"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
 
             var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
 
-            Log.Debug($"UpdateInfo:\r\n{updateInfo?.DumpToText()}");
-            if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
-            {
-                return null;
-            }
-
-            LatestVersion = updateInfo;
-            return updateInfo;
+            Log.Debug(() => $"UpdateInfo:\r\n{updateInfo.DumpToText().TakeChars(300)}");
+            LatestUpdate = updateInfo;
         }
 
         public async Task RestartApplication()
@@ -279,28 +270,7 @@ namespace PoeShared.Squirrel.Updater
             Log.Debug($"Check update is in progress: {progressPercent}%");
         }
 
-        private void OnAppUninstall(Version appVersion)
-        {
-            Log.Debug($"Uninstalling v{appVersion}...");
-            throw new NotSupportedException("Should never be invoked");
-        }
-
-        private void OnAppUpdate(Version appVersion)
-        {
-            Log.Debug($"Updating v{appVersion}...");
-            throw new NotSupportedException("Should never be invoked");
-        }
-
-        private void OnInitialInstall(Version appVersion)
-        {
-            Log.Debug($"App v{appVersion} installed");
-            throw new NotSupportedException("Should never be invoked");
-        }
-
-        private void OnFirstRun()
-        {
-            Log.Debug("App started for the first time");
-        }
+      
 
         private static string GetSquirrelUpdateExe()
         {

@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 using PoeShared.Squirrel.Core;
 using Squirrel;
 
@@ -11,13 +10,13 @@ namespace PoeShared.Squirrel.Updater
 {
     public interface IApplicationUpdaterModel : IDisposableReactiveObject
     {
-        UpdateSourceInfo UpdateSource { get; set; }
+        UpdateSourceInfo UpdateSource { get; }
 
         bool IgnoreDeltaUpdates { get; set; }
 
-        [CanBeNull] Version UpdatedVersion { get; }
+        [CanBeNull] Version LatestAppliedVersion { get; }
 
-        [CanBeNull] IPoeUpdateInfo LatestVersion { get; }
+        [CanBeNull] IPoeUpdateInfo LatestUpdate { get; }
         
         int ProgressPercent { get; }
         
@@ -26,18 +25,15 @@ namespace PoeShared.Squirrel.Updater
         /// <summary>
         ///     Checks whether update exist and if so, downloads it
         /// </summary>
-        /// <returns>True if application was updated</returns>
-        [NotNull]
-        Task<IPoeUpdateInfo> CheckForUpdates();
+        Task CheckForUpdates();
 
-        [NotNull]
         Task RestartApplication();
 
         Task ApplyRelease([NotNull] IPoeUpdateInfo updateInfo);
 
         void Reset();
 
-        void HandleSquirrelEvents();
+        Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry releaseEntry);
 
         FileInfo GetLatestExecutable();
     }

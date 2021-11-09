@@ -1,20 +1,26 @@
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.Squirrel.Core;
+using Squirrel;
 
 namespace PoeShared.Squirrel.Updater
 {
     public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     {
-        [NotNull] CommandWrapper CheckForUpdatesCommand { get; }
+        CommandWrapper CheckForUpdatesCommand { get; }
 
-        [NotNull] CommandWrapper RestartCommand { get; }
+        CommandWrapper RestartCommand { get; }
 
-        [NotNull] CommandWrapper ApplyUpdate { get; }
+        CommandWrapper ApplyUpdateCommand { get; }
+        
+        CommandWrapper ShowUpdaterCommand { get; }
 
         bool IsInErrorStatus { get; }
 
@@ -23,17 +29,25 @@ namespace PoeShared.Squirrel.Updater
         int ProgressPercent { get; }
 
         bool IsOpen { get; set; }
+        
+        bool IsBusy { get; }
 
         UpdateSourceInfo UpdateSource { get; }
         
-        Version UpdatedVersion { get; }
+        Version LatestAppliedVersion { get; }
 
         Version LatestVersion { get; }
+        
+        IPoeUpdateInfo LatestUpdate { get; }
+        
+        ReadOnlyObservableCollection<IReleaseEntry> AvailableReleases { get; }
 
         bool CheckForUpdates { get; set; }
 
         [NotNull] CommandWrapper OpenUri { get; }
 
         FileInfo GetLatestExecutable();
+
+        Task PrepareForceUpdate(IReleaseEntry targetRelease);
     }
 }

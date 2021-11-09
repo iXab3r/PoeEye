@@ -26,6 +26,9 @@ namespace PoeShared
         [Option('l', "lazyMode", Default = false, HelpText = "Lazy mode - Prism modules will be loaded on-demand")]
         public bool IsLazyMode { get; set; }
         
+        [Option('u', "update", Default = false, HelpText = "Show updater before app start")]
+        public bool ShowUpdater { get; set; }
+        
         [Option('m', "modules", HelpText = "Prism modules - Space-separated list of modules that will be loaded")]
         public IEnumerable<string> PrismModules { get; set; }
     }
@@ -85,6 +88,8 @@ namespace PoeShared
 
         public int ProcessId { get; }
 
+        public bool ShowUpdater { get; set; }
+        
         public bool IsElevated { get; set; }
 
         public string ApplicationExecutablePath { get; }
@@ -132,6 +137,7 @@ namespace PoeShared
                 AppDataDirectory,
                 LocalAppDataDirectory,
                 IsDebugMode,
+                ShowUpdater,
                 StartupArgs,
                 ApplicationPath = ApplicationExecutablePath,
                 ApplicationName = ApplicationExecutableName

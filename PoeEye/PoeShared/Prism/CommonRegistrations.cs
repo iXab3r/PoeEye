@@ -22,12 +22,16 @@ namespace PoeShared.Prism
                 .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
 
             Container
-                .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
+                .RegisterType( typeof(IFactory<,,,>), typeof(Factory<,,,>))
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
+                .RegisterType(typeof(IFactory<>),  typeof(Factory<>))
+                .RegisterType(typeof(INamedFactory<>), typeof(Factory<,,,>))
+                .RegisterType(typeof(INamedFactory<,,>), typeof(Factory<,,>))
+                .RegisterType(typeof(INamedFactory<,>), typeof(Factory<,>))
+                .RegisterType(typeof(INamedFactory<>),  typeof(Factory<>))
                 .RegisterType<IFolderCleanerService, FolderCleanerService>()
-                .RegisterType<ISharedResourceLatch, SharedResourceLatch>()
-                .RegisterType(typeof(IFactory<>), typeof(Factory<>));
+                .RegisterType<ISharedResourceLatch, SharedResourceLatch>();
         }
     }
 }
