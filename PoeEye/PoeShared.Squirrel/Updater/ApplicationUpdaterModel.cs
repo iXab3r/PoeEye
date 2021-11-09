@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -95,7 +96,18 @@ namespace PoeShared.Squirrel.Updater
             using var mgr = await CreateManager();
             
             Log.Debug("Downloading releases...");
-            await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => UpdateProgress(x, "DownloadRelease"));
+
+            const string downloadReleaseTaskName = "DownloadRelease";
+            const string applyReleaseTaskName = "ApplyRelease";
+            var progressByTask = new Dictionary<string, int>{ { downloadReleaseTaskName, 0 }, { applyReleaseTaskName, 0 } };
+            void CombinedProgressReporter(int progressPercent, string taskName)
+            {
+                progressByTask[taskName] = progressPercent;
+                var totalProgress = (int)progressByTask.Values.Average();
+                UpdateProgress(totalProgress, $"{taskName} {progressPercent}%");
+            }
+            
+            await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => CombinedProgressReporter(x, downloadReleaseTaskName));
 
             string newVersionFolder;
             var squirrelExe = GetSquirrelUpdateExe();
@@ -103,16 +115,21 @@ namespace PoeShared.Squirrel.Updater
             {
                 Log.Warn("Not a Squirrel-app or debug mode detected, skipping update");
                 newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
-                for (var i = 0; i < 100; i++)
+                for (var i = 0; i < 20; i++)
                 {
-                    UpdateProgress(i, "Debug");
-                    await Task.Delay(5000);
+                    CombinedProgressReporter(i*5, downloadReleaseTaskName);
+                    await Task.Delay(500);
+                }
+                for (var i = 0; i < 10; i++)
+                {
+                    CombinedProgressReporter(i*10, applyReleaseTaskName);
+                    await Task.Delay(500);
                 }
             }
             else
             {
                 Log.Debug($"Applying releases, squirrel executable: {squirrelExe}");
-                newVersionFolder = await mgr.ApplyReleases(updateInfo, x => UpdateProgress(x, "ApplyRelease"));
+                newVersionFolder = await mgr.ApplyReleases(updateInfo, x => CombinedProgressReporter(x, applyReleaseTaskName));
             }
 
             var lastAppliedRelease = updateInfo.ReleasesToApply.Last();

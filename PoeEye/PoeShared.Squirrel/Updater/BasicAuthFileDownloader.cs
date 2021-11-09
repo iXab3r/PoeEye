@@ -28,22 +28,22 @@ namespace PoeShared.Squirrel.Updater
         {
             using (var wc = CreateClient())
             {
-                var progressAnchors = new CompositeDisposable();
-                Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
+                using var progressAnchors = Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
                         h => wc.DownloadProgressChanged += h,
                         h => wc.DownloadProgressChanged -= h)
                     .Where(x => progress != null)
-                    .Sample(UiConstants.ArtificialShortDelay)
-                    .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException)
-                    .AddTo(progressAnchors);
+                    .Sample(UiConstants.UiThrottlingDelay)
+                    .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
                 try
                 {
                     Log.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
                     await wc.DownloadFileTaskAsync(url, targetFile);
+                    progress(100);
                 }
-                finally
+                catch (Exception e)
                 {
-                    progressAnchors.Dispose();
+                    Log.Warn($"Failed to download {url} to {targetFile}", e);
+                    progress(0);
                 }
             }
         }

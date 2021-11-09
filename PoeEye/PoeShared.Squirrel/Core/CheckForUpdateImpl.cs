@@ -36,13 +36,13 @@ namespace PoeShared.Squirrel.Core
         {
             progressCallback ??= _ => { };
 
-            IReadOnlyCollection<ReleaseEntry> localReleases;
+            IReadOnlyList<IReleaseEntry> localReleases;
             var stagingId = GetOrCreateStagedUserId();
 
             bool shouldInitialize;
             try
             {
-                localReleases = Utility.LoadLocalReleases(localReleaseFile).ToArray();
+                localReleases = Utility.LoadLocalReleases(localReleaseFile);
                 shouldInitialize = false;
             }
             catch (Exception ex)
@@ -177,8 +177,8 @@ namespace PoeShared.Squirrel.Core
 
                 Log.Warn(message);
 
-                var packages = new DirectoryInfo(updateUrlOrPath).GetFiles("*.nupkg");
-                if (packages.Length == 0)
+                var packages = Utility.EnumeratePackagesForApp(updateUrlOrPath);
+                if (packages.Count == 0)
                 {
                     throw new Exception(message);
                 }

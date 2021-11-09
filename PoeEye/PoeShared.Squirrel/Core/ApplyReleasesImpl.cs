@@ -40,15 +40,22 @@ namespace PoeShared.Squirrel.Core
         {
             progress ??= _ => { };
 
+            if (updateInfo.FutureReleaseEntry == null)
+            {
+                throw new ArgumentException($"Future version must be specified");
+            }
+
             progress(5);
-            var release = await CreateFullPackagesFromDeltas(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
+            Log.Debug($"Initializing unpacking, updateInfo: {new {updateInfo.FutureReleaseEntry.Filename, updateInfo.FutureReleaseEntry.Filesize, updateInfo.FutureReleaseEntry.EntryAsString }}");
+            var release = await UnpackRelease(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
             progress(10);
 
             if (release == null)
             {
+                Log.Warn("Failed to unpack release");
                 if (attemptingFullInstall)
                 {
-                    Log.Info("No release to install, running the app");
+                    Log.Warn("No release to install, running the app");
                     await InvokePostInstall(updateInfo.CurrentlyInstalledVersion?.Version, false, true, silentInstall);
                 }
 
@@ -57,20 +64,36 @@ namespace PoeShared.Squirrel.Core
             }
 
             var ret = await Log.ErrorIfThrows(
-                () => InstallPackageToAppDir(updateInfo, release),
+                () => ExtractPackageToAppDir(updateInfo, release),
                 "Failed to install package to app dir");
             progress(30);
 
-            var currentReleases = await Log.ErrorIfThrows(
-                UpdateLocalReleasesFile,
+            Log.Debug("Preparing local releases list");
+            var localReleases = await Log.ErrorIfThrows(
+                async () =>
+                {
+                    var releasesFilePath = Utility.LocalReleaseFileForAppDir(rootAppDirectory);
+                    Utility.WriteLocalReleases(releasesFilePath, new[] { release });
+                    return Utility.LoadLocalReleases(releasesFilePath);
+                },
                 "Failed to update local releases file");
             progress(50);
+            
+            Log.Debug($"Updated local releases file, list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
+            if (localReleases.Count != 1)
+            {
+                Log.Warn($"Invalid local releases list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
+                throw new InvalidOperationException($"Something went wrong - local releases list must contain a single item");
+            }
 
-            var newVersion = currentReleases.OrderByDescending(x => x.Version).First().Version;
-            ExecuteSelfUpdate(newVersion);
+            var localRelease = localReleases.Single();
+            var localReleaseVersion = localRelease.Version;
+            Log.Debug($"Performing self-update activities for {new { localRelease.Filename, localRelease.Filesize, localRelease.EntryAsString }}");
+            ExecuteSelfUpdate(localReleaseVersion);
 
+            Log.Debug($"Invoking post-install events, new version: {localReleaseVersion}");
             await Log.ErrorIfThrows(
-                () => InvokePostInstall(newVersion, attemptingFullInstall, false, silentInstall),
+                () => InvokePostInstall(localReleaseVersion, attemptingFullInstall, false, silentInstall),
                 "Failed to invoke post-install");
             progress(75);
 
@@ -92,8 +115,7 @@ namespace PoeShared.Squirrel.Core
             try
             {
                 var currentVersion = updateInfo.CurrentlyInstalledVersion?.Version;
-
-                await CleanDeadVersions(currentVersion, newVersion);
+                await CleanDeadVersions(localReleases, currentVersion, localReleaseVersion);
             }
             catch (Exception ex)
             {
@@ -356,7 +378,7 @@ namespace PoeShared.Squirrel.Core
             FixPinnedExecutables(zf.Version);
         }
 
-        private Task<string> InstallPackageToAppDir(IPoeUpdateInfo updateInfo, IReleaseEntry release)
+        private Task<string> ExtractPackageToAppDir(IPoeUpdateInfo updateInfo, IReleaseEntry release)
         {
             return Task.Run(
                 async () =>
@@ -382,20 +404,14 @@ namespace PoeShared.Squirrel.Core
                 });
         }
 
-        private async Task<IReleaseEntry> CreateFullPackagesFromDeltas(IReleaseEntry[] releasesToApply, IReleaseEntry currentVersion)
+        private async Task<IReleaseEntry> UnpackRelease(IReleaseEntry[] releasesToApply, IReleaseEntry currentVersion)
         {
             Guard.ArgumentIsTrue(releasesToApply != null, "releasesToApply != null");
 
             // If there are no remote releases at all, bail
             if (releasesToApply == null || !releasesToApply.Any())
             {
-                Log.Debug("Releases to apply is empty");
-                return null;
-            }
-                
-            if (currentVersion == null)
-            {
-                Log.Debug("Current version is not set, skipping delta-phase");
+                Log.Debug("Nothing to unpack - releases to apply is empty");
                 return null;
             }
                 
@@ -405,14 +421,19 @@ namespace PoeShared.Squirrel.Core
             {
                 return releasesToApply.MaxBy(x => x.Version).FirstOrDefault();
             }
-
+            
             if (!releasesToApply.All(x => x.IsDelta))
             {
-                throw new Exception("Cannot apply combinations of delta and full packages");
+                throw new InvalidOperationException("Cannot apply combinations of delta and full packages");
+            }
+            
+            if (currentVersion == null)
+            {
+                throw new InvalidOperationException("Current version must be set to apply delta-updates");
             }
 
             // Smash together our base full package and the nearest delta
-            var ret = await Task.Run(
+            var deltaPackage = await Task.Run(
                 () =>
                 {
                     var basePkg = new ReleasePackage(Path.Combine(rootAppDirectory, "packages", currentVersion.Filename));
@@ -434,17 +455,22 @@ namespace PoeShared.Squirrel.Core
                         deltaPkg,
                         finalPkgPath);
                 });
-
-            if (releasesToApply.Count() == 1)
+            Log.Debug($"Prepared package: {deltaPackage}");
+            
+            if (releasesToApply.Length == 1)
             {
-                return ReleaseEntry.GenerateFromFile(ret.InputPackageFile);
+                var finalReleaseEntry = ReleaseEntry.GenerateFromFile(deltaPackage.InputPackageFile);
+                Log.Debug($"No delta-updates left, prepared release entry: { new { finalReleaseEntry.Filename, finalReleaseEntry.Filesize, finalReleaseEntry.IsDelta, finalReleaseEntry.EntryAsString } } ");
+                return finalReleaseEntry;
             }
 
-            var fi = new FileInfo(ret.InputPackageFile);
+            var fi = new FileInfo(deltaPackage.InputPackageFile);
             var entry = ReleaseEntry.GenerateFromFile(fi.OpenRead(), fi.Name);
 
             // Recursively combine the rest of them
-            return await CreateFullPackagesFromDeltas(releasesToApply.Skip(1).ToArray(), entry);
+            var updatesToApply = releasesToApply.Skip(1).ToArray();
+            Log.Debug($"Recursively applying {updatesToApply.Length} updates to entry {entry.EntryAsString}, updates: {updatesToApply.Select(x => x.EntryAsString).DumpToString()}");
+            return await UnpackRelease(updatesToApply, entry);
         }
 
         private void ExecuteSelfUpdate(SemanticVersion currentVersion)
@@ -483,7 +509,7 @@ namespace PoeShared.Squirrel.Core
 
             var squirrelApps = SquirrelAwareExecutableDetector.GetAllSquirrelAwareApps(targetDir.FullName);
 
-            Log.Info($"Squirrel Enabled Apps: [{string.Join(",", squirrelApps)}]");
+            Log.Info($"Squirrel Enabled Apps for post-install notification: [{string.Join(",", squirrelApps)}]");
 
             // For each app, run the install command in-order and wait
             if (!firstRunOnly)
@@ -497,11 +523,12 @@ namespace PoeShared.Squirrel.Core
 
                             try
                             {
+                                Log.Debug($"Running Squirrel app with post-install args, executable: {exe}, args: {args}");
                                 await Utility.InvokeProcessAsync(exe, args, cts.Token);
                             }
                             catch (Exception ex)
                             {
-                                Log.Error("Couldn't run Squirrel hook, continuing: " + exe, ex);
+                                Log.Error($"Couldn't run Squirrel app with post-install args, executable: {exe}, args: {args}", ex);
                             }
                         }
                     },
@@ -658,7 +685,7 @@ namespace PoeShared.Squirrel.Core
             Log.Info("Finished shortcut successfully");
         }
 
-        internal void UnshimOurselves()
+        private void UnshimOurselves()
         {
             new[] {RegistryView.Registry32, RegistryView.Registry64}.ForEach(
                 view =>
@@ -707,7 +734,7 @@ namespace PoeShared.Squirrel.Core
         // directory are "dead" (i.e. already uninstalled, but not deleted), and
         // we blow them away. This is to make sure that we don't attempt to run
         // an uninstaller on an already-uninstalled version.
-        private async Task CleanDeadVersions(SemanticVersion originalVersion, SemanticVersion currentVersion, bool forceUninstall = false)
+        private async Task CleanDeadVersions(IReadOnlyList<IReleaseEntry> localReleases, SemanticVersion originalVersion, SemanticVersion currentVersion, bool forceUninstall = false)
         {
             if (currentVersion == null)
             {
@@ -720,21 +747,17 @@ namespace PoeShared.Squirrel.Core
                 return;
             }
 
-            Log.Info($"cleanDeadVersions: for version {currentVersion}");
+            Log.Info($"CleanDeadVersions: for version {currentVersion}, original: {originalVersion}, forceUninstall: {forceUninstall}");
 
             string originalVersionFolder = null;
             if (originalVersion != null)
             {
                 originalVersionFolder = GetDirectoryForRelease(originalVersion).Name;
-                Log.Info($"cleanDeadVersions: exclude folder {originalVersionFolder}");
+                Log.Info($"CleanDeadVersions: exclude folder {originalVersionFolder}");
             }
 
-            string currentVersionFolder = null;
-            if (currentVersion != null)
-            {
-                currentVersionFolder = GetDirectoryForRelease(currentVersion).Name;
-                Log.Info($"cleanDeadVersions: exclude folder {currentVersionFolder}");
-            }
+            var currentVersionFolder = GetDirectoryForRelease(currentVersion).Name;
+            Log.Info($"CleanDeadVersions: exclude folder {currentVersionFolder}");
 
             // NB: If we try to access a directory that has already been 
             // scheduled for deletion by MoveFileEx it throws what seems like
@@ -752,6 +775,7 @@ namespace PoeShared.Squirrel.Core
                     {
                         var squirrelApps = SquirrelAwareExecutableDetector.GetAllSquirrelAwareApps(x.FullName);
                         var args = $"--squirrel-obsolete {x.Name.Replace("app-", "")}";
+                        Log.Info($"Squirrel Enabled Apps for post-uninstall notification: [{string.Join(",", squirrelApps)}]");
 
                         if (squirrelApps.Count > 0)
                         {
@@ -765,11 +789,12 @@ namespace PoeShared.Squirrel.Core
 
                                         try
                                         {
+                                            Log.Debug($"Running Squirrel app with post-uninstall args, executable: {exe}, args: {args}");
                                             await Utility.InvokeProcessAsync(exe, args, cts.Token);
                                         }
                                         catch (Exception ex)
                                         {
-                                            Log.Error("Coudln't run Squirrel hook, continuing: " + exe, ex);
+                                            Log.Error($"Couldn't run Squirrel app with post-uninstall args, executable: {exe}, args: {args}", ex);
                                         }
                                     }
                                 },
@@ -816,23 +841,24 @@ namespace PoeShared.Squirrel.Core
                 });
 
             // Clean up the packages directory too
-            var releasesFile = Utility.LocalReleaseFileForAppDir(rootAppDirectory);
-            var entries = ReleaseEntry.ParseReleaseFile(File.ReadAllText(releasesFile, Encoding.UTF8));
-            var pkgDir = Utility.PackageDirectoryForAppDir(rootAppDirectory);
-            var releaseEntry = default(ReleaseEntry);
-
-            foreach (var entry in entries)
+            var packages = Utility.EnumeratePackagesForApp(rootAppDirectory);
+            foreach (var package in packages)
             {
-                if (entry.Version == currentVersion)
+                if (localReleases.Any(x => string.Equals(x.Filename, package.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    releaseEntry = ReleaseEntry.GenerateFromFile(Path.Combine(pkgDir, entry.Filename));
                     continue;
                 }
 
-                File.Delete(Path.Combine(pkgDir, entry.Filename));
+                try
+                {
+                    Log.Debug($"Removing old package: {package.FullName}");
+                    package.Delete();
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"Failed to remove old package: {package.FullName}", e);
+                }
             }
-
-            ReleaseEntry.WriteReleaseFile(new[] {releaseEntry}, releasesFile);
         }
 
         private static void MarkAppFolderAsDead(string appFolderPath)
@@ -843,11 +869,6 @@ namespace PoeShared.Squirrel.Core
         private static bool IsAppFolderDead(string appFolderPath)
         {
             return File.Exists(Path.Combine(appFolderPath, ".dead"));
-        }
-
-        internal async Task<List<ReleaseEntry>> UpdateLocalReleasesFile()
-        {
-            return await Task.Run(() => ReleaseEntry.BuildReleasesFile(Utility.PackageDirectoryForAppDir(rootAppDirectory)));
         }
 
         private IEnumerable<DirectoryInfo> GetReleases()

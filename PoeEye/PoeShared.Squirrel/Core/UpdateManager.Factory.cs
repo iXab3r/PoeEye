@@ -62,7 +62,8 @@ namespace PoeShared.Squirrel.Core
                 var response = await client.GetAsync(releasesApiBuilder.ToString());
                 response.EnsureSuccessStatusCode();
 
-                var releases = SimpleJson.DeserializeObject<List<Release>>(await response.Content.ReadAsStringAsync());
+                var serializedData = await response.Content.ReadAsStringAsync();
+                var releases = SimpleJson.DeserializeObject<List<Release>>(serializedData);
                 var latestRelease = releases
                     .Where(x => prerelease || !x.Prerelease)
                     .OrderByDescending(x => x.PublishedAt)
@@ -83,10 +84,12 @@ namespace PoeShared.Squirrel.Core
         public class Release
         {
             [DataMember(Name = "prerelease")] public bool Prerelease { get; set; }
-
+            [DataMember(Name = "created_at")] public DateTime CreatedAt { get; set; }
             [DataMember(Name = "published_at")] public DateTime PublishedAt { get; set; }
-
             [DataMember(Name = "html_url")] public string HtmlUrl { get; set; }
+            [DataMember(Name = "tag_name")] public string Tag { get; set; }
+            [DataMember(Name = "name")] public string Name { get; set; }
+            [DataMember(Name = "id")] public string Id { get; set; }
         }
     }
 }

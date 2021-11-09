@@ -342,20 +342,31 @@ namespace PoeShared.Squirrel.Scaffolding
             return Path.Combine(rootAppDirectory, "packages");
         }
 
+        public static IReadOnlyList<FileInfo> EnumeratePackagesForApp(string rootAppDirectory)
+        {
+            var packagesDirectory = PackageDirectoryForAppDir(rootAppDirectory);
+            var packages = Directory.GetFiles(packagesDirectory, "*.nupkg", SearchOption.TopDirectoryOnly).Select(x => new FileInfo(x));
+            return packages.ToList();
+        }
+
         public static string LocalReleaseFileForAppDir(string rootAppDirectory)
         {
             return Path.Combine(PackageDirectoryForAppDir(rootAppDirectory), "RELEASES");
         }
 
-        public static IEnumerable<ReleaseEntry> LoadLocalReleases(string localReleaseFile)
+        public static void WriteLocalReleases(string localReleaseFile, IEnumerable<IReleaseEntry> entries)
         {
-            var file = File.OpenRead(localReleaseFile);
-
-            // NB: sr disposes file
-            using (var sr = new StreamReader(file, Encoding.UTF8))
-            {
-                return ReleaseEntry.ParseReleaseFile(sr.ReadToEnd());
-            }
+            var content = string.Join("\n", entries.OrderBy(x => x.Version).ThenByDescending(x => x.IsDelta).Select(x => x.EntryAsString));
+            using var file = File.Open(localReleaseFile, FileMode.Create, FileAccess.ReadWrite);
+            using var writer = new StreamWriter(file, Encoding.UTF8);
+            writer.Write(content);
+        }
+        
+        public static IReadOnlyList<IReleaseEntry> LoadLocalReleases(string localReleaseFile)
+        {
+            using var file = File.OpenRead(localReleaseFile);
+            using var sr = new StreamReader(file, Encoding.UTF8);
+            return ReleaseEntry.ParseReleaseFile(sr.ReadToEnd()).ToList();
         }
 
         public static T FindCurrentVersion<T>(IEnumerable<T> localReleases) where T : IReleaseEntry
