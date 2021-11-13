@@ -15,7 +15,7 @@ namespace PoeShared.Bindings
 {
     public abstract class BindableReactiveObject : DisposableReactiveObject, IBindableReactiveObject
     {
-        private static long GlobalIdx = 0;
+        private static long GlobalIdx;
         private readonly string bindableObjectId = $"O#{Interlocked.Increment(ref GlobalIdx)}";
 
         private readonly SourceCache<IReactiveBinding, string> bindings = new(x => x.TargetPropertyPath);

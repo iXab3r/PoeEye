@@ -13,7 +13,7 @@ namespace PoeShared.UI
     
         public HotkeyListener(IHotkeyTracker hotkeyTracker)
         {
-            Log = typeof(HotkeyListener).PrepareLogger().WithSuffix(hotkeyTracker);
+            Log = base.Log.WithSuffix(hotkeyTracker);
             initialIsEnabled = hotkeyTracker.IsEnabled;
             hotkeyTracker.Reset();
             Log.Debug($"Initializing listener, tracker IsEnabled: {initialIsEnabled}");

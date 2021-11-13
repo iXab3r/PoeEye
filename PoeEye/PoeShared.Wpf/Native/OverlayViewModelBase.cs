@@ -31,7 +31,7 @@ namespace PoeShared.Native
     public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayViewModel
     {
         private static readonly Binder<OverlayViewModelBase> Binder = new();
-        private static long GlobalWindowId = 0;
+        private static long GlobalWindowId;
 
         private readonly ObservableAsPropertyHelper<PointF> dpi;
         private readonly object gate = new();

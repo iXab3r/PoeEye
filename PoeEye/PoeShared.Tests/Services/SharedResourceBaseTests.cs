@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using PoeShared.Logging;
@@ -48,10 +49,10 @@ namespace PoeShared.Tests.Services
             using var read = instance.RentReadLock();
 
             //When
-            instance.Dispose();
+            Action action = () => instance.Dispose();
 
             //Then
-            instance.Anchors.IsDisposed.ShouldBe(false);
+            action.ShouldThrow<LockRecursionException>();
         }
         
         [Test]
@@ -62,10 +63,10 @@ namespace PoeShared.Tests.Services
             using var read = instance.RentWriteLock();
 
             //When
-            instance.Dispose();
+            Action action = () =>  instance.Dispose();
 
             //Then
-            instance.Anchors.IsDisposed.ShouldBe(false);
+            action.ShouldThrow<LockRecursionException>();
         }
 
         [Test]

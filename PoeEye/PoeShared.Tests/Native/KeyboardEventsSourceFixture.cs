@@ -176,7 +176,7 @@ namespace PoeShared.Tests.Native
 
         private sealed class HookWrapper : DisposableReactiveObject
         {
-            private static long id;
+            private static long GlobalHookId;
 
             public long HookId { get; }
 
@@ -184,7 +184,7 @@ namespace PoeShared.Tests.Native
 
             public HookWrapper()
             {
-                HookId = Interlocked.Increment(ref id);
+                HookId = Interlocked.Increment(ref GlobalHookId);
             }
 
             public void Start()

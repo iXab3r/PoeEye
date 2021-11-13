@@ -5,15 +5,17 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Threading;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Services
 {
     public abstract class SharedResourceBase : DisposableReactiveObject
     {
-        private readonly ReaderWriterLockSlim gate = new(LockRecursionPolicy.SupportsRecursion);
+        private static readonly int MaxRefCount = 64;
 
-        private static long GlobalIdx = 0;
+        private static long GlobalIdx;
+        private readonly ReaderWriterLockSlim gate = new(LockRecursionPolicy.SupportsRecursion);
         private readonly string resourceId;
 
         /// <summary>
@@ -22,92 +24,62 @@ namespace PoeShared.Services
         /// </summary>
         private int refCount = 1;
 
+        protected SharedResourceBase()
+        {
+            resourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
+            Log = GetType().PrepareLogger().WithSuffix(resourceId);
+        }
+
         public int RefCount => refCount;
 
         public bool IsDisposed => Anchors.IsDisposed;
 
-        protected SharedResourceBase()
-        {
-            resourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
-        }
+        protected IFluentLog Log { get; }
 
         public IDisposable RentReadLock()
         {
+            EnsureNotDisposed();
             gate.EnterReadLock();
             return Disposable.Create(() => gate.ExitReadLock());
         }
 
         public IDisposable RentWriteLock()
         {
+            EnsureNotDisposed();
             gate.EnterWriteLock();
             return Disposable.Create(() => gate.ExitWriteLock());
         }
 
         public bool TryRent()
         {
-            try
+            if (Anchors.IsDisposed)
             {
-                gate.EnterReadLock();
-                if (Anchors.IsDisposed)
-                {
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                    WriteLog($"Failed to increment - already disposed");
+                WriteLog($"Failed to increment - already disposed");
 #endif
-                    return false;
-                }
+                return false;
+            }
 
-                var usages = Interlocked.Increment(ref refCount);
+            var usages = Interlocked.Increment(ref refCount);
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                WriteLog($"Incremented");
+            WriteLog($"Incremented");
 #endif
-                return usages > 0;
-            }
-            finally
+            if (usages > MaxRefCount)
             {
-                gate.ExitReadLock();
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}), leak ?");
+#if DEBUG
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+#endif
             }
+            return usages > 0;
         }
 
         public override void Dispose()
         {
-            try
-            {
-                gate.EnterUpgradeableReadLock();
-                var usages = Interlocked.Decrement(ref refCount);
-                if (usages > 0)
-                {
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                    WriteLog($"Decrement, ignoring, still in use");
-#endif
-                    return;
-                }
-
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                WriteLog($"Decrement, disposing");
-#endif
-                if (Anchors.IsDisposed)
-                {
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                    throw new InvalidOperationException($"Anchors are already disposed:\n\t{log.DumpToString()}");
-#else
-                    throw new InvalidOperationException($"Anchors for {this} are already disposed");
-#endif
-                }
-
-                try
-                {
-                    gate.EnterWriteLock();
-                    base.Dispose();
-                }
-                finally
-                {
-                    gate.ExitWriteLock();
-                }
-            }
-            finally
-            {
-                gate.ExitUpgradeableReadLock();
-            }
+            Dispose("via IDisposable");
         }
 
         public void AddResource(IDisposable resource)
@@ -118,6 +90,59 @@ namespace PoeShared.Services
         public void AddResource(Action disposeAction)
         {
             AddResource(Disposable.Create(disposeAction));
+        }
+
+        private void Dispose(string reason)
+        {
+            var usages = Interlocked.Decrement(ref refCount);
+            if (usages > 0)
+            {
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                WriteLog($"Decrement, ignoring, still in use [{reason}]");
+#endif
+                return;
+            }
+
+            if (usages < 0)
+            {
+                throw new ObjectDisposedException($"Attempted to dispose already disposed(or scheduled for disposal) resource, usages: {usages}, IsDisposed: {Anchors.IsDisposed}");
+            }
+
+            if (gate.IsWriteLockHeld)
+            {
+                throw new LockRecursionException($"Disposing resource under write-lock is not supported");
+            }
+
+            if (gate.IsReadLockHeld)
+            {
+                throw new LockRecursionException($"Disposing resource under read-lock is not supported");
+            }
+            
+            gate.EnterWriteLock();
+            try
+            {
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                WriteLog($"Decrement, disposing [{reason}]");
+#endif
+                EnsureNotDisposed();
+                base.Dispose();
+            }
+            finally
+            {
+                gate.ExitWriteLock();
+            }
+        }
+
+        private void EnsureNotDisposed()
+        {
+            if (Anchors.IsDisposed)
+            {
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                throw new InvalidOperationException($"Anchors are already disposed:\n\t{log.DumpToString()}");
+#else
+                throw new InvalidOperationException($"Anchors for {this} are already disposed");
+#endif
+            }
         }
 
         private string FormatPrefix()

@@ -21,7 +21,7 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
-        private static long GlobalIdx = 0;
+        private static long GlobalIdx;
         private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new(IntPtr.Zero);
         private readonly string overlayId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
