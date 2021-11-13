@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -13,9 +12,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Native;
-using PoeShared.Prism;
 using ReactiveUI;
-using Unity;
 
 namespace PoeShared.Services
 {
@@ -29,8 +26,7 @@ namespace PoeShared.Services
 
         public ApplicationAccessor(
             Application application,
-            IAppArguments appArguments,
-            [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler)
+            IAppArguments appArguments)
         {
             this.application = application;
             this.appArguments = appArguments;

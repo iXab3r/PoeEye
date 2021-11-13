@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
+using PoeShared.Services;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding

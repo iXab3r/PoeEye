@@ -44,6 +44,20 @@ namespace PoeShared.Scaffolding
             return new((int)Math.Round(rect.Left + (float)rect.Width / 2), (int)Math.Round(rect.Top + (float)rect.Height / 2));
         }
 
+        public static Rectangle IntersectWith(this Rectangle rect, Rectangle otherRectangle)
+        {
+            var result = rect;
+            result.Intersect(otherRectangle);
+            return result;
+        }
+
+        public static Rectangle OffsetBy(this Rectangle rect, WinPoint offset)
+        {
+            var result = rect;
+            result.Offset(offset);
+            return result;
+        }
+
         public static Rectangle Normalize(this Rectangle rect)
         {
             var x = rect.Width >= 0
@@ -77,6 +91,11 @@ namespace PoeShared.Scaffolding
             {
                 throw new ApplicationException($"Failed to compute Region size, sourceSize: {sourceSize}, current state: {new { desiredBounds, sourceSize }}", e);
             }
+        }
+
+        public static bool IsDefault(this Rectangle rect)
+        {
+            return rect.Width == default && rect.Height == default && rect.X == default && rect.Y == default;
         }
 
         public static bool IsNotEmpty(this Rectangle rect)

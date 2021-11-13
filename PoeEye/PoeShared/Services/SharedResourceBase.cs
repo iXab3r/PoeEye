@@ -11,7 +11,10 @@ namespace PoeShared.Services
 {
     public abstract class SharedResourceBase : DisposableReactiveObject
     {
-        private readonly ReaderWriterLockSlim gate = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLockSlim gate = new(LockRecursionPolicy.SupportsRecursion);
+
+        private static long GlobalIdx = 0;
+        private readonly string resourceId;
 
         /// <summary>
         ///   RefCount is needed to share the same unmanaged Bitmap across multiple users
@@ -20,6 +23,13 @@ namespace PoeShared.Services
         private int refCount = 1;
 
         public int RefCount => refCount;
+
+        public bool IsDisposed => Anchors.IsDisposed;
+
+        protected SharedResourceBase()
+        {
+            resourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
+        }
 
         public IDisposable RentReadLock()
         {

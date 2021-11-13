@@ -6,6 +6,8 @@
         <LangVersion>9.0</LangVersion>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="App.Metrics" Version="4.2.0" />
+        <PackageReference Include="App.Metrics.Reporting.TextFile" Version="4.2.0" />
         <PackageReference Include="BidirectionalMap" Version="1.0.0" />
         <PackageReference Include="Combinatorics" Version="1.1.0.19" />
         <PackageReference Include="CommandLineParser" Version="2.7.82" />

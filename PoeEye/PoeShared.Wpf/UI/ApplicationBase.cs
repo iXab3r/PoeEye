@@ -3,12 +3,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using App.Metrics;
+using App.Metrics.Timer;
 using log4net;
 using PInvoke;
 using PoeShared.Modularity;
@@ -28,6 +31,7 @@ namespace PoeShared.UI
     public abstract class ApplicationBase : Application
     {
         private readonly IAppArguments appArguments;
+        private readonly IMetricsRoot metrics;
 
         protected ApplicationBase()
         {
@@ -47,6 +51,7 @@ namespace PoeShared.UI
                     SharedLog.Instance.InitializeLogging("Startup", appArguments.AppName);
                     throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
                 }
+                metrics = Container.Resolve<IMetricsRoot>();
                 InitializeLogging();
                 InitializeSevenZip();
 
@@ -103,7 +108,6 @@ namespace PoeShared.UI
                 
                 Log.Debug($"Configuring AllowSetForegroundWindow permissions");
                 UnsafeNative.AllowSetForegroundWindow();
-
             }
             catch (Exception ex)
             {
@@ -116,10 +120,12 @@ namespace PoeShared.UI
 
         public CompositeDisposable Anchors { get; } = new();
 
-        private static ILog Log => SharedLog.Instance.Log;
+        private static IFluentLog Log => SharedLog.Instance.Log.ToFluent();
 
         private void InitializeSevenZip()
         {
+            using var executionTimer = metrics.Measure.Timer.Time(new TimerOptions { Name = nameof(InitializeSevenZip) });
+
             Log.Debug($"Initializing 7z wrapper, {nameof(Environment.Is64BitProcess)}: {Environment.Is64BitProcess}");
             var sevenZipDllPath = Path.Combine(appArguments.ApplicationDirectory.FullName, Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
             Log.Debug($"Setting 7z library path to {sevenZipDllPath}");
@@ -133,6 +139,7 @@ namespace PoeShared.UI
 
         private void InitializeLogging()
         {
+            using var executionTimer = metrics.Measure.Timer.Time(new TimerOptions { Name = nameof(InitializeLogging) });
             RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
             if (appArguments.IsDebugMode)
             {
@@ -147,6 +154,21 @@ namespace PoeShared.UI
             SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
             SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
             Container.Resolve<IExceptionReportingService>();
+
+            Observable.Timer(DateTime.Now, TimeSpan.FromSeconds(30))
+                .Subscribe(async idx =>
+                {
+                    try
+                    {
+                        Log.Debug(() => $"Reporting metrics #{idx}");
+                        await Task.WhenAll(metrics.ReportRunner.RunAllAsync());
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Warn($"Failed to report metrics #{idx}", e);
+                    }
+                })
+                .AddTo(Anchors);
         }
 
         protected override void OnExit(ExitEventArgs e)

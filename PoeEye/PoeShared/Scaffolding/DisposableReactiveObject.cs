@@ -43,6 +43,15 @@ namespace PoeShared.Scaffolding
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        protected void AddDisposableResource<T>(Func<T> accessor) where T : IDisposable
+        {
+            Disposable.Create(() =>
+            {
+                var item = accessor();
+                item?.Dispose();
+            }).AddTo(Anchors);
+        }
         
         public void RaisePropertyChanged(params string[] properties)
         {

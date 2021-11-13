@@ -14,6 +14,7 @@
     <RootNamespace>PoeShared</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="App.Metrics" Version="4.2.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
     <PackageReference Include="CompareNETObjects" Version="4.65.0" />
     <PackageReference Include="DynamicData" Version="6.13.13" />

@@ -17,6 +17,8 @@ namespace PoeShared.Native
         
         Rectangle DwmWindowBounds { get; }
         
+        Rectangle ClientRectWithinMonitor { get; }
+        
         Icon Icon { get; }
         
         BitmapSource IconBitmap { get; }

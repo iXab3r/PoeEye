@@ -176,6 +176,8 @@ namespace PoeShared.Native
         public Rectangle ClientBounds => UnsafeNative.GetClientRect(Handle);
 
         public Rectangle DwmWindowBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
+        
+        public Rectangle ClientRectWithinMonitor => UnsafeNative.GetClientRectWithinMonitor(Handle);
 
         [JsonIgnore] public Icon Icon => iconSupplier.Value;
 
