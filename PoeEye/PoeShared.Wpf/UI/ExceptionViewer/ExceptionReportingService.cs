@@ -34,6 +34,7 @@ namespace PoeShared.UI
             IApplicationAccessor applicationAccessor,
             IFolderCleanerService cleanupService,
             IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer,
+            IFactory<MetricsReportProvider> metricsProviderFactory,
             IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
             IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
             IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
@@ -60,6 +61,7 @@ namespace PoeShared.UI
                 ex => { ReportCrash(ex); }, Log.HandleException).AddTo(Anchors);
 
             AddReportItemProvider(lastLogEventsReportProviderFactory.Create()).AddTo(Anchors);
+            AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
             AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
             AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);
             AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);

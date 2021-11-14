@@ -154,21 +154,6 @@ namespace PoeShared.UI
             SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
             SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
             Container.Resolve<IExceptionReportingService>();
-
-            Observable.Timer(DateTime.Now, TimeSpan.FromSeconds(30))
-                .Subscribe(async idx =>
-                {
-                    try
-                    {
-                        Log.Debug(() => $"Reporting metrics #{idx}");
-                        await Task.WhenAll(metrics.ReportRunner.RunAllAsync());
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Warn($"Failed to report metrics #{idx}", e);
-                    }
-                })
-                .AddTo(Anchors);
         }
 
         protected override void OnExit(ExitEventArgs e)

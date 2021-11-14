@@ -1,4 +1,5 @@
 ﻿using System;
+using App.Metrics;
 
 namespace PoeShared.Logging
 {
@@ -10,6 +11,8 @@ namespace PoeShared.Logging
         internal LogData Data { get; }
         
         internal ILogWriter Writer { get; }
+        
+        IMetrics Metrics { get; }
 
         bool IsDebugEnabled { get; }
 

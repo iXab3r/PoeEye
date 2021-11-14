@@ -27,9 +27,14 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IPoeConfigConverterMigrationService, PoeConfigConverterMigrationService>()
                 .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
                 .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
-
+            
             Container
-                .RegisterSingleton<IMetricsRoot>(InitializeMetrics)
+                .RegisterSingleton<IMetricsRoot>(x =>
+                {
+                    var appArguments = x.Resolve<IAppArguments>();
+                    MetricsService.Instance.Initialize(appArguments);
+                    return MetricsService.Instance.Metrics;
+                })
                 .RegisterSingleton<IMetrics>(x => x.Resolve<IMetricsRoot>());
 
             Container
@@ -43,29 +48,6 @@ namespace PoeShared.Prism
                 .RegisterType(typeof(INamedFactory<>),  typeof(Factory<>))
                 .RegisterType<IFolderCleanerService, FolderCleanerService>()
                 .RegisterType<ISharedResourceLatch, SharedResourceLatch>();
-        }
-
-        private static IMetricsRoot InitializeMetrics(IUnityContainer container)
-        {
-            Log.Info("Initializing metrics...");
-            var appArguments = container.Resolve<IAppArguments>();
-
-            var metricsOutput = Path.Combine(appArguments.AppDataDirectory, $"logs", $"metrics{(appArguments.IsDebugMode ? "DebugMode" : default)}.txt");
-            Log.Info($"Exporting metrics to file {metricsOutput}");
-            var metrics = new MetricsBuilder()
-                .Configuration.Configure(
-                    options =>
-                    {
-                        options.Enabled = true;
-                        options.ReportingEnabled = true;
-                    })
-                .Report.ToTextFile(options =>
-                {
-                    options.OutputPathAndFileName = metricsOutput;
-                    options.AppendMetricsToTextFile = false;
-                })
-                .Build();
-            return metrics;
         }
     }
 }

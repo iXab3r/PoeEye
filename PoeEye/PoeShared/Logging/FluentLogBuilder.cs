@@ -1,4 +1,5 @@
 ﻿using System;
+using App.Metrics;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Logging
@@ -15,6 +16,8 @@ namespace PoeShared.Logging
         }
 
         ILogWriter IFluentLog.Writer => logWriter;
+        
+        public IMetrics Metrics => App.Metrics.Metrics.Instance;
 
         public bool IsDebugEnabled => logWriter.IsDebugEnabled;
 
