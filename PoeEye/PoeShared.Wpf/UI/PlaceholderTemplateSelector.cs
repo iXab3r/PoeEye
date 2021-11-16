@@ -4,9 +4,10 @@ using System.Windows.Data;
 
 namespace PoeShared.UI
 {
-    internal sealed class PlaceholderTemplateSelector : DataTemplateSelector
+    public sealed class PlaceholderTemplateSelector : DataTemplateSelector
     {
         public DataTemplate PlaceholderTemplate { get; set; }
+        public DataTemplate DefaultTemplate { get; set; }
         
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -14,7 +15,7 @@ namespace PoeShared.UI
             {
                 return PlaceholderTemplate;
             }
-            return base.SelectTemplate(item, container);
+            return DefaultTemplate ?? base.SelectTemplate(item, container);
         }
     }
 }
