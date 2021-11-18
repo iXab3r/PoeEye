@@ -124,7 +124,7 @@ namespace PoeShared.UI
 
         private void InitializeSevenZip()
         {
-            using var executionTimer = metrics.Measure.Timer.Time(new TimerOptions { Name = nameof(InitializeSevenZip) });
+            using var executionTimer = metrics.Measure.Gauge.Time(nameof(InitializeSevenZip));
 
             Log.Debug($"Initializing 7z wrapper, {nameof(Environment.Is64BitProcess)}: {Environment.Is64BitProcess}");
             var sevenZipDllPath = Path.Combine(appArguments.ApplicationDirectory.FullName, Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
@@ -139,7 +139,7 @@ namespace PoeShared.UI
 
         private void InitializeLogging()
         {
-            using var executionTimer = metrics.Measure.Timer.Time(new TimerOptions { Name = nameof(InitializeLogging) });
+            using var executionTimer = metrics.Measure.Gauge.Time(nameof(InitializeLogging));
             RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
             if (appArguments.IsDebugMode)
             {

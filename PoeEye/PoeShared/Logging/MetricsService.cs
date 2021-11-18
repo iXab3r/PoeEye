@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using App.Metrics;
+using App.Metrics.Counter;
 using App.Metrics.Extensions.Collectors;
 using App.Metrics.Extensions.Collectors.HostedServices;
+using App.Metrics.Formatters.Json;
+using App.Metrics.Gauge;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
@@ -18,7 +22,9 @@ namespace PoeShared.Logging
         private static readonly Lazy<MetricsService> InstanceSupplier = new();
         
         private readonly Lazy<IMetricsRoot> rootSupplier;
+        private readonly GaugeOptions appLifetimeCounter = new GaugeOptions() { Name = "Application lifetime", MeasurementUnit = Unit.Custom("ms")};
         private IAppArguments appArguments;
+        private readonly Stopwatch stopwatch = Stopwatch.StartNew();
 
         public MetricsService()
         {
@@ -38,6 +44,10 @@ namespace PoeShared.Logging
                 throw new InvalidOperationException($"Service is already initialized");
             }
             this.appArguments = appArguments;
+
+            Observable.Timer(DateTime.Now, TimeSpan.FromSeconds(1))
+                .SubscribeSafe(() => Log.Metrics.Measure.Gauge.SetValue(appLifetimeCounter, stopwatch.ElapsedMilliseconds), Log.HandleException)
+                .AddTo(Anchors);
             
             Observable.Timer(DateTime.Now, TimeSpan.FromSeconds(30))
                 .Subscribe(async idx =>
@@ -53,36 +63,6 @@ namespace PoeShared.Logging
                     }
                 })
                 .AddTo(Anchors);
-
-            Task.Run(async () =>
-            {
-                Log.Debug("Initializing system usage collector...");
-                try
-                {
-                    var systemUsageCollector = new SystemUsageCollectorHostedService(Metrics, new MetricsSystemUsageCollectorOptions() { CollectIntervalMilliseconds = 5000 }).AddTo(Anchors);
-                    await systemUsageCollector.StartAsync(CancellationToken.None);
-                    Log.Debug("System usage collector has started");
-                }
-                catch (Exception e)
-                {
-                    Log.Warn("Failed to initialize system usage collector", e);
-                }
-            });
-            
-            Task.Run(async () =>
-            {
-                Log.Debug("Initializing GC usage collector...");
-                try
-                {
-                    var gcUsageCollector = new GcEventsCollectorHostedService(Metrics, new MetricsGcEventsCollectorOptions(){ CollectIntervalMilliseconds = 5000 }).AddTo(Anchors);
-                    await gcUsageCollector.StartAsync(CancellationToken.None);
-                    Log.Debug("GC usage collector has started");
-                }
-                catch (Exception e)
-                {
-                    Log.Warn("Failed to initialize GC usage collector", e);
-                }
-            });
         }
         
         private static IMetricsRoot InitializeMetrics(IAppArguments appArguments)

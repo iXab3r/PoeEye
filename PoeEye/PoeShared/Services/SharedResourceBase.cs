@@ -70,7 +70,7 @@ namespace PoeShared.Services
 #if DEBUG
                 if (Debugger.IsAttached)
                 {
-                    Debugger.Break();
+                    //Debugger.Break();
                 }
 #endif
             }
