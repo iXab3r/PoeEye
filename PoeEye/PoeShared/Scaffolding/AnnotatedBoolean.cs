@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding
 {
-    public readonly struct AnnotatedBoolean : IConvertible
+    public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBoolean>
     {
         public AnnotatedBoolean(bool value, string annotation)
         {
@@ -30,6 +30,32 @@ namespace PoeShared.Scaffolding
         
         public static AnnotatedBoolean operator |(AnnotatedBoolean a, AnnotatedBoolean b)
             => new AnnotatedBoolean(a.Value | b.Value, $"{a.Value}({a.Annotation}) && {b.Value}({b.Annotation})");
+
+        public bool Equals(AnnotatedBoolean other)
+        {
+            return Value == other.Value && Annotation == other.Annotation;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is AnnotatedBoolean other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Value, Annotation);
+        }
+
+        public static bool operator ==(AnnotatedBoolean left, AnnotatedBoolean right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnnotatedBoolean left, AnnotatedBoolean right)
+        {
+            return !left.Equals(right);
+        }
+
 
         public TypeCode GetTypeCode()
         {
