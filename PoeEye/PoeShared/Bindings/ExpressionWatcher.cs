@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -150,7 +151,20 @@ namespace PoeShared.Bindings
         object IValueWatcher.Source
         {
             get => Source;
-            set => Source = (TSource)value;
+            set
+            {
+                if (value is TSource or null)
+                {
+                    Source = (TSource)value;
+                }
+                else
+                {
+                    Source = default;
+                    var error = new BindingException($"Failed to set source - value is of type {value.GetType()}, expected {typeof(TSource)}");
+                    Log.Warn($"Could not set source of watcher {this}", error);
+                    Error = error;
+                }
+            }
         }
 
         public void SetCurrentValue(object newValue)

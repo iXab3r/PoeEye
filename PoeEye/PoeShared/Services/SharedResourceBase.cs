@@ -27,7 +27,7 @@ namespace PoeShared.Services
         protected SharedResourceBase()
         {
             resourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
-            Log = GetType().PrepareLogger().WithSuffix(resourceId);
+            Log = GetType().PrepareLogger().WithSuffix(resourceId).WithSuffix(ToString);
         }
 
         public int RefCount => refCount;
@@ -66,14 +66,13 @@ namespace PoeShared.Services
 #endif
             if (usages > MaxRefCount)
             {
-                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}), leak ?");
-#if DEBUG
-                if (Debugger.IsAttached)
-                {
-                    //Debugger.Break();
-                }
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on rental, leak @ {new StackTrace()}");
+#else
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on rental");
 #endif
             }
+
             return usages > 0;
         }
 
@@ -95,6 +94,14 @@ namespace PoeShared.Services
         private void Dispose(string reason)
         {
             var usages = Interlocked.Decrement(ref refCount);
+            if (usages > MaxRefCount)
+            {
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on disposal, leak @ {new StackTrace()}");
+#else
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on disposal");
+#endif
+            }
             if (usages > 0)
             {
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG

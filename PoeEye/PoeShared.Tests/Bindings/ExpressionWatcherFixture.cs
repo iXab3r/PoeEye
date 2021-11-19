@@ -166,6 +166,23 @@ namespace PoeShared.Tests.Bindings
         }
 
         [Test]
+        public void ShouldNotThrowWhenInvalidSourceType()
+        {
+            //Given
+            var instance = (IValueWatcher)new ExpressionWatcher<TestReactiveContainer, int>(
+                x => x.Containers.Where(y => y.Id == "b").Select(y => y.IntProperty + 1).First(),
+                x => x != null && x.Containers.Any(y => y.Id == "b"));
+
+            //When
+            instance.Source = new TestObject();
+
+            //Then
+            instance.HasValue.ShouldBe(false);
+            instance.Value.ShouldBe(0);
+            instance.Error.ShouldNotBeNull();
+        }
+
+        [Test]
         public void ShouldNotThrowWhenInvalidTypeOfSourceIsSet()
         {
             var instance = CreateInstance();
