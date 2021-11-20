@@ -14,6 +14,9 @@ namespace PoeShared.Scaffolding
 
         protected IFluentLog Log => logSupplier.Value;
 
-        protected abstract IFluentLog PrepareLogger();
+        protected virtual IFluentLog PrepareLogger()
+        {
+            return GetType().PrepareLogger();
+        }
     }
 }

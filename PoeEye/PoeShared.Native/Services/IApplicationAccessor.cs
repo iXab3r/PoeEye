@@ -1,14 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace PoeShared.Services
 {
     public interface IApplicationAccessor : INotifyPropertyChanged
     {
-        IObservable<ExitEventArgs> WhenExit { get; }
+        IObservable<int> WhenExit { get; }
 
         Task Exit();
 

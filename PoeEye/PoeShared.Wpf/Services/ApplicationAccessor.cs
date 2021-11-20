@@ -38,12 +38,12 @@ namespace PoeShared.Services
             
             Log.Debug($"Binding to application {application}");
             WhenExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
-                .Select(x => x.EventArgs)
+                .Select(x => x.EventArgs.ApplicationExitCode)
                 .Replay(1)
                 .AutoConnect();
             WhenExit.SubscribeSafe(x =>
             {
-                Log.Info($"Application exit requested, exit code: {x.ApplicationExitCode}");
+                Log.Info($"Application exit requested, exit code: {x}");
                 IsExiting = true;
             }, Log.HandleException).AddTo(Anchors);
             LastExitWasGraceful = InitializeRunningLockFile();
@@ -68,7 +68,7 @@ namespace PoeShared.Services
             IsLoaded = true;
         }
 
-        public IObservable<ExitEventArgs> WhenExit { get; }
+        public IObservable<int> WhenExit { get; }
 
         public bool IsExiting { get; private set; }
 
@@ -96,9 +96,9 @@ namespace PoeShared.Services
                 Shutdown();
 
                 Log.Info($"Awaiting for application termination for {TerminationTimeout}");
-                var closeEvent = await WhenExit.Take(1).Timeout(TerminationTimeout);
+                var exitCode = await WhenExit.Take(1).Timeout(TerminationTimeout);
                 
-                Log.Info($"Application termination signal was processed, exit code: {closeEvent.ApplicationExitCode}");
+                Log.Info($"Application termination signal was processed, exit code: {exitCode}");
 
                 await Task.Delay(TerminationTimeout);
                 Log.Warn($"Application should've terminated by now");
@@ -155,16 +155,16 @@ namespace PoeShared.Services
                 Log.Warn("Seems that last application start was not graceful - lock file is still present");
             }
             PrepareLockFile(filePath);
-            WhenExit.SubscribeSafe(x =>
+            WhenExit.SubscribeSafe(exitCode =>
             {
-                if (x.ApplicationExitCode == 0)
+                if (exitCode == 0)
                 {
                     Log.Debug("Graceful exit - cleaning up lock file");
                     CleanupLockFile(filePath);
                 }
                 else
                 {
-                    Log.Warn($"Erroneous exit detected, code: {x.ApplicationExitCode} - leaving lock file intact @ {filePath}");
+                    Log.Warn($"Erroneous exit detected, code: {exitCode} - leaving lock file intact @ {filePath}");
                 }
             }, Log.HandleException).AddTo(Anchors);
             return !fileExists;
