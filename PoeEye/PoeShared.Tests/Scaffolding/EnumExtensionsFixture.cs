@@ -7,7 +7,7 @@ using Shouldly;
 namespace PoeShared.Tests.Scaffolding
 {
     [TestFixture]
-    public class EnumExtensions
+    public class EnumExtensionsFixture
     {
         [Test]
         [TestCase(Keys.None, Keys.None, Keys.None)]
