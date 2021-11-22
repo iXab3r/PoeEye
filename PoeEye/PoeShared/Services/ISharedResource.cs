@@ -4,7 +4,7 @@ namespace PoeShared.Services
 {
     public interface ISharedResource : IDisposable
     {
-        int RefCount { get; }
+        long RefCount { get; }
         
         IDisposable RentReadLock();
 

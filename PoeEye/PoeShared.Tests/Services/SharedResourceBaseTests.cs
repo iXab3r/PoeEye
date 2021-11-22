@@ -176,6 +176,50 @@ namespace PoeShared.Tests.Services
             Log.Debug("Tasks have completed");
         }
 
+        [Test]
+        [Repeat(1000)]
+        public void ShouldNotAllowToRentDisposedResource()
+        {
+            //Given
+            var instance = CreateInstance();
+
+            var expected = 0;
+            var gate = new object();
+            
+            //When
+            var task1 = Task.Run(() =>
+            {
+                Log.Debug($"Disposing instance {instance}");
+                instance.Dispose();
+                lock (gate)
+                {
+                    Interlocked.Increment(ref expected);
+                    Log.Debug($"Disposed instance {instance}");
+                }
+            });
+            var task2 = Task.Run(() =>
+            {
+                Log.Debug($"Renting instance {instance}");
+                var rented = instance.TryRent();
+                lock (gate)
+                {
+                    Log.Debug($"Rent result: {rented} for instance {instance}");
+                    if (Interlocked.Increment(ref expected) == 1)
+                    {
+                        rented.ShouldBe(true);
+                    }
+                    else
+                    {
+                        rented.ShouldBe(false);
+                    }
+                }
+            });
+
+
+            //Then
+            Task.WaitAll(task1, task2);
+        }
+
         private SharedResource CreateInstance()
         {
             return new SharedResource();
