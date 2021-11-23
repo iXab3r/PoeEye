@@ -6,7 +6,7 @@ using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI.Providers
 {
     internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProvider
     {

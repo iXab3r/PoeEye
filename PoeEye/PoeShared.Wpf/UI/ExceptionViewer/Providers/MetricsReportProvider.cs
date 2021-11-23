@@ -6,7 +6,7 @@ using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI.Providers
 {
     internal sealed class MetricsReportProvider : IExceptionReportItemProvider
     {
@@ -24,7 +24,7 @@ namespace PoeShared.UI
             Log.Debug("Preparing log files for crash report...");
             var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
             var filesToInclude = new DirectoryInfo(logFilesRoot)
-                .GetFiles("metrics*.txt", SearchOption.TopDirectoryOnly)
+                .GetFiles("metrics*.log", SearchOption.TopDirectoryOnly)
                 .OrderByDescending(x => x.LastWriteTime)
                 .ToArray();
 

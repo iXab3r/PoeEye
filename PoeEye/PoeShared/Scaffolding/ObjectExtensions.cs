@@ -56,6 +56,15 @@ namespace PoeShared.Scaffolding
             return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.DumpToTextRaw()));
         }
         
+        public static string DumpToHex(this byte[] value, int bytesPerLine = 32)
+        {
+            if (value == null)
+            {
+                return "null<byte[]>";
+            }
+            return StringUtils.HexDump(value, bytesPerLine);
+        }
+        
         public static string DumpToString<T>(this IEnumerable<T> instance)
         {
             return ToStringTable(instance, ", ");

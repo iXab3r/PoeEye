@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
+using DynamicData.Binding;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using PoeShared.Scaffolding;
@@ -81,6 +82,7 @@ namespace PoeShared.UI
             reportItems
                 .Connect()
                 .Transform(x => new ExceptionDialogSelectableItem(x))
+                .Sort(new SortExpressionComparer<ExceptionDialogSelectableItem>().ThenByDescending(x => x.IsChecked))
                 .ObserveOnDispatcher()
                 .Bind(out var attachments)
                 .SubscribeToErrors(Log.HandleException)
@@ -273,7 +275,7 @@ namespace PoeShared.UI
 
             if (Config == null)
             {
-                Log.Debug("Config is not configured yet");
+                Log.Debug("Config is not set yet");
                 return;
             }
             
@@ -304,9 +306,11 @@ namespace PoeShared.UI
                         Log.Debug($"Getting report item from {reportItemProvider}");
                         Status = $"Preparing report {providerIdx}/{Config.ItemProviders.Length}...";
 
-                        var reportItem = reportItemProvider.Prepare(crashReportDirectoryPath);
-                        reportItems.AddRange(reportItem);
-                        Log.Debug($"Successfully received report item from {reportItemProvider}: {reportItem}");
+                        foreach (var item in reportItemProvider.Prepare(crashReportDirectoryPath))
+                        {
+                            Log.Debug($"Successfully received report item from {reportItemProvider}: {item}");
+                            reportItems.Add(item);
+                        }
                     }
                     catch (Exception e)
                     {

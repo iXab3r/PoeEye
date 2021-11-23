@@ -5,11 +5,9 @@ using System.Reactive.Subjects;
 using log4net.Appender;
 using log4net.Core;
 using PoeShared.Logging;
-using PoeShared.Modularity;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI.Providers
 {
     internal sealed class ReportLastLogEventsProvider : DisposableReactiveObject, IExceptionReportItemProvider
     {

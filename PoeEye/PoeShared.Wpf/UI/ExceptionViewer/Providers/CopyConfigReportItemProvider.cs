@@ -6,7 +6,7 @@ using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI.Providers
 {
     internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using PoeShared.Native;
 
-namespace PoeShared.UI
+namespace PoeShared.UI.Providers
 {
     internal sealed class DesktopScreenshotReportItemProvider : IExceptionReportItemProvider
     {

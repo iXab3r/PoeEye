@@ -14,6 +14,7 @@ using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
+using PoeShared.UI.Providers;
 using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 
@@ -39,6 +40,7 @@ namespace PoeShared.UI
             IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
             IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
             IFactory<ReportLastLogEventsProvider> lastLogEventsReportProviderFactory,
+            IFactory<WindowsEventLogReportItemProvider> windowsEventLogReportProviderFactory,
             IAppArguments appArguments)
         {
             this.clock = clock;
@@ -64,6 +66,7 @@ namespace PoeShared.UI
             AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
             AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
             AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);
+            AddReportItemProvider(windowsEventLogReportProviderFactory.Create()).AddTo(Anchors);
             AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);
         }
 
