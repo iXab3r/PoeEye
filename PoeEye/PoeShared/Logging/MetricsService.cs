@@ -73,7 +73,7 @@ namespace PoeShared.Logging
             }
             Log.Info("Initializing metrics...");
 
-            var metricsOutput = Path.Combine(appArguments.AppDataDirectory, $"logs", $"metrics{(appArguments.IsDebugMode ? "DebugMode" : default)}.log");
+            var metricsOutput = Path.Combine(appArguments.AppDataDirectory, $"logs", $"metrics{(appArguments.IsDebugMode ? "DebugMode" : default)}.txt");
             Log.Info($"Exporting metrics to file {metricsOutput}");
             var metrics = new MetricsBuilder()
                 .Configuration.Configure(

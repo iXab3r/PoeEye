@@ -24,7 +24,7 @@ namespace PoeShared.UI.Providers
             Log.Debug("Preparing log files for crash report...");
             var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
             var filesToInclude = new DirectoryInfo(logFilesRoot)
-                .GetFiles("metrics*.log", SearchOption.TopDirectoryOnly)
+                .GetFiles("metrics*.txt", SearchOption.TopDirectoryOnly)
                 .OrderByDescending(x => x.LastWriteTime)
                 .ToArray();
 
