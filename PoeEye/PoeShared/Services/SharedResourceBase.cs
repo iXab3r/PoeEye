@@ -10,14 +10,14 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Services
 {
-    public abstract class SharedResourceBase : DisposableReactiveObject
+    public abstract class SharedResourceBase : DisposableReactiveObject, ISharedResource
     {
         private static readonly long MaxRefCount = 64;
 
         private static long GlobalIdx;
         private readonly ReaderWriterLockSlim resourceGate = new(LockRecursionPolicy.SupportsRecursion);
-        private readonly object refCountGate = new object();
-        private readonly string resourceId;
+        private readonly NamedLock refCountGate;
+        public string ResourceId { get; }
 
         /// <summary>
         ///   RefCount is needed to share the same unmanaged Bitmap across multiple users
@@ -27,8 +27,9 @@ namespace PoeShared.Services
 
         protected SharedResourceBase()
         {
-            resourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
-            Log = GetType().PrepareLogger().WithSuffix(resourceId).WithSuffix(() => $"x{RefCount}").WithSuffix(ToString);
+            ResourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
+            refCountGate = new NamedLock(ResourceId);
+            Log = GetType().PrepareLogger().WithSuffix(ResourceId).WithSuffix(() => $"x{RefCount}").WithSuffix(ToString);
             Log.Debug(() => $"Resource is created");
             Disposable.Create(() => Log.Debug("Resource anchors are being disposed")).AddTo(Anchors);
         }
@@ -37,7 +38,7 @@ namespace PoeShared.Services
         {
             get
             {
-                lock (refCountGate)
+                using (refCountGate.Enter())
                 {
                     return refCount;
                 }
@@ -51,7 +52,7 @@ namespace PoeShared.Services
         public IDisposable RentReadLock()
         {
             Log.Debug(() => "Renting read lock");
-            EnsureNotDisposed();
+            EnsureIsAlive();
             resourceGate.EnterReadLock();
             return Disposable.Create(() =>
             {
@@ -63,7 +64,7 @@ namespace PoeShared.Services
         public IDisposable RentWriteLock()
         {
             Log.Debug(() => "Renting write lock");
-            EnsureNotDisposed();
+            EnsureIsAlive();
             resourceGate.EnterWriteLock();
             return Disposable.Create(() =>
             {
@@ -74,7 +75,7 @@ namespace PoeShared.Services
 
         public bool TryRent()
         {
-            lock (refCountGate)
+            using (refCountGate.Enter())
             {
                 Log.Debug(() => "Resource is being rented");
                 if (refCount <= 0)
@@ -86,9 +87,8 @@ namespace PoeShared.Services
                     return false;
                 }
 
-
                 var usages = ++refCount;
-                Log.Debug(() => "Resource rented");
+                Log.Debug(() => "Resource is rented");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
                 WriteLog($"Incremented");
 #endif
@@ -107,7 +107,51 @@ namespace PoeShared.Services
 
         public override void Dispose()
         {
-            Dispose("via IDisposable");
+            var usages = DecrementRefCount();
+            if (usages > MaxRefCount)
+            {
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on disposal, leak @ {new StackTrace()}");
+#else
+                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on disposal");
+#endif
+            }
+
+            if (usages > 0)
+            {
+                Log.Debug(() => $"Resource is still in use - keeping it");
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+                WriteLog($"Decrement, ignoring, still in use");
+#endif
+                return;
+            }
+
+            if (usages < 0)
+            {
+                throw new ObjectDisposedException($"Attempted to dispose already disposed(or scheduled for disposal) resource, usages: {usages}, IsDisposed: {Anchors.IsDisposed}");
+            }
+
+            if (resourceGate.IsWriteLockHeld)
+            {
+                throw new LockRecursionException($"Disposing resource under write-lock is not supported");
+            }
+
+            if (resourceGate.IsReadLockHeld)
+            {
+                throw new LockRecursionException($"Disposing resource under read-lock is not supported");
+            }
+
+            if (Anchors.IsDisposed)
+            {
+                throw new ObjectDisposedException($"Resource is already disposed: {this}");
+            }
+
+            Log.Debug(() => "Disposing resource");
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+            WriteLog($"Disposing");
+#endif
+            base.Dispose();
+            Log.Debug(() => "Resource disposed");
         }
 
         public void AddResource(IDisposable resource)
@@ -120,69 +164,22 @@ namespace PoeShared.Services
             AddResource(Disposable.Create(disposeAction));
         }
 
-        private void Dispose(string reason)
+        private long DecrementRefCount()
         {
-            lock (refCountGate)
+            using (refCountGate.Enter())
             {
-                Log.Debug(() => "Resource is being released");
                 var usages = --refCount;
-                if (usages > MaxRefCount)
-                {
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                    Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on disposal, leak @ {new StackTrace()}");
-#else
-                Log.Warn($"Resource has RefCount({usages}) greater than expected(max: {MaxRefCount}) on disposal");
-#endif
-                }
-                
-                if (usages > 0)
-                {
-                    Log.Debug(() => $"Resource is still in use - keeping it");
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                    WriteLog($"Decrement, ignoring, still in use [{reason}]");
-#endif
-                    return;
-                }
-
-                if (usages < 0)
-                {
-                    throw new ObjectDisposedException($"Attempted to dispose already disposed(or scheduled for disposal) resource, usages: {usages}, IsDisposed: {Anchors.IsDisposed}");
-                }
-
-                if (resourceGate.IsWriteLockHeld)
-                {
-                    throw new LockRecursionException($"Disposing resource under write-lock is not supported");
-                }
-
-                if (resourceGate.IsReadLockHeld)
-                {
-                    throw new LockRecursionException($"Disposing resource under read-lock is not supported");
-                }
-
-                using var writeLock = RentWriteLock();
-                
-                Log.Debug(() => "Disposing resource");
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                WriteLog($"Decrement, disposing [{reason}]");
-#endif
-                EnsureNotDisposed();
-                base.Dispose();
-                Log.Debug(() => "Resource disposed");
+                Log.Debug(() => "Resource is released");
+                return usages;
             }
         }
-
-        private void EnsureNotDisposed()
+        
+        private void EnsureIsAlive()
         {
-            lock (refCountGate)
+            var usages = RefCount;
+            if (usages <= 0)
             {
-                if (Anchors.IsDisposed)
-                {
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-                    throw new InvalidOperationException($"Resource is disposed(anchors.IsDisposed: {Anchors.IsDisposed}):\n\t{log.DumpToString()}");
-#else
-                throw new InvalidOperationException($"Anchors for {this} are already disposed");
-#endif
-                }
+                throw new ObjectDisposedException($"RefCount is {usages}, resource is not available");
             }
         }
 

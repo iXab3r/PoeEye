@@ -177,47 +177,73 @@ namespace PoeShared.Tests.Services
         }
 
         [Test]
+        public void ShouldNotAllowToRentReadLockWhenDisposed()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.Dispose();
+
+            //When
+            Action action = () => instance.RentReadLock();
+
+
+            //Then
+            action.ShouldThrow<ObjectDisposedException>();
+        }
+        
+        [Test]
+        public void ShouldNotAllowToRentWriteLockWhenDisposed()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.Dispose();
+
+            //When
+            Action action = () => instance.RentWriteLock();
+
+
+            //Then
+            action.ShouldThrow<ObjectDisposedException>();
+        }
+
+        [Test]
         [Repeat(1000)]
         public void ShouldNotAllowToRentDisposedResource()
         {
             //Given
             var instance = CreateInstance();
 
-            var expected = 0;
-            var gate = new object();
+            var runId = Guid.NewGuid().ToString();
+            var logger = Log.WithSuffix(runId);
             
             //When
             var task1 = Task.Run(() =>
             {
-                Log.Debug($"Disposing instance {instance}");
+                logger.Debug($"Disposing instance {instance}");
                 instance.Dispose();
-                lock (gate)
-                {
-                    Interlocked.Increment(ref expected);
-                    Log.Debug($"Disposed instance {instance}");
-                }
+                logger.Debug($"Disposed instance {instance}");
             });
             var task2 = Task.Run(() =>
             {
-                Log.Debug($"Renting instance {instance}");
+                logger.Debug($"Renting instance {instance}");
                 var rented = instance.TryRent();
-                lock (gate)
+                logger.Debug($"Rent result: {rented} for instance {instance}");
+                if (instance.RefCount > 0)
                 {
-                    Log.Debug($"Rent result: {rented} for instance {instance}");
-                    if (Interlocked.Increment(ref expected) == 1)
-                    {
-                        rented.ShouldBe(true);
-                    }
-                    else
-                    {
-                        rented.ShouldBe(false);
-                    }
+                    logger.Debug("Expecting rent to succeed");
+                    rented.ShouldBe(true, () => $"Run {runId}");
+                }
+                else
+                {
+                    logger.Debug("Expecting rent to fail");
+                    rented.ShouldBe(false, () => $"Run {runId}");
                 }
             });
 
-
+            logger.Debug("Awaiting for all tasks to complete");
             //Then
             Task.WaitAll(task1, task2);
+            logger.Debug("All tasks have completed");
         }
 
         private SharedResource CreateInstance()
