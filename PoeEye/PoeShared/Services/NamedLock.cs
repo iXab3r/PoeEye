@@ -10,11 +10,7 @@ namespace PoeShared.Services
 {
     public sealed class NamedLock
     {
-#if DEBUG
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(-1); // infinite wait
-#else
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(60);
-#endif
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromHours(1); 
         
         private readonly Gate gate;
 #if DEBUG
@@ -82,6 +78,11 @@ namespace PoeShared.Services
             public string Name { get; }
 
             public bool IsEntered => Monitor.IsEntered(this);
+
+            public override string ToString()
+            {
+                return $"Gate {Name}";
+            }
         }
     }
 }
