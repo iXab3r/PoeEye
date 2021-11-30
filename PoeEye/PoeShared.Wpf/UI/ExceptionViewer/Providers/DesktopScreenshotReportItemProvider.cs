@@ -53,7 +53,7 @@ namespace PoeShared.UI.Providers
             var screenshots = visibleWindows.SelectSafe(x => new
             {
                 x.Window,
-                Screenshot = UnsafeNative.GetWindowImageViaPrintWindow(x.Window.Handle, Rectangle.Empty)
+                Screenshot = UnsafeNative.GetWindowImageViaCopyFromScreen(x.Window.Handle, Rectangle.Empty)
             });
 
             foreach (var item in screenshots)

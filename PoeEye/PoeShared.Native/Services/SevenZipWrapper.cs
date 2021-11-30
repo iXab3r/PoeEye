@@ -21,7 +21,7 @@ namespace PoeShared.Services
         public void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
         {
             Log.Debug($"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
-            var processStartInfo = new ProcessStartInfo(SevenZipPath);
+            var processStartInfo = PrepareProcessStartInfo();
             var args = new List<string>
             {
                 "a",
@@ -49,8 +49,8 @@ namespace PoeShared.Services
                 Log.Debug($"Creating output directory {outputDirectory}");
                 outputDirectory.Create();
             }
-            
-            var processStartInfo = new ProcessStartInfo(SevenZipPath);
+
+            var processStartInfo = PrepareProcessStartInfo();
             var args = new List<string>
             {
                 "e",
@@ -61,6 +61,17 @@ namespace PoeShared.Services
             ProcessHelper.RunCmd(processStartInfo);
             
             Log.Debug($"Output directory contains following files: {outputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+        }
+
+        private static ProcessStartInfo PrepareProcessStartInfo()
+        {
+            return new ProcessStartInfo(SevenZipPath)
+            {
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
         }
     }
 }

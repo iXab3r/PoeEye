@@ -1,17 +1,20 @@
-﻿<mah:MetroWindow x:Class="PoeShared.UI.MainWindow"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:local="clr-namespace:PoeShared.UI"
-                 xmlns:st="http://schemas.spicytaco.io/"
-                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                 mc:Ignorable="d"
-                 xmlns:eye="http://coderush.net/poeeye/"
-                 xmlns:system="clr-namespace:System;assembly=System.Runtime"
-                 WindowStartupLocation="CenterScreen"
-                 Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+﻿<eye:DpiAwareMetroWindow x:Class="PoeShared.UI.MainWindow"
+                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                         xmlns:local="clr-namespace:PoeShared.UI"
+                         xmlns:st="http://schemas.spicytaco.io/"
+                         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                         mc:Ignorable="d"
+                         xmlns:eye="http://coderush.net/poeeye/"
+                         xmlns:system="clr-namespace:System;assembly=System.Runtime"
+                         WindowStartupLocation="CenterScreen"
+                             UseLayoutRounding="True"
+                         ShowIconOnTitleBar="True"
+                         RenderOptions.EdgeMode="Aliased"
+                         Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
             <TabItem Header="Bindings">
@@ -231,4 +234,4 @@
             </TabItem>
         </TabControl>
     </Grid>
-</mah:MetroWindow>
+</eye:DpiAwareMetroWindow>
