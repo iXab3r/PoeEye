@@ -158,6 +158,28 @@ namespace PoeShared.Scaffolding
             return permutations.SelectMany(x => x);
         }
 
-        
+        public static IEnumerable<TResult> SelectSafe<T, TResult>(this IEnumerable<T> source, Func<T, TResult> selector)
+        {
+            foreach (var item in source)
+            {
+                TResult result;
+                bool success;
+                try
+                {
+                    result = selector(item);
+                    success = true;
+                }
+                catch (Exception e)
+                {
+                    success = false;
+                    result = default;
+                }
+
+                if (success)
+                {
+                    yield return result;
+                }
+            }
+        }
     }
 }

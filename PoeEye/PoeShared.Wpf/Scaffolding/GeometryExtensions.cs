@@ -121,6 +121,11 @@ namespace PoeShared.Scaffolding
             return point.X == 0 && point.Y == 0;
         }
         
+        public static double Area(this WinSize sourceSize)
+        {
+            return sourceSize.Height * sourceSize.Width;
+        }
+        
         public static bool IsNotEmpty(this System.Drawing.Size size)
         {
             return size.Width > 0 &&
