@@ -23,6 +23,7 @@ using PropertyBinder;
 using ReactiveUI;
 using SevenZip;
 using Syroot.Windows.IO;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI
 {
@@ -42,6 +43,7 @@ namespace PoeShared.UI
         private readonly IClipboardManager clipboardManager;
         private readonly ICloseController closeController;
         private readonly IExceptionReportingService reportingService;
+        private readonly ISevenZipWrapper sevenZipWrapper;
         private readonly SourceList<ExceptionReportItem> reportItems = new();
 
         static ExceptionDialogViewModel()
@@ -58,6 +60,7 @@ namespace PoeShared.UI
             IAppArguments appArguments, 
             IUniqueIdGenerator idGenerator,
             IExceptionReportingService reportingService,
+            ISevenZipWrapper sevenZipWrapper,
             ICloseController closeController)
         {
             this.clock = clock;
@@ -65,6 +68,7 @@ namespace PoeShared.UI
             this.appArguments = appArguments;
             this.idGenerator = idGenerator;
             this.reportingService = reportingService;
+            this.sevenZipWrapper = sevenZipWrapper;
             this.closeController = closeController;
 
             this.RaiseWhenSourceValue(x => x.AppName, this, x => x.Config).AddTo(Anchors);
@@ -240,17 +244,7 @@ namespace PoeShared.UI
             await Task.Run(() =>
             {
                 Log.Debug($"Compressing report with following files: {filesToAttach.DumpToTable()}");
-
-                var processStartInfo = new ProcessStartInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "7za.exe"));
-                var args = new List<string>
-                {
-                    "a",
-                    "-mx=3", // fast
-                    $"\"{outputFile.FullName}\"",
-                };
-                filesToAttach.Select(x => $"\"{x}\"").ForEach(args.Add);
-                processStartInfo.Arguments = args.JoinStrings(" ");
-                ProcessHelper.RunCmd(processStartInfo);
+                sevenZipWrapper.AddToArchive(outputFile, filesToAttach.Select(x => new FileInfo(x)).ToArray());
                 Log.Debug($"Compression has completed");
             });
             

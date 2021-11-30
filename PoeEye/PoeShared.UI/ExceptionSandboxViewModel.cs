@@ -20,9 +20,11 @@ namespace PoeShared.UI
         private readonly ISubject<Exception> sinkThrowOnBgScheduler = new Subject<Exception>();
 
         public ExceptionSandboxViewModel(
+            IErrorMonitorViewModel errorMonitor,
             [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
+            ReportProblemCommand = errorMonitor.ReportProblemCommand;
             ThrowInsideCommand = CommandWrapper.Create(() =>
             {
                 Log.Debug("Throwing exception");
@@ -50,6 +52,7 @@ namespace PoeShared.UI
 
         public ICommand ThrowOnUiSchedulerCommand { get; }
         public ICommand ThrowOnBgSchedulerCommand { get; }
+        public ICommand ReportProblemCommand { get; }
 
         public ICommand ThrowInsideCommand { get; }
     }
