@@ -150,4 +150,14 @@
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="obj\Debug\net5-windows7\Native\OverlayWindowView.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\ButtonEx.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\CachedContentControl.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\ExceptionViewer\ErrorMonitorView.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\ExceptionViewer\ExceptionDialogView.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\MouseButtonsTooltip.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\NumericUpDown.baml" />
+    <Content Include="obj\Debug\net5-windows7\UI\RandomPeriodSelector.baml" />
+  </ItemGroup>
 </Project>

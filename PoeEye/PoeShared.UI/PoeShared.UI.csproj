@@ -53,4 +53,10 @@
       <None Remove="Resources\giphy.gif" />
       <Resource Include="Resources\giphy.gif" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Content Include="obj\Debug\net5.0-windows\FakeDelayNumberView.baml" />
+      <Content Include="obj\Debug\net5.0-windows\FakeDelayStringView.baml" />
+      <Content Include="obj\Debug\net5.0-windows\MainWindow.baml" />
+    </ItemGroup>
 </Project>

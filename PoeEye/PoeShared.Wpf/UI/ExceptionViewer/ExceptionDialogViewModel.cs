@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
@@ -238,12 +239,23 @@ namespace PoeShared.UI
 
             await Task.Run(() =>
             {
-                var newArchive = new SevenZipCompressor();
                 Log.Debug($"Compressing report with following files: {filesToAttach.DumpToTable()}");
-                newArchive.DirectoryStructure = false;
-                newArchive.CompressionLevel = CompressionLevel.Normal;
-                newArchive.CompressFiles(outputFile.FullName, filesToAttach.ToArray());
+
+                var processStartInfo = new ProcessStartInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "7za.exe"));
+                var args = new List<string>
+                {
+                    "a",
+                    "-mx=3", // fast
+                    $"\"{outputFile.FullName}\"",
+                };
+                filesToAttach.Select(x => $"\"{x}\"").ForEach(args.Add);
+                processStartInfo.Arguments = args.JoinStrings(" ");
+                ProcessHelper.RunCmd(processStartInfo);
+                Log.Debug($"Compression has completed");
             });
+            
+            outputFile.Refresh();
+            Log.Debug($"Compressed directory {outputDirectory} as {outputFile.FullName} ({outputFile.Length}b)");
         }
 
         private static void TryToFormatException(DirectoryInfo outputDirectory, ISourceList<ExceptionReportItem> reportItems, Exception exception)
