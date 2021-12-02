@@ -18,11 +18,9 @@ namespace PoeShared.Native
 {
     public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
     {
-        private readonly Window owner;
-
         public WindowViewController(Window owner)
         {
-            this.owner = owner;
+            Window = owner;
             Handle = new WindowInteropHelper(owner).EnsureHandle();
             Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}, title: {owner.Title}");
             Log.Debug($"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
@@ -72,12 +70,20 @@ namespace PoeShared.Native
         public IObservable<Unit> WhenRendered { get; }
         
         public IntPtr Handle { get; }
+        
+        public Window Window { get; }
+
+        public void Activate()
+        {
+            Log.Debug("Activating window");
+            Window.Activate();
+        }
 
         public void Close(bool? result)
         {
             Log.Debug($"Closing window, result: {result}");
-            owner.DialogResult = result;
-            owner.Close();
+            Window.DialogResult = result;
+            Window.Close();
         }
 
         public void Close()
@@ -90,26 +96,26 @@ namespace PoeShared.Native
         public void Hide()
         {
             Log.Debug($"Hiding window");
-            UnsafeNative.HideWindow(owner);
+            UnsafeNative.HideWindow(Window);
         }
 
         public void Show()
         {
             Log.Debug($"Showing window");
-            UnsafeNative.ShowWindow(owner);
+            UnsafeNative.ShowWindow(Window);
             //FIXME Mahapps window resets topmost after minimize/maximize operations
-            owner.Topmost = Topmost;
+            Window.Topmost = Topmost;
         }
 
         public void TakeScreenshot(string fileName)
         {
-            CreateBitmapFromVisual(owner, fileName);
+            CreateBitmapFromVisual(Window, fileName);
         }
 
         public void Minimize()
         {
             Log.Debug($"Minimizing window");
-            owner.WindowState = WindowState.Minimized;
+            Window.WindowState = WindowState.Minimized;
         }
         
         public static void CreateBitmapFromVisual(Visual target, string fileName)

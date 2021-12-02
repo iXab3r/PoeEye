@@ -5,6 +5,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using MahApps.Metro.Controls;
 using PInvoke;
+using PoeShared.Native;
 
 namespace PoeShared.UI
 {
@@ -12,8 +13,6 @@ namespace PoeShared.UI
     {
         public static readonly DependencyProperty DpiProperty = DependencyProperty.Register(
             "Dpi", typeof(DpiScale), typeof(MetroWindow), new PropertyMetadata(default(DpiScale)));
-        
-        private const int HWND_MESSAGE = -3;
         
         public DpiAwareMetroWindow()
         {
@@ -36,7 +35,7 @@ namespace PoeShared.UI
             base.OnSourceInitialized(e);
             if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
             {
-                User32.SetParent(hwndSource.Handle, (IntPtr)HWND_MESSAGE);
+                UnsafeNative.SetParentToMessageOnly(hwndSource.Handle);
             }
         }
     }

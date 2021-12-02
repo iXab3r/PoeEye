@@ -11,39 +11,84 @@ namespace PoeShared.Native
 {
     public partial class UnsafeNative
     {
+        public enum ClassLong
+        {
+            Icon = -14,
+            IconSmall = -34
+        }
+
+        [Flags]
+        public enum KeyboardLayoutFlags : uint
+        {
+            KLF_NONE = 0,
+            KLF_ACTIVATE = 0x00000001,
+            KLF_SETFORPROCESS = 0x00000100
+        }
+
+        [Flags]
+        public enum WindowExStyles : long
+        {
+            AppWindow = 0x40000,
+            ToolWindow = 0x80,
+        }
+
+        public enum WindowLong
+        {
+            ExStyle = -20,
+        }
+
+        /// <summary>
+        ///     Indicates whether various virtual keys are down. This parameter can be one or more of the following values.
+        ///     https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
+        /// </summary>
+        [Flags]
+        public enum WmMouseParam
+        {
+            NONE = 0x0000,
+            MK_LBUTTON = 0x0001,
+            MK_RBUTTON = 0x0002,
+            MK_SHIFT = 0x0004,
+            MK_CONTROL = 0x0008,
+            MK_MBUTTON = 0x0010,
+            MK_XBUTTON1 = 0x0020,
+            MK_XBUTTON2 = 0x0040,
+        }
+
+        private const int HWND_MESSAGE = -3;
+
         [DllImport("user32.dll")]
         private static extern bool AllowSetForegroundWindow(int processId);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int GetKeyNameText(int lParam, [MarshalAs(UnmanagedType.LPWStr)] [Out] StringBuilder str, int size);
-        
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-        
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        static extern bool AdjustWindowRectEx(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle); 
-        
+        static extern bool AdjustWindowRectEx(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle);
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi); 
-        
+        static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi);
+
         [DllImport("user32.dll")]
         static extern int GetKeyboardLayoutList(int nBuff, [Out] uint[] lpList);
-        
+
         [DllImport("user32.dll")]
         static extern bool GetKeyboardLayoutName([Out] StringBuilder klId);
-        
+
         [DllImport("user32.dll")]
         static extern bool SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool bRedraw);
-        
+
         [DllImport("user32.dll", SetLastError=true)]
         static extern bool BringWindowToTop(IntPtr hWnd);
 
         [DllImport("user32.dll", SetLastError=true)]
         static extern bool BringWindowToTop(HandleRef hWnd);
-        
+
         [DllImport("gdi32.dll")]
         static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2,int cx, int cy);
-        
+
         [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
         private static extern int GetWindowLong32(IntPtr hWnd, WindowLong nIndex);
 
@@ -58,13 +103,10 @@ namespace PoeShared.Native
 
         [DllImport("user32.dll", EntryPoint = "GetClassLongW")]
         private static extern int GetClassLong32(IntPtr hWnd, int nIndex);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetParent(IntPtr hWnd);
 
-        [DllImport("User32", CharSet = CharSet.Auto)]
-        public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndParent);
-        
         [DllImport("user32.dll", 
             CallingConvention = CallingConvention.StdCall, 
             CharSet = CharSet.Unicode, 
@@ -88,62 +130,7 @@ namespace PoeShared.Native
             SetLastError = true, 
             ThrowOnUnmappableChar = false)]
         public static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, KeyboardLayoutFlags flags);
-        
-        [StructLayout(LayoutKind.Sequential)]
-        public struct WINDOWPOS
-        {
-            public readonly IntPtr hwnd;
-            public readonly IntPtr hwndInsertAfter;
-            public int x;
-            public int y;
-            public int cx;
-            public int cy;
-            public readonly int flags;
-        }
 
-        [Flags]
-        public enum KeyboardLayoutFlags : uint
-        {
-            KLF_NONE = 0,
-            KLF_ACTIVATE = 0x00000001,
-            KLF_SETFORPROCESS = 0x00000100
-        }
-        
-        /// <summary>
-        ///     Indicates whether various virtual keys are down. This parameter can be one or more of the following values.
-        ///     https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
-        /// </summary>
-        [Flags]
-        public enum WmMouseParam
-        {
-            NONE = 0x0000,
-            MK_LBUTTON = 0x0001,
-            MK_RBUTTON = 0x0002,
-            MK_SHIFT = 0x0004,
-            MK_CONTROL = 0x0008,
-            MK_MBUTTON = 0x0010,
-            MK_XBUTTON1 = 0x0020,
-            MK_XBUTTON2 = 0x0040,
-        }
-
-        [Flags]
-        public enum WindowExStyles : long
-        {
-            AppWindow = 0x40000,
-            ToolWindow = 0x80,
-        }
-
-        public enum WindowLong
-        {
-            ExStyle = -20,
-        }
-
-        public enum ClassLong
-        {
-            Icon = -14,
-            IconSmall = -34
-        }
-        
         /// <summary>
         ///     Checks whether a window is a top-level window (has no owner nor parent window).
         /// </summary>
@@ -155,7 +142,18 @@ namespace PoeShared.Native
 
             return !hasParent && !hasOwner;
         }
+
+        public static IntPtr SetParent(IntPtr hWnd, IntPtr parent)
+        {
+            return User32.SetParent(hWnd, parent);
+        }
         
+        public static IntPtr SetParentToMessageOnly(IntPtr hWnd)
+        {
+            var previousParent = SetParent(hWnd, (IntPtr)HWND_MESSAGE);
+            return previousParent;
+        }
+
         public static IntPtr GetClassLong(IntPtr hWnd, ClassLong i)
         {
             if (IntPtr.Size == 8)
@@ -165,7 +163,7 @@ namespace PoeShared.Native
 
             return new IntPtr(GetClassLong32(hWnd, (int) i));
         }
-        
+
         public static IntPtr GetWindowLong(IntPtr hWnd, WindowLong i)
         {
             if (IntPtr.Size == 8)
@@ -185,7 +183,7 @@ namespace PoeShared.Native
             };
             return User32.WindowFromPoint(pt);
         }
-        
+
         public static string GetWindowClass(IntPtr hwnd)
         {
             try
@@ -198,13 +196,13 @@ namespace PoeShared.Native
                 return null;
             }
         }
-        
+
         public static Point GetMousePosition() 
         {
             User32.GetCursorPos(out var pt);
             return new Point(pt.x, pt.y);
         }
-        
+
         public static string GetWindowTitle(IntPtr hwnd)
         {
             try
@@ -228,7 +226,7 @@ namespace PoeShared.Native
             User32.GetWindowThreadProcessId(hwnd, out var processId);
             return processId;
         }
-        
+
         public static bool SetWindowRgn(IntPtr hwnd, Rectangle rect)
         {
             var hRect = CreateRoundRectRgn(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height, 0, 0);
@@ -256,7 +254,7 @@ namespace PoeShared.Native
             var currentKeyboardLayout = GetKeyboardLayout(0);
             return GetKeyboardLayoutName(currentKeyboardLayout);
         }
-        
+
         public static string GetKeyboardLayoutName(IntPtr hkl)
         {
             var currentKeyboardLayout = GetKeyboardLayout(0);
@@ -279,6 +277,18 @@ namespace PoeShared.Native
             {
                 ActivateKeyboardLayout(currentKeyboardLayout, KeyboardLayoutFlags.KLF_NONE);
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPOS
+        {
+            public readonly IntPtr hwnd;
+            public readonly IntPtr hwndInsertAfter;
+            public int x;
+            public int y;
+            public int cx;
+            public int cy;
+            public readonly int flags;
         }
     }
 }

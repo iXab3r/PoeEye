@@ -57,7 +57,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public bool IsPaused { get; private set; }
 
-        public IDisposable Rent()
+        public IDisposable Busy()
         {
             return isBusyLatch.Rent();
         }

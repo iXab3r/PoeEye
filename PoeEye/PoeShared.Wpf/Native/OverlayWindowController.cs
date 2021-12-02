@@ -208,8 +208,6 @@ namespace PoeShared.Native
 
         private void HandleVisibilityChange(IFluentLog logger, OverlayWindowView overlayWindow, IOverlayViewModel viewModel)
         {
-            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
-           
             if (IsVisible && viewModel.IsVisible)
             {
                 logger.Debug($"Showing overlay {overlayWindow}");
@@ -219,8 +217,8 @@ namespace PoeShared.Native
                     overlayWindow.Visibility = Visibility.Visible;
                 }
 
-                WindowsServices.ShowInactiveTopmost(overlayWindowHandle, viewModel.NativeBounds);
-            } else if (overlayWindowHandle == IntPtr.Zero)
+                WindowsServices.ShowInactiveTopmost(overlayWindow.WindowHandle, viewModel.NativeBounds);
+            } else if (overlayWindow.WindowHandle == IntPtr.Zero)
             {
                 logger.Debug($"Overlay is not initialized yet");
             }
@@ -228,7 +226,7 @@ namespace PoeShared.Native
             {
                 logger.Debug($"Hiding overlay (tracker {windowTracker})");
 
-                WindowsServices.HideWindow(overlayWindowHandle);
+                WindowsServices.HideWindow(overlayWindow.WindowHandle);
             }
         }
 

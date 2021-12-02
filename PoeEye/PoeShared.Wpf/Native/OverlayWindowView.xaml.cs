@@ -25,6 +25,8 @@ namespace PoeShared.Native
         public IObservable<EventPattern<EventArgs>> WhenRendered => Observable
             .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h);
 
+        private bool AllowsTransparencyAfterLoad { get; set; }
+
         private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
         {
             var window = sender as Window;
@@ -43,10 +45,11 @@ namespace PoeShared.Native
 
             Dispatcher.BeginInvoke(new Action(() => Top -= delta), DispatcherPriority.Render);
         }
-        
+
         private void OnLoaded()
         {
             Log.Debug(() => $"Setting WindowExNoActivate");
+            AllowsTransparencyAfterLoad = AllowsTransparency;
             UnsafeNative.SetWindowExNoActivate(WindowHandle);
         }
 
@@ -57,7 +60,7 @@ namespace PoeShared.Native
 
         public void SetOverlayMode(OverlayMode mode)
         {
-            if (AllowsTransparency == false && mode == OverlayMode.Transparent)
+            if (AllowsTransparencyAfterLoad == false && mode == OverlayMode.Transparent)
             {
                 throw new InvalidOperationException($"Transparent mode requires AllowsTransparency to be set to True");
             }

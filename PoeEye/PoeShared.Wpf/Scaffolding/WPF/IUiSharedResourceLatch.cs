@@ -1,16 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace PoeShared.Scaffolding.WPF
+﻿namespace PoeShared.Scaffolding.WPF
 {
-    public interface IUiSharedResourceLatch : INotifyPropertyChanged
+    public interface IUiSharedResourceLatch : IPauseController, IBusyController
     {
-        bool IsBusy { get; }
-        
-        bool IsPaused { get; }
-        
-        IDisposable Rent();
-
-        IDisposable Pause();
     }
 }

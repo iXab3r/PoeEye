@@ -42,7 +42,10 @@ namespace PoeShared.Native
         {
             Title = WindowId;
             Tag = $"Tag of {WindowId}";
-            Log = typeof(ConstantAspectRatioWindow).PrepareLogger().WithSuffix(WindowId).WithSuffix(() => NativeWindowId);
+            Log = typeof(ConstantAspectRatioWindow).PrepareLogger()
+                .WithSuffix(WindowId)
+                .WithSuffix(() => NativeWindowId)
+                .WithSuffix(() => DataContext == default ? "Data context is not set" : DataContext.ToString());
             Loaded += OnLoaded;
             Initialized += OnInitialized;
             SourceInitialized += OnSourceInitialized;
