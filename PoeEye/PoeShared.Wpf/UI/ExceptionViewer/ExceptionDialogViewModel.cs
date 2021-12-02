@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.Prism;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PropertyBinder;
@@ -24,6 +26,7 @@ using ReactiveUI;
 using SevenZip;
 using Syroot.Windows.IO;
 using PoeShared.Scaffolding;
+using Unity;
 
 namespace PoeShared.UI
 {
@@ -42,6 +45,7 @@ namespace PoeShared.UI
         private readonly IClock clock;
         private readonly IClipboardManager clipboardManager;
         private readonly ICloseController closeController;
+        private readonly IScheduler uiScheduler;
         private readonly IExceptionReportingService reportingService;
         private readonly ISevenZipWrapper sevenZipWrapper;
         private readonly SourceList<ExceptionReportItem> reportItems = new();
@@ -61,7 +65,8 @@ namespace PoeShared.UI
             IUniqueIdGenerator idGenerator,
             IExceptionReportingService reportingService,
             ISevenZipWrapper sevenZipWrapper,
-            ICloseController closeController)
+            ICloseController closeController,
+            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.clock = clock;
             this.clipboardManager = clipboardManager;
@@ -70,25 +75,26 @@ namespace PoeShared.UI
             this.reportingService = reportingService;
             this.sevenZipWrapper = sevenZipWrapper;
             this.closeController = closeController;
+            this.uiScheduler = uiScheduler;
 
             this.RaiseWhenSourceValue(x => x.AppName, this, x => x.Config).AddTo(Anchors);
             CloseCommand = CommandWrapper.Create(closeController.Close);
-            SaveReportCommand = CommandWrapper.Create(SaveReportCommandExecuted, this.WhenAnyValue(x => x.IsBusy).ObserveOnDispatcher().Select(x => x == false));
+            SaveReportCommand = CommandWrapper.Create(SaveReportCommandExecuted, this.WhenAnyValue(x => x.IsBusy).ObserveOn(uiScheduler).Select(x => x == false));
             SendReportCommand = CommandWrapper.Create(SendReportCommandExecuted, 
                 Observable.CombineLatest(
                     this.WhenAnyValue(x => x.Config).Select(x => x?.ReportHandler != null),
-                    this.WhenAnyValue(x => x.IsBusy).Select(x => x == false),(hasHandler, notBusy) => hasHandler && notBusy).ObserveOnDispatcher());
+                    this.WhenAnyValue(x => x.IsBusy).Select(x => x == false),(hasHandler, notBusy) => hasHandler && notBusy).ObserveOn(uiScheduler));
             CopyStatusToClipboard = CommandWrapper.Create(() => clipboardManager.SetText(Status), 
                 Observable.CombineLatest(
                         this.WhenAnyValue(x => x.IsBusy).Select(x => x == false),
                         this.WhenAnyValue(x => x.Status).Select(x => !string.IsNullOrEmpty(x)), (notBusy, hasStatus) => notBusy && hasStatus)
-                .ObserveOnDispatcher());
+                    .ObserveOn(uiScheduler));
 
             reportItems
                 .Connect()
                 .Transform(x => new ExceptionDialogSelectableItem(x))
                 .Sort(new SortExpressionComparer<ExceptionDialogSelectableItem>().ThenByDescending(x => x.IsChecked))
-                .ObserveOnDispatcher()
+                .ObserveOn(uiScheduler)
                 .Bind(out var attachments)
                 .SubscribeToErrors(Log.HandleException)
                 .AddTo(Anchors);

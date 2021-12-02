@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace PoeShared.UI
         private readonly IClock clock;
         private readonly IFactory<IHotkeyTracker> hotkeyFactory;
         private readonly IKeyboardEventsSource keyboardEventsSource;
+        private readonly IScheduler uiScheduler;
         private readonly IWindowTracker mainWindowTracker;
         private readonly INotificationsService notificationsService;
         private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
@@ -57,7 +59,8 @@ namespace PoeShared.UI
             IHotkeySequenceEditorViewModel owner,
             INotificationsService notificationsService,
             IFactory<IHotkeyTracker> hotkeyFactory,
-            IKeyboardEventsSource keyboardEventsSource)
+            IKeyboardEventsSource keyboardEventsSource,
+            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.mainWindowTracker = mainWindowTracker;
             this.appArguments = appArguments;
@@ -66,6 +69,7 @@ namespace PoeShared.UI
             this.notificationsService = notificationsService;
             this.hotkeyFactory = hotkeyFactory;
             this.keyboardEventsSource = keyboardEventsSource;
+            this.uiScheduler = uiScheduler;
 
             this.WhenAnyValue(x => x.RecordStartTime)
                 .DistinctUntilChanged()
@@ -75,7 +79,7 @@ namespace PoeShared.UI
                 .ToProperty(out recordDuration, this, x => x.RecordingDuration)
                 .AddTo(Anchors);
 
-            startRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOnDispatcher());
+            startRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOn(uiScheduler));
             stopRecording = CommandWrapper.Create(StopRecordingExecuted);
 
             Binder.Attach(this).AddTo(Anchors);
@@ -161,7 +165,7 @@ namespace PoeShared.UI
             {
                 mouseLocationSource
                     .Sample(UiConstants.UiThrottlingDelay)
-                    .ObserveOnDispatcher()
+                    .ObserveOn(uiScheduler)
                     .Finally(() => MouseLocation = default)
                     .SubscribeSafe(x => MouseLocation = x, Log.HandleUiException)
                     .AddTo(recordingAnchors);
@@ -229,7 +233,7 @@ namespace PoeShared.UI
                     mouseLocationSource
                         .Sample(MousePositionRecordingResolution)
                         .DistinctUntilChanged()
-                        .ObserveOnDispatcher()
+                        .ObserveOn(uiScheduler)
                         .TakeUntil(cancel)
                         .SubscribeSafe(x =>
                         {
@@ -249,7 +253,7 @@ namespace PoeShared.UI
                             .Select(x => (Point?)x)
                             .Sample(MousePositionRecordingResolution)
                             .DistinctUntilChanged()
-                            .ObserveOnDispatcher()
+                            .ObserveOn(uiScheduler)
                             .TakeUntil(cancel)
                             .WithPrevious()
                             .SubscribeSafe(x =>
@@ -305,7 +309,7 @@ namespace PoeShared.UI
                             })
                             .DistinctUntilChanged()
                             .Where(x => x != default && !x.Value.IsEmpty)
-                            .ObserveOnDispatcher()
+                            .ObserveOn(uiScheduler)
                             .TakeUntil(cancel)
                             .SubscribeSafe(x =>
                             {
@@ -331,7 +335,7 @@ namespace PoeShared.UI
                     )
                     .DistinctUntilChanged()
                     .Where(x => !hotkey.Contains(x.KeyCode))
-                    .ObserveOnDispatcher()
+                    .ObserveOn(uiScheduler)
                     .TakeUntil(cancel)
                     .SubscribeSafe(x =>
                     {
@@ -353,7 +357,7 @@ namespace PoeShared.UI
                         keyboardEventsSource.WhenMouseUp.Select(x => new { x.Button, x.X, x.Y, IsDown = false })
                     )
                     .DistinctUntilChanged()
-                    .ObserveOnDispatcher()
+                    .ObserveOn(uiScheduler)
                     .TakeUntil(cancel)
                     .SubscribeSafe(x =>
                     {
