@@ -36,7 +36,7 @@ namespace PoeShared.Audio.Services
             this.fileSoundLibrarySource = fileSoundLibrarySource;
 
             Log.Info($"Initializing sound subsystem...");
-            knownNotifications[AudioNotificationType.Silence.ToString()] = new byte[0];
+            knownNotifications[AudioNotificationType.Silence.ToString()] = Array.Empty<byte>();
 
             bgScheduler.Schedule(Initialize).AddTo(Anchors);
         }

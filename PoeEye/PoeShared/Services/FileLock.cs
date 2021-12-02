@@ -44,7 +44,7 @@ namespace PoeShared.Services
             var lockFileExists = File.Exists(lockFilePath);
             if (lockFileExists)
             {
-                log.Warn($"Removing lock file {lockFilePath}");
+                log.Info($"Removing lock file {lockFilePath}");
                 File.Delete(lockFilePath);
             }
             else

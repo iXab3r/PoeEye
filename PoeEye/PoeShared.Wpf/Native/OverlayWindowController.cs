@@ -24,7 +24,7 @@ namespace PoeShared.Native
         private static long GlobalIdx;
         private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new(IntPtr.Zero);
-        private readonly string overlayId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
+        private readonly string overlayControllerId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
 
         private readonly IScheduler uiScheduler;
 
@@ -38,7 +38,7 @@ namespace PoeShared.Native
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            Log = typeof(OverlayWindowController).PrepareLogger().WithSuffix(overlayId).WithSuffix(ToString);
+            Log = typeof(OverlayWindowController).PrepareLogger().WithSuffix(overlayControllerId).WithSuffix(ToString);
             Log.Info($"Creating overlay window controller using {windowTracker}");
 
             this.windowTracker = windowTracker;
@@ -98,40 +98,32 @@ namespace PoeShared.Native
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
         {
-            using var sw = new BenchmarkTimer($"Registering viewModel {viewModel}", Log);
-
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
+            OverlayWindowView overlayWindow = default;
+            var logger = Log.WithSuffix(overlayControllerId).WithSuffix(viewModel.Id).WithSuffix(() => overlayWindow == default ? "No window yet" : overlayWindow.ToString());
 
             var childAnchors = new CompositeDisposable();
-
             viewModel.AddTo(childAnchors);
 
-            var overlayWindowViewModel = new OverlayWindowViewModel
+            logger.Debug(() =>"Initializing window container view model");
+            var overlayWindowViewModel = new OverlayWindowViewModel(logger)
             {
                 Content = viewModel
             };
             overlayWindowViewModel.AddTo(childAnchors);
-            sw.Step($"Initialized {nameof(OverlayWindowViewModel)}");
-
-            var overlayName = $"{viewModel.GetType().Name}";
-            var overlayWindow = new OverlayWindowView
+            logger.Debug(() => $"Initialized window container: {overlayWindowViewModel}");
+            overlayWindow = new OverlayWindowView
             {
-                Title = $"{overlayId} {windowTracker} #{overlayName} #{windows.Count + 1}",
+                Title = $"{viewModel.Id} {overlayControllerId} {windowTracker}",
                 Visibility = Visibility.Collapsed,
                 ShowInTaskbar = false,
                 ShowActivated = false,
                 Topmost = true,
-                Name = $"{overlayName}_OverlayView"
             };
-            Log.Info($"[#{overlayName}] Created Overlay window({windowTracker})");
-            sw.Step($"Initialized overlay window: {overlayWindow.Title}");
+            logger.Info(() => $"Created overlay window");
             overlayWindow.DataContext = overlayWindowViewModel;
-            sw.Step($"Initialized overlay data context: {overlayWindowViewModel}");
+            logger.Debug(() => $"Assigned data context");
 
-            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).EnsureHandle();
-            Log.Debug($"[#{overlayName}] Overlay window({windowTracker}) handle: {overlayWindowHandle.ToHexadecimal()}");
-            sw.Step($"Initialized overlay window handle: {overlayWindowHandle.ToHexadecimal()}");
-            
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
 
@@ -141,18 +133,25 @@ namespace PoeShared.Native
                 .AddTo(childAnchors);
 
             overlayWindow.WhenLoaded
-                .Do(args => Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}"))
-                .SubscribeSafe(() => viewModel.SetOverlayWindow(overlayWindow), Log.HandleUiException)
+                .Do(args => logger.Debug(() => $"Overlay is loaded, window: {args.Sender}"))
+                .SubscribeSafe(() =>
+                {
+                    logger.Debug(() => $"Assigning overlay view {overlayWindow} to view-model {viewModel}");
+                    viewModel.SetOverlayWindow(overlayWindow);
+                }, Log.HandleUiException)
                 .AddTo(childAnchors);
             
             Observable.Merge(
                     this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Controller IsVisible change, {x.prev} => {x.curr}"), 
                     viewModel.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Overlay IsVisible change, {x.prev} => {x.curr}"), 
                     windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
-                    overlayWindow.WhenLoaded.Select(x => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
-                .Do(reason => Log.Debug($"[{overlayName}] {reason}"))
+                    overlayWindow.WhenLoaded.Select(_ => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
                 .ObserveOn(uiScheduler)
-                .SubscribeSafe(reason => HandleVisibilityChange(overlayWindow, viewModel), Log.HandleUiException)
+                .SubscribeSafe(reason =>
+                {
+                    logger.Debug($"Processing visibility change, reason: {reason}");
+                    HandleVisibilityChange(logger, overlayWindow, viewModel);
+                }, Log.HandleUiException)
                 .AddTo(childAnchors);
 
             overlayWindow
@@ -160,12 +159,17 @@ namespace PoeShared.Native
                 .Select(_ => viewModel.WhenAnyValue(x => x.OverlayMode))
                 .Switch()
                 .ObserveOn(uiScheduler)
-                .SubscribeSafe(overlayWindow.SetOverlayMode, Log.HandleUiException)
+                .SubscribeSafe(x =>
+                {
+                    logger.Debug(() => $"Changing overlay mode to {x}");
+                    overlayWindow.SetOverlayMode(x);
+                }, Log.HandleUiException)
                 .AddTo(childAnchors);
 
             overlayWindow
                 .WhenRendered
-                .Do(_ => { Log.Debug($"[#{overlayWindow.Name}] Overlay is rendered"); })
+                .Take(1)
+                .Do(_ => { logger.Debug(() => $"Overlay is rendered"); })
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(childAnchors);
 
@@ -173,19 +177,20 @@ namespace PoeShared.Native
 
             Disposable.Create(() =>
             {
-                Log.Info($"[#{overlayWindow.Name}] Closing overlay");
+                logger.Info($"Closing overlay");
                 overlayWindow.Close();
             }).AddTo(childAnchors);
+            
             Disposable.Create(() =>
             {
-                Log.Debug($"[#{overlayWindow.Name}] Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
+                logger.Debug($"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
                 windows.Remove(overlayWindow);
             }).AddTo(childAnchors);
 
             childAnchors.AddTo(Anchors);
 
-            Log.Info($"Overlay #{overlayName} initialized");
-            sw.Step($"Registration completed");
+            Log.Info($"Overlay view initialized");
+            logger.Debug(() => $"Registration completed");
 
             return childAnchors;
         }
@@ -201,27 +206,27 @@ namespace PoeShared.Native
             UnsafeNative.SetForegroundWindow(windowHandle);
         }
 
-        private void HandleVisibilityChange(OverlayWindowView overlayWindow, IOverlayViewModel viewModel)
+        private void HandleVisibilityChange(IFluentLog logger, OverlayWindowView overlayWindow, IOverlayViewModel viewModel)
         {
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
            
             if (IsVisible && viewModel.IsVisible)
             {
-                Log.Debug($"[#{overlayWindow.Name}] Showing overlay {overlayWindow}");
+                logger.Debug($"Showing overlay {overlayWindow}");
                 if (overlayWindow.Visibility != Visibility.Visible)
                 {
-                    Log.Debug($"[#{overlayWindow.Name}] Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
+                    logger.Debug($"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
                     overlayWindow.Visibility = Visibility.Visible;
                 }
 
                 WindowsServices.ShowInactiveTopmost(overlayWindowHandle, viewModel.NativeBounds);
             } else if (overlayWindowHandle == IntPtr.Zero)
             {
-                Log.Debug($"[#{overlayWindow.Name}] Overlay is not initialized yet");
+                logger.Debug($"Overlay is not initialized yet");
             }
             else
             {
-                Log.Debug($"[#{overlayWindow.Name}] Hiding overlay (tracker {windowTracker})");
+                logger.Debug($"Hiding overlay (tracker {windowTracker})");
 
                 WindowsServices.HideWindow(overlayWindowHandle);
             }

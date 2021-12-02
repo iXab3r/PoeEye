@@ -28,7 +28,7 @@ namespace PoeShared.Native
         bool EnableHeader { get; set; }
         
         bool IsLocked { get; set; }
-
+        
         bool IsUnlockable { get; }
         
         bool IsVisible { get; set; }
@@ -36,6 +36,8 @@ namespace PoeShared.Native
         OverlayMode OverlayMode { get; set; }
         
         SizeToContent SizeToContent { get; }
+        
+        string Id { [NotNull] get; }
 
         string Title { [CanBeNull] get; }
 

@@ -41,8 +41,7 @@ namespace PoeShared.Native
         private readonly Dispatcher uiDispatcher;
         private readonly CommandWrapper unlockWindowCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
-        private readonly string windowId = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
-        
+
         private bool isLocked = true;
 
         static OverlayViewModelBase()
@@ -52,7 +51,7 @@ namespace PoeShared.Native
 
         protected OverlayViewModelBase()
         {
-            Log = GetType().PrepareLogger().WithSuffix(windowId).WithSuffix(ToString);
+            Log = GetType().PrepareLogger().WithSuffix(Id).WithSuffix(ToString);
             Title = GetType().ToString();
             uiDispatcher = Dispatcher.CurrentDispatcher;
             Log.Info("Created overlay view model");
@@ -184,6 +183,8 @@ namespace PoeShared.Native
         public OverlayMode OverlayMode { get; set; }
 
         public SizeToContent SizeToContent { get; protected set; } = SizeToContent.Manual;
+        
+        public string Id { get; } = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
 
         public string Title { get; protected set; }
 
@@ -221,8 +222,7 @@ namespace PoeShared.Native
                 throw new InvalidOperationException($"Window is already assigned");
             }
             OverlayWindow = owner;
-            var interopHelper = new WindowInteropHelper(OverlayWindow);
-            Log.Debug(() => $"Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
+            Log.Debug(() => $"Overlay window is assigned: {OverlayWindow}");
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -247,7 +247,7 @@ namespace PoeShared.Native
 
         public override string ToString()
         {
-            return string.IsNullOrEmpty(Title) ? "Title not set" : $"Ovm Title: {Title}";
+            return Id;
         }
 
         public DispatcherOperation BeginInvoke(Action dispatcherAction)

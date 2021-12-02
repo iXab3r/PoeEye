@@ -2,24 +2,19 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Threading;
-using log4net;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Native
 {
     public partial class OverlayWindowView
     {
-        private static readonly IFluentLog Log = typeof(OverlayWindowView).PrepareLogger();
-        
         public OverlayWindowView()
         {
             using var sw = new BenchmarkTimer("View initialization", Log, nameof(OverlayWindowView));
             InitializeComponent();
             sw.Step("Components initialized");
-            WhenLoaded.SubscribeSafe(OnLoaded, Log.HandleUiException);
+            WhenLoaded.SubscribeSafe(OnLoaded, Log.HandleUiException).AddTo(Anchors);
             sw.Step("WhenLoaded routine executed");
             SizeChanged += OnSizeChanged;
         }
@@ -51,13 +46,13 @@ namespace PoeShared.Native
         
         private void OnLoaded()
         {
-            var helper = new WindowInteropHelper(this);
-            WindowsServices.SetWindowExNoActivate(helper.Handle);
+            Log.Debug(() => $"Setting WindowExNoActivate");
+            UnsafeNative.SetWindowExNoActivate(WindowHandle);
         }
 
         public override string ToString()
         {
-            return $"[OverlayWindow] DataContext: {DataContext} (X:{Left:F0} Y:{Top:F0} Width: {Width:F0} Height: {Height:F0})";
+            return $"{base.ToString()} DataContext: {DataContext} (X:{Left:F0} Y:{Top:F0} Width: {Width:F0} Height: {Height:F0})";
         }
 
         public void SetOverlayMode(OverlayMode mode)

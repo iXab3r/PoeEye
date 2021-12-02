@@ -1,4 +1,5 @@
 using System.Windows;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
@@ -11,20 +12,31 @@ namespace PoeShared.Native
         static OverlayWindowViewModel()
         {
             Binder
-                .BindIf(x => x.Content != null && !x.Content.IsLocked, x => 15d)
+                .BindIf(x => x.Content != null && !x.Content.IsLocked && x.Content.OverlayWindow != null && x.Content.OverlayWindow.IsLoaded, x => 15d)
                 .Else(x => 0d)
-                .To(x => x.GlassFrameThickness);
+                .To((x, v) =>
+                {
+                    x.Log.Debug(() => $"Setting {nameof(x.GlassFrameThickness)} to {v}, content native bounds: {x.Content.NativeBounds}");
+                    x.GlassFrameThickness = v;
+                });
 
             Binder
-                .BindIf(x => x.Content != null && !x.Content.IsLocked, x => x.ResizeThumbSize / 2)
+                .BindIf(x => x.Content != null && !x.Content.IsLocked && x.Content.OverlayWindow != null && x.Content.OverlayWindow.IsLoaded, x => x.ResizeThumbSize / 2)
                 .Else(x => 0d)
-                .To(x => x.ResizeBorderThickness);
+                .To((x, v) =>
+                {
+                    x.Log.Debug(() => $"Setting {nameof(x.ResizeBorderThickness)} to {v}");
+                    x.ResizeBorderThickness = v;
+                });
         }
 
-        public OverlayWindowViewModel()
+        public OverlayWindowViewModel(IFluentLog logger)
         {
+            Log = logger;
             Binder.Attach(this).AddTo(Anchors);
         }
+        
+        private IFluentLog Log { get; }
 
         public bool ShowWireframes { get; set; }
 
