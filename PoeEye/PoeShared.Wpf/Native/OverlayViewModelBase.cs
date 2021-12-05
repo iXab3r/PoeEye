@@ -84,9 +84,21 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             this.WhenValueChanged(x => x.OverlayWindow, false)
-                .ToUnit()
+                .Take(1)
+                .Select(x => x.WhenLoaded())
+                .Switch()
                 .SubscribeSafe(whenLoaded)
                 .AddTo(Anchors);
+            whenLoaded.SubscribeSafe(_ =>
+            {
+                if (IsLoaded)
+                {
+                    Log.Warn("Window received multiple 'loaded' events");
+                    throw new ApplicationException($"Window has already been loaded: {this}");
+                }
+                Log.Debug("Window has been loaded, changing status");
+                IsLoaded = true;
+            }, Log.HandleUiException).AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NativeBounds)
                 .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (targetBounds, hwnd) => new { TargetBounds = targetBounds, hwnd })
@@ -158,6 +170,8 @@ namespace PoeShared.Native
         public Size MinSize { get; set; } = new Size(0, 0);
 
         public Size MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
+
+        public bool IsLoaded { get; private set; }
 
         [DoNotNotify]
         public bool IsLocked
@@ -381,14 +395,6 @@ namespace PoeShared.Native
             }
             Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
             OverlayMode = OverlayMode.Transparent;
-        }
-
-        protected TRet RaiseAndSetIfChangedOnDispatcher<TRet>(ref TRet backingField,
-            TRet newValue,
-            [CallerMemberName] string propertyName = null)
-        {
-            uiDispatcher.VerifyAccess();
-            return RaiseAndSetIfChanged<TRet>(ref backingField, newValue, propertyName);
         }
     }
 }

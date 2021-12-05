@@ -231,6 +231,31 @@ namespace PoeShared.Tests.Modularity
             isConverter.ShouldBe(expected);
         }
 
+        [Test]
+        [TestCase(typeof(object), 0, 0, false)]
+        [TestCase(typeof(Config), 1, 4, true)]
+        public void ShouldResolveConverter(Type targetType, int sourceVersion, int targetVersion, bool expected)
+        {
+            //Given
+            migrationService.AutomaticallyLoadConverters = true;
+            RegisterAll();
+
+            //When
+            var result = migrationService.TryGetConverter(targetType, sourceVersion, targetVersion, out var converterResult);
+
+
+            //Then
+            result.ShouldBe(expected);
+            if (result)
+            {
+                converterResult.ShouldNotBe(default);
+            }
+            else
+            {
+                converterResult.ShouldBe(default);
+            }
+        }
+        
         private void RegisterAll()
         {
             migrationService.RegisterMetadataConverter(new ConfigMetadataConverterV3ToV4());

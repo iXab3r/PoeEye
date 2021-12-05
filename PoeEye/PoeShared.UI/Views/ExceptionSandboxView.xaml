@@ -11,6 +11,8 @@
             <eye:ButtonEx Command="{Binding ThrowOnUiSchedulerCommand}" Content="Throw"/>
             <TextBlock Text="Throw on BG scheduler"/>
             <eye:ButtonEx Command="{Binding ThrowOnBgSchedulerCommand}" Content="Throw"/>
+            <TextBlock Text="Throw inside Task"/>
+            <eye:ButtonEx Command="{Binding ThrowInsideTaskCommand}" Content="Throw"/>
             <TextBlock Text="Report a problem"/>
             <eye:ButtonEx Command="{Binding ReportProblemCommand}" Content="Report"/>
         </st:AutoGrid>

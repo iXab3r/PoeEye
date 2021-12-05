@@ -12,7 +12,7 @@ namespace PoeShared.Native
         static OverlayWindowViewModel()
         {
             Binder
-                .BindIf(x => x.Content != null && !x.Content.IsLocked && x.Content.OverlayWindow != null && x.Content.OverlayWindow.IsLoaded, x => 15d)
+                .BindIf(x => x.Content != null && !x.Content.IsLocked && x.Content.IsLoaded, x => 15d)
                 .Else(x => 0d)
                 .To((x, v) =>
                 {
@@ -21,7 +21,7 @@ namespace PoeShared.Native
                 });
 
             Binder
-                .BindIf(x => x.Content != null && !x.Content.IsLocked && x.Content.OverlayWindow != null && x.Content.OverlayWindow.IsLoaded, x => x.ResizeThumbSize / 2)
+                .BindIf(x => x.Content != null && !x.Content.IsLocked && x.Content.IsLoaded, x => x.ResizeThumbSize / 2)
                 .Else(x => 0d)
                 .To((x, v) =>
                 {

@@ -6,6 +6,18 @@ namespace PoeShared.Scaffolding
 {
     public static class DictionaryExtensions
     {
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+        {
+            if (dictionary.TryGetValue(key, out var result))
+            {
+                return result;
+            }
+
+            var newValue = valueFactory(key);
+            dictionary[key] = newValue;
+            return newValue;
+        }
+        
         public static TValue AddOrUpdate<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,
             TKey key,

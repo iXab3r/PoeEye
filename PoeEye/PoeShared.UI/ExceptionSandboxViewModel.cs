@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using PoeShared.Logging;
 using PoeShared.Prism;
@@ -48,10 +49,20 @@ namespace PoeShared.UI
                     throw new ApplicationException("Exception that was thrown on BG scheduler");
                 });
             });
+            ThrowInsideTaskCommand = CommandWrapper.Create(() =>
+            {
+                Log.Debug("Throwing inside task");
+                Task.Run(() =>
+                {
+                    Log.Debug("Throwing exception");
+                    throw new ApplicationException("Exception that was thrown inside Task");
+                });
+            });
         }
 
         public ICommand ThrowOnUiSchedulerCommand { get; }
         public ICommand ThrowOnBgSchedulerCommand { get; }
+        public ICommand ThrowInsideTaskCommand { get; }
         public ICommand ReportProblemCommand { get; }
 
         public ICommand ThrowInsideCommand { get; }

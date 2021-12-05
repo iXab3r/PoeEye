@@ -93,10 +93,10 @@ namespace PoeShared.UI
             try
             {
                 var appDispatcher = Application.Current?.Dispatcher;
-                if (appDispatcher != null && Dispatcher.CurrentDispatcher != appDispatcher)
+                if (appDispatcher != null && !appDispatcher.CheckAccess())
                 {
                     Log.Warn("Exception occurred on non-UI thread, rescheduling to UI");
-                    appDispatcher.BeginInvoke(new Action(() => ShowExceptionViewer(config)), DispatcherPriority.Send);
+                    appDispatcher.Invoke(() => ShowExceptionViewer(config), DispatcherPriority.Send);
                     Log.Debug($"Sent signal to UI thread to report crash related to exception {config.Exception.Message}");
                     return;
                 }

@@ -9,6 +9,7 @@ using NUnit.Framework;
 namespace PoeShared.Tests.PropertyBinder
 {
     [TestFixture]
+    [Category("Benchmark")]
     public class BenchmarkBase
     {
         protected IConfig Config => PrepareDefaultConfig();

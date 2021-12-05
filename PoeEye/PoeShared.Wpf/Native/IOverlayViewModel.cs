@@ -27,6 +27,8 @@ namespace PoeShared.Native
 
         bool EnableHeader { get; set; }
         
+        bool IsLoaded { get; }
+        
         bool IsLocked { get; set; }
         
         bool IsUnlockable { get; }

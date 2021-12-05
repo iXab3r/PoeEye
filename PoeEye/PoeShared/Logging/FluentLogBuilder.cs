@@ -17,7 +17,7 @@ namespace PoeShared.Logging
 
         ILogWriter IFluentLog.Writer => logWriter;
         
-        public IMetrics Metrics => App.Metrics.Metrics.Instance;
+        public IMetrics Metrics => App.Metrics.Metrics.Instance ?? throw new InvalidOperationException("Metrics are not initialized yet");
 
         public bool IsDebugEnabled => logWriter.IsDebugEnabled;
 
