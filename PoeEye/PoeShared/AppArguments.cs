@@ -78,6 +78,16 @@ namespace PoeShared
             IsWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
             IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 #endif
+            
+            var arguments = Environment.GetCommandLineArgs();
+            if (!Parse(arguments))
+            {
+                SharedLog.Instance.InitializeLogging("Startup", this.AppName);
+                throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
+            }
+
+            Log.Debug($"Arguments: {arguments.DumpToString()}");
+            Log.Debug($"Parsed args: {this.DumpToText()}");
         }
 
         public bool IsWindows { get; }

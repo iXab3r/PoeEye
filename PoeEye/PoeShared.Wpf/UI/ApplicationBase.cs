@@ -44,19 +44,10 @@ namespace PoeShared.UI
                 Container.AddNewExtensionIfNotExists<NativeRegistrations>();
                 Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
 
-                var arguments = Environment.GetCommandLineArgs();
                 appArguments = Container.Resolve<IAppArguments>();
-                if (!appArguments.Parse(arguments))
-                {
-                    SharedLog.Instance.InitializeLogging("Startup", appArguments.AppName);
-                    throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
-                }
                 metrics = Container.Resolve<IMetricsRoot>();
                 InitializeLogging();
                 InitializeSevenZip();
-
-                Log.Debug($"Arguments: {arguments.DumpToString()}");
-                Log.Debug($"Parsed args: {appArguments.DumpToText()}");
                 Log.Debug($"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
                 Log.Debug($"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
                 Log.Debug($"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");

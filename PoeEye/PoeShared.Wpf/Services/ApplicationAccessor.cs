@@ -45,8 +45,8 @@ namespace PoeShared.Services
                 IsExiting = true;
             }, Log.HandleException).AddTo(Anchors);
 
-            runningFileLock = new FileLock(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $".running{(appArguments.IsDebugMode ? null : "DebugMode")}"))).AddTo(Anchors);
-            loadingFileLock = new FileLock(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $".loading{(appArguments.IsDebugMode ? null : "DebugMode")}"))).AddTo(Anchors);
+            runningFileLock = new FileLock(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $".running{(appArguments.IsDebugMode ? "DebugMode" : null)}"))).AddTo(Anchors);
+            loadingFileLock = new FileLock(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $".loading{(appArguments.IsDebugMode ? "DebugMode" : null)}"))).AddTo(Anchors);
             LastExitWasGraceful = !runningFileLock.ExistedInitially;
             LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
             this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
