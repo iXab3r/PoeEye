@@ -33,7 +33,7 @@ namespace PoeShared.Modularity
 
         public override string ToString()
         {
-            return $"({nameof(PoeConfigMetadata)} {nameof(AssemblyName)}: {AssemblyName}, {nameof(TypeName)}: {TypeName}, {nameof(Version)}: {Version})";
+            return $"Metadata for {TypeName} (v{Version}) in {AssemblyName}";
         }
     }
 

@@ -132,31 +132,37 @@ namespace PoeShared.Modularity
             PoeConfigMetadata<T> metadata, 
             Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : IPoeEyeConfig
         {
+            var log = Log.WithSuffix(metadata);
             if (metadata.Value == null)
             {
-                Log.Debug($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+                log.Debug(() => $"Metadata does not contain a value, trying to re-serialize it");
                 var serialized = Serialize(metadata);
                 if (string.IsNullOrEmpty(serialized))
                 {
                     throw new ApplicationException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
                 }
+                log.Debug(() => $"Deserializing metadata again");
                 var deserialized = Deserialize<PoeConfigMetadata<T>>(serialized);
                 if (deserialized.Value != null)
                 {
-                    Log.Debug($"Successfully restored type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}: {deserialized.Value}");
+                    log.Debug(() => $"Successfully restored value: {deserialized.Value}");
                     metadata = deserialized;
                 }
                 else
                 {
-                    Log.Warn($"Failed to restore type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}");
+                    log.Warn($"Failed to restore value");
                 }
             }
             
             if (metadata.Value == null)
             {
-                return defaultItemFactory(metadata);
+                log.Debug(() => $"Metadata does not contain a valid value, preparing default");
+                var defaultItem = defaultItemFactory(metadata);
+                log.Debug(() => $"Returning default value: {defaultItem}");
+                return defaultItem;
             }
 
+            log.Debug($"Returning value: {metadata.Value}");
             return metadata.Value;
         }
     }
