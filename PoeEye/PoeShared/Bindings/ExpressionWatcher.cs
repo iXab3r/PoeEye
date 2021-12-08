@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -200,6 +201,15 @@ namespace PoeShared.Bindings
             {
                 Error = default;
                 assignmentActionSupplier.Value(Source, newValue);
+                var current = Value;
+                if (EqualityComparer<TProperty>.Default.Equals(newValue, current))
+                {
+                    Log.Debug($"Updated value to {Value}");
+                }
+                else
+                {
+                    throw new InvalidStateException($"Failed to update value to {newValue}, currently it is {current}");
+                }
             }
             catch (Exception e)
             {
