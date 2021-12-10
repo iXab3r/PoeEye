@@ -23,6 +23,7 @@ namespace PoeShared.Scaffolding
             return new SourceList<T>(source);
         }
 
+        [Obsolete("DynamicCombiner and ReferenceCountTracker contain a bug that could be reproduced by Edit()ing a list and replacing an item there")]
         public static ISourceList<T> ToSourceList<T>(this IEnumerable<ISourceList<T>> lists)
         {
             Guard.ArgumentNotNull(lists, nameof(lists));
