@@ -13,9 +13,9 @@ namespace PoeShared.Modularity
         private static readonly IFluentLog Log = typeof(PoeConfigConverterMigrationService).PrepareLogger();
         private static readonly MethodInfo RegistrationMethod = typeof(PoeConfigConverterMigrationService).GetMethod(nameof(RegisterMetadataConverter), BindingFlags.Instance | BindingFlags.Public) ?? throw new ApplicationException($"Failed to find registration method");
 
-        private readonly IDictionary<PoeConfigMigrationConverterKey, Func<object, object>> convertersByMetadata = new Dictionary<PoeConfigMigrationConverterKey, Func<object, object>>();
+        private readonly Dictionary<PoeConfigMigrationConverterKey, Func<object, object>> convertersByMetadata = new Dictionary<PoeConfigMigrationConverterKey, Func<object, object>>();
         private readonly HashSet<Assembly> processedAssemblies = new();
-        private readonly IDictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new Dictionary<Type, IPoeEyeConfigVersioned>();
+        private readonly Dictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new Dictionary<Type, IPoeEyeConfigVersioned>();
 
         public bool AutomaticallyLoadConverters { get; set; } = true;
 
