@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace PoeShared.Modularity
 {
-    public class PoeConfigMetadata : IPoeEyeConfig
+    public record PoeConfigMetadata : IPoeEyeConfig
     {
         public string AssemblyName { get; set; }
         
@@ -37,7 +37,7 @@ namespace PoeShared.Modularity
         }
     }
 
-    public sealed class PoeConfigMetadata<T> : PoeConfigMetadata where T : IPoeEyeConfig
+    public sealed record PoeConfigMetadata<T> : PoeConfigMetadata where T : IPoeEyeConfig
     {
         public PoeConfigMetadata()
         {

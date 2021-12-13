@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
+using PoeShared.Services;
 
 namespace PoeShared.Modularity
 {
@@ -13,14 +14,16 @@ namespace PoeShared.Modularity
         private static readonly IFluentLog Log = typeof(PoeConfigConverterMigrationService).PrepareLogger();
         private static readonly MethodInfo RegistrationMethod = typeof(PoeConfigConverterMigrationService).GetMethod(nameof(RegisterMetadataConverter), BindingFlags.Instance | BindingFlags.Public) ?? throw new ApplicationException($"Failed to find registration method");
 
-        private readonly Dictionary<PoeConfigMigrationConverterKey, Func<object, object>> convertersByMetadata = new Dictionary<PoeConfigMigrationConverterKey, Func<object, object>>();
+        private readonly Dictionary<PoeConfigMigrationConverterKey, Func<object, object>> convertersByMetadata = new();
         private readonly HashSet<Assembly> processedAssemblies = new();
-        private readonly Dictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new Dictionary<Type, IPoeEyeConfigVersioned>();
+        private readonly Dictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new();
+        private readonly NamedLock migrationsLock = new("ConfigMigrationServiceMigrations"); 
 
         public bool AutomaticallyLoadConverters { get; set; } = true;
 
         public bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out KeyValuePair<PoeConfigMigrationConverterKey, Func<object, object>> result)
         {
+            using var @lock = migrationsLock.Enter();
             var logger = Log.WithSuffix($"{targetType} v{sourceVersion} => v{targetVersion}");
             logger.Debug(() => $"Looking up converter");
             var converterKvp = convertersByMetadata
@@ -57,6 +60,7 @@ namespace PoeShared.Modularity
 
         public bool IsMetadataConverter(Type type)
         {
+            using var @lock = migrationsLock.Enter();
             if (type.IsAbstract)
             {
                 return default;
@@ -68,6 +72,7 @@ namespace PoeShared.Modularity
 
         public void RegisterMetadataConverter<T1, T2>(ConfigMetadataConverter<T1, T2> converter) where T1 : IPoeEyeConfigVersioned, new() where T2 : IPoeEyeConfigVersioned, new()
         {
+            using var @lock = migrationsLock.Enter();
             var typeV1 = typeof(T1);
             var typeV2 = typeof(T2);
             var assemblyV1 = typeV1.Assembly;

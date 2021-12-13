@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PoeShared.Logging;
@@ -12,6 +13,7 @@ namespace PoeShared.Modularity
         private static readonly IFluentLog Log = typeof(AssemblyHelper).PrepareLogger();
 
         private readonly ConcurrentDictionary<string, Assembly> loadedAssemblyByName = new ConcurrentDictionary<string, Assembly>();
+        private readonly ConcurrentDictionary<string, string> typeNameMapping = new();
 
         private static readonly Lazy<AssemblyHelper> AssemblyHelperSupplier = new Lazy<AssemblyHelper>();
 

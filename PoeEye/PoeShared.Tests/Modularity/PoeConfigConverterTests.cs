@@ -16,12 +16,15 @@ namespace PoeShared.Tests.Modularity
         private static readonly IFluentLog Log = typeof(PoeConfigConverterTests).PrepareLogger();
 
         private Mock<IPoeConfigConverterMigrationService> migrationService;
+        private Mock<IPoeConfigMetadataReplacementService> replacementService;
         private PoeConfigConverter configConverter;
 
         protected override void SetUp()
         {
             migrationService = new Mock<IPoeConfigConverterMigrationService>();
-            configConverter = new PoeConfigConverter(migrationService.Object);
+            replacementService = new Mock<IPoeConfigMetadataReplacementService>();
+            replacementService.Setup(x => x.ReplaceIfNeeded(It.IsAny<PoeConfigMetadata>())).Returns((PoeConfigMetadata y) => y);
+            configConverter = new PoeConfigConverter(replacementService.Object, migrationService.Object);
         }
 
         [Test]
@@ -266,6 +269,28 @@ namespace PoeShared.Tests.Modularity
 
             //Then
             result.ShouldBe(serializedMetadata);
+        }
+
+        [Test]
+        public void ShouldReplaceMetadata()
+        {
+            //Given
+            var instance = CreateInstance();
+            var sourceMetadata = new PoeConfigMetadata()
+            {
+                AssemblyName = "EyeAuras",
+                TypeName = "test",
+                Version = 1
+            };
+            var destinationMetadata = new PoeConfigMetadata();
+            replacementService.Setup(x => x.ReplaceIfNeeded(It.Is<PoeConfigMetadata>(y => y.TypeName == sourceMetadata.TypeName))).Returns(destinationMetadata);
+            var serializedMetadata = instance.Serialize(sourceMetadata);
+
+            //When
+            var metadata = instance.Deserialize<PoeConfigMetadata>(serializedMetadata);
+
+            //Then
+            metadata.ShouldBeSameAs(destinationMetadata);
         }
         
         private static string PrepareSerialized(string fileName)

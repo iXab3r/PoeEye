@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoeShared.Logging;
-using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 
 namespace PoeShared.Modularity
@@ -24,6 +23,7 @@ namespace PoeShared.Modularity
             .GetMethod(nameof(SetMetadataTypedValue), BindingFlags.Instance | BindingFlags.NonPublic);
 
         private readonly ConcurrentDictionary<Type, MethodInfo> getMetadataValueByType = new();
+        private readonly IPoeConfigMetadataReplacementService replacementService;
         private readonly IPoeConfigConverterMigrationService migrationService;
         private readonly ConcurrentDictionary<Type, MethodInfo> setMetadataValueByType = new();
 
@@ -31,8 +31,11 @@ namespace PoeShared.Modularity
 
         private volatile bool skipNext;
 
-        public PoeConfigConverter(IPoeConfigConverterMigrationService migrationService)
+        public PoeConfigConverter(
+            IPoeConfigMetadataReplacementService replacementService,
+            IPoeConfigConverterMigrationService migrationService)
         {
+            this.replacementService = replacementService;
             this.migrationService = migrationService;
         }
 
@@ -93,10 +96,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentIsTrue(() => typeof(IPoeEyeConfig).IsAssignableFrom(serializedType));
 
-            var metadata = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType)
-                ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
-                : serializer.Deserialize<PoeConfigMetadata>(reader);
-
+            var metadata = DeserializeMetadata(reader, serializedType, serializer);
             if (metadata == null)
             {
                 Log.Warn(() => $"Failed to convert type {serializedType}, returning empty object instead");
@@ -124,6 +124,14 @@ namespace PoeShared.Modularity
             }
 
             return value;
+        }
+
+        private PoeConfigMetadata DeserializeMetadata(JsonReader reader, Type serializedType, JsonSerializer serializer)
+        {
+            var metadata = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType)
+                ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
+                : serializer.Deserialize<PoeConfigMetadata>(reader);
+            return replacementService.ReplaceIfNeeded(metadata);
         }
 
         private object DeserializeMetadataValue(PoeConfigMetadata metadata, JsonSerializer serializer, Type resolvedValueType)

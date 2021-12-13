@@ -110,11 +110,13 @@ namespace PoeShared.Tests.Modularity
 
         private PoeConfigConverter configConverter;
         private PoeConfigConverterMigrationService migrationService;
+        private PoeConfigMetadataReplacementService replacementService;
 
         protected override void SetUp()
         {
             migrationService = new PoeConfigConverterMigrationService() { AutomaticallyLoadConverters = false };
-            configConverter = new PoeConfigConverter(migrationService);
+            replacementService = new PoeConfigMetadataReplacementService();
+            configConverter = new PoeConfigConverter(replacementService, migrationService);
         }
 
         [Test]
@@ -254,6 +256,28 @@ namespace PoeShared.Tests.Modularity
             {
                 converterResult.ShouldBe(default);
             }
+        }
+
+        [Test]
+        public void ShouldReplaceIfNeeded()
+        {
+            //Given
+            var instance = CreateInstance();
+            var sourceMetadata = new PoeConfigMetadata()
+            {
+                AssemblyName = "EyeAuras",
+                TypeName = "test",
+                Version = 1
+            };
+            replacementService.AddMetadataReplacement(sourceMetadata.TypeName, typeof(SampleConfig));
+            var serializedMetadata = instance.Serialize(sourceMetadata);
+
+            //When
+            var result = instance.Deserialize<PoeConfigMetadata>(serializedMetadata);
+
+            //Then
+            result.AssemblyName.ShouldBe(typeof(SampleConfig).Assembly.GetName().Name);
+            result.TypeName.ShouldBe(typeof(SampleConfig).FullName);
         }
         
         private void RegisterAll()
