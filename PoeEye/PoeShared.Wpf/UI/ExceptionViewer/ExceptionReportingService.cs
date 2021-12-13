@@ -113,6 +113,12 @@ namespace PoeShared.UI
 
         private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
+            if (!e.Observed && e.Exception.InnerExceptions.Count == 1 && e.Exception.InnerExceptions[0].GetType().Name == "Http2ConnectionException")
+            {
+                Log.Warn("Suppressing unobserved GRPC Http2 connection exception");
+                e.SetObserved();
+                return;
+            }
             ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
         }
 
