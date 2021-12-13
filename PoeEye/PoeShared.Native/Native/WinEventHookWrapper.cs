@@ -37,7 +37,7 @@ namespace PoeShared.Native
             this.hookArgs = hookArgs;
             this.bgScheduler = bgScheduler;
             eventDelegate = WinEventDelegateProc;
-            Log.Debug($"New WinEvent hook created, args: {hookArgs}");
+            Log.Debug(() => $"New WinEvent hook created, args: {hookArgs}");
 
             Disposable.Create(() => Log.Info($"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
             Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
@@ -70,7 +70,7 @@ namespace PoeShared.Native
                 
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"[{hookArgs}] Event hook triggered: {data}");
+                    Log.Debug(() => $"[{hookArgs}] Event hook triggered: {data}");
                 }
                 whenWindowEventTriggered.OnNext(data);
             }
@@ -84,7 +84,7 @@ namespace PoeShared.Native
         {
             Log.Info($"Starting up event sink, args: {hookArgs}");
             RegisterHook().AddTo(Anchors);
-            Log.Debug($"Initializing event sink, args: {hookArgs}");
+            Log.Debug(() => $"Initializing event sink, args: {hookArgs}");
             EventLoop.RunWindowEventLoop(Log);
         }
 
@@ -100,7 +100,7 @@ namespace PoeShared.Native
                 hookArgs.ProcessId,
                 hookArgs.ThreadId,
                 hookArgs.Flags);
-            Log.Debug($"Hook handle(args: {hookArgs}): {hook.DangerousGetHandle().ToHexadecimal()}");
+            Log.Debug(() => $"Hook handle(args: {hookArgs}): {hook.DangerousGetHandle().ToHexadecimal()}");
 
             if (hook.IsInvalid)
             {
@@ -109,7 +109,7 @@ namespace PoeShared.Native
 
             return Disposable.Create(() =>
             {
-                Log.Debug($"Unregistering hook (args: {hookArgs}) {hook.DangerousGetHandle().ToHexadecimal()}");
+                Log.Debug(() => $"Unregistering hook (args: {hookArgs}) {hook.DangerousGetHandle().ToHexadecimal()}");
                 hook.DangerousRelease();
             });
         }

@@ -36,7 +36,7 @@ namespace PoeShared.Squirrel.Updater
                     .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
                 try
                 {
-                    Log.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
+                    Log.Debug(() => $"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
                     await wc.DownloadFileTaskAsync(url, targetFile);
                     progress(100);
                 }
@@ -52,7 +52,7 @@ namespace PoeShared.Squirrel.Updater
         {
             using (var wc = CreateClient())
             {
-                Log.Debug($"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
+                Log.Debug(() => $"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
 
                 return await wc.DownloadDataTaskAsync(url);
             }

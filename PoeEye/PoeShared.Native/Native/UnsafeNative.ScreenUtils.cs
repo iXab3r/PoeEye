@@ -201,12 +201,12 @@ namespace PoeShared.Native
 
         public static bool SetForegroundWindow(IntPtr hwnd)
         {
-            Log.Debug($"[{hwnd.ToHexadecimal()}] Setting foreground window");
+            Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Setting foreground window");
 
             var foregroundWindow = GetForegroundWindow();
             if (hwnd == foregroundWindow)
             {
-                Log.Debug($"[{hwnd.ToHexadecimal()}] Window is already foreground");
+                Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Window is already foreground");
                 return true;
             }
 
@@ -223,11 +223,11 @@ namespace PoeShared.Native
             {
                 if (foregroundThreadId != appThread)
                 {
-                    Log.Debug($"[{hwnd.ToHexadecimal()}] Attaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
+                    Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Attaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
                     User32.AttachThreadInput(appThread, foregroundThreadId, true);
                 }
 
-                Log.Debug($"[{hwnd.ToHexadecimal()}] Requesting window activation");
+                Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Requesting window activation");
                 Win32ErrorCode error;
 
                 if (!BringWindowToTop(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
@@ -248,7 +248,7 @@ namespace PoeShared.Native
             {
                 if (foregroundThreadId != appThread)
                 {
-                    Log.Debug($"[{hwnd.ToHexadecimal()}] Detaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
+                    Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Detaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
                     User32.AttachThreadInput(appThread, foregroundThreadId, false);
                 }
             }

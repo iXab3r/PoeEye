@@ -27,7 +27,7 @@ namespace WindowsHook.WinApi
         public HookProcedureHandle(User32.SafeHookHandle hookHandle)
             : base(true)
         {
-            Log.Debug($"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
+            Log.Debug(() => $"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
             this.hookHandle = hookHandle;
             if (hookHandle.IsClosed || hookHandle.IsInvalid)
             {
@@ -47,13 +47,13 @@ namespace WindowsHook.WinApi
 
             if (hookHandle.IsInvalid)
             {
-                Log.Debug($"Hook is invalid");
+                Log.Debug(() => $"Hook is invalid");
                 return false;
             }
             
             if (hookHandle.IsClosed)
             {
-                Log.Debug($"Hook is already disposed");
+                Log.Debug(() => $"Hook is already disposed");
                 return true;
             }
             
@@ -63,7 +63,7 @@ namespace WindowsHook.WinApi
             hookHandle.Dispose();
             if (hookHandle.IsClosed)
             {
-                Log.Debug($"Successfully removed hook");
+                Log.Debug(() => $"Successfully removed hook");
                 return true;
             }
             Log.Warn($"Failed to remove hook"); // throw here ? 

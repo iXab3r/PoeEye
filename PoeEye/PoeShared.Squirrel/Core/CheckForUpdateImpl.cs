@@ -74,12 +74,12 @@ namespace PoeShared.Squirrel.Core
             string releaseFile;
             if (Utility.IsHttpUrl(updateUrlOrPath))
             {
-                Log.Debug($"Loading releases from remote path {updateUrlOrPath}");
+                Log.Debug(() => $"Loading releases from remote path {updateUrlOrPath}");
                 releaseFile = await LoadRemoteReleases(updateUrlOrPath, urlDownloader, latestLocalRelease);
             }
             else
             {
-                Log.Debug($"Loading releases from local path {updateUrlOrPath}");
+                Log.Debug(() => $"Loading releases from local path {updateUrlOrPath}");
                 releaseFile = await LoadLocalReleases(updateUrlOrPath);
             }
             progressCallback(33);

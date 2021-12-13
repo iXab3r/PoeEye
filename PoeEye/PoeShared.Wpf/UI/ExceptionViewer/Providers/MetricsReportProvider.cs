@@ -34,7 +34,7 @@ namespace PoeShared.UI.Providers
                 var destinationFileName = Path.Combine(outputDirectory.FullName, logFile.Name);
                 try
                 {
-                    Log.Debug($"Copying {logFile.FullName} ({logFile.Length}b) to {destinationFileName}");
+                    Log.Debug(() => $"Copying {logFile.FullName} ({logFile.Length}b) to {destinationFileName}");
                     logFile.CopyTo(destinationFileName, true);
                     new ExceptionReportItem
                     {

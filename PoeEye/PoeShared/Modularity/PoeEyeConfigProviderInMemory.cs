@@ -24,7 +24,7 @@ namespace PoeShared.Modularity
             
             if (appArguments.IsDebugMode)
             {
-                Log.Debug($"[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
+                Log.Debug(() => $"[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
             }
             else
             {
@@ -41,7 +41,7 @@ namespace PoeShared.Modularity
 
         public void Reload()
         {
-            Log.Debug($"[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
+            Log.Debug(() => $"[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
 
             loadedConfigs.Clear();
 

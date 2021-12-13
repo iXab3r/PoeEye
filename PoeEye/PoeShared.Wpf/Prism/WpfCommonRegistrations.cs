@@ -61,9 +61,9 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);
             
-            Log.Debug($"Initializing application: {Application.Current}");
+            Log.Debug(() => $"Initializing application: {Application.Current}");
             var accessor = Container.Resolve<IApplicationAccessor>();
-            Log.Debug($"Application accessor: {accessor}");
+            Log.Debug(() => $"Application accessor: {accessor}");
 
             Container.RegisterOverlayController(WellKnownWindows.AllWindows, WellKnownWindows.AllWindows);
 
@@ -84,13 +84,13 @@ namespace PoeShared.Prism
         private void InitializeSchedulers()
         {
             var defaultDispatcher = Dispatcher.CurrentDispatcher;
-            Log.Debug($"Dispatcher set to: {defaultDispatcher}");
+            Log.Debug(() => $"Dispatcher set to: {defaultDispatcher}");
             var syncContext = new DispatcherSynchronizationContext(defaultDispatcher);
-            Log.Debug($"Synchronization context: {syncContext}");
+            Log.Debug(() => $"Synchronization context: {syncContext}");
             SynchronizationContext.SetSynchronizationContext(syncContext);
             var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            Log.Debug($"Task scheduler: {taskScheduler}");
-            Log.Debug($"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
+            Log.Debug(() => $"Task scheduler: {taskScheduler}");
+            Log.Debug(() => $"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
             Container
                 .RegisterSingleton<ISchedulerProvider>(x =>
                 {
@@ -106,13 +106,13 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IScheduler>(WellKnownSchedulers.UI, x =>
                 {
                     var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
-                    Log.Debug($"Initializing {WellKnownSchedulers.UI} scheduler on {uiDispatcher}");
+                    Log.Debug(() => $"Initializing {WellKnownSchedulers.UI} scheduler on {uiDispatcher}");
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Normal);
                 })
                 .RegisterSingleton<IScheduler>(WellKnownSchedulers.UIIdle, x =>
                 {
                     var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
-                    Log.Debug($"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
+                    Log.Debug(() => $"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Background);
                 })
                 .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler)

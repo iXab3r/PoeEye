@@ -81,17 +81,17 @@ namespace PoeShared.UI
             {
                 throw new InvalidOperationException($"Report consumer is already configured to {this.reportHandler}");
             }
-            Log.Debug($"Setting report consumer to {this.reportHandler}");
+            Log.Debug(() => $"Setting report consumer to {this.reportHandler}");
             this.reportHandler = reportHandler;
         }
 
         public IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider)
         {
-            Log.Debug($"Registering new report item provider: {reportItemProvider}");
+            Log.Debug(() => $"Registering new report item provider: {reportItemProvider}");
             reportItemProviders.Add(reportItemProvider);
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing report item provider: {reportItemProvider}");
+                Log.Debug(() => $"Removing report item provider: {reportItemProvider}");
                 reportItemProviders.Remove(reportItemProvider);
             });
         }

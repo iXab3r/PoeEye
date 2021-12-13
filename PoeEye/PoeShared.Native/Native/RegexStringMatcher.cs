@@ -23,7 +23,7 @@ namespace PoeShared.Native
         {
             if (value == null)
             {
-                Log.Debug($"Provided Value is not set, resetting to default - empty string");
+                Log.Debug(() => $"Provided Value is not set, resetting to default - empty string");
                 value = string.Empty;
             }
 
@@ -38,7 +38,7 @@ namespace PoeShared.Native
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Value '{value}' was found in blacklist: {blacklist.DumpToString()}");
+                    Log.Debug(() => $"Value '{value}' was found in blacklist: {blacklist.DumpToString()}");
                 }
 
                 return false;
@@ -50,7 +50,7 @@ namespace PoeShared.Native
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Value '{value}' was found in whitelist: {whitelist.DumpToString()}");
+                    Log.Debug(() => $"Value '{value}' was found in whitelist: {whitelist.DumpToString()}");
                 }
 
                 return true;
@@ -70,7 +70,7 @@ namespace PoeShared.Native
                 {
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug($"Value '{value}' was found in lazy whitelist: '{lazyRegexRaw}'");
+                        Log.Debug(() => $"Value '{value}' was found in lazy whitelist: '{lazyRegexRaw}'");
                     }
 
                     return true;
@@ -78,7 +78,7 @@ namespace PoeShared.Native
 
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Failed to match value '{value}' in lazy whitelist: '{lazyRegexRaw}'");
+                    Log.Debug(() => $"Failed to match value '{value}' in lazy whitelist: '{lazyRegexRaw}'");
                 }
             }
 

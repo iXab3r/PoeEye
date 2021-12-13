@@ -24,12 +24,12 @@ namespace PoeShared.Services
             var counterAfterIncrement = Interlocked.Increment(ref counter);
             if (!wasPaused)
             {
-                Log.Debug($"[{this}] Marked as busy: {counterAfterIncrement}");
+                Log.Debug(() => $"[{this}] Marked as busy: {counterAfterIncrement}");
                 RaisePropertyChanged(nameof(IsBusy));
             }
             else
             {
-                Log.Debug($"[{this}] Already in use: {counterAfterIncrement}");
+                Log.Debug(() => $"[{this}] Already in use: {counterAfterIncrement}");
             }
 
             return Disposable.Create(() =>
@@ -37,12 +37,12 @@ namespace PoeShared.Services
                 var counterAfterDecrement = Interlocked.Decrement(ref counter);
                 if (!IsBusy)
                 {
-                    Log.Debug($"[{this}] Released: {counterAfterDecrement}");
+                    Log.Debug(() => $"[{this}] Released: {counterAfterDecrement}");
                     RaisePropertyChanged(nameof(IsBusy));
                 }
                 else
                 {
-                    Log.Debug($"[{this}] Still in use: {counterAfterDecrement}");
+                    Log.Debug(() => $"[{this}] Still in use: {counterAfterDecrement}");
                 }
             });
         }

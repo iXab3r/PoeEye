@@ -86,8 +86,8 @@ namespace PoeShared
                 throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
             }
 
-            Log.Debug($"Arguments: {arguments.DumpToString()}");
-            Log.Debug($"Parsed args: {this.DumpToText()}");
+            Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
+            Log.Debug(() => $"Parsed args: {this.DumpToText()}");
         }
 
         public bool IsWindows { get; }
@@ -115,7 +115,7 @@ namespace PoeShared
 
         private static bool Parse(AppOptions instance, string[] args)
         {
-            Log.Debug($"Parsing command line args: {args.DumpToString()}");
+            Log.Debug(() => $"Parsing command line args: {args.DumpToString()}");
             var parser = new Parser(
                 settings =>
                 {
@@ -123,9 +123,9 @@ namespace PoeShared
                     settings.IgnoreUnknownArguments = true;
                     settings.ParsingCulture = CultureInfo.InvariantCulture;
                 });
-            Log.Debug($"Command line parser settings: {parser.Settings.DumpToTextRaw()}");
+            Log.Debug(() => $"Command line parser settings: {parser.Settings.DumpToTextRaw()}");
             var result = parser.ParseArguments<AppOptions>(args ?? new string[0]);
-            Log.Debug($"Command line parsing result: {result.Tag}, type: {result}");
+            Log.Debug(() => $"Command line parsing result: {result.Tag}, type: {result}");
             if (result.Tag == ParserResultType.Parsed && result is Parsed<AppOptions> parsedResult)
             {
                 parsedResult.Value.CopyPropertiesTo(instance);

@@ -20,7 +20,7 @@ namespace PoeShared.Services
 
         public void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
         {
-            Log.Debug($"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+            Log.Debug(() => $"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
             var processStartInfo = PrepareProcessStartInfo();
             var args = new List<string>
             {
@@ -38,15 +38,15 @@ namespace PoeShared.Services
                 throw new FileNotFoundException($"Could not add/update archive {outputFileName} - file not found after operation");
             }
             
-            Log.Debug($"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
+            Log.Debug(() => $"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
         }
 
         public void ExtractArchive(FileInfo inputFileName, DirectoryInfo outputDirectory)
         {
-            Log.Debug($"Extracting archive {inputFileName} to {outputDirectory}");
+            Log.Debug(() => $"Extracting archive {inputFileName} to {outputDirectory}");
             if (!outputDirectory.Exists)
             {
-                Log.Debug($"Creating output directory {outputDirectory}");
+                Log.Debug(() => $"Creating output directory {outputDirectory}");
                 outputDirectory.Create();
             }
 
@@ -60,7 +60,7 @@ namespace PoeShared.Services
             processStartInfo.Arguments = args.JoinStrings(" ");
             ProcessHelper.RunCmd(processStartInfo);
             
-            Log.Debug($"Output directory contains following files: {outputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+            Log.Debug(() => $"Output directory contains following files: {outputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
         }
 
         private static ProcessStartInfo PrepareProcessStartInfo()

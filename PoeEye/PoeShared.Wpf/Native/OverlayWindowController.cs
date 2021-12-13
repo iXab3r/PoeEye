@@ -62,10 +62,10 @@ namespace PoeShared.Native
                         OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowHandle),
                         IsEnabled
                     })
-                .Do(x => Log.Debug($"Active window has changed: {x}"))
+                .Do(x => Log.Debug(() => $"Active window has changed: {x}"))
                 .Select(x => (x.WindowIsActive || x.OverlayIsActive) && IsEnabled)
                 .DistinctUntilChanged()
-                .Do(x => Log.Debug($"Sending SetVisibility({x}) to window scheduler"))
+                .Do(x => Log.Debug(() => $"Sending SetVisibility({x}) to window scheduler"))
                 .ObserveOn(uiScheduler)
                 .SubscribeSafe(SetVisibility, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -149,7 +149,7 @@ namespace PoeShared.Native
                 .ObserveOn(uiScheduler)
                 .SubscribeSafe(reason =>
                 {
-                    logger.Debug($"Processing visibility change, reason: {reason}");
+                    logger.Debug(() => $"Processing visibility change, reason: {reason}");
                     HandleVisibilityChange(logger, overlayWindow, viewModel);
                 }, Log.HandleUiException)
                 .AddTo(childAnchors);
@@ -183,7 +183,7 @@ namespace PoeShared.Native
             
             Disposable.Create(() =>
             {
-                logger.Debug($"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
+                logger.Debug(() => $"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
                 windows.Remove(overlayWindow);
             }).AddTo(childAnchors);
 
@@ -210,21 +210,21 @@ namespace PoeShared.Native
         {
             if (IsVisible && viewModel.IsVisible)
             {
-                logger.Debug($"Showing overlay {overlayWindow}");
+                logger.Debug(() => $"Showing overlay {overlayWindow}");
                 if (overlayWindow.Visibility != Visibility.Visible)
                 {
-                    logger.Debug($"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
+                    logger.Debug(() => $"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
                     overlayWindow.Visibility = Visibility.Visible;
                 }
 
                 WindowsServices.ShowInactiveTopmost(overlayWindow.WindowHandle, viewModel.NativeBounds);
             } else if (overlayWindow.WindowHandle == IntPtr.Zero)
             {
-                logger.Debug($"Overlay is not initialized yet");
+                logger.Debug(() => $"Overlay is not initialized yet");
             }
             else
             {
-                logger.Debug($"Hiding overlay (tracker {windowTracker})");
+                logger.Debug(() => $"Hiding overlay (tracker {windowTracker})");
 
                 WindowsServices.HideWindow(overlayWindow.WindowHandle);
             }
@@ -243,7 +243,7 @@ namespace PoeShared.Native
                 return;
             }
 
-            Log.Debug($"Overlay controller IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
+            Log.Debug(() => $"Overlay controller IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
             IsVisible = isVisible;
         }
 

@@ -54,7 +54,7 @@ namespace PoeShared.Native
             
                 var graphics = Graphics.FromHdc(screenDc.DangerousGetHandle());
                 var dpi = GetDpi(graphics);
-                Log.Debug($"Monitor for window {windowHandle.ToHexadecimal()}: {GetMonitorInfo(windowHandle)}");
+                Log.Debug(() => $"Monitor for window {windowHandle.ToHexadecimal()}: {GetMonitorInfo(windowHandle)}");
                 return CalculateScreenBounds(screen, dpi);
             }
         }
@@ -129,9 +129,9 @@ namespace PoeShared.Native
         public static void ShowWindow(Window mainWindow)
         {
             Guard.ArgumentNotNull(() => mainWindow);
-            Log.Debug($"ShowWindow command executed, windowState: {mainWindow.WindowState}");
+            Log.Debug(() => $"ShowWindow command executed, windowState: {mainWindow.WindowState}");
 
-            Log.Debug($"Activating main window, title: '{mainWindow.Title}' {new Point(mainWindow.Left, mainWindow.Top)}, isActive: {mainWindow.IsActive}, state: {mainWindow.WindowState}, topmost: {mainWindow.Topmost}, style:{mainWindow.WindowStyle}");
+            Log.Debug(() => $"Activating main window, title: '{mainWindow.Title}' {new Point(mainWindow.Left, mainWindow.Top)}, isActive: {mainWindow.IsActive}, state: {mainWindow.WindowState}, topmost: {mainWindow.Topmost}, style:{mainWindow.WindowStyle}");
 
             if (mainWindow.Topmost)
             {
@@ -142,7 +142,7 @@ namespace PoeShared.Native
             var mainWindowHelper = new WindowInteropHelper(mainWindow);
             var mainWindowHandle = mainWindowHelper.EnsureHandle();
 
-            Log.Debug($"Showing main window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
+            Log.Debug(() => $"Showing main window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
             mainWindow.Show();
 
             if (mainWindow.WindowState == WindowState.Minimized)
@@ -152,10 +152,10 @@ namespace PoeShared.Native
 
             if (mainWindowHandle != IntPtr.Zero && UnsafeNative.GetForegroundWindow() != mainWindowHandle)
             {
-                Log.Debug($"Setting foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
+                Log.Debug(() => $"Setting foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
                 if (!UnsafeNative.SetForegroundWindow(mainWindowHandle))
                 {
-                    Log.Debug($"Failed to set foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}");
+                    Log.Debug(() => $"Failed to set foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}");
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentNotNull(() => mainWindow);
 
-            Log.Debug($"HideWindow command executed, windowState: {mainWindow.WindowState}");
+            Log.Debug(() => $"HideWindow command executed, windowState: {mainWindow.WindowState}");
             mainWindow.Hide();
         }
     }

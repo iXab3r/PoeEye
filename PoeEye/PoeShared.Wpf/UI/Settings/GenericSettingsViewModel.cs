@@ -124,7 +124,7 @@ namespace PoeShared.UI
         private void ReloadConfig(ISettingsViewModel viewModel)
         {
             var configType = GetConfigType(viewModel);
-            Log.Debug($"[PoeSettingsViewModel.ReloadConfig] Loading viewModel {viewModel} (configType {configType}");
+            Log.Debug(() => $"[PoeSettingsViewModel.ReloadConfig] Loading viewModel {viewModel} (configType {configType}");
             var invocationMethod = reloadConfigByType.GetOrAdd(configType, x => ReloadConfigMethod.MakeGenericMethod(x));
             invocationMethod.Invoke(this, new object[] {viewModel});
         }
@@ -132,7 +132,7 @@ namespace PoeShared.UI
         private void SaveConfig(ISettingsViewModel viewModel)
         {
             var configType = GetConfigType(viewModel);
-            Log.Debug($"[PoeSettingsViewModel.SaveConfig] Saving viewModel {viewModel} (configType {configType}");
+            Log.Debug(() => $"[PoeSettingsViewModel.SaveConfig] Saving viewModel {viewModel} (configType {configType}");
             var invocationMethod = saveConfigByType.GetOrAdd(configType, x => SaveConfigMethod.MakeGenericMethod(x));
             invocationMethod.Invoke(this, new object[] {viewModel});
         }

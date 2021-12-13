@@ -33,7 +33,7 @@ namespace PoeShared.Scaffolding.WPF
                     var msg = (User32.WindowMessage) msgRaw;
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug($"[{prefix}] Message: {msg} ({msgRaw.ToHexadecimal()} = {msgRaw})");
+                        Log.Debug(() => $"[{prefix}] Message: {msg} ({msgRaw.ToHexadecimal()} = {msgRaw})");
                     }
                     return IntPtr.Zero;
                 });

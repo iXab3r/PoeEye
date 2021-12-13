@@ -70,7 +70,7 @@ namespace PoeShared.Bindings
         public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor, Expression<Func<TSource, bool>> condition)
         {
             Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger("ExpressionWatcher").WithSuffix(watcherId).WithSuffix(ToString);
-            Log.Debug($"Expression created, source: {sourceAccessor}, condition: {condition}");
+            Log.Debug(() => $"Expression created, source: {sourceAccessor}, condition: {condition}");
 
             this.sourceAccessor = sourceAccessor;
             this.condition = condition;
@@ -101,13 +101,13 @@ namespace PoeShared.Bindings
                 {
                     if (sourceBinderAnchors.Disposable != null && x.Previous != null)
                     {
-                        Log.Debug($"Unbinding from existing source {x.Previous}");
+                        Log.Debug(() => $"Unbinding from existing source {x.Previous}");
                         sourceBinderAnchors.Disposable = default;
                     }
 
                     if (x.Current != null)
                     {
-                        Log.Debug($"Binding to source {x.Current}");
+                        Log.Debug(() => $"Binding to source {x.Current}");
                     }
                     Error = default;
                     sourceBinderAnchors.Disposable = sourceBinder.Attach(x.Current);
@@ -196,7 +196,7 @@ namespace PoeShared.Bindings
                 throw new InvalidOperationException($"Source is not set, could not set value {newValue}");
             }
 
-            Log.Debug($"Updating value: {Value} => {newValue}");
+            Log.Debug(() => $"Updating value: {Value} => {newValue}");
             try
             {
                 Error = default;
@@ -204,7 +204,7 @@ namespace PoeShared.Bindings
                 var current = Value;
                 if (EqualityComparer<TProperty>.Default.Equals(newValue, current))
                 {
-                    Log.Debug($"Updated value to {Value}");
+                    Log.Debug(() => $"Updated value to {Value}");
                 }
                 else
                 {

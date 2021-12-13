@@ -36,7 +36,7 @@ namespace PoeShared.Native
         {
             try
             {
-                Log.Debug($"Calling AllowSetForegroundWindow(pid: {CurrentProcessId})");
+                Log.Debug(() => $"Calling AllowSetForegroundWindow(pid: {CurrentProcessId})");
                 Win32ErrorCode error;
                 if (!AllowSetForegroundWindow(CurrentProcessId) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
                 {
@@ -44,7 +44,7 @@ namespace PoeShared.Native
                     throw new Win32Exception(error, $"Failed to {nameof(AllowSetForegroundWindow)}");
                 }
 
-                Log.Debug($"Successfully executed AllowSetForegroundWindow(pid: {CurrentProcessId})");
+                Log.Debug(() => $"Successfully executed AllowSetForegroundWindow(pid: {CurrentProcessId})");
             }
             catch (Exception e)
             {

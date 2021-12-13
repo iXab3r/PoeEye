@@ -30,7 +30,7 @@ namespace PoeShared.Dialogs.Services
 
         public async Task<MessageBoxElement> ShowDialog(string title, object content, params MessageBoxElement[] buttons)
         {
-            Log.Debug($"Showing message box {new {title, content, buttons}}");
+            Log.Debug(() => $"Showing message box {new {title, content, buttons}}");
 
             using var newMessageBox = messageBoxFactory.Create();
             newMessageBox.Content = content;
@@ -62,7 +62,7 @@ namespace PoeShared.Dialogs.Services
             params MessageBoxElement[] buttons
         )
         {
-            Log.Debug($"Showing message box {new {title, content, contentHint, isReadOnly, buttons}}");
+            Log.Debug(() => $"Showing message box {new {title, content, contentHint, isReadOnly, buttons}}");
 
             using var newMessageBox = textMessageBoxFactory.Create();
             newMessageBox.Content = content;

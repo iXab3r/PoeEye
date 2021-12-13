@@ -32,7 +32,7 @@ namespace PoeShared.Modularity
                     IsBackground = true,
                     Priority = ThreadPriority.Normal
                 };
-                Log.Debug($"Setting apartment state for thread {schedulerThread.Name}");
+                Log.Debug(() => $"Setting apartment state for thread {schedulerThread.Name}");
                 schedulerThread.SetApartmentState(ApartmentState.STA);
                 Log.Info($"Scheduler {name} with thread {schedulerThread.Name} initialized");
                 return schedulerThread;

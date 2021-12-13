@@ -39,11 +39,11 @@ namespace PoeShared.RegionSelector.Services
             regionSelector.NativeBounds = workingArea;
             using var regionSelectorAnchors = regionSelector.Show();
 
-            Log.Debug($"Showing new selector window: {regionSelector}");
+            Log.Debug(() => $"Showing new selector window: {regionSelector}");
             viewController.Minimize();
             try
             {
-                Log.Debug($"Awaiting for selection result from {regionSelector}");
+                Log.Debug(() => $"Awaiting for selection result from {regionSelector}");
                 return await regionSelector.StartSelection(minSelection);
             }
             catch (Exception ex)

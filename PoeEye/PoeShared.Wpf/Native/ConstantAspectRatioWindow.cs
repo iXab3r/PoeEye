@@ -126,7 +126,7 @@ namespace PoeShared.Native
         {
             Log.Debug(() => "Native window initialized");
             WindowHandle = new WindowInteropHelper(this).Handle; // should be already available here
-            Log.Debug($"Initialized native window handle");
+            Log.Debug(() => $"Initialized native window handle");
             if (WindowHandle == IntPtr.Zero)
             {
                 throw new ApplicationException("Window handle must be initialized at this point");

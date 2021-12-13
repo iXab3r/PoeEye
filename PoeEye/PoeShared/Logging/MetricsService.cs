@@ -38,7 +38,7 @@ namespace PoeShared.Logging
 
         public void Initialize(IAppArguments appArguments)
         {
-            Log.Debug($"Initializing metrics service, args: {appArguments}");
+            Log.Debug(() => $"Initializing metrics service, args: {appArguments}");
             if (this.appArguments != default)
             {
                 throw new InvalidOperationException($"Service is already initialized");

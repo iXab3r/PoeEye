@@ -60,16 +60,16 @@ namespace PoeShared.Tests.Native
             {
                 try
                 {
-                    Log.Debug($"Creating form for hooking keyboard and mouse events");
+                    Log.Debug(() => $"Creating form for hooking keyboard and mouse events");
                     hookForm = new HookForm();
-                    Log.Debug($"Running message loop in hook form");
+                    Log.Debug(() => $"Running message loop in hook form");
                     hookForm.Loaded += delegate
                     {
-                        Log.Debug($"Hook form is loaded");
+                        Log.Debug(() => $"Hook form is loaded");
                         hookFormReady.Set();
                     };
                     var result = hookForm.ShowDialog();
-                    Log.Debug($"Message loop terminated gracefully, dialog result: {result}");
+                    Log.Debug(() => $"Message loop terminated gracefully, dialog result: {result}");
                 }
                 catch (Exception e)
                 {
@@ -77,7 +77,7 @@ namespace PoeShared.Tests.Native
                 }
                 finally
                 {
-                    Log.Debug($"Hook form thread terminated");
+                    Log.Debug(() => $"Hook form thread terminated");
                 }
                 
             })
@@ -99,10 +99,10 @@ namespace PoeShared.Tests.Native
                     {
                         var wrapper = new HookWrapper();
                         wrappers.Add(wrapper);
-                        Log.Debug($"Created {wrapper}");
+                        Log.Debug(() => $"Created {wrapper}");
                         wrappersCreated[idx].Set();
                         startEvent.WaitOne();
-                        Log.Debug($"Starting {wrapper}");
+                        Log.Debug(() => $"Starting {wrapper}");
                         wrapper.Start();
                         wrappersReady[idx].Set();
                     });
@@ -159,7 +159,7 @@ namespace PoeShared.Tests.Native
 
                 Log.Info("HookForm loaded, applying style...");
                 var hwnd = new WindowInteropHelper(this).EnsureHandle();
-                Log.Debug($"HookForm handle: {hwnd.ToHexadecimal()}");
+                Log.Debug(() => $"HookForm handle: {hwnd.ToHexadecimal()}");
                 UnsafeNative.HideSystemMenu(hwnd);
                 UnsafeNative.SetWindowExTransparent(hwnd);
                 UnsafeNative.SetWindowRgn(hwnd, Rectangle.Empty);
@@ -195,7 +195,7 @@ namespace PoeShared.Tests.Native
 
             private void Hook2OnKeyDown(object? sender, KeyEventArgs e)
             {
-                Log.Debug($"[{HookId}] Key down: {e.KeyCode}");
+                Log.Debug(() => $"[{HookId}] Key down: {e.KeyCode}");
                 Events.Enqueue(e);
             }
 

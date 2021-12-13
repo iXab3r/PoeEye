@@ -69,7 +69,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug($"Failed to retrieve native process path for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                        Log.Debug(() => $"Failed to retrieve native process path for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
                         nativeProcessPath = default;
                     }
                     
@@ -81,7 +81,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug($"Failed to retrieve process times information for process Id {ProcessId}, window: {Title}, class: {Class}, using native path: {nativeProcessPath}", ex);
+                        Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}, window: {Title}, class: {Class}, using native path: {nativeProcessPath}", ex);
                         processPath = nativeProcessPath;
                     }
                     
@@ -101,7 +101,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug($"Failed to retrieve process name for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                        Log.Debug(() => $"Failed to retrieve process name for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
                         processName = default;
                     }
 
@@ -112,7 +112,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug($"Failed to retrieve command linefor process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                        Log.Debug(() => $"Failed to retrieve command linefor process Id {ProcessId}, window: {Title}, class: {Class}", ex);
                         commandLine = default;
                     }
 
@@ -123,7 +123,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug($"Failed to parse command line args for process Id {ProcessId}, window: {Title}, class: {Class}, command line: {commandLine}", ex);
+                        Log.Debug(() => $"Failed to parse command line args for process Id {ProcessId}, window: {Title}, class: {Class}, command line: {commandLine}", ex);
                         processArgs = default;
                     }
 
@@ -137,7 +137,7 @@ namespace PoeShared.Native
                         }
                         catch (Win32Exception ex)
                         {
-                            Log.Debug($"Failed to retrieve process times information for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                            Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
                         }
                     }
                     
@@ -149,7 +149,7 @@ namespace PoeShared.Native
                         }
                         catch (Win32Exception ex)
                         {
-                            Log.Debug($"Failed to retrieve native process times information for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                            Log.Debug(() => $"Failed to retrieve native process times information for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
                         }
                     }
                     
@@ -157,7 +157,7 @@ namespace PoeShared.Native
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug($"Failed to wrap Process with Id {ProcessId}, window: {Title}, class: {Class} - {ex.Message} ({ex.GetType().Name})");
+                    Log.Debug(() => $"Failed to wrap Process with Id {ProcessId}, window: {Title}, class: {Class} - {ex.Message} ({ex.GetType().Name})");
                 }
                 return default;
             });

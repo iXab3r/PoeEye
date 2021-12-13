@@ -275,7 +275,7 @@ namespace PoeShared.Squirrel.Scaffolding
         {
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(directoryPath), "!string.IsNullOrEmpty(directoryPath)");
 
-            Log.Debug($"Starting to delete folder: {directoryPath}");
+            Log.Debug(() => $"Starting to delete folder: {directoryPath}");
 
             if (!Directory.Exists(directoryPath))
             {
@@ -318,7 +318,7 @@ namespace PoeShared.Squirrel.Scaffolding
 
             await Task.WhenAll(fileOperations, directoryOperations);
 
-            Log.Debug($"Now deleting folder: {directoryPath}");
+            Log.Debug(() => $"Now deleting folder: {directoryPath}");
             File.SetAttributes(directoryPath, FileAttributes.Normal);
 
             try

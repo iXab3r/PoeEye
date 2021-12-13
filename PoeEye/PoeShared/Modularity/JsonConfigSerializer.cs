@@ -162,7 +162,7 @@ namespace PoeShared.Modularity
                 return defaultItem;
             }
 
-            log.Debug($"Returning value: {metadata.Value}");
+            log.Debug(() => $"Returning value: {metadata.Value}");
             return metadata.Value;
         }
     }

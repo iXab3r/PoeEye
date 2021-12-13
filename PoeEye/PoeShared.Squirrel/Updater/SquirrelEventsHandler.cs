@@ -19,19 +19,19 @@ namespace PoeShared.Squirrel.Updater
 
         private void OnAppUninstall(Version appVersion)
         {
-            Log.Debug($"Uninstalling v{appVersion}...");
+            Log.Debug(() => $"Uninstalling v{appVersion}...");
             applicationAccessor.Terminate(0);
         }
 
         private void OnAppUpdate(Version appVersion)
         {
-            Log.Debug($"Updating v{appVersion}...");
+            Log.Debug(() => $"Updating v{appVersion}...");
             applicationAccessor.Terminate(0);
         }
 
         private void OnInitialInstall(Version appVersion)
         {
-            Log.Debug($"App v{appVersion} installed");
+            Log.Debug(() => $"App v{appVersion} installed");
             applicationAccessor.Terminate(0);
         }
 

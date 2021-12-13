@@ -172,7 +172,7 @@ namespace PoeShared.Tests.Native
 
             Task.Run(() =>
             {
-                Log.Debug($"Creating {hooksCount} hooks");
+                Log.Debug(() => $"Creating {hooksCount} hooks");
 
                 Enumerable.Range(0, hooksCount).AsParallel()
                     .WithDegreeOfParallelism(hooksCount)
@@ -266,11 +266,11 @@ namespace PoeShared.Tests.Native
             public IDisposable Create()
             {
                 var updatedSubscriptions = Interlocked.Increment(ref subcriptions);
-                Log.Debug($"Resource created, count: {updatedSubscriptions}");
+                Log.Debug(() => $"Resource created, count: {updatedSubscriptions}");
                 return Disposable.Create(() =>
                 {
                     var updatedSubscriptions = Interlocked.Decrement(ref subcriptions);
-                    Log.Debug($"Resource Disposed, count: {updatedSubscriptions}");
+                    Log.Debug(() => $"Resource Disposed, count: {updatedSubscriptions}");
                 });
             }
         }

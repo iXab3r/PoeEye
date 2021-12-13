@@ -87,7 +87,7 @@ namespace WindowsHook.WinApi
             var process = Process.GetCurrentProcess();
             var mainModule = process.MainModule ?? throw new NotSupportedException($"Failed to get MainModule in {process}");
             BaseAddress = mainModule.BaseAddress;
-            SharedLog.Debug($"Application base address: {BaseAddress.ToHexadecimal()}");
+            SharedLog.Debug(() => $"Application base address: {BaseAddress.ToHexadecimal()}");
         }
 
         protected HookResult(User32.WindowsHookType hookType)
@@ -98,7 +98,7 @@ namespace WindowsHook.WinApi
             HookType = hookType;
             NativeThreadId = ThreadNativeMethods.GetCurrentThreadId();
             ManagedThreadId = $"{Thread.CurrentThread.ManagedThreadId}-{Thread.CurrentThread.Name}";
-            Log.Debug($"Initializing new hook of type {hookType}");
+            Log.Debug(() => $"Initializing new hook of type {hookType}");
             
             Disposable.Create(() =>
             {

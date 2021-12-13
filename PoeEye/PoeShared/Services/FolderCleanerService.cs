@@ -35,7 +35,7 @@ namespace PoeShared.Services
                     directoriesSource.Connect().CountChanged().ToUnit())
                 .Select(_ =>
                 {
-                    Log.Debug($"Cleanup period updated to {CleanupTimeout} with TTL set to {FileTimeToLive} with {directoriesSource.Count} target directories");
+                    Log.Debug(() => $"Cleanup period updated to {CleanupTimeout} with TTL set to {FileTimeToLive} with {directoriesSource.Count} target directories");
                     return CleanupTimeout > TimeSpan.Zero && FileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? ObservableEx.BlockingTimer(CleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
                 })
                 .Switch()
@@ -129,11 +129,11 @@ namespace PoeShared.Services
 
         public IDisposable AddDirectory(DirectoryInfo directoryInfo)
         {
-            Log.Debug($"Adding directory {directoryInfo} to directory list: {directoriesSource.Items.DumpToString()}");
+            Log.Debug(() => $"Adding directory {directoryInfo} to directory list: {directoriesSource.Items.DumpToString()}");
             directoriesSource.Add(directoryInfo);
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing directory {directoryInfo} from directory list: {directoriesSource.Items.DumpToString()}");
+                Log.Debug(() => $"Removing directory {directoryInfo} from directory list: {directoriesSource.Items.DumpToString()}");
                 directoriesSource.Remove(directoryInfo);
             });
         }

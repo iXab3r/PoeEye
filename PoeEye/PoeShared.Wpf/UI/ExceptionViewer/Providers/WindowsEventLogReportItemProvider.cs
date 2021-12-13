@@ -24,7 +24,7 @@ namespace PoeShared.UI.Providers
 
         public IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory)
         {
-            Log.Debug($"Preparing Windows EventLog records, output directory: {outputDirectory}");
+            Log.Debug(() => $"Preparing Windows EventLog records, output directory: {outputDirectory}");
             yield return PrepareItem("Application", outputDirectory, TimeSpan.FromDays(1));
             yield return PrepareItem("System", outputDirectory, TimeSpan.FromDays(1));
             Log.Debug("Successfully prepared Windows EventLog records");
@@ -35,7 +35,7 @@ namespace PoeShared.UI.Providers
             var destinationFileName = Path.Combine(outputDirectory.FullName, $"EventLog_{logName}.log");
             var minDate = timePeriod == null ? default(DateTime?) : clock.Now - timePeriod.Value;
 
-            Log.Debug($"Saving EventLog records from journal {logName} {(minDate != default ? $"no earlier than {minDate}" : default)} into {destinationFileName}");
+            Log.Debug(() => $"Saving EventLog records from journal {logName} {(minDate != default ? $"no earlier than {minDate}" : default)} into {destinationFileName}");
             var eventLog = new EventLog(logName);
             var recordsSaved = 0;
             using (var writer = new StreamWriter(new FileStream(destinationFileName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
@@ -60,7 +60,7 @@ namespace PoeShared.UI.Providers
                     recordsSaved++;
                 }
             }
-            Log.Debug($"Saved {recordsSaved}/{eventLog.Entries.Count} to {destinationFileName}");
+            Log.Debug(() => $"Saved {recordsSaved}/{eventLog.Entries.Count} to {destinationFileName}");
 
             return new ExceptionReportItem
             {

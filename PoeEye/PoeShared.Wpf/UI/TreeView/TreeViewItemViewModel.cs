@@ -42,7 +42,7 @@ namespace PoeShared.UI
                 .DistinctUntilChanged()
                 .Select(x =>
                 {
-                    Log.Debug($"[{this}] Changing Directory Path {x.prev} => {x.curr}");
+                    Log.Debug(() => $"[{this}] Changing Directory Path {x.prev} => {x.curr}");
                     return x.curr;
                 })
                 .ToProperty(this, x => x.Path)

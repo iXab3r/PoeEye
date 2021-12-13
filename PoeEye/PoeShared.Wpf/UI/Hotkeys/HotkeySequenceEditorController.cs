@@ -149,7 +149,7 @@ namespace PoeShared.UI
 
             if (windowToRecord != null)
             {
-                Log.Debug($"Activating window before recording: {windowToRecord}, previously active: {initialWindow}");
+                Log.Debug(() => $"Activating window before recording: {windowToRecord}, previously active: {initialWindow}");
                 UnsafeNative.ActivateWindow(windowToRecord.Handle);
             }
 
@@ -197,7 +197,7 @@ namespace PoeShared.UI
             {
                 IsRecording = false;
                 RecordStartTime = default;
-                Log.Debug($"Restoring window after recording: {initialWindow}");
+                Log.Debug(() => $"Restoring window after recording: {initialWindow}");
                 UnsafeNative.ActivateWindow(initialWindow);
             }).AddTo(recordingAnchors);
 
@@ -208,7 +208,7 @@ namespace PoeShared.UI
                 .Take(1)
                 .SubscribeSafe(reason =>
                 {
-                    Log.Debug($"Stopping recording, reason: {reason}");
+                    Log.Debug(() => $"Stopping recording, reason: {reason}");
                     StopRecordingExecuted();
                 }, Log.HandleUiException)
                 .AddTo(recordingAnchors);

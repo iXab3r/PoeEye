@@ -109,7 +109,7 @@ namespace PoeShared.Native
 
         public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)
         {
-            Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window bounds: {rect}");
+            Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Setting window bounds: {rect}");
             Win32ErrorCode error;
             if (!User32.SetWindowPos(hwnd, User32.SpecialWindowHandles.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
@@ -123,7 +123,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
 
-            Log.Debug($"[{hwnd.ToHexadecimal()}] Hiding SystemMenu");
+            Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Hiding SystemMenu");
 
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
             var newStyle = existingStyle & ~User32.SetWindowLongFlags.WS_SYSMENU;
@@ -137,7 +137,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
 
-            Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to Transparent");
+            Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to Transparent");
 
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
             var newStyle = existingStyle;
@@ -157,7 +157,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
 
-            Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to Layered");
+            Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to Layered");
 
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
             var newStyle = existingStyle;
@@ -175,7 +175,7 @@ namespace PoeShared.Native
         public static bool SetWindowExNoActivate(IntPtr hwnd)
         {
             Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
-            Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to NoActivate");
+            Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to NoActivate");
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
             var newStyle = existingStyle;
             newStyle |= User32.SetWindowLongFlags.WS_EX_NOACTIVATE;
@@ -190,7 +190,7 @@ namespace PoeShared.Native
 
         public static void ShowInactiveTopmost(IntPtr handle, Rectangle windowBounds)
         {
-            Log.Debug($"[{handle.ToHexadecimal()}] Showing window at {windowBounds}");
+            Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window at {windowBounds}");
             Win32ErrorCode error;
             if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
@@ -213,7 +213,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
 
-            Log.Debug($"[{handle.ToHexadecimal()}] Showing window with {showStyle}");
+            Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window with {showStyle}");
             Win32ErrorCode error;
             if (!User32.ShowWindow(handle, showStyle) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
@@ -233,7 +233,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
 
-            Log.Debug($"[{handle.ToHexadecimal()}] Hiding window");
+            Log.Debug(() => $"[{handle.ToHexadecimal()}] Hiding window");
 
             Win32ErrorCode error;
             if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_HIDE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
@@ -281,11 +281,11 @@ namespace PoeShared.Native
             var placement = User32.GetWindowPlacement(window);
             if (placement.showCmd == User32.WindowShowStyle.SW_SHOWMINIMIZED)
             {
-                Log.Debug($"Restoring minimized window {window.ToHexadecimal()}");
+                Log.Debug(() => $"Restoring minimized window {window.ToHexadecimal()}");
                 ShowWindow(window, User32.WindowShowStyle.SW_SHOWNORMAL);
             }
             
-            Log.Debug($"Bringing window {window.ToHexadecimal()} to foreground");
+            Log.Debug(() => $"Bringing window {window.ToHexadecimal()} to foreground");
             SetForegroundWindow(window);
             if (timeout <= TimeSpan.Zero)
             {

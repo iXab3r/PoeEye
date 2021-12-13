@@ -43,7 +43,7 @@ namespace PoeShared.Modularity
                 .Select(
                     x =>
                     {
-                        Log.Debug($"[{typeof(TConfig)}] Refreshing ActualConfig...");
+                        Log.Debug(() => $"[{typeof(TConfig)}] Refreshing ActualConfig...");
                         return configProvider.GetActualConfig<TConfig>();
                     })
                 .Subscribe(x => ActualConfig = x)
@@ -73,7 +73,7 @@ namespace PoeShared.Modularity
             WhenChanged = changes;
             changes.Connect().AddTo(Anchors);
             
-            Log.Debug($"[{typeof(TConfig)}] Initial re-save of config to update format using {configProvider}");
+            Log.Debug(() => $"[{typeof(TConfig)}] Initial re-save of config to update format using {configProvider}");
             configProvider.Save();
         }
 
@@ -93,7 +93,7 @@ namespace PoeShared.Modularity
         public void Reload()
         {
             Interlocked.Increment(ref loadCommandCounter);
-            Log.Debug($"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug(() => $"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Reload();
         }
@@ -106,12 +106,12 @@ namespace PoeShared.Modularity
 
             if (compare.AreEqual)
             {
-                Log.Debug($"[{typeof(TConfig)}] Attempted to save config that is an exact duplicate of an Actual config, skipping request");
+                Log.Debug(() => $"[{typeof(TConfig)}] Attempted to save config that is an exact duplicate of an Actual config, skipping request");
                 return;
             }
 
             Interlocked.Increment(ref saveCommandCounter);
-            Log.Debug($"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug(() => $"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
         }

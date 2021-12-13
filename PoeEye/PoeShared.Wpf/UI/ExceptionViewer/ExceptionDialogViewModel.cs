@@ -105,7 +105,7 @@ namespace PoeShared.UI
                 {
                     Log.Debug("Config has been updated, retrieving report items");
                     await Task.Run(PrepareReportItemsInternal);
-                    Log.Debug($"Retrieved {reportItems.Count} report items");
+                    Log.Debug(() => $"Retrieved {reportItems.Count} report items");
                 }, Log.HandleException)
                 .AddTo(Anchors);
             
@@ -142,19 +142,19 @@ namespace PoeShared.UI
 
         private async Task SendReportCommandExecuted()
         {
-            Log.Debug($"Handling report via {Config.ReportHandler}");
+            Log.Debug(() => $"Handling report via {Config.ReportHandler}");
 
             var tempFile = new FileInfo(Path.Combine(Path.GetTempPath(), "EyeAurasReports", GetDefaultReportName()));
 
             try
             {
-                Log.Debug($"Saving report to temporary file {tempFile}");
+                Log.Debug(() => $"Saving report to temporary file {tempFile}");
                 Status = "Compressing report...";
                 await CompressReport(tempFile);
-                Log.Debug($"Report saved to temporary file {tempFile}, sending to {Config.ReportHandler}");
+                Log.Debug(() => $"Report saved to temporary file {tempFile}, sending to {Config.ReportHandler}");
                 Status = "Sending report...";
                 var result = await Config.ReportHandler.Handle(tempFile);
-                Log.Debug($"Report sent to {Config.ReportHandler}");
+                Log.Debug(() => $"Report sent to {Config.ReportHandler}");
                 Status = $"Report Id: {result}";
             }
             catch (Exception ex)
@@ -207,7 +207,7 @@ namespace PoeShared.UI
             Log.Debug("Compression completed, opening Explorer");
 
             Status = "Compressing report...";
-            Log.Debug($"Opening link: {op.FileName}");
+            Log.Debug(() => $"Opening link: {op.FileName}");
             var process = Process.Start(ExplorerExecutablePath, $"/select,\"{op.FileName}\"");
             if (process == null)
             {
@@ -220,7 +220,7 @@ namespace PoeShared.UI
 
         private async Task CompressReport(FileInfo outputFile)
         {
-            Log.Debug($"Compressing report to {outputFile}");
+            Log.Debug(() => $"Compressing report to {outputFile}");
             var filesToAttach = new List<string>();
             Attachments.Where(x => x.IsChecked).Select(x => x.Item.Attachment.FullName).ForEach(filesToAttach.Add);
 
@@ -243,19 +243,19 @@ namespace PoeShared.UI
 
             if (!outputDirectory.Exists)
             {
-                Log.Debug($"Creating output directory {outputDirectory}");
+                Log.Debug(() => $"Creating output directory {outputDirectory}");
                 outputDirectory.Create();
             }
 
             await Task.Run(() =>
             {
-                Log.Debug($"Compressing report with following files: {filesToAttach.DumpToTable()}");
+                Log.Debug(() => $"Compressing report with following files: {filesToAttach.DumpToTable()}");
                 sevenZipWrapper.AddToArchive(outputFile, filesToAttach.Select(x => new FileInfo(x)).ToArray());
-                Log.Debug($"Compression has completed");
+                Log.Debug(() => $"Compression has completed");
             });
             
             outputFile.Refresh();
-            Log.Debug($"Compressed directory {outputDirectory} as {outputFile.FullName} ({outputFile.Length}b)");
+            Log.Debug(() => $"Compressed directory {outputDirectory} as {outputFile.FullName} ({outputFile.Length}b)");
         }
 
         private static void TryToFormatException(DirectoryInfo outputDirectory, ISourceList<ExceptionReportItem> reportItems, Exception exception)
@@ -300,7 +300,7 @@ namespace PoeShared.UI
                     crashReportDirectoryPath.Delete(true);
                 }
 
-                Log.Debug($"Creating directory {crashReportDirectoryPath.FullName}");
+                Log.Debug(() => $"Creating directory {crashReportDirectoryPath.FullName}");
                 crashReportDirectoryPath.Create();
 
                 if (Config.Exception != null)
@@ -315,12 +315,12 @@ namespace PoeShared.UI
 
                     try
                     {
-                        Log.Debug($"Getting report item from {reportItemProvider}");
+                        Log.Debug(() => $"Getting report item from {reportItemProvider}");
                         Status = $"Preparing report {providerIdx}/{Config.ItemProviders.Length}...";
 
                         foreach (var item in reportItemProvider.Prepare(crashReportDirectoryPath))
                         {
-                            Log.Debug($"Successfully received report item from {reportItemProvider}: {item}");
+                            Log.Debug(() => $"Successfully received report item from {reportItemProvider}: {item}");
                             reportItems.Add(item);
                         }
                     }

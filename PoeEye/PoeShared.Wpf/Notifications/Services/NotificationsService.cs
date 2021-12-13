@@ -69,7 +69,7 @@ namespace PoeShared.Notifications.Services
                 .ObserveOn(uiScheduler)
                 .SubscribeSafe(containerOffset =>
                 {
-                    Log.Debug($"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");
+                    Log.Debug(() => $"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");
                     transparentContainer.Offset = new System.Drawing.Point(0, containerOffset.Height + 5);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -89,12 +89,12 @@ namespace PoeShared.Notifications.Services
             var container = notificationContainerFactory.Create(notification);
             var closeController = new CloseController<INotificationViewModel>(notification, () =>
             {
-                Log.Debug($"Removing notification: {notification} in container: {container}");
+                Log.Debug(() => $"Removing notification: {notification} in container: {container}");
                 itemsSource.Remove(container);
             });
             notification.CloseController = closeController;
 
-            Log.Debug($"Showing notification: {notification} in container: {container}");
+            Log.Debug(() => $"Showing notification: {notification} in container: {container}");
             itemsSource.Add(container);
             return container;
         }

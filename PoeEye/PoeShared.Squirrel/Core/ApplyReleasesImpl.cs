@@ -46,7 +46,7 @@ namespace PoeShared.Squirrel.Core
             }
 
             progress(5);
-            Log.Debug($"Initializing unpacking, updateInfo: {new {updateInfo.FutureReleaseEntry.Filename, updateInfo.FutureReleaseEntry.Filesize, updateInfo.FutureReleaseEntry.EntryAsString }}");
+            Log.Debug(() => $"Initializing unpacking, updateInfo: {new {updateInfo.FutureReleaseEntry.Filename, updateInfo.FutureReleaseEntry.Filesize, updateInfo.FutureReleaseEntry.EntryAsString }}");
             var release = await UnpackRelease(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
             progress(10);
 
@@ -79,7 +79,7 @@ namespace PoeShared.Squirrel.Core
                 "Failed to update local releases file");
             progress(50);
             
-            Log.Debug($"Updated local releases file, list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
+            Log.Debug(() => $"Updated local releases file, list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
             if (localReleases.Count != 1)
             {
                 Log.Warn($"Invalid local releases list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
@@ -88,10 +88,10 @@ namespace PoeShared.Squirrel.Core
 
             var localRelease = localReleases.Single();
             var localReleaseVersion = localRelease.Version;
-            Log.Debug($"Performing self-update activities for {new { localRelease.Filename, localRelease.Filesize, localRelease.EntryAsString }}");
+            Log.Debug(() => $"Performing self-update activities for {new { localRelease.Filename, localRelease.Filesize, localRelease.EntryAsString }}");
             ExecuteSelfUpdate(localReleaseVersion);
 
-            Log.Debug($"Invoking post-install events, new version: {localReleaseVersion}");
+            Log.Debug(() => $"Invoking post-install events, new version: {localReleaseVersion}");
             await Log.ErrorIfThrows(
                 () => InvokePostInstall(localReleaseVersion, attemptingFullInstall, false, silentInstall),
                 "Failed to invoke post-install");
@@ -415,7 +415,7 @@ namespace PoeShared.Squirrel.Core
                 return null;
             }
                 
-            Log.Debug($"Applying delta-releases to {new { currentVersion?.PackageName, currentVersion?.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
+            Log.Debug(() => $"Applying delta-releases to {new { currentVersion?.PackageName, currentVersion?.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
             // If there are no deltas in our list, we're already done
             if (releasesToApply.All(x => !x.IsDelta))
             {
@@ -440,13 +440,13 @@ namespace PoeShared.Squirrel.Core
                     var deltaPkg = new ReleasePackage(Path.Combine(rootAppDirectory, "packages", releasesToApply.First().Filename));
 
                     using var tempDirectoryAnchor = Utility.WithTempDirectory(out var parentDirectory, rootAppDirectory);
-                    Log.Debug($"Preparing delta-package in {parentDirectory}, base: {basePkg}, delta: {deltaPkg}");
+                    Log.Debug(() => $"Preparing delta-package in {parentDirectory}, base: {basePkg}, delta: {deltaPkg}");
                     var deltaBuilder = new DeltaPackageBuilder(parentDirectory);
 
                     var finalPkgPath = Regex.Replace(deltaPkg.InputPackageFile, @"-delta.nupkg$", ".nupkg", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     if (File.Exists(finalPkgPath))
                     {
-                        Log.Debug($"Final package already exists @ {finalPkgPath}, removing it");
+                        Log.Debug(() => $"Final package already exists @ {finalPkgPath}, removing it");
                         File.Delete(finalPkgPath);
                     }
                         
@@ -455,12 +455,12 @@ namespace PoeShared.Squirrel.Core
                         deltaPkg,
                         finalPkgPath);
                 });
-            Log.Debug($"Prepared package: {deltaPackage}");
+            Log.Debug(() => $"Prepared package: {deltaPackage}");
             
             if (releasesToApply.Length == 1)
             {
                 var finalReleaseEntry = ReleaseEntry.GenerateFromFile(deltaPackage.InputPackageFile);
-                Log.Debug($"No delta-updates left, prepared release entry: { new { finalReleaseEntry.Filename, finalReleaseEntry.Filesize, finalReleaseEntry.IsDelta, finalReleaseEntry.EntryAsString } } ");
+                Log.Debug(() => $"No delta-updates left, prepared release entry: { new { finalReleaseEntry.Filename, finalReleaseEntry.Filesize, finalReleaseEntry.IsDelta, finalReleaseEntry.EntryAsString } } ");
                 return finalReleaseEntry;
             }
 
@@ -469,7 +469,7 @@ namespace PoeShared.Squirrel.Core
 
             // Recursively combine the rest of them
             var updatesToApply = releasesToApply.Skip(1).ToArray();
-            Log.Debug($"Recursively applying {updatesToApply.Length} updates to entry {entry.EntryAsString}, updates: {updatesToApply.Select(x => x.EntryAsString).DumpToString()}");
+            Log.Debug(() => $"Recursively applying {updatesToApply.Length} updates to entry {entry.EntryAsString}, updates: {updatesToApply.Select(x => x.EntryAsString).DumpToString()}");
             return await UnpackRelease(updatesToApply, entry);
         }
 
@@ -523,7 +523,7 @@ namespace PoeShared.Squirrel.Core
 
                             try
                             {
-                                Log.Debug($"Running Squirrel app with post-install args, executable: {exe}, args: {args}");
+                                Log.Debug(() => $"Running Squirrel app with post-install args, executable: {exe}, args: {args}");
                                 await Utility.InvokeProcessAsync(exe, args, cts.Token);
                             }
                             catch (Exception ex)
@@ -789,7 +789,7 @@ namespace PoeShared.Squirrel.Core
 
                                         try
                                         {
-                                            Log.Debug($"Running Squirrel app with post-uninstall args, executable: {exe}, args: {args}");
+                                            Log.Debug(() => $"Running Squirrel app with post-uninstall args, executable: {exe}, args: {args}");
                                             await Utility.InvokeProcessAsync(exe, args, cts.Token);
                                         }
                                         catch (Exception ex)
@@ -851,7 +851,7 @@ namespace PoeShared.Squirrel.Core
 
                 try
                 {
-                    Log.Debug($"Removing old package: {package.FullName}");
+                    Log.Debug(() => $"Removing old package: {package.FullName}");
                     package.Delete();
                 }
                 catch (Exception e)

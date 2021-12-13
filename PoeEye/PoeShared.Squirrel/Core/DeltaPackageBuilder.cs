@@ -38,7 +38,7 @@ namespace PoeShared.Squirrel.Core
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(outputFile), "!string.IsNullOrEmpty(outputFile)");
             Guard.ArgumentIsTrue(!File.Exists(outputFile), "!File.Exists(outputFile)");
 
-            Log.Debug($"Applying delta-package {deltaPackage} to base {basePackage}, local app directory: {localAppDirectory}");
+            Log.Debug(() => $"Applying delta-package {deltaPackage} to base {basePackage}, local app directory: {localAppDirectory}");
             using (Utility.WithTempDirectory(out var deltaPath, localAppDirectory))
             using (Utility.WithTempDirectory(out var workingPath, localAppDirectory))
             {
@@ -198,7 +198,7 @@ namespace PoeShared.Squirrel.Core
             var finalTarget = Path.Combine(workingDirectory, Regex.Replace(relativeFilePath, @"\.(bs)?diff$", ""));
 
             Utility.WithTempFile(out var tempTargetFile, localAppDirectory);
-            Log.Debug($"Applying diff to input file {inputFile}, target file: {finalTarget}, temp file: {tempTargetFile}");
+            Log.Debug(() => $"Applying diff to input file {inputFile}, target file: {finalTarget}, temp file: {tempTargetFile}");
 
             try
             {

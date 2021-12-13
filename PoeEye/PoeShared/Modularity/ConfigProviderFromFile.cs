@@ -55,7 +55,7 @@ namespace PoeShared.Modularity
                 .Select(x => Path.Combine(x, configFileName))
                 .Select(x => new {Path = x, Exists = File.Exists(x)})
                 .ToArray();
-            Log.Debug($"Configuration matrix, configuration file name: {configFileName}:\n\t{candidates.DumpToString()}");
+            Log.Debug(() => $"Configuration matrix, configuration file name: {configFileName}:\n\t{candidates.DumpToString()}");
             var existingFilePath = candidates.FirstOrDefault(x => x.Exists);
             if (existingFilePath != null)
             {
@@ -92,7 +92,7 @@ namespace PoeShared.Modularity
 
         public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
         {
-            Log.Debug($"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToString()}");
+            Log.Debug(() => $"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToString()}");
             strategies.Insert(0, strategy);
             return Disposable.Create(() => strategies.Remove(strategy));
         }
@@ -100,7 +100,7 @@ namespace PoeShared.Modularity
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Reload()
         {
-            Log.Debug($"Reloading configuration...");
+            Log.Debug(() => $"Reloading configuration...");
 
             var config = LoadInternal();
 
@@ -147,7 +147,7 @@ namespace PoeShared.Modularity
         {
             var metaConfig = new PoeEyeCombinedConfig();
             loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
-            Log.Debug($"Saving all configs, metadata: {metaConfig.DumpToTextRaw().TakeChars(500)}");
+            Log.Debug(() => $"Saving all configs, metadata: {metaConfig.DumpToTextRaw().TakeChars(500)}");
 
             SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
         }
@@ -178,7 +178,7 @@ namespace PoeShared.Modularity
 
             if (config is PoeConfigMetadata metadata)
             {
-                Log.Debug($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+                Log.Debug(() => $"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
                 var serialized = configSerializer.Serialize(metadata);
                 if (string.IsNullOrEmpty(serialized))
                 {
@@ -201,11 +201,11 @@ namespace PoeShared.Modularity
         {
             try
             {
-                Log.Debug($"Saving config to file '{configFilePath}'");
-                Log.Debug($"Serializing config data...");
+                Log.Debug(() => $"Saving config to file '{configFilePath}'");
+                Log.Debug(() => $"Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
-                Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
+                Log.Debug(() => $"Successfully serialized config, got {serializedData.Length} chars");
 
                 var directoryPath = Path.GetDirectoryName(configFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
@@ -223,31 +223,31 @@ namespace PoeShared.Modularity
                 var temporaryFile = new FileInfo(temporaryConfigPath);
                 var backupFile = new FileInfo(backupConfigPath);
 
-                Log.Debug($"Preparing temporary file '{temporaryFile}'...");
+                Log.Debug(() => $"Preparing temporary file '{temporaryFile}'...");
                 if (temporaryFile.Exists)
                 {
-                    Log.Debug($"Removing previous temporary file '{temporaryFile}'...");
+                    Log.Debug(() => $"Removing previous temporary file '{temporaryFile}'...");
                     temporaryFile.Delete();
                 }
 
-                Log.Debug($"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
+                Log.Debug(() => $"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
                 File.WriteAllText(temporaryConfigPath, serializedData, Encoding.Unicode);
                 temporaryFile.Refresh();
-                Log.Debug($"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
+                Log.Debug(() => $"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
 
                 if (backupFile.Exists)
                 {
-                    Log.Debug($"Removing previous backup file {backupFile}");
+                    Log.Debug(() => $"Removing previous backup file {backupFile}");
                     backupFile.Delete();
                 }
 
                 if (configFile.Exists)
                 {
-                    Log.Debug($"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
+                    Log.Debug(() => $"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
                     configFile.MoveTo(backupConfigPath);   
                 }
                 
-                Log.Debug($"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
+                Log.Debug(() => $"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
                 temporaryFile.MoveTo(configFilePath);
                 
                 strategies.ForEach(x => x.HandleConfigSave(new FileInfo(configFilePath)));
@@ -260,13 +260,13 @@ namespace PoeShared.Modularity
 
         private PoeEyeCombinedConfig LoadInternal()
         {
-            Log.Debug($"Loading config from file '{ConfigFilePath}'");
+            Log.Debug(() => $"Loading config from file '{ConfigFilePath}'");
             loadedConfigsByType.Clear();
             loadedConfigurationFile = string.Empty;
 
             if (!File.Exists(ConfigFilePath))
             {
-                Log.Debug($"File not found, fileName: '{ConfigFilePath}'");
+                Log.Debug(() => $"File not found, fileName: '{ConfigFilePath}'");
                 return new PoeEyeCombinedConfig();
             }
 
@@ -274,11 +274,11 @@ namespace PoeShared.Modularity
             try
             {
                 var fileData = File.ReadAllText(ConfigFilePath);
-                Log.Debug($"Successfully read {fileData.Length} chars, deserializing...");
+                Log.Debug(() => $"Successfully read {fileData.Length} chars, deserializing...");
                 loadedConfigurationFile = fileData;
 
                 result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
-                Log.Debug($"Successfully deserialized config data");
+                Log.Debug(() => $"Successfully deserialized config data");
             }
             catch (Exception ex)
             {
@@ -288,7 +288,7 @@ namespace PoeShared.Modularity
                 {
                     if (strategy.TryHandleConfigLoadException(new FileInfo(ConfigFilePath), out var strategyResult) && strategyResult != null)
                     {
-                        Log.Debug($"Strategy {strategy} has handled exception");
+                        Log.Debug(() => $"Strategy {strategy} has handled exception");
                         result = strategyResult;
                         break;
                     }

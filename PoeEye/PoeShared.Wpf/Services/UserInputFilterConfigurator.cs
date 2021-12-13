@@ -57,12 +57,12 @@ namespace PoeShared.Services
             {
                 if (keyboardState.TryGetValue(hotkey, out var state))
                 {
-                    Log.Debug($"Incrementing usages of hotkey {hotkey} in state {state} {state.WhitelistRefCount} => {state.WhitelistRefCount + 1}");
+                    Log.Debug(() => $"Incrementing usages of hotkey {hotkey} in state {state} {state.WhitelistRefCount} => {state.WhitelistRefCount + 1}");
                     state.IncrementRefCount();
                 }
                 else
                 {
-                    Log.Debug($"Adding {hotkey} to whitelist");
+                    Log.Debug(() => $"Adding {hotkey} to whitelist");
                     keyboardState[hotkey] = new GestureState(hotkey);
                 }
             }
@@ -75,7 +75,7 @@ namespace PoeShared.Services
                     {
                         throw new ApplicationException($"Failed to release hotkey {hotkey} from whitelist");
                     }
-                    Log.Debug($"Decrementing usages of hotkey {hotkey} {state.WhitelistRefCount} => {state.WhitelistRefCount - 1}");
+                    Log.Debug(() => $"Decrementing usages of hotkey {hotkey} {state.WhitelistRefCount} => {state.WhitelistRefCount - 1}");
                     state.DecrementRefCount();
                 }
             });
@@ -85,7 +85,7 @@ namespace PoeShared.Services
         {
             if (Log.IsDebugEnabled && appArguments.IsDebugMode)
             {
-                Log.Debug($"Hotkey {(isKeyDown ? "pressed" : "released")}: {hotkey}, key: {hotkey.Key}, mouse: {hotkey.MouseButton}, wheel: {hotkey.MouseWheel}, modifiers: {hotkey.ModifierKeys}");
+                Log.Debug(() => $"Hotkey {(isKeyDown ? "pressed" : "released")}: {hotkey}, key: {hotkey.Key}, mouse: {hotkey.MouseButton}, wheel: {hotkey.MouseWheel}, modifiers: {hotkey.ModifierKeys}");
             }
             
             lock (keyboardState)

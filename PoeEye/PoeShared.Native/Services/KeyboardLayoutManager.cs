@@ -108,7 +108,7 @@ namespace PoeShared.Services
                 return current;
             }
 
-            Log.Debug($"Resolved keyboard layout {keyboardLayout} for window {targetWindow}");
+            Log.Debug(() => $"Resolved keyboard layout {keyboardLayout} for window {targetWindow}");
             return knownLayout.Value;
         }
 

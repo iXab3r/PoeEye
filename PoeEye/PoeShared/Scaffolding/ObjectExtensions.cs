@@ -191,7 +191,7 @@ namespace PoeShared.Scaffolding
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}");
+                    Log.Debug(() => $"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}");
                 }
             }
         }

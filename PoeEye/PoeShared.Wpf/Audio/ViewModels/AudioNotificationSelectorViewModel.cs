@@ -171,7 +171,7 @@ namespace PoeShared.Audio.ViewModels
                 return;
             }
 
-            Log.Debug($"Adding notification {op.FileName}");
+            Log.Debug(() => $"Adding notification {op.FileName}");
             LastOpenedDirectory = Path.GetDirectoryName(op.FileName);
             var notification = notificationsManager.AddFromFile(new FileInfo(op.FileName));
             SelectedValue = notification;

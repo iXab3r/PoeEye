@@ -34,7 +34,7 @@ namespace PoeShared.Modularity
                 throw new FormatException($"Metadata is not valid(assembly is not defined): {metadata}");
             }
             
-            Log.Debug($"Type {metadata.TypeName} is not loaded, trying to read type from assembly {metadata.AssemblyName}");
+            Log.Debug(() => $"Type {metadata.TypeName} is not loaded, trying to read type from assembly {metadata.AssemblyName}");
             if (!loadedAssemblyByName.TryGetValue(metadata.AssemblyName, out var assembly))
             {
                 assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == metadata.AssemblyName);

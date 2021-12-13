@@ -32,7 +32,7 @@ namespace PoeShared.Scaffolding.WPF
                     {
                         return;
                     }
-                    Log.Debug($"Bringing item into view: {treeViewItem}");
+                    Log.Debug(() => $"Bringing item into view: {treeViewItem}");
                     treeViewItem.BringIntoView();
                 }, Log.HandleUiException)
                 .AddTo(anchors);

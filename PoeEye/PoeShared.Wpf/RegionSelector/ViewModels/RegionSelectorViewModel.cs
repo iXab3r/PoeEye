@@ -59,7 +59,7 @@ namespace PoeShared.RegionSelector.ViewModels
                 .ObserveOn(uiScheduler)
                 .Select(x => new Rectangle(x.X, x.Y, 1, 1))
                 .Select(ToRegionResult)
-                .Do(x => Log.Debug($"Selection candidate: {x}"))
+                .Do(x => Log.Debug(() => $"Selection candidate: {x}"))
                 .SubscribeSafe(x => SelectionCandidate = x, Log.HandleUiException)
                 .AddTo(Anchors);
             
@@ -85,7 +85,7 @@ namespace PoeShared.RegionSelector.ViewModels
                 .Switch()
                 .SubscribeSafe(reason =>
                 {
-                    Log.Debug($"Stopping selection, reason: {reason}");
+                    Log.Debug(() => $"Stopping selection, reason: {reason}");
                     IsBusy = false;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -132,18 +132,18 @@ namespace PoeShared.RegionSelector.ViewModels
                         var selection = new Rect(SelectionAdorner.Owner.PointToScreen(x.Location), x.Size).ToWinRectangle();
                         if (selection.Width >= minSelection.Width && selection.Height >= minSelection.Height)
                         {
-                            Log.Debug($"Selected region: {x} (screen: {selection}) (min size: {minSelection})");
+                            Log.Debug(() => $"Selected region: {x} (screen: {selection}) (min size: {minSelection})");
                             return selection;
                         }
                         else
                         {
                             var result = new WinRectangle(selection.X, selection.Y, 0, 0);
-                            Log.Debug($"Selected region({x}, screen: {selection}) is less than required({minSelection}, converting selection {selection} to {result}");
+                            Log.Debug(() => $"Selected region({x}, screen: {selection}) is less than required({minSelection}, converting selection {selection} to {result}");
                             return result;
                         }
                     })
                     .Select(ToRegionResult)
-                    .Do(x => Log.Debug($"Selection Result: {x}"))
+                    .Do(x => Log.Debug(() => $"Selection Result: {x}"))
                     .Take(1)
                     .ToTask();
                 return result;
@@ -161,14 +161,14 @@ namespace PoeShared.RegionSelector.ViewModels
                 return new RegionSelectorResult { Reason = "Selected Empty screen region" };
             }
             
-            Log.Debug($"Looking up foreground window in region {screenRegion}");
+            Log.Debug(() => $"Looking up foreground window in region {screenRegion}");
             var (window, selection) = FindMatchingWindow(screenRegion, windowSeeker.Windows);
 
             if (window != null)
             {
                 var absoluteSelection = selection;
                 absoluteSelection.Offset(window.ClientBounds.Left, window.ClientBounds.Top);
-                Log.Debug($"Found a window using region {screenRegion}: {window}");
+                Log.Debug(() => $"Found a window using region {screenRegion}: {window}");
                 return new RegionSelectorResult
                 {
                     AbsoluteSelection = absoluteSelection,

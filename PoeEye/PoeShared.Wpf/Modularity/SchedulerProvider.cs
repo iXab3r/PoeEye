@@ -33,7 +33,7 @@ namespace PoeShared.Modularity
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         public IScheduler GetOrCreate(string name)
         {
-            Log.Debug($"[{name}] Retrieving scheduler...");
+            Log.Debug(() => $"[{name}] Retrieving scheduler...");
             return schedulers.GetOrAdd(name, CreateEnforcedThreadScheduler);
         }
         
@@ -41,7 +41,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(name, nameof(name));
 
-            Log.Debug($"[{name}] Creating new enforced thread scheduler");
+            Log.Debug(() => $"[{name}] Creating new enforced thread scheduler");
             return new EnforcedThreadScheduler(name);
         }
 
@@ -49,7 +49,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(name, nameof(name));
 
-            Log.Debug($"[{name}] Creating new dispatcher");
+            Log.Debug(() => $"[{name}] Creating new dispatcher");
             var consumer = new TaskCompletionSource<IScheduler>();
             var dispatcherThread = new Thread(InitializeDispatcherThread)
             {
@@ -57,9 +57,9 @@ namespace PoeShared.Modularity
                 IsBackground = true
             };
             dispatcherThread.SetApartmentState(ApartmentState.STA);
-            Log.Debug($"[{name}] Starting dispatcher thread");
+            Log.Debug(() => $"[{name}] Starting dispatcher thread");
             dispatcherThread.Start(consumer);
-            Log.Debug($"[{name}] Dispatcher thread started");
+            Log.Debug(() => $"[{name}] Dispatcher thread started");
             return consumer.Task.Result;
         }
 
@@ -79,7 +79,7 @@ namespace PoeShared.Modularity
             {
                 Log.Debug("Dispatcher thread started");
                 var dispatcher = Dispatcher.CurrentDispatcher;
-                Log.Debug($"Dispatcher: {dispatcher}");
+                Log.Debug(() => $"Dispatcher: {dispatcher}");
                 var scheduler = new DispatcherScheduler(dispatcher);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
@@ -111,7 +111,7 @@ namespace PoeShared.Modularity
                         h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
                     .SubscribeSafe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs), Log.HandleUiException)
                     .AddTo(Anchors);
-                Log.Debug($"Scheduler: {dispatcher}");
+                Log.Debug(() => $"Scheduler: {dispatcher}");
                 consumer.TrySetResult(scheduler);
 
                 Log.Debug("Starting dispatcher...");

@@ -21,7 +21,7 @@ namespace PoeShared.Squirrel.Updater
 
         public UpdateSourceProviderFromConfig(IConfigProvider<UpdateSettingsConfig> configProvider)
         {
-            Log.Debug($"Initializing update sources using configProvider {configProvider}");
+            Log.Debug(() => $"Initializing update sources using configProvider {configProvider}");
             this.configProvider = configProvider;
             knownSources
                 .Connect()
@@ -41,7 +41,7 @@ namespace PoeShared.Squirrel.Updater
                     }
                     else
                     {
-                        Log.Debug($"UpdateSource in config has changed to {configSource}");
+                        Log.Debug(() => $"UpdateSource in config has changed to {configSource}");
                     }
                     
                     // remapping config source to known source, some details may differ
@@ -52,7 +52,7 @@ namespace PoeShared.Squirrel.Updater
                         knownSource = Optional<UpdateSourceInfo>.Create(KnownSources.FirstOrDefault());
                     }
 
-                    Log.Debug($"Setting UpdateSource to {configSource}");
+                    Log.Debug(() => $"Setting UpdateSource to {configSource}");
                     UpdateSource = knownSource.Value;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -63,7 +63,7 @@ namespace PoeShared.Squirrel.Updater
                 .Where(x => configProvider.ActualConfig.UpdateSource != x)
                 .SubscribeSafe(x =>
                 {
-                    Log.Debug($"Updating UpdateSource {configProvider.ActualConfig.UpdateSource} => {x}");
+                    Log.Debug(() => $"Updating UpdateSource {configProvider.ActualConfig.UpdateSource} => {x}");
                     var config = configProvider.ActualConfig with
                     {
                         UpdateSource = x
@@ -80,7 +80,7 @@ namespace PoeShared.Squirrel.Updater
                 .Where(_ => !UpdateSource.IsValid)
                 .SubscribeSafe(() =>
                 {
-                    Log.Debug($"Update source is not set - loading first available our of {knownSources.Items.DumpToString()}");
+                    Log.Debug(() => $"Update source is not set - loading first available our of {knownSources.Items.DumpToString()}");
                     UpdateSource = knownSources.Items.FirstOrDefault(x => x.IsValid);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -89,13 +89,13 @@ namespace PoeShared.Squirrel.Updater
                 .Connect()
                 .OnItemUpdated((curr, prev) =>
                 {
-                    Log.Debug($"UpdateSource updated(duh): {prev} => {curr}");
+                    Log.Debug(() => $"UpdateSource updated(duh): {prev} => {curr}");
                     if (curr.Uri != UpdateSource.Uri)
                     {
                         return;
                     }
 
-                    Log.Debug($"Replacing current update source: {UpdateSource} => {curr}");
+                    Log.Debug(() => $"Replacing current update source: {UpdateSource} => {curr}");
                     UpdateSource = curr;
                 })
                 .SubscribeToErrors(Log.HandleUiException)
@@ -115,9 +115,9 @@ namespace PoeShared.Squirrel.Updater
 
         private IEnumerable<UpdateSourceInfo> GetKnownSources()
         {
-            Log.Debug($"Fetching config of type {typeof(UpdateSettingsConfig)} from {configProvider}");
+            Log.Debug(() => $"Fetching config of type {typeof(UpdateSettingsConfig)} from {configProvider}");
             var actualConfig = configProvider.ActualConfig.UpdateSource;
-            Log.Debug($"Configured update source is {actualConfig} (isValid: {actualConfig.IsValid})");
+            Log.Debug(() => $"Configured update source is {actualConfig} (isValid: {actualConfig.IsValid})");
             if (actualConfig.IsValid)
             {
                 yield return actualConfig;

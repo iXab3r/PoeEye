@@ -47,7 +47,7 @@ namespace PoeShared.Audio.Services
             var source = sources.Lookup(name.ToLowerInvariant());
             if (!source.HasValue)
             {
-                Log.Debug($"Source was not found '{name}', loaded files: {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToString()}");
+                Log.Debug(() => $"Source was not found '{name}', loaded files: {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToString()}");
                 resourceData = null;
                 return false;
             }
@@ -85,7 +85,7 @@ namespace PoeShared.Audio.Services
             {
                 throw new FileNotFoundException("File not found", soundFile.FullName);
             }
-            Log.Debug($"Trying to add source {soundFile} ({soundFile.Length}b)");
+            Log.Debug(() => $"Trying to add source {soundFile} ({soundFile.Length}b)");
 
             var directory = GetKnownDirectory();
             var filePath = Path.Combine(directory.FullName, $"{Path.GetFileNameWithoutExtension(soundFile.Name)}.wav");
@@ -103,7 +103,7 @@ namespace PoeShared.Audio.Services
             var directory = knownDirectories.First();
             if (!directory.Exists)
             {
-                Log.Debug($"Directory {directory} does not exist, creating it");
+                Log.Debug(() => $"Directory {directory} does not exist, creating it");
                 directory.Create();
                 directory.Refresh();
             }
@@ -113,7 +113,7 @@ namespace PoeShared.Audio.Services
 
         private void Reload()
         {
-            Log.Debug($"Updating sound sources, directories:\r\n {knownDirectories.Select(x => new { x.FullName, x.Exists }).DumpToString()}");
+            Log.Debug(() => $"Updating sound sources, directories:\r\n {knownDirectories.Select(x => new { x.FullName, x.Exists }).DumpToString()}");
 
             var extensions = GetSupportedExtensions();
 
@@ -136,7 +136,7 @@ namespace PoeShared.Audio.Services
                 sources.AddOrUpdate(new FileSource(source));
             }
             
-            Log.Debug($"Source name list(count: {sources.Count}):\r\n {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToString()}");
+            Log.Debug(() => $"Source name list(count: {sources.Count}):\r\n {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToString()}");
         }
 
         private static byte[] LoadFileData(FileInfo file)

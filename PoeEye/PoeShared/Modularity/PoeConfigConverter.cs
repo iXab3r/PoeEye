@@ -149,7 +149,7 @@ namespace PoeShared.Modularity
                     
                 if (migrationService.TryGetConverter(resolvedValueType, metadata.Version.Value, innerTypeSample.Version, out var converterKvp))
                 {
-                    Log.Debug($"Found converter {converterKvp.Key}");
+                    Log.Debug(() => $"Found converter {converterKvp.Key}");
                     var sourceMetadata = new PoeConfigMetadata()
                     {
                         TypeName = converterKvp.Key.SourceType.FullName,

@@ -23,7 +23,7 @@ namespace PoeShared.Native
             Window = owner;
             Handle = new WindowInteropHelper(owner).EnsureHandle();
             Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}, title: {owner.Title}");
-            Log.Debug($"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
+            Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
             WhenRendered = Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
@@ -48,7 +48,7 @@ namespace PoeShared.Native
                 .Where(_ => Topmost)
                 .SubscribeSafe(() =>
                 {
-                    Log.Debug($"Window is deactivated, reactivating {nameof(Topmost)} style");
+                    Log.Debug(() => $"Window is deactivated, reactivating {nameof(Topmost)} style");
                     owner.Topmost = false;
                     owner.Topmost = true;
                 }, Log.HandleUiException)
@@ -81,7 +81,7 @@ namespace PoeShared.Native
 
         public void Close(bool? result)
         {
-            Log.Debug($"Closing window, result: {result}");
+            Log.Debug(() => $"Closing window, result: {result}");
             Window.DialogResult = result;
             Window.Close();
         }
@@ -95,13 +95,13 @@ namespace PoeShared.Native
 
         public void Hide()
         {
-            Log.Debug($"Hiding window");
+            Log.Debug(() => $"Hiding window");
             UnsafeNative.HideWindow(Window);
         }
 
         public void Show()
         {
-            Log.Debug($"Showing window");
+            Log.Debug(() => $"Showing window");
             UnsafeNative.ShowWindow(Window);
             //FIXME Mahapps window resets topmost after minimize/maximize operations
             Window.Topmost = Topmost;
@@ -114,7 +114,7 @@ namespace PoeShared.Native
 
         public void Minimize()
         {
-            Log.Debug($"Minimizing window");
+            Log.Debug(() => $"Minimizing window");
             Window.WindowState = WindowState.Minimized;
         }
         

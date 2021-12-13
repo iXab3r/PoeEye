@@ -25,13 +25,13 @@ namespace PoeShared.Audio.Services
 
         public IEnumerable<WaveOutDevice> GetDevices()
         {
-            Log.Debug($"Retrieving MMDevices");
+            Log.Debug(() => $"Retrieving MMDevices");
 
             using var deviceEnumerator = new MMDeviceEnumerator();
             var mmDevices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
             try
             {
-                Log.Debug($"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
+                Log.Debug(() => $"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
                 var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(idx =>
                 {
                     try
@@ -56,7 +56,7 @@ namespace PoeShared.Audio.Services
             }
             finally
             {
-                Log.Debug($"Releasing {mmDevices.Count} MMDevices");
+                Log.Debug(() => $"Releasing {mmDevices.Count} MMDevices");
                 mmDevices.DisposeAll((device, ex) => Log.Warn($"Failed to dispose device { new { device, device.FriendlyName }}", ex));
             }
         }
@@ -96,7 +96,7 @@ namespace PoeShared.Audio.Services
 
         private Task PlayInternal(AudioPlayerRequest request)
         {
-            Log.Debug($"Queueing audio stream, request: {request}");
+            Log.Debug(() => $"Queueing audio stream, request: {request}");
             return Task.Factory.StartNew(() =>
             {
                 try
@@ -108,7 +108,7 @@ namespace PoeShared.Audio.Services
                     {
                         try
                         {
-                            Log.Debug($"Initializing waveOut device {waveOut}, output: {request.OutputDevice}");
+                            Log.Debug(() => $"Initializing waveOut device {waveOut}, output: {request.OutputDevice}");
                             if (request.OutputDevice != null && request.OutputDevice != WaveOutDevice.DefaultDevice)
                             {
                                 waveOut.DeviceNumber = request.OutputDevice.DeviceNumber;
@@ -121,7 +121,7 @@ namespace PoeShared.Audio.Services
                             try
                             {
                                 waveOut.PlaybackStopped += playbackStoppedHandler;
-                                Log.Debug($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}, volume: {request.Volume}...");
+                                Log.Debug(() => $"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}, volume: {request.Volume}...");
                                 if (request.Volume != null)
                                 {
                                     waveOut.Volume = request.Volume.Value;
@@ -131,9 +131,9 @@ namespace PoeShared.Audio.Services
                                 WaitHandle.WaitAny(new[] {(WaitHandle) playbackAnchor, request.CancellationToken.WaitHandle});
                                 if (request.CancellationToken.IsCancellationRequested)
                                 {
-                                    Log.Debug($"Cancelling audio stream");
+                                    Log.Debug(() => $"Cancelling audio stream");
                                     waveOut.Stop();
-                                    Log.Debug($"Stopped waveOut device");
+                                    Log.Debug(() => $"Stopped waveOut device");
                                 }
                                 else
                                 {

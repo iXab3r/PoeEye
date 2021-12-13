@@ -43,23 +43,23 @@ namespace PoeShared.Squirrel.Updater
                 .WithPrevious()
                 .SubscribeSafe(x =>
                 {
-                    Log.Debug($"Update source changed: {x}");
+                    Log.Debug(() => $"Update source changed: {x}");
                     UpdateSource = x.Current;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
             
             var currentProcessName = Process.GetCurrentProcess().ProcessName + ".exe";
-            Log.Debug($"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
+            Log.Debug(() => $"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
             if (string.Equals(DotnetCoreRunnerName, currentProcessName, StringComparison.OrdinalIgnoreCase))
             {
-                Log.Debug($"Detected that Application is running using .net core runner ({DotnetCoreRunnerName})");
+                Log.Debug(() => $"Detected that Application is running using .net core runner ({DotnetCoreRunnerName})");
 
                 if (string.IsNullOrEmpty(appArguments.ApplicationExecutableName) || Path.GetExtension(appArguments.ApplicationExecutableName) != ".dll")
                 {
                     throw new NotSupportedException("Could not determine application name, expected either .dll with .net runner or raw executable (.exe)");
                 }
                 
-                Log.Debug($"Extracting application executable name from {appArguments.ApplicationExecutableName}");
+                Log.Debug(() => $"Extracting application executable name from {appArguments.ApplicationExecutableName}");
                 var executableName = Path.ChangeExtension(appArguments.ApplicationExecutableName, ".exe");
                 ApplicationExecutableFileName = executableName;
             }
@@ -67,7 +67,7 @@ namespace PoeShared.Squirrel.Updater
             {
                 ApplicationExecutableFileName = currentProcessName;
             }
-            Log.Debug($"Application will be started via executing {ApplicationExecutableFileName}");
+            Log.Debug(() => $"Application will be started via executing {ApplicationExecutableFileName}");
         }
 
         public string ApplicationExecutableFileName { get; }
@@ -90,7 +90,7 @@ namespace PoeShared.Squirrel.Updater
         {
             Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
 
-            Log.Debug($"Applying update {updateInfo}");
+            Log.Debug(() => $"Applying update {updateInfo}");
 
             using var unused = CreateIsBusyAnchor();
             using var mgr = await CreateManager();
@@ -128,7 +128,7 @@ namespace PoeShared.Squirrel.Updater
             }
             else
             {
-                Log.Debug($"Applying releases, squirrel executable: {squirrelExe}");
+                Log.Debug(() => $"Applying releases, squirrel executable: {squirrelExe}");
                 newVersionFolder = await mgr.ApplyReleases(updateInfo, x => CombinedProgressReporter(x, applyReleaseTaskName));
             }
 
@@ -211,7 +211,7 @@ namespace PoeShared.Squirrel.Updater
                 squirrelArgs.Append($" --process-start-args=-d");
             }
 
-            Log.Debug($"Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
+            Log.Debug(() => $"Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
             var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs.ToString());
             if (updaterProcess == null)
             {
@@ -223,7 +223,7 @@ namespace PoeShared.Squirrel.Updater
             // NB: We have to give update.exe some time to grab our PID, but
             // we can't use WaitForInputIdle because we probably don't have
             // whatever WaitForInputIdle considers a message loop.
-            Log.Debug($"Process spawned, PID: {updaterProcess.Id}");
+            Log.Debug(() => $"Process spawned, PID: {updaterProcess.Id}");
             await Task.Delay(2000);
             await applicationAccessor.Exit();
         }
@@ -231,7 +231,7 @@ namespace PoeShared.Squirrel.Updater
         public FileInfo GetLatestExecutable()
         {
             var appExecutable = new FileInfo(Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-            Log.Debug($"Most recent version folder: {MostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
+            Log.Debug(() => $"Most recent version folder: {MostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
 
             if (!appExecutable.Exists)
             {
@@ -250,16 +250,16 @@ namespace PoeShared.Squirrel.Updater
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
 
-            Log.Debug($"AppName: {appName}, root directory: {rootDirectory}");
+            Log.Debug(() => $"AppName: {appName}, root directory: {rootDirectory}");
 
-            Log.Debug($"Using update source: {UpdateSource.DumpToTextRaw()}");
+            Log.Debug(() => $"Using update source: {UpdateSource.DumpToTextRaw()}");
             var downloader = new BasicAuthFileDownloader(
                 new NetworkCredential(
                     UpdateSource.Username?.ToUnsecuredString(),
                     UpdateSource.Password?.ToUnsecuredString()));
             if (UpdateSource.Uri.Contains("github"))
             {
-                Log.Debug($"Using GitHub source: {UpdateSource.DumpToTextRaw()}");
+                Log.Debug(() => $"Using GitHub source: {UpdateSource.DumpToTextRaw()}");
 
                 var mgr = PoeUpdateManager.GitHubUpdateManager(
                     UpdateSource.Uri,
@@ -270,7 +270,7 @@ namespace PoeShared.Squirrel.Updater
             }
             else
             {
-                Log.Debug($"Using BasicHTTP source: {UpdateSource.DumpToTextRaw()}");
+                Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.DumpToTextRaw()}");
                 var mgr = new PoeUpdateManager(UpdateSource.Uri, downloader, appName, rootDirectory);
                 return mgr;
             }
@@ -278,13 +278,13 @@ namespace PoeShared.Squirrel.Updater
 
         private void UpdateProgress(int progressPercent, string taskName)
         {
-            Log.Debug($"{taskName} is in progress: {progressPercent}%");
+            Log.Debug(() => $"{taskName} is in progress: {progressPercent}%");
             ProgressPercent = progressPercent;
         }
 
         private void CheckUpdateProgress(int progressPercent)
         {
-            Log.Debug($"Check update is in progress: {progressPercent}%");
+            Log.Debug(() => $"Check update is in progress: {progressPercent}%");
         }
 
       

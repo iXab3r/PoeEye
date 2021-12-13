@@ -110,7 +110,7 @@ namespace PoeShared.Tests.Services
             for (var runnerIdx = 0; runnerIdx < runners; runnerIdx++)
             {
                 var runnerId = $"Runner#{runnerIdx}";
-                Log.Debug($"Starting runner #{runnerId}");
+                Log.Debug(() => $"Starting runner #{runnerId}");
                 var task = Task.Run(() =>
                 {
                     var logger = Log.WithSuffix(runnerId);
@@ -119,12 +119,12 @@ namespace PoeShared.Tests.Services
                     logger.Debug("Signal received, starting runs");
                     for (var runIdx = 0; runIdx < runs; runIdx++)
                     {
-                        logger.Debug($"Starting run #{runIdx}");
+                        logger.Debug(() => $"Starting run #{runIdx}");
                         using (var value = instance.GetOrAdd(0, x => new Resource(x)))
                         {
-                            logger.Debug($"Rented {value}");
+                            logger.Debug(() => $"Rented {value}");
                         }
-                        logger.Debug($"Completed run #{runIdx}");
+                        logger.Debug(() => $"Completed run #{runIdx}");
                     }
                 });
                 tasks.Add(task);

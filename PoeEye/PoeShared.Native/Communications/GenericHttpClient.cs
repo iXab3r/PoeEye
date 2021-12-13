@@ -81,7 +81,7 @@ namespace PoeShared.Communications
 
         private string GetInternal(string uri)
         {
-            Log.Debug($"[HttpClient] Querying uri '{uri}' (GET)");
+            Log.Debug(() => $"[HttpClient] Querying uri '{uri}' (GET)");
 
             var httpClient = WebRequest.CreateHttp(uri);
 
@@ -104,10 +104,10 @@ namespace PoeShared.Communications
         private string PostQueryInternal(string uri, NameValueCollection args)
         {
             var postData = nameValueConverter.Convert(args);
-            Log.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
+            Log.Debug(() => $"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
             if (Log.IsDebugEnabled)
             {
-                Log.Debug($"[HttpClient] POST data dump: {postData.SplitTrim('&').DumpToString()}");
+                Log.Debug(() => $"[HttpClient] POST data dump: {postData.SplitTrim('&').DumpToString()}");
             }
 
             var httpClient = WebRequest.CreateHttp(uri);
@@ -138,7 +138,7 @@ namespace PoeShared.Communications
             var proxy = Proxy;
             if (proxy != null)
             {
-                Log.Debug($"[HttpClient] Using proxy {proxy} for uri '{httpRequest.RequestUri}'");
+                Log.Debug(() => $"[HttpClient] Using proxy {proxy} for uri '{httpRequest.RequestUri}'");
                 httpRequest.Proxy = proxy;
             }
 
@@ -152,7 +152,7 @@ namespace PoeShared.Communications
                 }
             }
 
-            Log.Debug($"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
+            Log.Debug(() => $"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
             using (var response = (HttpWebResponse) httpRequest.GetResponse())
             using (var responseStream = response.GetResponseStream())
             {
@@ -161,9 +161,9 @@ namespace PoeShared.Communications
                 if (responseStream != null)
                 {
                     var rawBytes = responseStream.ReadToEnd() ?? new byte[0];
-                    Log.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes.Length}");
+                    Log.Debug(() => $"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes.Length}");
                     rawResponse = Encoding.UTF8.GetString(rawBytes);
-                    Log.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
+                    Log.Debug(() => $"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
                 }
                 else
                 {

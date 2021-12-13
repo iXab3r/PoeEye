@@ -27,7 +27,7 @@ namespace PoeShared.Services
         {
             Guard.ArgumentNotNull(appArguments, nameof(appArguments));
             Guard.ArgumentNotNull(args, nameof(args));
-            Log.Debug($"Creating startup helper using args: {args.DumpToTextRaw()}...");
+            Log.Debug(() => $"Creating startup helper using args: {args.DumpToTextRaw()}...");
 
             Guard.ArgumentNotNull(args.ExecutablePath, nameof(args.ExecutablePath));
             Guard.ArgumentNotNull(args.UniqueAppName, nameof(args.UniqueAppName));
@@ -43,7 +43,7 @@ namespace PoeShared.Services
                 StartupProviders.Task,
                 args.AutostartFlag ?? appArguments.AutostartFlag);    
             
-            Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
+            Log.Debug(() => $"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
 
             if (IsElevated)
             {
@@ -68,7 +68,7 @@ namespace PoeShared.Services
                 throw new InvalidOperationException("Operation is not available without Admin permissions");
             }
             
-            Log.Debug($"Registering application as {manager.Name} (dir {manager.WorkingDirectory})");
+            Log.Debug(() => $"Registering application as {manager.Name} (dir {manager.WorkingDirectory})");
             var result = manager.Register(args.CommandLineArgs);
             if (!result)
             {
@@ -90,7 +90,7 @@ namespace PoeShared.Services
                 throw new InvalidOperationException("Operation is not available without Admin permissions");
             }
             
-            Log.Debug($"Unregistering application as {manager.Name} (dir {manager.WorkingDirectory})");
+            Log.Debug(() => $"Unregistering application as {manager.Name} (dir {manager.WorkingDirectory})");
 
             var result = manager.Unregister();
             if (!result)
@@ -110,13 +110,13 @@ namespace PoeShared.Services
         {
             if (manager.IsRegistered)
             {
-                Log.Debug($"Reregistering application startup");
+                Log.Debug(() => $"Reregistering application startup");
                 Unregister();
                 Register();
             }
             else
             {
-                Log.Debug($"Application startup is not registered");
+                Log.Debug(() => $"Application startup is not registered");
             }
             
         }

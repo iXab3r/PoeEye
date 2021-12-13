@@ -48,18 +48,18 @@ namespace PoeShared.UI
                 metrics = Container.Resolve<IMetricsRoot>();
                 InitializeLogging();
                 InitializeSevenZip();
-                Log.Debug($"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
-                Log.Debug($"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
-                Log.Debug($"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
-                Log.Debug($"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
-                Log.Debug($"Is Elevated: {appArguments.IsElevated}");
+                Log.Debug(() => $"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
+                Log.Debug(() => $"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
+                Log.Debug(() => $"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
+                Log.Debug(() => $"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
+                Log.Debug(() => $"Is Elevated: {appArguments.IsElevated}");
                 
-                Log.Debug($"UI Scheduler: {RxApp.MainThreadScheduler}");
+                Log.Debug(() => $"UI Scheduler: {RxApp.MainThreadScheduler}");
                 RxApp.MainThreadScheduler = Container.Resolve<IScheduler>(WellKnownSchedulers.UI);
                 RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
                 Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
-                Log.Debug($"New UI Scheduler: {RxApp.MainThreadScheduler}");
-                Log.Debug($"BG Scheduler: {RxApp.TaskpoolScheduler}");
+                Log.Debug(() => $"New UI Scheduler: {RxApp.MainThreadScheduler}");
+                Log.Debug(() => $"BG Scheduler: {RxApp.TaskpoolScheduler}");
                 
                 Log.Debug("Initializing housekeeping");
                 var cleanupService = Container.Resolve<IFolderCleanerService>();
@@ -68,14 +68,14 @@ namespace PoeShared.UI
                 cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
                 cleanupService.FileTimeToLive = TimeSpan.FromDays(14);
                 
-                Log.Debug($"Trying to configure DpiAwareness, OS version: {Environment.OSVersion}");
+                Log.Debug(() => $"Trying to configure DpiAwareness, OS version: {Environment.OSVersion}");
                 if (UnsafeNative.IsWindows10OrGreater())
                 {
                     PInvoke.SHCore.GetProcessDpiAwareness(IntPtr.Zero, out var dpiAwareness);
-                    Log.Debug($"DpiAwareness: {dpiAwareness}");
+                    Log.Debug(() => $"DpiAwareness: {dpiAwareness}");
                     if (dpiAwareness != PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE)
                     {
-                        Log.Debug($"Setting DpiAwareness of current process {dpiAwareness} => {PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE}");
+                        Log.Debug(() => $"Setting DpiAwareness of current process {dpiAwareness} => {PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE}");
                         if (SHCore.SetProcessDpiAwareness(PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE).Failed)
                         {
                             Log.Warn($"Failed to set DpiAwareness of current process");
@@ -97,7 +97,7 @@ namespace PoeShared.UI
                     Log.Warn("Failed to upgrade process priority class", e);
                 }
                 
-                Log.Debug($"Configuring AllowSetForegroundWindow permissions");
+                Log.Debug(() => $"Configuring AllowSetForegroundWindow permissions");
                 UnsafeNative.AllowSetForegroundWindow();
             }
             catch (Exception ex)
@@ -111,15 +111,15 @@ namespace PoeShared.UI
 
         public CompositeDisposable Anchors { get; } = new();
 
-        private static IFluentLog Log => SharedLog.Instance.Log.ToFluent();
+        private static IFluentLog Log => SharedLog.Instance.Log;
 
         private void InitializeSevenZip()
         {
             using var executionTimer = metrics.Measure.Gauge.Time(nameof(InitializeSevenZip));
 
-            Log.Debug($"Initializing 7z wrapper, {nameof(Environment.Is64BitProcess)}: {Environment.Is64BitProcess}");
+            Log.Debug(() => $"Initializing 7z wrapper, {nameof(Environment.Is64BitProcess)}: {Environment.Is64BitProcess}");
             var sevenZipDllPath = Path.Combine(appArguments.ApplicationDirectory.FullName, Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
-            Log.Debug($"Setting 7z library path to {sevenZipDllPath}");
+            Log.Debug(() => $"Setting 7z library path to {sevenZipDllPath}");
             if (!File.Exists(sevenZipDllPath))
             {
                 throw new FileNotFoundException("7z library not found", sevenZipDllPath);
@@ -149,7 +149,7 @@ namespace PoeShared.UI
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Log.Debug($"Application exit detected, exit code: {e.ApplicationExitCode}");
+            Log.Debug(() => $"Application exit detected, exit code: {e.ApplicationExitCode}");
             base.OnExit(e);
             Log.Debug("Disposing application resources");
             Anchors.Dispose();

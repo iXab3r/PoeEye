@@ -122,7 +122,7 @@ namespace PoeShared.Squirrel.Updater
                     configProvider
                         .ListenTo(x => x.AutoUpdateTimeout)
                         .WithPrevious((prev, curr) => new {prev, curr})
-                        .Do(timeout => Log.Debug($"AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
+                        .Do(timeout => Log.Debug(() => $"AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
                         .Select(
                             timeout => timeout.curr <= TimeSpan.Zero
                                 ? Observable.Never<long>()
@@ -131,10 +131,10 @@ namespace PoeShared.Squirrel.Updater
                         .Select(_ => $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})"),
                     updaterModel
                         .ObservableForProperty(x => x.UpdateSource, skipInitial: true)
-                        .Do(source => Log.Debug($"Update source changed: {source}"))
+                        .Do(source => Log.Debug(() => $"Update source changed: {source}"))
                         .Select(x => $"update source change"))
                 .ObserveOn(uiScheduler)
-                .Do(reason => Log.Debug($"Checking for updates, reason: {reason}"))
+                .Do(reason => Log.Debug(() => $"Checking for updates, reason: {reason}"))
                 .Where(x => CheckForUpdatesCommand.CanExecute(null))
                 .SubscribeSafe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
@@ -195,7 +195,7 @@ namespace PoeShared.Squirrel.Updater
 
         public async Task PrepareForceUpdate(IReleaseEntry targetRelease)
         {
-            Log.Debug($"Force update preparation requested, target: {new { targetRelease.Version, targetRelease.Filename, targetRelease.Filesize }}");
+            Log.Debug(() => $"Force update preparation requested, target: {new { targetRelease.Version, targetRelease.Filename, targetRelease.Filesize }}");
             LatestUpdate = await updaterModel.PrepareForceUpdate(targetRelease);
             updaterModel.Reset();
             SetStatus($"Ready to update to v{LatestVersion}");
@@ -203,7 +203,7 @@ namespace PoeShared.Squirrel.Updater
 
         private void ShowUpdaterCommandExecuted(object arg)
         {
-            Log.Debug($"Show updater command executed, arg: {arg}");
+            Log.Debug(() => $"Show updater command executed, arg: {arg}");
             var owner = arg switch
             {
                 Window wnd => wnd,
@@ -224,10 +224,10 @@ namespace PoeShared.Squirrel.Updater
                 return;
             }
 
-            Log.Debug($"Preparing to open uri {uri}");
+            Log.Debug(() => $"Preparing to open uri {uri}");
             await Task.Run(() =>
             {
-                Log.Debug($"Starting new process for uri: {uri}");
+                Log.Debug(() => $"Starting new process for uri: {uri}");
                 var result = new Process {StartInfo = {FileName = uri, UseShellExecute = true}};
                 if (!result.Start())
                 {
@@ -235,14 +235,14 @@ namespace PoeShared.Squirrel.Updater
                 }
                 else
                 {
-                    Log.Debug($"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
+                    Log.Debug(() => $"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
                 }
             });
         }
 
         private async Task CheckForUpdatesCommandExecuted()
         {
-            Log.Debug($"Update check requested, source: {updaterModel.UpdateSource}");
+            Log.Debug(() => $"Update check requested, source: {updaterModel.UpdateSource}");
             if (CheckForUpdatesCommand.IsBusy || ApplyUpdateCommand.IsBusy)
             {
                 Log.Debug("Update is already in progress");
@@ -293,7 +293,7 @@ namespace PoeShared.Squirrel.Updater
 
         private async Task ApplyUpdateCommandExecuted()
         {
-            Log.Debug($"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
+            Log.Debug(() => $"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
             if (CheckForUpdatesCommand.IsBusy || ApplyUpdateCommand.IsBusy)
             {
                 Log.Debug("Already in progress");

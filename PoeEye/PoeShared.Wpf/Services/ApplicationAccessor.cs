@@ -28,13 +28,13 @@ namespace PoeShared.Services
         {
             this.application = application;
             this.appArguments = appArguments;
-            Log.Debug($"Initializing Application accessor for {application}");
+            Log.Debug(() => $"Initializing Application accessor for {application}");
             if (application == null)
             {
                 throw new ApplicationException("Application is not initialized");
             }
             
-            Log.Debug($"Binding to application {application}");
+            Log.Debug(() => $"Binding to application {application}");
             WhenExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
                 .Select(x => x.EventArgs.ApplicationExitCode)
                 .Replay(1)
@@ -51,14 +51,14 @@ namespace PoeShared.Services
             LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
             this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
             {
-                Log.Debug($"Application is loaded - cleaning up lock file {loadingFileLock}");
+                Log.Debug(() => $"Application is loaded - cleaning up lock file {loadingFileLock}");
                 loadingFileLock.Dispose();
             }, Log.HandleException).AddTo(Anchors);
             WhenExit.SubscribeSafe(exitCode =>
             {
                 if (exitCode == 0)
                 {
-                    Log.Debug($"Graceful exit - cleaning up lock file {runningFileLock}");
+                    Log.Debug(() => $"Graceful exit - cleaning up lock file {runningFileLock}");
                     runningFileLock.Dispose();
                 }
                 else
@@ -103,7 +103,7 @@ namespace PoeShared.Services
 
         public async Task Exit()
         {
-            Log.Debug($"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
+            Log.Debug(() => $"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
             lock (application)
             {
                 if (IsExiting)
@@ -141,15 +141,15 @@ namespace PoeShared.Services
                 throw new InvalidOperationException($"{nameof(Shutdown)} invoked on non-main thread");
             }
             
-            Log.Debug($"Terminating application (shutdownMode: {application.ShutdownMode}, window: {application.MainWindow})...");
+            Log.Debug(() => $"Terminating application (shutdownMode: {application.ShutdownMode}, window: {application.MainWindow})...");
             if (application.MainWindow != null && application.ShutdownMode == ShutdownMode.OnMainWindowClose)
             {
-                Log.Debug($"Closing main window {application.MainWindow}...");
+                Log.Debug(() => $"Closing main window {application.MainWindow}...");
                 application.MainWindow.Close();
             }
             else
             {
-                Log.Debug($"Closing app via Shutdown");
+                Log.Debug(() => $"Closing app via Shutdown");
                 application.Shutdown(0);
             }
         }

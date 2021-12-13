@@ -66,7 +66,7 @@ namespace PoeShared.Audio.Services
         public Task PlayNotification(string notificationName, float volume, WaveOutDevice waveOutDevice, CancellationToken cancellationToken)
         {
             Guard.ArgumentNotNull(notificationName, nameof(notificationName));
-            Log.Debug($"Notification of type {notificationName} requested...");
+            Log.Debug(() => $"Notification of type {notificationName} requested...");
 
             if (!TryToLoadNotification(notificationName, out var notificationData))
             {
@@ -77,11 +77,11 @@ namespace PoeShared.Audio.Services
 
             if (!notificationData.Any())
             {
-                Log.Debug($"No sound data loaded for notification of type {notificationData}");
+                Log.Debug(() => $"No sound data loaded for notification of type {notificationData}");
                 return Task.CompletedTask;
             }
 
-            Log.Debug($"Starting playback of {notificationName} ({notificationData.Length}b)...");
+            Log.Debug(() => $"Starting playback of {notificationName} ({notificationData.Length}b)...");
             return audioPlayer.Play(new AudioPlayerRequest()
             {
                 Volume = volume,
@@ -128,7 +128,7 @@ namespace PoeShared.Audio.Services
                 }
             }
 
-            Log.Debug($"Known notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
+            Log.Debug(() => $"Known notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
             Log.Info($"Loaded {knownNotifications.Count} audio notifications");
         }
     }

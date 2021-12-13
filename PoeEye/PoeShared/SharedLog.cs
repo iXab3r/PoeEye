@@ -21,11 +21,11 @@ namespace PoeShared
         /// <summary>
         ///     Log Instance HAVE to be initialized only after GlobalContext is configured
         /// </summary>
-        private static readonly Lazy<ILog> LogInstanceSupplier = new Lazy<ILog>(() =>
+        private static readonly Lazy<IFluentLog> LogInstanceSupplier = new Lazy<IFluentLog>(() =>
         {
             var log = LogManager.GetLogger(typeof(SharedLog));
             log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.DumpToTextRaw()}");
-            return log;
+            return log.ToFluent();
         });
 
         private static readonly Lazy<SharedLog> InstanceSupplier = new Lazy<SharedLog>();
@@ -39,7 +39,7 @@ namespace PoeShared
 
         public static SharedLog Instance => InstanceSupplier.Value;
 
-        public ILog Log => LogInstanceSupplier.Value;
+        public IFluentLog Log => LogInstanceSupplier.Value;
 
         public void InitializeLogging(string configurationMode)
         {
@@ -85,12 +85,12 @@ namespace PoeShared
         public IDisposable AddTraceAppender()
         {
             var listener = new Log4NetTraceListener(Log);
-            Log.Debug($"Adding TraceListener");
+            Log.Debug(() => $"Adding TraceListener");
             Trace.Listeners.Add(listener);
             Trace.WriteLine("TraceListener initialized");
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing TraceListener");
+                Log.Debug(() => $"Removing TraceListener");
                 Trace.Listeners.Remove(listener);
             });
         }
@@ -101,13 +101,13 @@ namespace PoeShared
 
             var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
             var root = repository.Root;
-            Log.Debug($"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
+            Log.Debug(() => $"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
             root.AddAppender(appender);
             repository.RaiseConfigurationChanged(EventArgs.Empty);
 
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing appender {appender}, currently root contains {root.Appenders.Count} appenders");
+                Log.Debug(() => $"Removing appender {appender}, currently root contains {root.Appenders.Count} appenders");
                 root.RemoveAppender(appender);
                 repository.RaiseConfigurationChanged(EventArgs.Empty);
             });
@@ -128,9 +128,9 @@ namespace PoeShared
         
         private sealed class Log4NetTraceListener : System.Diagnostics.TraceListener
         {
-            private readonly log4net.ILog log;
+            private readonly IFluentLog log;
 
-            public Log4NetTraceListener(log4net.ILog log)
+            public Log4NetTraceListener(IFluentLog log)
             {
                 this.log = log;
             }
@@ -141,7 +141,7 @@ namespace PoeShared
                 {
                     return;
                 }
-                log.Debug($"[TraceListener] {message}");
+                log.Debug(() => $"[TraceListener] {message}");
             }
 
             public override void WriteLine(string message)
@@ -150,7 +150,7 @@ namespace PoeShared
                 {
                     return;
                 }
-                log.Debug($"[TraceListener] {message}");
+                log.Debug(() => $"[TraceListener] {message}");
             }
         }
     }

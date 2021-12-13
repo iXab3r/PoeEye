@@ -119,10 +119,10 @@ namespace PoeShared.RegionSelector.ViewModels
             return Observable.Create<Rect>(
                 subscriber =>
                 {
-                    Log.Debug($"Initializing Selection");
+                    Log.Debug(() => $"Initializing Selection");
                     IsVisible = true;
                     var selectionAnchors = new CompositeDisposable();
-                    Disposable.Create(() => Log.Debug($"Disposing SelectionAnchors")).AddTo(selectionAnchors);
+                    Disposable.Create(() => Log.Debug(() => $"Disposing SelectionAnchors")).AddTo(selectionAnchors);
                     Disposable.Create(() => IsVisible = false).AddTo(selectionAnchors);
                     Selection = Rect.Empty;
 

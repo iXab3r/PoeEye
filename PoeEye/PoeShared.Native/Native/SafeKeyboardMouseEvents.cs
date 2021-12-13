@@ -114,22 +114,22 @@ namespace PoeShared.Native
 
         public IDisposable AddKeyboardFilter(IKeyboardEventFilter filter)
         {
-            Log.Debug($"Adding keyboard filter {filter} to list({mouseEventFilters.Count} items)");
+            Log.Debug(() => $"Adding keyboard filter {filter} to list({mouseEventFilters.Count} items)");
             keyboardEventFilters.Add(filter);
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing keyboard filter {filter} from list({mouseEventFilters.Count} items)");
+                Log.Debug(() => $"Removing keyboard filter {filter} from list({mouseEventFilters.Count} items)");
                 keyboardEventFilters.Remove(filter);
             });
         }
 
         public IDisposable AddMouseFilter(IMouseEventFilter filter)
         {
-            Log.Debug($"Adding  mouse filter {filter} to list({mouseEventFilters.Count} items)");
+            Log.Debug(() => $"Adding  mouse filter {filter} to list({mouseEventFilters.Count} items)");
             mouseEventFilters.Add(filter);
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing mouse filter {filter} from list({mouseEventFilters.Count} items)");
+                Log.Debug(() => $"Removing mouse filter {filter} from list({mouseEventFilters.Count} items)");
                 mouseEventFilters.Remove(filter);
             });
         }
@@ -189,7 +189,7 @@ namespace PoeShared.Native
                     keyboardMouseEvents
                         .Select(hookMethod)
                         .Switch()
-                        .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
+                        .Do(LogEvent, Log.HandleException, () => Log.Debug(() => $"{hookName} event loop completed"))
                         .Where(x => filter(x))
                         .Subscribe(result)
                         .AddTo(activeAnchors);
@@ -322,7 +322,7 @@ namespace PoeShared.Native
 
             if (!result && Log.IsDebugEnabled)
             {
-                Log.Debug($"Input event data {inputEventData} is filtered");
+                Log.Debug(() => $"Input event data {inputEventData} is filtered");
             }
 
             return result;

@@ -22,35 +22,35 @@ namespace PoeShared.Modularity
         public bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out KeyValuePair<PoeConfigMigrationConverterKey, Func<object, object>> result)
         {
             var logger = Log.WithSuffix($"{targetType} v{sourceVersion} => v{targetVersion}");
-            logger.Debug($"Looking up converter");
+            logger.Debug(() => $"Looking up converter");
             var converterKvp = convertersByMetadata
                 .FirstOrDefault(x => x.Key.TargetType == targetType && x.Key.SourceVersion == sourceVersion && x.Key.TargetVersion == targetVersion);
             if (converterKvp.Value != null)
             {
-                Log.Debug($"Found converter: {converterKvp}");
+                Log.Debug(() => $"Found converter: {converterKvp}");
                 result = converterKvp;
                 return true;
             }
             else if (AutomaticallyLoadConverters)
             {
-                Log.Debug($"Could not find converter, searching in all appdomain assemblies");
+                Log.Debug(() => $"Could not find converter, searching in all appdomain assemblies");
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                Log.Debug($"AppDomain contains {assemblies.Length} assemblies, processed: {processedAssemblies.Count}");
+                Log.Debug(() => $"AppDomain contains {assemblies.Length} assemblies, processed: {processedAssemblies.Count}");
                 var unprocessedAssemblies = assemblies.Except(processedAssemblies).ToArray();
                 if (unprocessedAssemblies.Any())
                 {
-                    Log.Debug($"Found {unprocessedAssemblies.Length} unprocessed assemblies, loading converters");
+                    Log.Debug(() => $"Found {unprocessedAssemblies.Length} unprocessed assemblies, loading converters");
                     unprocessedAssemblies.ForEach(LoadConvertersFromAssembly);
                     Log.Debug("Repeating lookup process again after processing");
                     return TryGetConverter(targetType, sourceVersion, targetVersion, out result);
                 }
                 else
                 {
-                    Log.Debug($"No additional assemblies to process");
+                    Log.Debug(() => $"No additional assemblies to process");
                 }
             }
 
-            Log.Debug($"Could not find matching converter");
+            Log.Debug(() => $"Could not find matching converter");
             result = default;
             return false;
         }
@@ -73,10 +73,10 @@ namespace PoeShared.Modularity
             var assemblyV1 = typeV1.Assembly;
             var assemblyV2 = typeV2.Assembly;
 
-            Log.Debug($"Registering converter {converter} for {typeV1}  => {typeV2}");
+            Log.Debug(() => $"Registering converter {converter} for {typeV1}  => {typeV2}");
             var sampleV1 = versionedConfigByType.GetOrAdd(typeV1, _ => new T1());
             var sampleV2 = versionedConfigByType.GetOrAdd(typeV2, _ => new T2());
-            Log.Debug($"Version of source type {typeV1} is {sampleV1.Version}, version of target type {typeV2} is {sampleV2.Version}");
+            Log.Debug(() => $"Version of source type {typeV1} is {sampleV1.Version}, version of target type {typeV2} is {sampleV2.Version}");
 
             if (sampleV2.Version < sampleV1.Version)
             {
@@ -99,7 +99,7 @@ namespace PoeShared.Modularity
             {
                 throw new InvalidOperationException($"Converter for {explicitConverterKey} is already registered: {existingConverter}");
             }
-            Log.Debug($"Registering explicit converter: {explicitConverterKey}");
+            Log.Debug(() => $"Registering explicit converter: {explicitConverterKey}");
 
             Func<object, object> explicitConverter = src =>
             {
@@ -192,13 +192,13 @@ namespace PoeShared.Modularity
                     return;
                 }
 
-                Log.Debug($"Registering implicit descending converter: {implicitConverterKey}");
+                Log.Debug(() => $"Registering implicit descending converter: {implicitConverterKey}");
                 var explicitConverter = convertersByMetadata[converterKey];
                 convertersByMetadata[implicitConverterKey] = src =>
                 {
-                    Log.Debug($"Converting source using implicit {implicitConverterKey}");
+                    Log.Debug(() => $"Converting source using implicit {implicitConverterKey}");
                     var interimConversionResult = previousConverter.Value.Invoke(src);
-                    Log.Debug($"Converting source using {converterKey}");
+                    Log.Debug(() => $"Converting source using {converterKey}");
                     return explicitConverter(interimConversionResult);
                 };
                 RegisterImplicitConverters(implicitConverterKey);
@@ -222,13 +222,13 @@ namespace PoeShared.Modularity
                     return;
                 }
 
-                Log.Debug($"Registering implicit ascending converter: {implicitConverterKey}");
+                Log.Debug(() => $"Registering implicit ascending converter: {implicitConverterKey}");
                 var explicitConverter = convertersByMetadata[converterKey];
                 convertersByMetadata[implicitConverterKey] = src =>
                 {
-                    Log.Debug($"Converting source using implicit {converterKey}");
+                    Log.Debug(() => $"Converting source using implicit {converterKey}");
                     var interimConversionResult = explicitConverter(src);
-                    Log.Debug($"Converting source using {implicitConverterKey}");
+                    Log.Debug(() => $"Converting source using {implicitConverterKey}");
                     return nextConverter.Value.Invoke(interimConversionResult);
                 };
                 RegisterImplicitConverters(implicitConverterKey);

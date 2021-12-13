@@ -37,21 +37,21 @@ namespace PoeShared.Services
                     continue;
                 }
 
-                Log.Debug($"Removing disposed item: {kvp}");
+                Log.Debug(() => $"Removing disposed item: {kvp}");
                 if (!cache.TryRemove(kvp.Key, out var _))
                 {
-                    Log.Debug($"Successfully removed disposed item {kvp}");
+                    Log.Debug(() => $"Successfully removed disposed item {kvp}");
                     removedItemCount++;
                 }
                 else
                 {
-                    Log.Debug($"Someone else already removed disposed item {kvp}");
+                    Log.Debug(() => $"Someone else already removed disposed item {kvp}");
                 }
             }
 
             if (removedItemCount > 0)
             {
-                Log.Debug($"Removed {removedItemCount} disposed item(s) from cache, total item count: {cache.Count}");
+                Log.Debug(() => $"Removed {removedItemCount} disposed item(s) from cache, total item count: {cache.Count}");
             }
         }
 

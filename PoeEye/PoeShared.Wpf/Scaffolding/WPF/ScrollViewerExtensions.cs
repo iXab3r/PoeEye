@@ -55,12 +55,12 @@ namespace PoeShared.Scaffolding.WPF
 
             if (Log.IsDebugEnabled)
             {
-                Log.Debug($"Scrolling {scrollViewer} to top...");
+                Log.Debug(() => $"Scrolling {scrollViewer} to top...");
             }
             scrollViewer.ScrollToTop();
             if (Log.IsDebugEnabled)
             {
-                Log.Debug($"Resetting value of {nameof(AutoScrollToTopProperty)} of {scrollViewer} to default value...");
+                Log.Debug(() => $"Resetting value of {nameof(AutoScrollToTopProperty)} of {scrollViewer} to default value...");
             }
             dependencyObject.SetCurrentValue(AutoScrollToTopProperty, false);
         }

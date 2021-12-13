@@ -113,7 +113,7 @@ namespace PoeShared.Scaffolding
             sw.Stop();
             if (logOnDisposal && logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
             {
-                logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
+                logger.Debug(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }
         }
     }
