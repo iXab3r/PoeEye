@@ -43,7 +43,7 @@ namespace PoeShared.Native
             };
 
             WpfRect currentRegionPercent;
-            if (currentTargetRegion.IsNotEmpty())
+            if (currentTargetRegion.IsNotEmptyArea())
             {
                 currentRegionPercent = new WpfRect
                 {

@@ -188,7 +188,7 @@ namespace PoeShared.RegionSelector.ViewModels
             var intersections = windows
                 .Where(x => x.ProcessId != CurrentProcessId)
                 .Where(x => UnsafeNative.WindowIsVisible(x.Handle))
-                .Where(x => x.ClientBounds.IsNotEmpty())
+                .Where(x => x.ClientBounds.IsNotEmptyArea())
                 .Where(x => x.ClientBounds.Contains(topLeft))
                 .Select(
                     (x, idx) =>
@@ -212,7 +212,7 @@ namespace PoeShared.RegionSelector.ViewModels
                             Area = intersection.Width * intersection.Height
                         };
                     })
-                .Where(x => GeometryExtensions.IsNotEmpty(x.Intersection))
+                .Where(x => GeometryExtensions.IsNotEmptyArea(x.Intersection))
                 .OrderBy(x => x.Window.ZOrder)
                 .ToArray();
 

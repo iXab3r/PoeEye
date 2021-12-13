@@ -98,7 +98,12 @@ namespace PoeShared.Scaffolding
             return rect.Width == default && rect.Height == default && rect.X == default && rect.Y == default;
         }
 
-        public static bool IsNotEmpty(this Rectangle rect)
+        public static bool IsEmptyArea(this Rectangle rect)
+        {
+            return !IsNotEmptyArea(rect);
+        }
+        
+        public static bool IsNotEmptyArea(this Rectangle rect)
         {
             return
                 rect.Width > 0 &&

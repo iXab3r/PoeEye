@@ -305,7 +305,7 @@ namespace PoeShared.Native
                 overlayBounds = config.OverlayBounds;
             }
             
-            if (!overlayBounds.IsNotEmpty() || overlayBounds.IsNotEmpty() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
+            if (!overlayBounds.IsNotEmptyArea() || overlayBounds.IsNotEmptyArea() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
             {
                 Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
                 ResetToDefault();
