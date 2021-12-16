@@ -58,6 +58,13 @@ namespace PoeShared.Native
             {
                 var result = new StringBuilder(1024);
                 var processPathLength = result.Capacity;
+                
+                if (Kernel32.QueryFullProcessImageName(openProcessHandle, Kernel32.QueryFullProcessImageNameFlags.None, result, ref processPathLength) || processPathLength == 0)
+                {
+                    return result.ToString(0, processPathLength);
+                }
+
+                result.Clear();
                 if (!Kernel32.QueryFullProcessImageName(openProcessHandle, Kernel32.QueryFullProcessImageNameFlags.PROCESS_NAME_NATIVE, result, ref processPathLength) || processPathLength == 0)
                 {
                     var lastError = Kernel32.GetLastError();
