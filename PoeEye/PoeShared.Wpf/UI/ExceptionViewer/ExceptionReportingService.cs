@@ -28,6 +28,7 @@ namespace PoeShared.UI
         private readonly IApplicationAccessor applicationAccessor;
         private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
         private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
+        private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
         private IExceptionReportHandler reportHandler;
 
         public ExceptionReportingService(
@@ -125,7 +126,7 @@ namespace PoeShared.UI
         private void ReportCrash(Exception exception, string developerMessage = "")
         {
             Log.Error($"Unhandled application exception({developerMessage})", exception);
-
+            using var @lock = exceptionReportGate.Enter();
             if (appArguments.IsDebugMode || Debugger.IsAttached)
             {
                 Debugger.Break();

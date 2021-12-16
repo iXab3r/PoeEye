@@ -112,7 +112,7 @@ namespace PoeShared.Modularity
             var innerType = AssemblyHelper.Instance.ResolveType(metadata);
             if (innerType == null)
             {
-                Log.Warn(() => $"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {metadata.AssemblyName}, returning wrapper object {metadata}");
+                Log.Warn(() => $"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {metadata.AssemblyName}, returning wrapper object {new { metadata.TypeName, metadata.Version }}");
                 return metadata;
             }
             
