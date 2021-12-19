@@ -141,6 +141,7 @@
             <eye:ButtonEx
                 MinWidth="100"
                 Command="{Binding SendReportCommand}"
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                 Icon="&#xf1d8;"
                 Content="Send" />
             <eye:ButtonEx Command="{Binding CloseCommand}"
