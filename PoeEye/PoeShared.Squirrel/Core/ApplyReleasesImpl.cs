@@ -129,10 +129,10 @@ namespace PoeShared.Squirrel.Core
 
         public async Task FullUninstall()
         {
-            var currentRelease = GetReleases().MaxBy(x => x.Name.ToSemanticVersion()).First();
+            var currentRelease = GetReleases().MaxBy(x => x.Name.ToSemanticVersion());
 
             Log.Info("Starting full uninstall");
-            if (currentRelease.Exists)
+            if (currentRelease is { Exists: true })
             {
                 var version = currentRelease.Name.ToSemanticVersion();
 
@@ -419,7 +419,7 @@ namespace PoeShared.Squirrel.Core
             // If there are no deltas in our list, we're already done
             if (releasesToApply.All(x => !x.IsDelta))
             {
-                return releasesToApply.MaxBy(x => x.Version).FirstOrDefault();
+                return releasesToApply.MaxBy(x => x.Version);
             }
             
             if (!releasesToApply.All(x => x.IsDelta))

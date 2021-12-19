@@ -2,7 +2,7 @@
   <PropertyGroup>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <ProjectGuid>{9AAA9005-0177-4F4C-B6DE-EB09037DB155}</ProjectGuid>
-    <TargetFramework>net5-windows7</TargetFramework>
+    <TargetFramework>net6-windows7</TargetFramework>
     <AssemblyTitle>PoeShared</AssemblyTitle>
     <Product>PoeShared</Product>
     <Description>PoeEye Shared classes</Description>

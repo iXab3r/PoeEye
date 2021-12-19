@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{38C9EBE2-2AC9-465F-8A2A-49DFB1CB9383}</ProjectGuid>
-    <TargetFramework>net5-windows7</TargetFramework>
+    <TargetFramework>net6-windows7</TargetFramework>
     <AssemblyTitle>PoeShared.Wpf</AssemblyTitle>
     <Product>PoeShared.Wpf</Product>
     <Description>PoeEye Shared Wpf classes</Description>
