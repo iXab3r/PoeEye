@@ -66,7 +66,7 @@ namespace PoeShared.UI.Providers
             {
                 Attached = true,
                 Attachment = new FileInfo(destinationFileName),
-                Description = $"Windows Event Log, journal {logName}{(minDate != null ? $"" : default)}\n{File.ReadAllText(destinationFileName)}"
+                Description = $"Windows Event Log, journal {logName}{(minDate != null ? $"" : default)}\n{File.ReadAllText(destinationFileName).TakeChars(ushort.MaxValue)}"
             };
         }
     }

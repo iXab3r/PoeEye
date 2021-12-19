@@ -111,7 +111,7 @@ namespace PoeShared.UI
 
         public CompositeDisposable Anchors { get; } = new();
 
-        private static IFluentLog Log => SharedLog.Instance.Log;
+        protected static IFluentLog Log => SharedLog.Instance.Log;
 
         private void InitializeSevenZip()
         {
