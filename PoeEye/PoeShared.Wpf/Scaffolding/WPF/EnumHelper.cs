@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using log4net;
 using PoeShared.Logging;
 
@@ -23,27 +24,51 @@ namespace PoeShared.Scaffolding.WPF
             return result;
         }
 
-        public static EnumValueWithDescription[] GetValuesAndDescriptions(Type enumType)
+        public static EnumValueWithDescription[] GetValuesAndDescriptions(Type enumType, string defaultValueName)
         {
-            var values = Enum.GetValues(enumType).Cast<object>();
-            var valuesAndDescriptions = from value in values
+            var values = Enum.GetValues(enumType).Cast<object>().ToHashSet();
+            var membersByName = enumType.GetMembers().OfType<FieldInfo>().Where(x => x.IsStatic).ToDictionary(x => x.Name, x => x);
+            var defaultValue = enumType.GetDefault();
+            values.Add(defaultValue);
+
+            string GetDescriptionOrDefault(object value, Func<string> defaultDescriptionFactory)
+            {
+                var memberName = value.ToString() ?? string.Empty;
+                if (!membersByName.TryGetValue(memberName, out var member))
+                {
+                    return defaultDescriptionFactory();
+                }
+
+                var descriptionAttribute = member
+                    .GetCustomAttributes(true)
+                    .OfType<DescriptionAttribute>()
+                    .FirstOrDefault();
+                return descriptionAttribute == default ? defaultDescriptionFactory() : descriptionAttribute.Description;
+            }
+
+            bool GetBrowsableOrDefault(object value, Func<bool> defaultDescriptionFactory)
+            {
+                var memberName = value.ToString() ?? string.Empty;
+                if (!membersByName.TryGetValue(memberName, out var member))
+                {
+                    return defaultDescriptionFactory();
+                }
+
+                var descriptionAttribute = member
+                    .GetCustomAttributes(true)
+                    .OfType<BrowsableAttribute>()
+                    .FirstOrDefault();
+                return descriptionAttribute?.Browsable ?? defaultDescriptionFactory();
+            }
+            
+            var valuesAndDescriptions = from value in values.OrderBy(x => x)
                 select new
                 {
                     Value = value,
-                    Description = value.GetType()
-                                      .GetMember(value.ToString())[0]
-                                      .GetCustomAttributes(true)
-                                      .OfType<DescriptionAttribute>()
-                                      .FirstOrDefault()?
-                                      .Description ?? value.ToString(),
-                    Browsable = value.GetType()
-                                    .GetMember(value.ToString())[0]
-                                    .GetCustomAttributes(true)
-                                    .OfType<BrowsableAttribute>()
-                                    .FirstOrDefault()?
-                                    .Browsable ?? true
+                    Description = GetDescriptionOrDefault(value, () => defaultValue.Equals(value) ? defaultValueName : value.ToString()),
+                    Browsable = GetBrowsableOrDefault(value, () => true)
                 };
-
+            
             return valuesAndDescriptions
                 .Where(x => x.Browsable)
                 .Select(x => new EnumValueWithDescription
@@ -52,6 +77,11 @@ namespace PoeShared.Scaffolding.WPF
                     Description = x.Description
                 })
                 .ToArray();
+        }
+        
+        public static EnumValueWithDescription[] GetValuesAndDescriptions(Type enumType)
+        {
+            return GetValuesAndDescriptions(enumType, "Default");
         }
 
         public static T SetFlags<T>(this T instance, T flagToSet) where T : struct
