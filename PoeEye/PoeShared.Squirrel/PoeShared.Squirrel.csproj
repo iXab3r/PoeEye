@@ -9,7 +9,7 @@
         <LangVersion>latest</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <TargetFramework>net6-windows7</TargetFramework>
+        <TargetFramework>net5-windows7</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

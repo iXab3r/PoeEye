@@ -67,7 +67,7 @@ namespace PoeShared.Squirrel.Core
             }
 
             var latestLocalRelease = localReleases.Any()
-                ? localReleases.MaxBy(x => x.Version)
+                ? localReleases.MaxBy(x => x.Version).First()
                 : default;
 
             // Fetch the remote RELEASES file, whether it's a local dir or an

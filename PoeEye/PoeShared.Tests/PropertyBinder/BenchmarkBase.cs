@@ -51,7 +51,7 @@ namespace PoeShared.Tests.PropertyBinder
             return result;
         }
 
-        protected IConfig PrepareDefaultConfig(string targetFrameworkMoniker =  "net7.0-windows7")
+        protected IConfig PrepareDefaultConfig(string targetFrameworkMoniker =  "net5.0-windows7")
         {
             var job = PrepareJob(targetFrameworkMoniker);
             var result = PrepareConfig()
