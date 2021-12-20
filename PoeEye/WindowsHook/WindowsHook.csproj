@@ -3,7 +3,7 @@
         <UseWindowsForms>True</UseWindowsForms>
         <AssemblyName>WindowsHook</AssemblyName>
         <RootNamespace>WindowsHook</RootNamespace>
-        <TargetFramework>net5-windows7</TargetFramework>
+        <TargetFramework>net6-windows7</TargetFramework>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <PackageProjectUrl>https://github.com/iXab3r/WindowsHook</PackageProjectUrl>
         <PackageIcon>mouse-keyboard-hook-logo64x64.png</PackageIcon>
