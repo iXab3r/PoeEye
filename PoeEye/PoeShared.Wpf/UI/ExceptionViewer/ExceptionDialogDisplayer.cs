@@ -56,7 +56,7 @@ namespace PoeShared.UI
 
         private void ShowMessageBox(ExceptionDialogConfig config)
         {
-            Log.Debug(() => $"Showing MessageBox, exception: {config.Exception}, config: {config.DumpToTextRaw()}");
+            Log.Debug(() => $"Showing MessageBox, exception: {config.Exception}, config: {config}");
 
             Window owner = null;
             var appWindow = Application.Current.MainWindow;
