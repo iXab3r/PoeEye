@@ -12,10 +12,10 @@ namespace PoeShared.Modularity
     {
         private static readonly IFluentLog Log = typeof(AssemblyHelper).PrepareLogger();
 
-        private readonly ConcurrentDictionary<string, Assembly> loadedAssemblyByName = new ConcurrentDictionary<string, Assembly>();
+        private readonly ConcurrentDictionary<string, Assembly> loadedAssemblyByName = new();
         private readonly ConcurrentDictionary<string, string> typeNameMapping = new();
 
-        private static readonly Lazy<AssemblyHelper> AssemblyHelperSupplier = new Lazy<AssemblyHelper>();
+        private static readonly Lazy<AssemblyHelper> AssemblyHelperSupplier = new();
 
         public static AssemblyHelper Instance => AssemblyHelperSupplier.Value;
         
