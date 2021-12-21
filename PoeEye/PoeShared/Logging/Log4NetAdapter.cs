@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using log4net;
 
 namespace PoeShared.Logging
@@ -20,12 +21,37 @@ namespace PoeShared.Logging
 
         public bool IsErrorEnabled => logger.IsErrorEnabled;
 
+        private static string GetThreadName()
+        {
+            if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
+            {
+                return Thread.CurrentThread.ManagedThreadId.ToString();
+            }
+
+            if (Thread.CurrentThread.Name == ".NET ThreadPool Worker")
+            {
+                return $"Pool#{Thread.CurrentThread.ManagedThreadId}";
+            }
+            
+            if (Thread.CurrentThread.Name == ".NET Long Running Task")
+            {
+                return $"Task#{Thread.CurrentThread.ManagedThreadId}";
+            }
+
+            return Thread.CurrentThread.Name;
+        }
+
         /// <summary>
         ///     Writes the specified LogData to log4net.
         /// </summary>
         /// <param name="logData">The log data.</param>
         public void WriteLog(LogData logData)
         {
+            if (ThreadContext.Properties["threadid"] is not string)
+            {
+                ThreadContext.Properties["threadid"] = GetThreadName();
+            }
+           
             switch (logData.LogLevel)
             {
                 case FluentLogLevel.Info:
