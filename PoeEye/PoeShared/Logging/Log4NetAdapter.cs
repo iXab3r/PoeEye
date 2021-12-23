@@ -25,17 +25,17 @@ namespace PoeShared.Logging
         {
             if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
             {
-                return Thread.CurrentThread.ManagedThreadId.ToString();
+                return Environment.CurrentManagedThreadId.ToString();
             }
 
             if (Thread.CurrentThread.Name == ".NET ThreadPool Worker")
             {
-                return $"Pool#{Thread.CurrentThread.ManagedThreadId}";
+                return $"Pool#{Environment.CurrentManagedThreadId}";
             }
             
             if (Thread.CurrentThread.Name == ".NET Long Running Task")
             {
-                return $"Task#{Thread.CurrentThread.ManagedThreadId}";
+                return $"Task#{Environment.CurrentManagedThreadId}";
             }
 
             return Thread.CurrentThread.Name;

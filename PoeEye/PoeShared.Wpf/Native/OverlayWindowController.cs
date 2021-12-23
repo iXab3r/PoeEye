@@ -103,7 +103,12 @@ namespace PoeShared.Native
             var logger = Log.WithSuffix(overlayControllerId).WithSuffix(viewModel.Id).WithSuffix(() => overlayWindow == default ? "No window yet" : overlayWindow.ToString());
 
             var childAnchors = new CompositeDisposable();
-            viewModel.AddTo(childAnchors);
+            Disposable.Create(() =>
+            {
+                logger.Debug($"Disposing overlay view model: {viewModel}");
+                viewModel.Dispose();
+                logger.Debug($"Disposed overlay view model: {viewModel}");
+            }).AddTo(childAnchors);
 
             logger.Debug(() =>"Initializing window container view model");
             var overlayWindowViewModel = new OverlayWindowViewModel(logger)

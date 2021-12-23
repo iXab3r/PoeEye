@@ -121,17 +121,28 @@ namespace PoeShared.Native
 
             this.WhenAnyValue(x => x.OverlayWindow)
                 .Where(x => x != null)
+                .Take(1)
                 .SubscribeSafe(x =>
                 {
-                    var hwndSource = HwndSource.FromHwnd(x.WindowHandle).AddTo(Anchors);
+                    Log.Debug(() => $"Overlay window is set, resolving {nameof(HwndSource)} for {x}");
+                    var hwndSource = HwndSource.FromHwnd(x.WindowHandle);
+                    if (hwndSource == null)
+                    {
+                        throw new InvalidStateException($"Failed to resolve {nameof(HwndSource)} for {x}");
+                    }
+                    Disposable.Create(() =>
+                    {
+                        Log.Debug(() => $"Releasing {nameof(HwndSource)} of {x}");
+                        hwndSource.Dispose();
+                    }).AddTo(Anchors);
                     //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
+                    Log.Debug(() => $"Resolved {nameof(HwndSource)} for {x}: {hwndSource}");
                     hwndSource.AddHook(WndProc);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
             Log.Info("Initialized overlay view model");
 
             Binder.Attach(this).AddTo(Anchors);
-            
             Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
         }
 

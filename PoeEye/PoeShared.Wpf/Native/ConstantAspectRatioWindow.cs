@@ -129,7 +129,7 @@ namespace PoeShared.Native
             Log.Debug(() => $"Initialized native window handle");
             if (WindowHandle == IntPtr.Zero)
             {
-                throw new ApplicationException("Window handle must be initialized at this point");
+                throw new InvalidStateException("Window handle must be initialized at this point");
             }
         }
 
@@ -139,7 +139,7 @@ namespace PoeShared.Native
             var hwndSource = (HwndSource)PresentationSource.FromVisual(this);
             if (hwndSource == null)
             {
-                throw new ApplicationException("HwndSource must be initialized at this point");
+                throw new InvalidStateException("HwndSource must be initialized at this point");
             }
 
             Dpi = GetDpiFromHwndSource(hwndSource);
