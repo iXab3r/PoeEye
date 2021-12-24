@@ -52,6 +52,14 @@ namespace PoeShared.Scaffolding
                 item?.Dispose();
             }).AddTo(Anchors);
         }
+
+        protected void EnsureNonUiThread()
+        {
+            if (Environment.CurrentManagedThreadId == 1)
+            {
+                throw new InvalidOperationException($"Operation must be completed on non-UI thread");
+            }
+        }
         
         public void RaisePropertyChanged(params string[] properties)
         {

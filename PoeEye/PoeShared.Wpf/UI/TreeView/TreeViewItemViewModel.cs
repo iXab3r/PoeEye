@@ -19,7 +19,7 @@ namespace PoeShared.UI
         private static readonly Binder<TreeViewItemViewModel> Binder = new();
         private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
 
-        private readonly SourceList<TreeViewItemViewModel> children = new();
+        private readonly SourceList<ITreeViewItemViewModel> children = new();
         private readonly ObservableAsPropertyHelper<string> pathSupplier;
         protected readonly Fallback<string> TabName = new();
         private readonly ObservableAsPropertyHelper<bool> parentIsExpanded;
@@ -68,7 +68,6 @@ namespace PoeShared.UI
                 .Switch();
             children
                 .Connect()
-                .Transform(x => (ITreeViewItemViewModel)x)
                 .Sort(this.WhenAnyValue(x => x.SortComparer), SortOptions.None, resort)
                 .Bind(out var chld)
                 .SubscribeToErrors(Log.HandleUiException)
@@ -77,7 +76,7 @@ namespace PoeShared.UI
 
             Disposable.Create(() =>
             {
-                this.Parent = null;
+                Parent = null;
             }).AddTo(Anchors);
             
             this.WhenAnyValue(x => x.Parent)
@@ -165,6 +164,34 @@ namespace PoeShared.UI
 
             var result = resultBuilder.ToString().Trim(System.IO.Path.DirectorySeparatorChar);
             return string.IsNullOrEmpty(result) ? null : result;
+        }
+
+        public IEnumerable<ITreeViewItemViewModel> EnumerateChildren()
+        {
+            return EnumerateChildren(this);
+        }
+
+        private static IEnumerable<ITreeViewItemViewModel> EnumerateChildren(TreeViewItemViewModel root)
+        {
+            if (root.children.Count <= 0)
+            {
+                yield break;
+            }
+            
+            foreach (var child in root.children.Items)
+            {
+                yield return child;
+
+                if (child is not TreeViewItemViewModel treeChild)
+                {
+                    throw new InvalidOperationException($"Enumeration is supported only for items of type {typeof(TreeViewItemViewModel)}, but got child {child} with type {child.GetType()}");
+                }
+
+                foreach (var childOfChild in EnumerateChildren(treeChild))
+                {
+                    yield return childOfChild;
+                }
+            }
         }
     }
 }

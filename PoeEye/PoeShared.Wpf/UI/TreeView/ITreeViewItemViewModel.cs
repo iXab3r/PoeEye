@@ -33,6 +33,12 @@ namespace PoeShared.UI
         public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
 
         void Clear();
+
+        /// <summary>
+        ///  Thread-safe enumeration, although it may contain partially modified data
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<ITreeViewItemViewModel> EnumerateChildren();
     }
     
     public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel

@@ -11,13 +11,19 @@ namespace PoeShared.Modularity
     {
         private static readonly IFluentLog Log = typeof(EnforcedThreadScheduler).PrepareLogger();
 
-        private readonly EventLoopScheduler threadScheduler;
+        private readonly IScheduler threadScheduler;
         private Thread schedulerThread;
+
+        public EnforcedThreadScheduler(Thread thread, IScheduler threadScheduler)
+        {
+            Log.Info($"Using existing thread scheduler: {threadScheduler}");
+            this.threadScheduler = threadScheduler;
+            this.schedulerThread = thread;
+        }
 
         public EnforcedThreadScheduler(string name)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-
             Log.Info($"Initializing new scheduler {name}");
             threadScheduler = new EventLoopScheduler(start =>
             {
@@ -41,7 +47,7 @@ namespace PoeShared.Modularity
 
         public string Name { get; }
 
-        public bool IsOnSchedulerThread => Thread.CurrentThread == schedulerThread;
+        public bool IsOnSchedulerThread => Environment.CurrentManagedThreadId == schedulerThread?.ManagedThreadId;
 
         public DateTimeOffset Now => threadScheduler.Now;
 
