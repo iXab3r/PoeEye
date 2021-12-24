@@ -23,6 +23,28 @@ namespace PoeShared.Scaffolding
             return new SourceList<T>(source);
         }
 
+        public static bool TryGetValue<T, TKey, TResult>(this ISourceCache<T, TKey> instance, TKey key, out TResult value, Func<T, TResult> converter)
+        {
+            var result = TryGetValue(instance, key, out var rawValue);
+            value = result ? converter(rawValue) : default;
+            return result;
+        }
+        
+        public static bool TryGetValue<T, TKey>(this ISourceCache<T, TKey> instance, TKey key, out T value)
+        {
+            var result = instance.Lookup(key);
+            if (result.HasValue)
+            {
+                value = result.Value;
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
+        }
+
         [Obsolete("DynamicCombiner and ReferenceCountTracker contain a bug that could be reproduced by Edit()ing a list and replacing an item there")]
         public static ISourceList<T> ToSourceList<T>(this IEnumerable<ISourceList<T>> lists)
         {

@@ -29,6 +29,8 @@ namespace PoeShared.Notifications.Services
             IFactory<INotificationContainerViewModel, INotificationViewModel> notificationContainerFactory,
             IFactory<OverlayNotificationsContainerViewModel> overlayNotificationsContainerFactory)
         {
+            Log.Debug(() => "Initializing notification service");
+
             this.notificationContainerFactory = notificationContainerFactory;
             overlayWindowController.IsEnabled = true;
 
@@ -40,41 +42,45 @@ namespace PoeShared.Notifications.Services
                 .Bind(out var items)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
-
-            var layeredContainer = overlayNotificationsContainerFactory.Create().AddTo(Anchors);
-            layeredContainer.OverlayMode = OverlayMode.Layered;
-            overlayWindowController.RegisterChild(layeredContainer).AddTo(Anchors);
-            itemsSource
-                .Connect()
-                .Filter(x => x.Notification.Interactive)
-                .ObserveOn(uiScheduler)
-                .Bind(out var interactiveItems)
-                .SubscribeToErrors(Log.HandleUiException)
-                .AddTo(Anchors);
-            layeredContainer.Items = interactiveItems;
-
-            var transparentContainer = overlayNotificationsContainerFactory.Create().AddTo(Anchors);
-            transparentContainer.OverlayMode = OverlayMode.Transparent;
-            overlayWindowController.RegisterChild(transparentContainer).AddTo(Anchors);
-            itemsSource
-                .Connect()
-                .Filter(x => !x.Notification.Interactive)
-                .ObserveOn(uiScheduler)
-                .Bind(out var nonInteractiveItems)
-                .SubscribeToErrors(Log.HandleUiException)
-                .AddTo(Anchors);
-            transparentContainer.Items = nonInteractiveItems;
-            
-            layeredContainer.WhenAnyValue(x => x.NativeBounds)
-                .ObserveOn(uiScheduler)
-                .SubscribeSafe(containerOffset =>
-                {
-                    Log.Debug(() => $"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");
-                    transparentContainer.Offset = new System.Drawing.Point(0, containerOffset.Height + 5);
-                }, Log.HandleUiException)
-                .AddTo(Anchors);
-
             Items = items;
+
+            Log.Debug(() => "Sending notification containers creation to UI thread");
+            uiScheduler.Schedule(() =>
+            {
+                Log.Debug(() => "Preparing notification containers");
+                var layeredContainer = overlayNotificationsContainerFactory.Create().AddTo(Anchors);
+                layeredContainer.OverlayMode = OverlayMode.Layered;
+                overlayWindowController.RegisterChild(layeredContainer).AddTo(Anchors);
+                itemsSource
+                    .Connect()
+                    .Filter(x => x.Notification.Interactive)
+                    .ObserveOn(uiScheduler)
+                    .Bind(out var interactiveItems)
+                    .SubscribeToErrors(Log.HandleUiException)
+                    .AddTo(Anchors);
+                layeredContainer.Items = interactiveItems;
+
+                var transparentContainer = overlayNotificationsContainerFactory.Create().AddTo(Anchors);
+                transparentContainer.OverlayMode = OverlayMode.Transparent;
+                overlayWindowController.RegisterChild(transparentContainer).AddTo(Anchors);
+                itemsSource
+                    .Connect()
+                    .Filter(x => !x.Notification.Interactive)
+                    .ObserveOn(uiScheduler)
+                    .Bind(out var nonInteractiveItems)
+                    .SubscribeToErrors(Log.HandleUiException)
+                    .AddTo(Anchors);
+                transparentContainer.Items = nonInteractiveItems;
+
+                layeredContainer.WhenAnyValue(x => x.NativeBounds)
+                    .ObserveOn(uiScheduler)
+                    .SubscribeSafe(containerOffset =>
+                    {
+                        Log.Debug(() => $"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");
+                        transparentContainer.Offset = new System.Drawing.Point(0, containerOffset.Height + 5);
+                    }, Log.HandleUiException)
+                    .AddTo(Anchors);
+            });
         }
 
         public ReadOnlyObservableCollection<INotificationContainerViewModel> Items { get; }
