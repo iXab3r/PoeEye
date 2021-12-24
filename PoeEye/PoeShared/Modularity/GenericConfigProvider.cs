@@ -19,8 +19,6 @@ namespace PoeShared.Modularity
 {
     public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
-        private static readonly IFluentLog Log = typeof(GenericConfigProvider<TConfig>).PrepareLogger();
-
         private readonly IComparisonService comparisonService;
         private readonly IConfigProvider configProvider;
         
@@ -34,17 +32,21 @@ namespace PoeShared.Modularity
             Guard.ArgumentNotNull(comparisonService, nameof(comparisonService));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
+            Log = GetType().PrepareLogger();
+
             this.comparisonService = comparisonService;
             this.configProvider = configProvider;
             
-            Observable.Merge(
-                    configProvider.ConfigHasChanged.ToUnit(),
-                    Observable.Return(Unit.Default))
+            configProvider
+                .ConfigHasChanged
+                .StartWithDefault()
                 .Select(
                     x =>
                     {
-                        Log.Debug(() => $"[{typeof(TConfig)}] Refreshing ActualConfig...");
-                        return configProvider.GetActualConfig<TConfig>();
+                        Log.Debug(() => $"Refreshing ActualConfig...");
+                        var result = configProvider.GetActualConfig<TConfig>();
+                        Log.Debug(() => "Refreshed actual config");
+                        return result;
                     })
                 .Subscribe(x => ActualConfig = x)
                 .AddTo(Anchors);
@@ -73,9 +75,11 @@ namespace PoeShared.Modularity
             WhenChanged = changes;
             changes.Connect().AddTo(Anchors);
             
-            Log.Debug(() => $"[{typeof(TConfig)}] Initial re-save of config to update format using {configProvider}");
+            Log.Debug(() => $"Initial re-save of config to update format using {configProvider}");
             configProvider.Save();
         }
+        
+        private IFluentLog Log { get; }
 
         public TConfig ActualConfig { get; private set; }
 
@@ -93,7 +97,7 @@ namespace PoeShared.Modularity
         public void Reload()
         {
             Interlocked.Increment(ref loadCommandCounter);
-            Log.Debug(() => $"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Reload();
         }
@@ -106,20 +110,19 @@ namespace PoeShared.Modularity
 
             if (compare.AreEqual)
             {
-                Log.Debug(() => $"[{typeof(TConfig)}] Attempted to save config that is an exact duplicate of an Actual config, skipping request");
+                Log.Debug(() => $"Attempted to save config that is an exact duplicate of an Actual config, skipping request");
                 return;
             }
 
             Interlocked.Increment(ref saveCommandCounter);
-            Log.Debug(() => $"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
         }
         
         private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
         {
-            Log.Debug(
-                $"[{typeof(TConfig)}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+            Log.Debug(() => $"Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
     }
 }

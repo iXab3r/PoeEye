@@ -11,7 +11,8 @@ using System.Text;
 using DynamicData;
 using JetBrains.Annotations;
 using PoeShared.Logging;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
+using PoeShared.Services;
 
 namespace PoeShared.Modularity
 {
@@ -25,14 +26,16 @@ namespace PoeShared.Modularity
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
         private readonly IConfigSerializer configSerializer;
 
-        private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigsByType = new ConcurrentDictionary<string, IPoeEyeConfig>();
-        private readonly SourceList<IConfigProviderStrategy> strategies = new SourceList<IConfigProviderStrategy>();
+        private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigsByType = new();
+        private readonly SourceList<IConfigProviderStrategy> strategies = new();
+        private readonly NamedLock fileLock = new("ConfigLock");
         private string loadedConfigurationFile;
 
         public ConfigProviderFromFile(
             IConfigSerializer configSerializer,
             IAppArguments appArguments)
         {
+            Log.Info("Initializing config provider");
             this.configSerializer = configSerializer;
 
             string configFileName;
@@ -97,41 +100,44 @@ namespace PoeShared.Modularity
             return Disposable.Create(() => strategies.Remove(strategy));
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Reload()
         {
-            Log.Debug(() => $"Reloading configuration...");
+            using (fileLock.Enter())
+            {
+                Log.Debug(() => $"Reloading configuration...");
+                var config = LoadInternal();
 
-            var config = LoadInternal();
-
-            config.Items
-                .ToList()
-                .ForEach(x =>
-                {
-                    string configType;
-                    if (x is PoeConfigMetadata metadata)
+                config.Items
+                    .ToList()
+                    .ForEach(x =>
                     {
-                        configType = metadata.TypeName;
-                    }
-                    else
-                    {
-                        configType = x.GetType().FullName;
-                    }
+                        string configType;
+                        if (x is PoeConfigMetadata metadata)
+                        {
+                            configType = metadata.TypeName;
+                        }
+                        else
+                        {
+                            configType = x.GetType().FullName;
+                        }
 
-                    if (string.IsNullOrEmpty(configType))
-                    {
-                        throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
-                    }
+                        if (string.IsNullOrEmpty(configType))
+                        {
+                            throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
+                        }
 
-                    loadedConfigsByType[configType] = x;
-                });
+                        loadedConfigsByType[configType] = x;
+                    });
+            }
 
+            Log.Debug(() => $"Sending notification about config update");
             configHasChanged.OnNext(Unit.Default);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
+            using var @lock = fileLock.Enter();
+            
             var configType = config.GetType().FullName;
             if (string.IsNullOrEmpty(configType))
             {
@@ -142,26 +148,34 @@ namespace PoeShared.Modularity
             Save();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void SaveToFile(FileInfo file)
         {
+            using var @lock = fileLock.Enter();
+            
             var metaConfig = new PoeEyeCombinedConfig();
             loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
-            Log.Debug(() => $"Saving all configs, metadata: {metaConfig.DumpToTextRaw().TakeChars(500)}");
+            Log.Debug(() => $"Saving all configs, metadata: {new { MetadataVersion = metaConfig.Version, Items = metaConfig.Items.Select(x => new { Type = x.GetType() }).ToArray() }.ToString().TakeChars(500)}");
 
             SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
-            SaveToFile(new FileInfo(ConfigFilePath));
+            var targetFile = new FileInfo(ConfigFilePath);
+            using (fileLock.Enter())
+            {
+                Log.Debug(() => $"Saving config to {targetFile}");
+                SaveToFile(targetFile);
+            }
+            
+            Log.Debug(() => $"Saved config to {targetFile}, sending notification about config update");
             configHasChanged.OnNext(Unit.Default);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
         {
+            using var @lock = fileLock.Enter();
+            
             var configType = typeof(TConfig).FullName;
             if (string.IsNullOrEmpty(configType))
             {
