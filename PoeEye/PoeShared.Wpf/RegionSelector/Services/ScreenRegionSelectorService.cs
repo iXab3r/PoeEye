@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -20,17 +21,23 @@ namespace PoeShared.RegionSelector.Services
         private readonly IWindowViewController viewController;
         private readonly IOverlayWindowController overlayController;
         private readonly IRegionSelectorViewModel regionSelector;
-        
+
         public ScreenRegionSelectorService(
             [Dependency(WellKnownWindows.MainWindow)] IWindowViewController viewController,
             [Dependency(WellKnownWindows.AllWindows)] IOverlayWindowController overlayController,
+            [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler,
             IFactory<IRegionSelectorViewModel> regionSelectorWindowFactory)
         {
+            Log.Debug(() => $"Initializing region selector service");
             this.viewController = viewController;
             this.overlayController = overlayController;
             regionSelector = regionSelectorWindowFactory.Create();
             regionSelector.IsVisible = false;
-            overlayController.RegisterChild(regionSelector).AddTo(Anchors);
+            uiScheduler.Schedule(() =>
+            {
+                Log.Debug(() => $"Registering region selector overlay");
+                overlayController.RegisterChild(regionSelector).AddTo(Anchors);
+            });
         }
 
         public async Task<RegionSelectorResult> SelectRegion(Size minSelection)
