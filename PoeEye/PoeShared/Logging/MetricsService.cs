@@ -54,7 +54,8 @@ namespace PoeShared.Logging
                 {
                     try
                     {
-                        Log.Debug(() => $"Reporting metrics #{idx}");
+                        ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
+                        Log.Debug(() => $"Reporting metrics #{idx}, available thread pool threads: worker {workerThreads}, completionPort {completionPortThreads}");
                         await Task.WhenAll(Metrics.ReportRunner.RunAllAsync());
                     }
                     catch (Exception e)

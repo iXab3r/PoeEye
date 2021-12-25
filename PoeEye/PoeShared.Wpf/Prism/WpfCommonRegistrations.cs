@@ -115,7 +115,7 @@ namespace PoeShared.Prism
                     Log.Debug(() => $"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Background);
                 })
-                .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler)
+                .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => ThreadPoolScheduler.Instance.DisableOptimizations())
                 .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
                 .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.InputHook))
                 .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.SharedThread));

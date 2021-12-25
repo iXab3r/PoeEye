@@ -61,6 +61,10 @@ namespace PoeShared.UI
                 Log.Debug(() => $"New UI Scheduler: {RxApp.MainThreadScheduler}");
                 Log.Debug(() => $"BG Scheduler: {RxApp.TaskpoolScheduler}");
                 
+                ThreadPool.GetMaxThreads(out var maxWorkerThreads, out var maxCompletionPortThreads);
+                ThreadPool.GetMinThreads(out var minWorkerThreads, out var minCompletionPortThreads);
+                Log.Debug(() => $"ThreadPool: worker [{minWorkerThreads}; {maxWorkerThreads}], completionPort [{minCompletionPortThreads}; {maxCompletionPortThreads}]");
+                
                 Log.Debug("Initializing housekeeping");
                 var cleanupService = Container.Resolve<IFolderCleanerService>();
                 cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
