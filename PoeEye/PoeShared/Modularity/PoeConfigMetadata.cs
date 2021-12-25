@@ -58,5 +58,10 @@ namespace PoeShared.Modularity
 
         [JsonIgnore]
         public T Value { get; set; }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
 }

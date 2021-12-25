@@ -11,7 +11,6 @@ using System.Windows.Interop;
 using DynamicData;
 
 using JetBrains.Annotations;
-using log4net;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -38,7 +37,7 @@ namespace PoeShared.Native
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            Log = typeof(OverlayWindowController).PrepareLogger().WithSuffix(overlayControllerId).WithSuffix(ToString);
+            Log = GetType().PrepareLogger().WithSuffix(overlayControllerId);
             Log.Info($"Creating overlay window controller using {windowTracker}");
 
             this.windowTracker = windowTracker;
@@ -100,7 +99,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
             OverlayWindowView overlayWindow = default;
-            var logger = Log.WithSuffix(overlayControllerId).WithSuffix(viewModel.Id).WithSuffix(() => overlayWindow == default ? "No window yet" : overlayWindow.ToString());
+            var logger = Log.WithSuffix(viewModel.Id).WithSuffix(() => overlayWindow == default ? "No window yet" : overlayWindow.ToString());
 
             var childAnchors = new CompositeDisposable();
             Disposable.Create(() =>
