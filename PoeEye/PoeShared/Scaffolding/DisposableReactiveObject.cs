@@ -53,13 +53,23 @@ namespace PoeShared.Scaffolding
             }).AddTo(Anchors);
         }
 
-        protected void EnsureNonUiThread()
+        protected static void EnsureUiThread()
         {
-            if (Environment.CurrentManagedThreadId == 1)
+            if (!IsUiThread)
+            {
+                throw new InvalidOperationException($"Operation must be completed on UI thread");
+            }
+        }
+        
+        protected static void EnsureNonUiThread()
+        {
+            if (IsUiThread)
             {
                 throw new InvalidOperationException($"Operation must be completed on non-UI thread");
             }
         }
+
+        protected static bool IsUiThread => Environment.CurrentManagedThreadId == 1;
         
         public void RaisePropertyChanged(params string[] properties)
         {
