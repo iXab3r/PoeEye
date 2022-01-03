@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using log4net;
@@ -18,7 +17,7 @@ namespace PoeShared.UI
         private static readonly IFluentLog Log = typeof(ExceptionDialogDisplayer).PrepareLogger();
         private readonly IAppArguments appArguments;
         private readonly IFactory<ExceptionDialogViewModel, ICloseController> dialogViewModelFactory;
-        private readonly SerialDisposable activeWindowAnchors = new SerialDisposable();
+        private readonly SerialDisposable activeWindowAnchors = new();
 
         public ExceptionDialogDisplayer(
             IAppArguments appArguments,
@@ -47,11 +46,6 @@ namespace PoeShared.UI
                     Log.Error($"Failed to show MessageBox with exception", e1);
                 }
             }
-        }
-
-        public Task<ExceptionReportItem[]> PrepareReportItems()
-        {
-            throw new NotImplementedException();
         }
 
         private void ShowMessageBox(ExceptionDialogConfig config)

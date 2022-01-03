@@ -21,6 +21,12 @@ namespace PoeShared.Services
         public void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
         {
             Log.Debug(() => $"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+
+            var uniqueFiles = filesToAdd.ToHashSet();
+            if (uniqueFiles.Count != filesToAdd.Count)
+            {
+                Log.Warn($"File list contains duplicates: {filesToAdd.Select(x => x.FullName)}");
+            }
             var processStartInfo = PrepareProcessStartInfo();
             var args = new List<string>
             {
@@ -28,7 +34,7 @@ namespace PoeShared.Services
                 "-mx=3", // fast
                 $"\"{outputFileName.FullName}\"",
             };
-            filesToAdd.Select(x => $"\"{x}\"").ForEach(args.Add);
+            uniqueFiles.Select(x => $"\"{x}\"").ForEach(args.Add);
             processStartInfo.Arguments = args.JoinStrings(" ");
             ProcessHelper.RunCmd(processStartInfo);
             
