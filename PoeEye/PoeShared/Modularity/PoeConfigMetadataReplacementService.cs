@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using DynamicData;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -10,9 +12,18 @@ namespace PoeShared.Modularity
     {
         private static readonly IFluentLog Log = typeof(PoeConfigMetadataReplacementService).PrepareLogger();
 
-        private readonly Dictionary<string, PoeConfigMetadata> substituteMetadataByTypeName = new();
-        private readonly NamedLock substitutionsLock = new("ConfigMigrationServiceSubstitutions"); 
-        
+        private readonly SourceCache<MetadataReplacementKey, string> substituteMetadataByTypeName = new(x => x.SourceTypeName);
+        private readonly NamedLock substitutionsLock = new("ConfigMigrationServiceSubstitutions");
+
+        public IObservable<PoeConfigMetadata> Watch(PoeConfigMetadata metadata)
+        {
+            if (substituteMetadataByTypeName.TryGetValue(metadata.TypeName, out var resolvedMetadata))
+            {
+                return Observable.Return(resolvedMetadata.TargetMetadata);
+            }
+            return substituteMetadataByTypeName.WatchCurrentValue(metadata.TypeName).Select(x => x.TargetMetadata).StartWith(metadata);
+        }
+
         public PoeConfigMetadata ReplaceIfNeeded(PoeConfigMetadata metadata)
         {
             using var @lock = substitutionsLock.Enter();
@@ -23,8 +34,8 @@ namespace PoeShared.Modularity
 
             var replacement = metadata with
             {
-                AssemblyName = resolvedMetadata.AssemblyName,
-                TypeName = resolvedMetadata.TypeName
+                AssemblyName = resolvedMetadata.TargetMetadata.AssemblyName,
+                TypeName = resolvedMetadata.TargetMetadata.TypeName
             };
             Log.Debug(() => $"Replacing metadata {metadata} with {replacement}");
             return replacement;
@@ -39,7 +50,15 @@ namespace PoeShared.Modularity
                 TypeName = targetType.FullName
             };
             Log.Debug(() => $"Registering replacement: {sourceTypeName} => {metadata}");
-            substituteMetadataByTypeName[sourceTypeName] = metadata;
+            substituteMetadataByTypeName.AddOrUpdate(new MetadataReplacementKey { SourceTypeName = sourceTypeName, TargetMetadata = metadata });
+        }
+
+
+        private sealed record MetadataReplacementKey
+        {
+            public string SourceTypeName { get; set; }
+            
+            public PoeConfigMetadata TargetMetadata { get; set; }
         }
     }
 }
