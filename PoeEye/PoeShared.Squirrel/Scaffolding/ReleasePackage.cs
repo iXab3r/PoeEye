@@ -74,7 +74,7 @@ namespace PoeShared.Squirrel.Scaffolding
                                     rootPackageFolder,
                                     Path.GetFileName(decoded).Replace("_ExecutionStub.exe", ".exe"));
 
-                                LogHost.Default.Info("Rigging execution stub for {0} to {1}", decoded, fullTargetFile);
+                                LogHost.Default.Info($"Rigging execution stub for {decoded} to {fullTargetFile}");
                             }
 
                             try

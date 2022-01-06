@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <UseWPF>true</UseWPF>
         <UseWindowsForms>True</UseWindowsForms>
         <AssemblyName>WindowsHook</AssemblyName>
         <RootNamespace>WindowsHook</RootNamespace>

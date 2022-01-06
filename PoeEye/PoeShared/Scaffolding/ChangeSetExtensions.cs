@@ -7,7 +7,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Aggregation;
-using DynamicData.Binding;
 using DynamicData.Kernel;
 using JetBrains.Annotations;
 
@@ -16,16 +15,6 @@ namespace PoeShared.Scaffolding
 {
     public static class ChangeSetExtensions
     {
-        public static IObservable<int> CountChangedFixed<T>(this IObservableList<T> list)
-        {
-            return list.Connect().Select(x => list.Count).DistinctUntilChanged(); //FIXME DynamicData SourceList/Cache CountChanged in 6.13 contains a multi-threading bug, it is fixed in latest versions
-        }
-        
-        public static IObservable<int> CountChangedFixed<T, TKey>(this IObservableCache<T, TKey> cache)
-        {
-            return cache.Connect().Select(x => cache.Count).DistinctUntilChanged(); //FIXME DynamicData SourceList/Cache CountChanged in 6.13 contains a multi-threading bug, it is fixed in latest versions
-        }
-
         public static ISourceList<T> ToSourceList<T>(this IObservable<IChangeSet<T>> source)
         {
             Guard.ArgumentNotNull(source, nameof(source));

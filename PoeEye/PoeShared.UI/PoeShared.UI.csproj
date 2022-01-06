@@ -9,7 +9,7 @@
         <Platforms>AnyCPU</Platforms>
         <LangVersion>8</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <TargetFramework>net6.0-windows</TargetFramework>
+        <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
         <ApplicationIcon>Resources/mainIconAlt.ico</ApplicationIcon>
     </PropertyGroup>
     
@@ -26,7 +26,7 @@
     
     <ItemGroup>
       <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" />
-      <PackageReference Include="ReactiveUI" Version="10.4.1" />
+      <PackageReference Include="ReactiveUI" Version="17.1.17" />
       <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
       <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29" />
     </ItemGroup>
