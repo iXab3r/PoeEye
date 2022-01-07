@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.Threading;
 
 namespace PoeShared
 {
     internal sealed class RandomNumberGenerator : IRandomNumberGenerator
     {
-        private readonly Random rng = new Random();
+        private readonly ThreadSafeRandom rng = new();
 
         public int Next(int min, int max)
         {
@@ -19,6 +19,11 @@ namespace PoeShared
         public int Next(int max)
         {
             return rng.Next(max);
+        }
+
+        public double NextDouble()
+        {
+            return rng.NextDouble();
         }
     }
 }

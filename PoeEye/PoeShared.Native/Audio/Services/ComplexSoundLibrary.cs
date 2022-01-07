@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using DynamicData;
@@ -18,7 +19,6 @@ namespace PoeShared.Audio.Services
         public ComplexSoundLibrary(ISoundLibrarySource[] sources)
         {
             this.sources = sources;
-            
             new SourceList<string>().Connect()
                 .Or(sources.Select(x => x.SourceName.ToObservableChangeSet()).ToArray())
                 .Transform(x => x.ToLowerInvariant())

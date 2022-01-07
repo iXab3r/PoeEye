@@ -9,6 +9,8 @@ namespace PoeShared
         int Next();
 
         int Next(int max);
+
+        double NextDouble();
         
         public TimeSpan GenerateDelay(TimeSpan minDelay, TimeSpan maxDelay)
         {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
@@ -7,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Aggregation;
+using DynamicData.Binding;
 using DynamicData.Kernel;
 using JetBrains.Annotations;
 
@@ -44,6 +47,13 @@ namespace PoeShared.Scaffolding
             }
         }
 
+        public static ISourceList<T> ToSourceList<T>(this IEnumerable<T> items)
+        {
+            var result = new SourceList<T>();
+            result.AddRange(items);
+            return result;
+        } 
+        
         [Obsolete("DynamicCombiner and ReferenceCountTracker contain a bug that could be reproduced by Edit()ing a list and replacing an item there")]
         public static ISourceList<T> ToSourceList<T>(this IEnumerable<ISourceList<T>> lists)
         {
