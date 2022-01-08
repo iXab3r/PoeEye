@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData;
+using DynamicData.Binding;
 using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -18,6 +19,7 @@ namespace PoeShared.UI
     {
         private static readonly Binder<TreeViewItemViewModel> Binder = new();
         private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
+        private static IComparer<ITreeViewItemViewModel> DefaultComparer = new SortExpressionComparer<ITreeViewItemViewModel>();
 
         private readonly SourceList<ITreeViewItemViewModel> children = new();
         private readonly ObservableAsPropertyHelper<string> pathSupplier;
@@ -68,7 +70,7 @@ namespace PoeShared.UI
                 .Switch();
             children
                 .Connect()
-                .Sort(this.WhenAnyValue(x => x.SortComparer), SortOptions.None, resort)
+                .Sort(this.WhenAnyValue(x => x.SortComparer).Select(x => x ?? DefaultComparer), SortOptions.None, resort) // DynamicData 7+ REQUIRES to have Comparer set to non-null
                 .Bind(out var chld)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
