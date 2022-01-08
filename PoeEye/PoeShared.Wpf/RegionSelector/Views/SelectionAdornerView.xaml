@@ -58,25 +58,25 @@
                                            FontWeight="Bold"
                                            TextTrimming="CharacterEllipsis">
                                     <TextBlock.Inlines>
-                                        <Run Text="{Binding ScreenMousePosition.X, StringFormat='X:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ScreenMousePosition.Y, StringFormat='Y:{0:F0}', Mode=OneWay}"/>
+                                        <Run Text="{Binding ProjectedMousePosition.X, StringFormat='X:{0:F0}', Mode=OneWay}"/>
+                                        <Run Text="{Binding ProjectedMousePosition.Y, StringFormat='Y:{0:F0}', Mode=OneWay}"/>
                                     </TextBlock.Inlines>
                                 </TextBlock>
                             </Border>
                         </Grid>
                         
                         <Grid Canvas.Left="{Binding Selection.X}" Canvas.Top="{Binding Selection.Y}"
-                              Visibility="{Binding ScreenSelection.IsEmpty, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}" >
+                              Visibility="{Binding ProjectedSelection.IsEmpty, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}" >
                             <Border Margin="10,-50,0,0" >
                                 <TextBlock FontSize="16" Margin="2.5"
                                            Foreground="{Binding Stroke}"
                                            FontWeight="Bold"
                                            TextTrimming="CharacterEllipsis">
                                     <TextBlock.Inlines>
-                                        <Run Text="{Binding ScreenSelection.X, StringFormat='X:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ScreenSelection.Y, StringFormat='Y:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ScreenSelection.Width, StringFormat='W:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ScreenSelection.Height, StringFormat='H:{0:F0}', Mode=OneWay}"/>
+                                        <Run Text="{Binding ProjectedSelection.X, StringFormat='X:{0:F0}', Mode=OneWay}"/>
+                                        <Run Text="{Binding ProjectedSelection.Y, StringFormat='Y:{0:F0}', Mode=OneWay}"/>
+                                        <Run Text="{Binding ProjectedSelection.Width, StringFormat='W:{0:F0}', Mode=OneWay}"/>
+                                        <Run Text="{Binding ProjectedSelection.Height, StringFormat='H:{0:F0}', Mode=OneWay}"/>
                                     </TextBlock.Inlines>
                                 </TextBlock>
                             </Border>

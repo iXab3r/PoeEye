@@ -4,11 +4,12 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using PoeShared.Native;
-using Point = System.Windows.Point;
-using Size = System.Windows.Size;
 using WinSize = System.Drawing.Size;
 using WinPoint = System.Drawing.Point;
-using WinRectangle = System.Drawing.Rectangle;
+using WinRect = System.Drawing.Rectangle;
+using WpfPoint = System.Windows.Point;
+using WpfSize = System.Windows.Size;
+using WpfRect = System.Windows.Rect;
 
 namespace PoeShared.Scaffolding
 {
@@ -34,12 +35,12 @@ namespace PoeShared.Scaffolding
             };
         }
 
-        public static Point Center(this Rect rect)
+        public static WpfPoint Center(this Rect rect)
         {
             return new(rect.Left + (float)rect.Width / 2, rect.Top + (float)rect.Height / 2);
         }
         
-        public static WinPoint Center(this WinRectangle rect)
+        public static WinPoint Center(this WinRect rect)
         {
             return new((int)Math.Round(rect.Left + (float)rect.Width / 2), (int)Math.Round(rect.Top + (float)rect.Height / 2));
         }
@@ -78,7 +79,7 @@ namespace PoeShared.Scaffolding
         /// <summary>
         ///     Computes the effective region representing the bounds inside a source thumbnail of a certain size.
         /// </summary>
-        public static WinSize FitToSize(this WinRectangle desiredBounds, WinSize sourceSize)
+        public static WinSize FitToSize(this WinRect desiredBounds, WinSize sourceSize)
         {
             try
             {
@@ -92,10 +93,42 @@ namespace PoeShared.Scaffolding
                 throw new ApplicationException($"Failed to compute Region size, sourceSize: {sourceSize}, current state: {new { desiredBounds, sourceSize }}", e);
             }
         }
+        
+        public static bool IsNotEmptyArea(this WinSize size)
+        {
+            return !size.IsEmptyArea();
+        }
+        
+        public static bool IsEmptyArea(this WinSize size)
+        {
+            return size.Width <= 0 || size.Height <= 0;
+        }
 
+        public static bool IsNotEmptyArea(this WpfSize size)
+        {
+            return !size.IsEmptyArea();
+        }
+        
+        public static bool IsEmptyArea(this WpfSize size)
+        {
+            return size.Width <= 0 || size.Height <= 0;
+        }
+        
         public static bool IsDefault(this Rectangle rect)
         {
             return rect.Width == default && rect.Height == default && rect.X == default && rect.Y == default;
+        }
+        
+        public static bool IsEmptyArea(this Rect rect)
+        {
+            return !IsNotEmptyArea(rect);
+        }
+        
+        public static bool IsNotEmptyArea(this Rect rect)
+        {
+            return
+                rect.Width > 0 &&
+                rect.Height > 0;
         }
 
         public static bool IsEmptyArea(this Rectangle rect)
@@ -121,7 +154,7 @@ namespace PoeShared.Scaffolding
                 IsFinite(rect.Height);
         }
         
-        public static bool IsEmpty(this Point point)
+        public static bool IsEmpty(this WpfPoint point)
         {
             return point.X == 0 && point.Y == 0;
         }
@@ -137,7 +170,7 @@ namespace PoeShared.Scaffolding
                    size.Height > 0;
         }
 
-        public static bool IsNotEmpty(this Size size)
+        public static bool IsNotEmpty(this WpfSize size)
         {
             return size.Width > 0 &&
                    size.Height > 0 &&
@@ -145,24 +178,24 @@ namespace PoeShared.Scaffolding
                    IsFinite(size.Height);
         }
 
-        public static Size ToWpfSize(this System.Drawing.Size sourceSize)
+        public static WinSize ToWpfSize(this System.Drawing.Size sourceSize)
         {
-            return new Size(sourceSize.Width, sourceSize.Height);
+            return new WinSize(sourceSize.Width, sourceSize.Height);
         }
 
-        public static WinSize ToWinSize(this Size sourceSize)
+        public static WinSize ToWinSize(this WpfSize sourceSize)
         {
             return new WinSize((int) sourceSize.Width, (int) sourceSize.Height);
         }
         
-        public static WinPoint ToScreen(this Point source, Visual owner)
+        public static WinPoint ToScreen(this WpfPoint source, Visual owner)
         {
             return owner.PointToScreen(source).ToWinPoint();
         }
 
         public static Rectangle ToScreen(this Rect sourceSize, Visual owner)
         {
-            var ownerTopLeft = owner.PointToScreen(new Point(0, 0));
+            var ownerTopLeft = owner.PointToScreen(new WpfPoint(0, 0));
             var topLeft = owner.PointToScreen(sourceSize.TopLeft);
             topLeft.Offset(-ownerTopLeft.X, -ownerTopLeft.Y);
             var bottomRight = owner.PointToScreen(sourceSize.BottomRight);
@@ -171,53 +204,53 @@ namespace PoeShared.Scaffolding
             return relative.ToWinRectangle();
         }
         
-        public static WinSize ToScreen(this Size sourceSize, Visual owner)
+        public static WinSize ToScreen(this WpfSize sourceSize, Visual owner)
         {
-            var ownerTopLeft = owner.PointToScreen(new Point(0, 0));
-            var bottomRight = owner.PointToScreen(new Point(sourceSize.Width, sourceSize.Height));
-            var relative = new Size(bottomRight.X - ownerTopLeft.X, bottomRight.Y - ownerTopLeft.Y);
+            var ownerTopLeft = owner.PointToScreen(new WpfPoint(0, 0));
+            var bottomRight = owner.PointToScreen(new WpfPoint(sourceSize.Width, sourceSize.Height));
+            var relative = new WpfSize(bottomRight.X - ownerTopLeft.X, bottomRight.Y - ownerTopLeft.Y);
             return relative.ToWinSize();
         }
 
-        public static WinPoint ScaleToScreen(this Point sourceSize)
+        public static WinPoint ScaleToScreen(this WpfPoint sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
             return ScaleToScreen(sourceSize, dpi);
         }
         
-        public static WinPoint ScaleToScreen(this Point sourceSize, PointF dpi)
+        public static WinPoint ScaleToScreen(this WpfPoint sourceSize, PointF dpi)
         {
             var result = new WinPoint((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y));
             return result;
         }
 
-        public static WinRectangle ScaleToScreen(this Rect sourceSize)
+        public static WinRect ScaleToScreen(this Rect sourceSize)
         {
             return ScaleToScreen(sourceSize, UnsafeNative.GetDesktopWindow());
         }
         
-        public static WinRectangle ScaleToScreen(this Rect sourceSize, IntPtr hDesktop)
+        public static WinRect ScaleToScreen(this Rect sourceSize, IntPtr hDesktop)
         {
             if (sourceSize.IsEmpty)
             {
-                return WinRectangle.Empty;
+                return WinRect.Empty;
             }
             var dpi = UnsafeNative.GetDesktopDpi(hDesktop);
             return ScaleToScreen(sourceSize, dpi);
         }
         
-        public static WinRectangle ScaleToScreen(this Rect sourceSize, PointF dpi)
+        public static WinRect ScaleToScreen(this Rect sourceSize, PointF dpi)
         {
-            return new WinRectangle((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y), (int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
+            return new WinRect((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y), (int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
         }
 
-        public static WinSize ScaleToScreen(this Size sourceSize)
+        public static WinSize ScaleToScreen(this WpfSize sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
             return ScaleToScreen(sourceSize, dpi);
         }
         
-        public static WinSize ScaleToScreen(this Size sourceSize, PointF dpi)
+        public static WinSize ScaleToScreen(this WpfSize sourceSize, PointF dpi)
         {
             return new WinSize((int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
         }
@@ -227,38 +260,38 @@ namespace PoeShared.Scaffolding
             return new WinSize((int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
         }
 
-        public static Rect ScaleToWpf(this WinRectangle sourceSize, PointF dpi)
+        public static Rect ScaleToWpf(this WinRect sourceSize, PointF dpi)
         {
             var result = sourceSize.ToWpfRectangle();
             result.Scale(1 / dpi.X, 1 / dpi.Y);
             return result;
         }
         
-        public static Rect ScaleToWpf(this WinRectangle sourceSize)
+        public static Rect ScaleToWpf(this WinRect sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
             return ScaleToWpf(sourceSize, dpi);
         }
         
-        public static Point ScaleToWpf(this WinPoint source)
+        public static WpfPoint ScaleToWpf(this WinPoint source)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
-            return new Point(source.X / dpi.X, source.Y / dpi.Y);
+            return new WpfPoint(source.X / dpi.X, source.Y / dpi.Y);
         }
         
-        public static WinRectangle Scale(this WinRectangle sourceSize, float dpi)
+        public static WinRect Scale(this WinRect sourceSize, float dpi)
         {
-            return new WinRectangle((int)(sourceSize.X / dpi), (int)(sourceSize.Y / dpi), (int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
+            return new WinRect((int)(sourceSize.X / dpi), (int)(sourceSize.Y / dpi), (int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
         }
         
-        public static WinRectangle InflateScale(this WinRectangle sourceSize, float widthMultiplier, float heightMultiplier)
+        public static WinRect InflateScale(this WinRect sourceSize, float widthMultiplier, float heightMultiplier)
         {
             var result = sourceSize;
             result.Inflate((int)(result.Width * widthMultiplier), (int)(result.Height * heightMultiplier));
             return result;
         }
         
-        public static WinRectangle InflateSize(this WinRectangle sourceSize, int width, int height)
+        public static WinRect InflateSize(this WinRect sourceSize, int width, int height)
         {
             var result = sourceSize;
             result.Inflate(result.Width, result.Height);
@@ -276,16 +309,16 @@ namespace PoeShared.Scaffolding
             };
         }
         
-        public static Point ToWpfPoint(this System.Drawing.Point source)
+        public static WpfPoint ToWpfPoint(this System.Drawing.Point source)
         {
-            return new Point
+            return new WpfPoint
             {
                 X = source.X,
                 Y = source.Y
             };
         }
 
-        public static System.Drawing.Point ToWinPoint(this Point source)
+        public static System.Drawing.Point ToWinPoint(this WpfPoint source)
         {
             return new System.Drawing.Point
             {
