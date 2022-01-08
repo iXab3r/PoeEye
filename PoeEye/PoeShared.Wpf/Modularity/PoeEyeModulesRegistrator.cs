@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-
+using DynamicData;
 using Unity;
 
 namespace PoeShared.Modularity
@@ -8,18 +8,17 @@ namespace PoeShared.Modularity
     {
         private readonly IUnityContainer container;
 
-        private readonly ObservableCollection<ISettingsViewModel> settings = new ObservableCollection<ISettingsViewModel>();
+        private readonly SourceList<ISettingsViewModel> settings = new();
 
         public PoeEyeModulesRegistrator(IUnityContainer container)
         {
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
-            Settings = new ReadOnlyObservableCollection<ISettingsViewModel>(settings);
+            Settings = settings;
         }
 
-        public ReadOnlyObservableCollection<ISettingsViewModel> Settings { get; }
-
+        public IObservableList<ISettingsViewModel> Settings { get; }
 
         public IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>()
             where TConfig : class, IPoeEyeConfig, new()

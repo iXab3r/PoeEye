@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using DynamicData;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity
@@ -13,6 +14,6 @@ namespace PoeShared.Modularity
 
     public interface IPoeEyeModulesEnumerator
     {
-        ReadOnlyObservableCollection<ISettingsViewModel> Settings { [NotNull] get; }
+        IObservableList<ISettingsViewModel> Settings { [NotNull] get; }
     }
 }

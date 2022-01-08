@@ -46,14 +46,13 @@ namespace PoeShared.UI
 
             modulesEnumerator
                 .Settings
-                .ToObservableChangeSet()
-                .ToUnit()
+                .Connect()
                 .StartWithDefault()
                 .CombineLatest(this.WhenAnyValue(x => x.IsOpen)
                         .Where(x => x)
                         .Take(1),
                     (unit, b) => Unit.Default)
-                .Select(x => modulesEnumerator.Settings.ToArray())
+                .Select(x => modulesEnumerator.Settings.Items.ToArray())
                 .SubscribeSafe(ReloadModulesList, Log.HandleUiException)
                 .AddTo(Anchors);
 
