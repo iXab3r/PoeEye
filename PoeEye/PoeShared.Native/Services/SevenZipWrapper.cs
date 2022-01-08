@@ -20,9 +20,9 @@ namespace PoeShared.Services
 
         public void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
         {
-            Log.Debug(() => $"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+            Log.Info(() => $"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
 
-            var uniqueFiles = filesToAdd.ToHashSet();
+            var uniqueFiles = filesToAdd.Select(x => x.FullName).ToHashSet();
             if (uniqueFiles.Count != filesToAdd.Count)
             {
                 Log.Warn($"File list contains duplicates: {filesToAdd.Select(x => x.FullName)}");
@@ -44,15 +44,15 @@ namespace PoeShared.Services
                 throw new FileNotFoundException($"Could not add/update archive {outputFileName} - file not found after operation");
             }
             
-            Log.Debug(() => $"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
+            Log.Info(() => $"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
         }
 
         public void ExtractArchive(FileInfo inputFileName, DirectoryInfo outputDirectory)
         {
-            Log.Debug(() => $"Extracting archive {inputFileName} to {outputDirectory}");
+            Log.Info(() => $"Extracting archive {inputFileName} to {outputDirectory}");
             if (!outputDirectory.Exists)
             {
-                Log.Debug(() => $"Creating output directory {outputDirectory}");
+                Log.Info(() => $"Creating output directory {outputDirectory}");
                 outputDirectory.Create();
             }
 
@@ -66,7 +66,7 @@ namespace PoeShared.Services
             processStartInfo.Arguments = args.JoinStrings(" ");
             ProcessHelper.RunCmd(processStartInfo);
             
-            Log.Debug(() => $"Output directory contains following files: {outputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+            Log.Info(() => $"Output directory contains following files: {outputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
         }
 
         private static ProcessStartInfo PrepareProcessStartInfo()
