@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:eye="clr-namespace:PoeShared.UI"
                     xmlns:viewModels="clr-namespace:PoeShared.RegionSelector.ViewModels"
-                    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding">
+                    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -53,32 +54,36 @@
                         
                         <Grid Canvas.Left="{Binding MousePosition.X}" Canvas.Top="{Binding MousePosition.Y}">
                             <Border Margin="10,10,0,0" >
-                                <TextBlock FontSize="16" Margin="2.5"
+                                <wpf:OutlinedTextBlock FontSize="16" Margin="2.5"
                                            Foreground="{Binding Stroke}"
                                            FontWeight="Bold"
                                            TextTrimming="CharacterEllipsis">
-                                    <TextBlock.Inlines>
-                                        <Run Text="{Binding ProjectedMousePosition.X, StringFormat='X:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ProjectedMousePosition.Y, StringFormat='Y:{0:F0}', Mode=OneWay}"/>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
+                                    <wpf:OutlinedTextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{}X:{0:F0} Y:{1:F0}" Mode="OneWay">
+                                            <Binding Path="ProjectedMousePosition.X"  />
+                                            <Binding Path="ProjectedMousePosition.Y" />
+                                        </MultiBinding>
+                                    </wpf:OutlinedTextBlock.Text>
+                                </wpf:OutlinedTextBlock>
                             </Border>
                         </Grid>
                         
                         <Grid Canvas.Left="{Binding Selection.X}" Canvas.Top="{Binding Selection.Y}"
                               Visibility="{Binding ProjectedSelection.IsEmpty, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}" >
                             <Border Margin="10,-50,0,0" >
-                                <TextBlock FontSize="16" Margin="2.5"
-                                           Foreground="{Binding Stroke}"
-                                           FontWeight="Bold"
-                                           TextTrimming="CharacterEllipsis">
-                                    <TextBlock.Inlines>
-                                        <Run Text="{Binding ProjectedSelection.X, StringFormat='X:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ProjectedSelection.Y, StringFormat='Y:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ProjectedSelection.Width, StringFormat='W:{0:F0}', Mode=OneWay}"/>
-                                        <Run Text="{Binding ProjectedSelection.Height, StringFormat='H:{0:F0}', Mode=OneWay}"/>
-                                    </TextBlock.Inlines>
-                                </TextBlock>
+                                <wpf:OutlinedTextBlock FontSize="16" Margin="2.5"
+                                                       Foreground="{Binding Stroke}"
+                                                       FontWeight="Bold"
+                                                       TextTrimming="CharacterEllipsis">
+                                    <wpf:OutlinedTextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{}X:{0:F0} Y:{1:F0} W:{2:F0} H:{3:F0}" Mode="OneWay">
+                                            <Binding Path="ProjectedSelection.X"  />
+                                            <Binding Path="ProjectedSelection.Y" />
+                                            <Binding Path="ProjectedSelection.Width" />
+                                            <Binding Path="ProjectedSelection.Height" />
+                                        </MultiBinding>
+                                    </wpf:OutlinedTextBlock.Text>
+                                </wpf:OutlinedTextBlock>
                             </Border>
                         </Grid>
                         
