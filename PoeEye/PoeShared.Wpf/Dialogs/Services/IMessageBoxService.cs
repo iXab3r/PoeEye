@@ -1,19 +1,25 @@
 ﻿using System.Threading.Tasks;
 using PoeShared.Dialogs.ViewModels;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Dialogs.Services
 {
     public interface IMessageBoxService : IDisposableReactiveObject
     {
-        IMessageBoxViewModel MessageBox { get; }
-
-        public Task<MessageBoxElement> ShowDialog(string title, object content, params MessageBoxElement[] buttons);
+        IMessageBoxHost MessageBox { get; }
+        
+        public Task<MessageBoxElement> ShowDialog(string title, IMessageBoxViewModel content, params MessageBoxElement[] buttons);
+        
+        public Task<T> ShowDialog<T>(string title, IMessageBoxViewModel<T> content);
         
         public Task<bool> ShowConfirmation(
             string title,
             string content);
+        
+        public Task<string> ShowInputBox(
+            string title,
+            string content,
+            string contentHint);
 
         public Task<(MessageBoxElement DialogResult, string InputContent)> ShowMessageBox(
             string title,

@@ -1,42 +1,36 @@
-using System;
-using PoeShared.Native;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+﻿using System;
+using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public class CloseController : ICloseController
 {
-    public class CloseController : ICloseController
+    private readonly Action closeAction;
+
+    public CloseController(Action action)
     {
-        private readonly Action closeAction;
-
-        public CloseController(Action action)
-        {
-            Guard.ArgumentNotNull(action, nameof(action));
-            closeAction = action;
-        }
-
-        public virtual void Close()
-        {
-            closeAction();
-        }
+        Guard.ArgumentNotNull(action, nameof(action));
+        closeAction = action;
     }
-    
-    public class CloseController<T> : CloseController
+
+    public virtual void Close()
     {
-        private readonly T item;
+        closeAction();
+    }
+}
 
-        public CloseController(T item, Action action) : base(action)
-        {
-            this.item = item;
-        }
+public class CloseController<T> : ICloseController<T>
+{
+    private readonly Action<T> closeAction;
 
-        public override void Close()
-        {
-            base.Close();
-            if (item is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
+    public CloseController(Action<T> action)
+    {
+        Guard.ArgumentNotNull(action, nameof(action));
+        closeAction = action;
+    }
+
+    public void Close(T value)
+    {
+        closeAction(value);
     }
 }

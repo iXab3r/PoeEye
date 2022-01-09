@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using PoeShared.Logging;
 
@@ -19,7 +20,8 @@ namespace PoeShared.Scaffolding
             
             IFluentLog GetLogger()
             {
-                var result = Log.WithSuffix(process.ProcessName);
+                var processName = Path.GetFileName(processStartInfo.FileName);
+                var result = Log.WithSuffix(processName);
                 if (process.StartTime >= DateTime.MinValue)
                 {
                     result = result.WithSuffix($"Id {process.Id} @ {process.StartTime}");

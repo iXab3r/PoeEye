@@ -5,34 +5,52 @@
                               xmlns:st="http://schemas.spicytaco.io/"
                               xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                               xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Style x:Key="MaterialMessageBoxStyleKey" TargetType="{x:Type materialDesign:DialogHost}" BasedOn="{StaticResource MaterialDesignEmbeddedDialogHost}">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="CloseOnClickAway" Value="True" />
+    </Style>
+
     <DataTemplate DataType="{x:Type ui:NotificationSandboxViewModel}">
-        <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
-            <TextBlock Text="ALL"/>
-            <eye:ButtonEx Content="Close" Command="{Binding CloseAllNotifications}" />
-            
-            <TextBlock Text="Interactive" />
-            <CheckBox IsChecked="{Binding Interactive}"/>
-            
-            <TextBlock Text="Closeable" />
-            <CheckBox IsChecked="{Binding Closeable}"/>
+        <Grid>
+            <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+                <TextBlock Text="ALL" />
+                <eye:ButtonEx Content="Close" Command="{Binding CloseAllNotifications}" />
 
-            <TextBlock Text="Show notification: Text" />
-            <eye:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
+                <TextBlock Text="Interactive" />
+                <CheckBox IsChecked="{Binding Interactive}" />
 
-            <TextBlock Text="Timeout" />
-            <mah:NumericUpDown
-                Interval="1000"
-                materialDesign:TextFieldAssist.SuffixText="ms"
-                Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
-            
-            <TextBlock Text="Title" />
-            <TextBox Text="{Binding NotificationTitle}"/>
-            
-            <TextBlock Text="Text" />
-            <TextBox Text="{Binding NotificationText}"/>
-            
-            <TextBlock Text="With Image" />
-            <CheckBox IsChecked="{Binding WithIcon}"/>
-        </st:AutoGrid>
+                <TextBlock Text="Closeable" />
+                <CheckBox IsChecked="{Binding Closeable}" />
+
+                <TextBlock Text="Show notification: Text" />
+                <eye:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
+                <TextBlock Text="Input box" />
+                <eye:ButtonEx Content="Show input box" Command="{Binding InputTextBoxCommand}" />
+
+                <TextBlock Text="Timeout" />
+                <mah:NumericUpDown
+                    Interval="1000"
+                    materialDesign:TextFieldAssist.SuffixText="ms"
+                    Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
+
+                <TextBlock Text="Title" />
+                <TextBox Text="{Binding NotificationTitle}" />
+
+                <TextBlock Text="Text" />
+                <TextBox Text="{Binding NotificationText}" />
+
+                <TextBlock Text="With Image" />
+                <CheckBox IsChecked="{Binding WithIcon}" />
+            </st:AutoGrid>
+
+            <materialDesign:DialogHost
+                x:Name="MessageBoxHost"
+                Style="{StaticResource MaterialMessageBoxStyleKey}"
+                IsOpen="{Binding MessageBoxService.MessageBox.IsOpen}"
+                materialDesign:TransitionAssist.DisableTransitions="True"
+                Visibility="{Binding MessageBoxService.MessageBox.IsOpen, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                DialogContent="{Binding MessageBoxService.MessageBox}" />
+        </Grid>
     </DataTemplate>
 </eye:SharedResourceDictionary>

@@ -2,7 +2,7 @@
 
 namespace PoeShared.Dialogs.ViewModels
 {
-    internal interface ITextMessageBoxViewModel : IMessageBoxViewModel
+    internal interface ITextMessageBoxViewModel : IMessageBoxHostViewModel
     {
         string Content { get; }
         

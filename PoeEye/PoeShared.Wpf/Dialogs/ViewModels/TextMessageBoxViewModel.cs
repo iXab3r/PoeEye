@@ -3,12 +3,18 @@ using PoeShared.Scaffolding.WPF;
 
 namespace PoeShared.Dialogs.ViewModels
 {
-    internal sealed class TextMessageBoxViewModel : MessageBoxViewModelBase, ITextMessageBoxViewModel
+    internal sealed class TextMessageBoxViewModel : MessageBoxHostViewModelBase, ITextMessageBoxViewModel
     {
-
-        public TextMessageBoxViewModel(IClipboardManager clipboardManager) 
+        public TextMessageBoxViewModel(IClipboardManager clipboardManager)
         {
-            CopyAllCommand = CommandWrapper.Create(() => clipboardManager.SetText(Content));
+            CloseOnClickAway = true;
+            CopyAllCommand = CommandWrapper.Create(() =>
+            {
+                if (!string.IsNullOrEmpty(Content))
+                {
+                    clipboardManager.SetText(Content);
+                }
+            });
         }
         
         public CommandWrapper CopyAllCommand { get; }

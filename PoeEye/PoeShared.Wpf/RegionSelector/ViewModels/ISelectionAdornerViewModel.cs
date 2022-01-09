@@ -31,7 +31,7 @@ namespace PoeShared.RegionSelector.ViewModels
         
         Rect Selection { get; }
         
-        bool StopWhenFocusLost { get; set; }
+        bool StopWhenAppFocusLost { get; set; }
         
         bool ShowCrosshair { get; set; }
         
@@ -43,6 +43,6 @@ namespace PoeShared.RegionSelector.ViewModels
         
         UIElement Owner { [CanBeNull] get; }
         
-        IObservable<Rect> StartSelection();
+        IObservable<Rect> StartSelection(bool supportBoxSelection = true);
     }
 }

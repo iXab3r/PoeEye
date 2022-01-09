@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Media.Imaging;
+using PoeShared.Dialogs.Services;
 using PoeShared.Notifications.Services;
 using PoeShared.Notifications.ViewModels;
 using PoeShared.Scaffolding;
@@ -13,14 +14,24 @@ namespace PoeShared.UI
     {
         private readonly INotificationsService notificationsService;
 
-        public NotificationSandboxViewModel(INotificationsService notificationsService)
+        public NotificationSandboxViewModel(INotificationsService notificationsService, IMessageBoxService messageBoxService)
         {
+            MessageBoxService = messageBoxService;
             this.notificationsService = notificationsService;
             AddTextNotification = CommandWrapper.Create(AddTextNotificationExecuted);
             CloseAllNotifications = CommandWrapper.Create(notificationsService.CloseAll);
             NotificationImage = Assembly.GetExecutingAssembly().LoadBitmapFromResource("Resources\\giphy.gif");
+            InputTextBoxCommand = CommandWrapper.Create(async () =>
+            {
+                var result = await messageBoxService.ShowInputBox("Input title", "Input content", "hint");
+                System.Windows.MessageBox.Show(result);
+            });
         }
+        
+        public IMessageBoxService MessageBoxService { get; }
 
+        public CommandWrapper InputTextBoxCommand { get; }
+        
         public CommandWrapper AddTextNotification { get; }
 
         public CommandWrapper CloseAllNotifications { get; }

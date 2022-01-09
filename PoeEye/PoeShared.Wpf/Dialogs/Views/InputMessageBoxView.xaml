@@ -1,0 +1,33 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:viewModels="clr-namespace:PoeShared.Dialogs.ViewModels"
+                             xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+                             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                             xmlns:st="http://schemas.spicytaco.io/">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type viewModels:InputMessageBoxViewModel}">
+        <st:AutoGrid Columns="*,Auto,Auto" Rows="*,Auto" ChildMargin="5">
+            <TextBox Grid.ColumnSpan="3"
+                     wpf:FocusHelper.IsFocused="True"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     MinHeight="60"
+                     VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     materialDesign:HintAssist.IsFloating="{Binding ContentHint, Converter={StaticResource NullToFalseConverter}}"
+                     IsReadOnly="{Binding IsReadOnly}"
+                     IsReadOnlyCaretVisible="True"
+                     materialDesign:HintAssist.Hint="{Binding ContentHint}"
+                     Text="{Binding Content}"
+                     VerticalScrollBarVisibility="Auto" />
+            
+            <ui:ButtonEx Grid.Row="1" Grid.Column="2" Content="OK" Command="{Binding ConfirmCommand}" />
+            <ui:ButtonEx Grid.Row="1" Grid.Column="3" Content="Cancel" Command="{Binding CancelCommand}" />
+        </st:AutoGrid>
+    </DataTemplate>
+</ui:SharedResourceDictionary>

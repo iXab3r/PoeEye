@@ -3,7 +3,7 @@ using DynamicData;
 
 namespace PoeShared.UI
 {
-    public sealed class RemoveItemController<T> : CloseController<T>
+    public sealed class RemoveItemController<T> : ItemCloseController<T>
     {
         public RemoveItemController(T item, ObservableCollection<T> collection) : base(item, () => collection.Remove(item))
         {

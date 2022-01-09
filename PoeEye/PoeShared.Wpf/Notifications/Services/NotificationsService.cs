@@ -93,7 +93,7 @@ namespace PoeShared.Notifications.Services
         public IDisposable AddNotification(INotificationViewModel notification)
         {
             var container = notificationContainerFactory.Create(notification);
-            var closeController = new CloseController<INotificationViewModel>(notification, () =>
+            var closeController = new ItemCloseController<INotificationViewModel>(notification, () =>
             {
                 Log.Debug(() => $"Removing notification: {notification} in container: {container}");
                 itemsSource.Remove(container);

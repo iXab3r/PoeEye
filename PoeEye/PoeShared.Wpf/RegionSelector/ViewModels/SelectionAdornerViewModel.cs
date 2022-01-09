@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -109,7 +110,7 @@ namespace PoeShared.RegionSelector.ViewModels
 
         public Rect Selection { get; private set; }
 
-        public bool StopWhenFocusLost { get; set; }
+        public bool StopWhenAppFocusLost { get; set; }
 
         public bool ShowCrosshair { get; set; }
 
@@ -124,14 +125,18 @@ namespace PoeShared.RegionSelector.ViewModels
         public Point MousePosition { get; private set; }
 
         public UIElement Owner { get; set; }
-
-        public IObservable<Rect> StartSelection()
+        
+        public IObservable<Rect> StartSelection(bool supportBoxSelection)
         {
             //FIXME Remove side-effects, code became too complicated
             return Observable.Create<Rect>(
                 subscriber =>
                 {
                     Log.Debug(() => $"Initializing Selection");
+                    if (IsVisible)
+                    {
+                        subscriber.OnError(new InvalidOperationException("Selection is already in progress"));
+                    }
                     IsVisible = true;
                     var selectionAnchors = new CompositeDisposable();
                     Disposable.Create(() => Log.Debug(() => $"Disposing SelectionAnchors")).AddTo(selectionAnchors);
@@ -139,9 +144,9 @@ namespace PoeShared.RegionSelector.ViewModels
                     Selection = Rect.Empty;
 
                     Observable.Merge(
-                            mainWindowTracker.WhenAnyValue(x => x.ActiveProcessId).Where(x => StopWhenFocusLost).Where(x => x != CurrentProcessId).Select(x => $"main window lost focus - processId changed"),
-                            keyboardEventsSource.WhenKeyUp.Where(x => x.KeyData == Keys.Escape).Select(x => $"{x.KeyData} pressed"),
-                            keyboardEventsSource.WhenMouseUp.Where(x => x.Button != MouseButtons.Left).Select(x => $"mouse {x.Button} pressed"))
+                            mainWindowTracker.WhenAnyValue(x => x.ActiveProcessId).Where(x => StopWhenAppFocusLost).Where(x => x != CurrentProcessId).Select(x => $"main window lost focus - processId changed"),
+                            keyboardEventsSource.WhenKeyDown.Where(x => x.KeyData == Keys.Escape).Do(x => x.Handled = true).Select(x => $"{x.KeyData} pressed"),
+                            keyboardEventsSource.WhenMouseDown.Where(x => x.Button != MouseButtons.Left).Do(x => x.Handled = true).Select(x => $"mouse {x.Button} pressed"))
                         .Do(reason => Log.Info($"Closing SelectionAdorner, reason: {reason}, activeWindow: {mainWindowTracker.ActiveWindowTitle}, activeProcess: {mainWindowTracker.ActiveProcessId}, currentProcess: {CurrentProcessId}"))
                         .ObserveOn(uiScheduler)
                         .SubscribeSafe(subscriber.OnCompleted, Log.HandleUiException)
@@ -155,6 +160,7 @@ namespace PoeShared.RegionSelector.ViewModels
                                     : Observable.Empty<MouseEventExtArgs>())
                         .Switch()
                         .ObserveOn(uiScheduler)
+                        .Where(x => Owner is { IsVisible: true })
                         .SubscribeSafe(HandleMouseMove, Log.HandleUiException)
                         .AddTo(selectionAnchors);
 
@@ -174,17 +180,11 @@ namespace PoeShared.RegionSelector.ViewModels
                             AnchorPoint = coords;
                             var region = new Rect(AnchorPoint.X, AnchorPoint.Y, 1, 1);
                             Selection = region;
-                            return keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ToUnit();
+                            return supportBoxSelection ? keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ToUnit() : Observable.Return(Unit.Default);
                         })
                         .Switch()
                         .ObserveOn(uiScheduler)
-                        .Select(
-                            _ =>
-                            {
-                                var selectedRegion = Selection;
-                                Selection = Rect.Empty;
-                                return selectedRegion;
-                            })
+                        .Select(_ => Selection)
                         .SubscribeSafe(subscriber)
                         .AddTo(selectionAnchors);
 

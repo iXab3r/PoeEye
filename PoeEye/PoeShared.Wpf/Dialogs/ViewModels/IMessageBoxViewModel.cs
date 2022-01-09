@@ -1,20 +1,12 @@
-using System.Collections.ObjectModel;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using PoeShared.Scaffolding.WPF;
+﻿using PoeShared.Scaffolding;
 
-namespace PoeShared.Dialogs.ViewModels
+namespace PoeShared.Dialogs.ViewModels;
+
+public interface IMessageBoxViewModel : IDisposableReactiveObject
 {
-    public interface IMessageBoxViewModel : IDisposableReactiveObject
-    {
-        string Title { get; }
-        
-        MessageBoxElement Result { get; }
+    bool CloseOnClickAway { get; }
+}
 
-        bool IsOpen { get; set; }
-        
-        CommandWrapper CloseMessageBoxCommand { get; }
-
-        ObservableCollection<MessageBoxElement> AvailableCommands { get; }
-    }
+public interface IMessageBoxViewModel<T> : IMessageBoxViewModel, ICloseable<T>
+{
 }

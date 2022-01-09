@@ -9,25 +9,17 @@ using ReactiveUI;
 
 namespace PoeShared.Dialogs.ViewModels
 {
-    internal abstract class MessageBoxViewModelBase : DisposableReactiveObject, IMessageBoxViewModel
+    internal abstract class MessageBoxHostViewModelBase : DisposableReactiveObject, IMessageBoxHostViewModel, ICloseController
     {
-        private static readonly IFluentLog Log = typeof(MessageBoxViewModelBase).PrepareLogger();
+        private static readonly IFluentLog Log = typeof(MessageBoxHostViewModelBase).PrepareLogger();
 
-        public MessageBoxViewModelBase()
+        public MessageBoxHostViewModelBase()
         {
             CloseMessageBoxCommand = CommandWrapper.Create<MessageBoxElement?>(x =>
             {
-                IsOpen = false;
                 Result = x ?? default;
+                Close();
             });
-
-            this.WhenAnyValue(x => x.IsOpen)
-                .Where(x => x == false && AvailableCommands.Count == 0)
-                .SubscribeSafe(() =>
-                {
-                    AvailableCommands.Add(MessageBoxElement.Close);
-                }, Log.HandleUiException)
-                .AddTo(Anchors);
         }
 
         public CommandWrapper CloseMessageBoxCommand { get; }
@@ -35,11 +27,18 @@ namespace PoeShared.Dialogs.ViewModels
         public string Title { get; set; }
 
         public bool IsOpen { get; set; }
+        
+        public bool CloseOnClickAway { get; protected set; }
 
         public MessageBoxElement Result { get; private set; }
         
         public ObservableCollection<MessageBoxElement> AvailableCommands { get; } = new();
 
         public MessageBoxElement DefaultCommand => AvailableCommands.FirstOrDefault();
+        
+        public void Close()
+        {
+            IsOpen = false;
+        }
     }
 }

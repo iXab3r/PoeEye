@@ -8,7 +8,7 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     
-    <DataTemplate DataType="{x:Type viewModels11:MessageBoxWithContentViewModelBase}">
+    <DataTemplate DataType="{x:Type viewModels11:MessageBoxHostWithContentViewModelBase}">
         <Grid x:Name="MessageBoxRoot" Margin="10">
             <Grid.InputBindings>
                 <KeyBinding Gesture="Escape" Command="{Binding CloseMessageBoxCommand}" />
@@ -19,13 +19,13 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="3*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>

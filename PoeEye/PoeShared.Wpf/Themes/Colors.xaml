@@ -18,6 +18,12 @@
     <SolidColorBrush x:Key="OverlayBackgroundBrushKey" Color="{StaticResource OverlayBackgroundColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayForegroundBrushKey" Color="{StaticResource OverlayForegroundColorKey}" ice:Freeze="True"/>
 
+    <DrawingBrush x:Key="CheckerboardBrushKey" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="LightGray"/>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    
     <Color x:Key="OverlayWindowBorderColorKey">#1A6A73</Color>
     <Color x:Key="OverlayWindowTitleBackgroundColorKey">#343E3D</Color>
     <Color x:Key="OverlayWindowBackgroundColorKey">#292C2A</Color>
