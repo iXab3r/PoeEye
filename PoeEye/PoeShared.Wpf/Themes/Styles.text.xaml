@@ -1,7 +1,8 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:eye="clr-namespace:PoeShared.UI"
-                             xmlns:system="clr-namespace:System;assembly=System.Runtime">
+                             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+                             xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -30,6 +31,28 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="{x:Type wpf:OutlinedTextBlock}" x:Key="DefaultOutlinedTextBlockStyleKey">
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="ToolTipService.ShowDuration" Value="{x:Static system:Int32.MaxValue}" />
+        <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.66" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="{x:Type wpf:OutlinedTextBlock}" BasedOn="{StaticResource DefaultOutlinedTextBlockStyleKey}">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+        <Setter Property="FontFamily" Value="{Binding RelativeSource={RelativeSource Self}, Path=(TextElement.FontFamily)}"/>
+        <Setter Property="Stroke" Value="Black"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+    </Style>
+    
     <Style TargetType="{x:Type TextBlock}" x:Key="IconTextBlock" BasedOn="{StaticResource DefaultTextBlockStyleKey}">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="FontSize" Value="14" />

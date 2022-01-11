@@ -94,6 +94,7 @@ public class OutlinedTextBlock : FrameworkElement
     {
         UpdatePen();
         TextDecorations = new TextDecorationCollection();
+        TextOptions.SetTextRenderingMode(this, TextRenderingMode.ClearType);
     }
 
     public TextStrokePosition TextStrokePosition
@@ -188,7 +189,7 @@ public class OutlinedTextBlock : FrameworkElement
             DashCap = PenLineCap.Round,
             EndLineCap = PenLineCap.Round,
             LineJoin = PenLineJoin.Round,
-            StartLineCap = PenLineCap.Round
+            StartLineCap = PenLineCap.Round,
         };
 
         if (TextStrokePosition == TextStrokePosition.Outside || TextStrokePosition == TextStrokePosition.Inside)
@@ -289,7 +290,9 @@ public class OutlinedTextBlock : FrameworkElement
             FlowDirection,
             new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
             FontSize,
-            Brushes.Black);
+            Brushes.Black,
+            new NumberSubstitution(),
+            TextFormattingMode.Ideal);
 
         UpdateFormattedText();
     }
