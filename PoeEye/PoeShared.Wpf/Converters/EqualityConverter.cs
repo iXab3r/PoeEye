@@ -29,7 +29,8 @@ namespace PoeShared.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value?.Equals(parameter);
+            var result = value?.Equals(parameter) ?? false;
+            return result ? TrueValue : FalseValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

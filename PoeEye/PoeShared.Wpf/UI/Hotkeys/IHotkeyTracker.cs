@@ -28,9 +28,9 @@ namespace PoeShared.UI
         
         bool HasModifiers { get; }
 
-        void Add(HotkeyGesture hotkeyToAdd);
+        void Add(params HotkeyGesture[] hotkeysToAdd);
 
-        void Remove(HotkeyGesture hotkeyToRemove);
+        void Remove(params HotkeyGesture[] hotkeysToRemove);
 
         void Clear();
 

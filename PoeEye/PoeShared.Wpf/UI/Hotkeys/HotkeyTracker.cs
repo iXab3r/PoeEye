@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
+using JetBrains.Annotations;
 using WindowsHook;
 using PoeShared.Native;
 using PoeShared.Prism;
@@ -232,24 +233,30 @@ namespace PoeShared.UI
 
         public bool IgnoreModifiers { get; set; }
 
-        public bool HasModifiers { get; private set; }
+        public bool HasModifiers { get; [UsedImplicitly] private set; }
 
         public bool SuppressKey { get; set; }
 
-        public bool CanSuppressHotkey { get; private set; }
+        public bool CanSuppressHotkey { get; [UsedImplicitly] private set; }
 
         public bool HandleApplicationKeys { get; set; }
 
-        public void Add(HotkeyGesture hotkeyToAdd)
+        public void Add(params HotkeyGesture[] hotkeysToAdd)
         {
-            Log.Debug(() => $"Registering hotkey {hotkeyToAdd}");
-            hotkeysSource.AddOrUpdate(hotkeyToAdd);
+            Log.Debug(() => $"Registering hotkeys {hotkeysToAdd.DumpToString()}");
+            hotkeysSource.Edit(list =>
+            {
+                hotkeysToAdd.ForEach(list.AddOrUpdate);
+            });
         }
 
-        public void Remove(HotkeyGesture hotkeyToRemove)
+        public void Remove(params HotkeyGesture[] hotkeysToRemove)
         {
-            Log.Debug(() => $"Unregistering hotkey {hotkeyToRemove}");
-            hotkeysSource.RemoveKey(hotkeyToRemove);
+            Log.Debug(() => $"Unregistering hotkeys {hotkeysToRemove.DumpToString()}");
+            hotkeysSource.Edit(list =>
+            {
+                hotkeysToRemove.ForEach(list.Remove);
+            });
         }
 
         public void Clear()
