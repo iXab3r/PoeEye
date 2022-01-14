@@ -19,7 +19,7 @@ namespace PoeShared.UI
     {
         private static readonly Binder<TreeViewItemViewModel> Binder = new();
         private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
-        private static IComparer<ITreeViewItemViewModel> DefaultComparer = new SortExpressionComparer<ITreeViewItemViewModel>();
+        private static readonly IComparer<ITreeViewItemViewModel> DefaultComparer = new SortExpressionComparer<ITreeViewItemViewModel>();
 
         private readonly SourceList<ITreeViewItemViewModel> children = new();
         private readonly ObservableAsPropertyHelper<string> pathSupplier;

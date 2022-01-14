@@ -16,6 +16,8 @@ namespace PoeShared.Native
         /// If system returns NULL we want to give a chance for window to activate. This is max timeout we'll wait for to GetForegroundWindow to return non-null value
         /// </summary>
         private static readonly TimeSpan MaxWindowActivationTimeout = TimeSpan.FromSeconds(10);
+        
+        private static readonly TimeSpan MinWindowActivationTimeout = TimeSpan.FromMilliseconds(10);
 
         [DllImport("dwmapi.dll")]
         private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out RECT pvAttribute, int cbAttribute);
@@ -287,16 +289,13 @@ namespace PoeShared.Native
             
             Log.Debug(() => $"Bringing window {window.ToHexadecimal()} to foreground");
             SetForegroundWindow(window);
-            if (timeout <= TimeSpan.Zero)
-            {
-                return;
-            }
+            var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
             
             var sw = Stopwatch.StartNew();
             IntPtr foregroundWindow;
             while ((foregroundWindow = GetForegroundWindow()) != window)
             {
-                if (sw.Elapsed > timeout)
+                if (sw.Elapsed > maxActivationTimeout)
                 {
                     if (foregroundWindow == IntPtr.Zero)
                     {
