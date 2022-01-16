@@ -12,7 +12,7 @@ namespace PoeShared.Evaluators
 
         static TextRegexEvaluator()
         {
-            Binder.BindIf(x => x.Expression != null, x => x.RecalculateRegex(x.Text, x.IgnoreCase))
+            Binder.BindIf(x => !string.IsNullOrEmpty(x.Expression), x => x.RecalculateRegex(x.Expression, x.IgnoreCase))
                 .Else(x => default)
                 .To(x => x.Regex);
             
