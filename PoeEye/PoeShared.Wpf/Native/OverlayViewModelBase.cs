@@ -108,25 +108,16 @@ namespace PoeShared.Native
             }, Log.HandleUiException).AddTo(Anchors);
 
             this.WhenAnyValue(x => x.WindowBounds)
-                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (desiredBounds, hwnd) => new { DesiredBounds = desiredBounds, hwnd })
+                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle ?? IntPtr.Zero), (desiredBounds, hwnd) => new { DesiredBounds = desiredBounds, hwnd })
+                .Where(x => x.hwnd != IntPtr.Zero && x.DesiredBounds.SourceType == ValueSourceType.User)
+                .ObserveOn(uiDispatcher)
                 .SubscribeSafe(x =>
                 {
-                    if (x.hwnd == null)
-                    {
-                        // window is not yet initialized
-                        return;
-                    }
-
-                    if (x.DesiredBounds.SourceType != ValueSourceType.User)
-                    {
-                        return;
-                    }
-                    
                     // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
-                    Log.Info(() => $"Native bounds changed, setting windows rect: {NativeBounds} = {x.DesiredBounds}");
-                    UnsafeNative.SetWindowRect(x.hwnd.Value, x.DesiredBounds.Value);
-                    var actualBounds = UnsafeNative.GetWindowRect(x.hwnd.Value);
-                    Log.Info(() => $"Native bounds changed to {actualBounds} (expected {x.DesiredBounds}), native: {NativeBounds}");
+                    Log.Info(() => $"Native bounds changed, setting windows rect: {WindowBounds} => {x.DesiredBounds}");
+                    UnsafeNative.SetWindowRect(x.hwnd, x.DesiredBounds.Value);
+                    var actualBounds = UnsafeNative.GetWindowRect(x.hwnd);
+                    Log.Info(() => $"Native bounds changed to RECT {actualBounds} (expected {x.DesiredBounds}), current: {WindowBounds})");
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
@@ -166,6 +157,8 @@ namespace PoeShared.Native
         public Size DefaultSize { get; set; }
 
         public string OverlayDescription => $"{(OverlayWindow == null ? "NOWINDOW" : OverlayWindow.Name)}";
+
+        private ValueHolder<Rectangle> WindowBounds { get; set; }
 
         public float Opacity { get; set; }
 
@@ -224,12 +217,10 @@ namespace PoeShared.Native
         public OverlayMode OverlayMode { get; set; }
 
         public SizeToContent SizeToContent { get; protected set; } = SizeToContent.Manual;
-        
+
         public string Id { get; } = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
 
         public string Title { get; protected set; }
-        
-        private ValueHolder<Rectangle> WindowBounds { get; set; }
 
         public virtual void ResetToDefault()
         {
@@ -428,7 +419,7 @@ namespace PoeShared.Native
             OverlayMode = OverlayMode.Transparent;
         }
 
-        private struct ValueHolder<T>
+        private readonly struct ValueHolder<T> : IEquatable<ValueHolder<T>>
         {
             public ValueHolder(T value, ValueSourceType sourceType = ValueSourceType.User)
             {
@@ -439,6 +430,36 @@ namespace PoeShared.Native
             public T Value { get; init; }
             
             public ValueSourceType SourceType { get; init; }
+
+            public bool Equals(ValueHolder<T> other)
+            {
+                return EqualityComparer<T>.Default.Equals(Value, other.Value);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is ValueHolder<T> other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return EqualityComparer<T>.Default.GetHashCode(Value);
+            }
+
+            public static bool operator ==(ValueHolder<T> left, ValueHolder<T> right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(ValueHolder<T> left, ValueHolder<T> right)
+            {
+                return !left.Equals(right);
+            }
+
+            public override string ToString()
+            {
+                return $"{Value} (src: {SourceType})";
+            }
         }
 
         private enum ValueSourceType
