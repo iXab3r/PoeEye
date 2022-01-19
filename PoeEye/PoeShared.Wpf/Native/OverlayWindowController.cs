@@ -221,7 +221,7 @@ namespace PoeShared.Native
                     overlayWindow.Visibility = Visibility.Visible;
                 }
 
-                WindowsServices.ShowInactiveTopmost(overlayWindow.WindowHandle, viewModel.NativeBounds);
+                UnsafeNative.ShowInactiveTopmost(overlayWindow.WindowHandle);
             } else if (overlayWindow.WindowHandle == IntPtr.Zero)
             {
                 logger.Debug(() => $"Overlay is not initialized yet");
@@ -230,7 +230,7 @@ namespace PoeShared.Native
             {
                 logger.Debug(() => $"Hiding overlay (tracker {windowTracker})");
 
-                WindowsServices.HideWindow(overlayWindow.WindowHandle);
+                UnsafeNative.HideWindow(overlayWindow.WindowHandle);
             }
         }
 

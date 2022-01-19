@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -34,7 +35,6 @@ namespace PoeShared.Native
         private static long GlobalWindowId;
 
         private readonly ObservableAsPropertyHelper<PointF> dpi;
-        private readonly object gate = new();
         private readonly CommandWrapper lockWindowCommand;
         private readonly CommandWrapper makeLayeredCommand;
         private readonly CommandWrapper makeTransparentCommand;
@@ -60,6 +60,13 @@ namespace PoeShared.Native
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
             makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
             makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
+
+            // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
+            // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
+            this.WhenAnyValue(x => x.WindowBounds)
+                .ObserveOn(uiDispatcher)
+                .Subscribe(x => RaisePropertyChanged(nameof(NativeBounds)))
+                .AddTo(Anchors);
             
             dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi))
                 .Switch()
@@ -100,8 +107,8 @@ namespace PoeShared.Native
                 IsLoaded = true;
             }, Log.HandleUiException).AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.NativeBounds)
-                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (targetBounds, hwnd) => new { TargetBounds = targetBounds, hwnd })
+            this.WhenAnyValue(x => x.WindowBounds)
+                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (desiredBounds, hwnd) => new { DesiredBounds = desiredBounds, hwnd })
                 .SubscribeSafe(x =>
                 {
                     if (x.hwnd == null)
@@ -109,13 +116,17 @@ namespace PoeShared.Native
                         // window is not yet initialized
                         return;
                     }
-                    
-                    // WARNING - SetWindowRect is blocking as it awaits for WndProc to process the corresponding WM_* messages
-                    Log.Info(() => $"Native bounds changed, setting windows rect: {NativeBounds} = {x.TargetBounds}");
-                    UnsafeNative.SetWindowRect(x.hwnd.Value, x.TargetBounds);
-                    var actualBounds = UnsafeNative.GetWindowRect(x.hwnd.Value);
-                    Log.Info(() => $"Native bounds changed to {actualBounds} (expected {x.TargetBounds}), native: {NativeBounds}");
 
+                    if (x.DesiredBounds.SourceType != ValueSourceType.User)
+                    {
+                        return;
+                    }
+                    
+                    // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
+                    Log.Info(() => $"Native bounds changed, setting windows rect: {NativeBounds} = {x.DesiredBounds}");
+                    UnsafeNative.SetWindowRect(x.hwnd.Value, x.DesiredBounds.Value);
+                    var actualBounds = UnsafeNative.GetWindowRect(x.hwnd.Value);
+                    Log.Info(() => $"Native bounds changed to {actualBounds} (expected {x.DesiredBounds}), native: {NativeBounds}");
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
@@ -176,7 +187,12 @@ namespace PoeShared.Native
 
         public PointF Dpi => dpi.Value;
 
-        public Rectangle NativeBounds { get; set; }
+        [DoNotNotify]
+        public Rectangle NativeBounds
+        {
+            get => WindowBounds.Value;
+            set => WindowBounds = new ValueHolder<Rectangle>(value, ValueSourceType.User);
+        }
 
         public Size MinSize { get; set; } = new Size(0, 0);
 
@@ -212,6 +228,8 @@ namespace PoeShared.Native
         public string Id { get; } = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
 
         public string Title { get; protected set; }
+        
+        private ValueHolder<Rectangle> WindowBounds { get; set; }
 
         public virtual void ResetToDefault()
         {
@@ -252,6 +270,7 @@ namespace PoeShared.Native
 
         private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+            //this callback is called on UI thread and handles all messages sent to window
             var msg = (User32.WindowMessage)msgRaw;
             if (msg == User32.WindowMessage.WM_WINDOWPOSCHANGED && lParam != IntPtr.Zero)
             {
@@ -260,10 +279,11 @@ namespace PoeShared.Native
                 {
                     var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
                     var bounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
-                    if (NativeBounds != bounds)
+                    var currentBounds = WindowBounds;
+                    if (currentBounds.Value != bounds)
                     {
                         Log.Info(() => $"Updating native bounds: {NativeBounds} => {bounds}");
-                        NativeBounds = bounds;
+                        WindowBounds = new ValueHolder<Rectangle>(){ Value = bounds, SourceType = ValueSourceType.System };
                     }
                 }
             }
@@ -406,6 +426,25 @@ namespace PoeShared.Native
             }
             Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
             OverlayMode = OverlayMode.Transparent;
+        }
+
+        private struct ValueHolder<T>
+        {
+            public ValueHolder(T value, ValueSourceType sourceType = ValueSourceType.User)
+            {
+                Value = value;
+                SourceType = sourceType;
+            }
+
+            public T Value { get; init; }
+            
+            public ValueSourceType SourceType { get; init; }
+        }
+
+        private enum ValueSourceType
+        {
+            User,
+            System
         }
     }
 }

@@ -190,16 +190,20 @@ namespace PoeShared.Native
             return true;
         }
 
-        public static void ShowInactiveTopmost(IntPtr handle, Rectangle windowBounds)
+        public static void ShowInactiveTopmost(IntPtr handle)
         {
-            Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window at {windowBounds}");
+            Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window topmost");
             Win32ErrorCode error;
             if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
                 Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
-                return;
             }
-
+        }
+        
+        public static void ShowInactiveTopmost(IntPtr handle, Rectangle windowBounds)
+        {
+            ShowInactiveTopmost(handle);
+            Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window as inactive topmost at {windowBounds}");
             if (!User32.SetWindowPos(handle, User32.SpecialWindowHandles.HWND_TOPMOST, windowBounds.X, windowBounds.Y, windowBounds.Width, windowBounds.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE))
             {
                 Log.Warn($"Failed to SetWindowPos({handle.ToHexadecimal()}, {User32.SpecialWindowHandles.HWND_TOPMOST}), error: {Kernel32.GetLastError()}");

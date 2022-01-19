@@ -72,7 +72,7 @@ namespace PoeShared.Native
                         }
 
                         Log.Debug(() => $"Setting initial window {this} size ({thisWindow.ToHexadecimal()}), TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, target bounds: {newBounds}");
-                        if (!WindowsServices.SetWindowRect(thisWindow, newBounds))
+                        if (!UnsafeNative.SetWindowRect(thisWindow, newBounds))
                         {
                             Log.Warn($"Failed to assign initial window {this} ({thisWindow.ToHexadecimal()}) size, TargetAspectRatio: {targetAspectRatio}, initial bounds: {bounds}, target bounds: {newBounds}");
                         }

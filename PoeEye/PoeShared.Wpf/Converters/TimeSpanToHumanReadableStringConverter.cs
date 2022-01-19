@@ -32,6 +32,16 @@ namespace PoeShared.Converters
                 return "-∞";
             }
 
+            if (timeSpan == TimeSpan.Zero)
+            {
+                return "0s";
+            }
+
+            if (timeSpan.TotalSeconds < 1)
+            {
+                return $"{timeSpan.TotalMilliseconds:F0}ms";
+            }
+
             if (timeSpan.TotalHours > 24)
             {
                 return $"{timeSpan.TotalDays:F0}d {timeSpan.Hours:F0}h";
