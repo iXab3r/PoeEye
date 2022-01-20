@@ -44,29 +44,7 @@ namespace PoeShared.Native
                 catch (Exception ex)
                 {
                     Log.Warn($"Failed to get processId via {nameof(User32.GetWindowThreadProcessId)}, last error: {Kernel32.GetLastError()}", ex);
-                }
-
-                if (processId == 0)
-                {
-                    try
-                    {
-                        var allProcesses = Process.GetProcesses();
-                        var targetProcess = allProcesses.FirstOrDefault(x => x.MainWindowHandle == handle);
-                        if (targetProcess != null)
-                        {
-                            processId = targetProcess.Id;
-                            if (targetProcess.Threads.Count > 0)
-                            {
-                                var candidateThread = targetProcess.Threads[0];
-                                threadId = candidateThread.Id;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Warn($"Failed to get processId via process list", ex);
-                    }
-                }
+                } 
 
                 return (processId: processId, threadId: threadId);
             });
