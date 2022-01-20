@@ -10,9 +10,18 @@ namespace PoeShared.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IntPtr)
+            if (value is IntPtr ptr)
             {
-                return ((IntPtr) value).ToHexadecimal();
+                return ptr.ToHexadecimal();
+            } else if (value is int intPtr)
+            {
+                return intPtr.ToHexadecimal();
+            } else if (value is uint uintPtr)
+            {
+                return uintPtr.ToHexadecimal();
+            } else if (value is long longPtr)
+            {
+                return longPtr.ToHexadecimal();
             }
 
             return Binding.DoNothing;

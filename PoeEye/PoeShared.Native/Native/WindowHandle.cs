@@ -55,6 +55,11 @@ namespace PoeShared.Native
                         if (targetProcess != null)
                         {
                             processId = targetProcess.Id;
+                            if (targetProcess.Threads.Count > 0)
+                            {
+                                var candidateThread = targetProcess.Threads[0];
+                                threadId = candidateThread.Id;
+                            }
                         }
                     }
                     catch (Exception ex)
