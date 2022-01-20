@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Text;
 using PInvoke;
@@ -277,6 +278,46 @@ namespace PoeShared.Native
             {
                 ActivateKeyboardLayout(currentKeyboardLayout, KeyboardLayoutFlags.KLF_NONE);
             }
+        }
+        
+        private static IDisposable AttachThreadInput(IntPtr hwnd)
+        {
+            var log = Log.WithSuffix(hwnd.ToHexadecimal());
+            log.Debug(() => $"Resolving target window threadId");
+            var targetThreadId = User32.GetWindowThreadProcessId(hwnd, out var targetProcessId);
+            if (targetThreadId <= 0)
+            {
+                log.Warn(
+                    $"Failed to retrieve foreground thread of process {targetProcessId} for window {hwnd.ToHexadecimal()} ({UnsafeNative.GetWindowTitle(hwnd)}), last error: {Kernel32.GetLastError()}");
+                return Disposable.Empty;
+            }
+
+            var currentThreadId = Kernel32.GetCurrentThreadId();
+            log.Debug(() => $"Resolved window threadId: {currentThreadId}, current threadId: {currentThreadId}");
+            if (targetThreadId == currentThreadId)
+            {
+                log.Debug(() => $"Attachment is not needed - we're already on thread {targetThreadId}");
+                return Disposable.Empty;
+            }
+
+            log.Debug(() => $"Attaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}");
+            if (!User32.AttachThreadInput(currentThreadId, targetThreadId, true))
+            {
+                var error = new Win32Exception();
+                log.Warn($"Failed to attach input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}, error: {error}");
+                throw error;
+            }
+
+            return Disposable.Create(() =>
+            {
+                log.Debug(() => $"Detaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}");
+                if (!User32.AttachThreadInput(currentThreadId, targetThreadId, false))
+                {
+                    var error = new Win32Exception();
+                    log.Warn($"Failed to detach input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}, error: {error}");
+                    throw error;
+                }
+            });
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -51,7 +51,7 @@ namespace PoeShared.Native
                 }
                 index++;
                 return true;
-            }, IntPtr.Zero);
+            }, IntPtr.Zero); 
 
             return z;
         }

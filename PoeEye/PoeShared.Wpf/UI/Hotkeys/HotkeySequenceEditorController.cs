@@ -202,7 +202,9 @@ namespace PoeShared.UI
             }).AddTo(recordingAnchors);
 
             Observable.Merge(
-                    windowToRecord == null ? Observable.Empty<string>() : mainWindowTracker.WhenAnyValue(x => x.ActiveWindowHandle).Where(x => x != windowToRecord.Handle).Select(x => $"Active window changed ! Expected {windowToRecord}, got: {x.ToHexadecimal()} ({UnsafeNative.GetWindowTitle(x)})"),
+                    windowToRecord == null ? Observable.Empty<string>() : mainWindowTracker.WhenAnyValue(x => x.ActiveWindow)
+                        .Where(x => x.Handle != windowToRecord.Handle && x.ProcessId != windowToRecord.ProcessId)
+                        .Select(x => $"Active window changed ! Expected {windowToRecord}, got: {x})"),
                     tracker.WhenAnyValue(x => x.IsActive).Where(x => x).Select(x => $"Hotkey {tracker} detected"),
                     this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).Select(x => $"Cannot add more items: {TotalDuration} / {Owner.MaxDuration}, {Owner.TotalCount} / {Owner.MaxItemsCount}"))
                 .Take(1)

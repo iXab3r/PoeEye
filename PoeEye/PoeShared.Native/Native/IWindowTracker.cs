@@ -14,6 +14,8 @@ namespace PoeShared.Native
 
         IntPtr ActiveWindowHandle { get; }
         
+        IWindowHandle ActiveWindow { get; }
+        
         int ActiveProcessId { get; }
         
         int ExecutingProcessId { get; }

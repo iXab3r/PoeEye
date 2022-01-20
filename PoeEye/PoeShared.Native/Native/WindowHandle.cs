@@ -8,12 +8,10 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using log4net;
 using Newtonsoft.Json;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 using Win32Exception = System.ComponentModel.Win32Exception;
 // ReSharper disable CA1416
 
@@ -21,20 +19,52 @@ namespace PoeShared.Native
 {
     internal sealed class WindowHandle : IWindowHandle  
     {
-        private static readonly IFluentLog Log = typeof(WindowHandle).PrepareLogger();
-
         private readonly Lazy<string> classSupplier;
         private readonly Lazy<Icon> iconSupplier;
         private readonly Lazy<BitmapSource> iconBitmapSupplier;
         private readonly Lazy<User32.WindowStyles> windowStyle;
         private readonly Lazy<User32.WindowStylesEx> windowStyleEx;
+        private readonly Lazy<(int processId, int threadId)> processIdSupplier;
         private readonly Lazy<(string processName, string processPath, string commandLine, string processArgs, DateTime createdAt)> processDataSupplier;
         
         public WindowHandle(IntPtr handle)
         {
+            Log = typeof(WindowHandle).PrepareLogger().WithSuffix(() => $"HWND {handle.ToHexadecimal()}, Title {Title}, Class: {Class}");
             Handle = handle;
             Title = UnsafeNative.GetWindowTitle(handle);
-            ProcessId = UnsafeNative.GetProcessIdByWindowHandle(handle);
+
+            processIdSupplier = new Lazy<(int processId, int threadId)>(() =>
+            {
+                var threadId = 0;
+                var processId = 0;
+                try
+                {
+                    threadId = User32.GetWindowThreadProcessId(handle, out processId);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Failed to get processId via {nameof(User32.GetWindowThreadProcessId)}, last error: {Kernel32.GetLastError()}", ex);
+                }
+
+                if (processId == 0)
+                {
+                    try
+                    {
+                        var allProcesses = Process.GetProcesses();
+                        var targetProcess = allProcesses.FirstOrDefault(x => x.MainWindowHandle == handle);
+                        if (targetProcess != null)
+                        {
+                            processId = targetProcess.Id;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warn($"Failed to get processId via process list", ex);
+                    }
+                }
+
+                return (processId: processId, threadId: threadId);
+            });
             
             classSupplier = new Lazy<string>(() => UnsafeNative.GetWindowClass(handle), LazyThreadSafetyMode.ExecutionAndPublication);
             iconSupplier = new Lazy<Icon>(() => GetWindowIcon(handle), LazyThreadSafetyMode.ExecutionAndPublication);
@@ -53,7 +83,7 @@ namespace PoeShared.Native
                 }
                 catch (Exception ex)
                 {
-                    Log.Warn($"Failed to get IconBitmap, window: {Title}, class: {Class}", ex);
+                    Log.Warn($"Failed to get IconBitmap, class: {Class}", ex);
                     return default;
                 }
             }, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -69,7 +99,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(() => $"Failed to retrieve native process path for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                        Log.Debug(() => $"Failed to retrieve native process path for process Id {ProcessId}", ex);
                         nativeProcessPath = default;
                     }
                     
@@ -81,7 +111,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}, window: {Title}, class: {Class}, using native path: {nativeProcessPath}", ex);
+                        Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}, using native path: {nativeProcessPath}", ex);
                         processPath = nativeProcessPath;
                     }
                     
@@ -101,7 +131,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(() => $"Failed to retrieve process name for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                        Log.Debug(() => $"Failed to retrieve process name for process Id {ProcessId}", ex);
                         processName = default;
                     }
 
@@ -112,7 +142,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(() => $"Failed to retrieve command linefor process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                        Log.Debug(() => $"Failed to retrieve command linefor process Id {ProcessId}", ex);
                         commandLine = default;
                     }
 
@@ -123,7 +153,7 @@ namespace PoeShared.Native
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(() => $"Failed to parse command line args for process Id {ProcessId}, window: {Title}, class: {Class}, command line: {commandLine}", ex);
+                        Log.Debug(() => $"Failed to parse command line args for process Id {ProcessId}, command line: {commandLine}", ex);
                         processArgs = default;
                     }
 
@@ -137,7 +167,7 @@ namespace PoeShared.Native
                         }
                         catch (Win32Exception ex)
                         {
-                            Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                            Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}", ex);
                         }
                     }
                     
@@ -149,7 +179,7 @@ namespace PoeShared.Native
                         }
                         catch (Win32Exception ex)
                         {
-                            Log.Debug(() => $"Failed to retrieve native process times information for process Id {ProcessId}, window: {Title}, class: {Class}", ex);
+                            Log.Debug(() => $"Failed to retrieve native process times information for process Id {ProcessId}", ex);
                         }
                     }
                     
@@ -157,17 +187,21 @@ namespace PoeShared.Native
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(() => $"Failed to wrap Process with Id {ProcessId}, window: {Title}, class: {Class} - {ex.Message} ({ex.GetType().Name})");
+                    Log.Debug(() => $"Failed to wrap Process with Id {ProcessId} - {ex.Message} ({ex.GetType().Name})");
                 }
                 return default;
             });
         }
         
+        private IFluentLog Log { get; }
+        
         public IntPtr Handle { get; }
 
         public string Title { get; }
 
-        public int ProcessId { get; }
+        public int ProcessId => processIdSupplier.Value.processId;
+
+        public int ThreadId => processIdSupplier.Value.threadId;
 
         public DateTime CreatedAt => processDataSupplier.Value.createdAt;
 

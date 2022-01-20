@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Services;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -202,7 +203,7 @@ namespace PoeShared.Native
 
         public static bool SetForegroundWindow(IntPtr hwnd)
         {
-            var log = Log.WithSuffix($"[{hwnd.ToHexadecimal()}]");
+            var log = Log.WithSuffix(hwnd.ToHexadecimal());
             log.Debug(() => $"Setting foreground window");
 
             var foregroundWindow = GetForegroundWindow();
@@ -212,56 +213,23 @@ namespace PoeShared.Native
                 return true;
             }
 
-            using var attachmentAnchor = UserInputAttacher.Attach(log, hwnd);
-            log.Debug(() => $"Requesting window activation");
+            using var attachmentAnchor = AttachThreadInput(hwnd);
+            log.Debug(() => $"Performing BringWindowToTop");
             Win32ErrorCode error;
 
             if (!BringWindowToTop(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
-                log.Warn($"Failed to SetForegroundWindow.BringWindowToTop({hwnd.ToHexadecimal()}), error: {error}");
+                log.Warn($"Failed to SetForegroundWindow.BringWindowToTop, error: {error}");
                 return false;
             }
 
             if (!User32.SetForegroundWindow(hwnd))
             {
-                log.Warn($"Failed to SetForegroundWindow({hwnd.ToHexadecimal()})");
+                log.Warn($"Failed to SetForegroundWindow");
                 return false;
             }
 
             return true;
-        }
-
-        private sealed class UserInputAttacher : DisposableReactiveObject
-        {
-            public static IDisposable Attach(IFluentLog log, IntPtr hwnd)
-            {
-                var targetThreadId = User32.GetWindowThreadProcessId(hwnd, out var targetProcessId);
-                if (targetThreadId <= 0)
-                {
-                    log.Warn(
-                        $"Failed to retrieve foreground thread of process {targetProcessId} for window {hwnd.ToHexadecimal()} ({GetWindowTitle(hwnd)}), last error: {Kernel32.GetLastError()}");
-                    return Disposable.Empty;
-                }
-                
-                var appThread = GetCurrentThreadId();
-                if (targetThreadId == appThread)
-                {
-                    Log.Debug(() => $"Attachment is not needed - we're already on thread {targetThreadId}");
-                    return Disposable.Empty;
-                }
-                
-                Log.Debug(() => $"Attaching thread input of thread {appThread} to thread {targetThreadId} of process {targetProcessId}");
-                User32.AttachThreadInput(appThread, targetThreadId, true);
-
-                return Disposable.Create(() =>
-                {
-                    if (targetThreadId != appThread)
-                    {
-                        log.Debug(() => $"Detaching thread input of thread {appThread} to thread {targetThreadId} of process {targetProcessId}");
-                        User32.AttachThreadInput(appThread, targetThreadId, false);
-                    }
-                });
-            }
         }
     }
 }

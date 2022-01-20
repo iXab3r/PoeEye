@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -23,15 +22,17 @@ namespace PoeShared.Native
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
         private readonly IWindowTrackerMatcher windowMatcher;
+        private readonly IWindowHandleProvider windowHandleProvider;
 
         public WindowTracker(
             IFactory<IWinEventHookWrapper, WinEventHookArguments> hookFactory,
             IWindowTrackerMatcher windowMatcher,
-            [Unity.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            IWindowHandleProvider windowHandleProvider)
         {
             Guard.ArgumentNotNull(windowMatcher, nameof(windowMatcher));
 
             this.windowMatcher = windowMatcher;
+            this.windowHandleProvider = windowHandleProvider;
 
             var timerObservable = ObservableEx
                 .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
@@ -61,11 +62,13 @@ namespace PoeShared.Native
 
         public IntPtr MatchingWindowHandle { get; private set; }
 
-        public string ActiveWindowTitle { get; private set; }
+        public string ActiveWindowTitle => ActiveWindow?.Title;
 
-        public IntPtr ActiveWindowHandle { get; private set; }
+        public IntPtr ActiveWindowHandle => ActiveWindow?.Handle ?? IntPtr.Zero;
+        
+        public IWindowHandle ActiveWindow { get; private set; }
 
-        public int ActiveProcessId { get; private set; }
+        public int ActiveProcessId => ActiveWindow?.ProcessId ?? default;
 
         public override string ToString()
         {
@@ -75,9 +78,7 @@ namespace PoeShared.Native
         private void WindowActivated(IntPtr hwnd, string title, int processId)
         {
             var previousState = new {IsActive, MatchingWindowHandle, ActiveWindowTitle, ActiveWindowHandle, ActiveProcessId};
-            ActiveWindowHandle = hwnd;
-            ActiveWindowTitle = title;
-            ActiveProcessId = processId;
+            ActiveWindow = windowHandleProvider.GetByWindowHandle(hwnd);
             IsActive = windowMatcher.IsMatch(title, hwnd, processId);
             MatchingWindowHandle = IsActive ? hwnd : IntPtr.Zero;
 
