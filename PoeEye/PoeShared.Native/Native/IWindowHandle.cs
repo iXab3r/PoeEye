@@ -27,6 +27,8 @@ namespace PoeShared.Native
         
         int ProcessId { get; }
         
+        int ThreadId { get; }
+        
         DateTime CreatedAt { get; }
         
         string ProcessPath { [CanBeNull] get; }

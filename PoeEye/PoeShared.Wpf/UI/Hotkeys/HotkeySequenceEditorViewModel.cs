@@ -26,6 +26,7 @@ namespace PoeShared.UI
         private static readonly Binder<HotkeySequenceEditorViewModel> Binder = new();
 
         private static readonly IFluentLog Log = typeof(HotkeySequenceEditorViewModel).PrepareLogger();
+        private readonly IWindowHandleProvider windowHandleProvider;
         private readonly IScreenRegionSelectorService screenRegionSelectorService;
 
         private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
@@ -39,9 +40,11 @@ namespace PoeShared.UI
         }
 
         public HotkeySequenceEditorViewModel(
+            IWindowHandleProvider windowHandleProvider,
             IFactory<IHotkeySequenceEditorController, IHotkeySequenceEditorViewModel> controllerFactory,
             IScreenRegionSelectorService screenRegionSelectorService)
         {
+            this.windowHandleProvider = windowHandleProvider;
             this.screenRegionSelectorService = screenRegionSelectorService;
             var items = new ObservableCollectionExtended<HotkeySequenceItem>();
             Items = items;
@@ -104,10 +107,10 @@ namespace PoeShared.UI
             using var windowAnchors = new CompositeDisposable();
 
             var windowToRecord = Controller.TargetWindow;
-            var initialWindow = UnsafeNative.GetForegroundWindow();
+            var initialWindow = windowHandleProvider.GetByWindowHandle(UnsafeNative.GetForegroundWindow());
             if (windowToRecord != null)
             {
-                UnsafeNative.ActivateWindow(windowToRecord.Handle);
+                UnsafeNative.ActivateWindow(windowToRecord);
                 Disposable.Create(() => UnsafeNative.ActivateWindow(initialWindow)).AddTo(windowAnchors);
             }
 

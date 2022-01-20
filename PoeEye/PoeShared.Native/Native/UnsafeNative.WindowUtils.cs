@@ -268,36 +268,36 @@ namespace PoeShared.Native
             return User32.GetForegroundWindow();
         }
 
-        public static void ActivateWindow(IntPtr window)
+        public static void ActivateWindow(IWindowHandle window)
         {
             ActivateWindow(window, TimeSpan.FromMilliseconds(500));    
         }
         
-        public static void ActivateWindow(IntPtr window, TimeSpan timeout)
+        public static void ActivateWindow(IWindowHandle window, TimeSpan timeout)
         {
-            if (window == IntPtr.Zero)
+            if (window == null || window.Handle == IntPtr.Zero)
             {
                 return;
             }
-            if (window == GetForegroundWindow())
+            if (window.Handle == GetForegroundWindow())
             {
                 return;
             }
             
-            var placement = User32.GetWindowPlacement(window);
+            var placement = User32.GetWindowPlacement(window.Handle);
             if (placement.showCmd == User32.WindowShowStyle.SW_SHOWMINIMIZED)
             {
-                Log.Debug(() => $"Restoring minimized window {window.ToHexadecimal()}");
-                ShowWindow(window, User32.WindowShowStyle.SW_SHOWNORMAL);
+                Log.Debug(() => $"Restoring minimized window {window}");
+                ShowWindow(window.Handle, User32.WindowShowStyle.SW_SHOWNORMAL);
             }
             
-            Log.Debug(() => $"Bringing window {window.ToHexadecimal()} to foreground");
+            Log.Debug(() => $"Bringing window {window} to foreground");
             SetForegroundWindow(window);
             var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
             
             var sw = Stopwatch.StartNew();
             IntPtr foregroundWindow;
-            while ((foregroundWindow = GetForegroundWindow()) != window)
+            while ((foregroundWindow = GetForegroundWindow()) != window.Handle)
             {
                 if (sw.Elapsed > maxActivationTimeout)
                 {
@@ -305,12 +305,12 @@ namespace PoeShared.Native
                     {
                         if (sw.Elapsed > MaxWindowActivationTimeout)
                         {
-                            throw new ApplicationException($"Failed to switch to window {UnsafeNative.GetWindowTitle(window)} (${window.ToHexadecimal()}) in {sw.ElapsedMilliseconds:F0}ms, foreground window is not found, still activating ?");
+                            throw new ApplicationException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is not found, still activating ?");
                         }
                         continue;
                     }
                     
-                    throw new ApplicationException($"Failed to switch to window {UnsafeNative.GetWindowTitle(window)} (${window.ToHexadecimal()}) in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
+                    throw new ApplicationException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
                 }
                 Thread.Sleep(10);
             }

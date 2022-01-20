@@ -126,38 +126,30 @@ namespace PoeShared.Native
             return GetPositionAtTheCenter(monitorBounds, new Size(window.Width, window.Height));
         }
 
-        public static void ShowWindow(Window mainWindow)
+        public static void ShowWindow(Window window)
         {
-            Guard.ArgumentNotNull(() => mainWindow);
-            Log.Debug(() => $"ShowWindow command executed, windowState: {mainWindow.WindowState}");
+            Guard.ArgumentNotNull(() => window);
+            Log.Debug(() => $"ShowWindow command executed, windowState: {window.WindowState}");
 
-            Log.Debug(() => $"Activating main window, title: '{mainWindow.Title}' {new Point(mainWindow.Left, mainWindow.Top)}, isActive: {mainWindow.IsActive}, state: {mainWindow.WindowState}, topmost: {mainWindow.Topmost}, style:{mainWindow.WindowStyle}");
+            Log.Debug(() => $"Activating window, title: '{window.Title}' {new Point(window.Left, window.Top)}, isActive: {window.IsActive}, state: {window.WindowState}, topmost: {window.Topmost}, style:{window.WindowStyle}");
 
-            if (mainWindow.Topmost)
+            if (window.Topmost)
             {
-                mainWindow.Topmost = false;
-                mainWindow.Topmost = true;
+                window.Topmost = false;
+                window.Topmost = true;
             }
             
-            var mainWindowHelper = new WindowInteropHelper(mainWindow);
-            var mainWindowHandle = mainWindowHelper.EnsureHandle();
+            var windowHelper = new WindowInteropHelper(window);
+            var windowHandle = new WindowHandle(windowHelper.EnsureHandle());
 
-            Log.Debug(() => $"Showing main window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
-            mainWindow.Show();
+            Log.Debug(() => $"Showing window, hWnd: {windowHandle}, windowState: {window.WindowState}");
+            window.Show();
 
-            if (mainWindow.WindowState == WindowState.Minimized)
+            if (window.WindowState == WindowState.Minimized)
             {
-                mainWindow.WindowState = WindowState.Normal;
+                window.WindowState = WindowState.Normal;
             }
-
-            if (mainWindowHandle != IntPtr.Zero && UnsafeNative.GetForegroundWindow() != mainWindowHandle)
-            {
-                Log.Debug(() => $"Setting foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
-                if (!UnsafeNative.SetForegroundWindow(mainWindowHandle))
-                {
-                    Log.Debug(() => $"Failed to set foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}");
-                }
-            }
+            SetForegroundWindow(windowHandle);
         }
 
         public static void HideWindow(Window mainWindow)

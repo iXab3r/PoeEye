@@ -28,6 +28,7 @@ namespace PoeShared.UI
         private readonly IClock clock;
         private readonly IFactory<IHotkeyTracker> hotkeyFactory;
         private readonly IKeyboardEventsSource keyboardEventsSource;
+        private readonly IWindowHandleProvider windowHandleProvider;
         private readonly IScheduler uiScheduler;
         private readonly IWindowTracker mainWindowTracker;
         private readonly INotificationsService notificationsService;
@@ -60,6 +61,7 @@ namespace PoeShared.UI
             INotificationsService notificationsService,
             IFactory<IHotkeyTracker> hotkeyFactory,
             IKeyboardEventsSource keyboardEventsSource,
+            IWindowHandleProvider windowHandleProvider,
             [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.mainWindowTracker = mainWindowTracker;
@@ -69,6 +71,7 @@ namespace PoeShared.UI
             this.notificationsService = notificationsService;
             this.hotkeyFactory = hotkeyFactory;
             this.keyboardEventsSource = keyboardEventsSource;
+            this.windowHandleProvider = windowHandleProvider;
             this.uiScheduler = uiScheduler;
 
             this.WhenAnyValue(x => x.RecordStartTime)
@@ -138,7 +141,7 @@ namespace PoeShared.UI
 
             IsRecording = true;
 
-            var initialWindow = UnsafeNative.GetForegroundWindow();
+            var initialWindow = windowHandleProvider.GetByWindowHandle(UnsafeNative.GetForegroundWindow());
             var windowToRecord = TargetWindow;
             using var recordingAnchors = new CompositeDisposable();
             Disposable.Create(StopRecordingExecuted).AddTo(recordingAnchors);
@@ -150,7 +153,7 @@ namespace PoeShared.UI
             if (windowToRecord != null)
             {
                 Log.Debug(() => $"Activating window before recording: {windowToRecord}, previously active: {initialWindow}");
-                UnsafeNative.ActivateWindow(windowToRecord.Handle);
+                UnsafeNative.ActivateWindow(windowToRecord);
             }
 
             using var notification = new RecordingNotificationViewModel(this).AddTo(recordingAnchors);

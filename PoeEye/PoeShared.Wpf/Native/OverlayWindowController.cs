@@ -22,7 +22,6 @@ namespace PoeShared.Native
     {
         private static long GlobalIdx;
         private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
-        private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new(IntPtr.Zero);
         private readonly string overlayControllerId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
 
         private readonly IScheduler uiScheduler;
@@ -70,9 +69,9 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             windowTracker
-                .WhenAnyValue(x => x.MatchingWindowHandle)
-                .Where(x => x != IntPtr.Zero && !IsPairedOverlay(windowTracker.ActiveWindowHandle))
-                .SubscribeSafe(lastActiveWindowHandle)
+                .WhenAnyValue(x => x.MatchingWindow)
+                .Where(x => x != null && !IsPairedOverlay(windowTracker.ActiveWindowHandle))
+                .SubscribeSafe(x => LastActiveWindow = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
@@ -85,6 +84,8 @@ namespace PoeShared.Native
         public bool IsVisible { get; private set; }
 
         public bool IsEnabled { get; set; } = true;
+        
+        public IWindowHandle LastActiveWindow { get; private set; }
 
         public IOverlayViewModel[] GetChildren()
         {
@@ -201,8 +202,8 @@ namespace PoeShared.Native
 
         public void ActivateLastActiveWindow()
         {
-            var windowHandle = lastActiveWindowHandle.Value;
-            if (windowHandle == IntPtr.Zero)
+            var windowHandle = LastActiveWindow;
+            if (windowHandle == default)
             {
                 return;
             }

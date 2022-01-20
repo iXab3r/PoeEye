@@ -280,15 +280,15 @@ namespace PoeShared.Native
             }
         }
         
-        private static IDisposable AttachThreadInput(IntPtr hwnd)
+        private static IDisposable AttachThreadInput(IWindowHandle hwnd)
         {
-            var log = Log.WithSuffix(hwnd.ToHexadecimal());
+            var log = Log.WithSuffix(hwnd);
             log.Debug(() => $"Resolving target window threadId");
-            var targetThreadId = User32.GetWindowThreadProcessId(hwnd, out var targetProcessId);
+            var targetThreadId = hwnd.ThreadId;
             if (targetThreadId <= 0)
             {
                 log.Warn(
-                    $"Failed to retrieve foreground thread of process {targetProcessId} for window {hwnd.ToHexadecimal()} ({UnsafeNative.GetWindowTitle(hwnd)}), last error: {Kernel32.GetLastError()}");
+                    $"Failed to retrieve foreground thread of process {hwnd.ProcessId} for window {hwnd}, last error: {Kernel32.GetLastError()}");
                 return Disposable.Empty;
             }
 
@@ -300,21 +300,21 @@ namespace PoeShared.Native
                 return Disposable.Empty;
             }
 
-            log.Debug(() => $"Attaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}");
+            log.Debug(() => $"Attaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}");
             if (!User32.AttachThreadInput(currentThreadId, targetThreadId, true))
             {
                 var error = new Win32Exception();
-                log.Warn($"Failed to attach input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}, error: {error}");
+                log.Warn($"Failed to attach input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}, error: {error}");
                 throw error;
             }
 
             return Disposable.Create(() =>
             {
-                log.Debug(() => $"Detaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}");
+                log.Debug(() => $"Detaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}");
                 if (!User32.AttachThreadInput(currentThreadId, targetThreadId, false))
                 {
                     var error = new Win32Exception();
-                    log.Warn($"Failed to detach input of thread {currentThreadId} to thread {targetThreadId} of process {targetProcessId}, error: {error}");
+                    log.Warn($"Failed to detach input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}, error: {error}");
                     throw error;
                 }
             });

@@ -203,11 +203,16 @@ namespace PoeShared.Native
 
         public static bool SetForegroundWindow(IntPtr hwnd)
         {
-            var log = Log.WithSuffix(hwnd.ToHexadecimal());
+            return SetForegroundWindow(new WindowHandle(hwnd));
+        }
+            
+        public static bool SetForegroundWindow(IWindowHandle hwnd)
+        {
+            var log = Log.WithSuffix(hwnd);
             log.Debug(() => $"Setting foreground window");
 
             var foregroundWindow = GetForegroundWindow();
-            if (hwnd == foregroundWindow)
+            if (hwnd.Handle == foregroundWindow)
             {
                 log.Debug(() => $"Window is already foreground");
                 return true;
@@ -217,13 +222,13 @@ namespace PoeShared.Native
             log.Debug(() => $"Performing BringWindowToTop");
             Win32ErrorCode error;
 
-            if (!BringWindowToTop(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+            if (!BringWindowToTop(hwnd.Handle) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
                 log.Warn($"Failed to SetForegroundWindow.BringWindowToTop, error: {error}");
                 return false;
             }
 
-            if (!User32.SetForegroundWindow(hwnd))
+            if (!User32.SetForegroundWindow(hwnd.Handle))
             {
                 log.Warn($"Failed to SetForegroundWindow");
                 return false;

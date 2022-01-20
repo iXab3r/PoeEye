@@ -9,6 +9,7 @@ namespace PoeShared.Native
         bool IsActive { get; }
 
         IntPtr MatchingWindowHandle { get; }
+        IWindowHandle MatchingWindow { get; }
 
         string ActiveWindowTitle { [CanBeNull] get; }
 

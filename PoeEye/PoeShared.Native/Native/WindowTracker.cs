@@ -60,13 +60,15 @@ namespace PoeShared.Native
 
         public bool IsActive { get; private set; }
 
-        public IntPtr MatchingWindowHandle { get; private set; }
+        public IntPtr MatchingWindowHandle => MatchingWindow?.Handle ?? IntPtr.Zero;
 
         public string ActiveWindowTitle => ActiveWindow?.Title;
 
         public IntPtr ActiveWindowHandle => ActiveWindow?.Handle ?? IntPtr.Zero;
         
         public IWindowHandle ActiveWindow { get; private set; }
+        
+        public IWindowHandle MatchingWindow { get; private set; }
 
         public int ActiveProcessId => ActiveWindow?.ProcessId ?? default;
 
@@ -80,7 +82,7 @@ namespace PoeShared.Native
             var previousState = new {IsActive, MatchingWindowHandle, ActiveWindowTitle, ActiveWindowHandle, ActiveProcessId};
             ActiveWindow = windowHandleProvider.GetByWindowHandle(hwnd);
             IsActive = windowMatcher.IsMatch(title, hwnd, processId);
-            MatchingWindowHandle = IsActive ? hwnd : IntPtr.Zero;
+            MatchingWindow = IsActive ? ActiveWindow : default;
 
             if (previousState.ActiveWindowHandle != ActiveWindowHandle)
             {
