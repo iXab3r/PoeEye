@@ -17,6 +17,9 @@
                          Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
+            <TabItem Header="AutoComplete">
+                <eye:CachedContentControl Content="{Binding AutoCompleteSandbox}"/>
+            </TabItem>
             <TabItem Header="Bindings">
                 <eye:CachedContentControl Content="{Binding BindingsSandbox}"/>
             </TabItem>

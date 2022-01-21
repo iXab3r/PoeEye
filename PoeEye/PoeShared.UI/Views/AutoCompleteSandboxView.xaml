@@ -1,0 +1,43 @@
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:ui="clr-namespace:PoeShared.UI"
+                              xmlns:editors="http://wpfcontrols.com/"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+   <DataTemplate DataType="{x:Type ui:TestComboItem}">
+        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+            <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False" />
+            <TextBlock Text="{Binding Name}" />
+        </st:StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ui:AutoCompleteSandboxViewModel}">
+        <st:StackPanel Orientation="Vertical" MarginBetweenChildren="10">
+
+            <st:StackPanel Orientation=" Vertical" MarginBetweenChildren="5">
+                <editors:AutoCompleteComboBox
+                    x:Name="AutoCompleteComboBox"
+                    Width="200"
+                    Provider="{Binding TextSuggestions}"
+                    Style="{StaticResource DefaultAutoCompleteComboBox}"
+                    DisplayMember="Name"
+                    Text="{Binding SelectedText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                </editors:AutoCompleteComboBox>
+                <TextBlock Text="{Binding SelectedText, StringFormat='Text: {0}'}"></TextBlock>
+                <TextBlock Text="{Binding SelectedItem, StringFormat='Item: {0}'}"></TextBlock>
+                <eye:CachedContentControl Content="{Binding SelectedItem}" />
+                <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                    <TextBox x:Name="ItemName" Width="150" />
+                    <eye:ButtonEx Content="Add" Command="{Binding AddItem}" CommandParameter="{Binding ElementName=ItemName, Path=Text}" />
+                    <eye:ButtonEx Content="Remove" Command="{Binding RemoveItem}" CommandParameter="{Binding ElementName=ItemName, Path=Text}" />
+                    <TextBox x:Name="Watermark" Width="100" Text="{Binding ElementName=AutoCompleteComboBox, Path=(materialDesign:HintAssist.Hint), Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </st:StackPanel>
+            </st:StackPanel>
+        </st:StackPanel>
+
+
+    </DataTemplate>
+</eye:SharedResourceDictionary>

@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="App.Metrics" Version="4.2.0" />
+    <PackageReference Include="AutoCompleteTextBox" Version="1.2.3" />
     <PackageReference Include="BidirectionalMap" Version="1.0.0" />
     <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.4" />

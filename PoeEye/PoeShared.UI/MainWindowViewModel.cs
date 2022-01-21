@@ -24,6 +24,7 @@ namespace PoeShared.UI
 {
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
+        public AutoCompleteSandboxViewModel AutoCompleteSandbox { get; }
         private readonly IScreenRegionSelectorService regionSelectorService;
 
         public MainWindowViewModel(
@@ -34,8 +35,10 @@ namespace PoeShared.UI
             NotificationSandboxViewModel notificationSandbox,
             ExceptionSandboxViewModel exceptionSandbox,
             IHotkeySequenceEditorViewModel hotkeySequenceEditor,
+            AutoCompleteSandboxViewModel autoCompleteSandbox,
             BindingsSandboxViewModel bindingsSandbox)
         {
+            AutoCompleteSandbox = autoCompleteSandbox;
             this.regionSelectorService = regionSelectorService;
             BindingsSandbox = bindingsSandbox.AddTo(Anchors);
             NotificationSandbox = notificationSandbox.AddTo(Anchors);
