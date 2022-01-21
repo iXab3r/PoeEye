@@ -131,6 +131,9 @@ namespace PoeShared.Native
             SetLastError = true, 
             ThrowOnUnmappableChar = false)]
         public static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, KeyboardLayoutFlags flags);
+        
+        [DllImport(nameof(User32), SetLastError = true)]
+        public static extern int GetWindowThreadProcessId(IntPtr hWnd, IntPtr pProcessId);
 
         /// <summary>
         ///     Checks whether a window is a top-level window (has no owner nor parent window).
@@ -279,6 +282,34 @@ namespace PoeShared.Native
                 ActivateKeyboardLayout(currentKeyboardLayout, KeyboardLayoutFlags.KLF_NONE);
             }
         }
+
+        private static IDisposable AttachThreadInput(int threadIdAttach, int threadIdAttachTo)
+        {
+            if (threadIdAttach == threadIdAttachTo || threadIdAttach == 0 || threadIdAttachTo == 0)
+            {
+                return Disposable.Empty;
+            }
+            
+            var log = Log.WithSuffix($"{threadIdAttach} => {threadIdAttachTo}");
+            log.Debug(() => $"Attaching thread input of thread {threadIdAttach} to thread {threadIdAttachTo}");
+            if (!User32.AttachThreadInput(threadIdAttach, threadIdAttachTo, true))
+            {
+                var error = new Win32Exception();
+                log.Warn($"Failed to attach input, error: {error}");
+                throw error;
+            }
+
+            return Disposable.Create(() =>
+            {
+                log.Debug(() => $"Detaching thread input");
+                if (!User32.AttachThreadInput(threadIdAttach, threadIdAttachTo, false))
+                {
+                    var error = new Win32Exception();
+                    log.Warn($"Failed to detach input, error: {error}");
+                    throw error;
+                }
+            });
+        }
         
         private static IDisposable AttachThreadInput(IWindowHandle hwnd)
         {
@@ -300,24 +331,7 @@ namespace PoeShared.Native
                 return Disposable.Empty;
             }
 
-            log.Debug(() => $"Attaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}");
-            if (!User32.AttachThreadInput(currentThreadId, targetThreadId, true))
-            {
-                var error = new Win32Exception();
-                log.Warn($"Failed to attach input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}, error: {error}");
-                throw error;
-            }
-
-            return Disposable.Create(() =>
-            {
-                log.Debug(() => $"Detaching thread input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}");
-                if (!User32.AttachThreadInput(currentThreadId, targetThreadId, false))
-                {
-                    var error = new Win32Exception();
-                    log.Warn($"Failed to detach input of thread {currentThreadId} to thread {targetThreadId} of process {hwnd.ProcessId}, error: {error}");
-                    throw error;
-                }
-            });
+            return AttachThreadInput(currentThreadId, targetThreadId);
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -199,42 +200,6 @@ namespace PoeShared.Native
         public static IntPtr GetDesktopWindow()
         {
             return User32.GetDesktopWindow();
-        }
-
-        public static bool SetForegroundWindow(IntPtr hwnd)
-        {
-            return SetForegroundWindow(new WindowHandle(hwnd));
-        }
-            
-        public static bool SetForegroundWindow(IWindowHandle hwnd)
-        {
-            var log = Log.WithSuffix(hwnd);
-            log.Debug(() => $"Setting foreground window");
-
-            var foregroundWindow = GetForegroundWindow();
-            if (hwnd.Handle == foregroundWindow)
-            {
-                log.Debug(() => $"Window is already foreground");
-                return true;
-            }
-
-            using var attachmentAnchor = AttachThreadInput(hwnd);
-            log.Debug(() => $"Performing BringWindowToTop");
-            Win32ErrorCode error;
-
-            if (!BringWindowToTop(hwnd.Handle) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
-            {
-                log.Warn($"Failed to SetForegroundWindow.BringWindowToTop, error: {error}");
-                return false;
-            }
-
-            if (!User32.SetForegroundWindow(hwnd.Handle))
-            {
-                log.Warn($"Failed to SetForegroundWindow");
-                return false;
-            }
-
-            return true;
         }
     }
 }
