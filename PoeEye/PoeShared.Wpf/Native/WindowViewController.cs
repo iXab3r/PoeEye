@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -8,11 +7,9 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using ReactiveUI;
-using Point = Hardcodet.Wpf.TaskbarNotification.Interop.Point;
 
 namespace PoeShared.Native;
 

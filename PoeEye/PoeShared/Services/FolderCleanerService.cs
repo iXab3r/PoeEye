@@ -1,15 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using DynamicData;
-using log4net;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 using ReactiveUI;
 using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 

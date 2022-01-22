@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using log4net;
 using MahApps.Metro.Controls;
 using PoeShared.Logging;
 

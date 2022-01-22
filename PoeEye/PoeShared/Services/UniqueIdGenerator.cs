@@ -1,5 +1,4 @@
-﻿using System;
-using shortid;
+﻿using shortid;
 using shortid.Configuration;
 
 // ReSharper disable StringLiteralTypo

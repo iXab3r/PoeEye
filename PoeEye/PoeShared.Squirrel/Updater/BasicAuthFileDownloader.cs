@@ -1,10 +1,8 @@
 using System;
 using System.Net;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Squirrel.Core;

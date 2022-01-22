@@ -1,13 +1,6 @@
-using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Subjects;
-using log4net;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Modularity;
 

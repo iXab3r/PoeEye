@@ -1,5 +1,4 @@
 using PoeShared.Native;
-using PoeShared.Scaffolding.WPF;
 
 namespace PoeShared.Dialogs.ViewModels;
 

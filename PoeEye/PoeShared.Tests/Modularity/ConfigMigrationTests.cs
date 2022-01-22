@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
-using AutoFixture;
 using System;
 using PoeShared.Modularity;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Shouldly;
 

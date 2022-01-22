@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using PoeShared.Wpf.Scaffolding;
 using Point = System.Drawing.Point;
 
 namespace PoeShared.Scaffolding;

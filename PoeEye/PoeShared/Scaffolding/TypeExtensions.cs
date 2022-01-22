@@ -1,8 +1,5 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Reflection;
 using log4net;
-using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding;
 

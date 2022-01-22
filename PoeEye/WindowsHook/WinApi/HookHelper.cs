@@ -2,10 +2,6 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;

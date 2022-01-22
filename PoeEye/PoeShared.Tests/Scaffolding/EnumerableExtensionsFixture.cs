@@ -1,8 +1,6 @@
-using System;
 using System.Linq;
 using NUnit.Framework;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using Shouldly;
 
 namespace PoeShared.Tests.Scaffolding;

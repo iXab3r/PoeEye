@@ -1,9 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using DynamicData;
 using JetBrains.Annotations;
-using log4net;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;

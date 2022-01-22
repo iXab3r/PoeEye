@@ -1,9 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
-using JetBrains.Annotations;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using ReactiveUI;
+﻿using System.Windows.Input;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.ViewModels;
 

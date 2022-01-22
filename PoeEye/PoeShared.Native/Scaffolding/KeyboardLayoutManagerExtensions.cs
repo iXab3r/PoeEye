@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Disposables;
-using PoeShared.Native;
 using PoeShared.Services;
 
 namespace PoeShared.Scaffolding;

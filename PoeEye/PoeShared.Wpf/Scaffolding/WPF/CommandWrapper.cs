@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using log4net;
 using PoeShared.Logging;
 using Prism.Commands;
 using ReactiveUI;

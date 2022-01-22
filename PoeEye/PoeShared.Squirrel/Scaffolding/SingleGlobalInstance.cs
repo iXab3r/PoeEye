@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Threading;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Splat;

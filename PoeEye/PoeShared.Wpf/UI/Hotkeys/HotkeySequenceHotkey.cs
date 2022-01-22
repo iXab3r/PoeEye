@@ -1,6 +1,5 @@
 using System.Drawing;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using PropertyBinder;
 
 namespace PoeShared.UI;

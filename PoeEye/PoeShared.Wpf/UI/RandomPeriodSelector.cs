@@ -1,7 +1,6 @@
 using System;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
-using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 
 namespace PoeShared.UI;

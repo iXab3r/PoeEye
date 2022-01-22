@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using log4net;
 using NuGet;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;

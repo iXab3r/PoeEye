@@ -1,13 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Security;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Converters;
 

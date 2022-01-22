@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Text;
 using DynamicData;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Logging;
 

@@ -1,19 +1,10 @@
-using System;
 using System.Linq.Expressions;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Threading;
 
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
-using log4net;
-using PoeShared.Logging;
-using PoeShared.Prism;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 using PoeShared.Services;
 using ReactiveUI;
-using Unity;
 
 namespace PoeShared.Modularity;
 

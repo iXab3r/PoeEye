@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 

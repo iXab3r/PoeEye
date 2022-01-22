@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using PoeShared.Logging;
 using PoeShared.Prism;
-using PropertyBinder;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using Unity;

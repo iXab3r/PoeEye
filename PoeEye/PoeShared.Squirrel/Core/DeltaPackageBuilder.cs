@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using DeltaCompressionDotNet.MsDelta;
-using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;

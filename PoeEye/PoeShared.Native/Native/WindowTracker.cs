@@ -1,17 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reactive.Linq;
-using System.Text;
-using System.Windows.Forms;
-using JetBrains.Annotations;
-using log4net;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Prism;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using ReactiveUI;
+using PoeShared.Scaffolding;
 using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
 namespace PoeShared.Native;

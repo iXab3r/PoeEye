@@ -1,14 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+﻿using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Threading;
-using log4net;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Services;
 

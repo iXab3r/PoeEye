@@ -13,7 +13,6 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.RegionSelector.Services;
-using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
 using ReactiveUI;
 using Point = System.Drawing.Point;

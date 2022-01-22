@@ -1,8 +1,4 @@
 ﻿using NUnit.Framework;
-using AutoFixture;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using PoeShared.Bindings;
 using PoeShared.Scaffolding;
 using Shouldly;

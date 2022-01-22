@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using PoeShared.Modularity;
 
 namespace PoeShared.Squirrel.Updater;

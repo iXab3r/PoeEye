@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using App.Metrics;
-using PoeShared.Logging;
+﻿using App.Metrics;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
 using PoeShared.Services;
 using Unity;
 using Unity.Extension;

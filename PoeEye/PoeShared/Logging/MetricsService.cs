@@ -1,17 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reactive.Linq;
+﻿using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using App.Metrics;
-using App.Metrics.Counter;
-using App.Metrics.Extensions.Collectors;
-using App.Metrics.Extensions.Collectors.HostedServices;
-using App.Metrics.Formatters.Json;
 using App.Metrics.Gauge;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Logging;
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Markup;
-using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 

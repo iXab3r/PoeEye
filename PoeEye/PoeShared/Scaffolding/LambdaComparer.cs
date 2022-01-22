@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PoeShared.Scaffolding;
+﻿namespace PoeShared.Scaffolding;
 
 public sealed class LambdaComparer<T> : IEqualityComparer<T>
 {

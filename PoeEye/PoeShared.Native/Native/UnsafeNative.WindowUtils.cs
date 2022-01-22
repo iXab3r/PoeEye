@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
 using PInvoke;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared.Scaffolding;
+﻿namespace PoeShared.Scaffolding;
 
 public class InvalidStateException : Exception
 {

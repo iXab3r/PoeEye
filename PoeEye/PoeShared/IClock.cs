@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared;
+﻿namespace PoeShared;
 
 public interface IClock
 {

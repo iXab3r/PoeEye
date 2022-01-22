@@ -5,8 +5,7 @@ using System.Runtime.InteropServices;
 using WindowsFormsAero;
 using PInvoke;
 using PoeShared.Native.Native;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
 

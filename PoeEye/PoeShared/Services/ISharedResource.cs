@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared.Services;
+﻿namespace PoeShared.Services;
 
 public interface ISharedResource : IDisposable
 {

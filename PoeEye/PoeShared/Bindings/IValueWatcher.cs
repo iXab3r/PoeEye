@@ -1,6 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+﻿using JetBrains.Annotations;
 
 namespace PoeShared.Bindings;
 

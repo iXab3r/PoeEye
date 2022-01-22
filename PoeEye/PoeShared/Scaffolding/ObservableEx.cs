@@ -1,8 +1,4 @@
-﻿using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using JetBrains.Annotations;
-using PoeShared.Services;
+﻿using PoeShared.Services;
 
 namespace PoeShared.Scaffolding;
 

@@ -1,7 +1,6 @@
 ﻿using System.Windows.Forms;
 using PoeShared.Prism;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
 

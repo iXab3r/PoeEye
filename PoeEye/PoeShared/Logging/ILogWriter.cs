@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared.Logging;
+﻿namespace PoeShared.Logging;
 
 /// <summary>
 /// An interface defining a log writer.

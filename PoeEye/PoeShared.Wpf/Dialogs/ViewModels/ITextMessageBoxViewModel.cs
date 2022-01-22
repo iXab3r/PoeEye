@@ -1,6 +1,4 @@
-﻿using PoeShared.Scaffolding.WPF;
-
-namespace PoeShared.Dialogs.ViewModels;
+﻿namespace PoeShared.Dialogs.ViewModels;
 
 internal interface ITextMessageBoxViewModel : IMessageBoxHostViewModel
 {

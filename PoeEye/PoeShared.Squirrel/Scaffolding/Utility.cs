@@ -10,7 +10,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Squirrel;

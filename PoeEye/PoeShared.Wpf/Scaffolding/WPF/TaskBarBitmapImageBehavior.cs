@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Interactivity;
 using Hardcodet.Wpf.TaskbarNotification;
-using log4net;
 using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF;

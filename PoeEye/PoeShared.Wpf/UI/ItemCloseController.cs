@@ -1,6 +1,4 @@
 using System;
-using PoeShared.Native;
-using PoeShared.Logging;
 
 namespace PoeShared.UI;
 

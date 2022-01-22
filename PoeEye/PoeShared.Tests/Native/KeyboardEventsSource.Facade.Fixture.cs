@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using WindowsHook;
-using log4net;
-using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using PoeShared.Native;
-using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
-using Shouldly;
 
 namespace PoeShared.Tests.Native;
 

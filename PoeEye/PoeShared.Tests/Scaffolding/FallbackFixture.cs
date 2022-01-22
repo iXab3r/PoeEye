@@ -1,10 +1,7 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
 using System;
-using System.ComponentModel;
 using PoeShared.Scaffolding;
-using PoeShared.Tests.Helpers;
-using PoeShared.UI;
 using Shouldly;
 
 namespace PoeShared.Tests.Scaffolding;

@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Text;
 using DynamicData;
 using DynamicData.Binding;
-using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PropertyBinder;

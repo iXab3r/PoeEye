@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using PInvoke;
-using PoeShared.Native;
 
 namespace PoeShared.WindowSeekers;
 

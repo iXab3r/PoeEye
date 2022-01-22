@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reactive.Disposables;
@@ -15,8 +14,6 @@ using PoeShared.Tests.Helpers;
 using PoeShared.UI;
 using Shouldly;
 using WindowsHook;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace PoeShared.Tests.UI.Hotkeys;
 

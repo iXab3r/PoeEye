@@ -1,13 +1,8 @@
 ﻿using System.ComponentModel;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-using System.Windows.Media;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
-using System;
 
 namespace PoeShared.UI;
 

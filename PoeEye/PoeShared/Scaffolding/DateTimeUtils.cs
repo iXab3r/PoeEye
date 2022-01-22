@@ -1,5 +1,3 @@
-using System;
-
 namespace PoeShared.Scaffolding;
 
 public static class DateTimeUtils

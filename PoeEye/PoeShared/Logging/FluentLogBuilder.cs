@@ -1,6 +1,4 @@
-﻿using System;
-using App.Metrics;
-using PoeShared.Scaffolding;
+﻿using App.Metrics;
 
 namespace PoeShared.Logging;
 

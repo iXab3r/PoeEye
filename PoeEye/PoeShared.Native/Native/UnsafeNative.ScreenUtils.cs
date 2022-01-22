@@ -1,15 +1,10 @@
 using System;
 using System.Drawing;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using PInvoke;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using PoeShared.Services;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 

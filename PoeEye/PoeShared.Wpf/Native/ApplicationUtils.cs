@@ -5,7 +5,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using log4net;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;

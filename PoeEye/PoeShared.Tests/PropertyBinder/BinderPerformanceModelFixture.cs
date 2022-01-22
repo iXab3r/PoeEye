@@ -1,13 +1,11 @@
 using NUnit.Framework;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
 using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 

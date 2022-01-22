@@ -4,8 +4,7 @@ using System.Linq.Expressions;
 using System.Reactive.Subjects;
 using Moq;
 using Moq.Language.Flow;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Tests.Helpers;
 

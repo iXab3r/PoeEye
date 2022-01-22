@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using DynamicData;
+﻿using DynamicData;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity;

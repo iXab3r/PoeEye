@@ -1,11 +1,4 @@
-using System;
-using System.Collections;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq.Expressions;
 using System.Reflection;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared;
 
@@ -34,11 +27,7 @@ public static class Guard
     {
         ArgumentNotNull(type, nameof(type));
 
-#if NETSTANDARD
         if (type.GetTypeInfo().IsInterface == throwIfItIsAnInterface)
-#else
-            if (type.IsInterface == throwIfItIsAnInterface)
-#endif
         {
             throw new ArgumentException(exceptionMessage, type.Name);
         }

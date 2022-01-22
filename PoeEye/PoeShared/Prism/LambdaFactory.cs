@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared.Prism;
+﻿namespace PoeShared.Prism;
 
 public sealed class LambdaFactory<TOut> : IFactory<TOut>
 {

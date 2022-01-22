@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Concurrency;
 using WindowsHook;
 
 namespace PoeShared.Native;

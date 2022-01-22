@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using PoeShared.Prism;
+﻿using PoeShared.Prism;
 
 namespace PoeShared.Modularity;
 

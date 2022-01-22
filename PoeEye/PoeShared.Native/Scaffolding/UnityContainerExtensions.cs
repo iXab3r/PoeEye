@@ -1,10 +1,6 @@
-using System;
-using PoeShared.Native;
 using PoeShared.Prism;
 using Unity;
-using Unity.Injection;
 using Unity.Lifetime;
-using Unity.Resolution;
 
 namespace PoeShared.Native.Scaffolding;
 

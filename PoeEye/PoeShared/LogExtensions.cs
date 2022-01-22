@@ -1,12 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using log4net;
-using PoeShared.Logging;
 using LogLevel = Splat.LogLevel;
 
 namespace PoeShared;

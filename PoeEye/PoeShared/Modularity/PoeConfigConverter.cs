@@ -1,15 +1,9 @@
-using System;
 using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PoeShared.Bindings;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
 
 namespace PoeShared.Modularity;
 

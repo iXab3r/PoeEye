@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using PInvoke;
-using PoeShared.Native;
 
 namespace PoeShared.Scaffolding;
 

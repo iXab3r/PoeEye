@@ -1,9 +1,6 @@
-using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 using PoeShared.Native;
 using WinPoint = System.Drawing.Point;
 

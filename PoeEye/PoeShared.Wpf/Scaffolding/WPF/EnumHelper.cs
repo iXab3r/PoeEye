@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using log4net;
 using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF;

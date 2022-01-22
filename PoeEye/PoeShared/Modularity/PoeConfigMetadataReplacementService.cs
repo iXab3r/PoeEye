@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using DynamicData;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
+﻿using DynamicData;
 using PoeShared.Services;
 
 namespace PoeShared.Modularity;

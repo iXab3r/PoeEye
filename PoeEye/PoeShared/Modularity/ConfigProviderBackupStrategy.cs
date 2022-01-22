@@ -1,9 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-
 namespace PoeShared.Modularity;
 
 public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, IConfigProviderStrategy

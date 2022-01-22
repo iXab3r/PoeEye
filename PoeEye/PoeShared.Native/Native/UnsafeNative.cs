@@ -6,7 +6,6 @@ using System.Runtime.Versioning;
 using System.Security.Principal;
 using System.Text;
 using System.Windows.Input;
-using log4net;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity;
 

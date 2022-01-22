@@ -2,7 +2,6 @@ using System;
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Interop;
-using log4net;
 using PInvoke;
 using PoeShared.Logging;
 

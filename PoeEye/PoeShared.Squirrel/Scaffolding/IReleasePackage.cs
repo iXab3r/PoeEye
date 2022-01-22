@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared.Squirrel.Scaffolding;
+﻿namespace PoeShared.Squirrel.Scaffolding;
 
 public interface IReleasePackage
 {

@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Aggregation;
-using DynamicData.Binding;
 using DynamicData.Kernel;
 using JetBrains.Annotations;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Forms;
-using PoeShared.Native;
 
 namespace PoeShared.Services;
 

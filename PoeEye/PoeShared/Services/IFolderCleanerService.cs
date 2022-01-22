@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace PoeShared.Services;
+﻿namespace PoeShared.Services;
 
 public interface IFolderCleanerService 
 {

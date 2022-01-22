@@ -1,11 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
-using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
-using PoeShared.Scaffolding.WPF;
-using ReactiveUI;
 
 namespace PoeShared.Dialogs.ViewModels;
 

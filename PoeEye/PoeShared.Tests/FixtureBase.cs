@@ -1,9 +1,6 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
-using System;
-using System.Collections.ObjectModel;
 using AutoFixture.AutoMoq;
-using Shouldly;
 
 namespace PoeShared.Tests;
 

@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
 using System;
-using System.Globalization;
 using System.Linq;
 using PoeShared.Services;
 using Shouldly;

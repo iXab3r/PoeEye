@@ -1,23 +1,16 @@
 using System;
 using System.Drawing;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
-using Microsoft.VisualBasic.Logging;
 using PoeShared.Audio.ViewModels;
-using PoeShared.Native;
 using PoeShared.RegionSelector.ViewModels;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using PoeShared.Notifications;
+using PoeShared.Scaffolding;
 using PoeShared.RegionSelector;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI.Bindings;
-using PoeShared.Wpf.Scaffolding;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.UI;

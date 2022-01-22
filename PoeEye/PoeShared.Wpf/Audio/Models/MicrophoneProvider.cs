@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using DynamicData;
-using log4net;
 using NAudio.CoreAudioApi;
 using NAudio.Utils;
 using PoeShared.Scaffolding; 

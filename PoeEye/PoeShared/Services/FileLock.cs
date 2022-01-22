@@ -1,10 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reactive.Disposables;
-using PoeShared.Logging;
-using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+﻿using System.Diagnostics;
 
 namespace PoeShared.Services;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using App.Metrics;
+﻿using App.Metrics;
 
 namespace PoeShared.Logging;
 

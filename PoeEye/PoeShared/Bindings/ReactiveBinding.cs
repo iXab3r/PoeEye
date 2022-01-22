@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using JetBrains.Annotations;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
+﻿using System.Linq.Expressions;
 using PropertyBinder;
 using PropertyChanged;
 

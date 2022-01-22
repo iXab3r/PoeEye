@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using DynamicData;
-using Microsoft.VisualBasic.Logging;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI.Providers;
-using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 
 namespace PoeShared.UI;

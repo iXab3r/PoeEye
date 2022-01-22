@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-
-using log4net;
 using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
 

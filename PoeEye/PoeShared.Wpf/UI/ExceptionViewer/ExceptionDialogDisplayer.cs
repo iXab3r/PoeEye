@@ -1,10 +1,7 @@
 using System;
-using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Threading;
-using log4net;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 

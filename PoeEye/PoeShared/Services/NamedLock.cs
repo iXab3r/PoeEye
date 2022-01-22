@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reactive.Disposables;
+﻿using System.Diagnostics;
 using System.Threading;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Services;
 

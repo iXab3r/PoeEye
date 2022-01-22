@@ -6,7 +6,6 @@ using DynamicData;
 using PoeShared.Bindings;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 
 namespace PoeShared.UI.Bindings;

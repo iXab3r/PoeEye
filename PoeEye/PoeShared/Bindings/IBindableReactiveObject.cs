@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using DynamicData;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Bindings;
 

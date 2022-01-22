@@ -9,11 +9,9 @@ using System.Reactive.Threading.Tasks;
 using System.Text;
 
 using JetBrains.Annotations;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Prism;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Communications;
 

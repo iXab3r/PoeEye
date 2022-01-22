@@ -1,10 +1,4 @@
-﻿using System.IO;
-using log4net;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-
-namespace PoeShared.Modularity;
+﻿namespace PoeShared.Modularity;
 
 public sealed class UseDefaultIfFailureConfigProviderStrategy : IConfigProviderStrategy
 {

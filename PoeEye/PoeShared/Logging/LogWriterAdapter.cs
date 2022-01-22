@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PoeShared.Logging;
+﻿namespace PoeShared.Logging;
 
 internal sealed class LogWriterAdapter<T> : ILogWriter
 {

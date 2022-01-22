@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PoeShared.Modularity;
+﻿namespace PoeShared.Modularity;
 
 internal interface IPoeConfigConverterMigrationService
 {

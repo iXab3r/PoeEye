@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace PoeShared.Modularity;
+﻿namespace PoeShared.Modularity;
 
 public interface IConfigProviderStrategy
 {

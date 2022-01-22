@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using AutoFixture;
 using System;
 using System.IO;
 using PoeShared.Services;

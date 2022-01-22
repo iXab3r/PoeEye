@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using log4net;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;

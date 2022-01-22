@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using PoeShared.Native;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.WindowSeekers;
 

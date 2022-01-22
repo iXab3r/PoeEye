@@ -1,5 +1,4 @@
 ﻿using PoeShared.Modularity;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Evaluators;
 

@@ -1,10 +1,4 @@
-using System;
-using System.Reactive.Disposables;
 using System.Threading;
-using log4net;
-using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Services;
 

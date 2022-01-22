@@ -1,8 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-
-namespace PoeShared.Scaffolding;
+﻿namespace PoeShared.Scaffolding;
 
 public static class StreamExtensions
 {

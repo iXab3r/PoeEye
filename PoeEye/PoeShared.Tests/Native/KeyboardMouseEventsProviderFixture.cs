@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -8,8 +7,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WindowsHook;
-using log4net;
-using Microsoft.VisualBasic.Logging;
 using Moq;
 using NUnit.Framework;
 using PoeShared.Native;

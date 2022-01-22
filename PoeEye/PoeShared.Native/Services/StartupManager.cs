@@ -1,14 +1,8 @@
 using System;
-using System.Diagnostics;
-using System.Windows.Forms;
-
 using JetBrains.Annotations;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using ReactiveUI;
+using PoeShared.Scaffolding;
 using StartupHelper;
 
 namespace PoeShared.Services;

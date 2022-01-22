@@ -1,11 +1,9 @@
 using System.IO;
-using log4net;
 using Moq;
 using NUnit.Framework;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
-using PoeShared.Tests.Helpers;
 using Shouldly;
 
 namespace PoeShared.Tests.Modularity;

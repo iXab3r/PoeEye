@@ -1,7 +1,3 @@
-using System;
-using System.Reactive.Disposables;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
 using ReactiveUI;
 
 namespace PoeShared.Services;

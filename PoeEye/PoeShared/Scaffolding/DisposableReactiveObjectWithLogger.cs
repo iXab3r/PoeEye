@@ -1,7 +1,4 @@
-﻿using System;
-using PoeShared.Logging;
-
-namespace PoeShared.Scaffolding;
+﻿namespace PoeShared.Scaffolding;
 
 public abstract class DisposableReactiveObjectWithLogger : DisposableReactiveObject
 {

@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using PoeShared.Audio.Services;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.ViewModels;
 

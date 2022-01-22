@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PoeShared.Modularity;
+﻿namespace PoeShared.Modularity;
 
 internal sealed record PoeConfigMigrationConverterKey
 {

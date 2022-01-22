@@ -4,8 +4,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using PInvoke;
 using PoeShared.Native;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
 

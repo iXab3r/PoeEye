@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using PoeShared.Bindings;
-using PoeShared.Scaffolding;
 using PropertyBinder;
 
 namespace PoeShared.Evaluators;

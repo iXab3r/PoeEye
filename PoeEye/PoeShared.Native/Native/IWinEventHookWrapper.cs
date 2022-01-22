@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using PInvoke;
 
 namespace PoeShared.Native;
 

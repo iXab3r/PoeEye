@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using AutoFixture;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
-using PoeShared.Wpf.Scaffolding;
 using Shouldly;
 
 namespace PoeShared.Tests.Services;

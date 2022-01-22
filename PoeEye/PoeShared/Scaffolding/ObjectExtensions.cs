@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Disposables;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
-using System.Text;
 using DynamicData;
-using log4net;
 using Newtonsoft.Json;
-using PoeShared.Logging;
 using PoeShared.Modularity;
 
 namespace PoeShared.Scaffolding;

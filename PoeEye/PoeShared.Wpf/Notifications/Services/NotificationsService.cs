@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Windows;
 using DynamicData;
 using PoeShared.Logging;
 using PoeShared.Native;

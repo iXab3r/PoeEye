@@ -1,7 +1,4 @@
 ﻿using NUnit.Framework;
-using AutoFixture;
-using System;
-using PoeShared.Bindings;
 using PoeShared.Evaluators;
 using Shouldly;
 

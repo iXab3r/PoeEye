@@ -1,5 +1,4 @@
-﻿using System.Reactive.Disposables;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interactivity;
 

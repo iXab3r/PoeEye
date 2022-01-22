@@ -1,7 +1,4 @@
-﻿using System;
-using PoeShared.Scaffolding;
-
-namespace PoeShared.Bindings;
+﻿namespace PoeShared.Bindings;
 
 public interface IReactiveBinding : IDisposableReactiveObject
 {

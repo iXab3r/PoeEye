@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-using log4net;
 using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF;

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
 using Unity;
 

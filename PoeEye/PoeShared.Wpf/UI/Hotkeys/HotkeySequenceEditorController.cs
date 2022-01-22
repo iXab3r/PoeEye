@@ -12,7 +12,6 @@ using PoeShared.Native;
 using PoeShared.Notifications.Services;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;

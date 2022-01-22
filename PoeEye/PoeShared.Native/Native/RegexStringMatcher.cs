@@ -2,11 +2,8 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text.RegularExpressions;
-
-using log4net;
 using PoeShared.Logging;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
 

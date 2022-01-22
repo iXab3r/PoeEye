@@ -6,12 +6,10 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using log4net;
 using Microsoft.Win32;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
-using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
 

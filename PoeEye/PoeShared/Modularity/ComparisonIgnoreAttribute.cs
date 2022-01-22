@@ -1,5 +1,3 @@
-using System;
-
 namespace PoeShared.Modularity;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]

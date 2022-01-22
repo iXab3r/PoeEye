@@ -1,7 +1,6 @@
 using System;
 using System.Windows.Media;
 using PoeShared.Scaffolding;
-using PoeShared.Services;
 
 namespace PoeShared.Notifications.ViewModels;
 

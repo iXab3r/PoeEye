@@ -1,5 +1,4 @@
-﻿using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+﻿using PoeShared.Scaffolding;
 using System;
 using System.Drawing;
 using PropertyChanged;

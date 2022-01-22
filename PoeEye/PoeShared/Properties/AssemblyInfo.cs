@@ -9,8 +9,11 @@ global using System.Reactive.Linq;
 global using System.Threading.Tasks;
 global using PoeShared.Scaffolding; 
 global using PoeShared.Logging;
-
-using System.Reflection;
+global using System.Collections;
+global using System.Diagnostics;
+global using System.Globalization;
+global using System.Linq.Expressions;
+global using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyVersion("0.0.0.0")]

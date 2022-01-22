@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using PoeShared.Scaffolding;
+﻿using System.Text;
 using PropertyBinder;
 
 namespace PoeShared.Bindings;

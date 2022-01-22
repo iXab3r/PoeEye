@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.VisualBasic.Logging;
 using NUnit.Framework;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
-using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 using PropertyBinder.Diagnostics;
 

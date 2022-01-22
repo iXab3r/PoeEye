@@ -1,9 +1,7 @@
-﻿using log4net;
-using PoeShared.Modularity;
+﻿using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Squirrel.Updater;
-using PoeShared.Wpf.Scaffolding;
 using Prism.Ioc;
 using Prism.Modularity;
 using Unity;

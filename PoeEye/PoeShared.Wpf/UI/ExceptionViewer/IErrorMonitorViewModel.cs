@@ -1,6 +1,4 @@
-﻿using PoeShared.Scaffolding.WPF;
-
-namespace PoeShared.UI;
+﻿namespace PoeShared.UI;
 
 public interface IErrorMonitorViewModel
 {

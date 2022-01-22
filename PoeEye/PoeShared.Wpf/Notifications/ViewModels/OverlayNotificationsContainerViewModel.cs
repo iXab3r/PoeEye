@@ -1,15 +1,12 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Forms;
-using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using Point = System.Windows.Point;
-using Size = System.Windows.Size;
 using WinPoint = System.Drawing.Point;
 using WinSize = System.Drawing.Size;
 

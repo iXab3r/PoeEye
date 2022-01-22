@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using log4net;
-using PoeShared.Logging;
 using Unity;
 using Unity.Extension;
 using Unity.Lifetime;

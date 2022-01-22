@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reactive.Disposables;
+﻿using System.Diagnostics;
 using App.Metrics;
 using App.Metrics.Gauge;
 

@@ -4,8 +4,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using log4net;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;

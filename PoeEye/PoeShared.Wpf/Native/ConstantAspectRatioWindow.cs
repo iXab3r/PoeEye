@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
-using log4net;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;

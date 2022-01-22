@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NuGet;
-using PoeShared.Squirrel.Scaffolding;
 using Squirrel;
 
 namespace PoeShared.Squirrel.Core;

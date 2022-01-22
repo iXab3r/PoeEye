@@ -8,9 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using PoeShared.Scaffolding.WPF;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
 

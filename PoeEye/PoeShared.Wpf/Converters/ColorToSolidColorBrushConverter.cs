@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 

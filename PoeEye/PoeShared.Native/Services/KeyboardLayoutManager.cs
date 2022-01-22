@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using DynamicData;
 using PInvoke;
 using PoeShared.Logging;
-using PoeShared.Modularity;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Services;

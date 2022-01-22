@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using AutoFixture;
-using System;
 using DynamicData;
 using PoeShared.Scaffolding;
 using Shouldly;
