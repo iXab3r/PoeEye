@@ -2,39 +2,38 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF;
+
+public sealed class SelectAllOnFocusBehavior : Behavior<TextBox>
 {
-    public sealed class SelectAllOnFocusBehavior : Behavior<TextBox>
+    protected override void OnAttached()
     {
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-            AssociatedObject.GotKeyboardFocus += AssociatedObjectOnGotFocus;
-        }
+        base.OnAttached();
+        AssociatedObject.GotKeyboardFocus += AssociatedObjectOnGotFocus;
+    }
 
-        private void AssociatedObjectOnGotFocus(object sender, RoutedEventArgs e)
+    private void AssociatedObjectOnGotFocus(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(AssociatedObject.Text))
         {
-            if (string.IsNullOrEmpty(AssociatedObject.Text))
-            {
-                AssociatedObject.TextChanged += AssociatedObjectOnTextChanged;
-            }
-            else
-            {
-                AssociatedObject.SelectAll();
-            }
+            AssociatedObject.TextChanged += AssociatedObjectOnTextChanged;
         }
-
-        private void AssociatedObjectOnTextChanged(object sender, TextChangedEventArgs e)
+        else
         {
-            AssociatedObject.TextChanged -= AssociatedObjectOnTextChanged;
             AssociatedObject.SelectAll();
         }
+    }
 
-        protected override void OnDetaching()
-        {
-            AssociatedObject.TextChanged -= AssociatedObjectOnTextChanged;
-            AssociatedObject.GotKeyboardFocus -= AssociatedObjectOnGotFocus;
-            base.OnDetaching();
-        }
+    private void AssociatedObjectOnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        AssociatedObject.TextChanged -= AssociatedObjectOnTextChanged;
+        AssociatedObject.SelectAll();
+    }
+
+    protected override void OnDetaching()
+    {
+        AssociatedObject.TextChanged -= AssociatedObjectOnTextChanged;
+        AssociatedObject.GotKeyboardFocus -= AssociatedObjectOnGotFocus;
+        base.OnDetaching();
     }
 }

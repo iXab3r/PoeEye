@@ -2,16 +2,15 @@
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace PoeShared.Native.Scaffolding
+namespace PoeShared.Native.Scaffolding;
+
+public static class BitmapExtensions
 {
-    public static class BitmapExtensions
+    public static Stream ToStream(this Bitmap bitmap, ImageFormat imageFormat)
     {
-        public static Stream ToStream(this Bitmap bitmap, ImageFormat imageFormat)
-        {
-            var stream = new MemoryStream();
-            bitmap.Save(stream, imageFormat);
-            stream.Position = 0;
-            return stream;
-        }
+        var stream = new MemoryStream();
+        bitmap.Save(stream, imageFormat);
+        stream.Position = 0;
+        return stream;
     }
 }

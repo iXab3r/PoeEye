@@ -9,40 +9,39 @@ using WpfRect = System.Windows.Rect;
 using WinRect = System.Drawing.Rectangle;
 using WpfSize = System.Windows.Size;
 
-namespace PoeShared.RegionSelector.ViewModels
-{
-    public interface ISelectionAdornerViewModel : IDisposableReactiveObject
-    {
-        Size RenderSize { get; }
+namespace PoeShared.RegionSelector.ViewModels;
 
-        [Obsolete("Moved to projection adapter")]
-        WinSize ScreenRenderSize { get; }
+public interface ISelectionAdornerViewModel : IDisposableReactiveObject
+{
+    Size RenderSize { get; }
+
+    [Obsolete("Moved to projection adapter")]
+    WinSize ScreenRenderSize { get; }
         
-        /// <summary>
-        ///   Projection area that selection will be mapped into
-        /// </summary>
-        WinRect ProjectionBounds { get; set; }
+    /// <summary>
+    ///   Projection area that selection will be mapped into
+    /// </summary>
+    WinRect ProjectionBounds { get; set; }
         
-        WinRect ProjectedSelection { get; }
+    WinRect ProjectedSelection { get; }
         
-        WinPoint ProjectedMousePosition { get; }
+    WinPoint ProjectedMousePosition { get; }
         
-        Point MousePosition { get; }
+    Point MousePosition { get; }
         
-        Rect Selection { get; }
+    Rect Selection { get; }
         
-        bool StopWhenAppFocusLost { get; set; }
+    bool StopWhenAppFocusLost { get; set; }
         
-        bool ShowCrosshair { get; set; }
+    bool ShowCrosshair { get; set; }
         
-        bool ShowBackground { get; set; }
+    bool ShowBackground { get; set; }
         
-        bool IsVisible { get; }
+    bool IsVisible { get; }
         
-        double BackgroundOpacity { get; set; }
+    double BackgroundOpacity { get; set; }
         
-        UIElement Owner { [CanBeNull] get; }
+    UIElement Owner { [CanBeNull] get; }
         
-        IObservable<Rect> StartSelection(bool supportBoxSelection = true);
-    }
+    IObservable<Rect> StartSelection(bool supportBoxSelection = true);
 }

@@ -2,32 +2,31 @@
 using DynamicData;
 using Unity;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+internal sealed class PoeEyeModulesRegistrator : IPoeEyeModulesRegistrator, IPoeEyeModulesEnumerator
 {
-    internal sealed class PoeEyeModulesRegistrator : IPoeEyeModulesRegistrator, IPoeEyeModulesEnumerator
+    private readonly IUnityContainer container;
+
+    private readonly SourceList<ISettingsViewModel> settings = new();
+
+    public PoeEyeModulesRegistrator(IUnityContainer container)
     {
-        private readonly IUnityContainer container;
+        Guard.ArgumentNotNull(container, nameof(container));
 
-        private readonly SourceList<ISettingsViewModel> settings = new();
+        this.container = container;
+        Settings = settings;
+    }
 
-        public PoeEyeModulesRegistrator(IUnityContainer container)
-        {
-            Guard.ArgumentNotNull(container, nameof(container));
+    public IObservableList<ISettingsViewModel> Settings { get; }
 
-            this.container = container;
-            Settings = settings;
-        }
+    public IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>()
+        where TConfig : class, IPoeEyeConfig, new()
+        where TSettingsViewModel : ISettingsViewModel<TConfig>
+    {
+        var viewModel = (ISettingsViewModel) container.Resolve(typeof(TSettingsViewModel));
+        settings.Add(viewModel);
 
-        public IObservableList<ISettingsViewModel> Settings { get; }
-
-        public IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>()
-            where TConfig : class, IPoeEyeConfig, new()
-            where TSettingsViewModel : ISettingsViewModel<TConfig>
-        {
-            var viewModel = (ISettingsViewModel) container.Resolve(typeof(TSettingsViewModel));
-            settings.Add(viewModel);
-
-            return this;
-        }
+        return this;
     }
 }

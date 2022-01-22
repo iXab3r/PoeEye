@@ -19,52 +19,51 @@ using Unity.Extension;
 using Unity.Lifetime;
 using Unity.Resolution;
 
-namespace PoeShared.Prism
+namespace PoeShared.Prism;
+
+public sealed class NativeRegistrations : UnityContainerExtension
 {
-    public sealed class NativeRegistrations : UnityContainerExtension
+    protected override void Initialize()
     {
-        protected override void Initialize()
-        {
-            Container
-                .RegisterSingleton<IStartupManager, StartupManager>()
-                .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
-                .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
-                .RegisterFactory<IKeyboardMouseEventsProvider>(x => x.Resolve<KeyboardMouseEventsProvider>(), new ContainerControlledLifetimeManager())
-                .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
-                .RegisterSingleton<IClipboardManager, ClipboardManager>()
-                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
-                .RegisterSingleton<IAudioPlayer, AudioPlayer>()
-                .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
-                .RegisterSingleton<IKeyboardLayoutManager, KeyboardLayoutManager>()
-                .RegisterSingleton<ISevenZipWrapper, SevenZipWrapper>()
-                .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
-                .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
-                .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
+        Container
+            .RegisterSingleton<IStartupManager, StartupManager>()
+            .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
+            .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
+            .RegisterFactory<IKeyboardMouseEventsProvider>(x => x.Resolve<KeyboardMouseEventsProvider>(), new ContainerControlledLifetimeManager())
+            .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
+            .RegisterSingleton<IClipboardManager, ClipboardManager>()
+            .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
+            .RegisterSingleton<IAudioPlayer, AudioPlayer>()
+            .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
+            .RegisterSingleton<IKeyboardLayoutManager, KeyboardLayoutManager>()
+            .RegisterSingleton<ISevenZipWrapper, SevenZipWrapper>()
+            .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
+            .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
+            .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
-            Container
-                .RegisterType<IWindowSeeker, TaskWindowSeeker>()
-                .RegisterType<IHttpClient, GenericHttpClient>();
+        Container
+            .RegisterType<IWindowSeeker, TaskWindowSeeker>()
+            .RegisterType<IHttpClient, GenericHttpClient>();
             
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-            {
-                Container.RegisterSingleton<IAppArguments, AppArgumentsForWindows>();
-            }
-
-            Container.RegisterSingleton<IFileSoundLibrarySource, FileSoundLibrarySource>();
-            Container.RegisterSingleton<IEmbeddedSoundLibrarySource, EmbeddedSoundLibrarySource>();
-            Container.RegisterFactory<ISoundLibrarySource>(
-                unity => unity.Resolve<ComplexSoundLibrary>(
-                    new DependencyOverride<ISoundLibrarySource[]>(
-                        new ISoundLibrarySource[]
-                        {
-                            unity.Resolve<IFileSoundLibrarySource>(),
-                            unity.Resolve<IEmbeddedSoundLibrarySource>()
-                        }
-                    )),new ContainerControlledLifetimeManager());
-
-            Container.RegisterWindowTracker<PassthroughWindowTrackerTitleMatcher>(WellKnownWindows.AllWindows);
-            Container.RegisterWindowTracker<MainWindowTrackerTitleMatcher>(WellKnownWindows.MainWindow);
-            Container.RegisterFactory<IWindowTracker>(x => x.Resolve<IWindowTracker>(WellKnownWindows.AllWindows));
+        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+        {
+            Container.RegisterSingleton<IAppArguments, AppArgumentsForWindows>();
         }
+
+        Container.RegisterSingleton<IFileSoundLibrarySource, FileSoundLibrarySource>();
+        Container.RegisterSingleton<IEmbeddedSoundLibrarySource, EmbeddedSoundLibrarySource>();
+        Container.RegisterFactory<ISoundLibrarySource>(
+            unity => unity.Resolve<ComplexSoundLibrary>(
+                new DependencyOverride<ISoundLibrarySource[]>(
+                    new ISoundLibrarySource[]
+                    {
+                        unity.Resolve<IFileSoundLibrarySource>(),
+                        unity.Resolve<IEmbeddedSoundLibrarySource>()
+                    }
+                )),new ContainerControlledLifetimeManager());
+
+        Container.RegisterWindowTracker<PassthroughWindowTrackerTitleMatcher>(WellKnownWindows.AllWindows);
+        Container.RegisterWindowTracker<MainWindowTrackerTitleMatcher>(WellKnownWindows.MainWindow);
+        Container.RegisterFactory<IWindowTracker>(x => x.Resolve<IWindowTracker>(WellKnownWindows.AllWindows));
     }
 }

@@ -10,61 +10,60 @@ using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using Unity;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+internal sealed class ExceptionSandboxViewModel : DisposableReactiveObject
 {
-    internal sealed class ExceptionSandboxViewModel : DisposableReactiveObject
+    private static readonly IFluentLog Log = typeof(ExceptionSandboxViewModel).PrepareLogger();
+
+    private readonly ISubject<Exception> sinkThrow = new Subject<Exception>();
+    private readonly ISubject<Exception> sinkThrowOnUiScheduler = new Subject<Exception>();
+    private readonly ISubject<Exception> sinkThrowOnBgScheduler = new Subject<Exception>();
+
+    public ExceptionSandboxViewModel(
+        IErrorMonitorViewModel errorMonitor,
+        [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
-        private static readonly IFluentLog Log = typeof(ExceptionSandboxViewModel).PrepareLogger();
-
-        private readonly ISubject<Exception> sinkThrow = new Subject<Exception>();
-        private readonly ISubject<Exception> sinkThrowOnUiScheduler = new Subject<Exception>();
-        private readonly ISubject<Exception> sinkThrowOnBgScheduler = new Subject<Exception>();
-
-        public ExceptionSandboxViewModel(
-            IErrorMonitorViewModel errorMonitor,
-            [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        ReportProblemCommand = errorMonitor.ReportProblemCommand;
+        ThrowInsideCommand = CommandWrapper.Create(() =>
         {
-            ReportProblemCommand = errorMonitor.ReportProblemCommand;
-            ThrowInsideCommand = CommandWrapper.Create(() =>
+            Log.Debug("Throwing exception");
+            throw new ApplicationException("Exception that was thrown inside command");
+        });
+        ThrowOnUiSchedulerCommand = CommandWrapper.Create(() =>
+        {
+            Log.Debug("Scheduling on UI");
+            uiScheduler.Schedule(() =>
             {
                 Log.Debug("Throwing exception");
-                throw new ApplicationException("Exception that was thrown inside command");
+                throw new ApplicationException("Exception that was thrown on UI scheduler");
             });
-            ThrowOnUiSchedulerCommand = CommandWrapper.Create(() =>
+        });
+        ThrowOnBgSchedulerCommand = CommandWrapper.Create(() =>
+        {
+            Log.Debug("Scheduling on BG");
+            bgScheduler.Schedule(() =>
             {
-                Log.Debug("Scheduling on UI");
-                uiScheduler.Schedule(() =>
-                {
-                    Log.Debug("Throwing exception");
-                    throw new ApplicationException("Exception that was thrown on UI scheduler");
-                });
+                Log.Debug("Throwing exception");
+                throw new ApplicationException("Exception that was thrown on BG scheduler");
             });
-            ThrowOnBgSchedulerCommand = CommandWrapper.Create(() =>
+        });
+        ThrowInsideTaskCommand = CommandWrapper.Create(() =>
+        {
+            Log.Debug("Throwing inside task");
+            Task.Run(() =>
             {
-                Log.Debug("Scheduling on BG");
-                bgScheduler.Schedule(() =>
-                {
-                    Log.Debug("Throwing exception");
-                    throw new ApplicationException("Exception that was thrown on BG scheduler");
-                });
+                Log.Debug("Throwing exception");
+                throw new ApplicationException("Exception that was thrown inside Task");
             });
-            ThrowInsideTaskCommand = CommandWrapper.Create(() =>
-            {
-                Log.Debug("Throwing inside task");
-                Task.Run(() =>
-                {
-                    Log.Debug("Throwing exception");
-                    throw new ApplicationException("Exception that was thrown inside Task");
-                });
-            });
-        }
-
-        public ICommand ThrowOnUiSchedulerCommand { get; }
-        public ICommand ThrowOnBgSchedulerCommand { get; }
-        public ICommand ThrowInsideTaskCommand { get; }
-        public ICommand ReportProblemCommand { get; }
-
-        public ICommand ThrowInsideCommand { get; }
+        });
     }
+
+    public ICommand ThrowOnUiSchedulerCommand { get; }
+    public ICommand ThrowOnBgSchedulerCommand { get; }
+    public ICommand ThrowInsideTaskCommand { get; }
+    public ICommand ReportProblemCommand { get; }
+
+    public ICommand ThrowInsideCommand { get; }
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+public interface IPoeConfigMetadataReplacementService
 {
-    public interface IPoeConfigMetadataReplacementService
-    {
-        IObservable<PoeConfigMetadata> Watch(PoeConfigMetadata metadata);
+    IObservable<PoeConfigMetadata> Watch(PoeConfigMetadata metadata);
 
-        PoeConfigMetadata ReplaceIfNeeded(PoeConfigMetadata metadata);
+    PoeConfigMetadata ReplaceIfNeeded(PoeConfigMetadata metadata);
 
-        void AddMetadataReplacement(string sourceTypeName, Type targetType);
-    }
+    void AddMetadataReplacement(string sourceTypeName, Type targetType);
 }

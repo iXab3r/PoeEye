@@ -4,30 +4,29 @@
 
 using System.Windows.Forms;
 
-namespace WindowsHook.Implementation
+namespace WindowsHook.Implementation;
+
+internal class ButtonSet
 {
-    internal class ButtonSet
+    public MouseButtons Values { get; private set; }
+
+    public ButtonSet()
     {
-        public MouseButtons Values { get; private set; }
+        Values = MouseButtons.None;
+    }
 
-        public ButtonSet()
-        {
-            Values = MouseButtons.None;
-        }
+    public void Add(MouseButtons element)
+    {
+        Values |= element;
+    }
 
-        public void Add(MouseButtons element)
-        {
-            Values |= element;
-        }
+    public void Remove(MouseButtons element)
+    {
+        Values &= ~element;
+    }
 
-        public void Remove(MouseButtons element)
-        {
-            Values &= ~element;
-        }
-
-        public bool Contains(MouseButtons element)
-        {
-            return (Values & element) != MouseButtons.None;
-        }
+    public bool Contains(MouseButtons element)
+    {
+        return (Values & element) != MouseButtons.None;
     }
 }

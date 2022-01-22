@@ -1,23 +1,22 @@
 using System.Runtime.InteropServices;
 
-namespace WindowsHook.Implementation
+namespace WindowsHook.Implementation;
+
+internal static class NativeMethods
 {
-    internal static class NativeMethods
+    private const int SM_CXDRAG = 68;
+    private const int SM_CYDRAG = 69;
+
+    [DllImport("user32.dll")]
+    private static extern int GetSystemMetrics(int index);
+
+    public static int GetXDragThreshold()
     {
-        private const int SM_CXDRAG = 68;
-        private const int SM_CYDRAG = 69;
+        return GetSystemMetrics(SM_CXDRAG);
+    }
 
-        [DllImport("user32.dll")]
-        private static extern int GetSystemMetrics(int index);
-
-        public static int GetXDragThreshold()
-        {
-            return GetSystemMetrics(SM_CXDRAG);
-        }
-
-        public static int GetYDragThreshold()
-        {
-            return GetSystemMetrics(SM_CYDRAG);
-        }
+    public static int GetYDragThreshold()
+    {
+        return GetSystemMetrics(SM_CYDRAG);
     }
 }

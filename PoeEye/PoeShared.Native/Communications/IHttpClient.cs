@@ -4,29 +4,28 @@ using System.IO;
 using System.Net;
 using JetBrains.Annotations;
 
-namespace PoeShared.Communications
+namespace PoeShared.Communications;
+
+public interface IHttpClient
 {
-    public interface IHttpClient
-    {
-        CookieCollection Cookies { [NotNull] get; [NotNull] set; }
+    CookieCollection Cookies { [NotNull] get; [NotNull] set; }
 
-        IWebProxy Proxy { [CanBeNull] get; [CanBeNull] set; }
+    IWebProxy Proxy { [CanBeNull] get; [CanBeNull] set; }
 
-        string Referer { [CanBeNull] get; [CanBeNull] set; }
+    string Referer { [CanBeNull] get; [CanBeNull] set; }
 
-        string UserAgent { [CanBeNull] get; [CanBeNull] set; }
+    string UserAgent { [CanBeNull] get; [CanBeNull] set; }
 
-        TimeSpan? Timeout { get; set; }
+    TimeSpan? Timeout { get; set; }
 
-        WebHeaderCollection CustomHeaders { [NotNull] get; [NotNull] set; }
+    WebHeaderCollection CustomHeaders { [NotNull] get; [NotNull] set; }
 
-        [NotNull]
-        IObservable<string> Post([NotNull] string uri, [NotNull] NameValueCollection args);
+    [NotNull]
+    IObservable<string> Post([NotNull] string uri, [NotNull] NameValueCollection args);
 
-        [NotNull]
-        IObservable<string> Get([NotNull] string uri);
+    [NotNull]
+    IObservable<string> Get([NotNull] string uri);
 
-        [NotNull]
-        IObservable<Stream> GetStreamAsync([NotNull] Uri requestUri);
-    }
+    [NotNull]
+    IObservable<Stream> GetStreamAsync([NotNull] Uri requestUri);
 }

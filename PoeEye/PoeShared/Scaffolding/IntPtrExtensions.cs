@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+public static class IntPtrExtensions
 {
-    public static class IntPtrExtensions
+    public static string ToHexadecimal(this IntPtr value)
     {
-        public static string ToHexadecimal(this IntPtr value)
-        {
-            var handle = value.ToInt64();
-            return handle.ToHexadecimal();
-        }
+        var handle = value.ToInt64();
+        return handle.ToHexadecimal();
     }
 }

@@ -2,20 +2,19 @@
 using System.Windows.Forms;
 using JetBrains.Annotations;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IClipboardManager
 {
-    public interface IClipboardManager
-    {
-        TimeSpan ClipboardRestorationTimeout { get; }
+    TimeSpan ClipboardRestorationTimeout { get; }
 
-        int ClipboardSetRetryCount { get; }
+    int ClipboardSetRetryCount { get; }
 
-        void SetText([NotNull] string text);
+    void SetText([NotNull] string text);
 
-        IDataObject GetDataObject();
+    IDataObject GetDataObject();
 
-        void SetDataObject(object dataObject);
+    void SetDataObject(object dataObject);
 
-        string GetText();
-    }
+    string GetText();
 }

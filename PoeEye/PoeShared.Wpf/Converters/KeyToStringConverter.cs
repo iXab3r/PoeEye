@@ -4,29 +4,28 @@ using System.Windows.Data;
 using System.Windows.Input;
 using PoeShared.UI;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class KeyToStringConverter : IValueConverter
 {
-    public sealed class KeyToStringConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        return value switch
         {
-            return value switch
-            {
-                Key key => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(key)),
-                MouseButton mouseButton => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(mouseButton)),
-                _ => Binding.DoNothing
-            };
+            Key key => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(key)),
+            MouseButton mouseButton => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(mouseButton)),
+            _ => Binding.DoNothing
+        };
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not string keyString)
+        {
+            return Binding.DoNothing;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is not string keyString)
-            {
-                return Binding.DoNothing;
-            }
-
-            var gesture = HotkeyConverter.Instance.ConvertFromString(keyString);
-            return gesture.Key;
-        }
+        var gesture = HotkeyConverter.Instance.ConvertFromString(keyString);
+        return gesture.Key;
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace PoeShared.Squirrel.Scaffolding
+namespace PoeShared.Squirrel.Scaffolding;
+
+public class ChecksumFailedException : Exception
 {
-    public class ChecksumFailedException : Exception
-    {
-        public string Filename { get; set; }
-    }
+    public string Filename { get; set; }
 }

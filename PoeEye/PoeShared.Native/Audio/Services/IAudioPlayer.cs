@@ -6,18 +6,17 @@ using JetBrains.Annotations;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Audio.Services
+namespace PoeShared.Audio.Services;
+
+public interface IAudioPlayer : IDisposableReactiveObject
 {
-    public interface IAudioPlayer : IDisposableReactiveObject
-    {
-        IEnumerable<WaveOutDevice> GetDevices();
+    IEnumerable<WaveOutDevice> GetDevices();
         
-        [NotNull]
-        Task Play([NotNull] byte[] waveData);
+    [NotNull]
+    Task Play([NotNull] byte[] waveData);
         
-        [NotNull]
-        Task Play([NotNull] byte[] waveData, float volume);
+    [NotNull]
+    Task Play([NotNull] byte[] waveData, float volume);
         
-        Task Play(AudioPlayerRequest request);
-    }
+    Task Play(AudioPlayerRequest request);
 }

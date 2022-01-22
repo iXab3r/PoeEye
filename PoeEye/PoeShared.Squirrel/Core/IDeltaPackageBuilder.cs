@@ -1,9 +1,8 @@
 using ReleasePackage = PoeShared.Squirrel.Scaffolding.ReleasePackage;
 
-namespace PoeShared.Squirrel.Core
+namespace PoeShared.Squirrel.Core;
+
+public interface IDeltaPackageBuilder
 {
-    public interface IDeltaPackageBuilder
-    {
-        ReleasePackage ApplyDeltaPackage(ReleasePackage basePackage, ReleasePackage deltaPackage, string outputFile);
-    }
+    ReleasePackage ApplyDeltaPackage(ReleasePackage basePackage, ReleasePackage deltaPackage, string outputFile);
 }

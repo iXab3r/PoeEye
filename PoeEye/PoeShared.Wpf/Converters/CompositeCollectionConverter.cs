@@ -3,31 +3,30 @@ using System.Collections;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public class CompositeCollectionConverter : IMultiValueConverter
 {
-    public class CompositeCollectionConverter : IMultiValueConverter
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        var compositeCollection = new CompositeCollection();
+        foreach (var value in values)
         {
-            var compositeCollection = new CompositeCollection();
-            foreach (var value in values)
+            if (value is IEnumerable enumerable)
             {
-                if (value is IEnumerable enumerable)
-                {
-                    compositeCollection.Add(new CollectionContainer { Collection = enumerable });
-                }
-                else
-                {
-                    compositeCollection.Add(value);
-                }
+                compositeCollection.Add(new CollectionContainer { Collection = enumerable });
             }
-
-            return compositeCollection;
+            else
+            {
+                compositeCollection.Add(value);
+            }
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
+        return compositeCollection;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }

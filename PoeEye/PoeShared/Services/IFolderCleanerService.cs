@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+public interface IFolderCleanerService 
 {
-    public interface IFolderCleanerService 
-    {
-        TimeSpan? FileTimeToLive { get; set; }
+    TimeSpan? FileTimeToLive { get; set; }
         
-        TimeSpan? CleanupTimeout { get; set; }
+    TimeSpan? CleanupTimeout { get; set; }
         
-        IDisposable AddDirectory(DirectoryInfo directoryInfo);
-    }
+    IDisposable AddDirectory(DirectoryInfo directoryInfo);
 }

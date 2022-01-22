@@ -1,9 +1,8 @@
 ﻿using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IHotkeyListener : IDisposableReactiveObject
 {
-    public interface IHotkeyListener : IDisposableReactiveObject
-    {
-        bool Activated { get; }
-    }
+    bool Activated { get; }
 }

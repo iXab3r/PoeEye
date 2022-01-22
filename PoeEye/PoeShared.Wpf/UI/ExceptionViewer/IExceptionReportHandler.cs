@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IExceptionReportHandler
 {
-    public interface IExceptionReportHandler
-    {
-        Task<string> Handle(FileInfo exceptionReport);
-    }
+    Task<string> Handle(FileInfo exceptionReport);
 }

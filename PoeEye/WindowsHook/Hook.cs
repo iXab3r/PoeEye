@@ -4,35 +4,34 @@
 
 using WindowsHook.Implementation;
 
-namespace WindowsHook
+namespace WindowsHook;
+
+/// <summary>
+///     This is the class to start with.
+/// </summary>
+public static class Hook
 {
     /// <summary>
-    ///     This is the class to start with.
+    ///     Here you find all application wide events. Both mouse and keyboard.
     /// </summary>
-    public static class Hook
+    /// <returns>
+    ///     Returned instance is used for event subscriptions.
+    ///     You can refetch it (you will get the same instance anyway).
+    /// </returns>
+    public static IKeyboardMouseEvents CreateAppEvents()
     {
-        /// <summary>
-        ///     Here you find all application wide events. Both mouse and keyboard.
-        /// </summary>
-        /// <returns>
-        ///     Returned instance is used for event subscriptions.
-        ///     You can refetch it (you will get the same instance anyway).
-        /// </returns>
-        public static IKeyboardMouseEvents CreateAppEvents()
-        {
-            return new AppEventFacade();
-        }
+        return new AppEventFacade();
+    }
 
-        /// <summary>
-        ///     Here you find all application wide events. Both mouse and keyboard.
-        /// </summary>
-        /// <returns>
-        ///     Returned instance is used for event subscriptions.
-        ///     You can refetch it (you will get the same instance anyway).
-        /// </returns>
-        public static IKeyboardMouseEvents CreateGlobalEvents()
-        {
-            return new GlobalEventFacade();
-        }
+    /// <summary>
+    ///     Here you find all application wide events. Both mouse and keyboard.
+    /// </summary>
+    /// <returns>
+    ///     Returned instance is used for event subscriptions.
+    ///     You can refetch it (you will get the same instance anyway).
+    /// </returns>
+    public static IKeyboardMouseEvents CreateGlobalEvents()
+    {
+        return new GlobalEventFacade();
     }
 }

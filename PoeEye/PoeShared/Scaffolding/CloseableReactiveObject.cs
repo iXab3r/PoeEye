@@ -1,8 +1,7 @@
-namespace PoeShared.Scaffolding
-{
-    public abstract class CloseableReactiveObject : DisposableReactiveObject, ICloseable
-    {
+namespace PoeShared.Scaffolding;
 
-        public ICloseController CloseController { get; set; }
-    }
+public abstract class CloseableReactiveObject : DisposableReactiveObject, ICloseable
+{
+
+    public ICloseController CloseController { get; set; }
 }

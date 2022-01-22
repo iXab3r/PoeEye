@@ -10,60 +10,59 @@ using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public class ApplicationUtils
 {
-    public class ApplicationUtils
+    private static readonly IFluentLog Log = typeof(ApplicationUtils).PrepareLogger();
+
+    static ApplicationUtils()
     {
-        private static readonly IFluentLog Log = typeof(ApplicationUtils).PrepareLogger();
-
-        static ApplicationUtils()
+        var appPath = Process.GetCurrentProcess().MainModule?.FileName;
+        if (!string.IsNullOrEmpty(appPath))
         {
-            var appPath = Process.GetCurrentProcess().MainModule?.FileName;
-            if (!string.IsNullOrEmpty(appPath))
-            {
-                AppIcon = Icon.ExtractAssociatedIcon(appPath);
-                AppIconSource = GetAppIcon(new FileInfo(appPath));
-            }
+            AppIcon = Icon.ExtractAssociatedIcon(appPath);
+            AppIconSource = GetAppIcon(new FileInfo(appPath));
         }
+    }
         
-        public static ImageSource AppIconSource { get; }
+    public static ImageSource AppIconSource { get; }
         
-        public static Icon AppIcon { get; }
+    public static Icon AppIcon { get; }
 
-        public static ImageSource GetAppIcon(FileInfo path)
+    public static ImageSource GetAppIcon(FileInfo path)
+    {
+        try
         {
-            try
+            if (!path.Exists)
             {
-                if (!path.Exists)
-                {
-                    throw new FileNotFoundException("File does not exist", path.FullName);
-                }
-
-                var associatedIcon = Icon.ExtractAssociatedIcon(path.FullName);
-                if (associatedIcon == null)
-                {
-                    Log.Warn($"Extracted empty icon from {path}");
-                    return null;
-                }
-
-                var hbitmap = associatedIcon.ToBitmap().GetHbitmap();
-                BitmapSource sourceFromHbitmap;
-                try
-                {
-                    sourceFromHbitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hbitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                }
-                finally
-                {
-                    Gdi32.DeleteObject(hbitmap);
-                }
-                sourceFromHbitmap.Freeze();
-                return sourceFromHbitmap;
+                throw new FileNotFoundException("File does not exist", path.FullName);
             }
-            catch (Exception ex)
+
+            var associatedIcon = Icon.ExtractAssociatedIcon(path.FullName);
+            if (associatedIcon == null)
             {
-                Log.Error($"Failed to extract icon from {path}", ex);
+                Log.Warn($"Extracted empty icon from {path}");
                 return null;
             }
+
+            var hbitmap = associatedIcon.ToBitmap().GetHbitmap();
+            BitmapSource sourceFromHbitmap;
+            try
+            {
+                sourceFromHbitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hbitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
+            finally
+            {
+                Gdi32.DeleteObject(hbitmap);
+            }
+            sourceFromHbitmap.Freeze();
+            return sourceFromHbitmap;
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to extract icon from {path}", ex);
+            return null;
         }
     }
 }

@@ -2,25 +2,24 @@
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Bindings
+namespace PoeShared.Bindings;
+
+public interface IValueProvider : IDisposableReactiveObject
 {
-    public interface IValueProvider : IDisposableReactiveObject
-    {
-        bool HasValue { get; }
+    bool HasValue { get; }
         
-        object Value { get; }
+    object Value { get; }
         
-        Exception Error { get; }
-    }
+    Exception Error { get; }
+}
     
-    public interface IValueWatcher : IValueProvider
-    {
-        object Source { [UsedImplicitly] get; set; }
+public interface IValueWatcher : IValueProvider
+{
+    object Source { [UsedImplicitly] get; set; }
         
-        bool CanSetValue { get; }
+    bool CanSetValue { get; }
         
-        bool SupportsSetValue { get; }
+    bool SupportsSetValue { get; }
         
-        void SetCurrentValue(object newValue);
-    }
+    void SetCurrentValue(object newValue);
 }

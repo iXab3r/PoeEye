@@ -1,12 +1,11 @@
 ﻿using System;
 using PoeShared.Notifications.ViewModels;
 
-namespace PoeShared.Notifications.Services
+namespace PoeShared.Notifications.Services;
+
+public interface INotificationsService
 {
-    public interface INotificationsService
-    {
-        void CloseAll();
+    void CloseAll();
         
-        IDisposable AddNotification(INotificationViewModel notification);
-    }
+    IDisposable AddNotification(INotificationViewModel notification);
 }

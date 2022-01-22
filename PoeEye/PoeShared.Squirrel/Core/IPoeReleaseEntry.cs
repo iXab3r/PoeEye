@@ -1,9 +1,8 @@
 using Squirrel;
 
-namespace PoeShared.Squirrel.Core
+namespace PoeShared.Squirrel.Core;
+
+public interface IPoeReleaseEntry : IReleaseEntry
 {
-    public interface IPoeReleaseEntry : IReleaseEntry
-    {
         
-    }
 }

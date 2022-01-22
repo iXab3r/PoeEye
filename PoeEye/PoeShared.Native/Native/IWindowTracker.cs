@@ -2,25 +2,24 @@
 using System.ComponentModel;
 using JetBrains.Annotations;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IWindowTracker : INotifyPropertyChanged
 {
-    public interface IWindowTracker : INotifyPropertyChanged
-    {
-        bool IsActive { get; }
+    bool IsActive { get; }
 
-        IntPtr MatchingWindowHandle { get; }
-        IWindowHandle MatchingWindow { get; }
+    IntPtr MatchingWindowHandle { get; }
+    IWindowHandle MatchingWindow { get; }
 
-        string ActiveWindowTitle { [CanBeNull] get; }
+    string ActiveWindowTitle { [CanBeNull] get; }
 
-        IntPtr ActiveWindowHandle { get; }
+    IntPtr ActiveWindowHandle { get; }
         
-        IWindowHandle ActiveWindow { get; }
+    IWindowHandle ActiveWindow { get; }
         
-        int ActiveProcessId { get; }
+    int ActiveProcessId { get; }
         
-        int ExecutingProcessId { get; }
+    int ExecutingProcessId { get; }
 
-        string Name { get; }
-    }
+    string Name { get; }
 }

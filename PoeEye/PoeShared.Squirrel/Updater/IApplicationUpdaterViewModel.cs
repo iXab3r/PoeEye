@@ -10,44 +10,43 @@ using PoeShared.Scaffolding.WPF;
 using PoeShared.Squirrel.Core;
 using Squirrel;
 
-namespace PoeShared.Squirrel.Updater
+namespace PoeShared.Squirrel.Updater;
+
+public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
 {
-    public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
-    {
-        CommandWrapper CheckForUpdatesCommand { get; }
+    CommandWrapper CheckForUpdatesCommand { get; }
 
-        CommandWrapper RestartCommand { get; }
+    CommandWrapper RestartCommand { get; }
 
-        CommandWrapper ApplyUpdateCommand { get; }
+    CommandWrapper ApplyUpdateCommand { get; }
         
-        CommandWrapper ShowUpdaterCommand { get; }
+    CommandWrapper ShowUpdaterCommand { get; }
 
-        bool IsInErrorStatus { get; }
+    bool IsInErrorStatus { get; }
 
-        string StatusText { get; }
+    string StatusText { get; }
         
-        int ProgressPercent { get; }
+    int ProgressPercent { get; }
 
-        bool IsOpen { get; set; }
+    bool IsOpen { get; set; }
         
-        bool IsBusy { get; }
+    bool IsBusy { get; }
 
-        UpdateSourceInfo UpdateSource { get; }
+    UpdateSourceInfo UpdateSource { get; }
         
-        Version LatestAppliedVersion { get; }
+    Version LatestAppliedVersion { get; }
 
-        Version LatestVersion { get; }
+    Version LatestVersion { get; }
         
-        IPoeUpdateInfo LatestUpdate { get; }
+    IPoeUpdateInfo LatestUpdate { get; }
         
-        ReadOnlyObservableCollection<IReleaseEntry> AvailableReleases { get; }
+    ReadOnlyObservableCollection<IReleaseEntry> AvailableReleases { get; }
 
-        bool CheckForUpdates { get; set; }
+    bool CheckForUpdates { get; set; }
 
-        [NotNull] CommandWrapper OpenUri { get; }
+    [NotNull] CommandWrapper OpenUri { get; }
 
-        FileInfo GetLatestExecutable();
+    FileInfo GetLatestExecutable();
 
-        Task PrepareForceUpdate(IReleaseEntry targetRelease);
-    }
+    Task PrepareForceUpdate(IReleaseEntry targetRelease);
 }

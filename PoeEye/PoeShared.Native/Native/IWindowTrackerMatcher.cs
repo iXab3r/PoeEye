@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IWindowTrackerMatcher
 {
-    public interface IWindowTrackerMatcher
-    {
-        bool IsMatch(string title, IntPtr hwnd, int processId);
-    }
+    bool IsMatch(string title, IntPtr hwnd, int processId);
 }

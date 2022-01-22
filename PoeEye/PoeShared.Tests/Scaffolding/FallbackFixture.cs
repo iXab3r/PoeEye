@@ -7,63 +7,62 @@ using PoeShared.Tests.Helpers;
 using PoeShared.UI;
 using Shouldly;
 
-namespace PoeShared.Tests.Scaffolding
+namespace PoeShared.Tests.Scaffolding;
+
+public class FallbackFixture : FixtureBase
 {
-    public class FallbackFixture : FixtureBase
+    protected override void SetUp()
     {
-        protected override void SetUp()
-        {
-        }
+    }
 
-        [Test]
-        public void ShouldCreate()
-        {
-            // Given
-            // When 
-            Action action = () => CreateInstance().ShouldNotBeNull();
+    [Test]
+    public void ShouldCreate()
+    {
+        // Given
+        // When 
+        Action action = () => CreateInstance().ShouldNotBeNull();
 
-            // Then
-            action.ShouldNotThrow();
-        }
+        // Then
+        action.ShouldNotThrow();
+    }
 
-        [Test]
-        [TestCase(null, null, null)]
-        [TestCase("a", null, "a")]
-        [TestCase("a", "b", "b")]
-        [TestCase(null, "b", "b")]
-        public void ShouldReturnValue(string defaultValue, string value, string expected)
-        {
-            //Given
-            var instance = CreateInstance();
-            instance.SetDefaultValue(defaultValue);
-            instance.SetValue(value);
+    [Test]
+    [TestCase(null, null, null)]
+    [TestCase("a", null, "a")]
+    [TestCase("a", "b", "b")]
+    [TestCase(null, "b", "b")]
+    public void ShouldReturnValue(string defaultValue, string value, string expected)
+    {
+        //Given
+        var instance = CreateInstance();
+        instance.SetDefaultValue(defaultValue);
+        instance.SetValue(value);
 
-            //When
-            var result = instance.Value;
+        //When
+        var result = instance.Value;
 
-            //Then
-            result.ShouldBe(expected);
-        }
+        //Then
+        result.ShouldBe(expected);
+    }
 
-        [Test]
-        [TestCase(null, false)]
-        [TestCase("b", true)]
-        public void ShouldReturnHasValue(string value, bool expected)
-        {
-            //Given
-            var instance = CreateInstance();
-            instance.SetValue(value);
+    [Test]
+    [TestCase(null, false)]
+    [TestCase("b", true)]
+    public void ShouldReturnHasValue(string value, bool expected)
+    {
+        //Given
+        var instance = CreateInstance();
+        instance.SetValue(value);
 
-            //When
-            var result = instance.HasActualValue;
+        //When
+        var result = instance.HasActualValue;
 
-            //Then
-            result.ShouldBe(expected);
-        }
+        //Then
+        result.ShouldBe(expected);
+    }
 
-        private Fallback<string> CreateInstance()
-        {
-            return Container.Create<Fallback<string>>();
-        }
+    private Fallback<string> CreateInstance()
+    {
+        return Container.Create<Fallback<string>>();
     }
 }

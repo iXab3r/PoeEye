@@ -5,54 +5,53 @@ using PoeShared.Scaffolding;
 using PoeShared.Services;
 using ReactiveUI;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
 {
-    internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
+    private readonly bool initialIsEnabled;
+    
+    public HotkeyListener(IHotkeyTracker hotkeyTracker)
     {
-        private readonly bool initialIsEnabled;
+        Log = base.Log.WithSuffix(hotkeyTracker);
+        initialIsEnabled = hotkeyTracker.IsEnabled;
+        hotkeyTracker.Reset();
+        Log.Debug(() => $"Initializing listener, tracker IsEnabled: {initialIsEnabled}");
+                    
+        hotkeyTracker.WhenAnyValue(x => x.IsActive)
+            .Where(x => x)
+            .Take(1)
+            .SubscribeSafe(_ =>
+            {
+                Log.Debug("Hotkey was pressed");
+                Activated = true;
+            }, Log.HandleException)
+            .AddTo(Anchors);
     
-        public HotkeyListener(IHotkeyTracker hotkeyTracker)
+        Disposable.Create(() =>
         {
-            Log = base.Log.WithSuffix(hotkeyTracker);
-            initialIsEnabled = hotkeyTracker.IsEnabled;
-            hotkeyTracker.Reset();
-            Log.Debug(() => $"Initializing listener, tracker IsEnabled: {initialIsEnabled}");
-                    
-            hotkeyTracker.WhenAnyValue(x => x.IsActive)
-                .Where(x => x)
-                .Take(1)
-                .SubscribeSafe(_ =>
-                {
-                    Log.Debug("Hotkey was pressed");
-                    Activated = true;
-                }, Log.HandleException)
-                .AddTo(Anchors);
-    
-            Disposable.Create(() =>
+            Log.Debug("Disposing listener");
+            if (hotkeyTracker.IsEnabled != initialIsEnabled)
             {
-                Log.Debug("Disposing listener");
-                if (hotkeyTracker.IsEnabled != initialIsEnabled)
-                {
-                    Log.Debug(() => $"Restoring tracker IsEnabled to {initialIsEnabled}");
-                    hotkeyTracker.IsEnabled = initialIsEnabled;
-                }
-                else
-                {
-                    Log.Debug(() => $"Tracker IsEnabled is already in required state {initialIsEnabled}");
-                }
-    
-                Log.Debug("Disposing listener");
-            }).AddTo(Anchors);
-                    
-            if (!hotkeyTracker.IsEnabled)
-            {
-                Log.Debug("Enabling Tracker");
-                hotkeyTracker.IsEnabled = true;
+                Log.Debug(() => $"Restoring tracker IsEnabled to {initialIsEnabled}");
+                hotkeyTracker.IsEnabled = initialIsEnabled;
             }
+            else
+            {
+                Log.Debug(() => $"Tracker IsEnabled is already in required state {initialIsEnabled}");
+            }
+    
+            Log.Debug("Disposing listener");
+        }).AddTo(Anchors);
+                    
+        if (!hotkeyTracker.IsEnabled)
+        {
+            Log.Debug("Enabling Tracker");
+            hotkeyTracker.IsEnabled = true;
         }
-    
-        private IFluentLog Log { get; }
-    
-        public bool Activated { get; private set; }
     }
+    
+    private IFluentLog Log { get; }
+    
+    public bool Activated { get; private set; }
 }

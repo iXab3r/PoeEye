@@ -1,7 +1,6 @@
-﻿namespace PoeShared.Native
+﻿namespace PoeShared.Native;
+
+public interface ICanBeLoaded
 {
-    public interface ICanBeLoaded
-    {
-        bool IsLoaded { get; set; }
-    }
+    bool IsLoaded { get; set; }
 }

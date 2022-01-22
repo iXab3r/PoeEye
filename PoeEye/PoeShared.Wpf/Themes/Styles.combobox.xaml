@@ -58,6 +58,7 @@
      <Style x:Key="DefaultAutoCompleteComboBox" TargetType="editors:AutoCompleteComboBox">
         <Setter Property="Focusable" Value="True" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="Padding" Value="0 0 0 -1"></Setter>
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -70,6 +71,7 @@
                 <ControlTemplate TargetType="{x:Type editors:AutoCompleteComboBox}">
                     <Grid>
                         <Border Background="{TemplateBinding Background}"
+                                x:Name="PART_ContentBorder"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -158,6 +160,9 @@
                     <ControlTemplate.Triggers>
                         <Trigger SourceName="PART_Editor" Property="Text" Value="">
                             <Setter TargetName="PART_Watermark" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger SourceName="PART_ContentBorder" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PART_ContentBorder" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
                         </Trigger>
                         <Trigger Property="IconPlacement" Value="Left">
                             <Setter TargetName="PART_Icon" Property="DockPanel.Dock" Value="Left" />

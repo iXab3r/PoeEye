@@ -4,7 +4,6 @@
 
 using WindowsHook.WinApi;
 
-namespace WindowsHook.Implementation
-{
-    internal delegate HookResult Subscribe(WinHookCallback callbck);
-}
+namespace WindowsHook.Implementation;
+
+internal delegate HookResult Subscribe(WinHookCallback callbck);

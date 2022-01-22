@@ -1,7 +1,6 @@
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IActivationController
 {
-    public interface IActivationController
-    {
-        void Activate();
-    }
+    void Activate();
 }

@@ -5,13 +5,12 @@ using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IGenericSettingsViewModel : IDisposableReactiveObject
 {
-    public interface IGenericSettingsViewModel : IDisposableReactiveObject
-    {
-        ReadOnlyObservableCollection<ISettingsViewModel> ModulesSettings { [NotNull] get; }
-        bool IsOpen { get; set; }
-        ICommand SaveConfigCommand { [NotNull] get; }
-        ICommand CancelCommand { [NotNull] get; }
-    }
+    ReadOnlyObservableCollection<ISettingsViewModel> ModulesSettings { [NotNull] get; }
+    bool IsOpen { get; set; }
+    ICommand SaveConfigCommand { [NotNull] get; }
+    ICommand CancelCommand { [NotNull] get; }
 }

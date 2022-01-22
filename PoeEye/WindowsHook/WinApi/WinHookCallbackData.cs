@@ -4,21 +4,20 @@
 
 using System;
 
-namespace WindowsHook.WinApi
+namespace WindowsHook.WinApi;
+
+public readonly struct WinHookCallbackData
 {
-    public readonly struct WinHookCallbackData
+    public WinHookCallbackData(int code, IntPtr wParam, IntPtr lParam)
     {
-        public WinHookCallbackData(int code, IntPtr wParam, IntPtr lParam)
-        {
-            Code = code;
-            WParam = wParam;
-            LParam = lParam;
-        }
-
-        public int Code { get; }
-        
-        public IntPtr WParam { get; }
-
-        public IntPtr LParam { get; }
+        Code = code;
+        WParam = wParam;
+        LParam = lParam;
     }
+
+    public int Code { get; }
+        
+    public IntPtr WParam { get; }
+
+    public IntPtr LParam { get; }
 }

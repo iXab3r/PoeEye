@@ -6,101 +6,100 @@ using System.Linq;
 using PoeShared.Services;
 using Shouldly;
 
-namespace PoeShared.Tests.Services
+namespace PoeShared.Tests.Services;
+
+[TestFixture]
+public class KeyboardLayoutManagerFixture : FixtureBase
 {
-    [TestFixture]
-    public class KeyboardLayoutManagerFixture : FixtureBase
+    [Test]
+    public void ShouldCreate()
     {
-        [Test]
-        public void ShouldCreate()
+        // Given
+        // When 
+        Action action = () => CreateInstance();
+
+        // Then
+        action.ShouldNotThrow();
+    }
+
+    [Test]
+    public void ShouldReturnCurrent()
+    {
+        //Given
+        var instance = CreateInstance();
+
+        //When
+        var result = instance.GetCurrent();
+
+        //Then
+        result.IsValid.ShouldBe(true);
+    }
+
+    [Test]
+    public void ShouldHaveLayouts()
+    {
+        //Given
+
+        //When
+        var instance = CreateInstance();
+
+
+        //Then
+        instance.KnownLayouts.Count.ShouldBeGreaterThan(0);
+    }
+
+    [Test]
+    public void ShouldResolveByLayoutId()
+    {
+        //Given
+        var instance = CreateInstance();
+        var layouts = instance.KnownLayouts.ToArray();
+
+        //When
+        //Then
+        foreach (var keyboardLayout in layouts)
         {
-            // Given
-            // When 
-            Action action = () => CreateInstance();
-
-            // Then
-            action.ShouldNotThrow();
+            var resolved = instance.ResolveByLayoutName(keyboardLayout.LayoutName);
+            resolved.ShouldBe(keyboardLayout);
+            resolved.IsValid.ShouldBe(true);
         }
+    }
 
-        [Test]
-        public void ShouldReturnCurrent()
+    [Test]
+    public void ShouldActivateLayouts()
+    {
+        //Given
+        var instance = CreateInstance();
+        var layouts = instance.KnownLayouts.ToArray();
+
+        //When
+        //Then
+        foreach (var keyboardLayout in layouts)
         {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.GetCurrent();
-
-            //Then
-            result.IsValid.ShouldBe(true);
+            instance.Activate(keyboardLayout);
+            var current = instance.GetCurrent();
+            current.ShouldBe(keyboardLayout);
         }
+    }
 
-        [Test]
-        public void ShouldHaveLayouts()
+    [Test]
+    public void ShouldResolveCultureByLayout()
+    {
+        //Given
+        var instance = CreateInstance();
+        var layouts = instance.KnownLayouts;
+
+        //When
+        //Then
+        foreach (var keyboardLayout in layouts)
         {
-            //Given
-
-            //When
-            var instance = CreateInstance();
-
-
-            //Then
-            instance.KnownLayouts.Count.ShouldBeGreaterThan(0);
+            var resolved = instance.ResolveByCulture(keyboardLayout.Culture);
+            resolved.ShouldBe(keyboardLayout);
         }
+    }
 
-        [Test]
-        public void ShouldResolveByLayoutId()
-        {
-            //Given
-            var instance = CreateInstance();
-            var layouts = instance.KnownLayouts.ToArray();
-
-            //When
-            //Then
-            foreach (var keyboardLayout in layouts)
-            {
-                var resolved = instance.ResolveByLayoutName(keyboardLayout.LayoutName);
-                resolved.ShouldBe(keyboardLayout);
-                resolved.IsValid.ShouldBe(true);
-            }
-        }
-
-        [Test]
-        public void ShouldActivateLayouts()
-        {
-            //Given
-            var instance = CreateInstance();
-            var layouts = instance.KnownLayouts.ToArray();
-
-            //When
-            //Then
-            foreach (var keyboardLayout in layouts)
-            {
-                instance.Activate(keyboardLayout);
-                var current = instance.GetCurrent();
-                current.ShouldBe(keyboardLayout);
-            }
-        }
-
-        [Test]
-        public void ShouldResolveCultureByLayout()
-        {
-            //Given
-            var instance = CreateInstance();
-            var layouts = instance.KnownLayouts;
-
-            //When
-            //Then
-            foreach (var keyboardLayout in layouts)
-            {
-                var resolved = instance.ResolveByCulture(keyboardLayout.Culture);
-                resolved.ShouldBe(keyboardLayout);
-            }
-        }
-
-        private KeyboardLayoutManager CreateInstance()
-        {
-            return Container.Build<KeyboardLayoutManager>().Create();
-        }
+    private KeyboardLayoutManager CreateInstance()
+    {
+        return Container.Build<KeyboardLayoutManager>().Create();
     }
 }

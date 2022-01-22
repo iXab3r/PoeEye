@@ -4,12 +4,11 @@
 
 using System;
 
-namespace WindowsHook
+namespace WindowsHook;
+
+/// <summary>
+///     Provides keyboard and mouse events.
+/// </summary>
+public interface IKeyboardMouseEvents : IKeyboardEvents, IMouseEvents, IDisposable
 {
-    /// <summary>
-    ///     Provides keyboard and mouse events.
-    /// </summary>
-    public interface IKeyboardMouseEvents : IKeyboardEvents, IMouseEvents, IDisposable
-    {
-    }
 }

@@ -1,8 +1,7 @@
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public enum OverlayMode
 {
-    public enum OverlayMode
-    {
-        Layered,
-        Transparent
-    }
+    Layered,
+    Transparent
 }

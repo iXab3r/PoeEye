@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace PoeShared
+namespace PoeShared;
+
+public interface IClock
 {
-    public interface IClock
-    {
-        DateTime UtcNow { get; }
+    DateTime UtcNow { get; }
         
-        DateTime Now { get; }
+    DateTime Now { get; }
         
-        TimeSpan Elapsed { get; }
-    }
+    TimeSpan Elapsed { get; }
 }

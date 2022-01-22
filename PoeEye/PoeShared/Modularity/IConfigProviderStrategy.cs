@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+public interface IConfigProviderStrategy
 {
-    public interface IConfigProviderStrategy
-    {
-        void HandleConfigSave(FileInfo configFile);
+    void HandleConfigSave(FileInfo configFile);
         
-        bool TryHandleConfigLoadException(FileInfo configFile, out ConfigProviderFromFile.PoeEyeCombinedConfig replacementConfig);
-    }
+    bool TryHandleConfigLoadException(FileInfo configFile, out ConfigProviderFromFile.PoeEyeCombinedConfig replacementConfig);
 }

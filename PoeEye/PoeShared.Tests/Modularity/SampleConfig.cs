@@ -1,9 +1,8 @@
 ﻿using PoeShared.Modularity;
 
-namespace PoeShared.Tests.Modularity
+namespace PoeShared.Tests.Modularity;
+
+public sealed class SampleConfig : IPoeEyeConfig
 {
-    public sealed class SampleConfig : IPoeEyeConfig
-    {
-        public string Value { get; set; }
-    }
+    public string Value { get; set; }
 }

@@ -1,8 +1,7 @@
-namespace PoeShared.Notifications.ViewModels
-{
-    public sealed class TextNotificationViewModel : NotificationViewModelBase
-    {
+namespace PoeShared.Notifications.ViewModels;
 
-        public string Text { get; set; }
-    }
+public sealed class TextNotificationViewModel : NotificationViewModelBase
+{
+
+    public string Text { get; set; }
 }

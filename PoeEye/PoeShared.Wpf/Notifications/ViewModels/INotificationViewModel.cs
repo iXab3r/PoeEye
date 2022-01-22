@@ -2,18 +2,17 @@
 using System.Windows.Media;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Notifications.ViewModels
+namespace PoeShared.Notifications.ViewModels;
+
+public interface INotificationViewModel : IDisposableReactiveObject, ICloseable
 {
-    public interface INotificationViewModel : IDisposableReactiveObject, ICloseable
-    {
-        string Title { get; set; }
+    string Title { get; set; }
         
-        ImageSource Icon { get; set; }
+    ImageSource Icon { get; set; }
         
-        TimeSpan TimeToLive { get; set; }
+    TimeSpan TimeToLive { get; set; }
         
-        bool Closeable { get; }
+    bool Closeable { get; }
         
-        bool Interactive { get; }
-    }
+    bool Interactive { get; }
 }

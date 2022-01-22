@@ -3,47 +3,46 @@ using Unity;
 using Unity.Lifetime;
 using Unity.Resolution;
 
-namespace PoeShared.Wpf.Scaffolding
+namespace PoeShared.Wpf.Scaffolding;
+
+public static class UnityContainerExtensions
 {
-    public static class UnityContainerExtensions
+    public static IUnityContainer RegisterOverlayController(
+        this IUnityContainer instance,
+        string dependencyName,
+        string windowTrackerDependencyName)
     {
-        public static IUnityContainer RegisterOverlayController(
-            this IUnityContainer instance,
-            string dependencyName,
-            string windowTrackerDependencyName)
-        {
-            instance
-                .RegisterFactory<IOverlayWindowController>(
-                    dependencyName,
-                    unity => unity.Resolve<OverlayWindowController>(
-                        new DependencyOverride<IWindowTracker>(
-                            unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
-                    new ContainerControlledLifetimeManager());
+        instance
+            .RegisterFactory<IOverlayWindowController>(
+                dependencyName,
+                unity => unity.Resolve<OverlayWindowController>(
+                    new DependencyOverride<IWindowTracker>(
+                        unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
+                new ContainerControlledLifetimeManager());
 
-            return instance;
-        }
+        return instance;
+    }
         
-        public static IUnityContainer RegisterOverlayController(
-            this IUnityContainer instance,
-            string windowTrackerDependencyName)
-        {
-            instance
-                .RegisterFactory<IOverlayWindowController>(
-                    unity => unity.Resolve<OverlayWindowController>(
-                        new DependencyOverride<IWindowTracker>(
-                            unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
-                    new ContainerControlledLifetimeManager());
+    public static IUnityContainer RegisterOverlayController(
+        this IUnityContainer instance,
+        string windowTrackerDependencyName)
+    {
+        instance
+            .RegisterFactory<IOverlayWindowController>(
+                unity => unity.Resolve<OverlayWindowController>(
+                    new DependencyOverride<IWindowTracker>(
+                        unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
+                new ContainerControlledLifetimeManager());
 
-            return instance;
-        }
+        return instance;
+    }
         
-        public static IUnityContainer RegisterOverlayController(
-            this IUnityContainer instance)
-        {
-            instance
-                .RegisterType<IOverlayWindowController, OverlayWindowController>();
+    public static IUnityContainer RegisterOverlayController(
+        this IUnityContainer instance)
+    {
+        instance
+            .RegisterType<IOverlayWindowController, OverlayWindowController>();
 
-            return instance;
-        }
+        return instance;
     }
 }

@@ -6,56 +6,55 @@ using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public partial class FakeDelayControl : UserControl
 {
-    public partial class FakeDelayControl : UserControl
+    private static readonly IFluentLog Log = typeof(FakeDelayControl).PrepareLogger();
+
+    public static readonly DependencyProperty RenderDelayProperty = DependencyProperty.Register(
+        "RenderDelay", typeof(int), typeof(FakeDelayControl), new PropertyMetadata(default(int)));
+
+    public static readonly DependencyProperty LoadDelayProperty = DependencyProperty.Register(
+        "LoadDelay", typeof(int), typeof(FakeDelayControl), new PropertyMetadata(5000));
+
+    public FakeDelayControl()
     {
-        private static readonly IFluentLog Log = typeof(FakeDelayControl).PrepareLogger();
+        InitializeComponent();
+        this.Loaded += OnLoaded;
+    }
 
-        public static readonly DependencyProperty RenderDelayProperty = DependencyProperty.Register(
-            "RenderDelay", typeof(int), typeof(FakeDelayControl), new PropertyMetadata(default(int)));
+    public int RenderDelay
+    {
+        get { return (int)GetValue(RenderDelayProperty); }
+        set { SetValue(RenderDelayProperty, value); }
+    }
 
-        public static readonly DependencyProperty LoadDelayProperty = DependencyProperty.Register(
-            "LoadDelay", typeof(int), typeof(FakeDelayControl), new PropertyMetadata(5000));
+    public int LoadDelay
+    {
+        get { return (int)GetValue(LoadDelayProperty); }
+        set { SetValue(LoadDelayProperty, value); }
+    }
 
-        public FakeDelayControl()
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (LoadDelay <= 0)
         {
-            InitializeComponent();
-            this.Loaded += OnLoaded;
+            return;
         }
+        Log.Warn($"Starting fake OnLoaded delay {LoadDelay}");
+        Thread.Sleep(LoadDelay);
+        Log.Warn("Fake OnLoaded delay ended");
+    }
 
-        public int RenderDelay
+    protected override void OnRender(DrawingContext drawingContext)
+    {
+        if (RenderDelay <= 0)
         {
-            get { return (int)GetValue(RenderDelayProperty); }
-            set { SetValue(RenderDelayProperty, value); }
+            return;
         }
-
-        public int LoadDelay
-        {
-            get { return (int)GetValue(LoadDelayProperty); }
-            set { SetValue(LoadDelayProperty, value); }
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            if (LoadDelay <= 0)
-            {
-                return;
-            }
-            Log.Warn($"Starting fake OnLoaded delay {LoadDelay}");
-            Thread.Sleep(LoadDelay);
-            Log.Warn("Fake OnLoaded delay ended");
-        }
-
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            if (RenderDelay <= 0)
-            {
-                return;
-            }
-            Log.Warn($"Starting fake render delay {RenderDelay}");
-            Thread.Sleep(RenderDelay);
-            Log.Warn("Fake delay render ended");
-        }
+        Log.Warn($"Starting fake render delay {RenderDelay}");
+        Thread.Sleep(RenderDelay);
+        Log.Warn("Fake delay render ended");
     }
 }

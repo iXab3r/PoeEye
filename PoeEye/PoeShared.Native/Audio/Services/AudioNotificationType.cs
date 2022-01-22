@@ -1,18 +1,17 @@
-﻿namespace PoeShared.Audio.Services
+﻿namespace PoeShared.Audio.Services;
+
+public enum AudioNotificationType
 {
-    public enum AudioNotificationType
-    {
-        Disabled,
-        Whistle,
-        Whisper,
-        Mercury,
-        Bell,
-        Ping,
-        Wob,
-        DingDong,
-        Minions,
-        Pizzicato,
-        Silence,
-        Keyboard
-    }
+    Disabled,
+    Whistle,
+    Whisper,
+    Mercury,
+    Bell,
+    Ping,
+    Wob,
+    DingDong,
+    Minions,
+    Pizzicato,
+    Silence,
+    Keyboard
 }

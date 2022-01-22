@@ -10,147 +10,146 @@ using PoeShared.Logging;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
 {
-    internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
+    private static readonly IFluentLog Log = typeof(TimerEx).PrepareLogger();
+
+    private readonly TimeSpan period;
+    private readonly bool amendPeriod;
+    private readonly ISubject<long> sink = new Subject<long>();
+    private readonly object padlock = new object();
+    private readonly Lazy<string> toStringSupplier;
+        
+    private long cycleIdx;
+    private Timer timer;
+
+    public TimerEx(string timerName, TimeSpan dueTime, TimeSpan period, bool amendPeriod)
     {
-        private static readonly IFluentLog Log = typeof(TimerEx).PrepareLogger();
-
-        private readonly TimeSpan period;
-        private readonly bool amendPeriod;
-        private readonly ISubject<long> sink = new Subject<long>();
-        private readonly object padlock = new object();
-        private readonly Lazy<string> toStringSupplier;
-        
-        private long cycleIdx;
-        private Timer timer;
-
-        public TimerEx(string timerName, TimeSpan dueTime, TimeSpan period, bool amendPeriod)
+        TimerName = timerName;
+        toStringSupplier = new Lazy<string>(() =>
         {
-            TimerName = timerName;
-            toStringSupplier = new Lazy<string>(() =>
+            var name = string.IsNullOrEmpty(timerName) ? timerName : $"-{timerName}";
+            if (dueTime == TimeSpan.Zero)
             {
-                var name = string.IsNullOrEmpty(timerName) ? timerName : $"-{timerName}";
-                if (dueTime == TimeSpan.Zero)
-                {
-                    return $"Tmr{name}, {period.TotalMilliseconds:F0}ms";
-                }
-                else
-                {
-                    return $"Tmr{name}, {dueTime.TotalMilliseconds:F0}ms, {period.TotalMilliseconds:F0}ms";
-                }
-            });
-            Log.Info($"[{this}] Initializing timer");
-            this.period = period;
-            this.amendPeriod = amendPeriod;
-            timer = new Timer(Callback, null, dueTime, TimeSpan.FromMilliseconds(-1));
-            Disposable.Create(() =>
+                return $"Tmr{name}, {period.TotalMilliseconds:F0}ms";
+            }
+            else
+            {
+                return $"Tmr{name}, {dueTime.TotalMilliseconds:F0}ms, {period.TotalMilliseconds:F0}ms";
+            }
+        });
+        Log.Info($"[{this}] Initializing timer");
+        this.period = period;
+        this.amendPeriod = amendPeriod;
+        timer = new Timer(Callback, null, dueTime, TimeSpan.FromMilliseconds(-1));
+        Disposable.Create(() =>
+        {
+            if (Log.IsDebugEnabled)
+            {
+                Log.Debug(() => $"[{this}] Disposing - acquiring lock");
+            }
+            lock (padlock)
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{this}] Disposing - acquiring lock");
+                    Log.Debug(() => $"[{this}] Disposing timer {timer}");
                 }
-                lock (padlock)
-                {
-                    if (Log.IsDebugEnabled)
-                    {
-                        Log.Debug(() => $"[{this}] Disposing timer {timer}");
-                    }
-                    timer?.Dispose();
-                    timer = null;
-                }
-            }).AddTo(Anchors);
-        }
+                timer?.Dispose();
+                timer = null;
+            }
+        }).AddTo(Anchors);
+    }
         
-        public string TimerName { get; }
+    public string TimerName { get; }
 
-        private void Callback(object state)
+    private void Callback(object state)
+    {
+        var executionTime = TimeSpan.Zero;
+        try
         {
-            var executionTime = TimeSpan.Zero;
-            try
+            if (Log.IsDebugEnabled)
             {
-                if (Log.IsDebugEnabled)
-                {
-                    Log.Debug(() => $"[{this}] Executing timer handler");
-                }
+                Log.Debug(() => $"[{this}] Executing timer handler");
+            }
                
-                lock (padlock)
+            lock (padlock)
+            {
+                if (timer == null)
                 {
-                    if (timer == null)
-                    {
-                        if (Log.IsDebugEnabled)
-                        {
-                            Log.Debug(() => $"[{this}] Callback - timer is already disposed on entry");
-                        }
-                        return;
-                    }
-
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug(() => $"[{this}] Stopping timer loop temporarily");
+                        Log.Debug(() => $"[{this}] Callback - timer is already disposed on entry");
                     }
-                    timer.Change(Timeout.Infinite, Timeout.Infinite);
+                    return;
                 }
 
-                var now = Stopwatch.GetTimestamp();
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{this}] Producing OnNext");
+                    Log.Debug(() => $"[{this}] Stopping timer loop temporarily");
                 }
-                sink.OnNext(cycleIdx++);
-                if (Log.IsDebugEnabled)
-                {
-                    Log.Debug(() => $"[{this}] Processed OnNext");
-                }
+                timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
 
-                executionTime = TimeSpan.FromMilliseconds((Stopwatch.GetTimestamp() - now) / (float) Stopwatch.Frequency);
-                lock (padlock)
-                {
-                    if (timer == null)
-                    {
-                        if (Log.IsDebugEnabled)
-                        {
-                            Log.Debug(() => $"[{this}] Callback - timer is already disposed on exit");
-                        }
-                        return;
-                    }
+            var now = Stopwatch.GetTimestamp();
+            if (Log.IsDebugEnabled)
+            {
+                Log.Debug(() => $"[{this}] Producing OnNext");
+            }
+            sink.OnNext(cycleIdx++);
+            if (Log.IsDebugEnabled)
+            {
+                Log.Debug(() => $"[{this}] Processed OnNext");
+            }
 
-                    var executeIn = TimeSpan.FromMilliseconds(
-                        amendPeriod
-                            ? Math.Max(0, period.TotalMilliseconds - executionTime.TotalMilliseconds)
-                            : period.TotalMilliseconds);
+            executionTime = TimeSpan.FromMilliseconds((Stopwatch.GetTimestamp() - now) / (float) Stopwatch.Frequency);
+            lock (padlock)
+            {
+                if (timer == null)
+                {
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug(() => $"[{this}] Re-arming timer loop, execute in: {executeIn}");
+                        Log.Debug(() => $"[{this}] Callback - timer is already disposed on exit");
                     }
-                    timer.Change(executeIn, TimeSpan.Zero);
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                if (Log.IsWarnEnabled)
-                {
-                    Log.Warn($"[{this}] Timer handler captured an error, propagating to sink", ex);
-                }
-                sink.OnError(ex);
-            }
-            finally
-            {
+
+                var executeIn = TimeSpan.FromMilliseconds(
+                    amendPeriod
+                        ? Math.Max(0, period.TotalMilliseconds - executionTime.TotalMilliseconds)
+                        : period.TotalMilliseconds);
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{this}] Timer handler completed in {executionTime.TotalMilliseconds:F0}ms");
+                    Log.Debug(() => $"[{this}] Re-arming timer loop, execute in: {executeIn}");
                 }
+                timer.Change(executeIn, TimeSpan.Zero);
             }
         }
-
-        public IDisposable Subscribe(IObserver<long> observer)
+        catch (Exception ex)
         {
-            return sink.Synchronize(padlock).Subscribe(observer);
+            if (Log.IsWarnEnabled)
+            {
+                Log.Warn($"[{this}] Timer handler captured an error, propagating to sink", ex);
+            }
+            sink.OnError(ex);
         }
-
-        public override string ToString()
+        finally
         {
-            return toStringSupplier.Value;
+            if (Log.IsDebugEnabled)
+            {
+                Log.Debug(() => $"[{this}] Timer handler completed in {executionTime.TotalMilliseconds:F0}ms");
+            }
         }
+    }
+
+    public IDisposable Subscribe(IObserver<long> observer)
+    {
+        return sink.Synchronize(padlock).Subscribe(observer);
+    }
+
+    public override string ToString()
+    {
+        return toStringSupplier.Value;
     }
 }

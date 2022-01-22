@@ -1,19 +1,18 @@
-﻿namespace PoeShared.Logging
+﻿namespace PoeShared.Logging;
+
+/// <summary>
+/// Defines available log levels.
+/// </summary>
+public enum FluentLogLevel
 {
-    /// <summary>
-    /// Defines available log levels.
-    /// </summary>
-    public enum FluentLogLevel
-    {
-        /// <summary>Trace log level.</summary>
-        Trace = 0,
-        /// <summary>Debug log level.</summary>
-        Debug = 1,
-        /// <summary>Info log level.</summary>
-        Info = 2,
-        /// <summary>Warn log level.</summary>
-        Warn = 3,
-        /// <summary>Error log level.</summary>
-        Error = 4
-    }
+    /// <summary>Trace log level.</summary>
+    Trace = 0,
+    /// <summary>Debug log level.</summary>
+    Debug = 1,
+    /// <summary>Info log level.</summary>
+    Info = 2,
+    /// <summary>Warn log level.</summary>
+    Warn = 3,
+    /// <summary>Error log level.</summary>
+    Error = 4
 }

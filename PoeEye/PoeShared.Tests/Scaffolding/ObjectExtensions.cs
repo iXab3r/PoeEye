@@ -1,12 +1,11 @@
 ﻿using Moq;
 
-namespace PoeShared.Tests.Scaffolding
+namespace PoeShared.Tests.Scaffolding;
+
+public static class ObjectExtensions
 {
-    public static class ObjectExtensions
+    public static Mock<T> GetMock<T>(this T mocked) where T : class
     {
-        public static Mock<T> GetMock<T>(this T mocked) where T : class
-        {
-            return Mock.Get(mocked);
-        }
+        return Mock.Get(mocked);
     }
 }

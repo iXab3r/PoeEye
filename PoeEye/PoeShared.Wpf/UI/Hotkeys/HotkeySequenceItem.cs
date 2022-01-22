@@ -2,13 +2,12 @@
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public abstract class HotkeySequenceItem : DisposableReactiveObject, ICloneable
 {
-    public abstract class HotkeySequenceItem : DisposableReactiveObject, ICloneable
+    public object Clone()
     {
-        public object Clone()
-        {
-            return this.CloneJson();
-        }
+        return this.CloneJson();
     }
 }

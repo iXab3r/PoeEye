@@ -6,34 +6,33 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using ReactiveUI;
 
-namespace PoeShared.Audio.ViewModels
+namespace PoeShared.Audio.ViewModels;
+
+internal sealed class NotificationTypeWrapperViewModel : DisposableReactiveObject
 {
-    internal sealed class NotificationTypeWrapperViewModel : DisposableReactiveObject
+    private readonly ObservableAsPropertyHelper<bool> isSelectedSupplier;
+
+    public NotificationTypeWrapperViewModel(
+        IAudioNotificationSelectorViewModel owner,
+        string value,
+        string name)
     {
-        private readonly ObservableAsPropertyHelper<bool> isSelectedSupplier;
+        Owner = owner;
+        Value = value;
+        Name = name;
 
-        public NotificationTypeWrapperViewModel(
-            IAudioNotificationSelectorViewModel owner,
-            string value,
-            string name)
-        {
-            Owner = owner;
-            Value = value;
-            Name = name;
-
-            isSelectedSupplier = owner
-                .WhenAnyValue(x => x.SelectedValue)
-                .Select(x => Value.Equals(x, StringComparison.OrdinalIgnoreCase))
-                .ToProperty(this, x => x.IsSelected)
-                .AddTo(Anchors);
-        }
-
-        public bool IsSelected => isSelectedSupplier.Value;
-
-        public string Value { get; }
-
-        public string Name { get; }
-        
-        public IAudioNotificationSelectorViewModel Owner { get; }
+        isSelectedSupplier = owner
+            .WhenAnyValue(x => x.SelectedValue)
+            .Select(x => Value.Equals(x, StringComparison.OrdinalIgnoreCase))
+            .ToProperty(this, x => x.IsSelected)
+            .AddTo(Anchors);
     }
+
+    public bool IsSelected => isSelectedSupplier.Value;
+
+    public string Value { get; }
+
+    public string Name { get; }
+        
+    public IAudioNotificationSelectorViewModel Owner { get; }
 }

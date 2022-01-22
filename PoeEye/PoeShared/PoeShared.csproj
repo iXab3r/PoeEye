@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.1;net6-windows7</TargetFrameworks>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <LangVersion>9.0</LangVersion>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="App.Metrics" Version="4.2.0" />

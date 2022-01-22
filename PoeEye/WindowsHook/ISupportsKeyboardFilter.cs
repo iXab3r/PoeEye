@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace WindowsHook
+namespace WindowsHook;
+
+public interface ISupportsKeyboardFilter
 {
-    public interface ISupportsKeyboardFilter
-    {
-        IDisposable AddKeyboardFilter(IKeyboardEventFilter filter);
-    }
+    IDisposable AddKeyboardFilter(IKeyboardEventFilter filter);
 }

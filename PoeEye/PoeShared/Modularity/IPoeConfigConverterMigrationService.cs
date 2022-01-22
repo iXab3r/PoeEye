@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+internal interface IPoeConfigConverterMigrationService
 {
-    internal interface IPoeConfigConverterMigrationService
-    {
-        bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out KeyValuePair<PoeConfigMigrationConverterKey, Func<object, object>> result);
-    }
+    bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out KeyValuePair<PoeConfigMigrationConverterKey, Func<object, object>> result);
 }

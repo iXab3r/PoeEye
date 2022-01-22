@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+internal sealed class WindowHandleProvider : IWindowHandleProvider
 {
-    internal sealed class WindowHandleProvider : IWindowHandleProvider
+    public IWindowHandle GetByWindowHandle(IntPtr hwnd)
     {
-        public IWindowHandle GetByWindowHandle(IntPtr hwnd)
-        {
-            return new WindowHandle(hwnd);
-        }
+        return new WindowHandle(hwnd);
     }
 }

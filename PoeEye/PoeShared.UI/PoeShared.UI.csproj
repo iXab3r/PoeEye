@@ -7,7 +7,7 @@
         <Copyright>Copyright © Xab3r 2020</Copyright>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <LangVersion>8</LangVersion>
+        <LangVersion>10</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
         <ApplicationIcon>Resources/mainIconAlt.ico</ApplicationIcon>

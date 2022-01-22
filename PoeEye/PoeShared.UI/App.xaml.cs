@@ -7,26 +7,25 @@ using PoeShared.Wpf.Scaffolding;
 using Unity;
 using Unity.Lifetime;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : ApplicationBase
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : ApplicationBase
+    protected override void OnStartup(StartupEventArgs e)
     {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
+        base.OnStartup(e);
             
-            Container
-                .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();
+        Container
+            .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();
             
-            var window = new MainWindow();
-            Container.RegisterOverlayController();
-            var viewController = new WindowViewController(window);
-            Container.RegisterInstance<IWindowViewController>(WellKnownWindows.MainWindow, viewController, new ContainerControlledLifetimeManager());
-            window.DataContext = Container.Resolve<MainWindowViewModel>();
-            window.Show();
-        }
+        var window = new MainWindow();
+        Container.RegisterOverlayController();
+        var viewController = new WindowViewController(window);
+        Container.RegisterInstance<IWindowViewController>(WellKnownWindows.MainWindow, viewController, new ContainerControlledLifetimeManager());
+        window.DataContext = Container.Resolve<MainWindowViewModel>();
+        window.Show();
     }
 }

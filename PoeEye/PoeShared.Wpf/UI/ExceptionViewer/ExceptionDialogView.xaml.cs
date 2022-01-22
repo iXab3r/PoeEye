@@ -1,10 +1,9 @@
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public partial class ExceptionDialogView
 {
-    public partial class ExceptionDialogView
+    public ExceptionDialogView()
     {
-        public ExceptionDialogView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

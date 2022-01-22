@@ -2,18 +2,17 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class PropagatingMultiValueConverter : IMultiValueConverter
 {
-    public sealed class PropagatingMultiValueConverter : IMultiValueConverter
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            return values.Clone();
-        }
+        return values.Clone();
+    }
         
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace PoeShared.Squirrel.Updater
+﻿namespace PoeShared.Squirrel.Updater;
+
+public interface ISquirrelEventsHandler
 {
-    public interface ISquirrelEventsHandler
-    {
-    }
 }

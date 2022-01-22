@@ -6,7 +6,7 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>10</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TargetFramework>net6-windows10.0.19041.0</TargetFramework>

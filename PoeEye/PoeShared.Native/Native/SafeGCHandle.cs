@@ -1,36 +1,35 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public sealed class SafeGCHandle : IDisposable
 {
-    public sealed class SafeGCHandle : IDisposable
+    private GCHandle gcHandle;
+    private bool isDisposed;
+
+    public SafeGCHandle(GCHandle gcHandle)
     {
-        private GCHandle gcHandle;
-        private bool isDisposed;
+        this.gcHandle = gcHandle;
+    }
 
-        public SafeGCHandle(GCHandle gcHandle)
-        {
-            this.gcHandle = gcHandle;
-        }
-
-        public T ToStructure<T>()
-        {
-            return Marshal.PtrToStructure<T>(gcHandle.AddrOfPinnedObject());
-        }
+    public T ToStructure<T>()
+    {
+        return Marshal.PtrToStructure<T>(gcHandle.AddrOfPinnedObject());
+    }
         
-        public void Dispose()
+    public void Dispose()
+    {
+        if (isDisposed)
         {
-            if (isDisposed)
-            {
-                return;
-            }
-            
-            if (gcHandle.IsAllocated)
-            {
-                gcHandle.Free();
-            }
-
-            isDisposed = true;
+            return;
         }
+            
+        if (gcHandle.IsAllocated)
+        {
+            gcHandle.Free();
+        }
+
+        isDisposed = true;
     }
 }

@@ -6,34 +6,33 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public class ColorToSolidColorBrushConverter : IValueConverter
 {
-    public class ColorToSolidColorBrushConverter : IValueConverter
-    {
-        private static readonly ConcurrentDictionary<Color, SolidColorBrush> BrushesByColor = new();
+    private static readonly ConcurrentDictionary<Color, SolidColorBrush> BrushesByColor = new();
         
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not Color color)
         {
-            if (value is not Color color)
-            {
-                return Binding.DoNothing;
-            }
-
-            return BrushesByColor.GetOrAdd(color, x =>
-            {
-                var result = new SolidColorBrush(x);
-                result.Freeze();
-                return result;
-            });
+            return Binding.DoNothing;
         }
 
-        public object ConvertBack(
-            object value,
-            Type targetType,
-            object parameter,
-            CultureInfo culture)
+        return BrushesByColor.GetOrAdd(color, x =>
         {
-            return ((SolidColorBrush) value)?.Color;
-        }
+            var result = new SolidColorBrush(x);
+            result.Freeze();
+            return result;
+        });
+    }
+
+    public object ConvertBack(
+        object value,
+        Type targetType,
+        object parameter,
+        CultureInfo culture)
+    {
+        return ((SolidColorBrush) value)?.Color;
     }
 }

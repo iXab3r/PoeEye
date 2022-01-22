@@ -1,10 +1,9 @@
 ﻿using System.Windows;
 using PropertyChanged;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+[DoNotNotify]
+public class DataPipeCollection : FreezableCollection<DataPipe>
 {
-    [DoNotNotify]
-    public class DataPipeCollection : FreezableCollection<DataPipe>
-    {
-    }
 }

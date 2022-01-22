@@ -1,7 +1,6 @@
-﻿namespace PoeShared.Modularity
+﻿namespace PoeShared.Modularity;
+
+public interface IHasVersion
 {
-    public interface IHasVersion
-    {
-        int Version { get; set; }
-    }
+    int Version { get; set; }
 }

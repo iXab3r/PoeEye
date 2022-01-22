@@ -1,21 +1,20 @@
 ﻿using System;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+public interface ISharedResource : IDisposable
 {
-    public interface ISharedResource : IDisposable
-    {
-        long RefCount { get; }
+    long RefCount { get; }
         
-        IDisposable RentReadLock();
+    IDisposable RentReadLock();
 
-        IDisposable RentWriteLock();
+    IDisposable RentWriteLock();
         
-        bool IsDisposed { get; }
+    bool IsDisposed { get; }
 
-        bool TryRent();
+    bool TryRent();
 
-        void AddResource(IDisposable resource);
+    void AddResource(IDisposable resource);
 
-        void AddResource(Action disposeAction);
-    }
+    void AddResource(Action disposeAction);
 }

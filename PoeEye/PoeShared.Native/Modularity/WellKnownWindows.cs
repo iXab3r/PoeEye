@@ -1,8 +1,7 @@
-﻿namespace PoeShared.Prism
+﻿namespace PoeShared.Prism;
+
+public static class WellKnownWindows
 {
-    public static class WellKnownWindows
-    {
-        public const string AllWindows = "AllWindows";
-        public const string MainWindow = "Main";
-    }
+    public const string AllWindows = "AllWindows";
+    public const string MainWindow = "Main";
 }

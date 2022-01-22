@@ -14,133 +14,132 @@ using PoeShared.Logging;
 using ReactiveUI;
 using Point = Hardcodet.Wpf.TaskbarNotification.Interop.Point;
 
-namespace PoeShared.Native
-{
-    public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
-    {
-        public WindowViewController(Window owner)
-        {
-            Window = owner;
-            Handle = new WindowInteropHelper(owner).EnsureHandle();
-            Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}, title: {owner.Title}");
-            Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
+namespace PoeShared.Native;
 
-            WhenRendered = Observable
-                .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
-                .ToUnit();
-            WhenUnloaded = Observable
-                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Unloaded += h, h => owner.Unloaded -= h)
-                .ToUnit();
-            WhenLoaded = Observable.Merge(
+public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
+{
+    public WindowViewController(Window owner)
+    {
+        Window = owner;
+        Handle = new WindowInteropHelper(owner).EnsureHandle();
+        Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}, title: {owner.Title}");
+        Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
+
+        WhenRendered = Observable
+            .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
+            .ToUnit();
+        WhenUnloaded = Observable
+            .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Unloaded += h, h => owner.Unloaded -= h)
+            .ToUnit();
+        WhenLoaded = Observable.Merge(
                 Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
                 Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
-                .Take(1);
+            .Take(1);
             
-            WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
-            WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
-            WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
+        WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
+        WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
+        WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
 
-            this.WhenAnyValue(x => x.Topmost)
-                .SubscribeSafe(x => owner.Topmost = x, Log.HandleUiException)
-                .AddTo(Anchors);
+        this.WhenAnyValue(x => x.Topmost)
+            .SubscribeSafe(x => owner.Topmost = x, Log.HandleUiException)
+            .AddTo(Anchors);
 
-            WhenDeactivated
-                .Where(_ => Topmost)
-                .SubscribeSafe(() =>
-                {
-                    Log.Debug(() => $"Window is deactivated, reactivating {nameof(Topmost)} style");
-                    owner.Topmost = false;
-                    owner.Topmost = true;
-                }, Log.HandleUiException)
-                .AddTo(Anchors);
-        }
+        WhenDeactivated
+            .Where(_ => Topmost)
+            .SubscribeSafe(() =>
+            {
+                Log.Debug(() => $"Window is deactivated, reactivating {nameof(Topmost)} style");
+                owner.Topmost = false;
+                owner.Topmost = true;
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+    }
         
-        private IFluentLog Log { get; }
+    private IFluentLog Log { get; }
 
-        public IObservable<Unit> WhenLoaded { get; }
+    public IObservable<Unit> WhenLoaded { get; }
         
-        public IObservable<Unit> WhenUnloaded { get; }
+    public IObservable<Unit> WhenUnloaded { get; }
         
-        public IObservable<Unit> WhenClosed { get; }
+    public IObservable<Unit> WhenClosed { get; }
  
-        public IObservable<Unit> WhenDeactivated { get; }
+    public IObservable<Unit> WhenDeactivated { get; }
         
-        public IObservable<CancelEventArgs> WhenClosing { get; }
+    public IObservable<CancelEventArgs> WhenClosing { get; }
 
-        public IObservable<Unit> WhenRendered { get; }
+    public IObservable<Unit> WhenRendered { get; }
         
-        public IntPtr Handle { get; }
+    public IntPtr Handle { get; }
         
-        public Window Window { get; }
+    public Window Window { get; }
 
-        public void Activate()
-        {
-            Log.Debug("Activating window");
-            Window.Activate();
-        }
+    public void Activate()
+    {
+        Log.Debug("Activating window");
+        Window.Activate();
+    }
 
-        public void Close(bool? result)
-        {
-            Log.Debug(() => $"Closing window, result: {result}");
-            Window.DialogResult = result;
-            Window.Close();
-        }
+    public void Close(bool? result)
+    {
+        Log.Debug(() => $"Closing window, result: {result}");
+        Window.DialogResult = result;
+        Window.Close();
+    }
 
-        public void Close()
-        {
-            Close(null);
-        }
+    public void Close()
+    {
+        Close(null);
+    }
 
-        public bool Topmost { get; set; }
+    public bool Topmost { get; set; }
 
-        public void Hide()
-        {
-            Log.Debug(() => $"Hiding window");
-            UnsafeNative.HideWindow(Window);
-        }
+    public void Hide()
+    {
+        Log.Debug(() => $"Hiding window");
+        UnsafeNative.HideWindow(Window);
+    }
 
-        public void Show()
-        {
-            Log.Debug(() => $"Showing window");
-            UnsafeNative.ShowWindow(Window);
-            //FIXME Mahapps window resets topmost after minimize/maximize operations
-            Window.Topmost = Topmost;
-        }
+    public void Show()
+    {
+        Log.Debug(() => $"Showing window");
+        UnsafeNative.ShowWindow(Window);
+        //FIXME Mahapps window resets topmost after minimize/maximize operations
+        Window.Topmost = Topmost;
+    }
 
-        public void TakeScreenshot(string fileName)
-        {
-            CreateBitmapFromVisual(Window, fileName);
-        }
+    public void TakeScreenshot(string fileName)
+    {
+        CreateBitmapFromVisual(Window, fileName);
+    }
 
-        public void Minimize()
-        {
-            Log.Debug(() => $"Minimizing window");
-            Window.WindowState = WindowState.Minimized;
-        }
+    public void Minimize()
+    {
+        Log.Debug(() => $"Minimizing window");
+        Window.WindowState = WindowState.Minimized;
+    }
         
-        public static void CreateBitmapFromVisual(Visual target, string fileName)
+    public static void CreateBitmapFromVisual(Visual target, string fileName)
+    {
+        if (target == null || string.IsNullOrEmpty(fileName))
         {
-            if (target == null || string.IsNullOrEmpty(fileName))
-            {
-                return;
-            }
+            return;
+        }
 
-            var bounds = target is FrameworkElement frameworkElement ? new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight) : VisualTreeHelper.GetDescendantBounds(target);
-            var dpi = VisualTreeHelper.GetDpi(target);
-            var renderTarget = new RenderTargetBitmap(
-                (int)(bounds.Width / 96d * dpi.PixelsPerInchX), 
-                (int)(bounds.Height / 96d * dpi.PixelsPerInchY), 
-                dpi.PixelsPerInchX, 
-                dpi.PixelsPerInchY, 
-                PixelFormats.Pbgra32);
-            renderTarget.Render(target);
+        var bounds = target is FrameworkElement frameworkElement ? new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight) : VisualTreeHelper.GetDescendantBounds(target);
+        var dpi = VisualTreeHelper.GetDpi(target);
+        var renderTarget = new RenderTargetBitmap(
+            (int)(bounds.Width / 96d * dpi.PixelsPerInchX), 
+            (int)(bounds.Height / 96d * dpi.PixelsPerInchY), 
+            dpi.PixelsPerInchX, 
+            dpi.PixelsPerInchY, 
+            PixelFormats.Pbgra32);
+        renderTarget.Render(target);
 
-            var bitmapEncoder = new PngBitmapEncoder();
-            bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
-            using (Stream stm = File.Create(fileName))
-            {
-                bitmapEncoder.Save(stm);
-            }
+        var bitmapEncoder = new PngBitmapEncoder();
+        bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
+        using (Stream stm = File.Create(fileName))
+        {
+            bitmapEncoder.Save(stm);
         }
     }
 }

@@ -7,82 +7,81 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using WindowsHook.WinApi;
 
-namespace WindowsHook.Implementation
+namespace WindowsHook.Implementation;
+
+internal abstract class KeyListener : BaseListener, IKeyboardEvents
 {
-    internal abstract class KeyListener : BaseListener, IKeyboardEvents
+    protected KeyListener(Subscribe subscribe)
+        : base(subscribe)
     {
-        protected KeyListener(Subscribe subscribe)
-            : base(subscribe)
-        {
-            IsReady = true;
-        }
-
-        public event KeyEventHandler KeyRaw;
-        public event KeyEventHandler KeyDown;
-        public event KeyPressEventHandler KeyPress;
-        public event KeyEventHandler KeyUp;
-
-        public void InvokeKeyDown(KeyEventArgsExt e)
-        {
-            var handler = KeyDown;
-            if (handler == null || e.Handled || !e.IsKeyDown)
-            {
-                return;
-            }
-
-            handler(this, e);
-        }
-
-        public void InvokeKeyPress(KeyPressEventArgsExt e)
-        {
-            var handler = KeyPress;
-            if (handler == null || e.Handled || e.IsNonChar)
-            {
-                return;
-            }
-
-            handler(this, e);
-        }
-
-        public void InvokeKeyUp(KeyEventArgsExt e)
-        {
-            var handler = KeyUp;
-            if (handler == null || e.Handled || !e.IsKeyUp)
-            {
-                return;
-            }
-
-            handler(this, e);
-        }
-
-        protected override bool Callback(WinHookCallbackData data)
-        {
-            var e = GetDownUpEventArgs(data);
-            if (e == null)
-            {
-                return false;
-            }
-
-            KeyRaw?.Invoke(this, e);
-
-            InvokeKeyDown(e);
-
-            if (KeyPress != null)
-            {
-                var pressEventArgs = GetPressEventArgs(data);
-                foreach (var pressEventArg in pressEventArgs)
-                {
-                    InvokeKeyPress(pressEventArg);
-                }
-            }
-
-            InvokeKeyUp(e);
-
-            return !e.Handled;
-        }
-
-        protected abstract IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(WinHookCallbackData data);
-        
-        protected abstract KeyEventArgsExt GetDownUpEventArgs(WinHookCallbackData data);
+        IsReady = true;
     }
+
+    public event KeyEventHandler KeyRaw;
+    public event KeyEventHandler KeyDown;
+    public event KeyPressEventHandler KeyPress;
+    public event KeyEventHandler KeyUp;
+
+    public void InvokeKeyDown(KeyEventArgsExt e)
+    {
+        var handler = KeyDown;
+        if (handler == null || e.Handled || !e.IsKeyDown)
+        {
+            return;
+        }
+
+        handler(this, e);
+    }
+
+    public void InvokeKeyPress(KeyPressEventArgsExt e)
+    {
+        var handler = KeyPress;
+        if (handler == null || e.Handled || e.IsNonChar)
+        {
+            return;
+        }
+
+        handler(this, e);
+    }
+
+    public void InvokeKeyUp(KeyEventArgsExt e)
+    {
+        var handler = KeyUp;
+        if (handler == null || e.Handled || !e.IsKeyUp)
+        {
+            return;
+        }
+
+        handler(this, e);
+    }
+
+    protected override bool Callback(WinHookCallbackData data)
+    {
+        var e = GetDownUpEventArgs(data);
+        if (e == null)
+        {
+            return false;
+        }
+
+        KeyRaw?.Invoke(this, e);
+
+        InvokeKeyDown(e);
+
+        if (KeyPress != null)
+        {
+            var pressEventArgs = GetPressEventArgs(data);
+            foreach (var pressEventArg in pressEventArgs)
+            {
+                InvokeKeyPress(pressEventArg);
+            }
+        }
+
+        InvokeKeyUp(e);
+
+        return !e.Handled;
+    }
+
+    protected abstract IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(WinHookCallbackData data);
+        
+    protected abstract KeyEventArgsExt GetDownUpEventArgs(WinHookCallbackData data);
 }

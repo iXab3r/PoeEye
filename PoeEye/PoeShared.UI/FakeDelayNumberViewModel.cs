@@ -1,10 +1,9 @@
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI
-{
-    public class FakeDelayNumberViewModel : DisposableReactiveObject
-    {
+namespace PoeShared.UI;
 
-        public int Number { get; set; }
-    }
+public class FakeDelayNumberViewModel : DisposableReactiveObject
+{
+
+    public int Number { get; set; }
 }

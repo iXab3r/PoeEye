@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+internal sealed class PassthroughWindowTrackerTitleMatcher : IWindowTrackerMatcher
 {
-    internal sealed class PassthroughWindowTrackerTitleMatcher : IWindowTrackerMatcher
+    public bool IsMatch(string title, IntPtr hwnd, int processId)
     {
-        public bool IsMatch(string title, IntPtr hwnd, int processId)
-        {
-            return true;
-        }
+        return true;
     }
 }

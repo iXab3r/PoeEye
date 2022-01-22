@@ -7,44 +7,43 @@ using Hardcodet.Wpf.TaskbarNotification;
 using log4net;
 using PoeShared.Logging;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF;
+
+public sealed class TaskBarBitmapImageBehavior : Behavior<TaskbarIcon>
 {
-    public sealed class TaskBarBitmapImageBehavior : Behavior<TaskbarIcon>
+    private static readonly IFluentLog Log = typeof(TaskBarBitmapImageBehavior).PrepareLogger();
+
+    public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
+        "Icon", typeof(Icon), typeof(TaskBarBitmapImageBehavior), new PropertyMetadata(default(Icon)));
+
+    private readonly SerialDisposable attachmentAnchors = new SerialDisposable();
+
+    public Icon Icon
     {
-        private static readonly IFluentLog Log = typeof(TaskBarBitmapImageBehavior).PrepareLogger();
+        get => (Icon) GetValue(IconProperty);
+        set => SetValue(IconProperty, value);
+    }
 
-        public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
-            "Icon", typeof(Icon), typeof(TaskBarBitmapImageBehavior), new PropertyMetadata(default(Icon)));
+    protected override void OnAttached()
+    {
+        base.OnAttached();
 
-        private readonly SerialDisposable attachmentAnchors = new SerialDisposable();
+        attachmentAnchors.Disposable =
+            this.Observe(IconProperty)
+                .Select(_ => Icon)
+                .SubscribeSafe(HandleImageChange, Log.HandleUiException);
+    }
 
-        public Icon Icon
-        {
-            get => (Icon) GetValue(IconProperty);
-            set => SetValue(IconProperty, value);
-        }
+    private void HandleImageChange(Icon source)
+    {
+        AssociatedObject.Icon = source;
+    }
 
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-
-            attachmentAnchors.Disposable =
-                this.Observe(IconProperty)
-                    .Select(_ => Icon)
-                    .SubscribeSafe(HandleImageChange, Log.HandleUiException);
-        }
-
-        private void HandleImageChange(Icon source)
-        {
-            AssociatedObject.Icon = source;
-        }
-
-        protected override void OnDetaching()
-        {
-            attachmentAnchors.Disposable = null;
-            base.OnDetaching();
-        }
+    protected override void OnDetaching()
+    {
+        attachmentAnchors.Disposable = null;
+        base.OnDetaching();
+    }
 
         
-    }
 }

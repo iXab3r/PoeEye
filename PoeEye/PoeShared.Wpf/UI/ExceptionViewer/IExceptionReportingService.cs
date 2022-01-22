@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IExceptionReportingService 
 {
-    public interface IExceptionReportingService 
-    {
-        Task<ExceptionDialogConfig> PrepareConfig();
+    Task<ExceptionDialogConfig> PrepareConfig();
 
-        void SetReportConsumer(IExceptionReportHandler reportHandler);
+    void SetReportConsumer(IExceptionReportHandler reportHandler);
 
-        IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider);
-    }
+    IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider);
 }

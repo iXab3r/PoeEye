@@ -1,8 +1,7 @@
-namespace PoeShared.UI
-{
-    public sealed class HotkeySequenceText : HotkeySequenceItem
-    {
+namespace PoeShared.UI;
 
-        public string Text { get; set; }
-    }
+public sealed class HotkeySequenceText : HotkeySequenceItem
+{
+
+    public string Text { get; set; }
 }

@@ -6,35 +6,34 @@ using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Core;
 using Squirrel;
 
-namespace PoeShared.Squirrel.Updater
+namespace PoeShared.Squirrel.Updater;
+
+public interface IApplicationUpdaterModel : IDisposableReactiveObject
 {
-    public interface IApplicationUpdaterModel : IDisposableReactiveObject
-    {
-        UpdateSourceInfo UpdateSource { get; }
+    UpdateSourceInfo UpdateSource { get; }
 
-        bool IgnoreDeltaUpdates { get; set; }
+    bool IgnoreDeltaUpdates { get; set; }
 
-        [CanBeNull] Version LatestAppliedVersion { get; }
+    [CanBeNull] Version LatestAppliedVersion { get; }
 
-        [CanBeNull] IPoeUpdateInfo LatestUpdate { get; }
+    [CanBeNull] IPoeUpdateInfo LatestUpdate { get; }
         
-        int ProgressPercent { get; }
+    int ProgressPercent { get; }
         
-        bool IsBusy { get; }
+    bool IsBusy { get; }
         
-        /// <summary>
-        ///     Checks whether update exist and if so, downloads it
-        /// </summary>
-        Task CheckForUpdates();
+    /// <summary>
+    ///     Checks whether update exist and if so, downloads it
+    /// </summary>
+    Task CheckForUpdates();
 
-        Task RestartApplication();
+    Task RestartApplication();
 
-        Task ApplyRelease([NotNull] IPoeUpdateInfo updateInfo);
+    Task ApplyRelease([NotNull] IPoeUpdateInfo updateInfo);
 
-        void Reset();
+    void Reset();
 
-        Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry releaseEntry);
+    Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry releaseEntry);
 
-        FileInfo GetLatestExecutable();
-    }
+    FileInfo GetLatestExecutable();
 }

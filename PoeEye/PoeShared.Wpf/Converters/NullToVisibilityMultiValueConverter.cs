@@ -4,43 +4,42 @@ using System.Linq;
 using System.Windows.Data;
 using Blue.MVVM.Converter;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class NullToVisibilityMultiValueConverter : VisibilityConverterBase, IMultiValueConverter
 {
-    public sealed class NullToVisibilityMultiValueConverter : VisibilityConverterBase, IMultiValueConverter
+    public IBoolMultiValueConverterStrategy Strategy { get; set; }
+
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        public IBoolMultiValueConverterStrategy Strategy { get; set; }
-
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        if (values == null)
         {
-            if (values == null)
-            {
-                return Binding.DoNothing;
-            }
-
-            var result = Convert(RequireStrategy(), values, parameter);
-            return result ? TrueValue : FalseValue;
+            return Binding.DoNothing;
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        var result = Convert(RequireStrategy(), values, parameter);
+        return result ? TrueValue : FalseValue;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+
+    private IBoolMultiValueConverterStrategy RequireStrategy()
+    {
+        var strategy = Strategy;
+        if (strategy != null)
         {
-            throw new NotSupportedException();
+            return strategy;
         }
 
-        private IBoolMultiValueConverterStrategy RequireStrategy()
-        {
-            var strategy = Strategy;
-            if (strategy != null)
-            {
-                return strategy;
-            }
+        throw new InvalidOperationException("no logical strategy has been set");
+    }
 
-            throw new InvalidOperationException("no logical strategy has been set");
-        }
-
-        public bool Convert(IBoolMultiValueConverterStrategy strategy, object[] values, object parameter)
-        {
-            var nullCheckResults = values.Select(ConverterHelpers.IsNullOrEmpty).ToArray();
-            return strategy.Convert(nullCheckResults, parameter);
-        }
+    public bool Convert(IBoolMultiValueConverterStrategy strategy, object[] values, object parameter)
+    {
+        var nullCheckResults = values.Select(ConverterHelpers.IsNullOrEmpty).ToArray();
+        return strategy.Convert(nullCheckResults, parameter);
     }
 }

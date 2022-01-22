@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿global using PoeShared.Native;
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;

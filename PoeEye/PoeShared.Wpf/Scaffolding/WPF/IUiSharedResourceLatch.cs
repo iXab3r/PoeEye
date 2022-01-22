@@ -1,6 +1,5 @@
-﻿namespace PoeShared.Scaffolding.WPF
+﻿namespace PoeShared.Scaffolding.WPF;
+
+public interface IUiSharedResourceLatch : IPauseController, IBusyController
 {
-    public interface IUiSharedResourceLatch : IPauseController, IBusyController
-    {
-    }
 }

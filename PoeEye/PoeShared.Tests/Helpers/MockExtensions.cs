@@ -7,24 +7,23 @@ using Moq.Language.Flow;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Tests.Helpers
+namespace PoeShared.Tests.Helpers;
+
+public static class MockExtensions
 {
-    public static class MockExtensions
+    public static ISubject<TProperty> ReturnsPublisher<T, TProperty>(this ISetupGetter<T, IObservable<TProperty>> getter) 
+        where T : class
     {
-        public static ISubject<TProperty> ReturnsPublisher<T, TProperty>(this ISetupGetter<T, IObservable<TProperty>> getter) 
-            where T : class
-        {
-            var result = new Subject<TProperty>();
-            getter.Returns(result);    
-            return result;
-        }
+        var result = new Subject<TProperty>();
+        getter.Returns(result);    
+        return result;
+    }
         
-        public static void SetupGetAndNotify<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
-            where T : class, INotifyPropertyChanged
-        {
-            var propertyName = expression.GetMemberName();
-            mock.SetupGet(expression).Returns(value);
-            mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs(propertyName));
-        }
+    public static void SetupGetAndNotify<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expression, TProperty value)
+        where T : class, INotifyPropertyChanged
+    {
+        var propertyName = expression.GetMemberName();
+        mock.SetupGet(expression).Returns(value);
+        mock.Raise(x => x.PropertyChanged -= null, new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -5,23 +5,22 @@
 using System.Collections.Generic;
 using WindowsHook.WinApi;
 
-namespace WindowsHook.Implementation
+namespace WindowsHook.Implementation;
+
+internal class GlobalKeyListener : KeyListener
 {
-    internal class GlobalKeyListener : KeyListener
+    public GlobalKeyListener()
+        : base(HookHelper.HookGlobalKeyboard)
     {
-        public GlobalKeyListener()
-            : base(HookHelper.HookGlobalKeyboard)
-        {
-        }
+    }
 
-        protected override IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(WinHookCallbackData data)
-        {
-            return KeyPressEventArgsExt.FromRawDataGlobal(data);
-        }
+    protected override IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(WinHookCallbackData data)
+    {
+        return KeyPressEventArgsExt.FromRawDataGlobal(data);
+    }
 
-        protected override KeyEventArgsExt GetDownUpEventArgs(WinHookCallbackData data)
-        {
-            return KeyEventArgsExt.FromRawDataGlobal(data);
-        }
+    protected override KeyEventArgsExt GetDownUpEventArgs(WinHookCallbackData data)
+    {
+        return KeyEventArgsExt.FromRawDataGlobal(data);
     }
 }

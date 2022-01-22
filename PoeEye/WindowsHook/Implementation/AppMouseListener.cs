@@ -4,18 +4,17 @@
 
 using WindowsHook.WinApi;
 
-namespace WindowsHook.Implementation
-{
-    internal class AppMouseListener : MouseListener
-    {
-        public AppMouseListener()
-            : base(HookHelper.HookAppMouse)
-        {
-        }
+namespace WindowsHook.Implementation;
 
-        protected override MouseEventExtArgs GetEventArgs(WinHookCallbackData data)
-        {
-            return MouseEventExtArgs.FromRawDataApp(data);
-        }
+internal class AppMouseListener : MouseListener
+{
+    public AppMouseListener()
+        : base(HookHelper.HookAppMouse)
+    {
+    }
+
+    protected override MouseEventExtArgs GetEventArgs(WinHookCallbackData data)
+    {
+        return MouseEventExtArgs.FromRawDataApp(data);
     }
 }

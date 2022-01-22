@@ -1,37 +1,35 @@
-﻿using shortid;
+﻿using System;
+using shortid;
 using shortid.Configuration;
 
 // ReSharper disable StringLiteralTypo
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+internal sealed class UniqueIdGenerator : IUniqueIdGenerator
 {
-    internal sealed class UniqueIdGenerator : IUniqueIdGenerator
+    private static readonly GenerationOptions IdOptions = new()
     {
-        private readonly GenerationOptions defaultOptions = new()
-        {
-            Length = 8,
-            UseSpecialCharacters = false,
-            UseNumbers = false
-        };
+        UseSpecialCharacters = false,
+        UseNumbers = true,
+        Length = 12
+    };
         
-        public UniqueIdGenerator()
-        {
-            ShortId.SetCharacters(@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        }
+    private readonly IClock clock;
+        
+    public UniqueIdGenerator(IClock clock)
+    {
+        this.clock = clock;
+        ShortId.SetCharacters(@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    }
 
-        public string Next()
-        {
-            return ShortId.Generate(defaultOptions);
-        }
+    public string Next()
+    {
+        return $"{clock.UtcNow:yyyyMMddHHmmss}{GenerateId()}";
+    }
 
-        public string Next(int length)
-        {
-            return ShortId.Generate(new GenerationOptions()
-            {
-                Length = length,
-                UseNumbers = defaultOptions.UseNumbers,
-                UseSpecialCharacters = defaultOptions.UseSpecialCharacters
-            });
-        }
+    private static string GenerateId()
+    {
+        return ShortId.Generate(IdOptions);
     }
 }

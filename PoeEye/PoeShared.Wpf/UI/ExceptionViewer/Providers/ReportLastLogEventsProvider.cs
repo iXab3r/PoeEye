@@ -7,65 +7,64 @@ using log4net.Core;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Providers
+namespace PoeShared.UI.Providers;
+
+internal sealed class ReportLastLogEventsProvider : DisposableReactiveObject, IExceptionReportItemProvider
 {
-    internal sealed class ReportLastLogEventsProvider : DisposableReactiveObject, IExceptionReportItemProvider
+    private static readonly IFluentLog Log = typeof(ReportLastLogEventsProvider).PrepareLogger();
+
+    private readonly CircularBuffer<LoggingEvent> lastEvents = new(1000);
+
+    public ReportLastLogEventsProvider()
     {
-        private static readonly IFluentLog Log = typeof(ReportLastLogEventsProvider).PrepareLogger();
+        var appender = new ObservableAppender();
+        appender.Events
+            .SubscribeSafe(
+                evt => { lastEvents.PushBack(evt); }, Log.HandleUiException)
+            .AddTo(Anchors);
 
-        private readonly CircularBuffer<LoggingEvent> lastEvents = new(1000);
+        SharedLog.Instance.AddAppender(appender).AddTo(Anchors);
+    }
 
-        public ReportLastLogEventsProvider()
+    public IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory)
+    {
+        Log.Debug("Preparing log dump for crash report...");
+        if (lastEvents.IsEmpty)
         {
-            var appender = new ObservableAppender();
-            appender.Events
-                .SubscribeSafe(
-                    evt => { lastEvents.PushBack(evt); }, Log.HandleUiException)
-                .AddTo(Anchors);
-
-            SharedLog.Instance.AddAppender(appender).AddTo(Anchors);
+            Log.Debug("Log is empty");
+            yield break;
         }
 
-        public IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory)
+        var lastLogEvents = new FileInfo(Path.Combine(outputDirectory.FullName, "logDump.log"));
+
+        var head = lastEvents.Front();
+        var tail = lastEvents.Back();
+        Log.Debug(() => $"Saving log dump to {lastLogEvents} [{head.TimeStamp};{tail.TimeStamp}]");
+        using (var rw = lastLogEvents.OpenWrite())
+        using (var writer = new StreamWriter(rw))
         {
-            Log.Debug("Preparing log dump for crash report...");
-            if (lastEvents.IsEmpty)
+            foreach (var loggingEvent in lastEvents)
             {
-                Log.Debug("Log is empty");
-                yield break;
+                writer.WriteLine(loggingEvent.RenderedMessage);
             }
-
-            var lastLogEvents = new FileInfo(Path.Combine(outputDirectory.FullName, "logDump.log"));
-
-            var head = lastEvents.Front();
-            var tail = lastEvents.Back();
-            Log.Debug(() => $"Saving log dump to {lastLogEvents} [{head.TimeStamp};{tail.TimeStamp}]");
-            using (var rw = lastLogEvents.OpenWrite())
-            using (var writer = new StreamWriter(rw))
-            {
-                foreach (var loggingEvent in lastEvents)
-                {
-                    writer.WriteLine(loggingEvent.RenderedMessage);
-                }
-            }
-
-            yield return new ExceptionReportItem()
-            {
-                Description = $"Last {lastEvents.Size} log records\nFirst: {head.TimeStamp}\nLast: {tail.TimeStamp}",
-                Attachment = lastLogEvents
-            };
         }
 
-        private class ObservableAppender : AppenderSkeleton
+        yield return new ExceptionReportItem()
         {
-            private readonly ISubject<LoggingEvent> events = new Subject<LoggingEvent>();
+            Description = $"Last {lastEvents.Size} log records\nFirst: {head.TimeStamp}\nLast: {tail.TimeStamp}",
+            Attachment = lastLogEvents
+        };
+    }
 
-            public IObservable<LoggingEvent> Events => events;
+    private class ObservableAppender : AppenderSkeleton
+    {
+        private readonly ISubject<LoggingEvent> events = new Subject<LoggingEvent>();
 
-            protected override void Append(LoggingEvent loggingEvent)
-            {
-                events.OnNext(loggingEvent);
-            }
+        public IObservable<LoggingEvent> Events => events;
+
+        protected override void Append(LoggingEvent loggingEvent)
+        {
+            events.OnNext(loggingEvent);
         }
     }
 }

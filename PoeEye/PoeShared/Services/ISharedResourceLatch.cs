@@ -2,14 +2,13 @@
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Services
-{
-    public interface ISharedResourceLatch : IDisposableReactiveObject
-    {
-        bool IsBusy { get; }
-        
-        string Name { get; set; }
+namespace PoeShared.Services;
 
-        IDisposable Rent();
-    }
+public interface ISharedResourceLatch : IDisposableReactiveObject
+{
+    bool IsBusy { get; }
+        
+    string Name { get; set; }
+
+    IDisposable Rent();
 }

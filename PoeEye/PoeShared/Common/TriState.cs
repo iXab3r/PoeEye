@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel;
 
-namespace PoeShared.Common
+namespace PoeShared.Common;
+
+public enum TriState
 {
-    public enum TriState
-    {
-        [Browsable(false)]
-        Unknown,
-        Yes,
-        No
-    }
+    [Browsable(false)]
+    Unknown,
+    Yes,
+    No
 }

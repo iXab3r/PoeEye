@@ -1,4 +1,9 @@
-﻿using System.Reflection;
+﻿global using PoeShared.Audio.ViewModels;
+global using PoeShared.Scaffolding.WPF;
+global using PoeShared.UI.Bindings;
+global using PoeShared.Wpf.Scaffolding;
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;

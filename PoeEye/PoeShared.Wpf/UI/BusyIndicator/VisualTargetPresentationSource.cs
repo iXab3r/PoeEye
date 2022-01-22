@@ -2,61 +2,60 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public sealed class VisualTargetPresentationSource : PresentationSource, IDisposable
 {
-    public sealed class VisualTargetPresentationSource : PresentationSource, IDisposable
+    private readonly VisualTarget visualTarget;
+    private bool isDisposed;
+
+    public VisualTargetPresentationSource(HostVisual hostVisual)
     {
-        private readonly VisualTarget visualTarget;
-        private bool isDisposed;
+        visualTarget = new VisualTarget(hostVisual);
+        AddSource();
+    }
 
-        public VisualTargetPresentationSource(HostVisual hostVisual)
+    public Size DesiredSize { get; private set; }
+
+    public override Visual RootVisual
+    {
+        get { return visualTarget.RootVisual; }
+        set
         {
-            visualTarget = new VisualTarget(hostVisual);
-            AddSource();
-        }
+            var oldRoot = visualTarget.RootVisual;
 
-        public Size DesiredSize { get; private set; }
+            // Set the root visual of the VisualTarget.  This visual will
+            // now be used to visually compose the scene.
+            visualTarget.RootVisual = value;
 
-        public override Visual RootVisual
-        {
-            get { return visualTarget.RootVisual; }
-            set
+            // Tell the PresentationSource that the root visual has
+            // changed.  This kicks off a bunch of stuff like the
+            // Loaded event.
+            RootChanged(oldRoot, value);
+
+            // Kickoff layout...
+            if (value is UIElement rootElement)
             {
-                var oldRoot = visualTarget.RootVisual;
+                rootElement.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                rootElement.Arrange(new Rect(rootElement.DesiredSize));
 
-                // Set the root visual of the VisualTarget.  This visual will
-                // now be used to visually compose the scene.
-                visualTarget.RootVisual = value;
-
-                // Tell the PresentationSource that the root visual has
-                // changed.  This kicks off a bunch of stuff like the
-                // Loaded event.
-                RootChanged(oldRoot, value);
-
-                // Kickoff layout...
-                if (value is UIElement rootElement)
-                {
-                    rootElement.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
-                    rootElement.Arrange(new Rect(rootElement.DesiredSize));
-
-                    DesiredSize = rootElement.DesiredSize;
-                }
-                else
-                    DesiredSize = new Size(0, 0);
+                DesiredSize = rootElement.DesiredSize;
             }
+            else
+                DesiredSize = new Size(0, 0);
         }
+    }
 
-        protected override CompositionTarget GetCompositionTargetCore()
-        {
-            return visualTarget;
-        }
+    protected override CompositionTarget GetCompositionTargetCore()
+    {
+        return visualTarget;
+    }
 
-        public override bool IsDisposed => isDisposed;
+    public override bool IsDisposed => isDisposed;
 
-        public void Dispose()
-        {
-            RemoveSource();
-            isDisposed = true;
-        }
+    public void Dispose()
+    {
+        RemoveSource();
+        isDisposed = true;
     }
 }

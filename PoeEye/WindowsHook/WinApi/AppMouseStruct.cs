@@ -6,65 +6,64 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace WindowsHook.WinApi
+namespace WindowsHook.WinApi;
+
+/// <summary>
+///     The AppMouseStruct structure contains information about a application-level mouse input event.
+/// </summary>
+/// <remarks>
+///     See full documentation at http://globalmousekeyhook.codeplex.com/wikipage?title=MouseStruct
+/// </remarks>
+[StructLayout(LayoutKind.Explicit)]
+internal readonly struct AppMouseStruct
 {
     /// <summary>
-    ///     The AppMouseStruct structure contains information about a application-level mouse input event.
+    ///     Specifies a Point structure that contains the X- and Y-coordinates of the cursor, in screen coordinates.
+    /// </summary>
+    [FieldOffset(0x00)] public readonly Point Point;
+
+    /// <summary>
+    ///     Specifies information associated with the message.
     /// </summary>
     /// <remarks>
-    ///     See full documentation at http://globalmousekeyhook.codeplex.com/wikipage?title=MouseStruct
+    ///     The possible values are:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>0 - No Information</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>1 - X-Button1 Click</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>2 - X-Button2 Click</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>120 - Mouse Scroll Away from User</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>-120 - Mouse Scroll Toward User</description>
+    ///         </item>
+    ///     </list>
     /// </remarks>
-    [StructLayout(LayoutKind.Explicit)]
-    internal readonly struct AppMouseStruct
+    [FieldOffset(0x16)] public readonly short MouseData_x86;
+
+    [FieldOffset(0x22)] public readonly short MouseData_x64;
+
+    /// <summary>
+    ///     Converts the current <see cref="AppMouseStruct" /> into a <see cref="MouseStruct" />.
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>
+    ///     The AppMouseStruct does not have a timestamp, thus one is generated at the time of this call.
+    /// </remarks>
+    public MouseStruct ToMouseStruct()
     {
-        /// <summary>
-        ///     Specifies a Point structure that contains the X- and Y-coordinates of the cursor, in screen coordinates.
-        /// </summary>
-        [FieldOffset(0x00)] public readonly Point Point;
-
-        /// <summary>
-        ///     Specifies information associated with the message.
-        /// </summary>
-        /// <remarks>
-        ///     The possible values are:
-        ///     <list type="bullet">
-        ///         <item>
-        ///             <description>0 - No Information</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>1 - X-Button1 Click</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>2 - X-Button2 Click</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>120 - Mouse Scroll Away from User</description>
-        ///         </item>
-        ///         <item>
-        ///             <description>-120 - Mouse Scroll Toward User</description>
-        ///         </item>
-        ///     </list>
-        /// </remarks>
-        [FieldOffset(0x16)] public readonly short MouseData_x86;
-
-        [FieldOffset(0x22)] public readonly short MouseData_x64;
-
-        /// <summary>
-        ///     Converts the current <see cref="AppMouseStruct" /> into a <see cref="MouseStruct" />.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        ///     The AppMouseStruct does not have a timestamp, thus one is generated at the time of this call.
-        /// </remarks>
-        public MouseStruct ToMouseStruct()
+        var tmp = new MouseStruct
         {
-            var tmp = new MouseStruct
-            {
-                Point = Point,
-                MouseData = IntPtr.Size == 4 ? MouseData_x86 : MouseData_x64,
-                Timestamp = Environment.TickCount
-            };
-            return tmp;
-        }
+            Point = Point,
+            MouseData = IntPtr.Size == 4 ? MouseData_x86 : MouseData_x64,
+            Timestamp = Environment.TickCount
+        };
+        return tmp;
     }
 }

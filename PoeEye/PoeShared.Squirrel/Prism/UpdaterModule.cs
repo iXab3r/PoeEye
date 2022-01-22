@@ -8,30 +8,29 @@ using Prism.Ioc;
 using Prism.Modularity;
 using Unity;
 
-namespace PoeShared.Squirrel.Prism
+namespace PoeShared.Squirrel.Prism;
+
+public sealed class UpdaterModule : IModule
 {
-    public sealed class UpdaterModule : IModule
+    private static readonly IFluentLog Log = typeof(UpdaterModule).PrepareLogger();
+
+    private readonly IUnityContainer container;
+
+    public UpdaterModule(IUnityContainer container)
     {
-        private static readonly IFluentLog Log = typeof(UpdaterModule).PrepareLogger();
+        Guard.ArgumentNotNull(container, nameof(container));
 
-        private readonly IUnityContainer container;
+        this.container = container;
+    }
 
-        public UpdaterModule(IUnityContainer container)
-        {
-            Guard.ArgumentNotNull(container, nameof(container));
+    public void RegisterTypes(IContainerRegistry containerRegistry)
+    {
+        container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
+    }
 
-            this.container = container;
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
-        }
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
-            registrator.RegisterSettingsEditor<UpdateSettingsConfig, UpdateSettingsViewModel>();
-        }
+    public void OnInitialized(IContainerProvider containerProvider)
+    {
+        var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
+        registrator.RegisterSettingsEditor<UpdateSettingsConfig, UpdateSettingsViewModel>();
     }
 }

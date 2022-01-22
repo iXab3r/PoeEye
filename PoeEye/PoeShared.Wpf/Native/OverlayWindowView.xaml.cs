@@ -5,74 +5,73 @@ using System.Windows;
 using System.Windows.Threading;
 using PoeShared.Scaffolding; 
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public partial class OverlayWindowView
 {
-    public partial class OverlayWindowView
+    public OverlayWindowView()
     {
-        public OverlayWindowView()
+        using var sw = new BenchmarkTimer("View initialization", Log, nameof(OverlayWindowView));
+        InitializeComponent();
+        sw.Step("Components initialized");
+        WhenLoaded.SubscribeSafe(OnLoaded, Log.HandleUiException).AddTo(Anchors);
+        sw.Step("WhenLoaded routine executed");
+        SizeChanged += OnSizeChanged;
+    }
+
+    public IObservable<EventPattern<RoutedEventArgs>> WhenLoaded => Observable
+        .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => Loaded += h, h => Loaded -= h);
+
+    public IObservable<EventPattern<EventArgs>> WhenRendered => Observable
+        .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h);
+
+    private bool AllowsTransparencyAfterLoad { get; set; }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
+    {
+        var window = sender as Window;
+        var windowViewModel = window?.DataContext as OverlayWindowViewModel;
+        var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
+        if (overlayViewModel == null)
         {
-            using var sw = new BenchmarkTimer("View initialization", Log, nameof(OverlayWindowView));
-            InitializeComponent();
-            sw.Step("Components initialized");
-            WhenLoaded.SubscribeSafe(OnLoaded, Log.HandleUiException).AddTo(Anchors);
-            sw.Step("WhenLoaded routine executed");
-            SizeChanged += OnSizeChanged;
+            return;
         }
 
-        public IObservable<EventPattern<RoutedEventArgs>> WhenLoaded => Observable
-            .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => Loaded += h, h => Loaded -= h);
-
-        public IObservable<EventPattern<EventArgs>> WhenRendered => Observable
-            .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h);
-
-        private bool AllowsTransparencyAfterLoad { get; set; }
-
-        private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
+        var delta = sizeChangedEventArgs.NewSize.Height - sizeChangedEventArgs.PreviousSize.Height;
+        if (!overlayViewModel.GrowUpwards)
         {
-            var window = sender as Window;
-            var windowViewModel = window?.DataContext as OverlayWindowViewModel;
-            var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
-            if (overlayViewModel == null)
-            {
-                return;
-            }
-
-            var delta = sizeChangedEventArgs.NewSize.Height - sizeChangedEventArgs.PreviousSize.Height;
-            if (!overlayViewModel.GrowUpwards)
-            {
-                return;
-            }
-
-            Dispatcher.BeginInvoke(new Action(() => Top -= delta), DispatcherPriority.Render);
+            return;
         }
 
-        private void OnLoaded()
-        {
-            Log.Debug(() => $"Setting WindowExNoActivate");
-            AllowsTransparencyAfterLoad = AllowsTransparency;
-            UnsafeNative.SetWindowExNoActivate(WindowHandle);
-        }
+        Dispatcher.BeginInvoke(new Action(() => Top -= delta), DispatcherPriority.Render);
+    }
 
-        public override string ToString()
-        {
-            return $"{base.ToString()} DataContext: {DataContext} (X:{Left:F0} Y:{Top:F0} Width: {Width:F0} Height: {Height:F0})";
-        }
+    private void OnLoaded()
+    {
+        Log.Debug(() => $"Setting WindowExNoActivate");
+        AllowsTransparencyAfterLoad = AllowsTransparency;
+        UnsafeNative.SetWindowExNoActivate(WindowHandle);
+    }
 
-        public void SetOverlayMode(OverlayMode mode)
+    public override string ToString()
+    {
+        return $"{base.ToString()} DataContext: {DataContext} (X:{Left:F0} Y:{Top:F0} Width: {Width:F0} Height: {Height:F0})";
+    }
+
+    public void SetOverlayMode(OverlayMode mode)
+    {
+        if (AllowsTransparencyAfterLoad == false && mode == OverlayMode.Transparent)
         {
-            if (AllowsTransparencyAfterLoad == false && mode == OverlayMode.Transparent)
-            {
-                throw new InvalidOperationException($"Transparent mode requires AllowsTransparency to be set to True");
-            }
-            switch (mode)
-            {
-                case OverlayMode.Layered:
-                    MakeLayered();
-                    break;
-                case OverlayMode.Transparent:
-                    MakeTransparent();
-                    break;
-            }
+            throw new InvalidOperationException($"Transparent mode requires AllowsTransparency to be set to True");
+        }
+        switch (mode)
+        {
+            case OverlayMode.Layered:
+                MakeLayered();
+                break;
+            case OverlayMode.Transparent:
+                MakeTransparent();
+                break;
         }
     }
 }

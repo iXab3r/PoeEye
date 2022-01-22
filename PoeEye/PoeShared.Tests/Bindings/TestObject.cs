@@ -1,32 +1,31 @@
 ﻿using System;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Tests.Bindings
+namespace PoeShared.Tests.Bindings;
+
+public class TestObject : DisposableReactiveObject
 {
-    public class TestObject : DisposableReactiveObject
+    public int intField;
+            
+    public string Id { get; set; }
+            
+    public int IntProperty { get; set; }
+        
+    public int ReadOnlyIntProperty { get; }
+        
+    public TestObject Inner { get; set; }
+
+    public int PropertyThatThrows
     {
-        public int intField;
-            
-        public string Id { get; set; }
-            
-        public int IntProperty { get; set; }
-        
-        public int ReadOnlyIntProperty { get; }
-        
-        public TestObject Inner { get; set; }
-
-        public int PropertyThatThrows
-        {
-            get => Throw ? throw new NotSupportedException() : intField;
-            set => intField = Throw ? throw new NotSupportedException() : value;
-        }
-        
-        public int PropertyThatThrowsOnSet
-        {
-            get => intField;
-            set => intField = Throw ? throw new NotSupportedException() : value;
-        }
-
-        public bool Throw { get; set; } = true;
+        get => Throw ? throw new NotSupportedException() : intField;
+        set => intField = Throw ? throw new NotSupportedException() : value;
     }
+        
+    public int PropertyThatThrowsOnSet
+    {
+        get => intField;
+        set => intField = Throw ? throw new NotSupportedException() : value;
+    }
+
+    public bool Throw { get; set; } = true;
 }

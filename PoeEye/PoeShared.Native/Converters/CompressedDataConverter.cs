@@ -9,72 +9,71 @@ using Newtonsoft.Json;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class CompressedDataConverter : JsonConverter
 {
-    public sealed class CompressedDataConverter : JsonConverter
+    private static readonly string GzipPrefix = "GZip ";
+        
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        private static readonly string GzipPrefix = "GZip ";
-        
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        if (!(value is byte[] valueToEncode))
         {
-            if (!(value is byte[] valueToEncode))
-            {
-                throw new ArgumentException($"Expected instance of {typeof(byte[])}, got {value?.GetType()}");
-            }
+            throw new ArgumentException($"Expected instance of {typeof(byte[])}, got {value?.GetType()}");
+        }
             
-            var compressedData = Compress(valueToEncode);
-            var compressedDataString = JsonConvert.SerializeObject(compressedData);
+        var compressedData = Compress(valueToEncode);
+        var compressedDataString = JsonConvert.SerializeObject(compressedData);
 
-            var serializedString = (GzipPrefix + compressedDataString.Trim('"')).SurroundWith('"');
-            writer.WriteRawValue(serializedString);
-        }
+        var serializedString = (GzipPrefix + compressedDataString.Trim('"')).SurroundWith('"');
+        writer.WriteRawValue(serializedString);
+    }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            var deserializedString = serializer.Deserialize<string>(reader);
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        var deserializedString = serializer.Deserialize<string>(reader);
             
-            if (deserializedString.StartsWith(GzipPrefix))
-            {
-                var compressedDataString = deserializedString.Substring(GzipPrefix.Length);
-                var compressedData = JsonConvert.DeserializeObject<byte[]>(compressedDataString.SurroundWith('"'));
-                if (compressedData != null)
-                {
-                    return Decompress(compressedData);
-                }
-            }
-            else
-            {
-                return JsonConvert.DeserializeObject<byte[]>(deserializedString.SurroundWith('"'));
-            }
-
-            return null;
-        }
-
-        public override bool CanConvert(Type objectType)
+        if (deserializedString.StartsWith(GzipPrefix))
         {
-            return objectType == typeof(SecureString);
+            var compressedDataString = deserializedString.Substring(GzipPrefix.Length);
+            var compressedData = JsonConvert.DeserializeObject<byte[]>(compressedDataString.SurroundWith('"'));
+            if (compressedData != null)
+            {
+                return Decompress(compressedData);
+            }
         }
+        else
+        {
+            return JsonConvert.DeserializeObject<byte[]>(deserializedString.SurroundWith('"'));
+        }
+
+        return null;
+    }
+
+    public override bool CanConvert(Type objectType)
+    {
+        return objectType == typeof(SecureString);
+    }
         
-        private static byte[] Compress(byte[] data)
+    private static byte[] Compress(byte[] data)
+    {
+        using (var compressedStream = new MemoryStream())
+        using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
         {
-            using (var compressedStream = new MemoryStream())
-            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
-            {
-                zipStream.Write(data, 0, data.Length);
-                zipStream.Close();
-                return compressedStream.ToArray();
-            }
+            zipStream.Write(data, 0, data.Length);
+            zipStream.Close();
+            return compressedStream.ToArray();
         }
+    }
 
-        private static byte[] Decompress(byte[] data)
+    private static byte[] Decompress(byte[] data)
+    {
+        using (var compressedStream = new MemoryStream(data))
+        using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+        using (var resultStream = new MemoryStream())
         {
-            using (var compressedStream = new MemoryStream(data))
-            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
-            using (var resultStream = new MemoryStream())
-            {
-                zipStream.CopyTo(resultStream);
-                return resultStream.ToArray();
-            }
+            zipStream.CopyTo(resultStream);
+            return resultStream.ToArray();
         }
     }
 }

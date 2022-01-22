@@ -1,12 +1,11 @@
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+public interface ICloseController
 {
-    public interface ICloseController
-    {
-        void Close();
-    }
+    void Close();
+}
     
-    public interface ICloseController<in TValue>
-    {
-        void Close(TValue value);
-    }
+public interface ICloseController<in TValue>
+{
+    void Close(TValue value);
 }

@@ -1,9 +1,8 @@
 using KellermanSoftware.CompareNetObjects;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+public interface IComparisonService
 {
-    public interface IComparisonService
-    {
-        ComparisonResult Compare(object first, object second);
-    }
+    ComparisonResult Compare(object first, object second);
 }

@@ -1,7 +1,6 @@
-﻿namespace PoeShared.Prism
+﻿namespace PoeShared.Prism;
+
+public static class WellKnownDispatchers
 {
-    public static class WellKnownDispatchers
-    {
-        public const string UI = "UiDispatcher";
-    }
+    public const string UI = "UiDispatcher";
 }

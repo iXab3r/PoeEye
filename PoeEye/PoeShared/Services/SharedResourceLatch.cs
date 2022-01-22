@@ -6,50 +6,49 @@ using PoeShared.Logging;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+internal sealed class SharedResourceLatch : DisposableReactiveObject, ISharedResourceLatch
 {
-    internal sealed class SharedResourceLatch : DisposableReactiveObject, ISharedResourceLatch
+    private static readonly IFluentLog Log = typeof(SharedResourceLatch).PrepareLogger();
+
+    private long counter = 0;
+
+    public bool IsBusy => counter > 0;
+
+    public string Name { get; set; }
+
+    public IDisposable Rent()
     {
-        private static readonly IFluentLog Log = typeof(SharedResourceLatch).PrepareLogger();
-
-        private long counter = 0;
-
-        public bool IsBusy => counter > 0;
-
-        public string Name { get; set; }
-
-        public IDisposable Rent()
+        var wasPaused = IsBusy;
+        var counterAfterIncrement = Interlocked.Increment(ref counter);
+        if (!wasPaused)
         {
-            var wasPaused = IsBusy;
-            var counterAfterIncrement = Interlocked.Increment(ref counter);
-            if (!wasPaused)
+            Log.Debug(() => $"[{this}] Marked as busy: {counterAfterIncrement}");
+            RaisePropertyChanged(nameof(IsBusy));
+        }
+        else
+        {
+            Log.Debug(() => $"[{this}] Already in use: {counterAfterIncrement}");
+        }
+
+        return Disposable.Create(() =>
+        {
+            var counterAfterDecrement = Interlocked.Decrement(ref counter);
+            if (!IsBusy)
             {
-                Log.Debug(() => $"[{this}] Marked as busy: {counterAfterIncrement}");
+                Log.Debug(() => $"[{this}] Released: {counterAfterDecrement}");
                 RaisePropertyChanged(nameof(IsBusy));
             }
             else
             {
-                Log.Debug(() => $"[{this}] Already in use: {counterAfterIncrement}");
+                Log.Debug(() => $"[{this}] Still in use: {counterAfterDecrement}");
             }
+        });
+    }
 
-            return Disposable.Create(() =>
-            {
-                var counterAfterDecrement = Interlocked.Decrement(ref counter);
-                if (!IsBusy)
-                {
-                    Log.Debug(() => $"[{this}] Released: {counterAfterDecrement}");
-                    RaisePropertyChanged(nameof(IsBusy));
-                }
-                else
-                {
-                    Log.Debug(() => $"[{this}] Still in use: {counterAfterDecrement}");
-                }
-            });
-        }
-
-        public override string ToString()
-        {
-            return $"{Name}Latch({counter})";
-        }
+    public override string ToString()
+    {
+        return $"{Name}Latch({counter})";
     }
 }

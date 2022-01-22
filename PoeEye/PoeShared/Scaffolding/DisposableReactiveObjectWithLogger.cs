@@ -1,22 +1,21 @@
 ﻿using System;
 using PoeShared.Logging;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+public abstract class DisposableReactiveObjectWithLogger : DisposableReactiveObject
 {
-    public abstract class DisposableReactiveObjectWithLogger : DisposableReactiveObject
-    {
-        private readonly Lazy<IFluentLog> logSupplier;
+    private readonly Lazy<IFluentLog> logSupplier;
         
-        protected DisposableReactiveObjectWithLogger()
-        {
-            logSupplier = new Lazy<IFluentLog>(PrepareLogger);
-        }
+    protected DisposableReactiveObjectWithLogger()
+    {
+        logSupplier = new Lazy<IFluentLog>(PrepareLogger);
+    }
 
-        protected IFluentLog Log => logSupplier.Value;
+    protected IFluentLog Log => logSupplier.Value;
 
-        protected virtual IFluentLog PrepareLogger()
-        {
-            return GetType().PrepareLogger();
-        }
+    protected virtual IFluentLog PrepareLogger()
+    {
+        return GetType().PrepareLogger();
     }
 }

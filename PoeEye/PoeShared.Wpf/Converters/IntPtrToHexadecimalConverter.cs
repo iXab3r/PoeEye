@@ -4,32 +4,31 @@ using System.Windows.Data;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class IntPtrToHexadecimalConverter : IValueConverter
 {
-    public sealed class IntPtrToHexadecimalConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        if (value is IntPtr ptr)
         {
-            if (value is IntPtr ptr)
-            {
-                return ptr.ToHexadecimal();
-            } else if (value is int intPtr)
-            {
-                return intPtr.ToHexadecimal();
-            } else if (value is uint uintPtr)
-            {
-                return uintPtr.ToHexadecimal();
-            } else if (value is long longPtr)
-            {
-                return longPtr.ToHexadecimal();
-            }
-
-            return Binding.DoNothing;
+            return ptr.ToHexadecimal();
+        } else if (value is int intPtr)
+        {
+            return intPtr.ToHexadecimal();
+        } else if (value is uint uintPtr)
+        {
+            return uintPtr.ToHexadecimal();
+        } else if (value is long longPtr)
+        {
+            return longPtr.ToHexadecimal();
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
+        return Binding.DoNothing;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }

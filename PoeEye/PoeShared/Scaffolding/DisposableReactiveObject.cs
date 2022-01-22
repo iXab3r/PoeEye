@@ -6,76 +6,75 @@ using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using ReactiveUI;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+public abstract class DisposableReactiveObject : IDisposableReactiveObject
 {
-    public abstract class DisposableReactiveObject : IDisposableReactiveObject
+    public CompositeDisposable Anchors { get; } = new CompositeDisposable();
+
+    public virtual void Dispose()
     {
-        public CompositeDisposable Anchors { get; } = new CompositeDisposable();
+        Anchors.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
-        public virtual void Dispose()
+    protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
+        TRet newValue,
+        [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<TRet>.Default.Equals(backingField, newValue))
         {
-            Anchors.Dispose();
-            GC.SuppressFinalize(this);
-        }
-
-        protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
-            TRet newValue,
-            [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<TRet>.Default.Equals(backingField, newValue))
-            {
-                return newValue;
-            }
-
-            return RaiseAndSet(ref backingField, newValue, propertyName);
-        }
-
-        protected TRet RaiseAndSet<TRet>(ref TRet backingField,
-            TRet newValue,
-            [CallerMemberName] string propertyName = null)
-        {
-            backingField = newValue;
-            RaisePropertyChanged(propertyName);
             return newValue;
         }
+
+        return RaiseAndSet(ref backingField, newValue, propertyName);
+    }
+
+    protected TRet RaiseAndSet<TRet>(ref TRet backingField,
+        TRet newValue,
+        [CallerMemberName] string propertyName = null)
+    {
+        backingField = newValue;
+        RaisePropertyChanged(propertyName);
+        return newValue;
+    }
         
-        public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        public void RaisePropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    public void RaisePropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
-        protected void AddDisposableResource<T>(Func<T> accessor) where T : IDisposable
+    protected void AddDisposableResource<T>(Func<T> accessor) where T : IDisposable
+    {
+        Disposable.Create(() =>
         {
-            Disposable.Create(() =>
-            {
-                var item = accessor();
-                item?.Dispose();
-            }).AddTo(Anchors);
-        }
+            var item = accessor();
+            item?.Dispose();
+        }).AddTo(Anchors);
+    }
 
-        protected static void EnsureUiThread()
+    protected static void EnsureUiThread()
+    {
+        if (!IsUiThread)
         {
-            if (!IsUiThread)
-            {
-                throw new InvalidOperationException($"Operation must be completed on UI thread");
-            }
+            throw new InvalidOperationException($"Operation must be completed on UI thread");
         }
+    }
         
-        protected static void EnsureNonUiThread()
+    protected static void EnsureNonUiThread()
+    {
+        if (IsUiThread)
         {
-            if (IsUiThread)
-            {
-                throw new InvalidOperationException($"Operation must be completed on non-UI thread");
-            }
+            throw new InvalidOperationException($"Operation must be completed on non-UI thread");
         }
+    }
 
-        protected static bool IsUiThread => Environment.CurrentManagedThreadId == 1;
+    protected static bool IsUiThread => Environment.CurrentManagedThreadId == 1;
         
-        public void RaisePropertyChanged(params string[] properties)
-        {
-            properties.ForEach(RaisePropertyChanged);
-        }
+    public void RaisePropertyChanged(params string[] properties)
+    {
+        properties.ForEach(RaisePropertyChanged);
     }
 }

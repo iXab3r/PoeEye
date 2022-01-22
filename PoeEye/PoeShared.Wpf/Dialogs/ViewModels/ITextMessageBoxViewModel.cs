@@ -1,15 +1,14 @@
 ﻿using PoeShared.Scaffolding.WPF;
 
-namespace PoeShared.Dialogs.ViewModels
+namespace PoeShared.Dialogs.ViewModels;
+
+internal interface ITextMessageBoxViewModel : IMessageBoxHostViewModel
 {
-    internal interface ITextMessageBoxViewModel : IMessageBoxHostViewModel
-    {
-        string Content { get; }
+    string Content { get; }
         
-        string ContentHint { get; }
+    string ContentHint { get; }
         
-        bool IsReadOnly { get; }
+    bool IsReadOnly { get; }
         
-        CommandWrapper CopyAllCommand { get; }
-    }
+    CommandWrapper CopyAllCommand { get; }
 }

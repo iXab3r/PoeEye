@@ -1,3 +1,15 @@
+global using System;
+global using System.Collections.Generic;
+global using System.IO;
+global using System.Linq;
+global using System;
+global using System.Drawing;
+global using System.Reactive.Disposables;
+global using System.Reactive.Linq;
+global using System.Threading.Tasks;
+global using PoeShared.Scaffolding; 
+global using PoeShared.Logging;
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -8,4 +20,3 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo("EyeAuras.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-

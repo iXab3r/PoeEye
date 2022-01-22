@@ -5,16 +5,15 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using ReactiveUI;
 
-namespace PoeShared.Audio.ViewModels
+namespace PoeShared.Audio.ViewModels;
+
+public interface IAudioNotificationSelectorViewModel : IDisposableReactiveObject
 {
-    public interface IAudioNotificationSelectorViewModel : IDisposableReactiveObject
-    {
-        string SelectedValue { get; set; }
+    string SelectedValue { get; set; }
         
-        float Volume { get; set; }
+    float Volume { get; set; }
         
-        ICommand PlayNotificationCommand { get; }
+    ICommand PlayNotificationCommand { get; }
         
-        ICommand SelectNotificationCommand { get; }
-    }
+    ICommand SelectNotificationCommand { get; }
 }

@@ -2,39 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+public static class EnumExtensions
 {
-    public static class EnumExtensions
+    public static T RemoveFlag<T>(this T flag, params T[] flagsToRemove) where T : Enum
     {
-        public static T RemoveFlag<T>(this T flag, params T[] flagsToRemove) where T : Enum
-        {
-            return flagsToRemove.Aggregate(flag, RemoveFlag);
-        }
+        return flagsToRemove.Aggregate(flag, RemoveFlag);
+    }
 
-        public static T RemoveFlag<T>(this T flag, T flagToRemove) where T : Enum
+    public static T RemoveFlag<T>(this T flag, T flagToRemove) where T : Enum
+    {
+        try
         {
-            try
+            if (!flag.HasFlag(flagToRemove))
             {
-                if (!flag.HasFlag(flagToRemove))
-                {
-                    return flag;
-                }
-
-                var maskValue = ~ Convert.ToInt64(flagToRemove);
-                var flagValue = Convert.ToInt64(flag);
-
-                return (T)Enum.ToObject(typeof(T), flagValue & maskValue);
+                return flag;
             }
-            catch (Exception ex)
-            {
-                throw new ArgumentException($"Could not remove flag value {flagToRemove} from {flag}, enum {typeof(T).Name}", ex);
-            }
+
+            var maskValue = ~ Convert.ToInt64(flagToRemove);
+            var flagValue = Convert.ToInt64(flag);
+
+            return (T)Enum.ToObject(typeof(T), flagValue & maskValue);
         }
-
-        public static IEnumerable<T> GetUniqueFlags<T>(this T flags)
-            where T : Enum 
+        catch (Exception ex)
         {
-            return from Enum value in Enum.GetValues(flags.GetType()) where flags.HasFlag(value) select (T)value;
+            throw new ArgumentException($"Could not remove flag value {flagToRemove} from {flag}, enum {typeof(T).Name}", ex);
         }
+    }
+
+    public static IEnumerable<T> GetUniqueFlags<T>(this T flags)
+        where T : Enum 
+    {
+        return from Enum value in Enum.GetValues(flags.GetType()) where flags.HasFlag(value) select (T)value;
     }
 }

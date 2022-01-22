@@ -7,41 +7,40 @@ using Microsoft.VisualBasic.Logging;
 using PoeShared.Logging;
 using PoeShared.UI;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF;
+
+public class BringSelectedItemIntoViewBehavior : Behavior<TreeView>
 {
-    public class BringSelectedItemIntoViewBehavior : Behavior<TreeView>
+    private static readonly IFluentLog Log = typeof(BringSelectedItemIntoViewBehavior).PrepareLogger();
+
+    private readonly SerialDisposable attachmentAnchor = new SerialDisposable();
+
+    protected override void OnAttached()
     {
-        private static readonly IFluentLog Log = typeof(BringSelectedItemIntoViewBehavior).PrepareLogger();
+        base.OnAttached();
 
-        private readonly SerialDisposable attachmentAnchor = new SerialDisposable();
+        var anchors = new CompositeDisposable();
+        attachmentAnchor.Disposable = anchors;
 
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-
-            var anchors = new CompositeDisposable();
-            attachmentAnchor.Disposable = anchors;
-
-            AssociatedObject
-                .Observe(TreeView.SelectedItemProperty)
-                .Select(_ => AssociatedObject.SelectedItem)
-                .OfType<TreeViewItem>()
-                .SubscribeSafe(treeViewItem =>
+        AssociatedObject
+            .Observe(TreeView.SelectedItemProperty)
+            .Select(_ => AssociatedObject.SelectedItem)
+            .OfType<TreeViewItem>()
+            .SubscribeSafe(treeViewItem =>
+            {
+                if (treeViewItem == null)
                 {
-                    if (treeViewItem == null)
-                    {
-                        return;
-                    }
-                    Log.Debug(() => $"Bringing item into view: {treeViewItem}");
-                    treeViewItem.BringIntoView();
-                }, Log.HandleUiException)
-                .AddTo(anchors);
-        }
+                    return;
+                }
+                Log.Debug(() => $"Bringing item into view: {treeViewItem}");
+                treeViewItem.BringIntoView();
+            }, Log.HandleUiException)
+            .AddTo(anchors);
+    }
 
-        protected override void OnDetaching()
-        {
-            base.OnDetaching();
-            attachmentAnchor.Disposable = null;
-        }
+    protected override void OnDetaching()
+    {
+        base.OnDetaching();
+        attachmentAnchor.Disposable = null;
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace PoeShared.Squirrel.Scaffolding
+namespace PoeShared.Squirrel.Scaffolding;
+
+public interface IReleasePackage
 {
-    public interface IReleasePackage
-    {
-        string InputPackageFile { get; }
+    string InputPackageFile { get; }
         
-        string ReleasePackageFile { get; }
-    }
+    string ReleasePackageFile { get; }
 }

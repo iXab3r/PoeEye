@@ -1,7 +1,6 @@
-﻿namespace PoeShared.Squirrel.Updater
+﻿namespace PoeShared.Squirrel.Updater;
+
+public interface IUpdaterWindowDisplayer
 {
-    public interface IUpdaterWindowDisplayer
-    {
-        bool? ShowDialog(UpdaterWindowArgs args);
-    }
+    bool? ShowDialog(UpdaterWindowArgs args);
 }

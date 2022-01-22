@@ -1,9 +1,8 @@
 ﻿using JetBrains.Annotations;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IStringMatcher
 {
-    public interface IStringMatcher
-    {
-        bool IsMatch([CanBeNull] string value);
-    }
+    bool IsMatch([CanBeNull] string value);
 }

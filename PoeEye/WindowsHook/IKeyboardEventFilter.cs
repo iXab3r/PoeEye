@@ -1,7 +1,6 @@
-﻿namespace WindowsHook
+﻿namespace WindowsHook;
+
+public interface IKeyboardEventFilter
 {
-    public interface IKeyboardEventFilter
-    {
-        bool ShouldProcess(KeyEventArgsExt eventArgs);
-    }
+    bool ShouldProcess(KeyEventArgsExt eventArgs);
 }

@@ -18,156 +18,155 @@ using PoeShared.UI.Providers;
 using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+internal sealed class ExceptionReportingService : DisposableReactiveObject, IExceptionReportingService
 {
-    internal sealed class ExceptionReportingService : DisposableReactiveObject, IExceptionReportingService
+    private static readonly IFluentLog Log = typeof(ExceptionReportingService).PrepareLogger();
+    private readonly IAppArguments appArguments;
+    private readonly IClock clock;
+    private readonly IApplicationAccessor applicationAccessor;
+    private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
+    private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
+    private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
+    private IExceptionReportHandler reportHandler;
+
+    public ExceptionReportingService(
+        IClock clock,
+        IApplicationAccessor applicationAccessor,
+        IFolderCleanerService cleanupService,
+        IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer,
+        IFactory<MetricsReportProvider> metricsProviderFactory,
+        IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
+        IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
+        IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
+        IFactory<ReportLastLogEventsProvider> lastLogEventsReportProviderFactory,
+        IFactory<WindowsEventLogReportItemProvider> windowsEventLogReportProviderFactory,
+        IAppArguments appArguments)
     {
-        private static readonly IFluentLog Log = typeof(ExceptionReportingService).PrepareLogger();
-        private readonly IAppArguments appArguments;
-        private readonly IClock clock;
-        private readonly IApplicationAccessor applicationAccessor;
-        private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
-        private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
-        private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
-        private IExceptionReportHandler reportHandler;
+        this.clock = clock;
+        this.applicationAccessor = applicationAccessor;
+        this.exceptionDialogDisplayer = exceptionDialogDisplayer;
+        this.appArguments = appArguments;
 
-        public ExceptionReportingService(
-            IClock clock,
-            IApplicationAccessor applicationAccessor,
-            IFolderCleanerService cleanupService,
-            IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer,
-            IFactory<MetricsReportProvider> metricsProviderFactory,
-            IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
-            IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
-            IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
-            IFactory<ReportLastLogEventsProvider> lastLogEventsReportProviderFactory,
-            IFactory<WindowsEventLogReportItemProvider> windowsEventLogReportProviderFactory,
-            IAppArguments appArguments)
+        Log.Debug("Initializing crashes housekeeping");
+        cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
+        cleanupService.CleanupTimeout = TimeSpan.FromHours(1);
+        cleanupService.FileTimeToLive = TimeSpan.FromDays(2);
+
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+        Dispatcher.CurrentDispatcher.UnhandledException += DispatcherOnUnhandledException;
+        TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+
+        Binder.SetExceptionHandler(BinderExceptionHandler);
+
+        SharedLog.Instance.Errors.SubscribeSafe(
+            ex => { ReportCrash(ex); }, Log.HandleException).AddTo(Anchors);
+
+        AddReportItemProvider(lastLogEventsReportProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(windowsEventLogReportProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);
+    }
+
+    public Task<ExceptionDialogConfig> PrepareConfig()
+    {
+        return Task.Run(() => PrepareConfigSafe(null));
+    }
+
+    public void SetReportConsumer(IExceptionReportHandler reportHandler)
+    {
+        if (this.reportHandler != null)
         {
-            this.clock = clock;
-            this.applicationAccessor = applicationAccessor;
-            this.exceptionDialogDisplayer = exceptionDialogDisplayer;
-            this.appArguments = appArguments;
+            throw new InvalidOperationException($"Report consumer is already configured to {this.reportHandler}");
+        }
+        Log.Debug(() => $"Setting report consumer to {this.reportHandler}");
+        this.reportHandler = reportHandler;
+    }
 
-            Log.Debug("Initializing crashes housekeeping");
-            cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
-            cleanupService.CleanupTimeout = TimeSpan.FromHours(1);
-            cleanupService.FileTimeToLive = TimeSpan.FromDays(2);
+    public IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider)
+    {
+        Log.Debug(() => $"Registering new report item provider: {reportItemProvider}");
+        reportItemProviders.Add(reportItemProvider);
+        return Disposable.Create(() =>
+        {
+            Log.Debug(() => $"Removing report item provider: {reportItemProvider}");
+            reportItemProviders.Remove(reportItemProvider);
+        });
+    }
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-            Dispatcher.CurrentDispatcher.UnhandledException += DispatcherOnUnhandledException;
-            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+    private void BinderExceptionHandler(object? sender, ExceptionEventArgs e)
+    {
+        ReportCrash(e.Exception, $"BinderException, sender: {sender}");
+    }
 
-            Binder.SetExceptionHandler(BinderExceptionHandler);
+    private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        ReportCrash(e.ExceptionObject as Exception, "CurrentDomainUnhandledException");
+    }
 
-            SharedLog.Instance.Errors.SubscribeSafe(
-                ex => { ReportCrash(ex); }, Log.HandleException).AddTo(Anchors);
+    private void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        ReportCrash(e.Exception, "DispatcherUnhandledException");
+    }
 
-            AddReportItemProvider(lastLogEventsReportProviderFactory.Create()).AddTo(Anchors);
-            AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
-            AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
-            AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);
-            AddReportItemProvider(windowsEventLogReportProviderFactory.Create()).AddTo(Anchors);
-            AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);
+    private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    {
+        if (!e.Observed && e.Exception.InnerExceptions.Count == 1 && e.Exception.InnerExceptions[0].GetType().Name == "Http2ConnectionException")
+        {
+            Log.Warn("Suppressing unobserved GRPC Http2 connection exception");
+            e.SetObserved();
+            return;
+        }
+        ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
+    }
+
+    private void ReportCrash(Exception exception, string developerMessage = "")
+    {
+        Log.Error($"Unhandled application exception({developerMessage})", exception);
+        using var @lock = exceptionReportGate.Enter();
+        if (appArguments.IsDebugMode || Debugger.IsAttached)
+        {
+            Debugger.Break();
         }
 
-        public Task<ExceptionDialogConfig> PrepareConfig()
-        {
-            return Task.Run(() => PrepareConfigSafe(null));
-        }
+        AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
+        TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
+        Dispatcher.CurrentDispatcher.UnhandledException -= DispatcherOnUnhandledException;
 
-        public void SetReportConsumer(IExceptionReportHandler reportHandler)
+        var config = PrepareConfigSafe(exception);
+
+        var reporter = exceptionDialogDisplayer.Create();
+        reporter.ShowDialog(config);
+
+        Log.Warn("Shutting down...");
+        applicationAccessor.Terminate(-1);
+    }
+
+    private ExceptionDialogConfig PrepareConfigSafe(Exception exception)
+    {
+        var basicConfig = new ExceptionDialogConfig
         {
-            if (this.reportHandler != null)
+            AppName = appArguments.AppName,
+            Title = $"{appArguments.AppTitle} Error Report",
+            Timestamp = clock.Now,
+            ReportHandler = reportHandler,
+            Exception = exception
+        };
+
+        try
+        {
+            return basicConfig with
             {
-                throw new InvalidOperationException($"Report consumer is already configured to {this.reportHandler}");
-            }
-            Log.Debug(() => $"Setting report consumer to {this.reportHandler}");
-            this.reportHandler = reportHandler;
-        }
-
-        public IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider)
-        {
-            Log.Debug(() => $"Registering new report item provider: {reportItemProvider}");
-            reportItemProviders.Add(reportItemProvider);
-            return Disposable.Create(() =>
-            {
-                Log.Debug(() => $"Removing report item provider: {reportItemProvider}");
-                reportItemProviders.Remove(reportItemProvider);
-            });
-        }
-
-        private void BinderExceptionHandler(object? sender, ExceptionEventArgs e)
-        {
-            ReportCrash(e.Exception, $"BinderException, sender: {sender}");
-        }
-
-        private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            ReportCrash(e.ExceptionObject as Exception, "CurrentDomainUnhandledException");
-        }
-
-        private void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            ReportCrash(e.Exception, "DispatcherUnhandledException");
-        }
-
-        private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
-        {
-            if (!e.Observed && e.Exception.InnerExceptions.Count == 1 && e.Exception.InnerExceptions[0].GetType().Name == "Http2ConnectionException")
-            {
-                Log.Warn("Suppressing unobserved GRPC Http2 connection exception");
-                e.SetObserved();
-                return;
-            }
-            ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
-        }
-
-        private void ReportCrash(Exception exception, string developerMessage = "")
-        {
-            Log.Error($"Unhandled application exception({developerMessage})", exception);
-            using var @lock = exceptionReportGate.Enter();
-            if (appArguments.IsDebugMode || Debugger.IsAttached)
-            {
-                Debugger.Break();
-            }
-
-            AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
-            TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
-            Dispatcher.CurrentDispatcher.UnhandledException -= DispatcherOnUnhandledException;
-
-            var config = PrepareConfigSafe(exception);
-
-            var reporter = exceptionDialogDisplayer.Create();
-            reporter.ShowDialog(config);
-
-            Log.Warn("Shutting down...");
-            applicationAccessor.Terminate(-1);
-        }
-
-        private ExceptionDialogConfig PrepareConfigSafe(Exception exception)
-        {
-            var basicConfig = new ExceptionDialogConfig
-            {
-                AppName = appArguments.AppName,
-                Title = $"{appArguments.AppTitle} Error Report",
-                Timestamp = clock.Now,
-                ReportHandler = reportHandler,
-                Exception = exception
+                ItemProviders = reportItemProviders.Items.ToArray()
             };
-
-            try
-            {
-                return basicConfig with
-                {
-                    ItemProviders = reportItemProviders.Items.ToArray()
-                };
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to prepare extended exception config", e);
-                return basicConfig;
-            }
+        }
+        catch (Exception e)
+        {
+            Log.Warn("Failed to prepare extended exception config", e);
+            return basicConfig;
         }
     }
 }

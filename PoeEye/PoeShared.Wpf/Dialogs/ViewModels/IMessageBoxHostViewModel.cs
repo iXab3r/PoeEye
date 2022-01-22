@@ -1,18 +1,17 @@
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Dialogs.ViewModels
+namespace PoeShared.Dialogs.ViewModels;
+
+public interface IMessageBoxHost : IDisposableReactiveObject
 {
-    public interface IMessageBoxHost : IDisposableReactiveObject
-    {
-        bool IsOpen { get; set; }
+    bool IsOpen { get; set; }
         
-        bool CloseOnClickAway { get; }
-    }
+    bool CloseOnClickAway { get; }
+}
     
-    internal interface IMessageBoxHostViewModel : IMessageBoxHost
-    {
-        string Title { get; }
+internal interface IMessageBoxHostViewModel : IMessageBoxHost
+{
+    string Title { get; }
         
-        MessageBoxElement Result { get; }
-    }
+    MessageBoxElement Result { get; }
 }

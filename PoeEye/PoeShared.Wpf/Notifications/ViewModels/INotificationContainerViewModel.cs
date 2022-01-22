@@ -3,18 +3,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Notifications.ViewModels
+namespace PoeShared.Notifications.ViewModels;
+
+internal interface INotificationContainerViewModel : IDisposableReactiveObject
 {
-    internal interface INotificationContainerViewModel : IDisposableReactiveObject
-    {
-        TimeSpan TimeLeft { get; }
+    TimeSpan TimeLeft { get; }
         
-        ICommand CloseCommand { get; }
+    ICommand CloseCommand { get; }
         
-        string Title { get; }
+    string Title { get; }
         
-        ImageSource Icon { get; }
+    ImageSource Icon { get; }
         
-        INotificationViewModel Notification { get; }
-    }
+    INotificationViewModel Notification { get; }
 }

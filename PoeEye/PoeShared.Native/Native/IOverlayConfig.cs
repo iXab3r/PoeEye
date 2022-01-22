@@ -2,18 +2,17 @@
 using System.Drawing;
 using PoeShared.Modularity;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IOverlayConfig : IPoeEyeConfig
 {
-    public interface IOverlayConfig : IPoeEyeConfig
-    {
-        [Obsolete]
-        System.Windows.Point? OverlayLocation { get; set; }
+    [Obsolete]
+    System.Windows.Point? OverlayLocation { get; set; }
 
-        [Obsolete]
-        System.Windows.Size? OverlaySize { get; set; }
+    [Obsolete]
+    System.Windows.Size? OverlaySize { get; set; }
         
-        Rectangle OverlayBounds { get; set; }
+    Rectangle OverlayBounds { get; set; }
 
-        float OverlayOpacity { get; set; }
-    }
+    float OverlayOpacity { get; set; }
 }

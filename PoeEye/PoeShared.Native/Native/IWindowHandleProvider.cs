@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IWindowHandleProvider
 {
-    public interface IWindowHandleProvider
-    {
-        IWindowHandle GetByWindowHandle(IntPtr hwnd);
-    }
+    IWindowHandle GetByWindowHandle(IntPtr hwnd);
 }

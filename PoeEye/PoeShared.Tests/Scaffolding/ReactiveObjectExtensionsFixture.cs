@@ -4,36 +4,35 @@ using NUnit.Framework;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Tests.Scaffolding
+namespace PoeShared.Tests.Scaffolding;
+
+[TestFixture]
+public class ReactiveObjectExtensionsFixture
 {
-    [TestFixture]
-    public class ReactiveObjectExtensionsFixture
+    public interface ITestReactiveSource : IDisposableReactiveObject
     {
-        public interface ITestReactiveSource : IDisposableReactiveObject
-        {
-            int SourceValue { get; set; }
-        }
+        int SourceValue { get; set; }
+    }
 
-        public interface ITestReactiveTarget : IDisposableReactiveObject
-        {
-            string TargetValue { get; set; }
-        }
+    public interface ITestReactiveTarget : IDisposableReactiveObject
+    {
+        string TargetValue { get; set; }
+    }
 
-        [Test]
-        public void ShouldBindProperty()
-        {
-            //Given
-            var target = new Mock<ITestReactiveTarget>();
-            var source = new Mock<ITestReactiveSource>();
+    [Test]
+    public void ShouldBindProperty()
+    {
+        //Given
+        var target = new Mock<ITestReactiveTarget>();
+        var source = new Mock<ITestReactiveSource>();
 
-            var anchor = target.Object.RaiseWhenSourceValue(x => x.TargetValue, source.Object, x => x.SourceValue);
+        var anchor = target.Object.RaiseWhenSourceValue(x => x.TargetValue, source.Object, x => x.SourceValue);
 
-            //When
-            source.Raise(x => x.PropertyChanged += null, new PropertyChangedEventArgs(nameof(ITestReactiveSource.SourceValue)));
+        //When
+        source.Raise(x => x.PropertyChanged += null, new PropertyChangedEventArgs(nameof(ITestReactiveSource.SourceValue)));
 
-            //Then
-            target.Verify(x => x.RaisePropertyChanged(nameof(ITestReactiveTarget.TargetValue)),
-                Times.Once);
-        }
+        //Then
+        target.Verify(x => x.RaisePropertyChanged(nameof(ITestReactiveTarget.TargetValue)),
+            Times.Once);
     }
 }

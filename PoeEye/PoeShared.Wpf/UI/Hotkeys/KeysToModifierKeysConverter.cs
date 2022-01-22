@@ -4,13 +4,12 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+internal sealed class KeysToModifierKeysConverter : IConverter<Keys, ModifierKeys>
 {
-    internal sealed class KeysToModifierKeysConverter : IConverter<Keys, ModifierKeys>
+    public ModifierKeys Convert(Keys value)
     {
-        public ModifierKeys Convert(Keys value)
-        {
-            return value.ToModifiers();
-        }
+        return value.ToModifiers();
     }
 }

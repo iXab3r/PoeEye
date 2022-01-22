@@ -1,9 +1,8 @@
 using System;
 using Prism.Modularity;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+public interface IDynamicModule : IModule, IDisposable
 {
-    public interface IDynamicModule : IModule, IDisposable
-    {
-    }
 }

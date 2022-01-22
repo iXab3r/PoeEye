@@ -1,7 +1,6 @@
-﻿namespace WindowsHook
+﻿namespace WindowsHook;
+
+public interface IMouseEventFilter
 {
-    public interface IMouseEventFilter
-    {
-        bool ShouldProcess(MouseEventExtArgs eventArgs);
-    }
+    bool ShouldProcess(MouseEventExtArgs eventArgs);
 }

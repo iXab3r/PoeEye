@@ -9,186 +9,185 @@ using PoeShared.Logging;
 using Prism.Commands;
 using ReactiveUI;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF;
+
+public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 {
-    public sealed class CommandWrapper : DisposableReactiveObject, ICommand
+    private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
+
+    private readonly ISubject<bool> isExecuting = new Subject<bool>();
+    private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
+    private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
+
+    private CommandWrapper(DelegateCommandBase command)
     {
-        private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
+        Guard.ArgumentNotNull(command, nameof(command));
 
-        private readonly ISubject<bool> isExecuting = new Subject<bool>();
-        private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
-        private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
+        InnerCommand = command;
+        Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
+            .Select(x => command.IsActive)
+            .SubscribeSafe(x => IsBusy = x, Log.HandleUiException)
+            .AddTo(Anchors);
 
-        private CommandWrapper(DelegateCommandBase command)
-        {
-            Guard.ArgumentNotNull(command, nameof(command));
+        isExecuting
+            .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
+            .AddTo(Anchors);
 
-            InnerCommand = command;
-            Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
-                .Select(x => command.IsActive)
-                .SubscribeSafe(x => IsBusy = x, Log.HandleUiException)
-                .AddTo(Anchors);
-
-            isExecuting
-                .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
-                .AddTo(Anchors);
-
-            raiseCanExecuteChangedRequests
-                .SubscribeSafe(command.RaiseCanExecuteChanged, Log.HandleUiException)
-                .AddTo(Anchors);
-        }
+        raiseCanExecuteChangedRequests
+            .SubscribeSafe(command.RaiseCanExecuteChanged, Log.HandleUiException)
+            .AddTo(Anchors);
+    }
         
-        public IObservable<Exception> ThrownExceptions => thrownExceptions;
+    public IObservable<Exception> ThrownExceptions => thrownExceptions;
 
-        private CommandWrapper(ICommand command)
+    private CommandWrapper(ICommand command)
+    {
+        InnerCommand = command;
+    }
+
+    public bool IsBusy { get; set; }
+
+    public string Error { get; private set; }
+
+    public string Description { get; set; }
+
+    private ICommand InnerCommand { get; }
+
+    public bool CanExecute(object parameter)
+    {
+        try
         {
-            InnerCommand = command;
+            return InnerCommand.CanExecute(parameter);
         }
-
-        public bool IsBusy { get; set; }
-
-        public string Error { get; private set; }
-
-        public string Description { get; set; }
-
-        private ICommand InnerCommand { get; }
-
-        public bool CanExecute(object parameter)
+        catch (InvalidCastException)
         {
-            try
-            {
-                return InnerCommand.CanExecute(parameter);
-            }
-            catch (InvalidCastException)
-            {
-                return false;
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException($"CommandWrapper.CanExecute exception, parameter: {parameter}", e);
-            }
+            return false;
         }
-
-        public void Execute(object parameter)
+        catch (Exception e)
         {
-            ResetError();
-            try
-            {
-                isExecuting.OnNext(true);
-                InnerCommand.Execute(parameter);
-            }
-            catch (Exception ex)
-            {
-                HandleException(ex);
-            }
-            finally
-            {
-                isExecuting.OnNext(false);
-            }
+            throw new ApplicationException($"CommandWrapper.CanExecute exception, parameter: {parameter}", e);
         }
+    }
 
-        public void ResetError()
+    public void Execute(object parameter)
+    {
+        ResetError();
+        try
         {
-            Error = null;
+            isExecuting.OnNext(true);
+            InnerCommand.Execute(parameter);
         }
-
-        public event EventHandler CanExecuteChanged
+        catch (Exception ex)
         {
-            add => InnerCommand.CanExecuteChanged += value;
-            remove => InnerCommand.CanExecuteChanged -= value;
+            HandleException(ex);
         }
-
-        public static CommandWrapper Create<T>(DelegateCommand<T> command)
+        finally
         {
-            return new CommandWrapper(command);
+            isExecuting.OnNext(false);
         }
+    }
 
-        public static CommandWrapper Create(DelegateCommand command)
-        {
-            return new CommandWrapper(command);
-        }
+    public void ResetError()
+    {
+        Error = null;
+    }
 
-        public static CommandWrapper Create(Action execute)
-        {
-            return Create(new DelegateCommand(execute));
-        }
+    public event EventHandler CanExecuteChanged
+    {
+        add => InnerCommand.CanExecuteChanged += value;
+        remove => InnerCommand.CanExecuteChanged -= value;
+    }
 
-        private static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
-        {
-            var result = new CommandWrapper(command);
-            command.IsExecuting.SubscribeSafe(x => result.IsBusy = x, Log.HandleUiException).AddTo(result.Anchors);
-            command.ThrownExceptions.SubscribeSafe(result.HandleException, Log.HandleUiException).AddTo(result.Anchors);
-            result.raiseCanExecuteChangedRequests
-                .SubscribeSafe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"), Log.HandleUiException)
-                .AddTo(result.Anchors);
+    public static CommandWrapper Create<T>(DelegateCommand<T> command)
+    {
+        return new CommandWrapper(command);
+    }
 
-            return result;
-        }
+    public static CommandWrapper Create(DelegateCommand command)
+    {
+        return new CommandWrapper(command);
+    }
+
+    public static CommandWrapper Create(Action execute)
+    {
+        return Create(new DelegateCommand(execute));
+    }
+
+    private static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
+    {
+        var result = new CommandWrapper(command);
+        command.IsExecuting.SubscribeSafe(x => result.IsBusy = x, Log.HandleUiException).AddTo(result.Anchors);
+        command.ThrownExceptions.SubscribeSafe(result.HandleException, Log.HandleUiException).AddTo(result.Anchors);
+        result.raiseCanExecuteChangedRequests
+            .SubscribeSafe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"), Log.HandleUiException)
+            .AddTo(result.Anchors);
+
+        return result;
+    }
         
-        public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
-        {
-            return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute));
-        }
+    public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
+    {
+        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute));
+    }
 
-        public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
-        {
-            return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
-        }
+    public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
+    {
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
+    }
 
-        public static CommandWrapper Create(Func<Task> execute)
-        {
-            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
-        }
+    public static CommandWrapper Create(Func<Task> execute)
+    {
+        return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
+    }
 
-        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
-        {
-            return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
-        }
+    public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
+    {
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
+    }
 
-        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
-        {
-            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
-        }
+    public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
+    {
+        return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
+    }
 
-        public static CommandWrapper Create(Action execute, Func<bool> canExecute)
-        {
-            return Create(new DelegateCommand(execute, canExecute));
-        }
+    public static CommandWrapper Create(Action execute, Func<bool> canExecute)
+    {
+        return Create(new DelegateCommand(execute, canExecute));
+    }
 
-        public static CommandWrapper Create<T>(Action<T> execute, Func<T, bool> canExecute)
-        {
-            return Create(new DelegateCommand<T>(execute, canExecute));
-        }
+    public static CommandWrapper Create<T>(Action<T> execute, Func<T, bool> canExecute)
+    {
+        return Create(new DelegateCommand<T>(execute, canExecute));
+    }
 
-        public static CommandWrapper Create<T>(Action<T> execute)
-        {
-            return Create(new DelegateCommand<T>(execute));
-        }
+    public static CommandWrapper Create<T>(Action<T> execute)
+    {
+        return Create(new DelegateCommand<T>(execute));
+    }
 
-        public CommandWrapper RaiseCanExecuteChangedWhen<T>(IObservable<T> eventSource)
-        {
-            Guard.ArgumentNotNull(() => eventSource);
+    public CommandWrapper RaiseCanExecuteChangedWhen<T>(IObservable<T> eventSource)
+    {
+        Guard.ArgumentNotNull(() => eventSource);
 
-            return RaiseCanExecuteChangedWhen(eventSource.ToUnit());
-        }
+        return RaiseCanExecuteChangedWhen(eventSource.ToUnit());
+    }
 
-        private CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)
-        {
-            Guard.ArgumentNotNull(() => eventSource);
+    private CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)
+    {
+        Guard.ArgumentNotNull(() => eventSource);
 
-            eventSource.SubscribeSafe(RaiseCanExecuteChanged, Log.HandleUiException).AddTo(Anchors);
-            return this;
-        }
+        eventSource.SubscribeSafe(RaiseCanExecuteChanged, Log.HandleUiException).AddTo(Anchors);
+        return this;
+    }
 
-        private void HandleException(Exception exception)
-        {
-            Log.HandleException(exception);
-            Error = exception.Message;
-        }
+    private void HandleException(Exception exception)
+    {
+        Log.HandleException(exception);
+        Error = exception.Message;
+    }
 
-        public void RaiseCanExecuteChanged()
-        {
-            raiseCanExecuteChangedRequests.OnNext(Unit.Default);
-        }
+    public void RaiseCanExecuteChanged()
+    {
+        raiseCanExecuteChangedRequests.OnNext(Unit.Default);
     }
 }

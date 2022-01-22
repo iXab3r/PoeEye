@@ -3,26 +3,25 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class NullToVisibilityConverter : IValueConverter
 {
-    public sealed class NullToVisibilityConverter : IValueConverter
+    public Visibility NullValue { get; set; } = Visibility.Collapsed;
+
+    public Visibility NotNullValue { get; set; } = Visibility.Visible;
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public Visibility NullValue { get; set; } = Visibility.Collapsed;
+        var isNull = ConverterHelpers.IsNullOrEmpty(value);
 
-        public Visibility NotNullValue { get; set; } = Visibility.Visible;
+        return isNull
+            ? NullValue
+            : NotNullValue;
+    }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var isNull = ConverterHelpers.IsNullOrEmpty(value);
-
-            return isNull
-                ? NullValue
-                : NotNullValue;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }

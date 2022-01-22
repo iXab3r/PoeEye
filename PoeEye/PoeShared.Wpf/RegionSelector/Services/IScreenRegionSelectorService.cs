@@ -1,10 +1,9 @@
 ﻿using System.Drawing;
 using System.Threading.Tasks;
 
-namespace PoeShared.RegionSelector.Services
+namespace PoeShared.RegionSelector.Services;
+
+public interface IScreenRegionSelectorService
 {
-    public interface IScreenRegionSelectorService
-    {
-        Task<RegionSelectorResult> SelectRegion(Size minSelection);
-    }
+    Task<RegionSelectorResult> SelectRegion(Size minSelection);
 }

@@ -2,16 +2,15 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+[JsonConverter(typeof(StringEnumConverter))]
+public enum MouseWheelAction
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum MouseWheelAction
-    {
-        [EnumMember(Value = nameof(None))]
-        None,
-        [EnumMember(Value = nameof(WheelUp))]
-        WheelUp,
-        [EnumMember(Value = nameof(WheelDown))]
-        WheelDown
-    }
+    [EnumMember(Value = nameof(None))]
+    None,
+    [EnumMember(Value = nameof(WheelUp))]
+    WheelUp,
+    [EnumMember(Value = nameof(WheelDown))]
+    WheelDown
 }

@@ -1,9 +1,8 @@
-﻿namespace PoeShared.UI
+﻿namespace PoeShared.UI;
+
+public enum MousePositionRecordingType
 {
-    public enum MousePositionRecordingType
-    {
-        None,
-        Absolute,
-        Relative
-    }
+    None,
+    Absolute,
+    Relative
 }

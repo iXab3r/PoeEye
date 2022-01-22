@@ -9,130 +9,129 @@ using System.Windows.Forms;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
-namespace WindowsHook.Implementation
+namespace WindowsHook.Implementation;
+
+internal abstract class EventFacade : DisposableReactiveObject, IKeyboardMouseEvents
 {
-    internal abstract class EventFacade : DisposableReactiveObject, IKeyboardMouseEvents
+    private static readonly IFluentLog SharedLog = typeof(EventFacade).PrepareLogger();
+
+    private readonly Lazy<KeyListener> keyListener;
+    private readonly Lazy<MouseListener> mouseListener;
+
+    protected EventFacade()
     {
-        private static readonly IFluentLog SharedLog = typeof(EventFacade).PrepareLogger();
-
-        private readonly Lazy<KeyListener> keyListener;
-        private readonly Lazy<MouseListener> mouseListener;
-
-        protected EventFacade()
+        Log = SharedLog.WithSuffix(ToString);
+        keyListener = new Lazy<KeyListener>(() =>
         {
-            Log = SharedLog.WithSuffix(ToString);
-            keyListener = new Lazy<KeyListener>(() =>
-            {
-                if (Anchors.IsDisposed)
-                {
-                    throw new ObjectDisposedException("Facade");
-                }
-
-                return CreateKeyListener().AddTo(Anchors);
-            });
-            mouseListener = new Lazy<MouseListener>(() =>
-            {
-                if (Anchors.IsDisposed)
-                {
-                    throw new ObjectDisposedException("Facade");
-                }
-                return CreateMouseListener().AddTo(Anchors);
-            });
-            Log.Debug("Created event facade");
-            Disposable.Create(() => Log.Debug("Disposed event facade")).AddTo(Anchors);
-        }
-        
-        protected IFluentLog Log { get; }
-
-        event KeyEventHandler IKeyboardEvents.KeyRaw
-        {
-            add => keyListener.Value.KeyRaw += value;
-            remove => keyListener.Value.KeyRaw += value;
-        }
-
-        public event KeyEventHandler KeyDown
-        {
-            add => keyListener.Value.KeyDown += value;
-            remove => keyListener.Value.KeyDown -= value;
-        }
-
-        public event KeyPressEventHandler KeyPress
-        {
-            add => keyListener.Value.KeyPress += value;
-            remove => keyListener.Value.KeyPress -= value;
-        }
-
-        public event KeyEventHandler KeyUp
-        {
-            add => keyListener.Value.KeyUp += value;
-            remove => keyListener.Value.KeyUp -= value;
-        }
-
-        event EventHandler<MouseEventExtArgs> IMouseEvents.MouseRaw
-        {
-            add => mouseListener.Value.MouseRaw += value;
-            remove => mouseListener.Value.MouseRaw += value;
-        }
-
-        public event EventHandler<MouseEventExtArgs> MouseMoveExt
-        {
-            add => mouseListener.Value.MouseMoveExt += value;
-            remove => mouseListener.Value.MouseMoveExt -= value;
-        }
-
-        public event EventHandler<MouseEventExtArgs> MouseDownExt
-        {
-            add => mouseListener.Value.MouseDownExt += value;
-            remove => mouseListener.Value.MouseDownExt -= value;
-        }
-
-        public event EventHandler<MouseEventExtArgs> MouseUpExt
-        {
-            add => mouseListener.Value.MouseUpExt += value;
-            remove => mouseListener.Value.MouseUpExt -= value;
-        }
-
-        public event EventHandler<MouseEventExtArgs> MouseWheelExt
-        {
-            add => mouseListener.Value.MouseWheelExt += value;
-            remove => mouseListener.Value.MouseWheelExt -= value;
-        }
-
-        public event EventHandler<MouseEventExtArgs> MouseDragStartedExt
-        {
-            add => mouseListener.Value.MouseDragStartedExt += value;
-            remove => mouseListener.Value.MouseDragStartedExt -= value;
-        }
-
-        public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt
-        {
-            add => mouseListener.Value.MouseDragFinishedExt += value;
-            remove => mouseListener.Value.MouseDragFinishedExt -= value;
-        }
-
-        protected abstract MouseListener CreateMouseListener();
-        protected abstract KeyListener CreateKeyListener();
-
-        public override string ToString()
-        {
-            var result = new StringBuilder("Facade");
-
             if (Anchors.IsDisposed)
             {
-                result.Append(" Disposed");
+                throw new ObjectDisposedException("Facade");
             }
 
-            if (mouseListener.IsValueCreated)
+            return CreateKeyListener().AddTo(Anchors);
+        });
+        mouseListener = new Lazy<MouseListener>(() =>
+        {
+            if (Anchors.IsDisposed)
             {
-                result.Append($" Mouse: {mouseListener.Value}");
+                throw new ObjectDisposedException("Facade");
             }
+            return CreateMouseListener().AddTo(Anchors);
+        });
+        Log.Debug("Created event facade");
+        Disposable.Create(() => Log.Debug("Disposed event facade")).AddTo(Anchors);
+    }
+        
+    protected IFluentLog Log { get; }
 
-            if (keyListener.IsValueCreated)
-            {
-                result.Append($" Keyboard: {keyListener.Value}");
-            }
+    event KeyEventHandler IKeyboardEvents.KeyRaw
+    {
+        add => keyListener.Value.KeyRaw += value;
+        remove => keyListener.Value.KeyRaw += value;
+    }
 
-            return result.ToString();
+    public event KeyEventHandler KeyDown
+    {
+        add => keyListener.Value.KeyDown += value;
+        remove => keyListener.Value.KeyDown -= value;
+    }
+
+    public event KeyPressEventHandler KeyPress
+    {
+        add => keyListener.Value.KeyPress += value;
+        remove => keyListener.Value.KeyPress -= value;
+    }
+
+    public event KeyEventHandler KeyUp
+    {
+        add => keyListener.Value.KeyUp += value;
+        remove => keyListener.Value.KeyUp -= value;
+    }
+
+    event EventHandler<MouseEventExtArgs> IMouseEvents.MouseRaw
+    {
+        add => mouseListener.Value.MouseRaw += value;
+        remove => mouseListener.Value.MouseRaw += value;
+    }
+
+    public event EventHandler<MouseEventExtArgs> MouseMoveExt
+    {
+        add => mouseListener.Value.MouseMoveExt += value;
+        remove => mouseListener.Value.MouseMoveExt -= value;
+    }
+
+    public event EventHandler<MouseEventExtArgs> MouseDownExt
+    {
+        add => mouseListener.Value.MouseDownExt += value;
+        remove => mouseListener.Value.MouseDownExt -= value;
+    }
+
+    public event EventHandler<MouseEventExtArgs> MouseUpExt
+    {
+        add => mouseListener.Value.MouseUpExt += value;
+        remove => mouseListener.Value.MouseUpExt -= value;
+    }
+
+    public event EventHandler<MouseEventExtArgs> MouseWheelExt
+    {
+        add => mouseListener.Value.MouseWheelExt += value;
+        remove => mouseListener.Value.MouseWheelExt -= value;
+    }
+
+    public event EventHandler<MouseEventExtArgs> MouseDragStartedExt
+    {
+        add => mouseListener.Value.MouseDragStartedExt += value;
+        remove => mouseListener.Value.MouseDragStartedExt -= value;
+    }
+
+    public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt
+    {
+        add => mouseListener.Value.MouseDragFinishedExt += value;
+        remove => mouseListener.Value.MouseDragFinishedExt -= value;
+    }
+
+    protected abstract MouseListener CreateMouseListener();
+    protected abstract KeyListener CreateKeyListener();
+
+    public override string ToString()
+    {
+        var result = new StringBuilder("Facade");
+
+        if (Anchors.IsDisposed)
+        {
+            result.Append(" Disposed");
         }
+
+        if (mouseListener.IsValueCreated)
+        {
+            result.Append($" Mouse: {mouseListener.Value}");
+        }
+
+        if (keyListener.IsValueCreated)
+        {
+            result.Append($" Keyboard: {keyListener.Value}");
+        }
+
+        return result.ToString();
     }
 }

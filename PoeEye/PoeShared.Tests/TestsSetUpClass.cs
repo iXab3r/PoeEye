@@ -9,62 +9,61 @@ using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 using PropertyBinder.Diagnostics;
 
-namespace PoeShared.Tests
+namespace PoeShared.Tests;
+
+[SetUpFixture]
+public class TestsSetUpClass
 {
-    [SetUpFixture]
-    public class TestsSetUpClass
+    [OneTimeSetUp]
+    public void RunBeforeAnyTests()
     {
-        [OneTimeSetUp]
-        public void RunBeforeAnyTests()
-        {
-            SharedLog.Instance.LoadLogConfiguration(new FileInfo("log4net.tests.config"));
-            Binder.SetTracer(new BinderLogger());
-            Binder.DebugMode = true;
+        SharedLog.Instance.LoadLogConfiguration(new FileInfo("log4net.tests.config"));
+        Binder.SetTracer(new BinderLogger());
+        Binder.DebugMode = true;
 
-            SharedLog.Instance.Errors.Subscribe(
-                ex =>
+        SharedLog.Instance.Errors.Subscribe(
+            ex =>
+            {
+                if (Debugger.IsAttached)
                 {
-                    if (Debugger.IsAttached)
-                    {
-                        Debugger.Break();
-                    }
+                    Debugger.Break();
+                }
 
-                    throw ex;
-                });
+                throw ex;
+            });
+    }
+
+    private sealed class BinderLogger : IBindingTracer
+    {
+        private readonly IFluentLog log = typeof(TestsSetUpClass).PrepareLogger();
+            
+        public BinderLogger()
+        {
         }
 
-        private sealed class BinderLogger : IBindingTracer
+        public void OnScheduled(string bindingDescription)
         {
-            private readonly IFluentLog log = typeof(TestsSetUpClass).PrepareLogger();
-            
-            public BinderLogger()
-            {
-            }
+            log.WithPrefix(nameof(OnScheduled)).Debug(bindingDescription);
+        }
 
-            public void OnScheduled(string bindingDescription)
-            {
-                log.WithPrefix(nameof(OnScheduled)).Debug(bindingDescription);
-            }
+        public void OnIgnored(string bindingDescription)
+        {
+            log.WithPrefix(nameof(OnIgnored)).Debug(bindingDescription);
+        }
 
-            public void OnIgnored(string bindingDescription)
-            {
-                log.WithPrefix(nameof(OnIgnored)).Debug(bindingDescription);
-            }
+        public void OnStarted(string bindingDescription)
+        {
+            log.WithPrefix(nameof(OnStarted)).Debug(bindingDescription);
+        }
 
-            public void OnStarted(string bindingDescription)
-            {
-                log.WithPrefix(nameof(OnStarted)).Debug(bindingDescription);
-            }
+        public void OnEnded(string bindingDescription)
+        {
+            log.WithPrefix(nameof(OnEnded)).Debug(bindingDescription);
+        }
 
-            public void OnEnded(string bindingDescription)
-            {
-                log.WithPrefix(nameof(OnEnded)).Debug(bindingDescription);
-            }
-
-            public void OnException(Exception ex)
-            {
-                log.WithPrefix(nameof(OnException)).Error("Binding error", ex);
-            }
+        public void OnException(Exception ex)
+        {
+            log.WithPrefix(nameof(OnException)).Error("Binding error", ex);
         }
     }
 }

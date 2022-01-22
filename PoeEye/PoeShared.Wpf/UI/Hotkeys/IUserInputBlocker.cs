@@ -1,9 +1,8 @@
 using System;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IUserInputBlocker
 {
-    public interface IUserInputBlocker
-    {
-        IDisposable Block(UserInputBlockType inputBlockType);
-    }
+    IDisposable Block(UserInputBlockType inputBlockType);
 }

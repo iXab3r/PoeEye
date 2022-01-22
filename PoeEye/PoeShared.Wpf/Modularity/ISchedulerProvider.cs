@@ -1,11 +1,10 @@
 ﻿using System.Reactive.Concurrency;
 using JetBrains.Annotations;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+public interface ISchedulerProvider
 {
-    public interface ISchedulerProvider
-    {
-        [NotNull]
-        IScheduler GetOrCreate([NotNull] string name);
-    }
+    [NotNull]
+    IScheduler GetOrCreate([NotNull] string name);
 }

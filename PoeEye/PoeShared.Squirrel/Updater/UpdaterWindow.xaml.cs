@@ -1,10 +1,9 @@
-﻿namespace PoeShared.Squirrel.Updater
+﻿namespace PoeShared.Squirrel.Updater;
+
+internal partial class UpdaterWindow
 {
-    internal partial class UpdaterWindow
+    public UpdaterWindow()
     {
-        public UpdaterWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

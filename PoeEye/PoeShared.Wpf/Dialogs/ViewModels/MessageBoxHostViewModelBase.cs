@@ -7,38 +7,37 @@ using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 
-namespace PoeShared.Dialogs.ViewModels
+namespace PoeShared.Dialogs.ViewModels;
+
+internal abstract class MessageBoxHostViewModelBase : DisposableReactiveObject, IMessageBoxHostViewModel, ICloseController
 {
-    internal abstract class MessageBoxHostViewModelBase : DisposableReactiveObject, IMessageBoxHostViewModel, ICloseController
+    private static readonly IFluentLog Log = typeof(MessageBoxHostViewModelBase).PrepareLogger();
+
+    public MessageBoxHostViewModelBase()
     {
-        private static readonly IFluentLog Log = typeof(MessageBoxHostViewModelBase).PrepareLogger();
-
-        public MessageBoxHostViewModelBase()
+        CloseMessageBoxCommand = CommandWrapper.Create<MessageBoxElement?>(x =>
         {
-            CloseMessageBoxCommand = CommandWrapper.Create<MessageBoxElement?>(x =>
-            {
-                Result = x ?? default;
-                Close();
-            });
-        }
+            Result = x ?? default;
+            Close();
+        });
+    }
 
-        public CommandWrapper CloseMessageBoxCommand { get; }
+    public CommandWrapper CloseMessageBoxCommand { get; }
 
-        public string Title { get; set; }
+    public string Title { get; set; }
 
-        public bool IsOpen { get; set; }
+    public bool IsOpen { get; set; }
         
-        public bool CloseOnClickAway { get; protected set; }
+    public bool CloseOnClickAway { get; protected set; }
 
-        public MessageBoxElement Result { get; private set; }
+    public MessageBoxElement Result { get; private set; }
         
-        public ObservableCollection<MessageBoxElement> AvailableCommands { get; } = new();
+    public ObservableCollection<MessageBoxElement> AvailableCommands { get; } = new();
 
-        public MessageBoxElement DefaultCommand => AvailableCommands.FirstOrDefault();
+    public MessageBoxElement DefaultCommand => AvailableCommands.FirstOrDefault();
         
-        public void Close()
-        {
-            IsOpen = false;
-        }
+    public void Close()
+    {
+        IsOpen = false;
     }
 }

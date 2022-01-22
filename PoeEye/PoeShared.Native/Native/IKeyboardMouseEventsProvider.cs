@@ -2,11 +2,10 @@
 using System.Reactive.Concurrency;
 using WindowsHook;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+internal interface IKeyboardMouseEventsProvider
 {
-    internal interface IKeyboardMouseEventsProvider
-    {
-        IObservable<IKeyboardMouseEvents> System { get; }
-        IObservable<IKeyboardMouseEvents> Application { get; }
-    }
+    IObservable<IKeyboardMouseEvents> System { get; }
+    IObservable<IKeyboardMouseEvents> Application { get; }
 }

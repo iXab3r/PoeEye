@@ -8,149 +8,148 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Scaffolding;
+
+public static class DependencyObjectExtensions
 {
-    public static class DependencyObjectExtensions
+    public static IEnumerable<DependencyObject> VisualDescendants(this DependencyObject d)
     {
-        public static IEnumerable<DependencyObject> VisualDescendants(this DependencyObject d)
-        {
-            var tree = new Queue<DependencyObject>();
-            tree.Enqueue(d);
+        var tree = new Queue<DependencyObject>();
+        tree.Enqueue(d);
 
-            while (tree.Count > 0)
+        while (tree.Count > 0)
+        {
+            var item = tree.Dequeue();
+            var count = VisualTreeHelper.GetChildrenCount(item);
+            for (int i = 0; i < count; ++i)
             {
-                var item = tree.Dequeue();
-                var count = VisualTreeHelper.GetChildrenCount(item);
-                for (int i = 0; i < count; ++i)
-                {
-                    var child = VisualTreeHelper.GetChild(item, i);
-                    tree.Enqueue(child);
-                    yield return child;
-                }
+                var child = VisualTreeHelper.GetChild(item, i);
+                tree.Enqueue(child);
+                yield return child;
             }
         }
+    }
 
-        public static IEnumerable<DependencyObject> VisualAncestors(this DependencyObject d)
+    public static IEnumerable<DependencyObject> VisualAncestors(this DependencyObject d)
+    {
+        var parent = VisualTreeHelper.GetParent(d);
+        while (parent != null)
         {
-            var parent = VisualTreeHelper.GetParent(d);
-            while (parent != null)
-            {
-                yield return parent;
-                parent = VisualTreeHelper.GetParent(parent);
-            }
+            yield return parent;
+            parent = VisualTreeHelper.GetParent(parent);
         }
+    }
         
-        public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty, Func<T, TValue> selector)
-            where T : DependencyObject
-        {
-            return Observe(component, dependencyProperty)
-                .Select(_ => selector(component));
-        }
+    public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty, Func<T, TValue> selector)
+        where T : DependencyObject
+    {
+        return Observe(component, dependencyProperty)
+            .Select(_ => selector(component));
+    }
         
-        public static IObservable<EventArgs> Observe<T>(this T component, DependencyProperty dependencyProperty)
-            where T : DependencyObject
+    public static IObservable<EventArgs> Observe<T>(this T component, DependencyProperty dependencyProperty)
+        where T : DependencyObject
+    {
+        return Observable.Create<EventArgs>(observer =>
         {
-            return Observable.Create<EventArgs>(observer =>
-            {
-                EventHandler update = (sender, args) => observer.OnNext(args);
+            EventHandler update = (sender, args) => observer.OnNext(args);
 
-                var property = DependencyPropertyDescriptor.FromProperty(dependencyProperty, typeof(T));
-                property.AddValueChanged(component, update);
-                return Disposable.Create(() => property.RemoveValueChanged(component, update));
-            }).StartWithDefault();
-        }
+            var property = DependencyPropertyDescriptor.FromProperty(dependencyProperty, typeof(T));
+            property.AddValueChanged(component, update);
+            return Disposable.Create(() => property.RemoveValueChanged(component, update));
+        }).StartWithDefault();
+    }
         
-        public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty)
-            where T : DependencyObject
+    public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty)
+        where T : DependencyObject
+    {
+        return Observe(component, dependencyProperty).Select(_ => component.GetValue(dependencyProperty)).OfType<TValue>();
+    }
+
+    public static IEnumerable<T> FindVisualChildren<T>(this DependencyObject depObj) where T : DependencyObject
+    {
+        if (depObj == null)
         {
-            return Observe(component, dependencyProperty).Select(_ => component.GetValue(dependencyProperty)).OfType<TValue>();
+            yield break;
         }
 
-        public static IEnumerable<T> FindVisualChildren<T>(this DependencyObject depObj) where T : DependencyObject
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); ++i)
         {
-            if (depObj == null)
+            var child = VisualTreeHelper.GetChild(depObj, i);
+            if (child is T variable)
             {
-                yield break;
+                yield return variable;
             }
 
-            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); ++i)
+            foreach (var visualChild in child.FindVisualChildren<T>())
             {
-                var child = VisualTreeHelper.GetChild(depObj, i);
-                if (child is T variable)
-                {
-                    yield return variable;
-                }
-
-                foreach (var visualChild in child.FindVisualChildren<T>())
-                {
-                    yield return visualChild;
-                }
-
-                child = null;
-            }
-        }
-
-        public static IEnumerable<T> FindLogicalChildren<T>(this DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj == null)
-            {
-                yield break;
+                yield return visualChild;
             }
 
-            foreach (var dependencyObject in LogicalTreeHelper.GetChildren(depObj).OfType<DependencyObject>())
-            {
-                var child = dependencyObject;
-                if (child is T variable)
-                {
-                    yield return variable;
-                }
+            child = null;
+        }
+    }
 
-                foreach (var logicalChild in child.FindLogicalChildren<T>())
-                {
-                    yield return logicalChild;
-                }
-
-                child = null;
-            }
+    public static IEnumerable<T> FindLogicalChildren<T>(this DependencyObject depObj) where T : DependencyObject
+    {
+        if (depObj == null)
+        {
+            yield break;
         }
 
-        public static DependencyObject FindVisualTreeRoot(this DependencyObject initial)
+        foreach (var dependencyObject in LogicalTreeHelper.GetChildren(depObj).OfType<DependencyObject>())
         {
-            var dependencyObject1 = initial;
-            var dependencyObject2 = initial;
-            for (;
-                dependencyObject1 != null;
-                dependencyObject1 = dependencyObject1 is Visual || dependencyObject1 is Visual3D
-                    ? VisualTreeHelper.GetParent(dependencyObject1)
-                    : LogicalTreeHelper.GetParent(dependencyObject1))
+            var child = dependencyObject;
+            if (child is T variable)
             {
-                dependencyObject2 = dependencyObject1;
+                yield return variable;
             }
 
-            return dependencyObject2;
-        }
-
-        public static T FindVisualAncestor<T>(this DependencyObject dependencyObject) where T : class
-        {
-            var reference = dependencyObject;
-            do
+            foreach (var logicalChild in child.FindLogicalChildren<T>())
             {
-                reference = VisualTreeHelper.GetParent(reference);
-            } while (reference != null && !(reference is T));
+                yield return logicalChild;
+            }
 
-            return reference as T;
+            child = null;
         }
+    }
 
-        public static T FindLogicalAncestor<T>(this DependencyObject dependencyObject) where T : class
+    public static DependencyObject FindVisualTreeRoot(this DependencyObject initial)
+    {
+        var dependencyObject1 = initial;
+        var dependencyObject2 = initial;
+        for (;
+             dependencyObject1 != null;
+             dependencyObject1 = dependencyObject1 is Visual || dependencyObject1 is Visual3D
+                 ? VisualTreeHelper.GetParent(dependencyObject1)
+                 : LogicalTreeHelper.GetParent(dependencyObject1))
         {
-            var current = dependencyObject;
-            do
-            {
-                var reference = current;
-                current = LogicalTreeHelper.GetParent(current) ?? VisualTreeHelper.GetParent(reference);
-            } while (current != null && !(current is T));
-
-            return current as T;
+            dependencyObject2 = dependencyObject1;
         }
+
+        return dependencyObject2;
+    }
+
+    public static T FindVisualAncestor<T>(this DependencyObject dependencyObject) where T : class
+    {
+        var reference = dependencyObject;
+        do
+        {
+            reference = VisualTreeHelper.GetParent(reference);
+        } while (reference != null && !(reference is T));
+
+        return reference as T;
+    }
+
+    public static T FindLogicalAncestor<T>(this DependencyObject dependencyObject) where T : class
+    {
+        var current = dependencyObject;
+        do
+        {
+            var reference = current;
+            current = LogicalTreeHelper.GetParent(current) ?? VisualTreeHelper.GetParent(reference);
+        } while (current != null && !(current is T));
+
+        return current as T;
     }
 }

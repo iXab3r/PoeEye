@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace PoeShared
+namespace PoeShared;
+
+internal sealed class Clock : IClock
 {
-    internal sealed class Clock : IClock
-    {
-        private readonly Stopwatch sw = Stopwatch.StartNew();
+    private readonly Stopwatch sw = Stopwatch.StartNew();
         
-        public DateTime UtcNow => DateTime.UtcNow;
+    public DateTime UtcNow => DateTime.UtcNow;
         
-        public DateTime Now => DateTime.Now;
+    public DateTime Now => DateTime.Now;
 
-        public long Ticks => sw.ElapsedTicks;
+    public long Ticks => sw.ElapsedTicks;
         
-        public long Frequency => Stopwatch.Frequency;
+    public long Frequency => Stopwatch.Frequency;
 
-        public TimeSpan Elapsed => sw.Elapsed;
-    }
+    public TimeSpan Elapsed => sw.Elapsed;
 }

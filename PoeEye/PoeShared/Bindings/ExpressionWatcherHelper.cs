@@ -1,7 +1,6 @@
-﻿namespace PoeShared.Bindings
+﻿namespace PoeShared.Bindings;
+
+internal static class ExpressionWatcherHelper
 {
-    internal static class ExpressionWatcherHelper
-    {
-        public static long GlobalIdx;
-    }
+    public static long GlobalIdx;
 }

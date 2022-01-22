@@ -1,12 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace PoeShared.Scaffolding.WPF
-{
-    public interface IBusyController : INotifyPropertyChanged
-    {
-        bool IsBusy { get; }
+namespace PoeShared.Scaffolding.WPF;
 
-        IDisposable Busy();
-    }
+public interface IBusyController : INotifyPropertyChanged
+{
+    bool IsBusy { get; }
+
+    IDisposable Busy();
 }

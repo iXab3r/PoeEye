@@ -5,48 +5,47 @@ using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
 using PInvoke;
 
-namespace PoeShared.Native
-{
-    public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHandle>
-    {
-        string Title { [CanBeNull] get; }
-        
-        Rectangle WindowBounds { get; }
-        
-        Rectangle ClientBounds { get; }
-        
-        Rectangle DwmWindowBounds { get; }
-        
-        Rectangle ClientRectWithinMonitor { get; }
-        
-        Icon Icon { get; }
-        
-        BitmapSource IconBitmap { get; }
-        
-        string Class { get; }
-        
-        int ProcessId { get; }
-        
-        int ThreadId { get; }
-        
-        DateTime CreatedAt { get; }
-        
-        string ProcessPath { [CanBeNull] get; }
-        
-        string ProcessName { [CanBeNull] get; }
-        
-        string ProcessArgs { [CanBeNull] get; }
+namespace PoeShared.Native;
 
-        string CommandLine { [CanBeNull] get; }
+public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHandle>
+{
+    string Title { [CanBeNull] get; }
         
-        int ZOrder { get; set; }
+    Rectangle WindowBounds { get; }
         
-        User32.WindowStyles WindowStyle { get; }
+    Rectangle ClientBounds { get; }
         
-        User32.WindowStylesEx WindowStylesEx { get; }
+    Rectangle DwmWindowBounds { get; }
         
-        bool IsVisible { get; }
+    Rectangle ClientRectWithinMonitor { get; }
         
-        bool IsIconic { get; }
-    }
+    Icon Icon { get; }
+        
+    BitmapSource IconBitmap { get; }
+        
+    string Class { get; }
+        
+    int ProcessId { get; }
+        
+    int ThreadId { get; }
+        
+    DateTime CreatedAt { get; }
+        
+    string ProcessPath { [CanBeNull] get; }
+        
+    string ProcessName { [CanBeNull] get; }
+        
+    string ProcessArgs { [CanBeNull] get; }
+
+    string CommandLine { [CanBeNull] get; }
+        
+    int ZOrder { get; set; }
+        
+    User32.WindowStyles WindowStyle { get; }
+        
+    User32.WindowStylesEx WindowStylesEx { get; }
+        
+    bool IsVisible { get; }
+        
+    bool IsIconic { get; }
 }

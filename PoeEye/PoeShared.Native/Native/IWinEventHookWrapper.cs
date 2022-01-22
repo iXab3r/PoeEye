@@ -2,11 +2,10 @@
 using JetBrains.Annotations;
 using PInvoke;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IWinEventHookWrapper
 {
-    public interface IWinEventHookWrapper
-    {
-        [NotNull]
-        IObservable<WinEventHookData> WhenWindowEventTriggered { get; }
-    }
+    [NotNull]
+    IObservable<WinEventHookData> WhenWindowEventTriggered { get; }
 }

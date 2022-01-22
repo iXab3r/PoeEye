@@ -2,23 +2,22 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
-namespace WindowsHook.Implementation
-{
-    internal class AppEventFacade : EventFacade
-    {
-        protected override MouseListener CreateMouseListener()
-        {
-            return new AppMouseListener();
-        }
+namespace WindowsHook.Implementation;
 
-        protected override KeyListener CreateKeyListener()
-        {
-            return new AppKeyListener();
-        }
+internal class AppEventFacade : EventFacade
+{
+    protected override MouseListener CreateMouseListener()
+    {
+        return new AppMouseListener();
+    }
+
+    protected override KeyListener CreateKeyListener()
+    {
+        return new AppKeyListener();
+    }
         
-        public override string ToString()
-        {
-            return $"App {base.ToString()}";
-        }
+    public override string ToString()
+    {
+        return $"App {base.ToString()}";
     }
 }

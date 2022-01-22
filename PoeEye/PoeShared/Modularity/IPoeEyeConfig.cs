@@ -1,10 +1,9 @@
-﻿namespace PoeShared.Modularity
-{
-    public interface IPoeEyeConfig
-    {
-    }
+﻿namespace PoeShared.Modularity;
 
-    public interface IPoeEyeConfigVersioned : IPoeEyeConfig, IHasVersion
-    {
-    }
+public interface IPoeEyeConfig
+{
+}
+
+public interface IPoeEyeConfigVersioned : IPoeEyeConfig, IHasVersion
+{
 }

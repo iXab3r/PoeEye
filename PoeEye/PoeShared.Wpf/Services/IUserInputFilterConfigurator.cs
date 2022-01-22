@@ -1,10 +1,9 @@
 ﻿using System;
 using PoeShared.UI;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+public interface IUserInputFilterConfigurator
 {
-    public interface IUserInputFilterConfigurator
-    {
-        IDisposable AddToWhitelist(HotkeyGesture hotkey);
-    }
+    IDisposable AddToWhitelist(HotkeyGesture hotkey);
 }

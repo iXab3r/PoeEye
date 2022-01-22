@@ -11,89 +11,88 @@ using PoeShared.Squirrel.Core;
 using PoeShared.Squirrel.Scaffolding;
 using PoeShared.UI;
 
-namespace PoeShared.Squirrel.Updater
+namespace PoeShared.Squirrel.Updater;
+
+internal sealed class BasicAuthFileDownloader : IFileDownloader
 {
-    internal sealed class BasicAuthFileDownloader : IFileDownloader
+    private static readonly IFluentLog Log = typeof(BasicAuthFileDownloader).PrepareLogger();
+
+    private readonly NetworkCredential credentials;
+
+    public BasicAuthFileDownloader(NetworkCredential credentials)
     {
-        private static readonly IFluentLog Log = typeof(BasicAuthFileDownloader).PrepareLogger();
+        this.credentials = credentials;
+    }
 
-        private readonly NetworkCredential credentials;
-
-        public BasicAuthFileDownloader(NetworkCredential credentials)
+    public async Task DownloadFile(string url, string targetFile, Action<int> progress)
+    {
+        using (var wc = CreateClient())
         {
-            this.credentials = credentials;
-        }
-
-        public async Task DownloadFile(string url, string targetFile, Action<int> progress)
-        {
-            using (var wc = CreateClient())
+            using var progressAnchors = Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
+                    h => wc.DownloadProgressChanged += h,
+                    h => wc.DownloadProgressChanged -= h)
+                .Where(x => progress != null)
+                .Sample(UiConstants.UiThrottlingDelay)
+                .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
+            try
             {
-                using var progressAnchors = Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
-                        h => wc.DownloadProgressChanged += h,
-                        h => wc.DownloadProgressChanged -= h)
-                    .Where(x => progress != null)
-                    .Sample(UiConstants.UiThrottlingDelay)
-                    .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
-                try
-                {
-                    Log.Debug(() => $"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
-                    await wc.DownloadFileTaskAsync(url, targetFile);
-                    progress(100);
-                }
-                catch (Exception e)
-                {
-                    Log.Warn($"Failed to download {url} to {targetFile}", e);
-                    progress(0);
-                }
+                Log.Debug(() => $"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
+                await wc.DownloadFileTaskAsync(url, targetFile);
+                progress(100);
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Failed to download {url} to {targetFile}", e);
+                progress(0);
             }
         }
+    }
 
-        public async Task<byte[]> DownloadUrl(string url)
+    public async Task<byte[]> DownloadUrl(string url)
+    {
+        using (var wc = CreateClient())
         {
-            using (var wc = CreateClient())
-            {
-                Log.Debug(() => $"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
+            Log.Debug(() => $"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
 
-                return await wc.DownloadDataTaskAsync(url);
-            }
+            return await wc.DownloadDataTaskAsync(url);
+        }
+    }
+
+    public Task<long> GetSize(string url)
+    {
+        if (!string.IsNullOrEmpty(credentials.UserName))
+        {
+            throw new NotSupportedException("Operation is not supported for BasicAuth client with credentials");
         }
 
-        public Task<long> GetSize(string url)
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
-            if (!string.IsNullOrEmpty(credentials.UserName))
-            {
-                throw new NotSupportedException("Operation is not supported for BasicAuth client with credentials");
-            }
-
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                throw new FormatException($"Failed to parse URI: {uri}");
-            }
-
-            return Utility.GetRemoteFileSize(uri);
+            throw new FormatException($"Failed to parse URI: {uri}");
         }
 
-        private WebClient CreateClient()
+        return Utility.GetRemoteFileSize(uri);
+    }
+
+    private WebClient CreateClient()
+    {
+        var result = new WebClient
         {
-            var result = new WebClient
-            {
-                Credentials = credentials
-            };
+            Credentials = credentials
+        };
 
-            if (!string.IsNullOrEmpty(credentials.UserName))
+        if (!string.IsNullOrEmpty(credentials.UserName))
+        {
+            var credentialsBuilder = new StringBuilder();
+            credentialsBuilder.Append(credentials.UserName);
+            if (!string.IsNullOrEmpty(credentials.Password))
             {
-                var credentialsBuilder = new StringBuilder();
-                credentialsBuilder.Append(credentials.UserName);
-                if (!string.IsNullOrEmpty(credentials.Password))
-                {
-                    credentialsBuilder.Append($":{credentials.Password}");
-                }
-
-                var credentialsString = Convert.ToBase64String(Encoding.ASCII.GetBytes(credentialsBuilder.ToString()));
-                result.Headers[HttpRequestHeader.Authorization] = $"Basic {credentialsString}";
+                credentialsBuilder.Append($":{credentials.Password}");
             }
 
-            return result;
+            var credentialsString = Convert.ToBase64String(Encoding.ASCII.GetBytes(credentialsBuilder.ToString()));
+            result.Headers[HttpRequestHeader.Authorization] = $"Basic {credentialsString}";
         }
+
+        return result;
     }
 }

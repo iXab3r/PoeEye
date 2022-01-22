@@ -3,21 +3,20 @@ using JetBrains.Annotations;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+public interface IOverlayWindowController : IDisposableReactiveObject
 {
-    public interface IOverlayWindowController : IDisposableReactiveObject
-    {
-        bool IsVisible { get; }
+    bool IsVisible { get; }
         
-        bool IsEnabled { get; set; }
+    bool IsEnabled { get; set; }
         
-        bool ShowWireframes { get; set; }
+    bool ShowWireframes { get; set; }
         
-        IDisposable RegisterChild([NotNull] IOverlayViewModel viewModel);
+    IDisposable RegisterChild([NotNull] IOverlayViewModel viewModel);
 
-        void ActivateLastActiveWindow();
+    void ActivateLastActiveWindow();
 
-        [NotNull]
-        IOverlayViewModel[] GetChildren();
-    }
+    [NotNull]
+    IOverlayViewModel[] GetChildren();
 }

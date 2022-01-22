@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IExceptionReportItemProvider
 {
-    public interface IExceptionReportItemProvider
-    {
-        IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory);
-    }
+    IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory);
 }

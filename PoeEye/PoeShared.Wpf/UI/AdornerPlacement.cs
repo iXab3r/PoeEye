@@ -1,11 +1,10 @@
-﻿namespace PoeShared.UI
+﻿namespace PoeShared.UI;
+
+/// <summary>
+/// Specifies the placement of the adorner in related to the adorned control.
+/// </summary>
+public enum AdornerPlacement
 {
-    /// <summary>
-    /// Specifies the placement of the adorner in related to the adorned control.
-    /// </summary>
-    public enum AdornerPlacement
-    {
-        Inside,
-        Outside
-    }
+    Inside,
+    Outside
 }

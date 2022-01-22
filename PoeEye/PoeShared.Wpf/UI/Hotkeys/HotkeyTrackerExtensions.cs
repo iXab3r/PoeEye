@@ -1,10 +1,9 @@
-﻿namespace PoeShared.UI
+﻿namespace PoeShared.UI;
+
+public static class HotkeyTrackerExtensions
 {
-    public static class HotkeyTrackerExtensions
+    public static IHotkeyListener Listen(this IHotkeyTracker hotkeyTracker)
     {
-        public static IHotkeyListener Listen(this IHotkeyTracker hotkeyTracker)
-        {
-            return new HotkeyListener(hotkeyTracker);
-        }
+        return new HotkeyListener(hotkeyTracker);
     }
 }

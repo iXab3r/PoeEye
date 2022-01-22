@@ -1,19 +1,18 @@
 ﻿using System;
 
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+internal sealed class WindowTrackerTitleMatcher : IWindowTrackerMatcher
 {
-    internal sealed class WindowTrackerTitleMatcher : IWindowTrackerMatcher
+    private readonly IStringMatcher titleMatcher;
+
+    public WindowTrackerTitleMatcher(IStringMatcher titleMatcher)
     {
-        private readonly IStringMatcher titleMatcher;
+        this.titleMatcher = titleMatcher;
+    }
 
-        public WindowTrackerTitleMatcher(IStringMatcher titleMatcher)
-        {
-            this.titleMatcher = titleMatcher;
-        }
-
-        public bool IsMatch(string title, IntPtr hwnd, int processId)
-        {
-            return titleMatcher.IsMatch(title);
-        }
+    public bool IsMatch(string title, IntPtr hwnd, int processId)
+    {
+        return titleMatcher.IsMatch(title);
     }
 }

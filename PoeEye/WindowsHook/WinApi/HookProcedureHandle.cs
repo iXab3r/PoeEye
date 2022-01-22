@@ -8,66 +8,65 @@ using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
-namespace WindowsHook.WinApi
+namespace WindowsHook.WinApi;
+
+public sealed class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
 {
-    public sealed class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
+    private static readonly IFluentLog Log = typeof(HookProcedureHandle).PrepareLogger();
+    private static volatile bool ApplicationIsClosing;
+    private readonly User32.SafeHookHandle hookHandle;
+
+    static HookProcedureHandle()
     {
-        private static readonly IFluentLog Log = typeof(HookProcedureHandle).PrepareLogger();
-        private static volatile bool ApplicationIsClosing;
-        private readonly User32.SafeHookHandle hookHandle;
-
-        static HookProcedureHandle()
+        Application.ApplicationExit += (sender, e) =>
         {
-            Application.ApplicationExit += (sender, e) =>
-            {
-                ApplicationIsClosing = true;
-            };
+            ApplicationIsClosing = true;
+        };
+    }
+
+    public HookProcedureHandle(User32.SafeHookHandle hookHandle)
+        : base(true)
+    {
+        Log.Debug(() => $"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
+        this.hookHandle = hookHandle;
+        if (hookHandle.IsClosed || hookHandle.IsInvalid)
+        {
+            return;
+        }
+        SetHandle(hookHandle.DangerousGetHandle());
+    }
+
+    protected override bool ReleaseHandle()
+    {
+        //NOTE Calling Unhook during processexit causes delay
+        if (ApplicationIsClosing)
+        {
+            Log.Debug("Application is closing - do not need to release the hook");
+            return true;
         }
 
-        public HookProcedureHandle(User32.SafeHookHandle hookHandle)
-            : base(true)
+        if (hookHandle.IsInvalid)
         {
-            Log.Debug(() => $"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
-            this.hookHandle = hookHandle;
-            if (hookHandle.IsClosed || hookHandle.IsInvalid)
-            {
-                return;
-            }
-            SetHandle(hookHandle.DangerousGetHandle());
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            //NOTE Calling Unhook during processexit causes delay
-            if (ApplicationIsClosing)
-            {
-                Log.Debug("Application is closing - do not need to release the hook");
-                return true;
-            }
-
-            if (hookHandle.IsInvalid)
-            {
-                Log.Debug(() => $"Hook is invalid");
-                return false;
-            }
-            
-            if (hookHandle.IsClosed)
-            {
-                Log.Debug(() => $"Hook is already disposed");
-                return true;
-            }
-            
-            Log.Debug("Releasing hook...");
-            //The hook procedure can be in the state of being called by another thread even after UnhookWindowsHookEx returns.
-            //If the hook procedure is not being called concurrently, the hook procedure is removed immediately before UnhookWindowsHookEx returns.
-            hookHandle.Dispose();
-            if (hookHandle.IsClosed)
-            {
-                Log.Debug(() => $"Successfully removed hook");
-                return true;
-            }
-            Log.Warn($"Failed to remove hook"); // throw here ? 
+            Log.Debug(() => $"Hook is invalid");
             return false;
         }
+            
+        if (hookHandle.IsClosed)
+        {
+            Log.Debug(() => $"Hook is already disposed");
+            return true;
+        }
+            
+        Log.Debug("Releasing hook...");
+        //The hook procedure can be in the state of being called by another thread even after UnhookWindowsHookEx returns.
+        //If the hook procedure is not being called concurrently, the hook procedure is removed immediately before UnhookWindowsHookEx returns.
+        hookHandle.Dispose();
+        if (hookHandle.IsClosed)
+        {
+            Log.Debug(() => $"Successfully removed hook");
+            return true;
+        }
+        Log.Warn($"Failed to remove hook"); // throw here ? 
+        return false;
     }
 }

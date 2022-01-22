@@ -4,37 +4,36 @@ using System.Linq.Expressions;
 using System.Reactive;
 using JetBrains.Annotations;
 
-namespace PoeShared.Modularity
+namespace PoeShared.Modularity;
+
+public interface IConfigProvider<TConfig>
+    where TConfig : IPoeEyeConfig
 {
-    public interface IConfigProvider<TConfig>
-        where TConfig : IPoeEyeConfig
-    {
-        TConfig ActualConfig { [NotNull] get; }
+    TConfig ActualConfig { [NotNull] get; }
 
-        IObservable<TConfig> WhenChanged { [NotNull] get; }
+    IObservable<TConfig> WhenChanged { [NotNull] get; }
 
-        void Reload();
+    void Reload();
 
-        void Save([NotNull] TConfig config);
+    void Save([NotNull] TConfig config);
 
-        [NotNull]
-        IObservable<T> ListenTo<T>([NotNull] Expression<Func<TConfig, T>> fieldToMonitor);
-    }
+    [NotNull]
+    IObservable<T> ListenTo<T>([NotNull] Expression<Func<TConfig, T>> fieldToMonitor);
+}
 
-    public interface IConfigProvider
-    {
-        IObservable<Unit> ConfigHasChanged { [NotNull] get; }
+public interface IConfigProvider
+{
+    IObservable<Unit> ConfigHasChanged { [NotNull] get; }
 
-        IDisposable RegisterStrategy([NotNull] IConfigProviderStrategy strategy);
+    IDisposable RegisterStrategy([NotNull] IConfigProviderStrategy strategy);
         
-        void Reload();
+    void Reload();
 
-        void Save();
+    void Save();
         
-        void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
+    void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
 
-        void SaveToFile(FileInfo file);
+    void SaveToFile(FileInfo file);
 
-        TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();
-    }
+    TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();
 }

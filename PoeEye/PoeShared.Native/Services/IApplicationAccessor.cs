@@ -2,30 +2,29 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+public interface IApplicationAccessor : INotifyPropertyChanged
 {
-    public interface IApplicationAccessor : INotifyPropertyChanged
-    {
-        IObservable<int> WhenExit { get; }
+    IObservable<int> WhenExit { get; }
 
-        Task Exit();
+    Task Exit();
 
-        /// <summary>
-        ///  Terminates instantly
-        /// </summary>
-        void Terminate(int exitCode);
+    /// <summary>
+    ///  Terminates instantly
+    /// </summary>
+    void Terminate(int exitCode);
         
-        bool IsExiting { get; }
+    bool IsExiting { get; }
         
-        /// <summary>
-        ///  IsLoaded is set to true after main window is loaded
-        /// </summary>
-        bool IsLoaded { get; }
+    /// <summary>
+    ///  IsLoaded is set to true after main window is loaded
+    /// </summary>
+    bool IsLoaded { get; }
         
-        bool LastExitWasGraceful { get; }
+    bool LastExitWasGraceful { get; }
         
-        bool LastLoadWasSuccessful { get; }
+    bool LastLoadWasSuccessful { get; }
 
-        void ReportIsLoaded();
-    }
+    void ReportIsLoaded();
 }

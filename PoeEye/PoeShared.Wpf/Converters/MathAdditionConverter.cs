@@ -2,74 +2,73 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PoeShared.Converters
+namespace PoeShared.Converters;
+
+public sealed class MathAdditionConverter : IValueConverter
 {
-    public sealed class MathAdditionConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        parameter = ConvertToNumberType(parameter);
+
+        if (value is int && parameter is int)
         {
-            parameter = ConvertToNumberType(parameter);
-
-            if (value is int && parameter is int)
-            {
-                return (int)value + (int)parameter;
-            }
-
-            if (value is double && parameter is double)
-            {
-                return (double)value + (double)parameter;
-            }
-
-            if (value is double && parameter is int)
-            {
-                return (double)value + (int)parameter;
-            }
-
-            return Binding.DoNothing;
+            return (int)value + (int)parameter;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        if (value is double && parameter is double)
         {
-            if (value is int && parameter is int)
-            {
-                return (int)value - (int)parameter;
-            }
-
-            if (value is double && parameter is double)
-            {
-                return (double)value - (double)parameter;
-            }
-
-            if (value is double && parameter is int)
-            {
-                return (double)value - (int)parameter;
-            }
-
-            return Binding.DoNothing;
+            return (double)value + (double)parameter;
         }
 
-        private object ConvertToNumberType(object parameter)
+        if (value is double && parameter is int)
         {
-            if (!(parameter is string))
-            {
-                return parameter;
-            }
+            return (double)value + (int)parameter;
+        }
 
-            var stringParameter = (string)parameter;
+        return Binding.DoNothing;
+    }
 
-            int parsedInt;
-            if (int.TryParse(stringParameter, out parsedInt))
-            {
-                return parsedInt;
-            }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int && parameter is int)
+        {
+            return (int)value - (int)parameter;
+        }
 
-            double parsedDouble;
-            if (double.TryParse(stringParameter, out parsedDouble))
-            {
-                return parsedDouble;
-            }
+        if (value is double && parameter is double)
+        {
+            return (double)value - (double)parameter;
+        }
 
+        if (value is double && parameter is int)
+        {
+            return (double)value - (int)parameter;
+        }
+
+        return Binding.DoNothing;
+    }
+
+    private object ConvertToNumberType(object parameter)
+    {
+        if (!(parameter is string))
+        {
             return parameter;
         }
+
+        var stringParameter = (string)parameter;
+
+        int parsedInt;
+        if (int.TryParse(stringParameter, out parsedInt))
+        {
+            return parsedInt;
+        }
+
+        double parsedDouble;
+        if (double.TryParse(stringParameter, out parsedDouble))
+        {
+            return parsedDouble;
+        }
+
+        return parameter;
     }
 }

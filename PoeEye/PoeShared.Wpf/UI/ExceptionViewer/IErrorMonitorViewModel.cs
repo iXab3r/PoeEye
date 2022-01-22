@@ -1,10 +1,9 @@
 ﻿using PoeShared.Scaffolding.WPF;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+public interface IErrorMonitorViewModel
 {
-    public interface IErrorMonitorViewModel
-    {
-        CommandWrapper ReportProblemCommand { get; }
-        CommandWrapper ThrowExceptionCommand { get; }
-    }
+    CommandWrapper ReportProblemCommand { get; }
+    CommandWrapper ThrowExceptionCommand { get; }
 }

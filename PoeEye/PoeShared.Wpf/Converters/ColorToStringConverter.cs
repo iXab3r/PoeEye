@@ -3,36 +3,35 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace PoeShared.Converters
-{
-    public class ColorToStringConverter : IValueConverter
-    {
-        private readonly ColorConverter colorConverter = new ColorConverter();
-        
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is Color valueColor)
-            {
-                return colorConverter.ConvertTo(valueColor, typeof(string));
-            }
+namespace PoeShared.Converters;
 
-            return null;
+public class ColorToStringConverter : IValueConverter
+{
+    private readonly ColorConverter colorConverter = new ColorConverter();
+        
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is Color valueColor)
+        {
+            return colorConverter.ConvertTo(valueColor, typeof(string));
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        return null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        try
         {
-            try
+            if (value is string valueString)
             {
-                if (value is string valueString)
-                {
-                    return colorConverter.ConvertFrom(valueString);
-                }
-                return Binding.DoNothing;
+                return colorConverter.ConvertFrom(valueString);
             }
-            catch (Exception)
-            {
-                return Binding.DoNothing;
-            }
+            return Binding.DoNothing;
+        }
+        catch (Exception)
+        {
+            return Binding.DoNothing;
         }
     }
 }

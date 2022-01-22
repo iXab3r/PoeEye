@@ -1,8 +1,7 @@
-﻿namespace PoeShared.Prism
+﻿namespace PoeShared.Prism;
+
+public static class WellKnownOverlays
 {
-    public static class WellKnownOverlays
-    {
-        public const string AllWindowsLayeredOverlay = "AllWindowsLayeredOverlay";
-        public const string PathOfExileOverlay = "PathOfExileOverlay";
-    }
+    public const string AllWindowsLayeredOverlay = "AllWindowsLayeredOverlay";
+    public const string PathOfExileOverlay = "PathOfExileOverlay";
 }

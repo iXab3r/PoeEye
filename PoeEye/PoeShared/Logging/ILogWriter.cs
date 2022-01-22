@@ -1,24 +1,23 @@
 ﻿using System;
 
-namespace PoeShared.Logging
+namespace PoeShared.Logging;
+
+/// <summary>
+/// An interface defining a log writer.
+/// </summary>
+internal interface ILogWriter
 {
+    bool IsDebugEnabled { get; }
+
+    bool IsInfoEnabled { get; }
+
+    bool IsWarnEnabled { get; }
+
+    bool IsErrorEnabled { get; }
+
     /// <summary>
-    /// An interface defining a log writer.
+    /// Writes the specified <see cref="LogData"/> to the underlying logger.
     /// </summary>
-    internal interface ILogWriter
-    {
-        bool IsDebugEnabled { get; }
-
-        bool IsInfoEnabled { get; }
-
-        bool IsWarnEnabled { get; }
-
-        bool IsErrorEnabled { get; }
-
-        /// <summary>
-        /// Writes the specified <see cref="LogData"/> to the underlying logger.
-        /// </summary>
-        /// <param name="logData">The log data to write.</param>
-        void WriteLog(LogData logData);
-    }
+    /// <param name="logData">The log data to write.</param>
+    void WriteLog(LogData logData);
 }

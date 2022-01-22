@@ -1,7 +1,6 @@
-﻿namespace PoeShared.Audio.Services
+﻿namespace PoeShared.Audio.Services;
+
+public interface IEmbeddedSoundLibrarySource : ISoundLibrarySource
 {
-    public interface IEmbeddedSoundLibrarySource : ISoundLibrarySource
-    {
         
-    }
 }

@@ -12,60 +12,59 @@ using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using ListBox = System.Windows.Controls.ListBox;
 
-namespace PoeShared.UI
+namespace PoeShared.UI;
+
+internal partial class HotkeySequenceEditor
 {
-    internal partial class HotkeySequenceEditor
+    private ListBox listBox;
+
+    public HotkeySequenceEditor()
     {
-        private ListBox listBox;
+        DropTarget = new HotkeyDropHandler(this);
+        DragSource = new HotkeyDragHandler();
 
-        public HotkeySequenceEditor()
-        {
-            DropTarget = new HotkeyDropHandler(this);
-            DragSource = new HotkeyDragHandler();
-
-            this.Observe(ViewModelProperty)
-                .Select(x => ViewModel)
-                .Select(x => x != null ? x.WhenAnyValue(y => y.Items) : Observable.Empty<ObservableCollection<HotkeySequenceItem>>())
-                .Switch()
-                .Select(x => x != null
-                    ? new ListCollectionView(x)
-                    {
-                        NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtEnd
-                    }
-                    : new ListCollectionView(new Collection()))
-                .Subscribe(x => CollectionView = x)
-                .AddTo(Anchors);
-        }
-
-        public override void OnApplyTemplate()
-        {
-            if (listBox != null)
-            {
-                listBox.KeyDown -= ListBoxOnKeyDown;
-            }
-
-            base.OnApplyTemplate();
-
-            listBox = (ListBox) Template.FindName(PART_ListBox, this);
-            if (listBox == null)
-            {
-                return;
-            }
-
-            listBox.KeyDown += ListBoxOnKeyDown;
-        }
-
-        private void ListBoxOnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete)
-            {
-                var selectedItems = listBox.SelectedItems.OfType<HotkeySequenceItem>().ToArray();
-                var itemsSource = ViewModel?.Items;
-                if (itemsSource != null && selectedItems.Any())
+        this.Observe(ViewModelProperty)
+            .Select(x => ViewModel)
+            .Select(x => x != null ? x.WhenAnyValue(y => y.Items) : Observable.Empty<ObservableCollection<HotkeySequenceItem>>())
+            .Switch()
+            .Select(x => x != null
+                ? new ListCollectionView(x)
                 {
-                    selectedItems.ForEach(x => itemsSource.Remove(x));
-                    e.Handled = true;
+                    NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtEnd
                 }
+                : new ListCollectionView(new Collection()))
+            .Subscribe(x => CollectionView = x)
+            .AddTo(Anchors);
+    }
+
+    public override void OnApplyTemplate()
+    {
+        if (listBox != null)
+        {
+            listBox.KeyDown -= ListBoxOnKeyDown;
+        }
+
+        base.OnApplyTemplate();
+
+        listBox = (ListBox) Template.FindName(PART_ListBox, this);
+        if (listBox == null)
+        {
+            return;
+        }
+
+        listBox.KeyDown += ListBoxOnKeyDown;
+    }
+
+    private void ListBoxOnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Delete)
+        {
+            var selectedItems = listBox.SelectedItems.OfType<HotkeySequenceItem>().ToArray();
+            var itemsSource = ViewModel?.Items;
+            if (itemsSource != null && selectedItems.Any())
+            {
+                selectedItems.ForEach(x => itemsSource.Remove(x));
+                e.Handled = true;
             }
         }
     }

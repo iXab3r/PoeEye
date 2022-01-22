@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace WindowsHook
+namespace WindowsHook;
+
+public interface ISupportsMouseFilter
 {
-    public interface ISupportsMouseFilter
-    {
-        IDisposable AddMouseFilter(IMouseEventFilter filter);
-    }
+    IDisposable AddMouseFilter(IMouseEventFilter filter);
 }

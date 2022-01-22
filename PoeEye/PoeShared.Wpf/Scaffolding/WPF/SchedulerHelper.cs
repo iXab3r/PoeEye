@@ -1,9 +1,8 @@
 ﻿using System.Reactive.Concurrency;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF;
+
+public static class SchedulerHelper
 {
-    public static class SchedulerHelper
-    {
-        public static IScheduler Current => DispatcherScheduler.Current;
-    }
+    public static IScheduler Current => DispatcherScheduler.Current;
 }

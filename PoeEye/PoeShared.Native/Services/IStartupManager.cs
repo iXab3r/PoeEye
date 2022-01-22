@@ -1,13 +1,12 @@
 using System.ComponentModel;
 
-namespace PoeShared.Services
+namespace PoeShared.Services;
+
+public interface IStartupManager : INotifyPropertyChanged
 {
-    public interface IStartupManager : INotifyPropertyChanged
-    {
-        bool IsRegistered { get; }
+    bool IsRegistered { get; }
         
-        bool Register();
+    bool Register();
         
-        bool Unregister();
-    }
+    bool Unregister();
 }

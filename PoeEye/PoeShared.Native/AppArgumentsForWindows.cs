@@ -1,10 +1,9 @@
-namespace PoeShared.Native
+namespace PoeShared.Native;
+
+internal sealed class AppArgumentsForWindows : AppArguments
 {
-    internal sealed class AppArgumentsForWindows : AppArguments
+    public AppArgumentsForWindows()
     {
-        public AppArgumentsForWindows()
-        {
-            IsElevated = UnsafeNative.IsElevated();
-        }
+        IsElevated = UnsafeNative.IsElevated();
     }
 }
