@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading;
-
-namespace PoeShared.Services;
+﻿namespace PoeShared.Services;
 
 public sealed class NamedLock
 {

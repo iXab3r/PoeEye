@@ -172,7 +172,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
 
     private string GetDefaultReportName()
     {
-        return $"{appArguments.AppName}_{appArguments.Version}{(appArguments.IsDebugMode ? "_DEBUG" : string.Empty)}_{idGenerator.Next()}_{clock.Now.ToString($"yyyy-MM-dd_HHmmss")}.7z";
+        return $"{appArguments.AppName}_{appArguments.Version}{(appArguments.IsDebugMode ? "_DEBUG" : string.Empty)}_{idGenerator.Next()}.7z";
     }
 
     private async Task SaveReportCommandExecuted()

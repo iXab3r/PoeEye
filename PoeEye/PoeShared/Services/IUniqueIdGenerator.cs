@@ -6,4 +6,7 @@ public interface IUniqueIdGenerator
 {
     [NotNull]
     string Next();
+    
+    [NotNull]
+    string Next(string prefix);
 }

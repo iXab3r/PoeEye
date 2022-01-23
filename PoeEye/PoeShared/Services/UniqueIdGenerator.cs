@@ -27,6 +27,11 @@ internal sealed class UniqueIdGenerator : IUniqueIdGenerator
         return $"{clock.UtcNow:yyyyMMddHHmmss}{GenerateId()}";
     }
 
+    public string Next(string prefix)
+    {
+        return $"{prefix}{Next()}";
+    }
+
     private static string GenerateId()
     {
         return ShortId.Generate(IdOptions);
