@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -21,40 +22,19 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
     private static readonly IComparer<ITreeViewItemViewModel> DefaultComparer = new SortExpressionComparer<ITreeViewItemViewModel>();
 
     private readonly SourceList<ITreeViewItemViewModel> children = new();
-    private readonly ObservableAsPropertyHelper<string> pathSupplier;
     protected readonly Fallback<string> TabName = new();
     private readonly ObservableAsPropertyHelper<bool> parentIsExpanded;
 
     static TreeViewItemViewModel()
     {
+        Binder.Bind(x => System.IO.Path.GetFileName(x.FullPath ?? string.Empty)).To(x => x.Name);
+        Binder.Bind(x => System.IO.Path.GetDirectoryName(x.FullPath ?? string.Empty)).To(x => x.FolderName);
+        Binder.Bind(x => System.IO.Path.Combine(x.FolderName ?? string.Empty, x.Name ?? string.Empty)).To(x => x.FullPath);
     }
 
     protected TreeViewItemViewModel()
     {
-        pathSupplier = Observable.Merge(
-                this.WhenAnyValue(x => x.Parent)
-                    .Select(x => x is IDirectoryTreeViewItemViewModel eyeItem ? eyeItem.WhenAnyValue(y => y.Path) : Observable.Return(string.Empty))
-                    .Switch()
-                    .Select(_ => "Parent directory path changed"),
-                this.WhenAnyValue(x => x.Name).Select(_ => "Directory name changed"))
-            .Select(x => FindPath(this))
-            .WithPrevious((prev, curr) => new {prev, curr})
-            .Where(x => x.prev != x.curr)
-            .DistinctUntilChanged()
-            .Select(x =>
-            {
-                if (string.IsNullOrEmpty(x.prev))
-                {
-                    Log.Debug(() => $"[{this}] Setting Directory Path: {x.curr}");
-                }
-                else
-                {
-                    Log.Debug(() => $"[{this}] Changing Directory Path {x.prev} => {x.curr}");
-                }
-                return x.curr;
-            })
-            .ToProperty(this, x => x.Path)
-            .AddTo(Anchors);
+        ChildrenList = children.AsObservableList();
             
         this.WhenAnyValue(x => x.Parent.ResortWhen)
             .SubscribeSafe(x => ResortWhen = x, Log.HandleUiException)
@@ -115,10 +95,13 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
     public bool ParentIsExpanded => parentIsExpanded.Value;
 
     public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
+    public IObservableList<ITreeViewItemViewModel> ChildrenList { get; }
 
     public bool IsSelected { get; set; }
 
-    public string Path => pathSupplier.Value;
+    public string FullPath { get; set; }
+    
+    public string FolderName { get; set; }
 
     public bool IsExpanded { get; set; } = true;
 
@@ -132,44 +115,6 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
     {
         get => TabName.Value;
         set => TabName.SetValue(value);
-    }
-
-    public void Clear()
-    {
-        children.Items.ForEach(x => x.Parent = null);
-    }
-
-    public static ITreeViewItemViewModel FindRoot(ITreeViewItemViewModel node)
-    {
-        var result = node;
-        while (result.Parent != null)
-        {
-            result = result.Parent;
-        }
-        return result;
-    }
-
-    public static string FindPath(ITreeViewItemViewModel node)
-    {
-        var resultBuilder = new StringBuilder();
-
-        while (node != null)
-        {
-            if (node is IDirectoryTreeViewItemViewModel parentDir)
-            {
-                resultBuilder.Insert(0, parentDir.Name + System.IO.Path.DirectorySeparatorChar);
-            }
-
-            node = node.Parent;
-        }
-
-        var result = resultBuilder.ToString().Trim(System.IO.Path.DirectorySeparatorChar);
-        return string.IsNullOrEmpty(result) ? null : result;
-    }
-
-    public IEnumerable<ITreeViewItemViewModel> EnumerateChildren()
-    {
-        return EnumerateChildren(this);
     }
 
     private static IEnumerable<ITreeViewItemViewModel> EnumerateChildren(TreeViewItemViewModel root)

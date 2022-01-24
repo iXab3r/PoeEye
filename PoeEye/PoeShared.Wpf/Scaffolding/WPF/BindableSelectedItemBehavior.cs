@@ -32,7 +32,6 @@ public class BindableSelectedItemBehavior : Behavior<TreeView>
 
         var anchors = new CompositeDisposable();
         attachmentAnchor.Disposable = anchors;
-
         AssociatedObject
             .Observe(TreeView.SelectedItemProperty)
             .Select(_ => AssociatedObject.SelectedItem)

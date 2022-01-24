@@ -4,23 +4,22 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using DynamicData;
 using JetBrains.Annotations;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
 
-public interface ITreeViewItemViewModel : IDisposableReactiveObject
+public interface ITreeViewItemViewModel : IDisposableReactiveObject, ICanBeSelected
 {
     string Name { get; }
     
     /// <summary>
     ///   Full path, i.e. item name and folder name
     /// </summary>
-    string Path { get; }
+    string FullPath { get; }
         
     public bool IsExpanded { get; set; }
 
-    public bool IsSelected { get; set; }
-        
     public AnnotatedBoolean IsVisible { get; }
         
     public bool IsEnabled { get; }

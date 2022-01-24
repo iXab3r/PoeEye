@@ -9,9 +9,22 @@ public static class TreeViewExtensions
 {
     private static readonly Predicate<ITreeViewItemViewModel> TRUE = model => true;
 
+    public static ITreeViewItemViewModel FindRoot(this ITreeViewItemViewModel node)
+    {
+        var result = node;
+        while (result.Parent != null)
+        {
+            result = result.Parent;
+        }
+        return result;
+    }
+
     public static IEnumerable<T> FindChildrenOfType<T>(this ITreeViewItemViewModel instance) where T : ITreeViewItemViewModel
     {
-        return FindChildren(instance, x => x is T, instance.Children).OfType<T>();
+        var children = instance is IDirectoryTreeViewItemViewModel dir
+            ? (IEnumerable<ITreeViewItemViewModel>)dir.Children
+            : instance.Parent?.Children;
+        return children == null ? ArraySegment<T>.Empty : FindChildren(x => x is T, children).OfType<T>();
     }
 
     public static IEnumerable<T> FindParentsOfType<T>(this ITreeViewItemViewModel instance) where T : ITreeViewItemViewModel
@@ -40,23 +53,17 @@ public static class TreeViewExtensions
 
     public static IEnumerable<ITreeViewItemViewModel> FindChildren(this ITreeViewItemViewModel instance, Predicate<ITreeViewItemViewModel> predicate)
     {
-        return FindChildren(instance, predicate, instance.Children);
+        return FindChildren(predicate, instance.Children);
     }
 
-    public static IEnumerable<ITreeViewItemViewModel> FindParents(this ITreeViewItemViewModel instance)
-    {
-        return instance.FindParents(TRUE, instance);
-    }
-
-    public static IEnumerable<ITreeViewItemViewModel> FindChildren(this ITreeViewItemViewModel instance,
-        Predicate<ITreeViewItemViewModel> predicate,
+    private static IEnumerable<ITreeViewItemViewModel> FindChildren(Predicate<ITreeViewItemViewModel> predicate,
         IEnumerable<ITreeViewItemViewModel> items)
     {
-        foreach (var node in items)
+        foreach (var node in items.EmptyIfNull())
         {
             if (node is IDirectoryTreeViewItemViewModel directoryNode)
             {
-                var matchingChildNodes = FindChildren(instance, predicate, directoryNode.Children);
+                var matchingChildNodes = FindChildren(predicate, directoryNode.Children);
                 foreach (var treeViewItemViewModel in matchingChildNodes)
                 {
                     yield return treeViewItemViewModel;
