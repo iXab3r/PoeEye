@@ -17,7 +17,7 @@ public class AdornedControl : ContentControl
     /// </summary>
     public static readonly DependencyProperty IsAdornerVisibleProperty =
         DependencyProperty.Register("IsAdornerVisible", typeof(bool), typeof(AdornedControl),
-            new FrameworkPropertyMetadata(IsAdornerVisible_PropertyChanged));
+            new FrameworkPropertyMetadata(defaultValue: false, IsAdornerVisible_PropertyChanged));
 
     public static readonly DependencyProperty AdornerContentProperty =
         DependencyProperty.Register("AdornerContent", typeof(FrameworkElement), typeof(AdornedControl),
