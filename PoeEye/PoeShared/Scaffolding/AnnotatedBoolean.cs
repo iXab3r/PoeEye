@@ -55,7 +55,6 @@ public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBool
         return !left.Equals(right);
     }
 
-
     public TypeCode GetTypeCode()
     {
         return Value.GetTypeCode();

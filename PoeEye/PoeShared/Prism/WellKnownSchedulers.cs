@@ -7,4 +7,5 @@ public static class WellKnownSchedulers
     public const string Background = "BackgroundScheduler";
     public const string InputHook = "Input";
     public const string SharedThread = "SharedThread";
+    public const string RedirectToUI = "UISchedulerIfNotOnUIThread";
 }

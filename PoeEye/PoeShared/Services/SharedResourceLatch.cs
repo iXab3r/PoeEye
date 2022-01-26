@@ -1,8 +1,6 @@
-using System.Threading;
-
 namespace PoeShared.Services;
 
-internal sealed class SharedResourceLatch : DisposableReactiveObject, ISharedResourceLatch
+public sealed class SharedResourceLatch : DisposableReactiveObject, ISharedResourceLatch
 {
     private static readonly IFluentLog Log = typeof(SharedResourceLatch).PrepareLogger();
 
@@ -11,6 +9,15 @@ internal sealed class SharedResourceLatch : DisposableReactiveObject, ISharedRes
     public bool IsBusy => counter > 0;
 
     public string Name { get; set; }
+
+    public SharedResourceLatch(string name)
+    {
+        Name = name;
+    }
+
+    public SharedResourceLatch() : this(string.Empty)
+    {
+    }
 
     public IDisposable Rent()
     {

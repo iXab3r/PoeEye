@@ -28,12 +28,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
     {
         InitializeSchedulers();
         Container
-            .RegisterSingleton<IUiSharedResourceLatch>(container =>
-            {
-                var result = container.Resolve<UiSharedResourceLatch>();
-                result.Name = "Ui";
-                return result;
-            });
+            .RegisterSingleton<IUiSharedResourceLatch, UiSharedResourceLatch>();
 
         Container
             .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
@@ -81,6 +76,8 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
         var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         Log.Debug(() => $"Task scheduler: {taskScheduler}");
         Log.Debug(() => $"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
+        
+        var uiThread = Thread.CurrentThread;
         Container
             .RegisterSingleton<ISchedulerProvider>(x =>
             {
@@ -108,6 +105,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => ThreadPoolScheduler.Instance.DisableOptimizations())
             .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.InputHook))
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.SharedThread));
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.SharedThread))
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.RedirectToUI, x => new EnforcedThreadScheduler(uiThread, x.Resolve<IScheduler>(WellKnownSchedulers.UI)));
     }
 }

@@ -4,7 +4,7 @@ public interface ISharedResourceLatch : IDisposableReactiveObject
 {
     bool IsBusy { get; }
         
-    string Name { get; set; }
+    string Name { get; }
 
     IDisposable Rent();
 }

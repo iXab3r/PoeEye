@@ -163,6 +163,11 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
         return Create(new DelegateCommand<T>(execute));
     }
+    
+    public static CommandWrapper Create<T>(Action<T> execute, IObservable<bool> raiseCanExecuteWhen)
+    {
+        return Create<T>(async x => execute(x), raiseCanExecuteWhen);
+    }
 
     public CommandWrapper RaiseCanExecuteChangedWhen<T>(IObservable<T> eventSource)
     {

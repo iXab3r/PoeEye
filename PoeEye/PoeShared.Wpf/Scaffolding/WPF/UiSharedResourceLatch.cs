@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Windows.Threading;
+using JetBrains.Annotations;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Services;
@@ -23,14 +24,10 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
 
     static UiSharedResourceLatch()
     {
-        Binder.Bind(x => $"{x.Name}-IsBusy").To(x => x.isBusyLatch.Name);
-        Binder.Bind(x => $"{x.Name}-Pause").To(x => x.pauseLatch.Name);
         Binder.Bind(x => x.pauseLatch.IsBusy).To(x => x.IsPaused);
     }
 
     public UiSharedResourceLatch(
-        ISharedResourceLatch pauseLatch,
-        ISharedResourceLatch isBusyLatch,
         [Dependency(WellKnownDispatchers.UI)] Dispatcher dispatcher,
         [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiIdleScheduler)
     {
@@ -38,8 +35,8 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
         this.dispatcher = dispatcher;
         this.uiIdleScheduler = uiIdleScheduler;
         this.isBusyAnchor = new SerialDisposable().AddTo(Anchors);
-        this.pauseLatch = pauseLatch.AddTo(Anchors);
-        this.isBusyLatch = isBusyLatch.AddTo(Anchors);
+        this.pauseLatch = new SharedResourceLatch($"UI-Pause").AddTo(Anchors);
+        this.isBusyLatch = new SharedResourceLatch($"UI-IsBusy").AddTo(Anchors);
         Log.Info($"UI latch is initialized");
 
         isBusyLatch.WhenAnyValue(x => x.IsBusy)
@@ -51,11 +48,9 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
 
     private IFluentLog Log { get; }
 
-    public string Name { get; set; }
-
     public bool IsBusy { get; private set; }
 
-    public bool IsPaused { get; private set; }
+    public bool IsPaused { get; [UsedImplicitly] private set; }
 
     public IDisposable Busy()
     {
