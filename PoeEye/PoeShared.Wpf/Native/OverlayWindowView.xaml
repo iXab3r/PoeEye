@@ -11,7 +11,7 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
     WindowStartupLocation="Manual"
-    Focusable="False"
+    Focusable="{Binding Content.IsLocked, Converter={StaticResource NotConverter}}"
     IsTabStop="False"
     ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
@@ -130,7 +130,7 @@
 
                 <!-- Body -->
                 <native:ContentControlEx Grid.Row="1" 
-                                         Focusable="False" IsTabStop="False"
+                                         Focusable="{Binding Content.IsLocked, Converter={StaticResource NotConverter}}" IsTabStop="False"
                                          Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
                                          Content="{Binding Content}"
                                          ContentTemplate="{Binding ContentTemplate}" />
