@@ -19,6 +19,8 @@ using PoeShared.Logging;
 using PropertyBinder;
 using PropertyChanged;
 using ReactiveUI;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using KeyEventHandler = System.Windows.Input.KeyEventHandler;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
@@ -137,6 +139,40 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 hwndSource.AddHook(WndProc);
             }, Log.HandleUiException)
             .AddTo(Anchors);
+
+        WhenKeyDown = this.WhenAnyValue(x => x.OverlayWindow)
+            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyDown += h, h => window.KeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
+            .Switch();
+
+        this.WhenAnyValue(x => x.IsLocked)
+            .Select(isLocked => isLocked == false ? WhenKeyDown : Observable.Empty<EventPattern<KeyEventArgs>>())
+            .Switch()
+            .SubscribeSafe(x =>
+            {
+                if (x.EventArgs.Key is Key.Down or Key.S)
+                {
+                    var bounds = NativeBounds;
+                    NativeBounds = new Rectangle(bounds.X, bounds.Y + 1, bounds.Width, bounds.Height);
+                    x.EventArgs.Handled = true;
+                } else if (x.EventArgs.Key is Key.Up or Key.W)
+                {
+                    var bounds = NativeBounds;
+                    NativeBounds = new Rectangle(bounds.X, bounds.Y - 1, bounds.Width, bounds.Height);
+                    x.EventArgs.Handled = true;
+                }else if (x.EventArgs.Key is Key.Left or Key.A)
+                {
+                    var bounds = NativeBounds;
+                    NativeBounds = new Rectangle(bounds.X - 1, bounds.Y, bounds.Width, bounds.Height);
+                    x.EventArgs.Handled = true;
+                }else if (x.EventArgs.Key is Key.Right or Key.D)
+                {
+                    var bounds = NativeBounds;
+                    NativeBounds = new Rectangle(bounds.X + 1, bounds.Y, bounds.Width, bounds.Height);
+                    x.EventArgs.Handled = true;
+                }
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+        
         Log.Info("Initialized overlay view model");
 
         Binder.Attach(this).AddTo(Anchors);
@@ -170,6 +206,8 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public ICommand LockWindowCommand => lockWindowCommand;
 
     public TransparentWindow OverlayWindow { get; private set; }
+    
+    public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
 
     public bool IsVisible { get; set; } = true;
 

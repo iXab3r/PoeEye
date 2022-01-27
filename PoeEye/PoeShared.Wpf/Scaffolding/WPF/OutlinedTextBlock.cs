@@ -229,13 +229,10 @@ public class OutlinedTextBlock : FrameworkElement
 
         // constrain the formatted text according to the available size
 
-        var w = availableSize.Width;
-        var h = availableSize.Height;
-
         // the Math.Min call is important - without this constraint (which seems arbitrary, but is the maximum allowable text width), things blow up when availableSize is infinite in both directions
         // the Math.Max call is to ensure we don't hit zero, which will cause MaxTextHeight to throw
-        formattedText.MaxTextWidth = Math.Min(3579139, w);
-        formattedText.MaxTextHeight = Math.Max(0.0001d, h);
+        formattedText.MaxTextWidth = Math.Min(3579139, formattedText.MaxTextWidth);
+        formattedText.MaxTextHeight = Math.Max(0.0001d, formattedText.MaxTextHeight);
 
         // return the desired size
         return new Size(Math.Ceiling(formattedText.Width), Math.Ceiling(formattedText.Height));
@@ -244,10 +241,6 @@ public class OutlinedTextBlock : FrameworkElement
     protected override Size ArrangeOverride(Size finalSize)
     {
         EnsureFormattedText();
-
-        // update the formatted text with the final size
-        formattedText.MaxTextWidth = finalSize.Width;
-        formattedText.MaxTextHeight = Math.Max(0.0001d, finalSize.Height);
 
         // need to re-generate the geometry now that the dimensions have changed
         textGeometry = null;

@@ -1,4 +1,6 @@
+using System;
 using System.Drawing;
+using System.Reactive;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -53,6 +55,8 @@ public interface IOverlayViewModel : IDisposableReactiveObject
     Point ViewModelLocation { get; }
         
     TransparentWindow OverlayWindow { [CanBeNull] get; }
+    
+    IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
 
     void ResetToDefault();
 
