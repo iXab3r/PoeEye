@@ -14,7 +14,7 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using DynamicData.Binding;
 using PInvoke;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PropertyBinder;
 using PropertyChanged;
@@ -64,13 +64,13 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
             .ObserveOn(uiDispatcher)
             .Subscribe(x => RaisePropertyChanged(nameof(NativeBounds)))
             .AddTo(Anchors);
-            
+
         dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi))
             .Switch()
             .Do(x => Log.Debug(() => $"DPI updated to {x}"))
             .ToProperty(this, x => x.Dpi)
             .AddTo(Anchors);
-            
+
         this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
             .SubscribeSafe(() =>
             {
@@ -78,7 +78,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 unlockWindowCommand.RaiseCanExecuteChanged();
             }, Log.HandleUiException)
             .AddTo(Anchors);
-            
+
         this.WhenAnyValue(x => x.OverlayMode)
             .SubscribeSafe(() =>
             {
@@ -100,14 +100,25 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 Log.Warn("Window received multiple 'loaded' events");
                 throw new ApplicationException($"Window has already been loaded: {this}");
             }
+
             Log.Debug("Window has been loaded, changing status");
             IsLoaded = true;
         }, Log.HandleUiException).AddTo(Anchors);
 
-        this.WhenAnyValue(x => x.WindowBounds)
-            .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle ?? IntPtr.Zero), (desiredBounds, hwnd) => new { DesiredBounds = desiredBounds, hwnd })
-            .Where(x => x.hwnd != IntPtr.Zero && x.DesiredBounds.SourceType == ValueSourceType.User)
+        this.WhenAnyValue(x => x.OverlayWindow)
+            .Select(x => x != null
+                ? this.WhenAnyValue(y => y.WindowBounds)
+                    .WithPrevious()
+                    .Select(x =>
+                    {
+                        Log.Info(() => $"Window bounds have changed: {x.Previous} => {x.Current}");
+                        return x.Current;
+                    })
+                    .Select(y => (DesiredBounds: y, hwnd: x.WindowHandle))
+                    .Where(x => x.hwnd != IntPtr.Zero && x.DesiredBounds.SourceType == ValueSourceType.User)
+                : Observable.Empty<(ValueHolder<Rectangle> DesiredBounds, IntPtr hwnd)>())
             .ObserveOn(uiDispatcher)
+            .Switch()
             .SubscribeSafe(x =>
             {
                 // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
@@ -129,6 +140,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 {
                     throw new InvalidStateException($"Failed to resolve {nameof(HwndSource)} for {x}");
                 }
+
                 Disposable.Create(() =>
                 {
                     Log.Debug(() => $"Releasing {nameof(HwndSource)} of {x}");
@@ -154,17 +166,20 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X, bounds.Y + 1, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
-                } else if (x.EventArgs.Key is Key.Up or Key.W)
+                }
+                else if (x.EventArgs.Key is Key.Up or Key.W)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X, bounds.Y - 1, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
-                }else if (x.EventArgs.Key is Key.Left or Key.A)
+                }
+                else if (x.EventArgs.Key is Key.Left or Key.A)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X - 1, bounds.Y, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
-                }else if (x.EventArgs.Key is Key.Right or Key.D)
+                }
+                else if (x.EventArgs.Key is Key.Right or Key.D)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X + 1, bounds.Y, bounds.Width, bounds.Height);
@@ -172,7 +187,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 }
             }, Log.HandleUiException)
             .AddTo(Anchors);
-        
+
         Log.Info("Initialized overlay view model");
 
         Binder.Attach(this).AddTo(Anchors);
@@ -206,7 +221,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public ICommand LockWindowCommand => lockWindowCommand;
 
     public TransparentWindow OverlayWindow { get; private set; }
-    
+
     public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
 
     public bool IsVisible { get; set; } = true;
@@ -261,6 +276,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException("Overlay window is not loaded yet");
         }
+
         var activeMonitor = UnsafeNative.GetMonitorInfo(OverlayWindow);
 
         Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {NativeBounds})");
@@ -283,11 +299,12 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public void SetOverlayWindow(TransparentWindow owner)
     {
         Guard.ArgumentNotNull(owner, nameof(owner));
-            
+
         if (this.OverlayWindow != null)
         {
             throw new InvalidOperationException($"Window is already assigned");
         }
+
         OverlayWindow = owner;
         Log.Debug(() => $"Overlay window is assigned: {OverlayWindow}");
     }
@@ -307,10 +324,11 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 if (currentBounds.Value != bounds)
                 {
                     Log.Info(() => $"Updating native bounds: {NativeBounds} => {bounds}");
-                    WindowBounds = new ValueHolder<Rectangle>(){ Value = bounds, SourceType = ValueSourceType.System };
+                    WindowBounds = new ValueHolder<Rectangle>() { Value = bounds, SourceType = ValueSourceType.System };
                 }
             }
         }
+
         return IntPtr.Zero;
     }
 
@@ -337,11 +355,11 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     protected virtual void ApplyConfig(IOverlayConfig config)
     {
         Log.Debug(() => $"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
-           
+
         var desktopHandle = UnsafeNative.GetDesktopWindow();
         var systemInformation = new
         {
-            MonitorCount = SystemInformation.MonitorCount, 
+            MonitorCount = SystemInformation.MonitorCount,
             VirtualScreen = SystemInformation.VirtualScreen,
             MonitorBounds = UnsafeNative.GetMonitorBounds(desktopHandle).ToWinRectangle(),
             MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
@@ -359,7 +377,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             overlayBounds = config.OverlayBounds;
         }
-            
+
         if (!overlayBounds.IsNotEmptyArea() || overlayBounds.IsNotEmptyArea() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
         {
             Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
@@ -398,6 +416,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Unlocking window @ {NativeBounds}");
         IsLocked = false;
     }
@@ -413,6 +432,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Locking window @ {NativeBounds}");
         IsLocked = true;
     }
@@ -433,6 +453,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Making overlay Layered");
         OverlayMode = OverlayMode.Layered;
     }
@@ -448,6 +469,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
         OverlayMode = OverlayMode.Transparent;
     }
@@ -461,7 +483,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         }
 
         public T Value { get; init; }
-            
+
         public ValueSourceType SourceType { get; init; }
 
         public bool Equals(ValueHolder<T> other)
