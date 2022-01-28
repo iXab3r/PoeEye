@@ -66,6 +66,14 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         }
     }
 
+    protected void EnsureNotDisposed()
+    {
+        if (Anchors.IsDisposed)
+        {
+            throw new ObjectDisposedException($"Object is already disposed: {this}");
+        }
+    }
+
     protected static bool IsUiThread => Environment.CurrentManagedThreadId == 1;
         
     public void RaisePropertyChanged(params string[] properties)

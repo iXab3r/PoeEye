@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading;
+﻿using System.Threading;
 
 namespace PoeShared.Services;
 
@@ -9,7 +8,7 @@ public sealed class NamedLock
         
     private readonly Gate gate;
 #if DEBUG
-        private readonly ConcurrentDictionary<int, StackTrace> lockInfoByThreadId = new();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<int, StackTrace> lockInfoByThreadId = new();
 #endif
     public NamedLock(string name)
     {
