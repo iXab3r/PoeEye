@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Prism;
 using Prism.Commands;
 using Prism.Modularity;
 using ReactiveUI;
@@ -36,7 +38,8 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
         
     public GenericSettingsViewModel(
         [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
-        [NotNull] IUnityContainer container)
+        [NotNull] IUnityContainer container,
+        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
         Guard.ArgumentNotNull(modulesEnumerator, nameof(modulesEnumerator));
         Guard.ArgumentNotNull(container, nameof(container));
@@ -72,6 +75,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
 
         moduleSettings
             .Connect()
+            .ObserveOn(uiScheduler)
             .Bind(out var moduleSettingsSource)
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
