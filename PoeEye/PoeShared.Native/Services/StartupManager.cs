@@ -26,7 +26,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
         Guard.ArgumentNotNull(args.ExecutablePath, nameof(args.ExecutablePath));
         Guard.ArgumentNotNull(args.UniqueAppName, nameof(args.UniqueAppName));
         Guard.ArgumentNotNull(args.CommandLineArgs, nameof(args.CommandLineArgs));
-
+        
         this.appArguments = appArguments;
         this.args = args;
         try
