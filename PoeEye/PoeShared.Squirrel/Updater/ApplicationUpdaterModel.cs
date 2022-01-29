@@ -230,9 +230,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     public FileInfo GetLatestExecutable()
     {
-        var appExecutable = new FileInfo(Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-        Log.Debug(() => $"Most recent version folder: {MostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
-
+        var appExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, ApplicationExecutableFileName));
+        Log.Debug(() => $"Application executable: {appExecutable} (exists: {appExecutable.Exists})");
         if (!appExecutable.Exists)
         {
             throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
