@@ -11,6 +11,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Notifications.Services;
 using PoeShared.Notifications.ViewModels;
+using PoeShared.Profiler;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -47,6 +48,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IMessageBoxService, MessageBoxService>()
             .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
             .RegisterSingleton<IErrorMonitorViewModel, ErrorMonitorViewModel>()
+            .RegisterSingleton<IProfilerViewModel, ProfilerViewModel>()
             .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
             .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
             .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);

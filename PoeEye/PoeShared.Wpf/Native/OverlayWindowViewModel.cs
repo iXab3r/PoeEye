@@ -16,7 +16,7 @@ internal sealed class OverlayWindowViewModel : DisposableReactiveObject
             .Else(x => 0d)
             .To((x, v) =>
             {
-                x.Log.Debug(() => $"Setting {nameof(x.GlassFrameThickness)} to {v}, content native bounds: {x.Content.NativeBounds}");
+                x.Log.Debug(() => $"Setting {nameof(x.GlassFrameThickness)} to {v}, content native bounds: {x.Content?.NativeBounds}");
                 x.GlassFrameThickness = v;
             });
 
