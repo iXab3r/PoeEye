@@ -11,6 +11,8 @@ public interface IAppConfig
     Version Version { get; }
         
     string AppDataDirectory { [CanBeNull] get; }
+    
+    string LocalAppDataDirectory { [CanBeNull] get; }
         
     int ProcessId { get; }
 
