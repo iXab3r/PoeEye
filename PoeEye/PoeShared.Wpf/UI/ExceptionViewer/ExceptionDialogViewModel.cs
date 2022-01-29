@@ -245,7 +245,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
 
         await Task.Run(() =>
         {
-            Log.Debug(() => $"Compressing report with following files: {filesToAttach.DumpToTable()}");
+            Log.Debug(() => $"Compressing report with following files: {filesToAttach.DumpToString()}");
             sevenZipWrapper.AddToArchive(outputFile, filesToAttach.Select(x => new FileInfo(x)).ToArray());
             Log.Debug(() => $"Compression has completed");
         });
