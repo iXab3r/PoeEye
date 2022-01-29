@@ -14,7 +14,6 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Services;
 using ReactiveUI;
-using SevenZip;
 using Unity;
 using Unity.Lifetime;
 
@@ -39,7 +38,6 @@ public abstract class ApplicationBase : Application
             appArguments = Container.Resolve<IAppArguments>();
             metrics = Container.Resolve<IMetricsRoot>();
             InitializeLogging();
-            InitializeSevenZip();
             Log.Debug(() => $"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
             Log.Debug(() => $"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
             Log.Debug(() => $"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
@@ -108,21 +106,6 @@ public abstract class ApplicationBase : Application
     public CompositeDisposable Anchors { get; } = new();
 
     protected static IFluentLog Log => SharedLog.Instance.Log;
-
-    private void InitializeSevenZip()
-    {
-        using var executionTimer = metrics.Measure.Gauge.Time(nameof(InitializeSevenZip));
-
-        Log.Debug(() => $"Initializing 7z wrapper, {nameof(Environment.Is64BitProcess)}: {Environment.Is64BitProcess}");
-        var sevenZipDllPath = Path.Combine(appArguments.ApplicationDirectory.FullName, Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
-        Log.Debug(() => $"Setting 7z library path to {sevenZipDllPath}");
-        if (!File.Exists(sevenZipDllPath))
-        {
-            throw new FileNotFoundException("7z library not found", sevenZipDllPath);
-        }
-
-        SevenZipBase.SetLibraryPath(sevenZipDllPath);
-    }
 
     private void InitializeLogging()
     {
