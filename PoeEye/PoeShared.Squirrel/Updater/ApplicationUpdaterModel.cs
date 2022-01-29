@@ -62,23 +62,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             
         var currentProcessName = Process.GetCurrentProcess().ProcessName + ".exe";
         Log.Debug(() => $"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
-        if (string.Equals(DotnetCoreRunnerName, currentProcessName, StringComparison.OrdinalIgnoreCase))
-        {
-            Log.Debug(() => $"Detected that Application is running using .net core runner ({DotnetCoreRunnerName})");
-
-            if (string.IsNullOrEmpty(appArguments.ApplicationExecutableName) || Path.GetExtension(appArguments.ApplicationExecutableName) != ".dll")
-            {
-                throw new NotSupportedException("Could not determine application name, expected either .dll with .net runner or raw executable (.exe)");
-            }
-                
-            Log.Debug(() => $"Extracting application executable name from {appArguments.ApplicationExecutableName}");
-            var executableName = Path.ChangeExtension(appArguments.ApplicationExecutableName, ".exe");
-            ApplicationExecutableFileName = executableName;
-        }
-        else
-        {
-            ApplicationExecutableFileName = currentProcessName;
-        }
+        ApplicationExecutableFileName = $"{appArguments.AppName}.exe";
         Log.Debug(() => $"Application will be started via executing {ApplicationExecutableFileName}");
         Binder.Attach(this).AddTo(Anchors);
     }
