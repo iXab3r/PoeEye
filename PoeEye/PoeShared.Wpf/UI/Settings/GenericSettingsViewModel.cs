@@ -92,18 +92,21 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
 
     private void ReloadModulesList(ISettingsViewModel[] viewModels)
     {
-        moduleSettings.Clear();
-        moduleSettings.AddRange(viewModels);
+        moduleSettings.Edit(list =>
+        {
+            list.Clear();
+            list.AddRange(viewModels);
+        });
     }
 
     private void ReloadConfigs()
     {
-        ModulesSettings.ForEach(ReloadConfig);
+        moduleSettings.Items.ForEach(ReloadConfig);
     }
 
     private void SaveConfigs()
     {
-        ModulesSettings.ForEach(SaveConfig);
+        moduleSettings.Items.ForEach(SaveConfig);
     }
 
     private Type GetConfigType(ISettingsViewModel viewModel)
