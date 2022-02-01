@@ -9,7 +9,7 @@ namespace PoeShared.Scaffolding;
 public static class ObservableExtensions
 {
     private static readonly Action NoOperation = () => { };
-
+ 
     public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext)
     {
         return observable.Subscribe(_ => onNext());
@@ -95,6 +95,24 @@ public static class ObservableExtensions
             return Unit.Default;
         }
         return source.SelectMany(Wrapped).SubscribeSafe(_ => { }, handler);
+    }
+
+    public static IObservable<TOut> SwitchIfNotDefault<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Func<TIn, IObservable<TOut>> selector)
+    {
+        return observable.SwitchIf(condition: x => x != null, trueSelector: selector, falseSelector: _ => Observable.Empty<TOut>());
+    }
+
+    public static IObservable<TOut> SwitchIf<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Predicate<TIn> condition,
+        [NotNull] Func<TIn, IObservable<TOut>> trueSelector,
+        [NotNull] Func<TIn, IObservable<TOut>> falseSelector)
+    {
+        return observable
+            .Select(x => condition(x) ? trueSelector(x) : falseSelector(x))
+            .Switch();
     }
 
     public static IObservable<TOut> SelectSafeOrDefault<TIn, TOut>(

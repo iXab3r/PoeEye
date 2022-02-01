@@ -1,19 +1,25 @@
 ﻿using PoeShared.Scaffolding;
 using System;
 using System.Drawing;
+using PoeShared.Bindings;
+using PoeShared.Logging;
+using PoeShared.Services;
 using PropertyChanged;
 
 namespace EyeAuras.OnTopReplica;
 
-public sealed class ReactiveRectangle : DisposableReactiveObject
+public sealed class ReactiveRectangle : BindableReactiveObject
 {
+    private readonly NamedLock updateLock;
+    
     private Rectangle bounds;
 
-    public ReactiveRectangle() : this(Rectangle.Empty)
+    public ReactiveRectangle()
     {
+        updateLock = new NamedLock(nameof(ReactiveRectangle));
     }
 
-    public ReactiveRectangle(Rectangle rectangle)
+    public ReactiveRectangle(Rectangle rectangle) : this()
     {
         SetValue(rectangle);
     }
@@ -74,6 +80,8 @@ public sealed class ReactiveRectangle : DisposableReactiveObject
 
     public void SetValue(Rectangle newValue)
     {
+        using var @lock = updateLock.Enter();
+        
         var previousValue = bounds;
         if (previousValue == newValue)
         {

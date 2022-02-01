@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -58,24 +59,6 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
         makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
 
-        // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
-        // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
-        this.WhenAnyValue(x => x.WindowBounds)
-            .WithPrevious()
-            .Where(x => x.Current != x.Previous)
-            .Select(x =>
-            {
-                Log.Info(() => $"Window bounds have changed: {x.Previous} => {x.Current}");
-                return x.Current;
-            })
-            .ObserveOn(uiDispatcher)
-            .Subscribe(x =>
-            {
-                Log.Info(() => $"Raising NativeBounds for {x}");
-                RaisePropertyChanged(nameof(NativeBounds));
-            })
-            .AddTo(Anchors);
-
         dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi))
             .Switch()
             .Do(x => Log.Debug(() => $"DPI updated to {x}"))
@@ -116,53 +99,6 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
             IsLoaded = true;
         }, Log.HandleUiException).AddTo(Anchors);
 
-        this.WhenAnyValue(x => x.OverlayWindow)
-            .Select(x => x != null
-                ? this.WhenAnyValue(y => y.WindowBounds)
-                    .WithPrevious()
-                    .Select(x =>
-                    {
-                        Log.Info(() => $"Window bounds have changed: {x.Previous} => {x.Current}");
-                        return x.Current;
-                    })
-                    .Select(y => (DesiredBounds: y, hwnd: x.WindowHandle))
-                    .Where(x => x.hwnd != IntPtr.Zero && x.DesiredBounds.SourceType == ValueSourceType.Property)
-                : Observable.Empty<(ValueHolder<Rectangle> DesiredBounds, IntPtr hwnd)>())
-            .ObserveOn(uiDispatcher)
-            .Switch()
-            .SubscribeSafe(x =>
-            {
-                // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
-                Log.Info(() => $"Native bounds changed, setting windows rect: {WindowBounds} => {x.DesiredBounds}");
-                UnsafeNative.SetWindowRect(x.hwnd, x.DesiredBounds.Value);
-                var actualBounds = UnsafeNative.GetWindowRect(x.hwnd);
-                Log.Info(() => $"Native bounds changed to RECT {actualBounds} (expected {x.DesiredBounds}), current: {WindowBounds})");
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.OverlayWindow)
-            .Where(x => x != null)
-            .Take(1)
-            .SubscribeSafe(x =>
-            {
-                Log.Debug(() => $"Overlay window is set, resolving {nameof(HwndSource)} for {x}");
-                var hwndSource = HwndSource.FromHwnd(x.WindowHandle);
-                if (hwndSource == null)
-                {
-                    throw new InvalidStateException($"Failed to resolve {nameof(HwndSource)} for {x}");
-                }
-
-                Disposable.Create(() =>
-                {
-                    Log.Debug(() => $"Releasing {nameof(HwndSource)} of {x}");
-                    hwndSource.Dispose();
-                }).AddTo(Anchors);
-                //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
-                Log.Debug(() => $"Resolved {nameof(HwndSource)} for {x}: {hwndSource}");
-                hwndSource.AddHook(WndProc);
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
-
         WhenKeyDown = this.WhenAnyValue(x => x.OverlayWindow)
             .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyDown += h, h => window.KeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
             .Switch();
@@ -201,6 +137,32 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
         Log.Info("Initialized overlay view model");
 
+        this.WhenAnyValue(x => x.OverlayWindow)
+            .SwitchIfNotDefault(x => x.Observe(ConstantAspectRatioWindow.NativeBoundsProperty, y => y.NativeBounds).Select(y => new { Window = x, ActualBounds = y }))
+            .Subscribe(x =>
+            {
+                // always on UI thread
+                Log.Info(() => $"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+                NativeBounds = x.ActualBounds;
+                Log.Info(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+            })
+            .AddTo(Anchors); 
+
+        this.WhenAnyValue(x => x.OverlayWindow)
+            .SwitchIfNotDefault(x => this.WhenAnyValue(y => y.NativeBounds)
+                .Select(y => new { Window = x, DesiredBounds = y })
+                .ObserveOnIfNeeded(x.Dispatcher))
+            .Subscribe(x =>
+            {
+                // always on UI thread, possible recursive assignment
+                // Native => SetWindowRect => Actual => Native => ...
+                var overlayBounds = x.Window.NativeBounds;
+                Log.Info(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+                x.Window.NativeBounds = x.DesiredBounds;
+                Log.Info(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+            })
+            .AddTo(Anchors);
+
         Binder.Attach(this).AddTo(Anchors);
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
     }
@@ -214,8 +176,6 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public Size DefaultSize { get; set; }
 
     public string OverlayDescription => $"{(OverlayWindow == null ? "NOWINDOW" : OverlayWindow.Name)}";
-
-    private ValueHolder<Rectangle> WindowBounds { get; set; }
 
     public float Opacity { get; set; }
 
@@ -239,12 +199,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
     public PointF Dpi => dpi.Value;
 
-    [DoNotNotify]
-    public Rectangle NativeBounds
-    {
-        get => WindowBounds.Value;
-        set => WindowBounds = new ValueHolder<Rectangle>(value, ValueSourceType.Property);
-    }
+    public Rectangle NativeBounds { get; set; }
 
     public Size MinSize { get; set; } = new Size(0, 0);
 
@@ -317,42 +272,12 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         }
 
         Log.Info(() => $"Assigning overlay window: {owner}");
-        
+
         Log.Info(() => $"Syncing window parameters with view model");
         UnsafeNative.SetWindowRect(owner.WindowHandle, NativeBounds);
 
         OverlayWindow = owner;
         Log.Info(() => $"Overlay window is assigned: {OverlayWindow}");
-    }
-
-    private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        //this callback is called on UI thread and handles all messages sent to window
-        if (lParam == IntPtr.Zero)
-        {
-            return IntPtr.Zero;
-        }
-        
-        var msg = (User32.WindowMessage)msgRaw;
-        if (msg is not User32.WindowMessage.WM_WINDOWPOSCHANGED)
-        {
-            return IntPtr.Zero;
-        }
-
-        var nativeStruct = Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
-        if (nativeStruct != null)
-        {
-            var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
-            var newBounds = new ValueHolder<Rectangle>( new Rectangle(wp.x, wp.y, wp.cx, wp.cy), ValueSourceType.System);
-            var currentBounds = WindowBounds;
-            if (currentBounds.Value != newBounds.Value)
-            {
-                Log.WithSuffix(msg).Info(() => $"Updating native bounds: {currentBounds} => {newBounds}");
-                WindowBounds = newBounds;
-            }
-        }
-
-        return IntPtr.Zero;
     }
 
     public override string ToString()
@@ -495,54 +420,5 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
         Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
         OverlayMode = OverlayMode.Transparent;
-    }
-
-    private readonly struct ValueHolder<T> : IEquatable<ValueHolder<T>>
-    {
-        public ValueHolder(T value, ValueSourceType sourceType)
-        {
-            Value = value;
-            SourceType = sourceType;
-        }
-
-        public T Value { get; }
-
-        public ValueSourceType SourceType { get; }
-
-        public bool Equals(ValueHolder<T> other)
-        {
-            return EqualityComparer<T>.Default.Equals(Value, other.Value);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ValueHolder<T> other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return EqualityComparer<T>.Default.GetHashCode(Value);
-        }
-
-        public static bool operator ==(ValueHolder<T> left, ValueHolder<T> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ValueHolder<T> left, ValueHolder<T> right)
-        {
-            return !left.Equals(right);
-        }
-
-        public override string ToString()
-        {
-            return $"{Value} (src: {SourceType})";
-        }
-    }
-
-    private enum ValueSourceType
-    {
-        Property,
-        System
     }
 }
