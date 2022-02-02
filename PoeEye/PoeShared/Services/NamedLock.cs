@@ -18,12 +18,12 @@ public sealed class NamedLock
         
     private IFluentLog Log { get; }
 
-    public IDisposable Enter()
+    public IDisposable Enter(TimeSpan timeout)
     {
         Log.Debug(() => $"Acquiring lock");
-        if (!Monitor.TryEnter(gate, DefaultTimeout))
+        if (!Monitor.TryEnter(gate, timeout))
         {
-            Log.Warn($"Failed to acquire lock in {DefaultTimeout}ms");
+            Log.Warn($"Failed to acquire lock in {timeout}ms");
             if (Debugger.IsAttached)
             {
                 Debugger.Break();
@@ -33,7 +33,7 @@ public sealed class NamedLock
         Log.Debug(() => $"Acquired lock");
             
 #if DEBUG
-            lockInfoByThreadId[Thread.CurrentThread.ManagedThreadId] = new StackTrace();
+        lockInfoByThreadId[Thread.CurrentThread.ManagedThreadId] = new StackTrace();
 #endif
         return Disposable.Create(() =>
         {
@@ -42,19 +42,24 @@ public sealed class NamedLock
             var isHolding = gate.IsEntered;
             Log.Debug(() => isHolding ? $"Released, but still holding the lock" : $"Released lock");
 #if DEBUG
-                if (isHolding || lockInfoByThreadId.TryRemove(Thread.CurrentThread.ManagedThreadId, out var _))
-                {
-                    return;
-                }
+            if (isHolding || lockInfoByThreadId.TryRemove(Thread.CurrentThread.ManagedThreadId, out var _))
+            {
+                return;
+            }
 
-                Log.Warn($"Failed to cleanup thread lock info for {new { Thread.CurrentThread.Name, Thread.CurrentThread.ManagedThreadId }}, threads holding lock: {lockInfoByThreadId.Keys.DumpToString()}");
-                if (Debugger.IsAttached)
-                {
-                    Debugger.Break();
-                }
-                throw new ApplicationException($"Failed to cleanup thread lock info, lock {this}");
+            Log.Warn($"Failed to cleanup thread lock info for {new { Thread.CurrentThread.Name, Thread.CurrentThread.ManagedThreadId }}, threads holding lock: {lockInfoByThreadId.Keys.DumpToString()}");
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+            throw new ApplicationException($"Failed to cleanup thread lock info, lock {this}");
 #endif
         });
+    }
+    
+    public IDisposable Enter()
+    {
+        return Enter(DefaultTimeout);
     }
 
     public override string ToString()

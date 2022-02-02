@@ -29,7 +29,7 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
             .OrderByDescending(x => x.LastWriteTime)
             .Take(logsToInclude)
             .ToArray();
-        Log.Debug($"{logFilesRoot} contains the following files:\n\t{logFilesToInclude.Select(y => new { y.Name, y.LastWriteTime }).DumpToString()}");
+        Log.Debug($"{logFilesRoot} contains the following files:\n\t{logFilesToInclude.Select(y => new { y.Name, y.LastWriteTime }).DumpToTable()}");
 
         var result = new List<ExceptionReportItem>();
         for (var idx = 0; idx < logFilesToInclude.Length; idx++)

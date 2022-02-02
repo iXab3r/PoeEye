@@ -40,7 +40,7 @@ internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IE
             .OrderByDescending(x => x.LastWriteTime)
             .Take(maxSnapshotsToInclude)
             .ToArray();
-        Log.Debug($"{TracesFolder} contains the following files: {snapshotsToInclude.Select(y => new { y.Name, y.LastWriteTime }).DumpToString()}");
+        Log.Debug($"{TracesFolder} contains the following files: {snapshotsToInclude.Select(y => new { y.Name, y.LastWriteTime }).DumpToTable()}");
 
         var result = new List<ExceptionReportItem>();
         for (var idx = 0; idx < snapshotsToInclude.Length; idx++)

@@ -6,7 +6,7 @@ namespace PoeShared.Services;
 
 public abstract class SharedResourceBase : DisposableReactiveObject, ISharedResource
 {
-    private static readonly long MaxRefCount = 64;
+    private static readonly long MaxRefCount = 1024;
 
     private static long GlobalIdx;
     private readonly ReaderWriterLockSlim resourceGate = new(LockRecursionPolicy.SupportsRecursion);
