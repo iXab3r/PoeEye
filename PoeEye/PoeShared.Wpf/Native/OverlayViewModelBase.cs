@@ -22,8 +22,8 @@ using PropertyChanged;
 using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using KeyEventHandler = System.Windows.Input.KeyEventHandler;
-using Point = System.Windows.Point;
-using Size = System.Windows.Size;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
 
@@ -132,6 +132,11 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                     NativeBounds = new Rectangle(bounds.X + 1, bounds.Y, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
                 }
+                else if (x.EventArgs.Key is Key.R)
+                {
+                    ResetToDefault();
+                    x.EventArgs.Handled = true;
+                }
             }, Log.HandleUiException)
             .AddTo(Anchors);
 
@@ -142,9 +147,9 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
             .Subscribe(x =>
             {
                 // always on UI thread
-                Log.Info(() => $"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+                Log.Debug(() => $"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
                 NativeBounds = x.ActualBounds;
-                Log.Info(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+                Log.Debug(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
             })
             .AddTo(Anchors); 
 
@@ -157,9 +162,9 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 // always on UI thread, possible recursive assignment
                 // Native => SetWindowRect => Actual => Native => ...
                 var overlayBounds = x.Window.NativeBounds;
-                Log.Info(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+                Log.Debug(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
                 x.Window.NativeBounds = x.DesiredBounds;
-                Log.Info(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+                Log.Debug(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
             })
             .AddTo(Anchors);
 
@@ -181,7 +186,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
     public double? TargetAspectRatio { get; set; }
 
-    public Point ViewModelLocation { get; set; }
+    public System.Windows.Point ViewModelLocation { get; set; }
 
     public ICommand UnlockWindowCommand => unlockWindowCommand;
 
@@ -247,7 +252,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
         Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {NativeBounds})");
         var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
-        var size = (DefaultSize.IsNotEmpty() ? DefaultSize : MinSize).ScaleToScreen(Dpi);
+        var size = DefaultSize.IsNotEmpty() ? DefaultSize : MinSize;
         NativeBounds = new Rectangle(center, size);
         Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
 
@@ -309,7 +314,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             MonitorCount = SystemInformation.MonitorCount,
             VirtualScreen = SystemInformation.VirtualScreen,
-            MonitorBounds = UnsafeNative.GetMonitorBounds(desktopHandle).ToWinRectangle(),
+            MonitorBounds = UnsafeNative.GetMonitorBounds(desktopHandle),
             MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
         };
 

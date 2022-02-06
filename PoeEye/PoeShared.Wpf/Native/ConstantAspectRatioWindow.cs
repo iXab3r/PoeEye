@@ -80,11 +80,8 @@ public class ConstantAspectRatioWindow : Window
                         return;
                     }
 
-                    Log.Debug(() => $"Setting initial window {this} size ({thisWindow.ToHexadecimal()}), TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, target bounds: {newBounds}");
-                    if (!UnsafeNative.SetWindowRect(thisWindow, newBounds))
-                    {
-                        Log.Warn($"Failed to assign initial window {this} ({thisWindow.ToHexadecimal()}) size, TargetAspectRatio: {targetAspectRatio}, initial bounds: {bounds}, target bounds: {newBounds}");
-                    }
+                    Log.Debug(() => $"Setting initial window bounds, TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, desired bounds: {newBounds}");
+                    NativeBounds = newBounds;
                 }, Log.HandleUiException)
             .AddTo(Anchors);
         Dpi = new PointF(1, 1);
@@ -180,6 +177,32 @@ public class ConstantAspectRatioWindow : Window
 
         // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
         // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
+        var isUpdatingActualBounds = false;
+        this.Observe(NativeBoundsProperty, x => x.NativeBounds)
+            .WithPrevious()
+            .Where(x => x.Current != x.Previous)
+            .SubscribeSafe(x =>
+            {
+                // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
+                if (isUpdatingActualBounds)
+                {
+                    Log.Debug(() => $"Native bounds changed as a part of actual bounds update: {x.Previous} => {x.Current}");
+                    return;
+                }
+                Log.Debug(() => $"Native bounds changed, setting windows rect: {x.Previous} => {x.Current}");
+                UnsafeNative.SetWindowRect(WindowHandle, x.Current);
+                var actualBounds = UnsafeNative.GetWindowRect(WindowHandle);
+                if (actualBounds != x.Current)
+                {
+                    Log.Warn(() => $"Failed to resize: {x.Previous} => {x.Current}, resulting native bounds: {actualBounds}");
+                }
+                else
+                {
+                    Log.Debug(() => $"Native bounds changed: {x.Previous} => {x.Current}");
+                }
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+        
         this.Observe(ActualBoundsProperty, x => x.ActualBounds)
             .WithPrevious()
             .Where(x => x.Current != x.Previous)
@@ -189,29 +212,17 @@ public class ConstantAspectRatioWindow : Window
                 {
                     return;
                 }
-                Log.Info(() => $"Actual bounds have changed: {x.Previous} => {x.Current}");
-                SetCurrentValue(NativeBoundsProperty, x.Current);
-                Log.Info(() => $"Propagated actual bounds: {x.Current}");
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
-        
-        this.Observe(NativeBoundsProperty, x => x.NativeBounds)
-            .WithPrevious()
-            .Where(x => x.Current != x.Previous)
-            .SubscribeSafe(x =>
-            {
-                // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
-                Log.Info(() => $"Native bounds changed, setting windows rect: {x.Previous} => {x.Current}");
-                UnsafeNative.SetWindowRect(WindowHandle, x.Current);
-                var actualBounds = UnsafeNative.GetWindowRect(WindowHandle);
-                if (actualBounds != x.Current)
+                Log.Debug(() => $"Actual bounds have changed: {x.Previous} => {x.Current}");
+                try
                 {
-                    Log.Warn(() => $"Failed to resize: {x.Previous} => {x.Current}, resulting native bounds: {actualBounds}");
+                    isUpdatingActualBounds = true;
+                    SetCurrentValue(NativeBoundsProperty, x.Current);
                 }
-                else
+                finally
                 {
-                    Log.Info(() => $"Native bounds changed: {x.Previous} => {x.Current}");
+                    isUpdatingActualBounds = false;
                 }
+                Log.Debug(() => $"Propagated actual bounds: {x.Current}");
             }, Log.HandleUiException)
             .AddTo(Anchors);
     }
@@ -233,9 +244,9 @@ public class ConstantAspectRatioWindow : Window
                 var currentBounds = ActualBounds;
                 if (newBounds != currentBounds)
                 {
-                    Log.WithSuffix(msg).Info(() => $"Updating actual bounds: {currentBounds} => {newBounds}");
+                    Log.WithSuffix(msg).Debug(() => $"Updating actual bounds: {currentBounds} => {newBounds}");
                     SetCurrentValue(ActualBoundsProperty, newBounds);
-                    Log.WithSuffix(msg).Info(() => $"Updated actual bounds: {currentBounds} => {newBounds}");
+                    Log.WithSuffix(msg).Debug(() => $"Updated actual bounds: {currentBounds} => {newBounds}");
                 }
 
                 break;
@@ -261,24 +272,22 @@ public class ConstantAspectRatioWindow : Window
         {
             case User32.WindowMessage.WM_ENTERSIZEMOVE:
             {
-                var bounds = UnsafeNative.GetWindowRect(WindowHandle);
-                var p = UnsafeNative.GetMousePosition();
-                var diffWidth = Math.Min(Math.Abs(p.X - bounds.X), Math.Abs(p.X - bounds.X - bounds.Width));
-                var diffHeight = Math.Min(Math.Abs(p.Y - bounds.Y), Math.Abs(p.Y - bounds.Y - bounds.Height));
-
+                var bounds = ActualBounds;
                 dragParams = new DragParams
                 {
-                    AdjustingHeight = diffHeight > diffWidth,
                     InitialBounds = bounds,
                     InitialAspectRatio = (double)bounds.Width / bounds.Height,
                 };
-
-                Log.Debug(() => $"Entering Drag mode for window {this}, initialBounds: {bounds}, adjustingHeight: {dragParams.Value.AdjustingHeight}");
+                Log.Debug(() => $"Entering Drag mode, initial bounds: {bounds}");
                 break;
             }
             case User32.WindowMessage.WM_EXITSIZEMOVE:
             {
-                Log.Debug(() => $"Drag mode completed for window {this}, initialBounds: {dragParams?.InitialBounds} => {new Rectangle((int)Left, (int)Top, (int)Width, (int)Height)}");
+                if (dragParams == null)
+                {
+                    break;
+                }
+                Log.Debug(() => $"Drag mode completed, initialBounds: {dragParams?.InitialBounds} => {ActualBounds}");
                 dragParams = null;
                 break;
             }
@@ -295,16 +304,29 @@ public class ConstantAspectRatioWindow : Window
                     break;
                 }
 
+                var initialBounds = dragParams.Value.InitialBounds;
+                var aspectRatio = TargetAspectRatio.Value;
+                var minSize = new System.Windows.Size(MinWidth, MinHeight).Scale(Dpi).ToWinSize();
+                var maxSize = new System.Windows.Size(MaxWidth, MaxHeight).Scale(Dpi).ToWinSize();
                 var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
-                var newBounds = aspectRatioSizeCalculator.Calculate(TargetAspectRatio.Value, bounds, dragParams.Value.InitialBounds, prioritizeHeight: TargetAspectRatio.Value >= 1);
-                newBounds.Width = (int)Math.Max(MinWidth, Math.Min(MaxWidth, newBounds.Width));
-                newBounds.Height = (int)Math.Max(MinHeight, Math.Min(MaxHeight, newBounds.Height));
+                var logSuffix = $"initial bounds: {initialBounds}, targetAspectRatio: {aspectRatio}, move bounds: {bounds}";
+
+                if (bounds.Size == initialBounds.Size)
+                {
+                    Log.WithSuffix(logSuffix).Debug(() => $"Ignoring position change - actual size stayed the same");
+                    break;
+                }
+
+                var newBounds = aspectRatioSizeCalculator.Calculate(aspectRatio, bounds, initialBounds, prioritizeHeight: aspectRatio >= 1);
+                Log.WithSuffix(logSuffix).Debug(() => $"Calculated updated bounds: {newBounds}");
+                newBounds.Width = newBounds.Width.EnsureInRange(minSize.Width, maxSize.Width);
+                newBounds.Height = newBounds.Height.EnsureInRange(minSize.Height, maxSize.Height);
                 if (newBounds == bounds)
                 {
                     break;
                 }
 
-                Log.Debug(() => $"In scope of resize to {bounds} of window: {this}( initial drag bounds: {dragParams?.InitialBounds}), targetAspectRatio: {TargetAspectRatio.Value} resizing to these bounds instead: {newBounds}");
+                Log.WithSuffix(logSuffix).Debug(() => $"Propagating updated bounds: {newBounds}");
 
                 pos.x = newBounds.X;
                 pos.y = newBounds.Y;
@@ -379,6 +401,5 @@ public class ConstantAspectRatioWindow : Window
         public Rectangle InitialBounds { get; set; }
         public double InitialAspectRatio { get; set; }
         public Point InitialMousePosition { get; set; }
-        public bool AdjustingHeight { get; set; }
     }
 }

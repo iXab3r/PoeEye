@@ -34,6 +34,20 @@ public static class GeometryExtensions
         };
     }
 
+    public static WinRect EnsureInBounds(this WinRect value, WinSize min, WinSize max)
+    {
+        return new WinRect(value.Location, value.Size.EnsureInBounds(min, max));
+    }
+    
+    public static WinSize EnsureInBounds(this WinSize value, WinSize min, WinSize max)
+    {
+        return new WinSize
+        {
+            Width = value.Width.EnsureInRange(min.Width, max.Width),
+            Height = value.Height.EnsureInRange(min.Height, max.Height)
+        };
+    }
+
     public static WpfPoint Center(this Rect rect)
     {
         return new(rect.Left + (float)rect.Width / 2, rect.Top + (float)rect.Height / 2);
@@ -278,7 +292,7 @@ public static class GeometryExtensions
         return new WpfPoint(source.X / dpi.X, source.Y / dpi.Y);
     }
         
-    public static WinRect Scale(this WinRect sourceSize, float dpi)
+    public static WinRect Scale(this WinRect sourceSize, double dpi)
     {
         return new WinRect((int)(sourceSize.X / dpi), (int)(sourceSize.Y / dpi), (int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
     }
