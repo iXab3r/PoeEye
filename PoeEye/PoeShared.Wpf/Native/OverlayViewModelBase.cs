@@ -279,7 +279,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         Log.Info(() => $"Assigning overlay window: {owner}");
 
         Log.Info(() => $"Syncing window parameters with view model");
-        UnsafeNative.SetWindowRect(owner.WindowHandle, NativeBounds);
+        owner.NativeBounds = NativeBounds;
 
         OverlayWindow = owner;
         Log.Info(() => $"Overlay window is assigned: {OverlayWindow}");

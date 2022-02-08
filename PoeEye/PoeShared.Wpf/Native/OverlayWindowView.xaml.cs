@@ -22,7 +22,7 @@ public partial class OverlayWindowView
 
     private void OnLocationChanged(object sender, EventArgs e)
     {
-        Log.Info(() => $"Window location changed");
+        Log.Debug(() => $"Window location changed");
     }
 
     public IObservable<EventPattern<RoutedEventArgs>> WhenLoaded => Observable
@@ -35,7 +35,7 @@ public partial class OverlayWindowView
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
     {
-        Log.Info(() => $"Window size changed");
+        Log.Debug(() => $"Window size changed");
 
         var window = sender as Window;
         var windowViewModel = window?.DataContext as OverlayWindowViewModel;
