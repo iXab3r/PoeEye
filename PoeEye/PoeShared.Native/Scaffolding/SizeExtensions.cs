@@ -1,4 +1,6 @@
-using System.Windows;
+using System.Drawing;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
 namespace PoeShared.Scaffolding;
 
@@ -10,6 +12,11 @@ public static class SizeExtensions
     }
         
     public static Size Scale(this Size size, Point factor)
+    {
+        return new Size(size.Width * factor.X, size.Height * factor.Y);
+    }
+    
+    public static Size Scale(this Size size, PointF factor)
     {
         return new Size(size.Width * factor.X, size.Height * factor.Y);
     }

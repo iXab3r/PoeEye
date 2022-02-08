@@ -6,6 +6,27 @@ namespace PoeShared.Logging;
 
 public static class FluentLogExtensions
 {
+    public static void DebugIfDebug(this IFluentLog log, Func<string> message)
+    {
+#if DEBUG
+        log.Debug(message);
+#endif
+    }
+    
+    public static void WarnIfDebug(this IFluentLog log, Func<string> message)
+    {
+#if DEBUG
+        log.Warn(message);
+#endif
+    }
+    
+    public static void InfoIfDebug(this IFluentLog log, Func<string> message)
+    {
+#if DEBUG
+        log.Info(message);
+#endif
+    }
+    
     public static IFluentLog CreateChildCollectionLogWriter(this IFluentLog log, ISourceList<string> collection)
     {
         var writerAdapter = new LogWriterAdapter<string>(logData =>

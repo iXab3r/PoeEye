@@ -7,4 +7,5 @@ public interface ISevenZipWrapper
 {
     void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd);
     void ExtractArchive(FileInfo inputFileName, DirectoryInfo outputDirectory);
+    void ExtractArchive(SevenZipExtractArguments arguments);
 }

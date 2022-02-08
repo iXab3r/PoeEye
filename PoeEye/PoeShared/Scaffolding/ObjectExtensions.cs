@@ -10,45 +10,36 @@ public static class ObjectExtensions
 {
     private static readonly IFluentLog Log = typeof(ObjectExtensions).PrepareLogger();
 
-    private static readonly List<JsonConverter> JsonConverters = new List<JsonConverter>()
-    {
-        new FileSystemInfoConverter()
-    };
-        
-    private static readonly JsonSerializerSettings SerializationIndented = new JsonSerializerSettings()
-    {
-        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-        Formatting = Formatting.Indented,
-        Converters = JsonConverters
-    }; 
-        
-    private static readonly JsonSerializerSettings SerializationNone = new JsonSerializerSettings()
-    {
-        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-        Formatting = Formatting.None,
-        Converters = JsonConverters
-    }; 
-        
+    private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> ReadablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
+    private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> WriteablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
+
     public static string Dump<T>(this T instance)
     {
-        return DumpToText(instance);
-    }
-        
-    public static string DumpToText<T>(this T instance)
-    {
-        return DumpToText(instance, SerializationIndented);
+        return ToStringSafe(instance);
     }
 
+    [Obsolete("Replaced with Dump(), left here for compatibility reasons")]
+    public static string DumpToText<T>(this T instance)
+    {
+        return instance.Dump();
+    }
+
+    [Obsolete("Replaced with Dump(), left here for compatibility reasons")]
     public static string DumpToTextRaw<T>(this T instance)
     {
-        return DumpToText(instance, SerializationNone);
+        return instance.Dump();
+    }
+
+    public static string DumpToString<T>(this IEnumerable<T> instance)
+    {
+        return ToStringTable(instance, ", ");
     }
 
     public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
     {
-        return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.DumpToTextRaw()));
+        return instance == null ? instance.Dump() : string.Join(separator, instance.Select(x => x.Dump()));
     }
-        
+
     public static string DumpToHex(this byte[] value, int bytesPerLine = 32)
     {
         if (value == null)
@@ -57,18 +48,19 @@ public static class ObjectExtensions
         }
         return StringUtils.HexDump(value, bytesPerLine);
     }
-        
-    public static string DumpToString<T>(this IEnumerable<T> instance)
-    {
-        return ToStringTable(instance, ", ");
-    }
-        
+
+    [Obsolete("Replaced with DumpToTable(), left here for compatibility reasons")]
     public static string ToStringTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
     {
-        return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.ToHumanReadable()));
+        return instance.DumpToTable(separator);
     }
-        
-    public static string ToHumanReadable<T>(this T item)
+
+    public static string ToStringSafe<T>(this T instance)
+    {
+        return ToHumanReadable(instance);
+    }
+
+    private static string ToHumanReadable<T>(this T item)
     {
         if (item is IntPtr ptr)
         {
@@ -76,23 +68,7 @@ public static class ObjectExtensions
         }
         return item == null ? "null" : item.ToString();
     }
-        
-    public static string ToStringSafe<T>(this T instance)
-    {
-        return instance == null ? "NULL" : instance.ToString();
-    }
-        
-    public static string DumpToTable<T>(this IEnumerable<T> instance, string tableName, string separator = "\n\t")
-    {
-        var header = instance == null ? $"{tableName} (null)" : $"{tableName} ({instance.Count()})";
-        return header + separator + DumpToTable(instance, separator);
-    }
 
-    public static string DumpToText<T>(this T instance, JsonSerializerSettings settings)
-    {
-        return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, settings);
-    }
-        
     public static TItem AddTo<TItem, TCollection>(this TItem instance, ISourceList<TCollection> parent) where TItem : TCollection
     {
         Guard.ArgumentNotNull(instance, nameof(instance));
@@ -101,7 +77,7 @@ public static class ObjectExtensions
         parent.Add(instance);
         return instance;
     }
-        
+
     public static TItem AddTo<TItem, TCollection>(this TItem instance, ICollection<TCollection> collection) where TItem : TCollection
     {
         Guard.ArgumentNotNull(instance, nameof(instance));
@@ -110,7 +86,7 @@ public static class ObjectExtensions
         collection.Add(instance);
         return instance;
     }
-        
+
     public static TItem InsertTo<TItem, TCollection>(this TItem instance, IList<TCollection> collection, int index) where TItem : TCollection
     {
         Guard.ArgumentNotNull(instance, nameof(instance));
@@ -119,7 +95,7 @@ public static class ObjectExtensions
         collection.Insert(index, instance);
         return instance;
     }
-        
+
     public static IEnumerable<PropertyInfo> GetAllProperties(this Type type, BindingFlags flags)
     {
         if (!type.IsInterface)
@@ -131,9 +107,6 @@ public static class ObjectExtensions
             .Concat(type.GetInterfaces())
             .SelectMany(i => i.GetProperties(flags));
     }
-
-    private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> ReadablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
-    private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> WriteablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
 
     public static void TransferPropertiesTo<TSource, TTarget>(this TSource source, TTarget target)
         where TTarget : class, TSource
@@ -238,7 +211,7 @@ public static class ObjectExtensions
 
         return extractor(instance);
     }
-        
+
     public static TValue Eval<T, TValue>(this T instance, Func<T, TValue> extractor) where T : class
     {
         return EvalOrDefault(instance, extractor, default);

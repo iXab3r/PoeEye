@@ -1,11 +1,13 @@
 using System;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Services;
 
 namespace PoeShared.UI;
 
@@ -15,6 +17,7 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
     private readonly IAppArguments appArguments;
     private readonly IFactory<ExceptionDialogViewModel, ICloseController> dialogViewModelFactory;
     private readonly SerialDisposable activeWindowAnchors = new();
+    private readonly NamedLock dialogLock = new(nameof(ExceptionDialogDisplayer));
 
     public ExceptionDialogDisplayer(
         IAppArguments appArguments,
@@ -91,8 +94,10 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
                 Log.Debug(() => $"Sent signal to UI thread to report crash related to exception {config.Exception.Message}");
                 return;
             }
-                
-            Log.Debug(() => $"Showing custom ExceptionViewer, exception: {config.Exception}, config: {new { config.Title, config.AppName, config.Timestamp, config.Exception }}");
+
+            Log.Info(() => $"Acquiring dialog lock");
+            using var @lock = dialogLock.Enter();
+            Log.Info(() => $"Showing custom ExceptionViewer, exception: {config.Exception}, config: {new { config.Title, config.AppName, config.Timestamp, config.Exception }}");
 
             var windowAnchors = new CompositeDisposable();
             Window window = null;

@@ -8,11 +8,14 @@ using System.Reactive.Disposables;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Services;
 using PoeShared.Squirrel.Core;
+using PropertyBinder;
 using ReactiveUI;
 using Squirrel;
 
@@ -21,11 +24,19 @@ namespace PoeShared.Squirrel.Updater;
 internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
 {
     private static readonly IFluentLog Log = typeof(ApplicationUpdaterModel).PrepareLogger();
+    private static readonly Binder<ApplicationUpdaterModel> Binder = new();
 
     private static readonly string DotnetCoreRunnerName = "dotnet.exe";
     private static readonly string UpdaterExecutableName = "update.exe";
     private readonly IAppArguments appArguments;
     private readonly IApplicationAccessor applicationAccessor;
+
+    static ApplicationUpdaterModel()
+    {
+        Binder
+            .Bind(x => new DirectoryInfo(Path.Combine(x.RootDirectory.FullName, x.appArguments.AppName)))
+            .To(x => x.AppRootDirectory);
+    }
  
     public ApplicationUpdaterModel(
         IApplicationAccessor applicationAccessor,
@@ -37,6 +48,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
         MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
         LatestAppliedVersion = null;
+        RootDirectory = new DirectoryInfo(Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%"));
             
         updateSourceProvider
             .WhenAnyValue(x => x.UpdateSource)
@@ -50,27 +62,16 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             
         var currentProcessName = Process.GetCurrentProcess().ProcessName + ".exe";
         Log.Debug(() => $"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
-        if (string.Equals(DotnetCoreRunnerName, currentProcessName, StringComparison.OrdinalIgnoreCase))
-        {
-            Log.Debug(() => $"Detected that Application is running using .net core runner ({DotnetCoreRunnerName})");
-
-            if (string.IsNullOrEmpty(appArguments.ApplicationExecutableName) || Path.GetExtension(appArguments.ApplicationExecutableName) != ".dll")
-            {
-                throw new NotSupportedException("Could not determine application name, expected either .dll with .net runner or raw executable (.exe)");
-            }
-                
-            Log.Debug(() => $"Extracting application executable name from {appArguments.ApplicationExecutableName}");
-            var executableName = Path.ChangeExtension(appArguments.ApplicationExecutableName, ".exe");
-            ApplicationExecutableFileName = executableName;
-        }
-        else
-        {
-            ApplicationExecutableFileName = currentProcessName;
-        }
+        ApplicationExecutableFileName = $"{appArguments.AppName}.exe";
         Log.Debug(() => $"Application will be started via executing {ApplicationExecutableFileName}");
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     public string ApplicationExecutableFileName { get; }
+    
+    public DirectoryInfo RootDirectory { get; }
+    
+    public DirectoryInfo AppRootDirectory { get; [UsedImplicitly] private set; }
 
     public DirectoryInfo MostRecentVersionAppFolder { get; set; }
 
@@ -110,10 +111,9 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => CombinedProgressReporter(x, downloadReleaseTaskName));
 
         string newVersionFolder;
-        var squirrelExe = GetSquirrelUpdateExe();
-        if (string.IsNullOrWhiteSpace(squirrelExe))
+        if (appArguments.IsDebugMode)
         {
-            Log.Warn("Not a Squirrel-app or debug mode detected, skipping update");
+            Log.Warn("Debug mode detected, simulating update process without touching files");
             newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
             for (var i = 0; i < 20; i++)
             {
@@ -128,7 +128,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
         else
         {
-            Log.Debug(() => $"Applying releases, squirrel executable: {squirrelExe}");
+            Log.Debug(() => $"Applying releases: {updateInfo}");
             newVersionFolder = await mgr.ApplyReleases(updateInfo, x => CombinedProgressReporter(x, applyReleaseTaskName));
         }
 
@@ -230,9 +230,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     public FileInfo GetLatestExecutable()
     {
-        var appExecutable = new FileInfo(Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-        Log.Debug(() => $"Most recent version folder: {MostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
-
+        var appExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, ApplicationExecutableFileName));
+        Log.Debug(() => $"Application executable: {appExecutable} (exists: {appExecutable.Exists})");
         if (!appExecutable.Exists)
         {
             throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
@@ -242,17 +241,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     private async Task<PoeUpdateManager> CreateManager()
     {
-        var appName = Process.GetCurrentProcess().ProcessName;
-        var rootDirectory = default(string);
-
-        if (appArguments.IsDebugMode || string.IsNullOrWhiteSpace(GetSquirrelUpdateExe()))
-        {
-            rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        }
-
-        Log.Debug(() => $"AppName: {appName}, root directory: {rootDirectory}");
-
         Log.Debug(() => $"Using update source: {UpdateSource.DumpToTextRaw()}");
+
         var downloader = new BasicAuthFileDownloader(
             new NetworkCredential(
                 UpdateSource.Username?.ToUnsecuredString(),
@@ -264,14 +254,18 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             var mgr = PoeUpdateManager.GitHubUpdateManager(
                 UpdateSource.Uri,
                 downloader,
-                appName,
-                rootDirectory);
+                appArguments.AppName,
+                RootDirectory.FullName);
             return await mgr;
         }
         else
         {
             Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.DumpToTextRaw()}");
-            var mgr = new PoeUpdateManager(UpdateSource.Uri, downloader, appName, rootDirectory);
+            var mgr = new PoeUpdateManager(
+                UpdateSource.Uri, 
+                downloader, 
+                appArguments.AppName, 
+                RootDirectory.FullName);
             return mgr;
         }
     }
@@ -287,32 +281,9 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         Log.Debug(() => $"Check update is in progress: {progressPercent}%");
     }
 
-      
-
-    private static string GetSquirrelUpdateExe()
+    private string GetSquirrelUpdateExeOrThrow()
     {
-        var entryAssembly = Assembly.GetEntryAssembly();
-        if (entryAssembly != null &&
-            Path.GetFileName(entryAssembly.Location).Equals(UpdaterExecutableName, StringComparison.OrdinalIgnoreCase) &&
-            entryAssembly.Location.IndexOf("app-", StringComparison.OrdinalIgnoreCase) == -1 &&
-            entryAssembly.Location.IndexOf("SquirrelTemp", StringComparison.OrdinalIgnoreCase) == -1)
-        {
-            return Path.GetFullPath(entryAssembly.Location);
-        }
-
-        var squirrelAssembly = typeof(PoeUpdateManager).Assembly;
-        var executingAssembly = Path.GetDirectoryName(squirrelAssembly.Location);
-        if (executingAssembly == null)
-        {
-            throw new ApplicationException($"Failed to get directory assembly {squirrelAssembly}");
-        }
-
-        return Path.Combine(executingAssembly, "..", UpdaterExecutableName);
-    }
-
-    private static string GetSquirrelUpdateExeOrThrow()
-    {
-        var squirrelUpdateExe = GetSquirrelUpdateExe();
+        var squirrelUpdateExe = Path.Combine(AppRootDirectory.FullName, UpdaterExecutableName);
         if (!File.Exists(squirrelUpdateExe))
         {
             throw new FileNotFoundException($"{UpdaterExecutableName} not found(path: {squirrelUpdateExe}), not a Squirrel-installed app?",

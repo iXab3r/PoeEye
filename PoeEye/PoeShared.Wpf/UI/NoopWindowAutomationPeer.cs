@@ -6,6 +6,8 @@ namespace PoeShared.UI;
 
 public sealed class NoopWindowAutomationPeer : FrameworkElementAutomationPeer
 {
+    private static readonly List<AutomationPeer> EmptyList = new();
+    
     public NoopWindowAutomationPeer(FrameworkElement owner) : base(owner) { }
 
     protected override string GetNameCore()
@@ -20,6 +22,6 @@ public sealed class NoopWindowAutomationPeer : FrameworkElementAutomationPeer
 
     protected override List<AutomationPeer> GetChildrenCore()
     {
-        return new List<AutomationPeer>();
+        return EmptyList;
     }
 }
