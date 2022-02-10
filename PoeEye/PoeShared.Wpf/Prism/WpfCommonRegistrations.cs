@@ -15,6 +15,7 @@ using PoeShared.Profiler;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Services;
 using PoeShared.UI;
+using PoeShared.UI.Evaluators;
 using Unity;
 using Unity.Extension;
 using Application = System.Windows.Application;
@@ -67,6 +68,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
             .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
             .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
+            .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
             .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
             .RegisterType<INotificationContainerViewModel, NotificationContainerViewModel>()

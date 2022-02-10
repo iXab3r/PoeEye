@@ -44,7 +44,6 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterType(typeof(INamedFactory<,,>), typeof(Factory<,,>))
             .RegisterType(typeof(INamedFactory<,>), typeof(Factory<,>))
             .RegisterType(typeof(INamedFactory<>),  typeof(Factory<>))
-            .RegisterType<ISwitchableTextEvaluator, SwitchableTextEvaluator>()
             .RegisterType<IFolderCleanerService, FolderCleanerService>()
             .RegisterType<ISharedResourceLatch, SharedResourceLatch>();
     }

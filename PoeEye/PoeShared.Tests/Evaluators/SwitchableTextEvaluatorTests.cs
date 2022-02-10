@@ -2,6 +2,7 @@
 using AutoFixture;
 using System;
 using PoeShared.Evaluators;
+using PoeShared.UI.Evaluators;
 using Shouldly;
 
 namespace PoeShared.Tests.Evaluators;
@@ -47,8 +48,8 @@ public class SwitchableTextEvaluatorTests : FixtureBase
         instance.IsMatch.ShouldBe(expected);
     }
 
-    private SwitchableTextEvaluator CreateInstance()
+    private SwitchableTextEvaluatorViewModel CreateInstance()
     {
-        return Container.Build<SwitchableTextEvaluator>().Create();
+        return Container.Build<SwitchableTextEvaluatorViewModel>().Create();
     }
 }

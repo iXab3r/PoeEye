@@ -1,19 +1,27 @@
+using System;
 using JetBrains.Annotations;
+using PoeShared.Evaluators;
+using PoeShared.Scaffolding;
 using PropertyBinder;
 
-namespace PoeShared.Evaluators;
+namespace PoeShared.UI.Evaluators;
 
-internal sealed class SwitchableTextEvaluator : DisposableReactiveObject, ISwitchableTextEvaluator
+internal sealed class SwitchableTextEvaluatorViewModel : DisposableReactiveObject, ISwitchableTextEvaluatorViewModel
 {
-    private static readonly Binder<SwitchableTextEvaluator> Binder = new();
+    private static readonly Binder<SwitchableTextEvaluatorViewModel> Binder = new();
 
-    static SwitchableTextEvaluator()
+    static SwitchableTextEvaluatorViewModel()
     {
         Binder.BindIf(x => x.Evaluator != default, x => x.Expression)
             .To(x => x.Evaluator.Expression);
-        Binder.BindIf(x => x.Evaluator != default, x => x.Text)
-            .To(x => x.Evaluator.Text);
         
+        Binder.BindIf(x => x.TestMode == false, x => x.Text)
+            .To(x => x.TestText);
+        
+        Binder.BindIf(x => x.Evaluator != default && x.TestMode == false, x => x.Text)
+            .ElseIf(x => x.Evaluator != default && x.TestMode == true, x => x.TestText)
+            .To(x => x.Evaluator.Text);
+
         Binder.BindIf(x => x.Evaluator != default, x => x.Evaluator.IsMatch)
             .To(x => x.IsMatch);
         Binder.BindIf(x => x.Evaluator != default, x => x.Evaluator.Match)
@@ -21,15 +29,15 @@ internal sealed class SwitchableTextEvaluator : DisposableReactiveObject, ISwitc
         Binder.BindIf(x => x.Evaluator != default, x => x.Evaluator.Error)
             .Else(x => default)
             .To(x => x.Error);
-        
+
         Binder.Bind(x => CreateEvaluator(x.EvaluatorType, x.IgnoreCase))
             .To(x => x.Evaluator);
-        
+
         Binder.Bind(x => x.EvaluatorType == TextEvaluatorType.Regex || x.EvaluatorType == TextEvaluatorType.Text)
             .To(x => x.CanIgnoreCase);
     }
 
-    public SwitchableTextEvaluator()
+    public SwitchableTextEvaluatorViewModel()
     {
         Binder.Attach(this).AddTo(Anchors);
     }
@@ -46,6 +54,10 @@ internal sealed class SwitchableTextEvaluator : DisposableReactiveObject, ISwitc
 
     public bool CanIgnoreCase { get; [UsedImplicitly] private set; }
     
+    public bool TestMode { get; set; }
+    
+    public string TestText { get; [UsedImplicitly] set; }
+
     public TextEvaluatorType EvaluatorType { get; set; }
 
     private static ITextEvaluator CreateEvaluator(TextEvaluatorType evaluatorType, bool ignoreCase)

@@ -2,7 +2,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace PoeShared.Evaluators;
+namespace PoeShared.UI.Evaluators;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum TextEvaluatorType
