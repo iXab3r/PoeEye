@@ -204,27 +204,20 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         Log.Debug(
             $"Restarting app, folder: {MostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
 
-        var squirrelUpdater = GetSquirrelUpdateExeOrThrow();
-        var squirrelArgs = new StringBuilder($"--processStartAndWait {executable.FullName}");
+        var appPath = Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName);
+        var appArgs = new StringBuilder($"--processStartAndWait {executable.FullName}");
         if (appArguments.IsDebugMode)
         {
-            squirrelArgs.Append($" --process-start-args=-d");
+            appArgs.Append($" -d");
         }
 
-        Log.Debug(() => $"Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
-        var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs.ToString());
+        Log.Debug(() => $"Starting application @ '{appPath}', args: {appArgs} ...");
+        var updaterProcess = Process.Start(appPath, appArgs.ToString());
         if (updaterProcess == null)
         {
-            throw new FileNotFoundException($"Failed to start updater @ '{squirrelUpdater}'");
+            throw new FileNotFoundException($"Failed to start application @ '{appPath}'");
         }
-            
-        //FIXME Rewrite this pile of mess.PID should be send via args along with a mutex name, that way it will be fully controllable
-            
-        // NB: We have to give update.exe some time to grab our PID, but
-        // we can't use WaitForInputIdle because we probably don't have
-        // whatever WaitForInputIdle considers a message loop.
         Log.Debug(() => $"Process spawned, PID: {updaterProcess.Id}");
-        await Task.Delay(2000);
         await applicationAccessor.Exit();
     }
 
