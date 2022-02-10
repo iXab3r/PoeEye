@@ -28,7 +28,7 @@
                                Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}" />
                     <RadioButton
                         Style="{StaticResource FastTabRadioButton}"
-                        ToolTip="Text by 'contains'"
+                        ToolTip="Text by exact match"
                         IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Text}}">
                         <RadioButton.Content>
                             <materialDesign:PackIcon Kind="Text" Height="16" Width="16"/>
@@ -45,7 +45,7 @@
                     <RadioButton
                         Style="{StaticResource FastTabRadioButton}"
                         IsChecked="{Binding Path=EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Lambda}}"
-                        ToolTip="Use 'x' to get current value">
+                        ToolTip='C# Lambda that converts input string to boolean. Use "x" (without quotes) to get current value, e.g. x == "text" or int.Parse(x) == 6'>
                         <RadioButton.Content>
                             <TextBlock Text="C#"/>
                         </RadioButton.Content>
