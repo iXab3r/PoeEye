@@ -9,6 +9,8 @@ namespace PoeShared.Scaffolding;
 
 public static class NotifyPropertyChangedExtensions
 {
+    private static readonly IFluentLog Log = typeof(NotifyPropertyChangedExtensions).PrepareLogger();
+
     public static IObservable<EventPattern<PropertyChangedEventArgs>> WhenAnyProperty<TObject>([NotNull] this TObject instance, params string[] propertiesToMonitor)
         where TObject : INotifyPropertyChanged
     {
@@ -111,8 +113,11 @@ public static class NotifyPropertyChangedExtensions
         TimeSpan timeout)
         where TObject : INotifyPropertyChanged
     {
-        var source = instance
-            .WhenAnyValue(ex1);
+        var extractor = ex1.Compile();
+
+        var source = Observable.Merge(
+                instance.WhenAnyValue(ex1), 
+                Observable.Return(Unit.Default).Select(_ => extractor.Invoke(instance)));
             
         if (timeout <= TimeSpan.Zero)
         {
@@ -122,9 +127,10 @@ public static class NotifyPropertyChangedExtensions
                 .ToTask();
         }
 
-        return source.Where(x => condition(x))
+        return source
+            .Where(x => condition(x))
             .Take(1)
-            .Timeout(timeout)
+            .Amb(Observable.Return(default(T1)).Delay(timeout).Select(_ => Observable.Throw<T1>(new TimeoutException($"Value did not satisfy condition in {timeout}"))).Switch())
             .ToTask();
     }
         
