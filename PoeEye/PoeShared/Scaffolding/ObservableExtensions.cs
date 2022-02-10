@@ -99,9 +99,25 @@ public static class ObservableExtensions
 
     public static IObservable<TOut> SwitchIfNotDefault<TIn, TOut>(
         this IObservable<TIn> observable,
+        Func<TIn, IObservable<TOut>> trueSelector,
+        Func<IObservable<TOut>> falseSelector)
+    {
+        return observable.SwitchIf(condition: x => x != null, trueSelector: trueSelector, falseSelector: _ => falseSelector());
+    }
+
+    public static IObservable<TOut> SwitchIfNotDefault<TIn, TOut>(
+        this IObservable<TIn> observable,
         [NotNull] Func<TIn, IObservable<TOut>> selector)
     {
-        return observable.SwitchIf(condition: x => x != null, trueSelector: selector, falseSelector: _ => Observable.Empty<TOut>());
+        return SwitchIfNotDefault(observable, trueSelector: selector, falseSelector: Observable.Empty<TOut>);
+    }
+    
+    public static IObservable<TOut> SwitchIf<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Predicate<TIn> condition,
+        [NotNull] Func<TIn, IObservable<TOut>> trueSelector)
+    {
+        return observable.SwitchIf(condition, trueSelector, _ => Observable.Empty<TOut>());
     }
 
     public static IObservable<TOut> SwitchIf<TIn, TOut>(

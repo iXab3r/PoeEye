@@ -16,6 +16,11 @@ public sealed class TextExpressionEvaluator : DisposableReactiveObject, ITextEva
             .BindIf(x => x.watcher.HasValue && x.watcher.Value is bool, x => (bool)x.watcher.Value)
             .Else(x => false)
             .To(x => x.IsMatch);
+        
+        Binder
+            .BindIf(x => x.IsMatch, x => x.Text)
+            .Else(x => default)
+            .To(x => x.Match);
                 
         Binder.Bind(x => x.Text)
             .To(x => x.watcher.Source);
@@ -40,6 +45,8 @@ public sealed class TextExpressionEvaluator : DisposableReactiveObject, ITextEva
     public string Expression { get; set; }
             
     public bool IsMatch { get; [UsedImplicitly] private set; }
-        
+    
+    public string Match { get; [UsedImplicitly] private set; }
+
     public string Error { get; [UsedImplicitly] private set; }
 }

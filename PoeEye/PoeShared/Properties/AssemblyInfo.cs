@@ -13,7 +13,7 @@ global using System.Collections;
 global using System.Diagnostics;
 global using System.Globalization;
 global using System.Linq.Expressions;
-global using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyVersion("0.0.0.0")]

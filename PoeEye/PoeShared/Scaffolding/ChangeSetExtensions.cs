@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Reactive;
 using DynamicData;
 using DynamicData.Aggregation;

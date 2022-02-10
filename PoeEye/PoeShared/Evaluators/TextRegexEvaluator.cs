@@ -10,7 +10,7 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
 
     static TextRegexEvaluator()
     {
-        Binder.BindIf(x => !string.IsNullOrEmpty(x.Expression), x => x.RecalculateRegex(x.Expression, x.IgnoreCase))
+        Binder.BindIf(x => x.Expression != default, x => x.RecalculateRegex(x.Expression, x.IgnoreCase))
             .Else(x => default)
             .To(x => x.Regex);
             
@@ -21,6 +21,11 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
         Binder.BindIf(x => x.RegexMatch != default, x => x.RegexMatch.Success)
             .Else(x => false)
             .To(x => x.IsMatch);
+        
+        Binder
+            .BindIf(x => x.RegexMatch != default, x => x.RegexMatch.Value)
+            .Else(x => default)
+            .To(x => x.Match);
     }
 
     public TextRegexEvaluator()
@@ -39,7 +44,9 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
     public string Expression { get; set; }
             
     public bool IsMatch { get; [UsedImplicitly] private set; }
-        
+    
+    public string Match { get; [UsedImplicitly] private set; }
+
     public string Error { get; [UsedImplicitly] private set; }
 
     private Regex RecalculateRegex(string text, bool ignoreCase)
