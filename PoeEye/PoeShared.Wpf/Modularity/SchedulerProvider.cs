@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using PoeShared.Prism;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using Unity;
 
@@ -19,7 +19,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     private static readonly Lazy<SchedulerProvider> InstanceSupplier = new();
 
     private readonly ConcurrentDictionary<string, IScheduler> schedulers = new();
-        
+
     public static ISchedulerProvider Instance => InstanceSupplier.Value;
 
     public void Initialize(IUnityContainer container)
@@ -31,23 +31,38 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
     public IScheduler GetOrCreate(string name)
     {
-        Log.Debug(() => $"[{name}] Retrieving scheduler...");
-        return schedulers.GetOrAdd(name, CreateEnforcedThreadScheduler);
+        Log.Debug(() => $"Retrieving scheduler...");
+        return schedulers.GetOrAdd(name, x => CreateEnforcedThreadScheduler(name, ThreadPriority.Normal));
     }
-        
-    private IScheduler CreateEnforcedThreadScheduler(string name)
+
+    public IScheduler Create(string name, ThreadPriority threadPriority)
+    {
+        if (schedulers.TryGetValue(name, out var existing))
+        {
+            throw new InvalidOperationException($"Scheduler with the same name {name} is already created: {existing}");
+        }
+
+        var newScheduler = CreateEnforcedThreadScheduler(name, priority: threadPriority);
+        if (!schedulers.TryAdd(name, newScheduler))
+        {
+            throw new InvalidOperationException($"Failed to add scheduler {name} to collection: {schedulers.DumpToString()}");
+        }
+        return newScheduler;
+    }
+
+    private IScheduler CreateEnforcedThreadScheduler(string name, ThreadPriority priority)
     {
         Guard.ArgumentNotNull(name, nameof(name));
 
-        Log.Debug(() => $"[{name}] Creating new enforced thread scheduler");
-        return new EnforcedThreadScheduler(name);
+        Log.WithSuffix(name).Debug(() => $"Creating new enforced thread scheduler");
+        return new EnforcedThreadScheduler(name, priority);
     }
 
     private IScheduler CreateDispatcherScheduler(string name)
     {
         Guard.ArgumentNotNull(name, nameof(name));
 
-        Log.Debug(() => $"[{name}] Creating new dispatcher");
+        Log.WithSuffix(name).Debug(() => $"Creating new dispatcher");
         var consumer = new TaskCompletionSource<IScheduler>();
         var dispatcherThread = new Thread(InitializeDispatcherThread)
         {
@@ -55,9 +70,9 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
             IsBackground = true
         };
         dispatcherThread.SetApartmentState(ApartmentState.STA);
-        Log.Debug(() => $"[{name}] Starting dispatcher thread");
+        Log.WithSuffix(name).Debug(() => $"Starting dispatcher thread");
         dispatcherThread.Start(consumer);
-        Log.Debug(() => $"[{name}] Dispatcher thread started");
+        Log.WithSuffix(name).Debug(() => $"Dispatcher thread started");
         return consumer.Task.Result;
     }
 
@@ -67,7 +82,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         {
             throw new InvalidOperationException($"Wrong args: {arg}");
         }
-            
+
         InitializeDispatcherThread(consumer);
     }
 
