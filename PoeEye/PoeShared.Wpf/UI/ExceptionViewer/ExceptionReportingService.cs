@@ -37,6 +37,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
         IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
         IFactory<ReportLastLogEventsProvider> lastLogEventsReportProviderFactory,
+        IFactory<GcLogReportProvider> gcLogReportProviderFactory,
         IFactory<WindowsEventLogReportItemProvider> windowsEventLogReportProviderFactory,
         IAppArguments appArguments)
     {
@@ -60,6 +61,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
             ex => { ReportCrash(ex); }, Log.HandleException).AddTo(Anchors);
 
         AddReportItemProvider(lastLogEventsReportProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(gcLogReportProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);

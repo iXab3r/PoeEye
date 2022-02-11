@@ -22,7 +22,7 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
     {
         const int logsToInclude = 5;
         const int logsToAttach = 3;
-        Log.Debug("Preparing log files for crash report...");
+        Log.Debug("Preparing log files for report...");
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var logFilesToInclude = new DirectoryInfo(logFilesRoot)
             .GetFiles("*.log", SearchOption.AllDirectories)
