@@ -278,29 +278,36 @@ public partial class UnsafeNative
         ActivateWindow(window, TimeSpan.FromMilliseconds(500));
     }
 
-    public static void ActivateWindow(IWindowHandle window, TimeSpan timeout)
+    public static void ActivateWindow(IWindowHandle window, TimeSpan timeout, IFluentLog log)
     {
         if (window == null || window.Handle == IntPtr.Zero)
         {
+            log.Debug(() => $"Window is not specified - nothing to activate");
             return;
         }
 
+        log.Debug(() => $"Performing initial activation check");
         if (window.Handle == GetForegroundWindow())
         {
+            log.Debug(() => $"Window is already on a foreground, skipping activation");
             return;
         }
 
+        log.Debug(() => $"Requesting window placement");
         var placement = User32.GetWindowPlacement(window.Handle);
+        log.Debug(() => $"Window placement: {new { placement.flags, placement.showCmd, placement.ptMaxPosition, placement.ptMinPosition }}");
         if (placement.showCmd == User32.WindowShowStyle.SW_SHOWMINIMIZED)
         {
-            Log.Debug(() => $"Restoring minimized window {window}");
+            log.Debug(() => $"Restoring minimized window {window} to normal");
             ShowWindow(window.Handle, User32.WindowShowStyle.SW_SHOWNORMAL);
+            log.Debug(() => $"Restored minimized window {window} to normal");
         }
 
-        Log.Debug(() => $"Bringing window {window} to foreground");
-        SetForegroundWindow(window);
-        var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
+        log.Debug(() => $"Bringing window to foreground");
+        var activationResult = SetForegroundWindow(window, log);
+        log.Debug(() => $"SetForegroundWindow returned {activationResult}");
 
+        var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
         var sw = Stopwatch.StartNew();
         IntPtr foregroundWindow;
         while ((foregroundWindow = GetForegroundWindow()) != window.Handle)
@@ -311,17 +318,24 @@ public partial class UnsafeNative
                 {
                     if (sw.Elapsed > MaxWindowActivationTimeout)
                     {
-                        throw new ApplicationException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is not found, still activating ?");
+                        log.Warn($"Max global activation timeout {MaxWindowActivationTimeout} elapsed, failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms");
+                        throw new InvalidStateException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is not found, still activating ?");
                     }
 
                     continue;
                 }
 
-                throw new ApplicationException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
+                log.Warn($"Activation timeout {maxActivationTimeout} elapsed, failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms");
+                throw new InvalidStateException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
             }
 
             Thread.Sleep(10);
         }
+    }
+    
+    public static void ActivateWindow(IWindowHandle window, TimeSpan timeout)
+    {
+        ActivateWindow(window, timeout, Log.WithSuffix(window));
     }
 
     public static bool SetForegroundWindow(IntPtr hwnd)
@@ -331,9 +345,12 @@ public partial class UnsafeNative
 
     public static bool SetForegroundWindow(IWindowHandle hwnd)
     {
-        var log = Log.WithSuffix(hwnd);
-        log.Debug(() => $"Setting foreground window");
-
+        return SetForegroundWindow(hwnd, Log.WithSuffix(hwnd));
+    }
+    
+    public static bool SetForegroundWindow(IWindowHandle hwnd, IFluentLog log)
+    {
+        log.Debug(() => $"Initiating SetForegroundWindow");
         var initialForegroundWindow = GetForegroundWindow();
 
         if (User32.IsIconic(hwnd.Handle))
@@ -355,12 +372,11 @@ public partial class UnsafeNative
         }
 
         log.Debug(() => "Initial attempt to SetForegroundWindow has failed");
-
         var mainThreadId = MainWindowThreadResolver.Instance.GetMainWindowThreadId();
         var foregroundWindowThreadId = initialForegroundWindow != IntPtr.Zero ? GetWindowThreadProcessId(initialForegroundWindow, IntPtr.Zero) : 0;
 
-        using (AttachThreadInput(mainThreadId, foregroundWindowThreadId))
-        using (AttachThreadInput(foregroundWindowThreadId, hwnd.ThreadId))
+        using (AttachThreadInput(log, mainThreadId, foregroundWindowThreadId))
+        using (AttachThreadInput(log, foregroundWindowThreadId, hwnd.ThreadId))
         {
             var maxAttempts = 5;
             var attemptIdx = 0;

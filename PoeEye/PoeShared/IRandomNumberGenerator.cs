@@ -14,7 +14,7 @@ public interface IRandomNumberGenerator
     {
         var minDelayMs = (int)minDelay.TotalMilliseconds;
         var maxDelayMs = (int)maxDelay.TotalMilliseconds;
-        var delayMs = minDelayMs != maxDelayMs ? minDelayMs + Next(minDelayMs, maxDelayMs) : minDelayMs;
+        var delayMs = minDelayMs < maxDelayMs ? minDelayMs + Next(maxDelayMs - minDelayMs) : minDelayMs;
         return TimeSpan.FromMilliseconds(delayMs);
     }
 }

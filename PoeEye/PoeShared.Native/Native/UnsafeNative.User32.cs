@@ -283,14 +283,13 @@ public partial class UnsafeNative
         }
     }
 
-    private static IDisposable AttachThreadInput(int threadIdAttach, int threadIdAttachTo)
+    private static IDisposable AttachThreadInput(IFluentLog log, int threadIdAttach, int threadIdAttachTo)
     {
         if (threadIdAttach == threadIdAttachTo || threadIdAttach == 0 || threadIdAttachTo == 0)
         {
             return Disposable.Empty;
         }
-            
-        var log = Log.WithSuffix($"{threadIdAttach} => {threadIdAttachTo}");
+        log = log.WithSuffix($"{threadIdAttach} => {threadIdAttachTo}");
         log.Debug(() => $"Attaching thread input of thread {threadIdAttach} to thread {threadIdAttachTo}");
         if (!User32.AttachThreadInput(threadIdAttach, threadIdAttachTo, true))
         {
@@ -331,7 +330,7 @@ public partial class UnsafeNative
             return Disposable.Empty;
         }
 
-        return AttachThreadInput(currentThreadId, targetThreadId);
+        return AttachThreadInput(log, currentThreadId, targetThreadId);
     }
 
     [StructLayout(LayoutKind.Sequential)]
