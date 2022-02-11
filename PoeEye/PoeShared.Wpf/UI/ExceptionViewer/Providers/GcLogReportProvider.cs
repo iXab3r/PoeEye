@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using PoeShared.GCLog;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
@@ -14,14 +13,10 @@ internal sealed class GcLogReportProvider : DisposableReactiveObject, IException
 
     private readonly IAppArguments appArguments;
 
-    private readonly EtwGcLog gcLog;
-
     public GcLogReportProvider(IAppArguments appArguments)
     {
         this.appArguments = appArguments;
         LogFilePath = new FileInfo(Path.Combine(appArguments.AppDataDirectory, "logs", $"gc{(appArguments.IsDebugMode ? "DebugMode" : null)}.csv"));
-        gcLog = new EtwGcLog(LogFilePath, Environment.ProcessId).AddTo(Anchors);
-        gcLog.Start();
         Log.Info(() => "Gc log report provider has been initialized");
     }
     
