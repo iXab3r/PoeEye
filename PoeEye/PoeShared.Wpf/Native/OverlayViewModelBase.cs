@@ -160,7 +160,6 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
             .Subscribe(x =>
             {
                 // always on UI thread, possible recursive assignment
-                // Native => SetWindowRect => Actual => Native => ...
                 var overlayBounds = x.Window.NativeBounds;
                 Log.Debug(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
                 x.Window.NativeBounds = x.DesiredBounds;

@@ -1,5 +1,6 @@
 ﻿using PoeShared.Scaffolding;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using PoeShared.Bindings;
 using PoeShared.Logging;
@@ -8,6 +9,7 @@ using PropertyChanged;
 
 namespace EyeAuras.OnTopReplica;
 
+[DebuggerDisplay("Bounds={Bounds}")]
 public sealed class ReactiveRectangle : BindableReactiveObject
 {
     private readonly NamedLock updateLock;

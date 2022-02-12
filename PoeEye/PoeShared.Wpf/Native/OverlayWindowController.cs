@@ -99,7 +99,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     {
         Guard.ArgumentNotNull(viewModel, nameof(viewModel));
         OverlayWindowView overlayWindow = default;
-        var logger = Log.WithSuffix(viewModel).WithSuffix(() => overlayWindow.Dump());
+        var logger = Log.WithSuffix(viewModel).WithSuffix(() => overlayWindow);
 
         var childAnchors = new CompositeDisposable();
         Disposable.Create(() =>
