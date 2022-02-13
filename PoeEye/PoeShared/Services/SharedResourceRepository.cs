@@ -16,7 +16,16 @@ public sealed class SharedResourceRepository<TKey, TResource> where TResource : 
     private IFluentLog Log { get; }
 
     public int Count => cache.Count;
-        
+
+    public IObservable<TResource> ResolveOrAdd(TKey key, Func<TKey, TResource> resourceFactory)
+    {
+        return Observable.Using(() =>
+        {
+            var resource = GetOrAdd(key, resourceFactory);
+            return resource;
+        }, x => Observable.Return(x).Concat(Observable.Never<TResource>()));
+    }
+
     public TResource GetOrAdd(TKey key, Func<TKey, TResource> resourceFactory)
     {
         return RentOrAddSession(key, resourceFactory);
