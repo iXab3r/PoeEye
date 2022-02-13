@@ -18,6 +18,9 @@
     <eyeConverters:BitmapImageOrNullConverter x:Key="BitmapImageToNullConverter" IsInverted="True" />
     <wpf:IgnoreMouseClickBehavior x:Key="IgnoreMouseLeftDoubleClickBehavior" MinClickCount="2" ChangedButton="Left" />
     
+    <kent:DateTimeConverter x:Key="DateTimeLocalToUtcConverter" SourceKind="Local" TargetKind="Utc"/>
+    <kent:DateTimeConverter x:Key="DateTimeUtcToLocalConverter" SourceKind="Utc" TargetKind="Local"/>
+    
     <blue:MultiplyDoubleConverter x:Key="DoubleToPercentConverter" Factor="100" />
     <blue:MultiplyDoubleConverter x:Key="DoubleFromPercentConverter" Factor="0.01" />
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwentyFiveConverter" Factor="0.04" />
