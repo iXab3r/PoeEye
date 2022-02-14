@@ -111,8 +111,8 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             })
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => ThreadPoolScheduler.Instance.DisableOptimizations())
             .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().Create(WellKnownSchedulers.InputHook, ThreadPriority.AboveNormal))
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().Create(WellKnownSchedulers.SharedThread, ThreadPriority.Normal))
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SendInput, x => x.Resolve<ISchedulerProvider>().Create(WellKnownSchedulers.SendInput, ThreadPriority.Highest));
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.InputHook, ThreadPriority.AboveNormal))
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SharedThread, ThreadPriority.Normal))
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SendInput, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SendInput, ThreadPriority.Highest));
     }
 }

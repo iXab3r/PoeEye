@@ -29,13 +29,13 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
-    public IScheduler GetOrCreate(string name)
+    public IScheduler GetOrAdd(string name)
     {
         Log.Debug(() => $"Retrieving scheduler...");
         return schedulers.GetOrAdd(name, x => CreateEnforcedThreadScheduler(name, ThreadPriority.Normal));
     }
-
-    public IScheduler Create(string name, ThreadPriority threadPriority)
+    
+    public IScheduler Add(string name, ThreadPriority threadPriority)
     {
         if (schedulers.TryGetValue(name, out var existing))
         {

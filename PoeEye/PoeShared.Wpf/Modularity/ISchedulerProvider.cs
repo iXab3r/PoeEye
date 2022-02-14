@@ -7,8 +7,8 @@ namespace PoeShared.Modularity;
 public interface ISchedulerProvider
 {
     [NotNull]
-    IScheduler GetOrCreate([NotNull] string name);
+    IScheduler GetOrAdd([NotNull] string name);
     
     [NotNull]
-    IScheduler Create([NotNull] string name, ThreadPriority threadPriority);
+    IScheduler Add([NotNull] string name, ThreadPriority threadPriority);
 }
