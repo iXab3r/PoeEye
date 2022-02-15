@@ -252,7 +252,10 @@ public static class ChangeSetExtensions
         list.Connect().OnItemAdded(newObject => destination.AddOrUpdate(newObject)).Subscribe().AddTo(anchors);
         Disposable.Create(() =>
         {
-            list.Items.ForEach(x => destination.Remove(x));
+            destination.Edit(destinationList =>
+            {
+                list.Items.ForEach(x => destinationList.Remove(x));
+            });
         }).AddTo(anchors);
         return anchors;
     }
