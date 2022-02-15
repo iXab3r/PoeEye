@@ -47,26 +47,33 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
         Log.Info(() => $"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
     }
 
-    public void ExtractArchive(FileInfo inputFileName, DirectoryInfo outputDirectory)
+    public void ExtractArchive(
+        FileInfo inputFileName, 
+        DirectoryInfo outputDirectory)
     {
-        Log.Info(() => $"Extracting archive {inputFileName} to {outputDirectory}");
-        if (!outputDirectory.Exists)
+        ExtractArchive(new SevenZipExtractArguments(inputFileName, outputDirectory));
+    }
+
+    public void ExtractArchive(SevenZipExtractArguments arguments)
+    {
+        Log.Info(() => $"Extracting archive, args: {arguments}");
+        if (!arguments.OutputDirectory.Exists)
         {
-            Log.Info(() => $"Creating output directory {outputDirectory}");
-            outputDirectory.Create();
+            Log.Info(() => $"Creating output directory {arguments.OutputDirectory}");
+            arguments.OutputDirectory.Create();
         }
 
         var processStartInfo = PrepareProcessStartInfo();
         var args = new List<string>
         {
-            "e",
-            $"\"{inputFileName.FullName}\"",
-            $"\"-o{outputDirectory.FullName}\"",
+            "x", // extract with full paths
+            $"\"{arguments.Archive.FullName}\"",
+            $"\"-o{arguments.OutputDirectory.FullName}\"",
+            arguments.OverwriteAll ? "-aoa" : string.Empty
         };
         processStartInfo.Arguments = args.JoinStrings(" ");
         ProcessHelper.RunCmd(processStartInfo);
-            
-        Log.Info(() => $"Output directory contains following files: {outputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+        Log.Info(() => $"Output directory contains following files: {arguments.OutputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
     }
 
     private static ProcessStartInfo PrepareProcessStartInfo()

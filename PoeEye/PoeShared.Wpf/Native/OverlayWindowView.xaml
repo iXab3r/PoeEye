@@ -1,5 +1,6 @@
 ﻿<native:TransparentWindow
     x:Class="PoeShared.Native.OverlayWindowView"
+    x:Name="WindowRoot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -51,10 +52,11 @@
             <Setter Property="Background" Value="{x:Null}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="DataContext" Value="{Binding}" />
-            <Setter Property="MaxWidth" Value="{Binding Content.MaxSize.Width, Mode=TwoWay, FallbackValue=0}" />
-            <Setter Property="MaxHeight" Value="{Binding Content.MaxSize.Height, Mode=TwoWay, FallbackValue=0}" />
-            <Setter Property="MinWidth" Value="{Binding Content.MinSize.Width, Mode=TwoWay}" />
-            <Setter Property="MinHeight" Value="{Binding Content.MinSize.Height, Mode=TwoWay}" />
+            <Setter Property="MinWidth" Value="{Binding MinWidth, Mode=OneWay}" />
+            <Setter Property="MaxWidth" Value="{Binding MaxWidth, Mode=OneWay}" />
+            <Setter Property="MinHeight" Value="{Binding MinHeight, Mode=OneWay}" />
+            <Setter Property="MaxHeight" Value="{Binding MaxHeight, Mode=OneWay}" />
+            
             <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
             <Setter Property="TargetAspectRatio" Value="{Binding Content.TargetAspectRatio, Mode=OneWay}" />
             
@@ -211,17 +213,26 @@
         </Border>
         
         <Grid Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
-            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" IsHitTestVisible="False" x:Name="ThumbSW" />
-            <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"/>
-            <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"/>
-            <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"/>
+            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" 
+                   IsHitTestVisible="False" 
+                   Width="{Binding ResizeThumbSize}"
+                   Height="{Binding ResizeThumbSize}"/>
+            <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"
+                   Width="{Binding ResizeThumbSize}"
+                   Height="{Binding ResizeThumbSize}"/>
+            <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"
+                   Width="{Binding ResizeThumbSize}"
+                   Height="{Binding ResizeThumbSize}"/>
+            <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"
+                   Width="{Binding ResizeThumbSize}"
+                   Height="{Binding ResizeThumbSize}"/>
         </Grid>
         
         <scaffolding:DataPiping.DataPipes>
             <scaffolding:DataPipeCollection>
                 <scaffolding:DataPipe
-                    Source="{Binding ElementName=ThumbSW, Path=ActualWidth}"
-                    Target="{Binding ResizeThumbSize, Mode=OneWayToSource}" />
+                    Source="{Binding ElementName=WindowRoot, Path=NativeBounds}"
+                    Target="{Binding NativeBounds, Mode=OneWayToSource}" />
             </scaffolding:DataPipeCollection>
         </scaffolding:DataPiping.DataPipes>
     </Grid>

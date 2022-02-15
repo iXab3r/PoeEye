@@ -7,4 +7,5 @@ public interface ITextEvaluator : IDisposableReactiveObject, IHasError
     string Text { get; set; }
     string Expression { get; set; }
     bool IsMatch { get; }
+    string Match { get; }
 }

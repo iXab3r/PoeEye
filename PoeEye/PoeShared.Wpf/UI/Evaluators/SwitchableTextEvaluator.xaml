@@ -1,0 +1,121 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:evaluators="clr-namespace:PoeShared.Evaluators;assembly=PoeShared"
+                             xmlns:st="http://schemas.spicytaco.io/"
+                             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                             xmlns:evaluators1="clr-namespace:PoeShared.UI.Evaluators"
+                             xmlns:ui="clr-namespace:PoeShared.UI">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.radiobutton.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.checkbox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.buttons.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.text.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type evaluators1:SwitchableTextEvaluatorViewModel}">
+        <Border x:Name="ControlBorder">
+            <st:StackPanel Orientation="Vertical">
+                <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                    <TextBox BorderThickness="0"
+                             IsTabStop="True"
+                             st:StackPanel.Fill="Fill"
+                             AcceptsReturn="False"
+                             materialDesign:HintAssist.Hint="Text or expression to search for"
+                             Text="{Binding Expression, UpdateSourceTrigger=PropertyChanged, Delay={x:Static ui:UiConstants.UiThrottlingDelayInMilliseconds}}"
+                             TextWrapping="NoWrap" />
+                    <TextBlock Style="{StaticResource ErrorIconTextBlock}" ToolTip="{Binding Error}"
+                               Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}" />
+                    <RadioButton
+                        Style="{StaticResource FastTabRadioButton}"
+                        ToolTip="Text by exact match"
+                        IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Text}}">
+                        <RadioButton.Content>
+                            <materialDesign:PackIcon Kind="Text" Height="16" Width="16"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+                    <RadioButton
+                        Style="{StaticResource FastTabRadioButton}"
+                        IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Regex}}"
+                        ToolTip="Regular expression">
+                        <RadioButton.Content>
+                            <materialDesign:PackIcon Kind="Regex" Height="16" Width="16"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+                    <RadioButton
+                        Style="{StaticResource FastTabRadioButton}"
+                        IsChecked="{Binding Path=EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Lambda}}"
+                        ToolTip='C# Lambda that converts input string to boolean. Use "x" (without quotes) to get current value, e.g. x == "text" or int.Parse(x) == 6'>
+                        <RadioButton.Content>
+                            <TextBlock Text="C#"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+                    <CheckBox
+                        Style="{StaticResource FastTabCheckBoxStyle}"
+                        IsEnabled="{Binding CanIgnoreCase}"
+                        IsChecked="{Binding IgnoreCase, Converter={StaticResource NotConverter}}"
+                        ToolTip="Match Case">
+                        <CheckBox.Content>
+                            <materialDesign:PackIcon Kind="FormatLetterCase" Width="20" Height="20" />
+                        </CheckBox.Content>
+                    </CheckBox>
+                    <CheckBox
+                        Style="{StaticResource FastTabCheckBoxStyle}"
+                        VerticalAlignment="Center"
+                        ToolTip="In test mode expression is matched against Input text rather than other actual value. Do not forget to turn it off for real-case scenario !"
+                        x:Name="TestModeSelector"
+                        IsChecked="{Binding TestMode}">
+                        <st:StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Bug" Height="16" Width="16" />
+                            <TextBlock Text="Test Mode"/>
+                        </st:StackPanel>
+                    </CheckBox>
+                </st:StackPanel>
+                <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5"
+                               Visibility="{Binding TestMode, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                    <TextBox BorderThickness="0"
+                             IsTabStop="True"
+                             st:StackPanel.Fill="Fill"
+                             AcceptsReturn="True"
+                             materialDesign:HintAssist.Hint="Input test text"
+                             Text="{Binding TestText, UpdateSourceTrigger=PropertyChanged, Delay={x:Static ui:UiConstants.UiThrottlingDelayInMilliseconds}}"
+                             TextWrapping="NoWrap" />
+                    <ToggleButton
+                        Width="24" Height="24"
+                        Style="{StaticResource MaterialDesignActionToggleButton}"
+                        IsHitTestVisible="False"
+                        IsTabStop="False"
+                        IsChecked="{Binding IsMatch, Mode=OneWay}">
+                        <ToggleButton.Content>
+                            <materialDesign:PackIcon Kind="WindowClose" Width="16" Height="16" Foreground="{StaticResource NegativeBrush}" />
+                        </ToggleButton.Content>
+                        <materialDesign:ToggleButtonAssist.OnContent>
+                            <materialDesign:PackIcon Kind="CheckBold" Width="16" Height="16" Foreground="{StaticResource PositiveBrush}" />
+                        </materialDesign:ToggleButtonAssist.OnContent>
+                    </ToggleButton>
+                    <TextBox BorderThickness="0"
+                             IsTabStop="True"
+                             IsReadOnly="True"
+                             IsReadOnlyCaretVisible="True"
+                             AcceptsReturn="True"
+                             materialDesign:HintAssist.Hint="Matching text"
+                             MinWidth="100"
+                             x:Name="MatchText"
+                             Text="{Binding Match, Mode=OneWay}"
+                             TextWrapping="NoWrap" />
+                </st:StackPanel>
+
+            </st:StackPanel>
+        </Border>
+
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Match, Converter={StaticResource NullToTrueConverter}}" Value="True">
+                <Setter TargetName="MatchText" Property="Text" Value="Does not match"></Setter>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding TestMode}" Value="True">
+                <Setter TargetName="TestModeSelector" Property="Foreground" Value="{StaticResource NegativeBrush}"/>
+            </DataTrigger>
+        </DataTemplate.Triggers>
+
+    </DataTemplate>
+</ui:SharedResourceDictionary>

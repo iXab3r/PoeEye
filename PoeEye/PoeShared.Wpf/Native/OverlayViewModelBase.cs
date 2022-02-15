@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -14,15 +15,15 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using DynamicData.Binding;
 using PInvoke;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PropertyBinder;
 using PropertyChanged;
 using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using KeyEventHandler = System.Windows.Input.KeyEventHandler;
-using Point = System.Windows.Point;
-using Size = System.Windows.Size;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
 
@@ -58,19 +59,12 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
         makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
 
-        // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
-        // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
-        this.WhenAnyValue(x => x.WindowBounds)
-            .ObserveOn(uiDispatcher)
-            .Subscribe(x => RaisePropertyChanged(nameof(NativeBounds)))
-            .AddTo(Anchors);
-            
         dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi))
             .Switch()
             .Do(x => Log.Debug(() => $"DPI updated to {x}"))
             .ToProperty(this, x => x.Dpi)
             .AddTo(Anchors);
-            
+
         this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
             .SubscribeSafe(() =>
             {
@@ -78,7 +72,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 unlockWindowCommand.RaiseCanExecuteChanged();
             }, Log.HandleUiException)
             .AddTo(Anchors);
-            
+
         this.WhenAnyValue(x => x.OverlayMode)
             .SubscribeSafe(() =>
             {
@@ -100,45 +94,10 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 Log.Warn("Window received multiple 'loaded' events");
                 throw new ApplicationException($"Window has already been loaded: {this}");
             }
+
             Log.Debug("Window has been loaded, changing status");
             IsLoaded = true;
         }, Log.HandleUiException).AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.WindowBounds)
-            .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle ?? IntPtr.Zero), (desiredBounds, hwnd) => new { DesiredBounds = desiredBounds, hwnd })
-            .Where(x => x.hwnd != IntPtr.Zero && x.DesiredBounds.SourceType == ValueSourceType.User)
-            .ObserveOn(uiDispatcher)
-            .SubscribeSafe(x =>
-            {
-                // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
-                Log.Info(() => $"Native bounds changed, setting windows rect: {WindowBounds} => {x.DesiredBounds}");
-                UnsafeNative.SetWindowRect(x.hwnd, x.DesiredBounds.Value);
-                var actualBounds = UnsafeNative.GetWindowRect(x.hwnd);
-                Log.Info(() => $"Native bounds changed to RECT {actualBounds} (expected {x.DesiredBounds}), current: {WindowBounds})");
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.OverlayWindow)
-            .Where(x => x != null)
-            .Take(1)
-            .SubscribeSafe(x =>
-            {
-                Log.Debug(() => $"Overlay window is set, resolving {nameof(HwndSource)} for {x}");
-                var hwndSource = HwndSource.FromHwnd(x.WindowHandle);
-                if (hwndSource == null)
-                {
-                    throw new InvalidStateException($"Failed to resolve {nameof(HwndSource)} for {x}");
-                }
-                Disposable.Create(() =>
-                {
-                    Log.Debug(() => $"Releasing {nameof(HwndSource)} of {x}");
-                    hwndSource.Dispose();
-                }).AddTo(Anchors);
-                //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
-                Log.Debug(() => $"Resolved {nameof(HwndSource)} for {x}: {hwndSource}");
-                hwndSource.AddHook(WndProc);
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
 
         WhenKeyDown = this.WhenAnyValue(x => x.OverlayWindow)
             .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyDown += h, h => window.KeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
@@ -154,26 +113,59 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X, bounds.Y + 1, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
-                } else if (x.EventArgs.Key is Key.Up or Key.W)
+                }
+                else if (x.EventArgs.Key is Key.Up or Key.W)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X, bounds.Y - 1, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
-                }else if (x.EventArgs.Key is Key.Left or Key.A)
+                }
+                else if (x.EventArgs.Key is Key.Left or Key.A)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X - 1, bounds.Y, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
-                }else if (x.EventArgs.Key is Key.Right or Key.D)
+                }
+                else if (x.EventArgs.Key is Key.Right or Key.D)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = new Rectangle(bounds.X + 1, bounds.Y, bounds.Width, bounds.Height);
                     x.EventArgs.Handled = true;
                 }
+                else if (x.EventArgs.Key is Key.R)
+                {
+                    ResetToDefault();
+                    x.EventArgs.Handled = true;
+                }
             }, Log.HandleUiException)
             .AddTo(Anchors);
-        
+
         Log.Info("Initialized overlay view model");
+
+        this.WhenAnyValue(x => x.OverlayWindow)
+            .SwitchIfNotDefault(x => x.Observe(ConstantAspectRatioWindow.NativeBoundsProperty, y => y.NativeBounds).Select(y => new { Window = x, ActualBounds = y }))
+            .Subscribe(x =>
+            {
+                // always on UI thread
+                Log.Debug(() => $"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+                NativeBounds = x.ActualBounds;
+                Log.Debug(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+            })
+            .AddTo(Anchors); 
+
+        this.WhenAnyValue(x => x.OverlayWindow)
+            .SwitchIfNotDefault(x => this.WhenAnyValue(y => y.NativeBounds)
+                .Select(y => new { Window = x, DesiredBounds = y })
+                .ObserveOnIfNeeded(x.Dispatcher))
+            .Subscribe(x =>
+            {
+                // always on UI thread, possible recursive assignment
+                var overlayBounds = x.Window.NativeBounds;
+                Log.Debug(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+                x.Window.NativeBounds = x.DesiredBounds;
+                Log.Debug(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+            })
+            .AddTo(Anchors);
 
         Binder.Attach(this).AddTo(Anchors);
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
@@ -189,13 +181,11 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
     public string OverlayDescription => $"{(OverlayWindow == null ? "NOWINDOW" : OverlayWindow.Name)}";
 
-    private ValueHolder<Rectangle> WindowBounds { get; set; }
-
     public float Opacity { get; set; }
 
     public double? TargetAspectRatio { get; set; }
 
-    public Point ViewModelLocation { get; set; }
+    public System.Windows.Point ViewModelLocation { get; set; }
 
     public ICommand UnlockWindowCommand => unlockWindowCommand;
 
@@ -206,19 +196,14 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public ICommand LockWindowCommand => lockWindowCommand;
 
     public TransparentWindow OverlayWindow { get; private set; }
-    
+
     public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
 
     public bool IsVisible { get; set; } = true;
 
     public PointF Dpi => dpi.Value;
 
-    [DoNotNotify]
-    public Rectangle NativeBounds
-    {
-        get => WindowBounds.Value;
-        set => WindowBounds = new ValueHolder<Rectangle>(value, ValueSourceType.User);
-    }
+    public Rectangle NativeBounds { get; set; }
 
     public Size MinSize { get; set; } = new Size(0, 0);
 
@@ -261,11 +246,12 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException("Overlay window is not loaded yet");
         }
+
         var activeMonitor = UnsafeNative.GetMonitorInfo(OverlayWindow);
 
         Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {NativeBounds})");
         var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
-        var size = (DefaultSize.IsNotEmpty() ? DefaultSize : MinSize).ScaleToScreen(Dpi);
+        var size = DefaultSize.IsNotEmpty() ? DefaultSize : MinSize;
         NativeBounds = new Rectangle(center, size);
         Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
 
@@ -283,40 +269,24 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public void SetOverlayWindow(TransparentWindow owner)
     {
         Guard.ArgumentNotNull(owner, nameof(owner));
-            
+
         if (this.OverlayWindow != null)
         {
             throw new InvalidOperationException($"Window is already assigned");
         }
-        OverlayWindow = owner;
-        Log.Debug(() => $"Overlay window is assigned: {OverlayWindow}");
-    }
 
-    private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        //this callback is called on UI thread and handles all messages sent to window
-        var msg = (User32.WindowMessage)msgRaw;
-        if (msg == User32.WindowMessage.WM_WINDOWPOSCHANGED && lParam != IntPtr.Zero)
-        {
-            var nativeStruct = Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
-            if (nativeStruct != null)
-            {
-                var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
-                var bounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
-                var currentBounds = WindowBounds;
-                if (currentBounds.Value != bounds)
-                {
-                    Log.Info(() => $"Updating native bounds: {NativeBounds} => {bounds}");
-                    WindowBounds = new ValueHolder<Rectangle>(){ Value = bounds, SourceType = ValueSourceType.System };
-                }
-            }
-        }
-        return IntPtr.Zero;
+        Log.Info(() => $"Assigning overlay window: {owner}");
+
+        Log.Info(() => $"Syncing window parameters with view model");
+        owner.NativeBounds = NativeBounds;
+
+        OverlayWindow = owner;
+        Log.Info(() => $"Overlay window is assigned: {OverlayWindow}");
     }
 
     public override string ToString()
     {
-        return Id;
+        return $"OverlayVM {Id} Bounds: {NativeBounds}";
     }
 
     public DispatcherOperation BeginInvoke(Action dispatcherAction)
@@ -337,13 +307,13 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     protected virtual void ApplyConfig(IOverlayConfig config)
     {
         Log.Debug(() => $"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
-           
+
         var desktopHandle = UnsafeNative.GetDesktopWindow();
         var systemInformation = new
         {
-            MonitorCount = SystemInformation.MonitorCount, 
+            MonitorCount = SystemInformation.MonitorCount,
             VirtualScreen = SystemInformation.VirtualScreen,
-            MonitorBounds = UnsafeNative.GetMonitorBounds(desktopHandle).ToWinRectangle(),
+            MonitorBounds = UnsafeNative.GetMonitorBounds(desktopHandle),
             MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
         };
 
@@ -359,7 +329,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             overlayBounds = config.OverlayBounds;
         }
-            
+
         if (!overlayBounds.IsNotEmptyArea() || overlayBounds.IsNotEmptyArea() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
         {
             Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
@@ -398,6 +368,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Unlocking window @ {NativeBounds}");
         IsLocked = false;
     }
@@ -413,6 +384,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Locking window @ {NativeBounds}");
         IsLocked = true;
     }
@@ -433,6 +405,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Making overlay Layered");
         OverlayMode = OverlayMode.Layered;
     }
@@ -448,56 +421,8 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         {
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
         }
+
         Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
         OverlayMode = OverlayMode.Transparent;
-    }
-
-    private readonly struct ValueHolder<T> : IEquatable<ValueHolder<T>>
-    {
-        public ValueHolder(T value, ValueSourceType sourceType = ValueSourceType.User)
-        {
-            Value = value;
-            SourceType = sourceType;
-        }
-
-        public T Value { get; init; }
-            
-        public ValueSourceType SourceType { get; init; }
-
-        public bool Equals(ValueHolder<T> other)
-        {
-            return EqualityComparer<T>.Default.Equals(Value, other.Value);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ValueHolder<T> other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return EqualityComparer<T>.Default.GetHashCode(Value);
-        }
-
-        public static bool operator ==(ValueHolder<T> left, ValueHolder<T> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ValueHolder<T> left, ValueHolder<T> right)
-        {
-            return !left.Equals(right);
-        }
-
-        public override string ToString()
-        {
-            return $"{Value} (src: {SourceType})";
-        }
-    }
-
-    private enum ValueSourceType
-    {
-        User,
-        System
     }
 }

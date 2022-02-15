@@ -99,7 +99,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     {
         Guard.ArgumentNotNull(viewModel, nameof(viewModel));
         OverlayWindowView overlayWindow = default;
-        var logger = Log.WithSuffix(viewModel.Id).WithSuffix(() => overlayWindow == default ? "No window yet" : overlayWindow.ToString());
+        var logger = Log.WithSuffix(viewModel).WithSuffix(() => overlayWindow);
 
         var childAnchors = new CompositeDisposable();
         Disposable.Create(() =>
@@ -193,7 +193,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
 
         childAnchors.AddTo(Anchors);
 
-        Log.Info($"Overlay view initialized");
+        Log.Info($"Overlay view initialized: {overlayWindow}");
         logger.Debug(() => $"Registration completed");
 
         return childAnchors;
@@ -214,13 +214,14 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     {
         if (IsVisible && viewModel.IsVisible)
         {
-            logger.Debug(() => $"Showing overlay {overlayWindow}");
             if (overlayWindow.Visibility != Visibility.Visible)
             {
                 logger.Debug(() => $"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
                 overlayWindow.Visibility = Visibility.Visible;
             }
 
+            var currentRect = UnsafeNative.GetWindowRect(overlayWindow.WindowHandle);
+            logger.Debug(() => $"Showing overlay {overlayWindow}, native bounds: {currentRect}");
             UnsafeNative.ShowInactiveTopmost(overlayWindow.WindowHandle);
         } else if (overlayWindow.WindowHandle == IntPtr.Zero)
         {

@@ -12,15 +12,7 @@
         <Setter Property="Background" Value="{StaticResource OverlayWindowTextBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource OverlayBorderBrushKey}" />
         <Setter Property="Cursor" Value="{x:Static Cursors.AppStarting}" />
-        <Setter Property="MaxWidth" Value="30"/>
-        <Setter Property="MaxHeight" Value="30"/>
-        <Setter Property="MinWidth" Value="12"/>
-        <Setter Property="MinHeight" Value="12"/>
-        
-        <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth, Converter={StaticResource DoubleDivideByTwentyFiveConverter}}"/>
-        <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Self}, Path=Width}"/>
         <Setter Property="RenderTransformOrigin" Value="0.5 0.5"/>
-        <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
         
         <Setter Property="Template">
             <Setter.Value>

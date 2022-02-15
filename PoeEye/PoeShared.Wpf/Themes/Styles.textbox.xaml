@@ -47,6 +47,7 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsEnabled" Value="True" />
+                                <Condition Property="IsReadOnly" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 1" />
                             <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
@@ -76,6 +77,12 @@
     </Style>
 
     <Style x:Key="MinimalTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource FastTextBoxStyle}" />
+    
+    <Style x:Key="TextLabelStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource FastTextBoxStyle}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
+    </Style>
 
     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" />
@@ -175,6 +182,7 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsEnabled" Value="True" />
+                                <Condition Property="IsReadOnly" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 1" />
                             <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />

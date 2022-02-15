@@ -6,7 +6,28 @@ namespace PoeShared.Logging;
 
 public static class FluentLogExtensions
 {
-    public static IFluentLog CreateChildCollectionLogWriter(this IFluentLog log, ISourceList<string> collection)
+    public static void DebugIfDebug(this IFluentLog log, Func<string> message)
+    {
+#if DEBUG
+        log.Debug(message);
+#endif
+    }
+    
+    public static void WarnIfDebug(this IFluentLog log, Func<string> message)
+    {
+#if DEBUG
+        log.Warn(message);
+#endif
+    }
+    
+    public static void InfoIfDebug(this IFluentLog log, Func<string> message)
+    {
+#if DEBUG
+        log.Info(message);
+#endif
+    }
+    
+    public static IFluentLog WithAction(this IFluentLog log, Action<string> messageConsumer)
     {
         var writerAdapter = new LogWriterAdapter<string>(logData =>
         {
@@ -16,9 +37,15 @@ public static class FluentLogExtensions
             {
                 message += Environment.NewLine + logData.Exception.Message + Environment.NewLine + logData.Exception.StackTrace;
             }
-            collection.Add(message);
+
+            messageConsumer(message);
         });
         return new FluentLogBuilder(writerAdapter);
+    }
+    
+    public static IFluentLog CreateChildCollectionLogWriter(this IFluentLog log, ISourceList<string> collection)
+    {
+        return log.WithAction(collection.Add);
     }
         
     public static BenchmarkTimer CreateProfiler(this IFluentLog log, string benchmarkName, [CallerMemberName] string propertyName = null)

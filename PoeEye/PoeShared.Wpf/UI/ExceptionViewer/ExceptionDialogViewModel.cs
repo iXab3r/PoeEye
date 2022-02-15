@@ -62,6 +62,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
         IExceptionReportingService reportingService,
         ISevenZipWrapper sevenZipWrapper,
         ICloseController closeController,
+        [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
         this.clock = clock;
@@ -97,10 +98,13 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
         Attachments = attachments;
 
         this.WhenAnyValue(x => x.Config)
-            .SubscribeSafe(async x =>
+            .Where(x => x != null)
+            .Take(1)
+            .ObserveOn(bgScheduler)
+            .SubscribeSafe(x =>
             {
                 Log.Debug("Config has been updated, retrieving report items");
-                await Task.Run(PrepareReportItemsInternal);
+                PrepareReportItemsInternal();
                 Log.Debug(() => $"Retrieved {reportItems.Count} report items");
             }, Log.HandleException)
             .AddTo(Anchors);
@@ -245,7 +249,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
 
         await Task.Run(() =>
         {
-            Log.Debug(() => $"Compressing report with following files: {filesToAttach.DumpToTable()}");
+            Log.Debug(() => $"Compressing report with following files: {filesToAttach.DumpToString()}");
             sevenZipWrapper.AddToArchive(outputFile, filesToAttach.Select(x => new FileInfo(x)).ToArray());
             Log.Debug(() => $"Compression has completed");
         });

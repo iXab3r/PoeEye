@@ -13,10 +13,10 @@ global using System.Collections;
 global using System.Diagnostics;
 global using System.Globalization;
 global using System.Linq.Expressions;
-global using System.Reflection;
 global using System.Collections.Concurrent;
 global using System.Threading;
 
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyVersion("0.0.0.0")]

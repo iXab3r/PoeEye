@@ -11,9 +11,11 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Notifications.Services;
 using PoeShared.Notifications.ViewModels;
+using PoeShared.Profiler;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Services;
 using PoeShared.UI;
+using PoeShared.UI.Evaluators;
 using Unity;
 using Unity.Extension;
 using Application = System.Windows.Application;
@@ -42,6 +44,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IMessageBoxService, MessageBoxService>()
             .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
             .RegisterSingleton<IErrorMonitorViewModel, ErrorMonitorViewModel>()
+            .RegisterSingleton<IProfilerViewModel, ProfilerViewModel>()
             .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
             .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
             .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);
@@ -60,6 +63,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
             .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
             .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
+            .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
             .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
             .RegisterType<INotificationContainerViewModel, NotificationContainerViewModel>()
@@ -104,8 +108,8 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             })
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => ThreadPoolScheduler.Instance.DisableOptimizations())
             .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.InputHook))
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.SharedThread))
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.RedirectToUI, x => new EnforcedThreadScheduler(uiThread, x.Resolve<IScheduler>(WellKnownSchedulers.UI)));
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.InputHook, ThreadPriority.AboveNormal))
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SharedThread, ThreadPriority.Normal))
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SendInput, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SendInput, ThreadPriority.Highest));
     }
 }

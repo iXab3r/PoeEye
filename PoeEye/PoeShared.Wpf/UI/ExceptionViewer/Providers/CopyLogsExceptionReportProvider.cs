@@ -21,14 +21,15 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
     public IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory)
     {
         const int logsToInclude = 5;
-        const int logsToAttach = 2;
-        Log.Debug("Preparing log files for crash report...");
+        const int logsToAttach = 3;
+        Log.Debug("Preparing log files for report...");
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var logFilesToInclude = new DirectoryInfo(logFilesRoot)
             .GetFiles("*.log", SearchOption.AllDirectories)
             .OrderByDescending(x => x.LastWriteTime)
             .Take(logsToInclude)
             .ToArray();
+        Log.Debug($"{logFilesRoot} contains the following files:\n\t{logFilesToInclude.Select(y => new { y.Name, y.LastWriteTime }).DumpToTable()}");
 
         var result = new List<ExceptionReportItem>();
         for (var idx = 0; idx < logFilesToInclude.Length; idx++)

@@ -9,8 +9,6 @@ namespace PoeShared.Modularity;
 
 public sealed class EnforcedThreadScheduler : IScheduler
 {
-    private static readonly IFluentLog Log = typeof(EnforcedThreadScheduler).PrepareLogger();
-
     private readonly IScheduler threadScheduler;
     private Thread schedulerThread;
 
@@ -21,28 +19,49 @@ public sealed class EnforcedThreadScheduler : IScheduler
         this.schedulerThread = thread;
     }
 
-    public EnforcedThreadScheduler(string name)
+    public EnforcedThreadScheduler(string name, ThreadPriority priority)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
+        Log = GetType().PrepareLogger().WithSuffix($"SchedulerName: {name}");
         Log.Info($"Initializing new scheduler {name}");
         threadScheduler = new EventLoopScheduler(start =>
         {
-            Log.Info($"Initializing thread for scheduler {name}");
+            Log.Info($"Initializing thread for scheduler {name} with priority {priority}");
             if (schedulerThread != null)
             {
                 throw new InvalidOperationException("This method must(and will in current implementation) be called only once");
             }
-            schedulerThread = new Thread(start)
+            schedulerThread = new Thread(() => ThreadFunc(start))
             {
                 Name = $"{name}",
                 IsBackground = true,
-                Priority = ThreadPriority.Normal
+                Priority = priority
             };
             Log.Debug(() => $"Setting apartment state for thread {schedulerThread.Name}");
             schedulerThread.SetApartmentState(ApartmentState.STA);
             Log.Info($"Scheduler {name} with thread {schedulerThread.Name} initialized");
             return schedulerThread;
         });
+    }
+    
+    private IFluentLog Log { get; }
+
+    private void ThreadFunc(ThreadStart innerFunc)
+    {
+        try
+        {
+            Log.Info(() => $"Scheduler thread has started, priority: {Thread.CurrentThread.Priority}");
+            innerFunc();
+        }
+        catch (Exception e)
+        {
+            Log.Error("Unhandled exception in scheduler thread", e);
+            throw;
+        }
+        finally{
+        {
+            Log.Info(() => $"Scheduler thread has completed");
+        }}
     }
 
     public string Name { get; }

@@ -59,7 +59,9 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         Binder.Bind(x => x.SupportsSetValue && x.Source != null).To(x => x.CanSetValue);
     }
 
-    public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor, Expression<Func<TSource, bool>> condition)
+    public ExpressionWatcher(
+        Expression<Func<TSource, TProperty>> sourceAccessor, 
+        Expression<Func<TSource, bool>> condition)
     {
         Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger("ExpressionWatcher").WithSuffix(watcherId).WithSuffix(ToString);
         Log.Debug(() => $"Expression created, source: {sourceAccessor}, condition: {condition}");

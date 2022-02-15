@@ -1,4 +1,5 @@
 ﻿using App.Metrics;
+using PoeShared.Evaluators;
 using PoeShared.Modularity;
 using PoeShared.Services;
 using Unity;

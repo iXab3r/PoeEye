@@ -3,7 +3,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
 
@@ -17,6 +17,12 @@ public partial class OverlayWindowView
         WhenLoaded.SubscribeSafe(OnLoaded, Log.HandleUiException).AddTo(Anchors);
         sw.Step("WhenLoaded routine executed");
         SizeChanged += OnSizeChanged;
+        LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object sender, EventArgs e)
+    {
+        Log.Debug(() => $"Window location changed");
     }
 
     public IObservable<EventPattern<RoutedEventArgs>> WhenLoaded => Observable
@@ -29,6 +35,8 @@ public partial class OverlayWindowView
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
     {
+        Log.Debug(() => $"Window size changed");
+
         var window = sender as Window;
         var windowViewModel = window?.DataContext as OverlayWindowViewModel;
         var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
@@ -55,7 +63,7 @@ public partial class OverlayWindowView
 
     public override string ToString()
     {
-        return $"{base.ToString()} DataContext: {DataContext} (X:{Left:F0} Y:{Top:F0} Width: {Width:F0} Height: {Height:F0})";
+        return $"{base.ToString()} DataContext: {DataContext.Dump()} {{X={Left:F0},Y={Top:F0},Width={Width:F0},Height={Height:F0}}}";
     }
 
     public void SetOverlayMode(OverlayMode mode)
@@ -64,6 +72,7 @@ public partial class OverlayWindowView
         {
             throw new InvalidOperationException($"Transparent mode requires AllowsTransparency to be set to True");
         }
+
         switch (mode)
         {
             case OverlayMode.Layered:

@@ -21,4 +21,34 @@ public static class SchedulerExtensions
                 }
             });
     }
+
+    public static void Run(this IScheduler scheduler, Action action, CancellationToken cancellationToken)
+    {
+        var completionEvent = new ManualResetEventSlim();
+        Exception inputException = null;
+        scheduler.Schedule(() =>
+        {
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+                action();
+            }
+            catch (Exception ex)
+            {
+                inputException = ex;
+            }
+            finally
+            {
+                completionEvent.Set();
+            }
+        });
+        completionEvent.Wait(cancellationToken);
+        if (inputException != null)
+        {
+            throw inputException;
+        }
+    }
 }

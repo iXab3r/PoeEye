@@ -6,7 +6,7 @@ namespace PoeShared.Services;
 
 public abstract class SharedResourceBase : DisposableReactiveObject, ISharedResource
 {
-    private static readonly long MaxRefCount = 64;
+    private static readonly long MaxRefCount = 1024;
 
     private static long GlobalIdx;
     private readonly ReaderWriterLockSlim resourceGate = new(LockRecursionPolicy.SupportsRecursion);
@@ -183,7 +183,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     }
 
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-        private readonly ConcurrentQueue<string> log = new ConcurrentQueue<string>(new[] { $"[{Thread.CurrentThread.ManagedThreadId,2}] Created {new StackTrace()}" });
+        private readonly System.Collections.Concurrent.ConcurrentQueue<string> log = new(new[] { $"[{Thread.CurrentThread.ManagedThreadId,2}] Created {new StackTrace()}" });
         private readonly int maxLogLength = 30;
 
         private void WriteLog(string message)

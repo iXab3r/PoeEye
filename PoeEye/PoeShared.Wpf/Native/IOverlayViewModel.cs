@@ -5,8 +5,8 @@ using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
-using Point = System.Windows.Point;
-using Size = System.Windows.Size;
+using Size = System.Drawing.Size;
+using WpfPoint = System.Windows.Point;
 
 namespace PoeShared.Native;
 
@@ -52,7 +52,7 @@ public interface IOverlayViewModel : IDisposableReactiveObject
         
     double? TargetAspectRatio { get; set; }
         
-    Point ViewModelLocation { get; }
+    WpfPoint ViewModelLocation { get; }
         
     TransparentWindow OverlayWindow { [CanBeNull] get; }
     

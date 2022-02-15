@@ -8,6 +8,11 @@ public static class EnumerableExtensions
 {
     private static readonly Random Rng = new Random();
 
+    public static bool IsEmpty<T>(this IEnumerable<T> enumerable)
+    {
+        return !enumerable.Any();
+    }
+
     public static T PickRandom<T>(this IEnumerable<T> enumerable)
     {
         Guard.ArgumentNotNull(enumerable, nameof(enumerable));

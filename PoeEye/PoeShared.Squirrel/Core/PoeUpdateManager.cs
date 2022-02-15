@@ -29,8 +29,8 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
     public PoeUpdateManager(
         string urlOrPath,
         IFileDownloader urlDownloader,
-        string applicationName = null,
-        string rootDirectory = null)
+        string applicationName,
+        string rootDirectory)
     {
         Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), "!string.IsNullOrEmpty(urlOrPath)");
         Guard.ArgumentIsTrue(!string.IsNullOrEmpty(applicationName), "!string.IsNullOrEmpty(applicationName)");
@@ -38,15 +38,12 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
         updateUrlOrPath = urlOrPath;
         this.urlDownloader = urlDownloader;
         ApplicationName = applicationName ?? GetApplicationName();
-
-        RootAppDirectory = Path.Combine(rootDirectory ?? GetLocalAppDataDirectory(), ApplicationName);
+        RootAppDirectory = Path.Combine(rootDirectory, ApplicationName);
     }
 
     public string ApplicationName { get; }
 
     public string RootAppDirectory { get; }
-
-    public bool IsInstalledApp => Assembly.GetExecutingAssembly().Location.StartsWith(RootAppDirectory, StringComparison.OrdinalIgnoreCase);
 
     public async Task<IPoeUpdateInfo> PrepareUpdate(
         bool ignoreDeltaUpdates, 
@@ -207,35 +204,6 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
         await Task.Delay(500);
 
         return updateProcess;
-    }
-
-    public static string GetLocalAppDataDirectory(string assemblyLocation = null)
-    {
-        // Try to divine our our own install location via reading tea leaves
-        //
-        // * We're Update.exe, running in the app's install folder
-        // * We're Update.exe, running on initial install from SquirrelTemp
-        // * We're a C# EXE with Squirrel linked in
-
-        var assembly = Assembly.GetEntryAssembly();
-        if (assemblyLocation == null && assembly == null)
-        {
-            // dunno lol
-            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        }
-
-        assemblyLocation = assemblyLocation ?? assembly.Location;
-
-        if (Path.GetFileName(assemblyLocation).Equals("update.exe", StringComparison.OrdinalIgnoreCase))
-        {
-            // NB: Both the "SquirrelTemp" case and the "App's folder" case 
-            // mean that the root app dir is one up
-            var oneFolderUpFromAppFolder = Path.Combine(Path.GetDirectoryName(assemblyLocation), "..");
-            return Path.GetFullPath(oneFolderUpFromAppFolder);
-        }
-
-        var twoFoldersUpFromAppFolder = Path.Combine(Path.GetDirectoryName(assemblyLocation), "..\\..");
-        return Path.GetFullPath(twoFoldersUpFromAppFolder);
     }
 
     private IDisposable AcquireUpdateLock()

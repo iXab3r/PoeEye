@@ -17,22 +17,10 @@ public class ProcessHelper
         using var process = new Process();
         process.StartInfo = processStartInfo;
         var stderr = new List<string>();
-            
-        IFluentLog GetLogger()
-        {
-            var processName = Path.GetFileName(processStartInfo.FileName);
-            var result = Log.WithSuffix(processName);
-            if (process.StartTime >= DateTime.MinValue)
-            {
-                result = result.WithSuffix($"Id {process.Id} @ {process.StartTime}");
-            }
-            if (process.HasExited)
-            {
-                result = result.WithSuffix($"ExitCode: {process.ExitCode} @ {process.ExitTime}");
-            }
-            return result;
-        }
 
+        var processName = Path.GetFileName(processStartInfo.FileName);
+        
+        var log = Log.WithSuffix(processName);
         if (processStartInfo.RedirectStandardOutput)
         {
             process.OutputDataReceived += (sender, eventArgs) =>
@@ -41,7 +29,7 @@ public class ProcessHelper
                 {
                     return;
                 }
-                GetLogger().WithPrefix("STDOUT").Info($"STDOUT: {eventArgs.Data}");
+                log.WithPrefix("STDOUT").Info(eventArgs.Data);
             };
         }
 
@@ -52,43 +40,57 @@ public class ProcessHelper
                 {
                     return;
                 }
-                GetLogger().WithPrefix("STDERR").Warn($"{eventArgs.Data}");
+                log.WithPrefix("STDERR").Warn($"{eventArgs.Data}");
                 stderr.Add(eventArgs.Data);
             };
         }
             
         Log.Info($"Starting process: {processStartInfo.FileName} {process.StartInfo.Arguments}");
         process.Start();
-
-        if (process.StartInfo.RedirectStandardOutput)
+        try
         {
-            process.BeginOutputReadLine();
-        }
-
-        if (process.StartInfo.RedirectStandardError)
-        {
-            process.BeginErrorReadLine();
-        }
+            log = log.WithSuffix($"Id {process.Id} @ {process.StartTime}");
             
-        GetLogger().Info($"Awaiting {timeout} for process to exit");
+            log.Info(() => $"Starting to read process output");
+            if (process.StartInfo.RedirectStandardOutput)
+            {
+                process.BeginOutputReadLine();
+            }
+            if (process.StartInfo.RedirectStandardError)
+            {
+                process.BeginErrorReadLine();
+            }
+            log.Info(() => $"Started reading process output");
+        }
+        catch (Exception e)
+        {
+            log.Warn($"Failed to get processId", e);
+            log = log.WithSuffix($"Id Unknown");
+        }
+        
+        log.Info($"Awaiting {timeout} for process to exit");
         var processExited = process.WaitForExit(timeout != null ? (int)timeout.Value.TotalMilliseconds : int.MaxValue);
         if (processExited == false)	
         {
-            GetLogger().Warn("Process has failed to finish in time, killing it");
+            log.Warn("Process has failed to finish in time, killing it");
             process.Kill();
-            GetLogger().Warn("Killed the process");
-            throw new Exception("ERROR: Process took too long to finish");
+            log.Warn("Killed the process");
+            throw new InvalidStateException("ERROR: Process took too long to finish");
         }
-            
-        GetLogger().Info("Application has exited");
+        if (process.HasExited)
+        {
+            log = log.WithSuffix($"ExitCode: {process.ExitCode} @ {process.ExitTime}");
+        }
+        log.Info("Application has exited");
         if (process.ExitCode != 0) 
         {
-            throw new Exception("Process exited with non-zero exit code of: " + process.ExitCode);
+            throw new InvalidStateException("Process exited with non-zero exit code of: " + process.ExitCode);
         } 
             
         if (stderr.Any()) 
         {
-            throw new Exception("Process has written errors into output, exit code: " + process.ExitCode + Environment.NewLine + "ERRORS: " + Environment.NewLine + string.Join(Environment.NewLine, stderr));
+            throw new InvalidStateException("Process has written errors into output, exit code: " + process.ExitCode + Environment.NewLine + "ERRORS: " + Environment.NewLine + string.Join(Environment.NewLine, stderr));
         }
+        log.Info(() => $"Application has successfully completed");
     }
 }

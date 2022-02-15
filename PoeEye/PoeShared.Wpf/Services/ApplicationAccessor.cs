@@ -74,11 +74,6 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     public bool LastExitWasGraceful { get; }
         
     public bool LastLoadWasSuccessful { get; }
-
-    public void ReportStartedLoading()
-    {
-            
-    }
         
     public void ReportIsLoaded()
     {

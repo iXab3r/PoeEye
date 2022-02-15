@@ -54,7 +54,7 @@ internal class ApplyReleasesImpl : IEnableLogger
             if (attemptingFullInstall)
             {
                 Log.Warn("No release to install, running the app");
-                await InvokePostInstall(updateInfo.CurrentlyInstalledVersion?.Version, false, true, silentInstall);
+                await InvokePostInstall(updateInfo.CurrentlyInstalledVersion?.Version, false, silentInstall);
             }
 
             progress(100);
@@ -89,10 +89,6 @@ internal class ApplyReleasesImpl : IEnableLogger
         Log.Debug(() => $"Performing self-update activities for {new { localRelease.Filename, localRelease.Filesize, localRelease.EntryAsString }}");
         ExecuteSelfUpdate(localReleaseVersion);
 
-        Log.Debug(() => $"Invoking post-install events, new version: {localReleaseVersion}");
-        await Log.ErrorIfThrows(
-            () => InvokePostInstall(localReleaseVersion, attemptingFullInstall, false, silentInstall),
-            "Failed to invoke post-install");
         progress(75);
 
         Log.Info("Starting fixPinnedExecutables");
@@ -498,62 +494,19 @@ internal class ApplyReleasesImpl : IEnableLogger
                 File.Copy(newSquirrel, Path.Combine(targetDir.Parent.FullName, "Update.exe"), true));
     }
 
-    private async Task InvokePostInstall(SemanticVersion currentVersion, bool isInitialInstall, bool firstRunOnly, bool silentInstall)
+    private async Task InvokePostInstall(SemanticVersion currentVersion, bool isInitialInstall, bool silentInstall)
     {
         var targetDir = GetDirectoryForRelease(currentVersion);
-        var args = isInitialInstall
-            ? $"--squirrel-install {currentVersion}"
-            : $"--squirrel-updated {currentVersion}";
-
         var squirrelApps = SquirrelAwareExecutableDetector.GetAllSquirrelAwareApps(targetDir.FullName);
 
         Log.Info($"Squirrel Enabled Apps for post-install notification: [{string.Join(",", squirrelApps)}]");
-
-        // For each app, run the install command in-order and wait
-        if (!firstRunOnly)
-        {
-            await squirrelApps.ForEachAsync(
-                async exe =>
-                {
-                    using (var cts = new CancellationTokenSource())
-                    {
-                        cts.CancelAfter(15 * 1000);
-
-                        try
-                        {
-                            Log.Debug(() => $"Running Squirrel app with post-install args, executable: {exe}, args: {args}");
-                            await Utility.InvokeProcessAsync(exe, args, cts.Token);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error($"Couldn't run Squirrel app with post-install args, executable: {exe}, args: {args}", ex);
-                        }
-                    }
-                },
-                1 /* at a time */);
-        }
 
         // If this is the first run, we run the apps with first-run and 
         // *don't* wait for them, since they're probably the main EXE
         if (squirrelApps.Count == 0)
         {
-            Log.Warn("No apps are marked as Squirrel-aware! Going to run them all");
-
-            squirrelApps = targetDir.EnumerateFiles()
-                .Where(x => x.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-                .Where(x => !x.Name.StartsWith("squirrel.", StringComparison.OrdinalIgnoreCase))
-                .Select(x => x.FullName)
-                .ToList();
-
-            // Create shortcuts for apps automatically if they didn't
-            // create any Squirrel-aware apps
-            squirrelApps.ForEach(
-                x => CreateShortcutsForExecutable(
-                    Path.GetFileName(x),
-                    ShortcutLocation.Desktop | ShortcutLocation.StartMenu,
-                    isInitialInstall == false,
-                    null,
-                    null));
+            Log.Warn("No apps are marked as Squirrel-aware!");
+            throw new InvalidStateException($"Could not find Squirrel-aware apps in {targetDir.FullName}");
         }
 
         if (!isInitialInstall || silentInstall)
@@ -765,41 +718,6 @@ internal class ApplyReleasesImpl : IEnableLogger
             .Where(x => x.Name.ToLowerInvariant().Contains("app-"))
             .Where(x => x.Name != currentVersionFolder && x.Name != originalVersionFolder)
             .Where(x => !IsAppFolderDead(x.FullName));
-
-        if (forceUninstall == false)
-        {
-            await toCleanup.ForEachAsync(
-                async x =>
-                {
-                    var squirrelApps = SquirrelAwareExecutableDetector.GetAllSquirrelAwareApps(x.FullName);
-                    var args = $"--squirrel-obsolete {x.Name.Replace("app-", "")}";
-                    Log.Info($"Squirrel Enabled Apps for post-uninstall notification: [{string.Join(",", squirrelApps)}]");
-
-                    if (squirrelApps.Count > 0)
-                    {
-                        // For each app, run the install command in-order and wait
-                        await squirrelApps.ForEachAsync(
-                            async exe =>
-                            {
-                                using (var cts = new CancellationTokenSource())
-                                {
-                                    cts.CancelAfter(10 * 1000);
-
-                                    try
-                                    {
-                                        Log.Debug(() => $"Running Squirrel app with post-uninstall args, executable: {exe}, args: {args}");
-                                        await Utility.InvokeProcessAsync(exe, args, cts.Token);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log.Error($"Couldn't run Squirrel app with post-uninstall args, executable: {exe}, args: {args}", ex);
-                                    }
-                                }
-                            },
-                            1 /* at a time */);
-                    }
-                });
-        }
 
         // Include dead folders in folders to :fire:
         toCleanup = di.GetDirectories()
