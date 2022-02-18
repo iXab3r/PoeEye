@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+<h1>Counter</h1>
+
+<p>The current count is: @currentCount</p>
+<button @onclick="IncrementCount">Count</button>
+
+@code {
+    int currentCount = 0;
+
+    void IncrementCount()
+    {
+        currentCount++;
+    }
+}
+
+@code {
+    
+}

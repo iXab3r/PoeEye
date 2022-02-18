@@ -14,6 +14,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
 
     public EnforcedThreadScheduler(Thread thread, IScheduler threadScheduler)
     {
+        Log = GetType().PrepareLogger();
         Log.Info($"Using existing thread scheduler: {threadScheduler}");
         this.threadScheduler = threadScheduler;
         this.schedulerThread = thread;

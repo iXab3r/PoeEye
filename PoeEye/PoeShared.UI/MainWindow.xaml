@@ -20,6 +20,9 @@
             <TabItem Header="AutoComplete">
                 <eye:CachedContentControl Content="{Binding AutoCompleteSandbox}"/>
             </TabItem>
+            <TabItem Header="Blazor">
+                <eye:CachedContentControl Content="{Binding BlazorSandbox}"/>
+            </TabItem>
             <TabItem Header="Bindings">
                 <eye:CachedContentControl Content="{Binding BindingsSandbox}"/>
             </TabItem>

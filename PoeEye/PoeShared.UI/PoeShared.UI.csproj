@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
     <PropertyGroup>
         <ProjectGuid>{B477A982-DF35-499C-A7B5-86A0AB7D7BBA}</ProjectGuid>
         <AssemblyTitle>PoeShared.UI</AssemblyTitle>
@@ -19,6 +19,8 @@
     </PropertyGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\PoeShared.Blazor.Wpf\PoeShared.Blazor.Wpf.csproj" />
+      <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
       <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
       <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
       <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
@@ -47,10 +49,14 @@
       <Compile Update="FakeDelayNumberViewModel.cs">
         <DependentUpon>FakeDelayNumberView.xaml</DependentUpon>
       </Compile>
+      <Compile Update="Blazor\MainCounter.cs">
+        <DependentUpon>Main.razor</DependentUpon>
+      </Compile>
     </ItemGroup>
     
     <ItemGroup>
       <None Remove="Resources\giphy.gif" />
       <Resource Include="Resources\giphy.gif" />
     </ItemGroup>
+    
 </Project>

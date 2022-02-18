@@ -89,7 +89,7 @@ internal sealed class Log4NetAdapter : ILogWriter
         }
         else
         {
-            errorAction(message, logData.Exception);
+            errorAction(message, logData.Exception.Demystify());
         }
     }
 }

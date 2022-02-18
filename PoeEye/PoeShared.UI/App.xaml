@@ -16,6 +16,7 @@
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/Views/NotificationSandboxView.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/Views/ExceptionSandboxView.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/Views/AutoCompleteSandboxView.xaml" />
+                <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/Blazor/BlazorSandboxView.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/Bindings/BindingsSandboxView.xaml" />
             </eye:SharedResourceDictionary.MergedDictionaries>
         </eye:SharedResourceDictionary>

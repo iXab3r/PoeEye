@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using PoeShared.Audio.ViewModels;
+using PoeShared.Blazor;
+using PoeShared.Prism;
 using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding;
 using PoeShared.RegionSelector;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI.Bindings;
+using PoeShared.UI.Blazor;
+using Unity;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.UI;
@@ -21,6 +25,7 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     private readonly IScreenRegionSelectorService regionSelectorService;
 
     public MainWindowViewModel(
+        IFactory<BlazorSandboxViewModel> blazorHostViewModelFactory,
         IAudioNotificationSelectorViewModel audioNotificationSelector,
         IRandomPeriodSelector randomPeriodSelector,
         ISelectionAdornerViewModel selectionAdorner,
@@ -40,17 +45,14 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
         RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
         HotkeySequenceEditor = hotkeySequenceEditor.AddTo(Anchors);
-        LongCommand = CommandWrapper.Create(async () =>
-        {
-            await Task.Delay(3000);
-        });
-            
+        LongCommand = CommandWrapper.Create(async () => { await Task.Delay(3000); });
+
         ErrorCommand = CommandWrapper.Create(async () =>
         {
             await Task.Delay(3000);
             throw new ApplicationException("Error");
         });
-            
+
         RandomPeriodSelector.LowerValue = TimeSpan.FromSeconds(3);
         RandomPeriodSelector.UpperValue = TimeSpan.FromSeconds(3);
         NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
@@ -70,8 +72,9 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
                 FakeDelay = null;
             }
         });
-            
+
         SelectRegionCommnad = CommandWrapper.Create(SelectRegionExecuted);
+        BlazorSandbox = blazorHostViewModelFactory.Create();
     }
 
     private async Task SelectRegionExecuted()
@@ -82,7 +85,7 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     public NotificationSandboxViewModel NotificationSandbox { get; }
     public ExceptionSandboxViewModel ExceptionSandbox { get; }
     public BindingsSandboxViewModel BindingsSandbox { get; }
-
+    public BlazorSandboxViewModel BlazorSandbox { get; }
     public ICommand StartSelectionCommand { get; }
 
 
@@ -115,6 +118,8 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     public DisposableReactiveObject FakeDelay { get; set; }
 
     public TimeSpan RandomPeriod { get; set; }
+
+    public CommandWrapper ShowBlazorWindow { get; }
 
     private async Task HandleSelectionCommandExecuted()
     {

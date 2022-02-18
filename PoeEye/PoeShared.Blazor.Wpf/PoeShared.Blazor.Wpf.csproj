@@ -1,0 +1,40 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+
+     <PropertyGroup>
+         <TargetFramework>net6-windows10.0.19041.0</TargetFramework>
+         <AssemblyTitle>PoeShared.Blazor</AssemblyTitle>
+         <Product>PoeShared.Blazor</Product>
+         <Copyright>Copyright © Xab3r 2022</Copyright>
+         <Configurations>Debug;Release</Configurations>
+         <Platforms>AnyCPU</Platforms>
+         <UseWpf>true</UseWpf>
+         <LangVersion>10</LangVersion>
+         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+     </PropertyGroup>
+
+     <ItemGroup>
+         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
+         <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
+         <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+     </ItemGroup>
+
+     <ItemGroup>
+         <PackageReference Include="FluentValidation" Version="9.5.1" />
+         <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
+         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="6.0.2" />
+         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.200-preview.13.2865" />
+     </ItemGroup>
+
+     <ItemGroup>
+       <Folder Include="Services" />
+     </ItemGroup>
+
+     <ItemGroup>
+       <None Update="wwwroot4wpf\app.css">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+       </None>
+       <None Update="wwwroot4wpf\index.html">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+       </None>
+     </ItemGroup>
+</Project>

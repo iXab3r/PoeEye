@@ -1,0 +1,7 @@
+<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eye="http://coderush.net/poeeye/">
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/BlazorHostView.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
+</eye:SharedResourceDictionary>
