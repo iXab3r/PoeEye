@@ -5,7 +5,54 @@
                     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.textbox.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
+    
+    <Style TargetType="{x:Type eye:HotKeyBox}" x:Key="test">
+     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="AcceptsTab" Value="False"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}"/>
+        <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type eye:HotKeyBox}">
+                    <Border MinHeight="{TemplateBinding MinHeight}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Focusable="{TemplateBinding Focusable}"
+                            Background="{TemplateBinding Background}"
+                            ToolTip="{TemplateBinding ToolTip}">
+                        <TextBox x:Name="PART_TextBox"
+                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"    
+                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                             FontFamily="{TemplateBinding FontFamily}"
+                             FontSize="{TemplateBinding FontSize}"
+                             Foreground="{TemplateBinding Foreground}"
+                             HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                             IsTabStop="{TemplateBinding IsTabStop}"
+                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                             Text="{TemplateBinding Text}"
+                             materialDesign:HintAssist.IsFloating="False"
+                             Validation.ErrorTemplate="{TemplateBinding Validation.ErrorTemplate}"
+                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                             AcceptsReturn="{TemplateBinding AcceptsReturn}"
+                             AcceptsTab="{TemplateBinding AcceptsTab}">
+                        <TextBox.ContextMenu>
+                            <ContextMenu IsEnabled="False"/>
+                        </TextBox.ContextMenu>
+                    </TextBox>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
     <Style TargetType="{x:Type eye:HotKeyBox}">
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />

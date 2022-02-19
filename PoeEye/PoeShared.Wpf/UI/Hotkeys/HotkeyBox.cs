@@ -17,13 +17,13 @@ namespace PoeShared.UI;
 public class HotKeyBox : Control
 {
     public const string PART_TextBox = "PART_TextBox";
-    private static readonly ISet<Key> EscapeKeys = new HashSet<Key> {Key.Escape, Key.Back, Key.Delete};
+    private static readonly ISet<Key> EscapeKeys = new HashSet<Key> { Key.Escape, Key.Back, Key.Delete };
 
     public static readonly DependencyProperty HotKeyProperty = DependencyProperty.Register(
         "HotKey",
         typeof(HotkeyGesture),
         typeof(HotKeyBox),
-        new FrameworkPropertyMetadata(default(HotkeyGesture), OnHotKeyChanged) {BindsTwoWayByDefault = true});
+        new FrameworkPropertyMetadata(default(HotkeyGesture), OnHotKeyChanged) { BindsTwoWayByDefault = true });
 
     public static readonly DependencyProperty AreModifierKeysRequiredProperty = DependencyProperty.Register(
         "AreModifierKeysRequired",
@@ -77,67 +77,67 @@ public class HotKeyBox : Control
 
     public bool AcceptsModifiers
     {
-        get => (bool) GetValue(AcceptsModifiersProperty);
+        get => (bool)GetValue(AcceptsModifiersProperty);
         set => SetValue(AcceptsModifiersProperty, value);
     }
 
     public bool AcceptsMouseWheel
     {
-        get => (bool) GetValue(AcceptsMouseWheelProperty);
+        get => (bool)GetValue(AcceptsMouseWheelProperty);
         set => SetValue(AcceptsMouseWheelProperty, value);
     }
 
     public bool AcceptsReturn
     {
-        get => (bool) GetValue(AcceptsReturnProperty);
+        get => (bool)GetValue(AcceptsReturnProperty);
         set => SetValue(AcceptsReturnProperty, value);
     }
 
     public bool AcceptsTab
     {
-        get => (bool) GetValue(AcceptsTabProperty);
+        get => (bool)GetValue(AcceptsTabProperty);
         set => SetValue(AcceptsTabProperty, value);
     }
 
     public bool AcceptsMouseKeys
     {
-        get => (bool) GetValue(AcceptsMouseKeysProperty);
+        get => (bool)GetValue(AcceptsMouseKeysProperty);
         set => SetValue(AcceptsMouseKeysProperty, value);
     }
 
     public HotkeyGesture HotKey
     {
-        get => (HotkeyGesture) GetValue(HotKeyProperty);
+        get => (HotkeyGesture)GetValue(HotKeyProperty);
         set => SetValue(HotKeyProperty, value);
     }
 
     public bool AreModifierKeysRequired
     {
-        get => (bool) GetValue(AreModifierKeysRequiredProperty);
+        get => (bool)GetValue(AreModifierKeysRequiredProperty);
         set => SetValue(AreModifierKeysRequiredProperty, value);
     }
 
     public string Watermark
     {
-        get => (string) GetValue(WatermarkProperty);
+        get => (string)GetValue(WatermarkProperty);
         set => SetValue(WatermarkProperty, value);
     }
 
     public string Text
     {
-        get => (string) GetValue(TextProperty);
+        get => (string)GetValue(TextProperty);
         private set => SetValue(TextPropertyKey, value);
     }
 
     private static void OnHotKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var ctrl = (HotKeyBox) d;
+        var ctrl = (HotKeyBox)d;
         ctrl.UpdateText();
     }
 
     private static void OnGotFocus(object sender, RoutedEventArgs e)
     {
-        var hotKeyBox = (HotKeyBox) sender;
+        var hotKeyBox = (HotKeyBox)sender;
 
         // If we're an editable HotKeyBox, forward focus to the TextBox or previous element
         if (e.Handled)
@@ -207,7 +207,7 @@ public class HotKeyBox : Control
         {
             return;
         }
-            
+
         if (e.Delta != 0)
         {
             HotKey = new HotkeyGesture(e.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, currentModifierKeys);
@@ -226,7 +226,7 @@ public class HotKeyBox : Control
         {
             return;
         }
-            
+
         if (e.XButton1 == MouseButtonState.Pressed)
         {
             HotKey = new HotkeyGesture(MouseButton.XButton1, currentModifierKeys);
@@ -266,7 +266,7 @@ public class HotKeyBox : Control
 
     private void ComponentDispatcherOnThreadPreprocessMessage(ref MSG msgRaw, ref bool handled)
     {
-        var msg = (User32.WindowMessage) msgRaw.message;
+        var msg = (User32.WindowMessage)msgRaw.message;
         if (msg == User32.WindowMessage.WM_HOTKEY)
         {
             handled = true;
@@ -336,7 +336,7 @@ public class HotKeyBox : Control
             modifierKeys = currentModifierKeys;
             return true;
         }
-            
+
         modifierKeys = ModifierKeys.None;
         return currentModifierKeys == ModifierKeys.None;
     }

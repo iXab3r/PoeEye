@@ -22,11 +22,23 @@ public sealed class FocusHelper
         obj.SetValue(IsFocusedProperty, value);
     }
 
+    private static T FindFocusable<T>(DependencyObject element) where T : FrameworkElement
+    {
+        if (element is T)
+        {
+            return (T)element;
+        }
+
+        return element.FindVisualChildren<T>().FirstOrDefault();
+    }
+
     private static void OnIsFocusedPropertyChanged(
         DependencyObject associatedObject,
         DependencyPropertyChangedEventArgs valueToSet)
     {
-        var element = associatedObject as FrameworkElement;
+        var element = 
+            FindFocusable<TextBox>(associatedObject) ?? 
+            FindFocusable<FrameworkElement>(associatedObject);
         if (element == null)
         {
             return;
@@ -64,7 +76,7 @@ public sealed class FocusHelper
 
         element.IsVisibleChanged += ElementOnIsVisibleChanged;
     }
-        
+
     private static bool ApplyFocus(FrameworkElement element)
     {
         element.Loaded -= ElementOnLoaded;

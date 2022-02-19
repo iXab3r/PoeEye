@@ -16,6 +16,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+        <Setter Property="wpf:TextFieldAssist.UnderlineBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBoxBase}">
@@ -50,13 +51,14 @@
                                 <Condition Property="IsReadOnly" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 1" />
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(wpf:TextFieldAssist.UnderlineBrush)}" />
                         </MultiTrigger>
 
                         <!-- IsKeyboardFocused -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsKeyboardFocused" Value="True" />
+                                <Condition Property="IsReadOnly" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0, 2,0,0" />
                             <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 2" />
@@ -78,7 +80,7 @@
 
     <Style x:Key="MinimalTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource FastTextBoxStyle}" />
     
-    <Style x:Key="TextLabelStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource FastTextBoxStyle}">
+    <Style x:Key="TextBoxAsLabelStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource FastTextBoxStyle}">
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
