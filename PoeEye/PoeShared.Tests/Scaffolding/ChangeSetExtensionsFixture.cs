@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using DynamicData;
 using PoeShared.Scaffolding;
 using Shouldly;

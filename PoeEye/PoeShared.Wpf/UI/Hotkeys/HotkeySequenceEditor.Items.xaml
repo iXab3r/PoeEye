@@ -50,7 +50,7 @@
                              Style="{StaticResource HotkeySequenceTextBoxStyle}"
                              Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
                         <i:Interaction.Behaviors>
-                            <wpf:SelectAllOnFocusBehavior />
+                            <wpf:SelectAllOnFocusBehavior WaitForText="True"/>
                         </i:Interaction.Behaviors>
                     </TextBox>
                 </materialDesign:PopupBox>

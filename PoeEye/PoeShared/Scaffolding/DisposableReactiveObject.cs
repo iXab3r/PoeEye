@@ -41,6 +41,17 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    protected void AddDisposableResources<T>(Func<IEnumerable<T>> itemsSupplier) where T : IDisposable
+    {
+        Disposable.Create(() =>
+        {
+            foreach (var evaluator in itemsSupplier())
+            {
+                evaluator?.Dispose();
+            }
+        }).AddTo(Anchors);
+    }
+    
     protected void AddDisposableResource<T>(Func<T> accessor) where T : IDisposable
     {
         Disposable.Create(() =>

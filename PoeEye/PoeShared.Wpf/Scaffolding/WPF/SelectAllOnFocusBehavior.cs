@@ -6,6 +6,15 @@ namespace PoeShared.Scaffolding.WPF;
 
 public sealed class SelectAllOnFocusBehavior : Behavior<TextBox>
 {
+    public static readonly DependencyProperty WaitForTextProperty = DependencyProperty.Register(
+        "WaitForText", typeof(bool), typeof(SelectAllOnFocusBehavior), new PropertyMetadata(default(bool)));
+
+    public bool WaitForText
+    {
+        get { return (bool)GetValue(WaitForTextProperty); }
+        set { SetValue(WaitForTextProperty, value); }
+    }
+    
     protected override void OnAttached()
     {
         base.OnAttached();
@@ -14,7 +23,7 @@ public sealed class SelectAllOnFocusBehavior : Behavior<TextBox>
 
     private void AssociatedObjectOnGotFocus(object sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrEmpty(AssociatedObject.Text))
+        if (WaitForText && string.IsNullOrEmpty(AssociatedObject.Text))
         {
             AssociatedObject.TextChanged += AssociatedObjectOnTextChanged;
         }

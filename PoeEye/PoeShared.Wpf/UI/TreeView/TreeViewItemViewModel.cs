@@ -50,7 +50,7 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
         children
             .Connect()
             .Sort(this.WhenAnyValue(x => x.SortComparer).Select(x => x ?? DefaultComparer), SortOptions.None, resort) // DynamicData 7+ REQUIRES to have Comparer set to non-null
-            .Bind(out var chld)
+            .BindToCollection(out var chld)
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
         Children = chld;
@@ -94,8 +94,11 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
         
     public bool ParentIsExpanded => parentIsExpanded.Value;
 
-    public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
+    public bool MatchesFilter { get; } = true;
+
+    public IReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
     public IObservableList<ITreeViewItemViewModel> ChildrenList { get; }
+    public Func<ITreeViewItemViewModel, IObservable<bool>> Filter { get; set; }
 
     public bool IsSelected { get; set; }
 

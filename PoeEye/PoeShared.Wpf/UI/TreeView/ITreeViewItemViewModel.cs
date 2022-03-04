@@ -18,30 +18,31 @@ public interface ITreeViewItemViewModel : IDisposableReactiveObject, ICanBeSelec
     /// </summary>
     string FullPath { get; }
         
-    public bool IsExpanded { get; set; }
+    bool IsExpanded { get; set; }
 
-    public AnnotatedBoolean IsVisible { get; }
+    AnnotatedBoolean IsVisible { get; }
         
-    public bool IsEnabled { get; }
+    bool IsEnabled { get; }
         
-    public bool ParentIsExpanded { get; }
+    bool ParentIsExpanded { get; }
 
-    public ITreeViewItemViewModel Parent { [CanBeNull] get; }
+    bool MatchesFilter { get; }
+    
+    ITreeViewItemViewModel Parent { [CanBeNull] get; }
         
-    public IComparer<ITreeViewItemViewModel> SortComparer { get; set; }
+    IComparer<ITreeViewItemViewModel> SortComparer { get; set; }
         
-    public Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen { get; set; }
-
-    /// <summary>
-    ///   Not thread-safe for enumeration
-    /// </summary>
-    public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
+    Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen { get; set; }
+    
+    IReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
     
     /// <summary>
     ///  Supports thread-safe enumeration, although it may contain partially modified data
     /// </summary>
     /// <returns></returns>
-    public IObservableList<ITreeViewItemViewModel> ChildrenList { [NotNull] get; }
+    IObservableList<ITreeViewItemViewModel> ChildrenList { [NotNull] get; }
+    
+    Func<ITreeViewItemViewModel, IObservable<bool>> Filter { get; set; }
 }
     
 public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel

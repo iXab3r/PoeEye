@@ -16,7 +16,14 @@ public static class ConverterHelpers
             
         return value switch
         {
+            int i => IsNullOrDefault(i),
+            float f => IsNullOrDefault(f),
+            double d => IsNullOrDefault(d),
+            decimal m => IsNullOrDefault(m),
             string s => IsNullOrDefault(s),
+            DateTime dt => IsNullOrDefault(dt),
+            Point p => IsNullOrDefault(p),
+            PointF pf => IsNullOrDefault(pf),
             IList list => IsNullOrDefault(list),
             IEnumerable enumerable => IsNullOrDefault(enumerable),
             TimeSpan timeSpan => timeSpan == TimeSpan.Zero,

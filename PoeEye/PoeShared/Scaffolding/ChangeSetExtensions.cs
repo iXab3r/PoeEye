@@ -1,16 +1,37 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Reactive;
 using DynamicData;
 using DynamicData.Aggregation;
+using DynamicData.Binding;
 using DynamicData.Kernel;
 using JetBrains.Annotations;
-
 
 namespace PoeShared.Scaffolding;
 
 public static class ChangeSetExtensions
 {
+    public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this IObservableList<T> source)
+    {
+        return source.Connect();
+    }
+    
+     public static IObservable<IChangeSet<T, TKey>> ToObservableChangeSet<T, TKey>(this IObservableCache<T, TKey> source)
+        {
+            return source.Connect();
+        }
+    
+    public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this IReadOnlyObservableCollection<T> source)
+    {
+        return source.ToObservableChangeSet<IReadOnlyObservableCollection<T>, T>();
+    }
+    
+    public static IObservable<IChangeSet<T>> BindToCollection<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
+    {
+        var result = new SynchronizedObservableCollection<T>();
+        collection = result;
+        return source.Bind(result);
+    }
+
     public static ISourceList<T> ToSourceList<T>(this IObservable<IChangeSet<T>> source)
     {
         Guard.ArgumentNotNull(source, nameof(source));
@@ -24,7 +45,7 @@ public static class ChangeSetExtensions
         value = result ? converter(rawValue) : default;
         return result;
     }
-        
+
     public static bool TryGetValue<T, TKey>(this ISourceCache<T, TKey> instance, TKey key, out T value)
     {
         var result = instance.Lookup(key);
@@ -33,11 +54,9 @@ public static class ChangeSetExtensions
             value = result.Value;
             return true;
         }
-        else
-        {
-            value = default;
-            return false;
-        }
+
+        value = default;
+        return false;
     }
 
     public static ISourceList<T> ToSourceList<T>(this IEnumerable<T> items)
@@ -45,8 +64,8 @@ public static class ChangeSetExtensions
         var result = new SourceList<T>();
         result.AddRange(items);
         return result;
-    } 
-        
+    }
+
     [Obsolete("DynamicCombiner and ReferenceCountTracker contain a bug that could be reproduced by Edit()ing a list and replacing an item there")]
     public static ISourceList<T> ToSourceList<T>(this IEnumerable<ISourceList<T>> lists)
     {
@@ -79,6 +98,7 @@ public static class ChangeSetExtensions
             {
                 return;
             }
+
             list.Move(idx, 0);
         });
     }
@@ -92,6 +112,7 @@ public static class ChangeSetExtensions
             {
                 return;
             }
+
             list.Move(idx, list.Count - 1);
         });
     }
@@ -105,6 +126,7 @@ public static class ChangeSetExtensions
             {
                 return;
             }
+
             list.Move(idx, idx + 1);
         });
     }
@@ -118,6 +140,7 @@ public static class ChangeSetExtensions
             {
                 return;
             }
+
             list.Move(idx, idx - 1);
         });
     }
@@ -166,7 +189,7 @@ public static class ChangeSetExtensions
     }
 
     /// <summary>
-    /// Watches each item in the collection and notifies when any of them has changed
+    ///     Watches each item in the collection and notifies when any of them has changed
     /// </summary>
     /// <typeparam name="TObject">The type of the object.</typeparam>
     /// <param name="source">The source.</param>
@@ -184,7 +207,7 @@ public static class ChangeSetExtensions
 
         return source.MergeMany(t => t.WhenAnyProperty(propertiesToMonitor));
     }
-        
+
     public static IDisposable PopulateFrom<T, TKey, T1>(this ISourceCache<T, TKey> instance, params ISourceList<T1>[] lists)
         where T1 : T
     {
@@ -192,7 +215,7 @@ public static class ChangeSetExtensions
         lists.ForEach(x => SyncListWithCache(x, instance).AddTo(anchors));
         return anchors;
     }
-        
+
     public static IDisposable PopulateFrom<T, TKey, T1, T2>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2)
         where T1 : T
         where T2 : T
@@ -202,7 +225,7 @@ public static class ChangeSetExtensions
         SyncListWithCache(list2, instance).AddTo(anchors);
         return anchors;
     }
-        
+
     public static IDisposable PopulateFrom<T, TKey, T1, T2, T3>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3)
         where T1 : T
         where T2 : T
@@ -214,7 +237,7 @@ public static class ChangeSetExtensions
         SyncListWithCache(list3, instance).AddTo(anchors);
         return anchors;
     }
-        
+
     public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4)
         where T1 : T
         where T2 : T
@@ -228,7 +251,7 @@ public static class ChangeSetExtensions
         SyncListWithCache(list4, instance).AddTo(anchors);
         return anchors;
     }
-        
+
     public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4, T5>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4, IObservableList<T5> list5)
         where T1 : T
         where T2 : T
@@ -250,18 +273,12 @@ public static class ChangeSetExtensions
         var anchors = new CompositeDisposable();
         list.Connect().OnItemRemoved(newObject => destination.Remove(newObject)).Subscribe().AddTo(anchors);
         list.Connect().OnItemAdded(newObject => destination.AddOrUpdate(newObject)).Subscribe().AddTo(anchors);
-        Disposable.Create(() =>
-        {
-            destination.Edit(destinationList =>
-            {
-                list.Items.ForEach(x => destinationList.Remove(x));
-            });
-        }).AddTo(anchors);
+        Disposable.Create(() => { destination.Edit(destinationList => { list.Items.ForEach(x => destinationList.Remove(x)); }); }).AddTo(anchors);
         return anchors;
     }
 
     public static IDisposable ChangeKeyDynamically<TObject, TSourceKey, TDestinationKey>(
-        this IObservable<IChangeSet<TObject, TSourceKey>> source, 
+        this IObservable<IChangeSet<TObject, TSourceKey>> source,
         Expression<Func<TObject, TDestinationKey>> keySelectorExpression,
         out IObservableCache<TObject, TDestinationKey> cacheWithChangedKey)
         where TSourceKey : notnull
@@ -269,9 +286,10 @@ public static class ChangeSetExtensions
         where TObject : INotifyPropertyChanged
     {
         var keySelector = keySelectorExpression.Compile();
+        var anchors = new CompositeDisposable();
         var result = new SourceCache<TObject, TDestinationKey>(keySelector);
         cacheWithChangedKey = result;
-        var onKeyUpdate = source
+        source
             .WhenPropertyChanged(keySelectorExpression)
             .GroupBy(x => x.Sender)
             .Do(group =>
@@ -294,65 +312,67 @@ public static class ChangeSetExtensions
                                 byPath.AddOrUpdate(item);
                             }
                         });
-                    });
+                    }).AddTo(anchors);
             })
-            .Subscribe();;
+            .Subscribe()
+            .AddTo(anchors);
 
-        var onItemRemoval =
-            source
-                .OnItemRemoved(x =>
-                {
-                    result.Remove(x);
-                })
-                .Subscribe();
+        source
+            .OnItemRemoved(x => { result.Remove(x); })
+            .Subscribe()
+            .AddTo(anchors);
 
-        return new CompositeDisposable(onKeyUpdate, onItemRemoval);
+        return anchors;
     }
-    
 
     public static IObservable<IChangeSet<TDestination, TKey>> TransformWithInlineUpdate<TObject, TKey, TDestination>(this IObservable<IChangeSet<TObject, TKey>> source,
         Func<TObject, TDestination> transformFactory,
         Action<TDestination, TObject> updateAction = null)
     {
         return source.Scan((ChangeAwareCache<TDestination, TKey>)null, (cache, changes) =>
+        {
+            //The change aware cache captures a history of all changes so downstream operators can replay the changes
+            if (cache == null)
             {
-                //The change aware cache captures a history of all changes so downstream operators can replay the changes
-                if (cache == null)
-                    cache = new ChangeAwareCache<TDestination, TKey>(changes.Count);
+                cache = new ChangeAwareCache<TDestination, TKey>(changes.Count);
+            }
 
-                foreach (var change in changes)
+            foreach (var change in changes)
+            {
+                switch (change.Reason)
                 {
-                    switch (change.Reason)
+                    case ChangeReason.Add:
+                        cache.AddOrUpdate(transformFactory(change.Current), change.Key);
+                        break;
+                    case ChangeReason.Update:
                     {
-                        case ChangeReason.Add:
-                            cache.AddOrUpdate(transformFactory(change.Current), change.Key);
-                            break;
-                        case ChangeReason.Update:
+                        if (updateAction == null)
                         {
-                            if (updateAction == null) continue;
-
-                            var previous = cache.Lookup(change.Key)
-                                .ValueOrThrow(()=> new MissingKeyException($"{change.Key} is not found."));
-                            //callback when an update has been received
-                            updateAction(previous, change.Current);
-
-                            //send a refresh as this will force downstream operators to filter, sort, group etc
-                            cache.Refresh(change.Key);
+                            continue;
                         }
-                            break;
-                        case ChangeReason.Remove:
-                            cache.Remove(change.Key);
-                            break;
-                        case ChangeReason.Refresh:
-                            cache.Refresh(change.Key);
-                            break;
-                        case ChangeReason.Moved:
-                            //Do nothing !
-                            break;
-                    }
-                }
-                return cache;
 
-            }).Select(cache => cache.CaptureChanges()); //invoke capture changes to return the changeset
+                        var previous = cache.Lookup(change.Key)
+                            .ValueOrThrow(() => new MissingKeyException($"{change.Key} is not found."));
+                        //callback when an update has been received
+                        updateAction(previous, change.Current);
+
+                        //send a refresh as this will force downstream operators to filter, sort, group etc
+                        cache.Refresh(change.Key);
+                    }
+                        break;
+                    case ChangeReason.Remove:
+                        cache.Remove(change.Key);
+                        break;
+                    case ChangeReason.Refresh:
+                        cache.Refresh(change.Key);
+                        break;
+                    case ChangeReason.Moved:
+                        //Do nothing !
+                        break;
+                }
+            }
+
+            return cache;
+        }).Select(cache => cache.CaptureChanges()); //invoke capture changes to return the changeset
     }
 }

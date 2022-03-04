@@ -15,6 +15,7 @@
     </ControlTemplate>
 
     <Style x:Key="DefaultCachedContentControlStyle" TargetType="{x:Type ui:CachedContentControl}">
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template" Value="{StaticResource CachedControlControlTemplate}">
         </Setter>
     </Style>
