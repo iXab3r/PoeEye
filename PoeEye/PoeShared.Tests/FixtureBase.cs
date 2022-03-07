@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Reactive.Concurrency;
+using System.Threading;
 using NUnit.Framework;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -28,6 +29,7 @@ public abstract class FixtureBase
         Container = new Fixture();
         Container.Customize(new AutoMoqCustomization());
         Container.OmitAutoProperties = true;
+        Container.Register<IScheduler>(() => Scheduler.Immediate);
         SetUp();
     }
 

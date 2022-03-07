@@ -20,6 +20,11 @@ public sealed class AssemblyHelper
 
     public Type ResolveType(PoeConfigMetadata metadata)
     {
+        if (string.IsNullOrEmpty(metadata.TypeName))
+        {
+            Log.Warn($"Invalid metadata: {metadata}");
+            throw new ArgumentException($"Invalid metadata - typename is not set");
+        }
         var loadedType = Type.GetType(metadata.TypeName, false);
         if (loadedType != null)
         {
