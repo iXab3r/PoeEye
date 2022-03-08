@@ -1,21 +1,5 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
-using DynamicData.Aggregation;
-using DynamicData.Binding;
-using NUnit.Framework;
-using PoeShared.Scaffolding;
-using PropertyBinder;
-using ReactiveUI;
-using System;
-using DynamicData;
-using Shouldly;
+namespace PoeShared.Benchmarks.PropertyBinder;
 
-namespace PoeShared.Tests.PropertyBinder;
-
-[TestFixture]
 public class BinderPerformanceCollectionsFixture : BenchmarkBase
 {
     [Test]

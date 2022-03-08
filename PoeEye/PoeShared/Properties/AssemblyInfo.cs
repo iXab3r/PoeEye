@@ -25,4 +25,5 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo("EyeAuras.Tests")]
+[assembly: InternalsVisibleTo("EyeAuras.Benchmarks")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

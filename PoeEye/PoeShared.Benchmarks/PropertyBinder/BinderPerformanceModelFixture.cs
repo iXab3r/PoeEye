@@ -1,17 +1,5 @@
-using NUnit.Framework;
-using PoeShared.Scaffolding;
-using PropertyBinder;
-using ReactiveUI;
-using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
+namespace PoeShared.Benchmarks.PropertyBinder;
 
-namespace PoeShared.Tests.PropertyBinder;
-
-[TestFixture]
 public class BinderPerformanceModelFixture : BenchmarkBase
 {
     [Test]

@@ -29,7 +29,6 @@ public abstract class FixtureBase
         Container = new Fixture();
         Container.Customize(new AutoMoqCustomization());
         Container.OmitAutoProperties = true;
-        Container.Register<IScheduler>(() => Scheduler.Immediate);
         SetUp();
     }
 

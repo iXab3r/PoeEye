@@ -1,11 +1,5 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
-using NUnit.Framework;
-
-namespace PoeShared.Tests.PropertyBinder;
+﻿
+namespace PoeShared.Benchmarks;
 
 [TestFixture]
 [Category("Benchmark")]
@@ -22,7 +16,7 @@ public class BenchmarkBase
                     new NetCoreAppSettings(
                         targetFrameworkMoniker: targetFrameworkMoniker,
                         runtimeFrameworkVersion: null,
-                        name: "5.0")))
+                        name: "6.0")))
             .WithArguments(new Argument[]{ new MsBuildArgument("/p:ValidateExecutableReferencesMatchSelfContained=false") })
             .AsDefault();
         return job;
