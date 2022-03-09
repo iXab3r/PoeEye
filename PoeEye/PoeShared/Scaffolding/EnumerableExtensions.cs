@@ -52,7 +52,12 @@ public static class EnumerableExtensions
     {
         return Task.WhenAll(enumerable.Select(action));
     }
-
+    
+    public static T[] EmptyIfNull<T>(this T[] array)
+    {
+        return array ?? Array.Empty<T>();
+    }
+    
     public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
     {
         return enumerable ?? Enumerable.Empty<T>();
