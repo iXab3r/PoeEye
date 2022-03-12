@@ -39,9 +39,9 @@ public sealed class RunglishTextMatcher : ITextMatcher
         this.matcher = matcher;
     }
 
-    public bool IsMatch(string needle, string haystack)
+    public bool IsMatch(string needle, string haystack, bool matchCase)
     {
-        var result = matcher.IsMatch(needle, haystack);
+        var result = matcher.IsMatch(needle, haystack, matchCase);
         if (result)
         {
             return true;
@@ -49,7 +49,7 @@ public sealed class RunglishTextMatcher : ITextMatcher
 
         // direct search failed, trying 'converted' search
         var converted = ConvertToEnglishLayout(needle);
-        return matcher.IsMatch(converted, haystack);
+        return matcher.IsMatch(converted, haystack, matchCase);
     }
 
     private static string ConvertToEnglishLayout(string source)

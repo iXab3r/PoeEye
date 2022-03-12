@@ -2,5 +2,5 @@
 
 public interface ITextMatcher
 {
-    bool IsMatch(string needle, string haystack);
+    bool IsMatch(string needle, string haystack, bool matchCase);
 }

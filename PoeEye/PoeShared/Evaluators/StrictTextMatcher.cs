@@ -2,15 +2,12 @@
 
 public sealed class StrictTextMatcher : ITextMatcher
 {
-    private readonly StringComparison stringComparison;
-
-    public StrictTextMatcher(StringComparison stringComparison)
+    public StrictTextMatcher()
     {
-        this.stringComparison = stringComparison;
     }
 
-    public bool IsMatch(string needle, string haystack)
+    public bool IsMatch(string needle, string haystack, bool matchCase)
     {
-        return haystack.Contains(needle, stringComparison);
+        return haystack.Contains(needle, matchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
     }
 }
