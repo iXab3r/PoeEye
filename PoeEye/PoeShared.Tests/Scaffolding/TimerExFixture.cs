@@ -42,14 +42,14 @@ public class TimerExFixture
 
         var idx = 0;
         //When
-        timer.TakeWhile(_ => idx < 1000).Do(_ =>
+        timer.TakeWhile(_ => idx < 100).Do(_ =>
         {
             queue.Enqueue((idx, $"#{idx} => #{Interlocked.Increment(ref idx)}"));
             Thread.Sleep(1);
         }).Wait();
 
         //Then
-        queue.Count.ShouldBe(1000);
+        queue.Count.ShouldBe(100);
         queue.Select(x => x.Item1).ShouldBeInOrder();
     }
 

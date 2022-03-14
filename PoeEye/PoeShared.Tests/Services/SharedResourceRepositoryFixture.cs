@@ -13,8 +13,6 @@ namespace PoeShared.Tests.Services;
 [TestFixture]
 public class SharedResourceRepositoryFixture : FixtureBase
 {
-    private static readonly IFluentLog Log = typeof(SharedResourceRepositoryFixture).PrepareLogger();
-
     [Test]
     public void ShouldCreate()
     {
@@ -98,7 +96,6 @@ public class SharedResourceRepositoryFixture : FixtureBase
     [TestCase(2, 100)]
     [TestCase(100, 1)]
     [TestCase(100, 10)]
-    [Repeat(10)]
     public void ShouldAllowSimultaneousRents(int runners, int runs)
     {
         //Given

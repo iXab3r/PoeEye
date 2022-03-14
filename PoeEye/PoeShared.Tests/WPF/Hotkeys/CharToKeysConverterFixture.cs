@@ -21,7 +21,7 @@ internal class CharToKeysConverterFixture : FixtureBase
         base.SetUp();
 
         keyboardLayoutManager = Container.Build<KeyboardLayoutManager>().Create(); // using real layout manager to test integration with WinApi
-        Container.Register<IKeyboardLayoutManager>(() => keyboardLayoutManager);
+        Container.Register(() => keyboardLayoutManager);
     }
 
     [Test]
