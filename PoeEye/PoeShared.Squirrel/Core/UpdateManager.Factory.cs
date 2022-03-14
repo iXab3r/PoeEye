@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Scaffolding;
 
 namespace PoeShared.Squirrel.Core;
@@ -22,11 +23,12 @@ public sealed partial class PoeUpdateManager
         string accessToken = null)
     {
         var repoUri = new Uri(repoUrl);
-        var userAgent = new ProductInfoHeaderValue("Squirrel", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+        var userAgent = new ProductInfoHeaderValue("Squirrel", Assembly.GetExecutingAssembly().GetName().Version?.ToString());
+        Log.Debug(() => $"Creating GitHub UpdateManager for {repoUri}, userAgent: {userAgent}");
 
         if (repoUri.Segments.Length != 3)
         {
-            throw new Exception("Repo URL must be to the root URL of the repo e.g. https://github.com/myuser/myrepo");
+            throw new ArgumentException("Repo URL must be to the root URL of the repo e.g. https://github.com/myuser/myrepo");
         }
 
         var releasesApiBuilder = new StringBuilder("repos")
@@ -56,28 +58,35 @@ public sealed partial class PoeUpdateManager
 
         // above ^^ notice the end slashes for the baseAddress, explained here: http://stackoverflow.com/a/23438417/162694
 
-        using (var client = new HttpClient {BaseAddress = baseAddress})
+        Log.Debug($"GitHub base address: {baseAddress}");
+        using var client = new HttpClient {BaseAddress = baseAddress};
+        client.DefaultRequestHeaders.UserAgent.Add(userAgent);
+        Log.Debug($"Downloading data, URI: {releasesApiBuilder}");
+        var response = await client.GetAsync(releasesApiBuilder.ToString());
+        Log.Debug($"Received response, code: {response.StatusCode}");
+        response.EnsureSuccessStatusCode();
+
+        var serializedData = await response.Content.ReadAsStringAsync();
+        var releases = SimpleJson.DeserializeObject<List<Release>>(serializedData);
+        Log.Debug($"Deserialized response, length: {serializedData.Length}");
+
+        var latestReleases = releases
+            .Where(x => prerelease || !x.Prerelease)
+            .OrderByDescending(x => x.PublishedAt)
+            .Take(5)
+            .ToArray();
+        
+        var latestRelease = latestReleases.FirstOrDefault();
+        Log.Debug($"Received info about following releases:\n\t{latestReleases.DumpToTable()}");
+
+        if (latestRelease == null)
         {
-            client.DefaultRequestHeaders.UserAgent.Add(userAgent);
-            var response = await client.GetAsync(releasesApiBuilder.ToString());
-            response.EnsureSuccessStatusCode();
-
-            var serializedData = await response.Content.ReadAsStringAsync();
-            var releases = SimpleJson.DeserializeObject<List<Release>>(serializedData);
-            var latestRelease = releases
-                .Where(x => prerelease || !x.Prerelease)
-                .OrderByDescending(x => x.PublishedAt)
-                .FirstOrDefault();
-
-            if (latestRelease == null)
-            {
-                throw new ApplicationException($"could not find a valid Release, releases count: {releases.Count}");
-            }
-                
-            var latestReleaseUrl = latestRelease.HtmlUrl.Replace("/tag/", "/download/");
-
-            return new PoeUpdateManager(latestReleaseUrl, urlDownloader, applicationName, rootDirectory);
+            throw new InvalidStateException($"could not find a valid Release, releases count: {releases.Count}");
         }
+                
+        var latestReleaseUrl = latestRelease.HtmlUrl.Replace("/tag/", "/download/");
+        Log.Debug($"Latest release URL: {latestReleaseUrl}");
+        return new PoeUpdateManager(latestReleaseUrl, urlDownloader, applicationName, rootDirectory);
     }
 
     [DataContract]
