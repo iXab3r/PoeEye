@@ -36,5 +36,15 @@ public sealed class RegexTextMatcher : ITextMatcher
         }
     }
 
-    private sealed record RegexKey(string Pattern, RegexOptions Options);
+    private sealed record RegexKey
+    {
+        public RegexKey(string pattern, RegexOptions options)
+        {
+            this.Pattern = pattern;
+            this.Options = options;
+        }
+
+        public string Pattern { get; }
+        public RegexOptions Options { get; }
+    }
 }
