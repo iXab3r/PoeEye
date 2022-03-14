@@ -319,20 +319,10 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
         Log.Debug(() => $"[{OverlayDescription}] Current SystemInformation: {systemInformation}");
 
-
-        Rectangle overlayBounds;
-        if (config.OverlayLocation != null && config.OverlaySize != null)
-        {
-            overlayBounds = new System.Windows.Rect(config.OverlayLocation.Value, config.OverlaySize.Value).ScaleToScreen(Dpi);
-        }
-        else
-        {
-            overlayBounds = config.OverlayBounds;
-        }
-
+        var overlayBounds = config.OverlayBounds;
         if (!overlayBounds.IsNotEmptyArea() || overlayBounds.IsNotEmptyArea() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
         {
-            Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
+            Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.Dump()}, config: {config.Dump()}");
             ResetToDefault();
         }
         else
@@ -342,7 +332,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
         if (config.OverlayOpacity <= 0.01)
         {
-            Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation}, config: {config.DumpToTextRaw()}");
+            Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation}, config: {config.Dump()}");
 
             config.OverlayOpacity = 1;
             if (UnlockWindowCommand.CanExecute(null))
@@ -357,8 +347,6 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     protected void SavePropertiesToConfig(IOverlayConfig config)
     {
         config.OverlayBounds = NativeBounds;
-        config.OverlayLocation = default;
-        config.OverlaySize = default;
         config.OverlayOpacity = Opacity;
     }
 

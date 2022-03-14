@@ -104,7 +104,7 @@ public partial class UnsafeNative
 
         if (processInfo.PebBaseAddress == IntPtr.Zero)
         {
-            throw new ApplicationException($"{nameof(processInfo.PebBaseAddress)} is not set for processId: {processId}, structure: {processInfo.DumpToTextRaw()}");
+            throw new ApplicationException($"{nameof(processInfo.PebBaseAddress)} is not set for processId: {processId}, structure: {processInfo.Dump()}");
         }
 
         // Get pointer from the ProcessParameters member of the PEB (PEB has different structure on x86 vs x64 so different structures needed for each)
@@ -121,7 +121,7 @@ public partial class UnsafeNative
             processParametersPtr = peb64.ProcessParameters;
             if (processParametersPtr == IntPtr.Zero)
             {
-                throw new ApplicationException($"{nameof(Peb64.ProcessParameters)} is not set for processId: {processId}, 64-bit structure: {peb64.DumpToTextRaw()}");
+                throw new ApplicationException($"{nameof(Peb64.ProcessParameters)} is not set for processId: {processId}, 64-bit structure: {peb64.Dump()}");
             }
         }
         else
@@ -130,7 +130,7 @@ public partial class UnsafeNative
             processParametersPtr = peb32.ProcessParameters;
             if (processParametersPtr == IntPtr.Zero)
             {
-                throw new ApplicationException($"{nameof(Peb64.ProcessParameters)} is not set for processId: {processId}, 32-bit structure: {peb32.DumpToTextRaw()}");
+                throw new ApplicationException($"{nameof(Peb64.ProcessParameters)} is not set for processId: {processId}, 32-bit structure: {peb32.Dump()}");
             }
         }
 

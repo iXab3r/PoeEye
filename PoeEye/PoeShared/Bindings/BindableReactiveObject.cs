@@ -41,7 +41,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         var existingBindingsToRemove = bindings.Items.Where(x => x.TargetPropertyPath.StartsWith(targetPropertyName)).ToArray();
         if (existingBindingsToRemove.Any())
         {
-            Log.Debug(() => $"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyName}:\n\t{existingBindingsToRemove.ToStringTable()}");
+            Log.Debug(() => $"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyName}:\n\t{existingBindingsToRemove.DumpToTable()}");
             existingBindingsToRemove.ForEach(RemoveBinding);
         }
     }

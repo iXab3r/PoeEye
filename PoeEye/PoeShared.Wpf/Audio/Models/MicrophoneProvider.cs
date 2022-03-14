@@ -61,21 +61,21 @@ internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophone
                 notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug(() => $"[Notification] Device removed, id: {deviceId}")).ToUnit())
             .Throttle(ThrottlingTimeout)
             .Select(x => EnumerateLines())
-            .DistinctUntilChanged(x => x.DumpToText())
+            .DistinctUntilChanged(x => x.Dump())
             .SubscribeSafe(newLines =>
             {
                 Log.Debug(() => $"Microphone lines list changed:\n\tCurrent lines list:\n\t\t{microphoneLines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
                 var linesToAdd = newLines.Except(microphoneLines.Items).ToArray();
                 if (linesToAdd.Any())
                 {
-                    Log.Debug(() => $"Adding microphone lines: {linesToAdd.DumpToTextRaw()}");
+                    Log.Debug(() => $"Adding microphone lines: {linesToAdd.Dump()}");
                     microphoneLines.AddRange(linesToAdd);
                 }
 
                 var linesToRemove = microphoneLines.Items.Except(newLines).ToArray();
                 if (linesToRemove.Any())
                 {
-                    Log.Debug(() => $"Removing microphone lines: {linesToRemove.DumpToTextRaw()}");
+                    Log.Debug(() => $"Removing microphone lines: {linesToRemove.Dump()}");
                     microphoneLines.RemoveMany(linesToRemove);
                 }
             }, Log.HandleUiException)

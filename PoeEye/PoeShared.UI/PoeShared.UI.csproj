@@ -11,7 +11,7 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
         <ApplicationIcon>Resources/mainIconAlt.ico</ApplicationIcon>
-        <NoWarn>CA1416;NU1701;CS0649;CS0414</NoWarn>
+        <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
     </PropertyGroup>
     
     <PropertyGroup>

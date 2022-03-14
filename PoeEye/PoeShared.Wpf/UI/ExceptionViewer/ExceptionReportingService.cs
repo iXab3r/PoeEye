@@ -95,7 +95,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         });
     }
 
-    private void BinderExceptionHandler(object? sender, ExceptionEventArgs e)
+    private void BinderExceptionHandler(object sender, ExceptionEventArgs e)
     {
         ReportCrash(e.Exception, $"BinderException, sender: {sender}");
     }

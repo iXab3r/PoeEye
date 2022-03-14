@@ -113,6 +113,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
         
     private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
     {
-        Log.Debug(() => $"Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+        Log.Debug(() => $"Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.Dump())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.Dump())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
     }
 }

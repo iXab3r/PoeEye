@@ -48,7 +48,7 @@ public sealed class MultiValueToTupleConverter : IMultiValueConverter
         var methodBase = methods.FirstOrDefault(method => method.Name == nameof(ValueTuple.Create) && method.GetParameters().Length == typeArguments.Length);
         if (methodBase == null)
         {
-            Log.Warn($"Failed to find method for type arguments: {typeArguments.Select(x => x.Name).JoinStrings(", ")} in {typeof(ValueTuple)}, methods: \n\t{methods.Select(x => $"{x.Name} (params: {x.GetParameters().Select(y => y.Name)})").ToStringTable()}");
+            Log.Warn($"Failed to find method for type arguments: {typeArguments.Select(x => x.Name).JoinStrings(", ")} in {typeof(ValueTuple)}, methods: \n\t{methods.Select(x => $"{x.Name} (params: {x.GetParameters().Select(y => y.Name)})").DumpToTable()}");
             throw new ArgumentException($"Failed to find method for type arguments: {typeArguments.Select(x => x.Name).JoinStrings(", ")} in {typeof(ValueTuple)}");
         }
         return methodBase.MakeGenericMethod(typeArguments);

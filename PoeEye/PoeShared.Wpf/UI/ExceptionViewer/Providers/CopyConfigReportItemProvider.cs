@@ -83,7 +83,7 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
             }
             catch (Exception e)
             {
-                Log.Warn($"Failed to copy existing configuration from config provider {configProvider}, config: {existingConfig}");
+                Log.Warn($"Failed to copy existing configuration from config provider {configProvider}, config: {existingConfig}", e);
             }
         }
         catch (Exception e)

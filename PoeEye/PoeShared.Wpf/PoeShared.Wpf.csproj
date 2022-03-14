@@ -12,7 +12,7 @@
     <LangVersion>10</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>PoeShared</RootNamespace>
-    <NoWarn>CA1416;NU1701;CS0649;CS0414</NoWarn>
+    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="App.Metrics" Version="4.2.0" />

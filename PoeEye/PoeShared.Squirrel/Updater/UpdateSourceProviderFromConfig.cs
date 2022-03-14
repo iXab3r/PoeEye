@@ -47,7 +47,7 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
                 var knownSource = knownSources.Lookup(configSource.Uri ?? string.Empty);
                 if (!knownSource.HasValue)
                 {
-                    Log.Warn($"UpdateSource that was loaded from config is not known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.ToStringTable()}");
+                    Log.Warn($"UpdateSource that was loaded from config is not known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
                     knownSource = Optional<UpdateSourceInfo>.Create(KnownSources.FirstOrDefault());
                 }
 

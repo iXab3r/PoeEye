@@ -32,7 +32,7 @@ public static class ObjectExtensions
 
     public static string DumpToString<T>(this IEnumerable<T> instance)
     {
-        return ToStringTable(instance, ", ");
+        return DumpToTable(instance, ", ");
     }
 
     public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")

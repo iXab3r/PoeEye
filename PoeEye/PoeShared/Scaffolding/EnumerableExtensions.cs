@@ -174,7 +174,7 @@ public static class EnumerableExtensions
                 result = selector(item);
                 success = true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 success = false;
                 result = default;

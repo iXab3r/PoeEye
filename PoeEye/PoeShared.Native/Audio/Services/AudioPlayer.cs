@@ -47,7 +47,7 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"Failed to get WaveOut capabilities for device #{idx}");
+                    Log.Warn($"Failed to get WaveOut capabilities for device #{idx}", e);
                     return null;
                 }
             }).Where(x => x != null);

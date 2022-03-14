@@ -162,7 +162,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
         using var mgr = await CreateManager();
         var updateInfo = await mgr.PrepareUpdate(IgnoreDeltaUpdates, ArraySegment<IReleaseEntry>.Empty, new[] { releaseEntry });
-        Log.Debug(() => $"Force UpdateInfo:\r\n{updateInfo.DumpToText().TakeChars(300)}");
+        Log.Debug(() => $"Force UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
         return updateInfo;
     }
 
@@ -181,7 +181,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
         var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
 
-        Log.Debug(() => $"UpdateInfo:\r\n{updateInfo.DumpToText().TakeChars(300)}");
+        Log.Debug(() => $"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
         LatestUpdate = updateInfo;
     }
 
@@ -234,7 +234,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     private async Task<PoeUpdateManager> CreateManager()
     {
-        Log.Debug(() => $"Using update source: {UpdateSource.DumpToTextRaw()}");
+        Log.Debug(() => $"Using update source: {UpdateSource.Dump()}");
 
         var downloader = new BasicAuthFileDownloader(
             new NetworkCredential(
@@ -242,7 +242,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
                 UpdateSource.Password?.ToUnsecuredString()));
         if (UpdateSource.Uri.Contains("github"))
         {
-            Log.Debug(() => $"Using GitHub source: {UpdateSource.DumpToTextRaw()}");
+            Log.Debug(() => $"Using GitHub source: {UpdateSource.Dump()}");
 
             var mgr = PoeUpdateManager.GitHubUpdateManager(
                 UpdateSource.Uri,
@@ -253,7 +253,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
         else
         {
-            Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.DumpToTextRaw()}");
+            Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.Dump()}");
             var mgr = new PoeUpdateManager(
                 UpdateSource.Uri, 
                 downloader, 

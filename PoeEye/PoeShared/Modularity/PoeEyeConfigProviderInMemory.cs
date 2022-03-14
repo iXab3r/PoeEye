@@ -21,7 +21,7 @@ public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
         }
         else
         {
-            throw new ApplicationException($"InMemory config must be used only in debug mode, args: {appArguments.DumpToTextRaw()}");
+            throw new ApplicationException($"InMemory config must be used only in debug mode, args: {appArguments.Dump()}");
         }
     }
 

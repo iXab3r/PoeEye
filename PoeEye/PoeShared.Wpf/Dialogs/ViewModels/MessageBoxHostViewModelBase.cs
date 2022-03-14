@@ -11,7 +11,7 @@ internal abstract class MessageBoxHostViewModelBase : DisposableReactiveObject, 
 
     public MessageBoxHostViewModelBase()
     {
-        CloseMessageBoxCommand = CommandWrapper.Create<MessageBoxElement?>(x =>
+        CloseMessageBoxCommand = CommandWrapper.Create<MessageBoxElement>(x =>
         {
             Result = x ?? default;
             Close();

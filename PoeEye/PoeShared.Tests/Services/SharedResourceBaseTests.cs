@@ -13,8 +13,6 @@ namespace PoeShared.Tests.Services;
 [TestFixture]
 public class SharedResourceBaseTests : FixtureBase
 {
-    private static readonly IFluentLog Log = typeof(SharedResourceBaseTests).PrepareLogger();
-
     [Test]
     public void ShouldCreate()
     {

@@ -81,7 +81,7 @@ public class AppArguments : AppOptions, IAppArguments
         }
 
         Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
-        Log.Debug(() => $"Parsed args: {this.DumpToText()}");
+        Log.Debug(() => $"Parsed args: {this.Dump()}");
     }
 
     public bool IsWindows { get; }
@@ -115,8 +115,8 @@ public class AppArguments : AppOptions, IAppArguments
                 settings.IgnoreUnknownArguments = true;
                 settings.ParsingCulture = CultureInfo.InvariantCulture;
             });
-        Log.Debug(() => $"Command line parser settings: {parser.Settings.DumpToTextRaw()}");
-        var result = parser.ParseArguments<AppOptions>(args ?? new string[0]);
+        Log.Debug(() => $"Command line parser settings: {parser.Settings.Dump()}");
+        var result = parser.ParseArguments<AppOptions>(args ?? Array.Empty<string>());
         Log.Debug(() => $"Command line parsing result: {result.Tag}, type: {result}");
         if (result.Tag == ParserResultType.Parsed && result is Parsed<AppOptions> parsedResult)
         {
@@ -143,6 +143,6 @@ public class AppArguments : AppOptions, IAppArguments
             StartupArgs,
             ApplicationPath = ApplicationExecutablePath,
             ApplicationName = ApplicationExecutableName
-        }.DumpToTextRaw();
+        }.Dump();
     }
 }

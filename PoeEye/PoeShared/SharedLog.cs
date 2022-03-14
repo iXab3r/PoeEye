@@ -19,7 +19,7 @@ public class SharedLog : DisposableReactiveObject
     private static readonly Lazy<IFluentLog> LogInstanceSupplier = new Lazy<IFluentLog>(() =>
     {
         var log = LogManager.GetLogger(typeof(SharedLog));
-        log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.DumpToTextRaw()}");
+        log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.Dump()}");
         return log.ToFluent();
     });
 

@@ -11,8 +11,6 @@ namespace PoeShared.Tests.Modularity;
 [TestFixture]
 public class PoeConfigConverterTests : FixtureBase
 {
-    private static readonly IFluentLog Log = typeof(PoeConfigConverterTests).PrepareLogger();
-
     private Mock<IPoeConfigConverterMigrationService> migrationService;
     private Mock<IPoeConfigMetadataReplacementService> replacementService;
     private PoeConfigConverter configConverter;

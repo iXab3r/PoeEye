@@ -103,7 +103,7 @@ public class KeyboardEventsSourceFixture
                     wrappersReady[idx].Set();
                 });
                 
-        });
+        }).Start();
             
         Log.Debug("Awaiting for hook form to be ready");
         hookFormReady.WaitOne();
@@ -189,7 +189,7 @@ public class KeyboardEventsSourceFixture
             hook.KeyDown += Hook2OnKeyDown;
         }
 
-        private void Hook2OnKeyDown(object? sender, KeyEventArgs e)
+        private void Hook2OnKeyDown(object sender, KeyEventArgs e)
         {
             Log.Debug(() => $"[{HookId}] Key down: {e.KeyCode}");
             Events.Enqueue(e);
