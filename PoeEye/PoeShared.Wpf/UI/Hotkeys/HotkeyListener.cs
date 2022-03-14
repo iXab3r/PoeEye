@@ -51,7 +51,7 @@ internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
         }
     }
     
-    private IFluentLog Log { get; }
+    private new IFluentLog Log { get; }
     
     public bool Activated { get; private set; }
 }

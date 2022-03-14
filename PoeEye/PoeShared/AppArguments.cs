@@ -92,8 +92,6 @@ public class AppArguments : AppOptions, IAppArguments
 
     public int ProcessId { get; }
 
-    public bool ShowUpdater { get; set; }
-        
     public bool IsElevated { get; set; }
 
     public string ApplicationExecutablePath { get; }

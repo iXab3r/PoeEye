@@ -5,7 +5,7 @@
         <IsPackable>false</IsPackable>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <UseWPF>true</UseWPF>
-        <NoWarn>CS0414</NoWarn>
+        <NoWarn>CS0414;CA1416;NU1701</NoWarn>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="AutoFixture.AutoMoq" Version="4.17.0" />

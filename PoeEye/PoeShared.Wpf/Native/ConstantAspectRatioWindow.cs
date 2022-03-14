@@ -127,7 +127,7 @@ public class ConstantAspectRatioWindow : Window
 
     protected IFluentLog Log { get; }
 
-    private void OnInitialized(object? sender, EventArgs e)
+    private void OnInitialized(object sender, EventArgs e)
     {
         Log.Debug(() => $"Window initialized");
         Log.Debug("Initializing native window handle");
@@ -135,14 +135,14 @@ public class ConstantAspectRatioWindow : Window
         Log.Debug(() => "Native window initialized");
     }
 
-    private void OnClosed(object? sender, EventArgs e)
+    private void OnClosed(object sender, EventArgs e)
     {
         Log.Info($"Window is closed, source: {this}");
 
         Anchors.Dispose();
     }
 
-    private void OnSourceInitialized(object? sender, EventArgs e)
+    private void OnSourceInitialized(object sender, EventArgs e)
     {
         Log.Debug(() => "Native window initialized");
         WindowHandle = new WindowInteropHelper(this).Handle; // should be already available here

@@ -10,6 +10,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TargetFramework>net6-windows10.0.19041.0</TargetFramework>
+        <NoWarn>CA1416;NU1701;CS0649;CS0414</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
