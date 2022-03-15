@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Net.Http;
 using PoeShared.Audio.Services;
 using PoeShared.Communications;
 using PoeShared.Modularity;

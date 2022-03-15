@@ -256,7 +256,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.Dump()}");
             var mgr = new PoeUpdateManager(
                 UpdateSource.Uri, 
-                downloader, 
+                downloader,
                 appArguments.AppName, 
                 RootDirectory.FullName);
             return mgr;

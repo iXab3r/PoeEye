@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using PoeShared.Scaffolding;
-using PoeShared.Squirrel.Scaffolding;
 
 namespace PoeShared.Squirrel.Core;
 
@@ -59,15 +59,11 @@ public sealed partial class PoeUpdateManager
         // above ^^ notice the end slashes for the baseAddress, explained here: http://stackoverflow.com/a/23438417/162694
 
         Log.Debug($"GitHub base address: {baseAddress}");
-        using var client = new HttpClient {BaseAddress = baseAddress};
-        client.DefaultRequestHeaders.UserAgent.Add(userAgent);
+        using var client = new WebClient() { BaseAddress = baseAddress.ToString() };
+        client.Headers.Add(HttpRequestHeader.UserAgent, userAgent.ToString());
         Log.Debug($"Downloading data, URI: {releasesApiBuilder}");
-        var response = await client.GetAsync(releasesApiBuilder.ToString());
-        Log.Debug($"Received response, code: {response.StatusCode}");
-        response.EnsureSuccessStatusCode();
-
-        var serializedData = await response.Content.ReadAsStringAsync();
-        var releases = SimpleJson.DeserializeObject<List<Release>>(serializedData);
+        var serializedData = await client.DownloadStringTaskAsync(releasesApiBuilder.ToString());
+        var releases = JsonConvert.DeserializeObject<List<Release>>(serializedData);
         Log.Debug($"Deserialized response, length: {serializedData.Length}");
 
         var latestReleases = releases

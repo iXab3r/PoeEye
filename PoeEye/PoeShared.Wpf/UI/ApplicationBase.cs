@@ -34,6 +34,7 @@ public abstract class ApplicationBase : Application
             Container.AddNewExtensionIfNotExists<Diagnostic>();
             Container.AddNewExtensionIfNotExists<CommonRegistrations>();
             Container.AddNewExtensionIfNotExists<NativeRegistrations>();
+            Container.AddNewExtensionIfNotExists<HttpClientRegistrations>();
             Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
 
             appArguments = Container.Resolve<IAppArguments>();
