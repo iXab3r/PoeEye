@@ -112,9 +112,18 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
 
     private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
     {
-        if (!e.Observed && e.Exception.InnerExceptions.Count == 1 && e.Exception.InnerExceptions[0].GetType().Name == "Http2ConnectionException")
+        if (!e.Observed && e.Exception.InnerExceptions.Count == 1 && e.Exception.InnerExceptions[0].GetType().Name is "RpcException" or "Http2ConnectionException")
         {
-            Log.Warn("Suppressing unobserved GRPC Http2 connection exception");
+            //FIXME There should be a smarter way of solving that problem with unobserved GRPC RpcException/Http exceptions
+            /*
+             * There is a problem with Grpc.Net.Client.Internal.GrpcCall, specifically with how its method RunCall is called:
+             * private async Task RunCall(HttpRequestMessage request, TimeSpan? timeout)
+             * this is how current code uses it in multiple places: 
+             * _ = RunCall(message, timeout);
+             * This means that IF something happens inside RunCall the entire app will blow up as this exception will be gathered when Task is finalized
+             * most usual errors in RunCall are HTTP and Rpc exceptions
+             */
+            Log.Warn("Suppressing unobserved GRPC RPC connection exception", e.Exception.InnerException);
             e.SetObserved();
             return;
         }
