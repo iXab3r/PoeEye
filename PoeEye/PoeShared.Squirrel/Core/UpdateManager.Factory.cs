@@ -12,9 +12,9 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Squirrel.Core;
 
-public sealed partial class PoeUpdateManager
+public sealed partial class PoeUpdateManager : IPoeUpdateManager
 {
-    public static async Task<PoeUpdateManager> GitHubUpdateManager(
+    public static async Task<IPoeUpdateManager> GitHubUpdateManager(
         string repoUrl,
         IFileDownloader urlDownloader,
         string applicationName = null,
@@ -86,7 +86,7 @@ public sealed partial class PoeUpdateManager
     }
 
     [DataContract]
-    public class Release
+    private sealed record Release
     {
         [DataMember(Name = "prerelease")] public bool Prerelease { get; set; }
         [DataMember(Name = "created_at")] public DateTime CreatedAt { get; set; }

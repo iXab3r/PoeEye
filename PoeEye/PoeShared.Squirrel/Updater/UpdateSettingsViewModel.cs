@@ -1,10 +1,14 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
 using System.Threading.Tasks;
+using DynamicData;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Prism;
+using ReactiveUI;
+using Unity;
 
 namespace PoeShared.Squirrel.Updater;
 
@@ -13,17 +17,24 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
 {
     private static readonly IFluentLog Log = typeof(UpdateSettingsViewModel).PrepareLogger();
 
-    private readonly IUpdateSourceProvider updateSourceProvider;
     private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
 
     public UpdateSettingsViewModel(
         IUpdateSourceProvider updateSourceProvider,
-        IConfigProvider<UpdateSettingsConfig> configProvider)
+        IConfigProvider<UpdateSettingsConfig> configProvider,
+        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
-        this.updateSourceProvider = updateSourceProvider;
         this.configProvider = configProvider;
 
-        KnownSources = updateSourceProvider.KnownSources;
+        var knownSources = new SynchronizedObservableCollection<UpdateSourceInfo>();
+        updateSourceProvider.WhenAnyValue(x => x.KnownSources)
+            .SubscribeSafe(x =>
+            {
+                knownSources.Clear();
+                knownSources.AddRange(x);
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+        KnownSources = knownSources;
     }
 
     public string ModuleName { get; } = "Update Settings";
@@ -34,7 +45,7 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
 
     public bool IgnoreDeltaUpdates { get; set; }
         
-    public ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
+    public IReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         
     public Task Load(UpdateSettingsConfig config)
     {

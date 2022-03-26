@@ -23,7 +23,6 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
 {
     private static readonly IFluentLog Log = typeof(PoeUpdateManager).PrepareLogger();
 
-    private readonly string updateUrlOrPath;
     private readonly IFileDownloader urlDownloader;
 
     public PoeUpdateManager(
@@ -35,11 +34,13 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
         Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), "!string.IsNullOrEmpty(urlOrPath)");
         Guard.ArgumentIsTrue(!string.IsNullOrEmpty(applicationName), "!string.IsNullOrEmpty(applicationName)");
 
-        updateUrlOrPath = urlOrPath;
+        UpdateUrlOrPath = urlOrPath;
         this.urlDownloader = urlDownloader;
         ApplicationName = applicationName ?? GetApplicationName();
         RootAppDirectory = Path.Combine(rootDirectory, ApplicationName);
     }
+    
+    public string UpdateUrlOrPath { get; }
 
     public string ApplicationName { get; }
 
@@ -63,22 +64,23 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
         var checkForUpdate = new CheckForUpdateImpl(urlDownloader, RootAppDirectory);
         var result = await checkForUpdate.CheckForUpdate(
             Utility.LocalReleaseFileForAppDir(RootAppDirectory),
-            updateUrlOrPath,
+            UpdateUrlOrPath,
             ignoreDeltaUpdates,
             progress);
         sw.Step("Update check completed");
         return result;
     }
 
-    public async Task DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
+    public async Task<IReadOnlyCollection<FileInfo>> DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
     {
         using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToString()}", Log);
         using var updateLock = AcquireUpdateLock();
             
         sw.Step("Update lock acquired");
         var downloadReleases = new DownloadReleasesImpl(urlDownloader, RootAppDirectory);
-        await downloadReleases.DownloadReleases(updateUrlOrPath, releasesToDownload, progress);
+        var result = await downloadReleases.DownloadReleases(UpdateUrlOrPath, releasesToDownload, progress);
         sw.Step("Download completed");
+        return result;
     }
 
     public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, Action<int> progress = null)

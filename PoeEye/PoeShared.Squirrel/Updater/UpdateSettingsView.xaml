@@ -37,7 +37,7 @@
                         <RadioButton
                             ToolTip="{Binding}"
                             MinWidth="80"
-                            Content="{Binding Description}"
+                            Content="{Binding Name}"
                             IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>

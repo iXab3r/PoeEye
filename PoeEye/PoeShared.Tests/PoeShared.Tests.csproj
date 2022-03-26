@@ -19,6 +19,7 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.12" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PoeShared.Squirrel\PoeShared.Squirrel.csproj" />
     <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />

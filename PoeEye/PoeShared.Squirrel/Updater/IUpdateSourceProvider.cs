@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -8,7 +9,5 @@ public interface IUpdateSourceProvider : IDisposableReactiveObject
 {
     UpdateSourceInfo UpdateSource { get; set; }
         
-    ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { [NotNull] get; }
-
-    void AddSource(UpdateSourceInfo sourceInfo);
+    IReadOnlyList<UpdateSourceInfo> KnownSources { get; set; }
 }

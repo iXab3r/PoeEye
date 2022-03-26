@@ -22,7 +22,7 @@ internal sealed class UserInputFilterConfigurator : DisposableReactiveObject, IU
     private static readonly TimeSpan AllowedTimeframeForWhitelistedItems = TimeSpan.FromMilliseconds(10);
 
     private readonly IAppArguments appArguments;
-    private readonly Dictionary<HotkeyGesture, GestureState> keyboardState = new(new LambdaComparer<HotkeyGesture>((first, second) => first?.Equals(second, ignoreModifiers: true) ?? false));
+    private readonly Dictionary<HotkeyGesture, GestureState> keyboardState = new(new LambdaEqualityComparer<HotkeyGesture>((first, second) => first?.Equals(second, ignoreModifiers: true) ?? false));
 
     public UserInputFilterConfigurator(
         IAppArguments appArguments,

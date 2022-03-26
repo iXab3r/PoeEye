@@ -5,11 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -107,8 +105,9 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             var totalProgress = (int)progressByTask.Values.Average();
             UpdateProgress(totalProgress, $"{taskName} {progressPercent}%");
         }
-            
-        await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => CombinedProgressReporter(x, downloadReleaseTaskName));
+
+        var downloadedReleases = await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => CombinedProgressReporter(x, downloadReleaseTaskName));
+        Log.Warn($"Downloaded following releases:\n\t{downloadedReleases.DumpToTable()}");
 
         string newVersionFolder;
         if (appArguments.IsDebugMode)
@@ -180,7 +179,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         Log.Debug(() => $"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
 
         var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
-
         Log.Debug(() => $"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
         LatestUpdate = updateInfo;
     }
@@ -232,7 +230,21 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         return appExecutable;
     }
 
-    private async Task<PoeUpdateManager> CreateManager()
+    private async Task<IPoeUpdateManager> CreateManager()
+    {
+        var manager = new ResilientUpdateManager(
+            UpdateSource.Uris,
+            async uri =>
+            {
+                Log.Debug(() => $"Creating manager for URL {uri}");
+                var manager = await CreateManager(uri);
+                Log.Debug(() => $"Created manager: {manager}");
+                return manager;
+            }
+        );
+        return manager;
+    }
+    private async Task<IPoeUpdateManager> CreateManager(string updateUrl)
     {
         Log.Debug(() => $"Using update source: {UpdateSource.Dump()}");
 
@@ -240,22 +252,22 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             new NetworkCredential(
                 UpdateSource.Username?.ToUnsecuredString(),
                 UpdateSource.Password?.ToUnsecuredString()));
-        if (UpdateSource.Uri.Contains("github"))
+        if (updateUrl.Contains("github"))
         {
             Log.Debug(() => $"Using GitHub source: {UpdateSource.Dump()}");
 
-            var mgr = PoeUpdateManager.GitHubUpdateManager(
-                UpdateSource.Uri,
+            var mgr = await PoeUpdateManager.GitHubUpdateManager(
+                updateUrl,
                 downloader,
                 appArguments.AppName,
                 RootDirectory.FullName);
-            return await mgr;
+            return mgr;
         }
         else
         {
             Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.Dump()}");
             var mgr = new PoeUpdateManager(
-                UpdateSource.Uri, 
+                updateUrl, 
                 downloader,
                 appArguments.AppName, 
                 RootDirectory.FullName);
@@ -272,18 +284,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     private void CheckUpdateProgress(int progressPercent)
     {
         Log.Debug(() => $"Check update is in progress: {progressPercent}%");
-    }
-
-    private string GetSquirrelUpdateExeOrThrow()
-    {
-        var squirrelUpdateExe = Path.Combine(AppRootDirectory.FullName, UpdaterExecutableName);
-        if (!File.Exists(squirrelUpdateExe))
-        {
-            throw new FileNotFoundException($"{UpdaterExecutableName} not found(path: {squirrelUpdateExe}), not a Squirrel-installed app?",
-                squirrelUpdateExe);
-        }
-
-        return squirrelUpdateExe;
     }
 
     private IDisposable CreateIsBusyAnchor()

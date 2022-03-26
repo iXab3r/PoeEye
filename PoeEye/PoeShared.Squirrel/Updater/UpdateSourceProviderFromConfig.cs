@@ -15,54 +15,22 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
 {
     private static readonly IFluentLog Log = typeof(UpdateSourceProviderFromConfig).PrepareLogger();
 
-    private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
-    private readonly ISourceCache<UpdateSourceInfo, string> knownSources = new SourceCache<UpdateSourceInfo, string>(x => x.Uri);
-
     public UpdateSourceProviderFromConfig(IConfigProvider<UpdateSettingsConfig> configProvider)
     {
         Log.Debug(() => $"Initializing update sources using configProvider {configProvider}");
-        this.configProvider = configProvider;
-        knownSources
-            .Connect()
-            .Bind(out var known)
-            .SubscribeToErrors(Log.HandleUiException)
-            .AddTo(Anchors);
-        KnownSources = known;
-            
-        GetKnownSources().ForEach(x => knownSources.AddOrUpdate(x));
-        configProvider
-            .ListenTo(x => x.UpdateSource)
-            .SubscribeSafe(configSource =>
-            {
-                if (!configSource.IsValid)
-                {
-                    Log.Warn($"UpdateSource loaded from configuration is not valid or not set: {configSource}");
-                }
-                else
-                {
-                    Log.Debug(() => $"UpdateSource in config has changed to {configSource}");
-                }
-                    
-                // remapping config source to known source, some details may differ
-                var knownSource = knownSources.Lookup(configSource.Uri ?? string.Empty);
-                if (!knownSource.HasValue)
-                {
-                    Log.Warn($"UpdateSource that was loaded from config is not known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
-                    knownSource = Optional<UpdateSourceInfo>.Create(KnownSources.FirstOrDefault());
-                }
 
-                Log.Debug(() => $"Setting UpdateSource to {configSource}");
-                UpdateSource = knownSource.Value;
-            }, Log.HandleUiException)
+        configProvider.ListenTo(x => x.UpdateSource)
+            .SubscribeSafe(x => UpdateSource = x, Log.HandleUiException)
             .AddTo(Anchors);
-
         this.WhenAnyValue(x => x.UpdateSource)
-            .DistinctUntilChanged()
-            .Where(x => x != default)
-            .Where(x => configProvider.ActualConfig.UpdateSource != x)
             .SubscribeSafe(x =>
             {
-                Log.Debug(() => $"Updating UpdateSource {configProvider.ActualConfig.UpdateSource} => {x}");
+                if (configProvider.ActualConfig.UpdateSource == x)
+                {
+                    return;
+                }
+                
+                Log.Debug(() => $"Saving update source to config: {x}");
                 var config = configProvider.ActualConfig with
                 {
                     UpdateSource = x
@@ -71,55 +39,38 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
             }, Log.HandleUiException)
             .AddTo(Anchors);
 
-        this.WhenAnyValue(x => x.UpdateSource)
-            .ToUnit()
-            .Merge(knownSources.CountChanged.ToUnit())
-            .Merge(knownSources.Connect().ToUnit())
-            .Where(_ => knownSources.Items.Any(x => x.IsValid))
-            .Where(_ => !UpdateSource.IsValid)
-            .SubscribeSafe(() =>
+        this.WhenAnyValue(x => x.KnownSources)
+            .CombineLatest(this.WhenAnyValue(x => x.UpdateSource), (items, selected) => new {items, selected})
+            .SubscribeSafe(x =>
             {
-                Log.Debug(() => $"Update source is not set - loading first available our of {knownSources.Items.DumpToString()}");
-                UpdateSource = knownSources.Items.FirstOrDefault(x => x.IsValid);
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        knownSources
-            .Connect()
-            .OnItemUpdated((curr, prev) =>
-            {
-                Log.Debug(() => $"UpdateSource updated(duh): {prev} => {curr}");
-                if (curr.Uri != UpdateSource.Uri)
+                if (x.items == null || x.items.IsEmpty())
                 {
                     return;
                 }
 
-                Log.Debug(() => $"Replacing current update source: {UpdateSource} => {curr}");
-                UpdateSource = curr;
-            })
-            .SubscribeToErrors(Log.HandleUiException)
+                if (x.selected == default)
+                {
+                    return;
+                }
+
+                if (x.items.Contains(x.selected) && x.selected.IsValid)
+                {
+                    return;
+                }
+
+                var defaultSource = x.items[0];
+                Log.Debug(() => $"Defaulting update source to {defaultSource}");
+                UpdateSource = defaultSource;
+            }, Log.HandleUiException)
             .AddTo(Anchors);
     }
 
     public UpdateSourceInfo UpdateSource { get; set; }
+    
+    public IReadOnlyList<UpdateSourceInfo> KnownSources { get; set; }
 
-    public ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
-        
-    public void AddSource(UpdateSourceInfo sourceInfo)
+    private static string ToKey(UpdateSourceInfo updateSourceInfo)
     {
-        var existingSource = knownSources.Lookup(sourceInfo.Uri);
-        Log.Debug(existingSource.HasValue ? $"Updating source {existingSource.Value} => {sourceInfo}" : $"Adding new update source {sourceInfo}");
-        knownSources.AddOrUpdate(sourceInfo);
-    }
-
-    private IEnumerable<UpdateSourceInfo> GetKnownSources()
-    {
-        Log.Debug(() => $"Fetching config of type {typeof(UpdateSettingsConfig)} from {configProvider}");
-        var actualConfig = configProvider.ActualConfig.UpdateSource;
-        Log.Debug(() => $"Configured update source is {actualConfig} (isValid: {actualConfig.IsValid})");
-        if (actualConfig.IsValid)
-        {
-            yield return actualConfig;
-        }
+        return updateSourceInfo.Id ?? string.Empty;
     }
 }

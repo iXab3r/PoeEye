@@ -1,15 +1,19 @@
 using System;
+using System.Linq;
 using System.Security;
 using Newtonsoft.Json;
 using PoeShared.Converters;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Squirrel.Updater;
 
 public struct UpdateSourceInfo
 {
-    public string Uri { get; set; }
-
-    public string Description { get; set; }
+    public string Id { get; set; }
+    
+    public string[] Uris { get; set; }
+    
+    public string Name { get; set; }
 
     public bool RequiresAuthentication { get; set; }
 
@@ -17,11 +21,15 @@ public struct UpdateSourceInfo
 
     [JsonConverter(typeof(SafeDataConverter))] public SecureString Password { get; set; }
 
-    [JsonIgnore] public bool IsValid => !string.IsNullOrEmpty(Uri);
+    [JsonIgnore] public bool IsValid => 
+        !string.IsNullOrEmpty(Id) && 
+        !string.IsNullOrEmpty(Name) && 
+        Uris?.Length > 0 && Uris.All(x => !string.IsNullOrEmpty(x));
 
     public bool Equals(UpdateSourceInfo other)
     {
-        return Uri == other.Uri && Description == other.Description && RequiresAuthentication == other.RequiresAuthentication;
+        var urisAreEqual = Uris == other.Uris || Uris != null && other.Uris != null && Uris.SequenceEqual(other.Uris);
+        return urisAreEqual && Name == other.Name && RequiresAuthentication == other.RequiresAuthentication;
     }
 
     public override bool Equals(object obj)
@@ -31,7 +39,7 @@ public struct UpdateSourceInfo
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Uri, Description, RequiresAuthentication);
+        return HashCode.Combine(Uris, Name, RequiresAuthentication);
     }
 
     public static bool operator ==(UpdateSourceInfo left, UpdateSourceInfo right)
@@ -46,6 +54,6 @@ public struct UpdateSourceInfo
 
     public override string ToString()
     {
-        return $"{nameof(Uri)}: {Uri}, {nameof(Description)}: {Description}";
+        return $"{nameof(Uris)}: {Uris.DumpToString()}, {nameof(Name)}: {Name}";
     }
 }

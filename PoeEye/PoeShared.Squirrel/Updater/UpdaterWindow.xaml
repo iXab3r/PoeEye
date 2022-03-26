@@ -138,7 +138,7 @@
                                       eye:CommandWrapperHelper.Icon="&#xF0ED;">
                 <eye:CachedContentControl.ToolTip>
                     <TextBlock
-                        Text="{Binding ApplicationUpdater.UpdateSource.Description, StringFormat='Check for updates @ {0}'}" />
+                        Text="{Binding ApplicationUpdater.UpdateSource.Name, StringFormat='Check for updates @ {0}'}" />
                 </eye:CachedContentControl.ToolTip>
             </eye:CachedContentControl>
         </mah:WindowCommands>

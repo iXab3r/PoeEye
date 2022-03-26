@@ -23,7 +23,7 @@ internal class DownloadReleasesImpl : IEnableLogger
         this.rootAppDirectory = rootAppDirectory;
     }
 
-    public async Task DownloadReleases(
+    public async Task<IReadOnlyCollection<FileInfo>> DownloadReleases(
         string updateUrlOrPath,
         IReadOnlyCollection<IReleaseEntry> releasesToDownload,
         Action<int> progress = null)
@@ -35,20 +35,21 @@ internal class DownloadReleasesImpl : IEnableLogger
         double current = 0;
         var toIncrement = 100.0 / releasesToDownload.Count;
 
+        var downloadedFiles = new List<FileInfo>();
         if (Utility.IsHttpUrl(updateUrlOrPath))
         {
             // From Internet
             await releasesToDownload.ForEachAsync(
                 async x =>
                 {
-                    var targetFile = Path.Combine(packagesDirectory, x.Filename);
+                    var targetFile = new FileInfo(Path.Combine(packagesDirectory, x.Filename));
 
                     double component = 0;
                     await DownloadRelease(
                         updateUrlOrPath,
                         x,
                         urlDownloader,
-                        targetFile,
+                        targetFile.FullName,
                         p =>
                         {
                             lock (progress)
@@ -59,6 +60,8 @@ internal class DownloadReleasesImpl : IEnableLogger
                             }
                         });
                     ChecksumPackage(x);
+
+                    targetFile.AddTo(downloadedFiles);
                 });
         }
         else
@@ -67,11 +70,11 @@ internal class DownloadReleasesImpl : IEnableLogger
             await releasesToDownload.ForEachAsync(
                 x =>
                 {
-                    var targetFile = Path.Combine(packagesDirectory, x.Filename);
+                    var targetFile = new FileInfo(Path.Combine(packagesDirectory, x.Filename));
 
                     File.Copy(
                         Path.Combine(updateUrlOrPath, x.Filename),
-                        targetFile,
+                        targetFile.FullName,
                         true);
 
                     lock (progress)
@@ -80,8 +83,12 @@ internal class DownloadReleasesImpl : IEnableLogger
                     }
 
                     ChecksumPackage(x);
+
+                    targetFile.AddTo(downloadedFiles);
                 });
         }
+
+        return downloadedFiles;
     }
 
     private static Task DownloadRelease(
