@@ -7,7 +7,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Squirrel.Updater;
 
-public struct UpdateSourceInfo
+public sealed record UpdateSourceInfo
 {
     public string Id { get; set; }
     
@@ -28,28 +28,17 @@ public struct UpdateSourceInfo
 
     public bool Equals(UpdateSourceInfo other)
     {
+        if (other == null)
+        {
+            return false;
+        }
         var urisAreEqual = Uris == other.Uris || Uris != null && other.Uris != null && Uris.SequenceEqual(other.Uris);
-        return urisAreEqual && Name == other.Name && RequiresAuthentication == other.RequiresAuthentication;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return obj is UpdateSourceInfo other && Equals(other);
+        return urisAreEqual && Id == other.Id && Name == other.Name && RequiresAuthentication == other.RequiresAuthentication;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Uris, Name, RequiresAuthentication);
-    }
-
-    public static bool operator ==(UpdateSourceInfo left, UpdateSourceInfo right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(UpdateSourceInfo left, UpdateSourceInfo right)
-    {
-        return !left.Equals(right);
+        return HashCode.Combine(Uris, Id, Name, RequiresAuthentication);
     }
 
     public override string ToString()

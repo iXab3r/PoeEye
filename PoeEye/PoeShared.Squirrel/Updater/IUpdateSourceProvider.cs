@@ -7,7 +7,9 @@ namespace PoeShared.Squirrel.Updater;
 
 public interface IUpdateSourceProvider : IDisposableReactiveObject
 {
-    UpdateSourceInfo UpdateSource { get; set; }
+    UpdateSourceInfo UpdateSource { get; }
+    
+    string UpdateSourceId { get; set; }
         
     IReadOnlyList<UpdateSourceInfo> KnownSources { get; set; }
 }

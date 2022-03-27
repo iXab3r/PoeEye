@@ -9,7 +9,7 @@ public sealed record UpdateSettingsConfig : IPoeEyeConfigVersioned
 
     public TimeSpan AutoUpdateTimeout { get; set; } = DefaultAutoUpdateTimeout;
 
-    public UpdateSourceInfo UpdateSource { get; set; }
+    public string UpdateSourceId { get; set; }
 
     public bool IgnoreDeltaUpdates { get; set; } = true;
 

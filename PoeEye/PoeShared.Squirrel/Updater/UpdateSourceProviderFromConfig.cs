@@ -5,8 +5,6 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using System.Linq;
 using System.Reactive.Linq;
-using DynamicData;
-using DynamicData.Kernel;
 using ReactiveUI;
 
 namespace PoeShared.Squirrel.Updater;
@@ -19,13 +17,13 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
     {
         Log.Debug(() => $"Initializing update sources using configProvider {configProvider}");
 
-        configProvider.ListenTo(x => x.UpdateSource)
-            .SubscribeSafe(x => UpdateSource = x, Log.HandleUiException)
+        configProvider.ListenTo(x => x.UpdateSourceId)
+            .SubscribeSafe(x => UpdateSourceId = x, Log.HandleUiException)
             .AddTo(Anchors);
-        this.WhenAnyValue(x => x.UpdateSource)
+        this.WhenAnyValue(x => x.UpdateSourceId)
             .SubscribeSafe(x =>
             {
-                if (configProvider.ActualConfig.UpdateSource == x)
+                if (configProvider.ActualConfig.UpdateSourceId == x)
                 {
                     return;
                 }
@@ -33,22 +31,25 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
                 Log.Debug(() => $"Saving update source to config: {x}");
                 var config = configProvider.ActualConfig with
                 {
-                    UpdateSource = x
+                    UpdateSourceId = x
                 };
                 configProvider.Save(config);
             }, Log.HandleUiException)
             .AddTo(Anchors);
 
         this.WhenAnyValue(x => x.KnownSources)
+            .CombineLatest(this.WhenAnyValue(x => x.UpdateSourceId), (items, selectedId) => new {items, selectedId})
+            .SubscribeSafe(x =>
+            {
+                UpdateSource = x.items.EmptyIfNull().FirstOrDefault(y => y.Id == x.selectedId);
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+        
+        this.WhenAnyValue(x => x.KnownSources)
             .CombineLatest(this.WhenAnyValue(x => x.UpdateSource), (items, selected) => new {items, selected})
             .SubscribeSafe(x =>
             {
                 if (x.items == null || x.items.IsEmpty())
-                {
-                    return;
-                }
-
-                if (x.selected == default)
                 {
                     return;
                 }
@@ -60,17 +61,14 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
 
                 var defaultSource = x.items[0];
                 Log.Debug(() => $"Defaulting update source to {defaultSource}");
-                UpdateSource = defaultSource;
+                UpdateSourceId = defaultSource.Id;
             }, Log.HandleUiException)
             .AddTo(Anchors);
     }
 
-    public UpdateSourceInfo UpdateSource { get; set; }
+    public UpdateSourceInfo UpdateSource { get; private set; }
+    
+    public string UpdateSourceId { get; set; }
     
     public IReadOnlyList<UpdateSourceInfo> KnownSources { get; set; }
-
-    private static string ToKey(UpdateSourceInfo updateSourceInfo)
-    {
-        return updateSourceInfo.Id ?? string.Empty;
-    }
 }

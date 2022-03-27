@@ -1,6 +1,10 @@
 using System;
+using System.Collections;
+using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using DynamicData;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
@@ -42,26 +46,39 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
     public bool CheckForUpdates { get; set; }
 
     public UpdateSourceInfo UpdateSource { get; set; }
-
+    
     public bool IgnoreDeltaUpdates { get; set; }
-        
+    
     public IReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         
     public Task Load(UpdateSettingsConfig config)
     {
         CheckForUpdates = config.AutoUpdateTimeout > TimeSpan.Zero;
-        UpdateSource = config.UpdateSource;
+        UpdateSource = KnownSources.FirstOrDefault(x => x.Id == config.UpdateSourceId);
         IgnoreDeltaUpdates = config.IgnoreDeltaUpdates;
         return Task.CompletedTask;
     }
 
     public UpdateSettingsConfig Save()
     {
-        var updatedConfig = configProvider.ActualConfig.CloneJson();
-        updatedConfig.AutoUpdateTimeout =
-            CheckForUpdates ? UpdateSettingsConfig.DefaultAutoUpdateTimeout : TimeSpan.Zero;
-        updatedConfig.UpdateSource = UpdateSource;
-        updatedConfig.IgnoreDeltaUpdates = IgnoreDeltaUpdates;
+        var updatedConfig = configProvider.ActualConfig with
+        {
+            AutoUpdateTimeout = CheckForUpdates ? UpdateSettingsConfig.DefaultAutoUpdateTimeout : TimeSpan.Zero,
+            UpdateSourceId = UpdateSource?.Id,
+            IgnoreDeltaUpdates = IgnoreDeltaUpdates
+        };
         return updatedConfig;
+    }
+    
+    private sealed class CollectionViewWithComparer : CollectionView
+    {
+        public CollectionViewWithComparer(
+            [NotNull] IEnumerable collection,
+            IComparer comparer) : base(collection)
+        {
+            Comparer = comparer;
+        }
+
+        public override IComparer Comparer { get; }
     }
 }

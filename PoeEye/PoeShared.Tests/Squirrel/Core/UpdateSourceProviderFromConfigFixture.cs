@@ -32,12 +32,31 @@ public class UpdateSourceProviderFromConfigFixture : FixtureBase
     }
 
     [Test]
+    public void ShouldResolveUpdateSourceById()
+    {
+        // Given
+        var config = configProvider.ActualConfig with
+        {
+            UpdateSourceId = "b"
+        };
+        configProvider.Save(config);
+        var instance = CreateInstance();
+
+        // When 
+        instance.KnownSources = new[] { CreateSource("a"), CreateSource("b") };
+
+        // Then
+        instance.UpdateSourceId.ShouldBe(instance.UpdateSourceId);
+        instance.UpdateSource.Id.ShouldBe("b");
+    }
+
+    [Test]
     public void ShouldResetToFirstKnown()
     {
         // Given
         var config = configProvider.ActualConfig with
         {
-            UpdateSource = CreateSource("a")
+            UpdateSourceId = "a"
         };
         configProvider.Save(config);
         
