@@ -304,7 +304,7 @@ public partial class UnsafeNative
         }
 
         log.Debug(() => $"Bringing window to foreground");
-        var activationResult = SetForegroundWindow(window, log);
+        var activationResult = SetForegroundWindow(log, window);
         log.Debug(() => $"SetForegroundWindow returned {activationResult}");
 
         var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
@@ -345,10 +345,10 @@ public partial class UnsafeNative
 
     public static bool SetForegroundWindow(IWindowHandle hwnd)
     {
-        return SetForegroundWindow(hwnd, Log.WithSuffix(hwnd));
+        return SetForegroundWindow(Log.WithSuffix(hwnd), hwnd);
     }
     
-    public static bool SetForegroundWindow(IWindowHandle hwnd, IFluentLog log)
+    public static bool SetForegroundWindow(IFluentLog log, IWindowHandle hwnd)
     {
         log.Debug(() => $"Initiating SetForegroundWindow");
         var initialForegroundWindow = GetForegroundWindow();
@@ -365,7 +365,7 @@ public partial class UnsafeNative
             return true;
         }
 
-        if (AttemptSetForegroundWindow(hwnd))
+        if (AttemptSetForegroundWindow(log, hwnd))
         {
             log.Debug(() => $"Activated window without any workarounds");
             return true;
@@ -380,7 +380,7 @@ public partial class UnsafeNative
         {
             var maxAttempts = 5;
             var attemptIdx = 0;
-            while (!AttemptSetForegroundWindow(hwnd))
+            while (!AttemptSetForegroundWindow(log, hwnd))
             {
                 if (attemptIdx >= maxAttempts)
                 {
@@ -408,18 +408,23 @@ public partial class UnsafeNative
         return true;
     }
 
-    private static bool AttemptSetForegroundWindow(IWindowHandle window)
+    private static bool AttemptSetForegroundWindow(IFluentLog log, IWindowHandle window)
     {
-        var log = Log.WithSuffix(window);
         log.Debug(() => "Calling SetForegroundWindow");
         var result = User32.SetForegroundWindow(window.Handle); // SetForegroundWindow may lie, result must be double-checked via GetForegroundWindow
         log.Debug(() => $"Call result for SetForegroundWindow is {result}, double-checking...");
         var sw = Stopwatch.StartNew();
         IntPtr foregroundWindow;
-        while ((foregroundWindow = GetForegroundWindow()) != window.Handle && User32.GetWindow(foregroundWindow, User32.GetWindowCommands.GW_OWNER) != window.Handle)
+        while ((foregroundWindow = GetForegroundWindow()) != window.Handle && 
+               User32.GetWindow(foregroundWindow, User32.GetWindowCommands.GW_OWNER) != window.Handle)
         {
             if (sw.Elapsed > MinWindowActivationTimeout)
             {
+                if (result && foregroundWindow == IntPtr.Zero)
+                {
+                    log.Warn($"SetForegroundWindow result is OK, but failed to wait for GetForegroundWindow to become {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is null");
+                    break;
+                }
                 log.Warn($"Failed to SetForegroundWindow {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
                 return false;
             }
