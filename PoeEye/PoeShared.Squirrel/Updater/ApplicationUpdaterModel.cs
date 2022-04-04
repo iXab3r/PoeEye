@@ -45,7 +45,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         this.appArguments = appArguments;
 
         MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-        LatestAppliedVersion = null;
         RootDirectory = new DirectoryInfo(Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%"));
             
         updateSourceProvider
