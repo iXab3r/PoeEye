@@ -22,4 +22,7 @@ public static class AwesomeIcons
     public const string LinkIcon = "\uf0c1";
     public const string UnlinkIcon = "\uf127";
     public const string CloseIcon = "\uf00d";
+    public const string WarningIcon = "\uf071";
+    public const string InfoIcon = "\uf05a";
+    public const string ErrorIcon = "\uf06a";
 }
