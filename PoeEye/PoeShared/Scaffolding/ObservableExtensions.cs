@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Reactive.Concurrency;
+using DynamicData.Kernel;
 using JetBrains.Annotations;
 using ReactiveUI;
 
@@ -9,6 +9,14 @@ namespace PoeShared.Scaffolding;
 public static class ObservableExtensions
 {
     private static readonly Action NoOperation = () => { };
+    
+    public static IObservable<T> RetryWithBackOff<T>(
+        this IObservable<T> observable,
+        Func<Exception, int, TimeSpan?> strategy)
+    {
+        return observable
+            .RetryWithBackOff<T, Exception>(strategy);
+    }
  
     public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext)
     {
