@@ -43,7 +43,8 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
             reportItems.Add(new ExceptionReportItem()
             {
                 Description = $"In-memory config",
-                Attachment = configFromMemoryPath
+                Attachment = configFromMemoryPath,
+                Attached = false
             });
         }
         catch (Exception e)
@@ -78,7 +79,8 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
                 reportItems.Add(new ExceptionReportItem()
                 {
                     Description = $"Copy of {existingConfig}",
-                    Attachment = configCopy
+                    Attachment = configCopy,
+                    Attached = false
                 });
             }
             catch (Exception e)

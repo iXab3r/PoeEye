@@ -5,7 +5,7 @@ namespace PoeShared.UI;
 
 public interface IExceptionReportingService 
 {
-    Task<ExceptionDialogConfig> PrepareConfig();
+    void ReportProblem();
 
     void SetReportConsumer(IExceptionReportHandler reportHandler);
 

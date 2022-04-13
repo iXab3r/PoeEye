@@ -46,6 +46,20 @@ public static class ChangeSetExtensions
         return result;
     }
 
+    public static bool TryRemove<T, TKey>(this ISourceCache<T, TKey> instance, TKey key, out T value)
+    {
+        var result = instance.Lookup(key);
+        if (result.HasValue)
+        {
+            instance.RemoveKey(key);
+            value = result.Value;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+    
     public static bool TryGetValue<T, TKey>(this ISourceCache<T, TKey> instance, TKey key, out T value)
     {
         var result = instance.Lookup(key);

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using DynamicData;
@@ -22,7 +23,8 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
     private readonly IAppArguments appArguments;
     private readonly IClock clock;
     private readonly IApplicationAccessor applicationAccessor;
-    private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
+    private readonly IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory;
+    private readonly IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer;
     private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
     private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
     private IExceptionReportHandler reportHandler;
@@ -31,18 +33,19 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         IClock clock,
         IApplicationAccessor applicationAccessor,
         IFolderCleanerService cleanupService,
-        IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer,
+        IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory,
+        IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer,
         IFactory<MetricsReportProvider> metricsProviderFactory,
         IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
+        IFactory<AppScreenshotReportItemProvider> appScreenshotReportProviderFactory,
         IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
         IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
-        IFactory<ReportLastLogEventsProvider> lastLogEventsReportProviderFactory,
-        IFactory<GcLogReportProvider> gcLogReportProviderFactory,
         IFactory<WindowsEventLogReportItemProvider> windowsEventLogReportProviderFactory,
         IAppArguments appArguments)
     {
         this.clock = clock;
         this.applicationAccessor = applicationAccessor;
+        this.reportItemsAggregatorFactory = reportItemsAggregatorFactory;
         this.exceptionDialogDisplayer = exceptionDialogDisplayer;
         this.appArguments = appArguments;
 
@@ -60,18 +63,12 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         SharedLog.Instance.Errors.SubscribeSafe(
             ex => { ReportCrash(ex); }, Log.HandleException).AddTo(Anchors);
 
-        AddReportItemProvider(lastLogEventsReportProviderFactory.Create()).AddTo(Anchors);
-        AddReportItemProvider(gcLogReportProviderFactory.Create()).AddTo(Anchors);
-        AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(appScreenshotReportProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(configReportProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(copyLogsProviderFactory.Create()).AddTo(Anchors);
+        AddReportItemProvider(metricsProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(windowsEventLogReportProviderFactory.Create()).AddTo(Anchors);
         AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);
-    }
-
-    public Task<ExceptionDialogConfig> PrepareConfig()
-    {
-        return Task.Run(() => PrepareConfigSafe(null));
     }
 
     public void SetReportConsumer(IExceptionReportHandler reportHandler)
@@ -80,6 +77,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         {
             throw new InvalidOperationException($"Report consumer is already configured to {this.reportHandler}");
         }
+
         Log.Debug(() => $"Setting report consumer to {this.reportHandler}");
         this.reportHandler = reportHandler;
     }
@@ -93,6 +91,29 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
             Log.Debug(() => $"Removing report item provider: {reportItemProvider}");
             reportItemProviders.Remove(reportItemProvider);
         });
+    }
+
+    public void ReportProblem()
+    {
+        ShowExceptionDialog(default(Exception));
+    }
+
+    private void ShowExceptionDialog(Exception exception)
+    {
+        Log.Info($"Preparing config for exception {exception}");
+        var config = PrepareConfigSafe(exception);
+
+        Log.Info("Creating report items aggregator");
+        using var itemsAggregator = reportItemsAggregatorFactory.Create(config);
+
+        Log.Info("Giving some time for collecting mission-critical data before altering program state");
+        //FIXME Dirty hack to allow appScreenshot reporter to capture screenshots of the app without Exception Dialog
+        Thread.Sleep(1000);
+
+        Log.Info("Sending signal to show exception dialog window");
+        var reporter = exceptionDialogDisplayer.Create(itemsAggregator);
+        reporter.ShowDialog(config);
+        Log.Info("Exception dialog window was closed");
     }
 
     private void BinderExceptionHandler(object sender, ExceptionEventArgs e)
@@ -112,7 +133,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
 
     private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
     {
-        if (!e.Observed && 
+        if (!e.Observed &&
             e.Exception.InnerException?.GetType().Name is "RpcException" or "Http2ConnectionException" or nameof(TaskCanceledException) or nameof(TimeoutException))
         {
             //FIXME There should be a smarter way of solving that problem with unobserved GRPC RpcException/Http exceptions
@@ -128,6 +149,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
             e.SetObserved();
             return;
         }
+
         ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
     }
 
@@ -144,10 +166,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
         Dispatcher.CurrentDispatcher.UnhandledException -= DispatcherOnUnhandledException;
 
-        var config = PrepareConfigSafe(exception);
-
-        var reporter = exceptionDialogDisplayer.Create();
-        reporter.ShowDialog(config);
+        ShowExceptionDialog(exception);
 
         Log.Warn("Shutting down...");
         applicationAccessor.Terminate(-1);

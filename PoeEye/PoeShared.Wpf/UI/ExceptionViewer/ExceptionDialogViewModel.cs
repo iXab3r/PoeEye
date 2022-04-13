@@ -28,7 +28,6 @@ namespace PoeShared.UI;
 
 internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
 {
-    private static readonly int CurrentProcessId = Environment.ProcessId;
     private static readonly IFluentLog Log = typeof(ExceptionDialogViewModel).PrepareLogger();
     private static readonly Binder<ExceptionDialogViewModel> Binder = new();
 
@@ -36,43 +35,33 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
         Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
 
     private readonly IAppArguments appArguments;
+    private readonly IReportItemsAggregator reportItemsAggregator;
     private readonly IUniqueIdGenerator idGenerator;
 
-    private readonly IClock clock;
-    private readonly IClipboardManager clipboardManager;
-    private readonly ICloseController closeController;
-    private readonly IScheduler uiScheduler;
-    private readonly IExceptionReportingService reportingService;
     private readonly ISevenZipWrapper sevenZipWrapper;
-    private readonly SourceList<ExceptionReportItem> reportItems = new();
 
     static ExceptionDialogViewModel()
     {
-        Binder.Bind(x => x.SaveReportCommand.IsBusy || x.SendReportCommand.IsBusy || !x.AllProvidersProcessed).To(x => x.IsBusy);
+        Binder.Bind(x => x.SaveReportCommand.IsBusy || x.SendReportCommand.IsBusy || !x.reportItemsAggregator.IsReady).To(x => x.IsBusy);
         Binder.BindIf(x => x.SelectedItem == null && x.Attachments.Count > 0, x => x.Attachments[0]).To(x => x.SelectedItem);
         Binder.BindIf(x => x.Config != null, x => x.Config.Title).Else(x => default).To(x => x.Title);
         Binder.BindIf(x => x.Config != null, x => x.Config.AppName).Else(x => default).To(x => x.AppName);
+        Binder.BindIf(x => x.reportItemsAggregator.Status != null, x => x.reportItemsAggregator.Status).To(x => x.Status);
     }
 
     public ExceptionDialogViewModel(
-        IClock clock,
         IClipboardManager clipboardManager,
         IAppArguments appArguments, 
+        IReportItemsAggregator reportItemsAggregator,
         IUniqueIdGenerator idGenerator,
-        IExceptionReportingService reportingService,
         ISevenZipWrapper sevenZipWrapper,
         ICloseController closeController,
-        [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
-        this.clock = clock;
-        this.clipboardManager = clipboardManager;
         this.appArguments = appArguments;
+        this.reportItemsAggregator = reportItemsAggregator;
         this.idGenerator = idGenerator;
-        this.reportingService = reportingService;
         this.sevenZipWrapper = sevenZipWrapper;
-        this.closeController = closeController;
-        this.uiScheduler = uiScheduler;
 
         this.RaiseWhenSourceValue(x => x.AppName, this, x => x.Config).AddTo(Anchors);
         CloseCommand = CommandWrapper.Create(closeController.Close);
@@ -87,8 +76,10 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
                     this.WhenAnyValue(x => x.Status).Select(x => !string.IsNullOrEmpty(x)), (notBusy, hasStatus) => notBusy && hasStatus)
                 .ObserveOn(uiScheduler));
 
-        reportItems
+        reportItemsAggregator
+            .ReportItems
             .Connect()
+            .Filter(x => x.IsRequired == false)
             .Transform(x => new ExceptionDialogSelectableItem(x))
             .Sort(new SortExpressionComparer<ExceptionDialogSelectableItem>().ThenByDescending(x => x.IsChecked))
             .ObserveOn(uiScheduler)
@@ -96,18 +87,6 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
             .SubscribeToErrors(Log.HandleException)
             .AddTo(Anchors);
         Attachments = attachments;
-
-        this.WhenAnyValue(x => x.Config)
-            .Where(x => x != null)
-            .Take(1)
-            .ObserveOn(bgScheduler)
-            .SubscribeSafe(x =>
-            {
-                Log.Debug("Config has been updated, retrieving report items");
-                PrepareReportItemsInternal();
-                Log.Debug(() => $"Retrieved {reportItems.Count} report items");
-            }, Log.HandleException)
-            .AddTo(Anchors);
             
         Binder.Attach(this).AddTo(Anchors);
     }
@@ -135,8 +114,6 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
     public string LastSavedFile { get; set; }
 
     public string Status { get; private set; }
-
-    public bool AllProvidersProcessed { get; private set; }
 
     public bool IsBusy { get; [UsedImplicitly] private set; }
 
@@ -222,7 +199,15 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
     {
         Log.Debug(() => $"Compressing report to {outputFile}");
         var filesToAttach = new List<string>();
-        Attachments.Where(x => x.IsChecked).Select(x => x.Item.Attachment.FullName).ForEach(filesToAttach.Add);
+        
+        reportItemsAggregator.ReportItems.Items.Where(x => x.IsRequired)
+            .Select(x => x.Attachment.FullName)
+            .ForEach(filesToAttach.Add);
+
+        Attachments
+            .Where(x => x.IsChecked)
+            .Select(x => x.Item.Attachment.FullName)
+            .ForEach(filesToAttach.Add);
 
         var tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(tempDirectory);
@@ -258,84 +243,5 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
         Log.Debug(() => $"Compressed directory {outputDirectory} as {outputFile.FullName} ({outputFile.Length}b)");
     }
 
-    private static void TryToFormatException(DirectoryInfo outputDirectory, ISourceList<ExceptionReportItem> reportItems, Exception exception)
-    {
-        try
-        {
-            Log.Debug("Preparing exception stacktrace for crash report...");
-
-            var destinationFileName = Path.Combine(outputDirectory.FullName, $"stacktrace.txt");
-            var description = $"Exception: {exception}\n\nMessage:\n\n{exception.Message}StackTrace:\n\n{exception.StackTrace}";
-            File.WriteAllText(destinationFileName, description);
-
-            reportItems.Add(new ExceptionReportItem()
-            {
-                Description = description,
-                Attachment = new FileInfo(destinationFileName)
-            });
-        }
-        catch (Exception e)
-        {
-            Log.Warn("Failed to prepare exception trace", e);
-        }
-    }
-
-    private void PrepareReportItemsInternal()
-    {
-        reportItems.Clear();
-        AllProvidersProcessed = false;
-
-        if (Config == null)
-        {
-            Log.Debug("Config is not set yet");
-            return;
-        }
-            
-        try
-        {
-            var crashReportDirectoryPath = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes", $"{appArguments.AppName} {appArguments.Version}{(appArguments.IsDebugMode ? " DEBUG" : string.Empty)} Id{CurrentProcessId} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}"));
-            if (crashReportDirectoryPath.Exists)
-            {
-                Log.Warn($"Removing existing directory with crash data {crashReportDirectoryPath.FullName}");
-                crashReportDirectoryPath.Delete(true);
-            }
-
-            Log.Debug(() => $"Creating directory {crashReportDirectoryPath.FullName}");
-            crashReportDirectoryPath.Create();
-
-            if (Config.Exception != null)
-            {
-                TryToFormatException(crashReportDirectoryPath, reportItems, Config.Exception);
-            }
-
-            var providerIdx = 0;
-            foreach (var reportItemProvider in Config.ItemProviders)
-            {
-                providerIdx++;
-
-                try
-                {
-                    Log.Debug(() => $"Getting report item from {reportItemProvider}");
-                    Status = $"Preparing report {providerIdx}/{Config.ItemProviders.Length}...";
-
-                    foreach (var item in reportItemProvider.Prepare(crashReportDirectoryPath))
-                    {
-                        Log.Debug(() => $"Successfully received report item from {reportItemProvider}: {item}");
-                        reportItems.Add(item);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Warn($"Failed to get report item from {reportItemProvider}", e);
-                }
-
-            }
-
-            Status = default;
-        }
-        finally
-        {
-            AllProvidersProcessed = true;
-        }
-    }
+    
 }

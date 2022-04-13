@@ -63,6 +63,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
             .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
             .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
+            .RegisterType<IReportItemsAggregator, ReportItemsAggregator>()
             .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
             .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()

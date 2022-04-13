@@ -47,8 +47,7 @@
                             IsReadOnlyCaretVisible="True"
                             Text="{Binding Item.Description, Mode=OneWay}" />
                     </ScrollViewer>
-
-                    <Image Margin="1" MinWidth="128" MinHeight="128" x:Name="SelectedItemImage" />
+                    <Image x:Name="SelectedItemImage" Margin="1" MinWidth="128" MinHeight="128" />
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsImage}" Value="True">

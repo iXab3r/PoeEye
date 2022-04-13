@@ -12,7 +12,6 @@ namespace PoeShared.UI;
 internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMonitorViewModel
 {
     private static readonly Binder<ErrorMonitorViewModel> Binder = new();
-    private readonly IExceptionDialogDisplayer exceptionDialogDisplayer;
     private readonly IExceptionReportingService exceptionReportingService;
 
     static ErrorMonitorViewModel()
@@ -20,12 +19,10 @@ internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMo
     }
 
     public ErrorMonitorViewModel(
-        IAppArguments appArguments,
-        IExceptionDialogDisplayer exceptionDialogDisplayer, 
+        IAppArguments appArguments, 
         IExceptionReportingService exceptionReportingService,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
-        this.exceptionDialogDisplayer = exceptionDialogDisplayer;
         this.exceptionReportingService = exceptionReportingService;
         ReportProblemCommand = CommandWrapper.Create(ReportProblemCommandExecuted);
         ThrowExceptionCommand = appArguments.IsDebugMode ? CommandWrapper.Create(() => uiScheduler.Schedule(() => throw new ApplicationException("Exception thrown on UI scheduler"))) : default;
@@ -39,10 +36,6 @@ internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMo
 
     private async Task ReportProblemCommandExecuted()
     {
-        var config = await exceptionReportingService.PrepareConfig() with
-        {
-            Title = "Report a problem"
-        };
-        exceptionDialogDisplayer.ShowDialog(config);
+        await Task.Run(() => exceptionReportingService.ReportProblem());
     }
 }

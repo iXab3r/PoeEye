@@ -15,16 +15,19 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
 {
     private static readonly IFluentLog Log = typeof(ExceptionDialogDisplayer).PrepareLogger();
     private readonly IAppArguments appArguments;
-    private readonly IFactory<ExceptionDialogViewModel, ICloseController> dialogViewModelFactory;
+    private readonly IReportItemsAggregator reportItemsAggregator;
+    private readonly IFactory<ExceptionDialogViewModel, ICloseController, IReportItemsAggregator> dialogViewModelFactory;
     private readonly SerialDisposable activeWindowAnchors = new();
     private readonly NamedLock dialogLock = new(nameof(ExceptionDialogDisplayer));
 
     public ExceptionDialogDisplayer(
         IAppArguments appArguments,
-        IFactory<ExceptionDialogViewModel, ICloseController> dialogViewModelFactory)
+        IReportItemsAggregator reportItemsAggregator,
+        IFactory<ExceptionDialogViewModel, ICloseController, IReportItemsAggregator> dialogViewModelFactory)
     {
         activeWindowAnchors.AddTo(Anchors);
         this.appArguments = appArguments;
+        this.reportItemsAggregator = reportItemsAggregator;
         this.dialogViewModelFactory = dialogViewModelFactory;
     }
 
@@ -125,7 +128,7 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
             
                 var closeController = new CloseController(windowAnchors.Dispose);
 
-                var dialogViewModel = dialogViewModelFactory.Create(closeController);
+                var dialogViewModel = dialogViewModelFactory.Create(closeController, reportItemsAggregator);
                 dialogViewModel.Config = config;
                 window.DataContext = dialogViewModel;
                 window.ShowDialog();
