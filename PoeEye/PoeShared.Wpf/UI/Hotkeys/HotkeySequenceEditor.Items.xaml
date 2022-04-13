@@ -72,7 +72,7 @@
 
     <DataTemplate DataType="{x:Type eye:HotkeySequenceDelay}">
         <st:StackPanel Orientation="Vertical" Cursor="Hand" Background="Transparent" VerticalAlignment="Center" MinWidth="36">
-            <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
+            <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}, UpdateSourceTrigger=PropertyChanged}"
                      x:Name="FirstLineText"
                      Style="{StaticResource HotkeySequenceTextBoxStyle}"
                      Foreground="{StaticResource SequenceEditorTextForeground}"
