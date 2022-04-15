@@ -38,8 +38,17 @@ public static class ChangeSetExtensions
 
         return new SourceList<T>(source);
     }
+    
+    public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
+    {
+        if (instance.TryGetValue(key, out var value))
+        {
+            return value;
+        }
+        return default;
+    }
 
-    public static bool TryGetValue<T, TKey, TResult>(this ISourceCache<T, TKey> instance, TKey key, out TResult value, Func<T, TResult> converter)
+    public static bool TryGetValue<T, TKey, TResult>(this IObservableCache<T, TKey> instance, TKey key, out TResult value, Func<T, TResult> converter)
     {
         var result = TryGetValue(instance, key, out var rawValue);
         value = result ? converter(rawValue) : default;
@@ -60,7 +69,7 @@ public static class ChangeSetExtensions
         return false;
     }
     
-    public static bool TryGetValue<T, TKey>(this ISourceCache<T, TKey> instance, TKey key, out T value)
+    public static bool TryGetValue<T, TKey>(this IObservableCache<T, TKey> instance, TKey key, out T value)
     {
         var result = instance.Lookup(key);
         if (result.HasValue)
