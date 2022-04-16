@@ -25,4 +25,5 @@ public static class AwesomeIcons
     public const string WarningIcon = "\uf071";
     public const string InfoIcon = "\uf05a";
     public const string ErrorIcon = "\uf06a";
+    public const string SyncIcon = "\uf021";
 }
