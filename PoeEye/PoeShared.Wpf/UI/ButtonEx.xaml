@@ -10,7 +10,6 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
-
     <Style TargetType="{x:Type TextBlock}"
            BasedOn="{StaticResource ErrorIconTextBlock}"
            x:Key="CommandWrapperIndicatorErrorStyleKey" />
@@ -58,7 +57,8 @@
                         VerticalAlignment="{TemplateBinding VerticalAlignment}"
                         IsHitTestVisible="{TemplateBinding IsHitTestVisible}"
                         ToolTip="{TemplateBinding ToolTip}">
-                        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="2.5">
+                        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="2.5"
+                                       x:Name="ButtonBox">
                             <ContentPresenter x:Name="ContentLabel"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -77,6 +77,9 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="ContentLabel" Property="TextElement.Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
                         </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ButtonBox" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -88,7 +91,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:ButtonEx}">
-                    <Border
+                    <Border x:Name="ButtonBox"
                         Focusable="False"
                         CornerRadius="{TemplateBinding CornerRadius}"
                         Width="{TemplateBinding Width}"
@@ -232,6 +235,9 @@
                         </Trigger>
                         <Trigger SourceName="ErrorIcon" Property="Visibility" Value="Visible">
                             <Setter TargetName="IconLabel" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ButtonBox" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

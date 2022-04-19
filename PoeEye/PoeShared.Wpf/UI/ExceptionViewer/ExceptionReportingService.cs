@@ -134,7 +134,11 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
     private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
     {
         if (!e.Observed &&
-            e.Exception.InnerException?.GetType().Name is "RpcException" or "Http2ConnectionException" or nameof(TaskCanceledException) or nameof(TimeoutException))
+            e.Exception.InnerException?.GetType().Name is "RpcException" or 
+                "Http2ConnectionException" or 
+                nameof(TaskCanceledException) or 
+                nameof(TimeoutException) or
+                nameof(IOException))
         {
             //FIXME There should be a smarter way of solving that problem with unobserved GRPC RpcException/Http exceptions
             /*
