@@ -77,9 +77,14 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="ContentLabel" Property="TextElement.Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
                         </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=HideIfDisabled}" Value="True"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled}" Value="False"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Command.IsBusy}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="ButtonBox" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -236,9 +241,14 @@
                         <Trigger SourceName="ErrorIcon" Property="Visibility" Value="Visible">
                             <Setter TargetName="IconLabel" Property="Visibility" Value="Collapsed" />
                         </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=HideIfDisabled}" Value="True"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled}" Value="False"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Command.IsBusy}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="ButtonBox" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
