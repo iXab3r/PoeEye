@@ -100,9 +100,9 @@ public static class ChangeSetExtensions
         return result.Or().ToSourceList();
     }
 
-    public static IObservable<T> WatchCurrentValue<T, TKey>(this IConnectableCache<T, TKey> cache, TKey key)
+    public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservableCache<T, TKey> cache, TKey key)
     {
-        return cache.Watch(key).Select(x => x.Reason switch
+        var result = cache.Watch(key).Select(x => x.Reason switch
         {
             ChangeReason.Add => x.Current,
             ChangeReason.Update => x.Current,
@@ -110,6 +110,8 @@ public static class ChangeSetExtensions
             //ChangeReason.Remove x.Current contains removed element, which seems wrong
             _ => default
         });
+        
+        return cache.Lookup(key).HasValue ? result : result.StartWithDefault();
     }
 
     public static void MoveItemToTop<T>(this ISourceList<T> collection, T item)
