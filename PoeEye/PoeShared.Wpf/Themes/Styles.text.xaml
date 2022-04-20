@@ -53,9 +53,18 @@
         <Setter Property="Stroke" Value="Black"/>
         <Setter Property="StrokeThickness" Value="1"/>
     </Style>
-    
+
     <Style TargetType="{x:Type TextBlock}" x:Key="IconTextBlock" BasedOn="{StaticResource DefaultTextBlockStyleKey}">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+    
+    <Style TargetType="{x:Type TextBlock}" x:Key="HeaderIconTextBlock" BasedOn="{StaticResource IconTextBlock}">
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+    
+    <Style TargetType="{x:Type TextBlock}" x:Key="HeaderTextBlock" BasedOn="{StaticResource DefaultTextBlockStyleKey}">
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="14" />
     </Style>
 
