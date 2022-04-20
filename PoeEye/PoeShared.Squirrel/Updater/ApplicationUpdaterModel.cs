@@ -202,7 +202,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             $"Restarting app, folder: {MostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
 
         var appPath = Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName);
-        var appArgs = new StringBuilder($"--processStartAndWait {executable.FullName}");
+        var appArgs = new StringBuilder();
         if (appArguments.IsDebugMode)
         {
             appArgs.Append($" -d");

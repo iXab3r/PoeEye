@@ -57,6 +57,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
 
         Container
             .RegisterType<IHotkeyTracker, HotkeyTracker>()
+            .RegisterType<ISingleInstanceValidationHelper, SingleInstanceValidationHelper>()
             .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
             .RegisterType<ISelectionAdornerViewModel, SelectionAdornerViewModel>()
             .RegisterType<IBindingsEditorViewModel, BindingsEditorViewModel>()

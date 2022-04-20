@@ -127,11 +127,18 @@ public static class NotifyPropertyChangedExtensions
                 .ToTask();
         }
 
-        return source
-            .Where(x => condition(x))
-            .Take(1)
-            .Amb(Observable.Return(default(T1)).Delay(timeout).Select(_ => Observable.Throw<T1>(new TimeoutException($"Value did not satisfy condition in {timeout}"))).Switch())
-            .ToTask();
+        var reactiveResult = source.Where(x => condition(x)).Take(1);
+        if (timeout < TimeSpan.MaxValue)
+        {
+            var timeoutSource = Observable
+                .Return(default(T1))
+                .Delay(timeout)
+                .Select(_ => Observable.Throw<T1>(new TimeoutException($"Value did not satisfy condition in {timeout}")))
+                .Switch();
+            reactiveResult = reactiveResult.Amb(timeoutSource);
+        }
+
+        return reactiveResult.ToTask();
     }
         
     public static bool TryWaitForValue<TObject, T1>(

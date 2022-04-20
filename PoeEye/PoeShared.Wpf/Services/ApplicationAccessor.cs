@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows;
 using PoeShared.Scaffolding; 
@@ -21,6 +22,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private readonly Application application;
     private readonly FileLock loadingFileLock;
     private readonly FileLock runningFileLock;
+    private readonly ISubject<int> whenTerminated = new Subject<int>();
 
     public ApplicationAccessor(
         Application application,
@@ -88,10 +90,13 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
     public IObservable<int> WhenExit { get; }
 
+    public IObservable<int> WhenTerminate => whenTerminated;
+
     public bool IsExiting { get; private set; }
 
     public void Terminate(int exitCode)
     {
+        ReportTermination(exitCode);
         Log.Warn($"Closing application via Environment.Exit with code {exitCode}");
         Environment.Exit(exitCode);
     }
@@ -127,6 +132,13 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             Log.Warn("Failed to terminate app gracefully, forcing Terminate", e);
             Terminate(-1);
         }
+    }
+
+    private void ReportTermination(int exitCode)
+    {
+        Log.Warn($"Raising Terminate event with code {exitCode}");
+        whenTerminated.OnNext(exitCode);
+        Log.Warn($"Processed Terminate event with code {exitCode}");
     }
 
     private void Shutdown()

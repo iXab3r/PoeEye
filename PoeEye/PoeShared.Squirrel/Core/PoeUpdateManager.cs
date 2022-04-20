@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using NuGet;
@@ -153,59 +151,6 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
     {
         var installHelpers = new InstallHelperImpl(ApplicationName, RootAppDirectory);
         installHelpers.KillAllProcessesBelongingToPackage();
-    }
-
-    public static void RestartApp(string exeToStart = null, string arguments = null)
-    {
-        // NB: Here's how this method works:
-        //
-        // 1. We're going to pass the *name* of our EXE and the params to 
-        //    Update.exe
-        // 2. Update.exe is going to grab our PID (via getting its parent), 
-        //    then wait for us to exit.
-        // 3. We exit cleanly, dropping any single-instance mutexes or 
-        //    whatever.
-        // 4. Update.exe unblocks, then we launch the app again, possibly 
-        //    launching a different version than we started with (this is why
-        //    we take the app's *name* rather than a full path)
-
-        exeToStart = exeToStart ?? Path.GetFileName(Assembly.GetEntryAssembly().Location);
-        var argsArg = arguments != null
-            ? $"-a \"{arguments}\""
-            : "";
-
-        Process.Start(GetUpdateExe(), $"--processStartAndWait {exeToStart} {argsArg}");
-
-        // NB: We have to give update.exe some time to grab our PID, but
-        // we can't use WaitForInputIdle because we probably don't have
-        // whatever WaitForInputIdle considers a message loop.
-        Thread.Sleep(500);
-        Environment.Exit(0);
-    }
-
-    public static async Task<Process> RestartAppWhenExited(string exeToStart = null, string arguments = null)
-    {
-        // NB: Here's how this method works:
-        //
-        // 1. We're going to pass the *name* of our EXE and the params to 
-        //    Update.exe
-        // 2. Update.exe is going to grab our PID (via getting its parent), 
-        //    then wait for us to exit.
-        // 3. Return control and new Process back to caller and allow them to Exit as desired.
-        // 4. After our process exits, Update.exe unblocks, then we launch the app again, possibly 
-        //    launching a different version than we started with (this is why
-        //    we take the app's *name* rather than a full path)
-
-        exeToStart = exeToStart ?? Path.GetFileName(Assembly.GetEntryAssembly().Location);
-        var argsArg = arguments != null
-            ? $"-a \"{arguments}\""
-            : "";
-
-        var updateProcess = Process.Start(GetUpdateExe(), $"--processStartAndWait {exeToStart} {argsArg}");
-
-        await Task.Delay(500);
-
-        return updateProcess;
     }
 
     private IDisposable AcquireUpdateLock()

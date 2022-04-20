@@ -6,7 +6,12 @@ namespace PoeShared.Services;
 
 public interface IApplicationAccessor : INotifyPropertyChanged
 {
+    /// <summary>
+    ///   Happens only when Exit() is called, Terminate bypasses this
+    /// </summary>
     IObservable<int> WhenExit { get; }
+    
+    IObservable<int> WhenTerminate { get; }
 
     Task Exit();
 
