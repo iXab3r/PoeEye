@@ -117,10 +117,10 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
         
     private async Task ShowDialog(IMessageBoxHostViewModel newMessageBox)
     {
-        if (MessageBox != null)
+        var currentMessageBox = MessageBox;
+        if (currentMessageBox != null)
         {
             Log.Warn($"Currently already showing message box {newMessageBox}");
-            throw new NotSupportedException($"Multiple message boxes are not supported yet, please report this bug");
         }
             
         try
@@ -131,7 +131,7 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
         }
         finally
         {
-            MessageBox = default;
+            MessageBox = currentMessageBox;
         }
     }
 }
