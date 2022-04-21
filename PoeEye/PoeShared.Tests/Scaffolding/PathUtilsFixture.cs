@@ -10,6 +10,32 @@ namespace PoeShared.Tests.Scaffolding;
 public class PathUtilsFixture : FixtureBase
 {
     [Test]
+    [TestCase(null, null)]
+    [TestCase(null, "")]
+    [TestCase(null, "a", "b")]
+    [TestCase("a", "a")]
+    [TestCase("a", "a\\b", "a\\c")]
+    [TestCase("a", "a\\b\\c", "a\\c\\d")]
+    [TestCase("a\\b", "a\\b")]
+    [TestCase("a\\b", "a\\b", "a\\b\\c")]
+    public void ShouldGetCommonRootDirectory(string expected, params string[] paths)
+    {
+        //Given
+        //When
+        var resultSupplier = () => PathUtils.GetCommonRootDirectory(paths);
+
+        //Then
+        if (expected == null)
+        {
+            resultSupplier.ShouldThrow<Exception>();
+        }
+        else
+        {
+            resultSupplier().ShouldBe(expected);
+        }
+    }
+    
+    [Test]
     [TestCase(null, null, true)]
     [TestCase("", "", true)]
     [TestCase("", "a", false)]

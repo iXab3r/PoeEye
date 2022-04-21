@@ -4,6 +4,47 @@ namespace PoeShared.Scaffolding;
 
 public static class PathUtils
 {
+    public static string GetCommonRootDirectory(IReadOnlyList<string> paths)
+    {
+        return GetCommonRootDirectory(paths, Path.DirectorySeparatorChar);
+    }
+    
+    public static string GetCommonRootDirectory(IReadOnlyList<string> paths, char separator)
+    {
+        if (paths.IsEmpty())
+        {
+            throw new ArgumentException("At least one path must be supplied");
+        }
+        var commonPath = string.Empty;
+        var separatedPath = paths
+            .First ( str => str.Length == paths.Max ( st2 => st2.Length ) )
+            .Split (separator, StringSplitOptions.RemoveEmptyEntries )
+            .ToList ( );
+ 
+        foreach ( var segment in separatedPath.AsEnumerable ( ) )
+        {
+            if ( commonPath.Length == 0 && paths.All ( str => str.StartsWith ( segment ) ) )
+            {
+                commonPath = segment;
+            }
+            else if ( paths.All ( str => str.StartsWith ( commonPath + separator + segment ) ) )
+            {
+                commonPath += separator + segment;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(commonPath))
+        {
+            throw new ArgumentException($"Failed to find common path: {paths.DumpToString()}");
+        }
+ 
+        return commonPath;
+    }
+    
     public static string GetRootDirectory(string path)
     {
         if (string.IsNullOrEmpty(path))
