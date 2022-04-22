@@ -16,7 +16,11 @@ internal sealed class PoeConfigMetadataReplacementService : IPoeConfigMetadataRe
         {
             return Observable.Return(resolvedMetadata.TargetMetadata);
         }
-        return substituteMetadataByTypeName.WatchCurrentValue(metadata.TypeName).Select(x => x.TargetMetadata).StartWith(metadata);
+        return substituteMetadataByTypeName
+            .WatchCurrentValue(metadata.TypeName)
+            .Where(x => x != null)
+            .Select(x => x.TargetMetadata)
+            .StartWith(metadata);
     }
 
     public PoeConfigMetadata ReplaceIfNeeded(PoeConfigMetadata metadata)
