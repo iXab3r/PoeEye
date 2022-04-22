@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Polly;
@@ -17,7 +19,8 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
     public SingleInstanceValidationHelper(
         string mutexId,
         Application parent,
-        IApplicationAccessor applicationAccessor)
+        IApplicationAccessor applicationAccessor
+        )
     {
         MutexId = mutexId;
         applicationAccessor.WhenTerminate
@@ -41,6 +44,10 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
         var anchors = new CompositeDisposable();
         Log.Info(() => $"Acquiring mutex {mutexId}...");
         var mutex = new Mutex(true, mutexId);
+
+        var initialThread = Thread.CurrentThread;
+        var threadDispatcher = Dispatcher.CurrentDispatcher;
+        Log.Info(() => $"Mutex will be disposed on dispatcher {threadDispatcher}, thread: { new { initialThread.Name, initialThread.ManagedThreadId } }");
         
         var mutexAcquired = 
             Policy.Handle<Exception>(ex =>
@@ -70,11 +77,29 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
         if (mutexAcquired)
         {
             Log.Info(() => $"Acquired mutex {mutexId}");
-            Disposable.Create(() =>
+
+            var mutexReleaseAction = () =>
             {
                 Log.Info(() => $"Releasing mutex {mutexId}");
                 mutex.ReleaseMutex();
                 Log.Info("Released mutex");
+            };
+            
+            Disposable.Create(() =>
+            {
+                if (Thread.CurrentThread != initialThread)
+                {
+                    Log.Info(() => $"Dispatching mutex release action as current thread differs from initial");
+                    threadDispatcher.Invoke(() =>
+                    {
+                        Log.Info(() => $"Invoking mutex release action");
+                        mutexReleaseAction();
+                    });
+                }
+                else
+                {
+                    mutexReleaseAction();
+                }
             }).AddTo(anchors);
         }
         else
