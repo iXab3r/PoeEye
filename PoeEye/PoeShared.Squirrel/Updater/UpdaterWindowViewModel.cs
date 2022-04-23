@@ -58,7 +58,7 @@ internal sealed class UpdaterWindowViewModel : DisposableReactiveObject, IUpdate
             .Subscribe(async x => await ApplicationUpdater.PrepareForceUpdate(x))
             .AddTo(Anchors);
             
-        CloseCommand = CommandWrapper.Create(viewController.Close);
+        CloseCommand = CommandWrapper.Create(() => viewController.Close(true));
         TerminateCommand = CommandWrapper.Create(async () =>
         {
             Log.Debug("User decided to terminate application");

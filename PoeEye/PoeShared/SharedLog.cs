@@ -16,14 +16,15 @@ public class SharedLog : DisposableReactiveObject
     /// <summary>
     ///     Log Instance HAVE to be initialized only after GlobalContext is configured
     /// </summary>
-    private static readonly Lazy<IFluentLog> LogInstanceSupplier = new Lazy<IFluentLog>(() =>
+    private static readonly Lazy<IFluentLog> LogInstanceSupplier = new(() =>
     {
         var log = LogManager.GetLogger(typeof(SharedLog));
         log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.Dump()}");
-        return log.ToFluent();
+        var process = Process.GetCurrentProcess();
+        return log.ToFluent().WithSuffix($"{process.ProcessName} PID {process.Id}");
     });
 
-    private static readonly Lazy<SharedLog> InstanceSupplier = new Lazy<SharedLog>();
+    private static readonly Lazy<SharedLog> InstanceSupplier = new();
 
     public SharedLog()
     {

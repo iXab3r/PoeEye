@@ -148,8 +148,10 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             throw new InvalidOperationException($"{nameof(Shutdown)} invoked on non-main thread");
         }
             
-        Log.Info(() => $"Terminating application (shutdownMode: {application.ShutdownMode}, window: {application.MainWindow})...");
-        if (application.MainWindow != null && application.ShutdownMode == ShutdownMode.OnMainWindowClose)
+        Log.Info(() => $"Terminating application (shutdownMode: {application.ShutdownMode}, window: {new { application.MainWindow }})...");
+        if (application.MainWindow != null && 
+            application.ShutdownMode == ShutdownMode.OnMainWindowClose && 
+            application.MainWindow.IsLoaded)
         {
             Log.Info(() => $"Closing main window {application.MainWindow}...");
             application.MainWindow.Close();

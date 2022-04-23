@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive.Concurrency;
@@ -150,7 +151,7 @@ public abstract class ApplicationBase : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        Log.Debug(() => $"Application exit detected, exit code: {e.ApplicationExitCode}");
+        Log.Debug(() => $"Processing application OnExit, exit code: {e.ApplicationExitCode}");
         base.OnExit(e);
         Log.Debug("Disposing application resources");
         Anchors.Dispose();

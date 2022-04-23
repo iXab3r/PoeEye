@@ -29,4 +29,7 @@ public static class AwesomeIcons
     public const string RepeatIcon = "\uf01e";
     public const string RotateLeft = Undo;
     public const string RotateRight = RepeatIcon;
+    public const string SignIn = "\uf090";
+    public const string SignOut = "\uf08b";
+    public const string CloudDownload = "\uf0ed";
 }

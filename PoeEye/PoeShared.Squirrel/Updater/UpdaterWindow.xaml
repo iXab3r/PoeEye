@@ -10,6 +10,7 @@
                  xmlns:st="http://schemas.spicytaco.io/"
                  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                  xmlns:logging="clr-namespace:PoeShared.Logging;assembly=PoeShared"
+                 xmlns:themes="clr-namespace:PoeShared.Themes;assembly=PoeShared.Wpf"
                  mc:Ignorable="d"
                  TextElement.Foreground="{DynamicResource MaterialDesignBody}"
                  TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
@@ -57,7 +58,7 @@
                         <eye:ButtonEx Command="{Binding UpdateToVersionCommand}"
                                       CommandParameter="{Binding PreviousVersionEntry}"
                                       IsEnabled="{Binding PreviousVersionEntry, Converter={StaticResource NullToFalseConverter}}"
-                                      Icon="&#xf0e2;">
+                                      Icon="{x:Static themes:AwesomeIcons.RotateLeft}">
                             <eye:ButtonEx.Content>
                                 <TextBlock Text="{Binding PreviousVersionEntry.Version, StringFormat='Rollback to previous version v{0}', FallbackValue='Rollback is not available yet'}" />
                             </eye:ButtonEx.Content>
@@ -80,8 +81,9 @@
                             <TextBlock Text="Update channel:" Width="350" TextAlignment="Right" />
                             <ComboBox st:StackPanel.Fill="Fill"
                                       ItemsSource="{Binding UpdateSourceProvider.KnownSources}"
-                                      DisplayMemberPath="Description"
-                                      SelectedItem="{Binding UpdateSourceProvider.UpdateSource}" />
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding UpdateSourceProvider.UpdateSourceId}"/>
                         </st:StackPanel>
 
                         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5" Height="30"
@@ -96,10 +98,10 @@
 
                     <st:AutoGrid Columns="140,*,140" x:Name="ControlsView"
                                  IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource NotConverter}}">
-                        <eye:ButtonEx Command="{Binding TerminateCommand}" Content="Terminate" Icon="&#xf08b;"
+                        <eye:ButtonEx Command="{Binding TerminateCommand}" Content="Terminate" Icon="{x:Static themes:AwesomeIcons.SignOut}"
                                       Visibility="{Binding AllowTermination, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
                         <Separator Visibility="Hidden" st:StackPanel.Fill="Fill" />
-                        <eye:ButtonEx Command="{Binding CloseCommand}" Content="Continue" Icon="&#xf090;" />
+                        <eye:ButtonEx Command="{Binding CloseCommand}" Content="Continue" Icon="{x:Static themes:AwesomeIcons.SignIn}" />
                     </st:AutoGrid>
                 </st:StackPanel>
                 <DataTemplate.Triggers>
@@ -132,10 +134,12 @@
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands ShowSeparators="True">
             <eye:CachedContentControl Content="{Binding ErrorMonitor}" />
+            <eye:ButtonEx Command="{Binding ApplicationUpdater.RestartCommand}"
+                          Icon="{x:Static themes:AwesomeIcons.RotateRight}"/>
             <eye:CachedContentControl Content="{Binding ApplicationUpdater.CheckForUpdatesCommand}"
                                       ContentTemplate="{StaticResource CommandWrapperIcon}"
                                       eye:CommandWrapperHelper.Progress="{Binding ApplicationUpdater.ProgressPercent}"
-                                      eye:CommandWrapperHelper.Icon="&#xF0ED;">
+                                      eye:CommandWrapperHelper.Icon="{x:Static themes:AwesomeIcons.CloudDownload}">
                 <eye:CachedContentControl.ToolTip>
                     <TextBlock
                         Text="{Binding ApplicationUpdater.UpdateSource.Name, StringFormat='Check for updates @ {0}'}" />
