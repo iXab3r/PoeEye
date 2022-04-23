@@ -201,18 +201,17 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         Log.Debug(
             $"Restarting app, folder: {MostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
 
-        var appPath = Path.Combine(MostRecentVersionAppFolder.FullName, ApplicationExecutableFileName);
         var appArgs = new StringBuilder();
         if (appArguments.IsDebugMode)
         {
             appArgs.Append($" -d");
         }
 
-        Log.Debug(() => $"Starting application @ '{appPath}', args: {appArgs} ...");
-        var updaterProcess = Process.Start(appPath, appArgs.ToString());
+        Log.Debug(() => $"Starting application @ '{executable.FullName}', args: {appArgs} ...");
+        var updaterProcess = Process.Start(executable.FullName, appArgs.ToString());
         if (updaterProcess == null)
         {
-            throw new FileNotFoundException($"Failed to start application @ '{appPath}'");
+            throw new FileNotFoundException($"Failed to start application @ '{executable.FullName}'");
         }
         Log.Debug(() => $"Process spawned, PID: {updaterProcess.Id}");
         await applicationAccessor.Exit();
@@ -222,6 +221,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     {
         var appExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, ApplicationExecutableFileName));
         Log.Debug(() => $"Application executable: {appExecutable} (exists: {appExecutable.Exists})");
+        Log.Debug(() => $"Running executable cmd line: {Environment.CommandLine}, app domain directory: {AppDomain.CurrentDomain.BaseDirectory}");
         if (!appExecutable.Exists)
         {
             throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
