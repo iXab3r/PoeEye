@@ -69,11 +69,13 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
         SendReportCommand = CommandWrapper.Create(SendReportCommandExecuted, 
             Observable.CombineLatest(
                 this.WhenAnyValue(x => x.Config).Select(x => x?.ReportHandler != null),
-                this.WhenAnyValue(x => x.IsBusy).Select(x => x == false),(hasHandler, notBusy) => hasHandler && notBusy).ObserveOn(uiScheduler));
-        CopyStatusToClipboard = CommandWrapper.Create(() => clipboardManager.SetText(Status), 
+                this.WhenAnyValue(x => x.SentReportId),
+                this.WhenAnyValue(x => x.IsBusy).Select(x => x == false),(hasHandler, sentReportId, notBusy) => hasHandler && notBusy && string.IsNullOrEmpty(sentReportId)).ObserveOn(uiScheduler));
+        CopyStatusToClipboard = CommandWrapper.Create(() => clipboardManager.SetText(SentReportId ?? Status), 
             Observable.CombineLatest(
                     this.WhenAnyValue(x => x.IsBusy).Select(x => x == false),
-                    this.WhenAnyValue(x => x.Status).Select(x => !string.IsNullOrEmpty(x)), (notBusy, hasStatus) => notBusy && hasStatus)
+                    this.WhenAnyValue(x => x.SentReportId),
+                    this.WhenAnyValue(x => x.Status), (notBusy, sentReportId, status) => notBusy && (!string.IsNullOrEmpty(status) || !string.IsNullOrEmpty(sentReportId)))
                 .ObserveOn(uiScheduler));
 
         reportItemsAggregator
@@ -112,6 +114,8 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
     public CommandWrapper CopyStatusToClipboard { get; }
 
     public string LastSavedFile { get; set; }
+    
+    public string SentReportId { get; private set; }
 
     public string Status { get; private set; }
 
@@ -131,8 +135,9 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
             Log.Debug(() => $"Report saved to temporary file {tempFile}, sending to {Config.ReportHandler}");
             Status = "Sending report...";
             var result = await Config.ReportHandler.Handle(tempFile);
-            Log.Debug(() => $"Report sent to {Config.ReportHandler}");
-            Status = $"Report Id: {result}";
+            Log.Debug(() => $"Report sent to {Config.ReportHandler}: {result}");
+            SentReportId = result;
+            Status = $"Report sent";
         }
         catch (Exception ex)
         {

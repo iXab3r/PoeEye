@@ -125,8 +125,8 @@
                          Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
             <eye:ButtonEx
                 Command="{Binding CopyStatusToClipboard}"
+                HideIfDisabled="True"
                 ToolTip="Copy to clipboard"
-                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                 Icon="&#xf0c5;" />
             <TextBlock Text="{Binding Status}" 
                        TextTrimming="CharacterEllipsis"
@@ -134,13 +134,14 @@
                        st:StackPanel.Fill="Fill" />
             <eye:ButtonEx
                 MinWidth="80"
+                HideIfDisabled="True"
                 Command="{Binding SaveReportCommand}"
                 Icon="&#xf0c7;"
                 Content="Save..." />
             <eye:ButtonEx
                 MinWidth="100"
+                HideIfDisabled="True"
                 Command="{Binding SendReportCommand}"
-                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                 Icon="&#xf1d8;"
                 Content="Send" />
             <eye:ButtonEx Command="{Binding CloseCommand}"

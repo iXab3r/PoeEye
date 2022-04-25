@@ -34,7 +34,6 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
 
         Container
             .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
-            .RegisterSingleton<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
             .RegisterSingleton<IExceptionReportingService, ExceptionReportingService>()
             .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
             .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
@@ -65,6 +64,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
             .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
             .RegisterType<IReportItemsAggregator, ReportItemsAggregator>()
+            .RegisterType<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
             .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
             .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
