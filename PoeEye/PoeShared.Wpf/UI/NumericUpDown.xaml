@@ -151,4 +151,8 @@
     </Style>
 
     <Style TargetType="{x:Type mah:NumericUpDown}" BasedOn="{StaticResource FastNumericUpDown}" />
+    
+    <Style TargetType="{x:Type eye:NumericUpDownEx}" BasedOn="{StaticResource FastNumericUpDown}">
+    </Style>
+
 </eye:SharedResourceDictionary>

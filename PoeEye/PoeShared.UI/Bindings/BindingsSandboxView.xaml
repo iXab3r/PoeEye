@@ -7,10 +7,10 @@
     <DataTemplate DataType="{x:Type bindings:StubViewModel}">
         <st:AutoGrid Columns="Auto,*">
             <TextBlock Text="Int" VerticalAlignment="Top"/>
-            <mah:NumericUpDown
+            <eye:NumericUpDownEx
                 Value="{Binding IntProperty}" Interval="1" />
             <TextBlock Text="Double" VerticalAlignment="Top"/>
-            <mah:NumericUpDown
+            <eye:NumericUpDownEx
                 Value="{Binding DoubleProperty}" Interval="0.1" />
             <TextBlock Text="String" VerticalAlignment="Top"/>
             <TextBox Text="{Binding StringProperty}"/>

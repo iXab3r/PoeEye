@@ -68,7 +68,7 @@
                             Content="Relative" />
                     </st:StackPanel>
                     <TextBlock Text="every" x:Name="MouseRecordingResolutionPrefix" />
-                    <mah:NumericUpDown MinWidth="40" MaxWidth="140"
+                    <eye:NumericUpDownEx MinWidth="40" MaxWidth="140"
                                        Margin="5,0,0,0"
                                        x:Name="MouseRecordingResolution"
                                        materialDesign:TextFieldAssist.SuffixText=" ms"

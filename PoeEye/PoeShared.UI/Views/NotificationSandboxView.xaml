@@ -29,7 +29,7 @@
                 <eye:ButtonEx Content="Show input box" Command="{Binding InputTextBoxCommand}" />
 
                 <TextBlock Text="Timeout" />
-                <mah:NumericUpDown
+                <eye:NumericUpDownEx
                     Interval="1000"
                     materialDesign:TextFieldAssist.SuffixText="ms"
                     Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />

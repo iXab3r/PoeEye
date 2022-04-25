@@ -31,6 +31,12 @@
             </TabItem>
             <TabItem Header="Misc">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+                    <TextBlock Text="Numeric up/down" />
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                        <eye:NumericUpDownEx Value="100" Width="100" IsMouseDragEnabled="True"/>
+                        <eye:NumericUpDownEx Value="1000" Width="100"/>
+                    </st:StackPanel>
+                    
                     <TextBlock Text="Random period selector" />
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                         <eye:CachedContentControl Content="{Binding RandomPeriodSelector}" />
@@ -207,17 +213,17 @@
                             HotKey="{Binding HotkeySequenceEditor.Controller.ToggleRecordingHotkey.DefaultValue}" />
 
                         <TextBlock Text="MaxDuration" />
-                        <mah:NumericUpDown
+                        <eye:NumericUpDownEx
                             Interval="1000"
                             Value="{Binding HotkeySequenceEditor.MaxDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
                         
                         <TextBlock Text="Key Press Duration" />
-                        <mah:NumericUpDown
+                        <eye:NumericUpDownEx
                             Interval="50"
                             Value="{Binding HotkeySequenceEditor.DefaultKeyPressDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
 
                         <TextBlock Text="MousePositionRecordingResolution" />
-                        <mah:NumericUpDown
+                        <eye:NumericUpDownEx
                             Interval="100"
                             Value="{Binding HotkeySequenceEditor.Controller.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
                     </st:AutoGrid>

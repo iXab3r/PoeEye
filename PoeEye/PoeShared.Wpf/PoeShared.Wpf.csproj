@@ -136,6 +136,9 @@
     <Compile Update="UI\CachedContentControl.cs">
       <DependentUpon>CachedContentControl.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UI\NumericUpDownEx.cs">
+      <DependentUpon>NumericUpDown.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="UI\Hotkeys\HotkeySequenceEditor.Defaults.xaml">

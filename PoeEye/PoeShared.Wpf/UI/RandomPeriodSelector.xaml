@@ -10,14 +10,14 @@
     
     <DataTemplate DataType="{x:Type eye:RandomPeriodSelector}">
        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="10">
-           <mah:NumericUpDown MinWidth="60" Interval="100"
+           <eye:NumericUpDownEx MinWidth="60" Interval="100"
                               x:Name="Lower"
                               Minimum="{Binding Minimum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               Maximum="{Binding Maximum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               materialDesign:HintAssist.Hint="Min" materialDesign:HintAssist.IsFloating="True"
                               materialDesign:TextFieldAssist.SuffixText="ms"
                               Value="{Binding LowerValue, Converter={StaticResource TimeSpanToMillisecondsConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-           <mah:NumericUpDown MinWidth="60" DockPanel.Dock="Right"
+           <eye:NumericUpDownEx MinWidth="60" DockPanel.Dock="Right"
                               x:Name="Upper"
                               Visibility="{Binding RandomizeValue, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                               Interval="100"
