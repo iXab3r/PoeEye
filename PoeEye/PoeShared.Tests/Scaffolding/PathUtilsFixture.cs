@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
 using System;
+using System.Collections.Generic;
 using PoeShared.Scaffolding;
 using Shouldly;
 
@@ -100,6 +101,26 @@ public class PathUtilsFixture : FixtureBase
         //Given
         //When
         var result = PathUtils.IsParentDir(folderPath, fullPath);
+
+        //Then
+        result.ShouldBe(expected);
+    }
+
+    [Test]
+    [TestCase("a", "a")]
+    [TestCase("a", "a", "b")]
+    [TestCase("f\\a", "f\\a")]
+    [TestCase("f\\a", "f\\a", "a", "f\\b")]
+    [TestCase("f\\a", "f\\a (2)", "f\\a", "f\\b")]
+    [TestCase("a", "a (2)", "a")]
+    [TestCase("a", "a (2)", "b", "a")]
+    public void ShouldGenerateValidName(string candidate, string expected, params string[] existing)
+    {
+        //Given
+        var existingPaths = new HashSet<string>(existing);
+
+        //When
+        var result = PathUtils.GenerateValidName(candidate, x => !existingPaths.Contains(x));
 
         //Then
         result.ShouldBe(expected);

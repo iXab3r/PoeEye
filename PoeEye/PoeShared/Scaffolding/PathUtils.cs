@@ -110,4 +110,33 @@ public static class PathUtils
         var path2 = FullPath.FromPath(fullPath);
         return path2.IsChildOf(path1);
     }
+    
+    public static string GenerateValidName(string candidate, Predicate<string> pathValidator)
+    {
+        if (string.IsNullOrEmpty(candidate))
+        {
+            throw new ArgumentException($"New folder path must be specified");
+        }
+
+        var folderName = Path.GetFileNameWithoutExtension(candidate);
+        if (string.IsNullOrEmpty(folderName))
+        {
+            throw new ArgumentException($"Invalid new folder path: {candidate}");
+        }
+
+        var folderPath = Path.GetDirectoryName(candidate) ?? string.Empty;
+        var idx = 1;
+        while (true)
+        {
+            var fullPath = Path.Combine(folderPath, idx == 1 ? folderName : $"{folderName} ({idx})");
+            if (!pathValidator(fullPath))
+            {
+                idx++;
+            }
+            else
+            {
+                return fullPath;
+            }
+        }
+    }
 }
