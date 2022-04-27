@@ -3,62 +3,65 @@
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:ui="clr-namespace:PoeShared.UI"
                     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
-                    xmlns:viewModels11="clr-namespace:PoeShared.Dialogs.ViewModels">
+                    xmlns:viewModels11="clr-namespace:PoeShared.Dialogs.ViewModels"
+                    xmlns:blue="http://www.nuget.org/Blue.MVVM"
+                    xmlns:st="http://schemas.spicytaco.io/">
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     
+    <blue:MultiplyDoubleConverter x:Key="MessageBoxContentSizeMultiplier" Factor="0.8" />
+    
     <DataTemplate DataType="{x:Type viewModels11:MessageBoxHostWithContentViewModelBase}">
-        <Grid x:Name="MessageBoxRoot" Margin="10">
-            <Grid.InputBindings>
+        <st:StackPanel Orientation="Vertical" MarginBetweenChildren="0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       x:Name="MessageBoxRoot"
+                       MaxHeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type materialDesign:DialogHost}}, Path=ActualHeight, Converter={StaticResource MessageBoxContentSizeMultiplier}}"
+                       MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type materialDesign:DialogHost}}, Path=ActualWidth, Converter={StaticResource MessageBoxContentSizeMultiplier}}">
+            <st:StackPanel.InputBindings>
                 <KeyBinding Gesture="Escape" Command="{Binding CloseMessageBoxCommand}" />
                 <KeyBinding Gesture="Enter" 
                             Command="{Binding CloseMessageBoxCommand}"
                             CommandParameter="{Binding DefaultCommand}"/>
-            </Grid.InputBindings>
+            </st:StackPanel.InputBindings>
+            
+            <st:StackPanel Orientation="Horizontal" x:Name="MessageBoxTitle"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Margin="10, 5, 10, 0">
+                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                           Text="{Binding Title}" />
+            </st:StackPanel>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="1*" />
-            </Grid.RowDefinitions>
+            <ui:CachedContentControl x:Name="MessageBoxContent" 
+                                     Margin="10"
+                                     st:StackPanel.Fill="Auto"
+                                     Content="{Binding Content}"/>
 
-            <DockPanel Grid.Column="1" Grid.Row="1">
-                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Text="{Binding Title}" />
-            </DockPanel>
-
-            <ui:CachedContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding Content}"/>
-
-            <DockPanel Grid.Column="1" Grid.Row="3" Margin="0,5,0,0" VerticalAlignment="Center">
+            <st:StackPanel Orientation="Horizontal" 
+                           Margin="10, 0, 10, 5"
+                           x:Name="MessageBoxFooter">
                 <ItemsControl ItemsSource="{Binding AvailableCommands}"
                               x:Name="CommandListControl"
                               DockPanel.Dock="Right"
                               HorizontalAlignment="Right">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <DockPanel />
+                            <st:StackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <ui:ButtonEx
-                                Margin="5,0"
                                 Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=DataContext.CloseMessageBoxCommand}"
                                 CommandParameter="{Binding}"
                                 Content="{Binding Caption}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </DockPanel>
-        </Grid>
+            </st:StackPanel>
+        </st:StackPanel>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type viewModels11:TextMessageBoxViewModel}">
