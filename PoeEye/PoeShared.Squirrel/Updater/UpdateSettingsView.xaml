@@ -11,8 +11,8 @@
         <st:AutoGrid Columns="240, *" RowHeight="40" ChildMargin="5" x:Name="UpdateSettingsRoot">
             <TextBlock Text="Check for updates: " HorizontalAlignment="Right" />
             <CheckBox IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}" />
-            <TextBlock Text="Updates channel: " HorizontalAlignment="Right" IsEnabled="{Binding CheckForUpdates}" />
-            <ListBox ItemsSource="{Binding KnownSources}" IsEnabled="{Binding CheckForUpdates}"
+            <TextBlock Text="Updates channel: " HorizontalAlignment="Right" />
+            <ListBox ItemsSource="{Binding KnownSources}"
                      SelectedItem="{Binding UpdateSource}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
