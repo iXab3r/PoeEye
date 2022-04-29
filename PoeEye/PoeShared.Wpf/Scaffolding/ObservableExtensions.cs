@@ -10,5 +10,12 @@ public static class ObservableExtensions
     {
         return source
             .Select(x => dispatcher.CheckAccess() ? Observable.Return(x) : Observable.Return(x).ObserveOn(dispatcher).Select(x => x)).Switch();
-    } 
+    }
+
+    public static IObservable<T> Suspend<T>(
+        this IObservable<T> source,
+        IPauseController pauseController)
+    {
+        return source.Where(x => !pauseController.IsPaused);
+    }
 }

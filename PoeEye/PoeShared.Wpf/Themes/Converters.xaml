@@ -61,7 +61,8 @@
     <blue:ThicknessConverter x:Key="ThicknessConverter" UseBottom="True" UseLeft="True" UseRight="True" UseTop="True" />
     <eyeConverters:ColorAndAlphaToColorConverter x:Key="ColorAndAlphaToColorConverter"/>
     <eyeConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
-    <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverter"/>
+    <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverter" AllowAlpha="True"/>
+    <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverterWithoutAlpha" AllowAlpha="False"/>
     
     <kent:MapConverter x:Key="ZeroToTrueConverter" FallbackValue="{StaticResource FalseValue}" FallbackBehavior="ReturnFallbackValue">
         <kent:Mapping To="{StaticResource TrueValue}">

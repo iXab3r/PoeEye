@@ -5,13 +5,12 @@
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:local="clr-namespace:PoeShared.UI"
                          xmlns:st="http://schemas.spicytaco.io/"
-                         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          mc:Ignorable="d"
                          xmlns:eye="http://coderush.net/poeeye/"
                          xmlns:system="clr-namespace:System;assembly=System.Runtime"
                          WindowStartupLocation="CenterScreen"
-                             UseLayoutRounding="True"
+                         UseLayoutRounding="True"
                          ShowIconOnTitleBar="True"
                          RenderOptions.EdgeMode="Aliased"
                          Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
@@ -31,6 +30,15 @@
             </TabItem>
             <TabItem Header="Misc">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+                    <TextBlock Text="Color picker" />
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                        <eye:ColorPickerEx x:Name="ColorPickerEx" Color="{Binding Color}" PickerDock="Right" />
+                        <eye:ColorPickerEx Color="{Binding Color}" PickerDock="Left" />
+                        <CheckBox IsChecked="{Binding ElementName=ColorPickerEx, Path=AllowAlpha}" Content="Allow alpha"/>
+                        <TextBlock Text="{Binding ElementName=ColorPickerEx, Path=ColorWithoutAlpha, Converter={StaticResource ColorToStringConverter}, StringFormat='Color w/Alpha: {0}'}"/>
+                        <TextBlock Text="{Binding ElementName=ColorPickerEx, Path=Alpha, StringFormat='Alpha: {0}'}"/>
+                    </st:StackPanel>
+                    
                     <TextBlock Text="Numeric up/down" />
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                         <eye:NumericUpDownEx Value="100" Width="100" IsMouseDragEnabled="True"/>

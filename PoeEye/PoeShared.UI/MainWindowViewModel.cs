@@ -1,9 +1,9 @@
 using System;
-using System.Drawing;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Blazor;
 using PoeShared.Prism;
@@ -87,9 +87,10 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     public BindingsSandboxViewModel BindingsSandbox { get; }
     public BlazorSandboxViewModel BlazorSandbox { get; }
     public ICommand StartSelectionCommand { get; }
+    
+    public Color Color { get; set; }
 
-
-    public Rectangle SelectionRectangle { get; set; }
+    public System.Drawing.Rectangle SelectionRectangle { get; set; }
 
     public Rect SelectionRect { get; set; }
 

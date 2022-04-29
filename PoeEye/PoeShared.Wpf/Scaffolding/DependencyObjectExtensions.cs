@@ -39,6 +39,18 @@ public static class DependencyObjectExtensions
             parent = VisualTreeHelper.GetParent(parent);
         }
     }
+
+    public static void SetCurrentValueIfChanged<T, TValue>(
+        this T component, DependencyProperty dependencyProperty, 
+        TValue value)
+        where T : DependencyObject
+    {
+        var currentValueUntyped = component.GetValue(dependencyProperty);
+        if (currentValueUntyped is not TValue currentValue || !EqualityComparer<TValue>.Default.Equals(currentValue, value))
+        {
+            component.SetCurrentValue(dependencyProperty, value);
+        }
+    }
         
     public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty, Func<T, TValue> selector)
         where T : DependencyObject
