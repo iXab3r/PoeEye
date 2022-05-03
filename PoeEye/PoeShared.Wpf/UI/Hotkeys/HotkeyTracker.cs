@@ -162,13 +162,14 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                     {
                         Log.Debug(() => $"Skipping event, hotkey data is null: {hotkeysPair}");
                         return;
-                    }
+                    }        
                         
                     var sameHotkey = hotkeysPair.Previous?.Hotkey?.Equals(hotkeysPair.Current?.Hotkey) ?? false;
                     var sameState = hotkeysPair.Current?.KeyDown == hotkeysPair.Previous?.KeyDown;
+                    var sameTimestamp = hotkeysPair.Current?.Timestamp == hotkeysPair.Previous?.Timestamp;
                     var isMouseWheelEvent = (hotkeysPair.Current?.Hotkey?.MouseWheel ?? MouseWheelAction.None) != MouseWheelAction.None;
                         
-                    if (sameHotkey && sameState && !isMouseWheelEvent)
+                    if (sameHotkey && sameState && sameTimestamp && !isMouseWheelEvent)
                     {
                         Log.Debug(() => $"Skipping duplicate event: {hotkeysPair}");
                         return;
@@ -353,6 +354,12 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
         if (pressed.Length > 1)
         {
             Log.Warn(() => $"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToString()}");
+            return false;
+        }
+
+        if (IgnoreModifiers)
+        {
+            Log.Debug(() => $"Released modifier will be ignored: {data}");
             return false;
         }
 

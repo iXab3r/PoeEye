@@ -384,16 +384,40 @@ internal class HotkeyTrackerFixture
     }
         
     [Test]
-    public void ShouldProcessKeyWithIgnoreModifiersWhenModeIsHold()
+    [TestCase(Keys.Control)]
+    [TestCase(Keys.Alt)]
+    [TestCase(Keys.Shift)]
+    public void ShouldProcessKeyDownWithIgnoreModifiersWhenModeIsHold(Keys modifier)
     {
         //Given
         var instance = CreateInstance();
         instance.HotkeyMode = HotkeyMode.Hold;
         instance.IgnoreModifiers = true;
-        instance.Add(new HotkeyGesture(Key.A));
+        instance.Hotkey = new HotkeyGesture(Key.A);
 
         //When
-        whenKeyDown.OnNext(new KeyEventArgsExt(Keys.A | Keys.Control));
+        whenKeyDown.OnNext(new KeyEventArgsExt(Keys.A | modifier));
+
+        //Then
+        instance.IsActive.ShouldBe(true);
+    }
+    
+    [Test]
+    [TestCase(Keys.Control)]
+    [TestCase(Keys.Alt)]
+    [TestCase(Keys.Shift)]
+    public void ShouldModifierKeyUpWithIgnoreModifiersWhenModeIsHold(Keys modifier)
+    {
+        //Given
+        var instance = CreateInstance();
+        instance.HotkeyMode = HotkeyMode.Hold;
+        instance.IgnoreModifiers = true;
+        instance.Hotkey = new HotkeyGesture(Key.A);
+        whenKeyDown.OnNext(new KeyEventArgsExt(Keys.A | modifier));
+        instance.IsActive.ShouldBe(true);
+
+        //When
+        whenKeyUp.OnNext(new KeyEventArgsExt(modifier));
 
         //Then
         instance.IsActive.ShouldBe(true);
