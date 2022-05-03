@@ -11,11 +11,15 @@ namespace PoeShared.Scaffolding;
 [DoNotNotify]
 public sealed class SynchronizedObservableCollection<T> : DisposableReactiveObject, IObservableCollection<T>, IReadOnlyObservableCollection<T>
 {
+    private static long collectionIdx;
+
     private readonly ObservableCollectionExtended<T> collection = new();
-    private readonly NamedLock syncRoot = new("COC");
+    private readonly string collectionId = $"Collection<{typeof(T).Name}>#{Interlocked.Increment(ref collectionIdx)}";
+    private readonly NamedLock syncRoot;
 
     public SynchronizedObservableCollection()
     {
+        syncRoot = new NamedLock($"{collectionId} Lock");
         this.RaiseWhenSourceValue(x => x.Count, collection, x => x.Count).AddTo(Anchors);
         collection.CollectionChanged += OnCollectionChanged;
     }

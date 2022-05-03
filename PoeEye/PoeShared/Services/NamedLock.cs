@@ -14,12 +14,22 @@ public sealed class NamedLock
         Log = typeof(NamedLock).PrepareLogger().WithSuffix(ToString);
         gate = new Gate(name);
     }
-        
+#if DEBUG
+    public bool EnableLogging { get; set; }
+    
+    public bool RecordStackTraces { get; set; }
+
+#endif
     private IFluentLog Log { get; }
 
     public IDisposable Enter(TimeSpan timeout)
     {
-        Log.Debug(() => $"Acquiring lock");
+        
+#if DEBUG
+        var acquireStackTrace = RecordStackTraces ? new EnhancedStackTrace(new StackTrace()) : default(StackTrace);
+        LogIfEnabled(() => $"Acquiring lock{PrepareStackLog(acquireStackTrace)}");
+#endif
+        
         if (!Monitor.TryEnter(gate, timeout))
         {
             Log.Warn($"Failed to acquire lock in {timeout}ms");
@@ -29,20 +39,33 @@ public sealed class NamedLock
             }
             throw new TimeoutException($"Failed to acquire lock {this}");
         }
-        Log.Debug(() => $"Acquired lock");
             
 #if DEBUG
-        lockInfoByThreadId[Thread.CurrentThread.ManagedThreadId] = new StackTrace();
+        lockInfoByThreadId[Thread.CurrentThread.ManagedThreadId] = acquireStackTrace;
+        LogIfEnabled(() => $"Acquired lock");
 #endif
+        
         return Disposable.Create(() =>
         {
-            Log.Debug(() => $"Releasing lock");
+#if DEBUG
+            var releaseStackTrace = RecordStackTraces ? new EnhancedStackTrace(new StackTrace()) : default(StackTrace);
+            LogIfEnabled(() => $"Releasing lock{PrepareStackLog(releaseStackTrace)}");
+#endif
+            
             Monitor.Exit(gate);
             var isHolding = gate.IsEntered;
-            Log.Debug(() => isHolding ? $"Released, but still holding the lock" : $"Released lock");
+            LogIfEnabled(() => isHolding ? $"Released, but still holding the lock" : $"Released lock");
+
 #if DEBUG
-            if (isHolding || lockInfoByThreadId.TryRemove(Environment.CurrentManagedThreadId, out _))
+            if (isHolding)
             {
+                LogIfEnabled(() => $"Released, but still holding the lock");
+                return;
+            }
+
+            if (lockInfoByThreadId.TryRemove(Environment.CurrentManagedThreadId, out _))
+            {
+                LogIfEnabled(() => $"Released lock");
                 return;
             }
 
@@ -64,6 +87,27 @@ public sealed class NamedLock
     public override string ToString()
     {
         return $"Lock {gate.Name}, IsEntered: {gate.IsEntered}";
+    }
+
+    private string PrepareStackLog(StackTrace stackTrace)
+    {
+        if (stackTrace == null)
+        {
+            return string.Empty;
+        }
+        var allFrames = stackTrace.GetFrames() ?? Array.Empty<StackFrame>();
+        var framesToShow = allFrames.Length > 30 ? allFrames.Length / 3 : 10;
+        return $"@\n\t{allFrames.DumpToNamedTable("Frames", framesToShow)}";
+    }
+
+    private void LogIfEnabled(Func<string> messageSupplier)
+    {
+        if (!EnableLogging)
+        {
+            return;
+        }
+
+        Log.DebugIfDebug(messageSupplier);
     }
 
     private sealed class Gate

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using System.Text;
+using CommandLine;
 using DynamicData;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
@@ -37,9 +39,54 @@ public static class ObjectExtensions
 
     public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
     {
-        return instance == null ? instance.Dump() : string.Join(separator, instance.Select(x => x.Dump()));
+        return instance.DumpToTable(separator: separator, name: null, maxItemsToShow: null);
     }
 
+    public static string DumpToNamedTable<T>(this IEnumerable<T> instance, string name, string separator = "\n\t")
+    {
+        return instance.DumpToTable(separator: separator, name: name, maxItemsToShow: null);
+    }
+
+    public static string DumpToNamedTable<T>(this IEnumerable<T> instance, string name, int maxItemsToShow, string separator = "\n\t")
+    {
+        return instance.DumpToTable(separator: separator, name: name, maxItemsToShow: maxItemsToShow);
+    }
+
+    public static string DumpToTable<T>(
+        this IEnumerable<T> instance, 
+        string name,
+        string separator,
+        int? maxItemsToShow)
+    {
+        if (instance == null)
+        {
+            return instance.Dump();
+        }
+        var result = new StringBuilder();
+        var itemCount = 0;
+        foreach (var item in instance)
+        {
+            if (itemCount <= maxItemsToShow)
+            {
+                result.Append(separator);
+                result.Append(item.Dump());
+            }
+            itemCount++;
+        }
+
+        if (itemCount > maxItemsToShow)
+        {
+            result.Append(separator);
+            result.Append($"and {itemCount - maxItemsToShow} more...");
+        }
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            result.Insert(0, $"{name}({itemCount}):");
+        }
+        return result.ToString();
+    }
+    
     public static string DumpToHex(this byte[] value, int bytesPerLine = 32)
     {
         if (value == null)

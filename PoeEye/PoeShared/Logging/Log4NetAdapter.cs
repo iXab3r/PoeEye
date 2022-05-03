@@ -22,22 +22,14 @@ internal sealed class Log4NetAdapter : ILogWriter
 
     private static string GetThreadName()
     {
-        if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
+        string threadName = Thread.CurrentThread.Name switch
         {
-            return Environment.CurrentManagedThreadId.ToString();
-        }
+            ".NET ThreadPool Worker" => $"Pool",
+            ".NET Long Running Task" => $"Task",
+            _ => Thread.CurrentThread.Name
+        };
 
-        if (Thread.CurrentThread.Name == ".NET ThreadPool Worker")
-        {
-            return $"Pool#{Environment.CurrentManagedThreadId}";
-        }
-            
-        if (Thread.CurrentThread.Name == ".NET Long Running Task")
-        {
-            return $"Task#{Environment.CurrentManagedThreadId}";
-        }
-
-        return Thread.CurrentThread.Name;
+        return $"{threadName}@{Environment.CurrentManagedThreadId}";
     }
 
     /// <summary>
@@ -48,7 +40,7 @@ internal sealed class Log4NetAdapter : ILogWriter
     {
         if (ThreadContext.Properties["threadid"] is not string)
         {
-            ThreadContext.Properties["threadid"] = GetThreadName();
+            ThreadContext.Properties["threadid"] = $"{GetThreadName()}";
         }
            
         switch (logData.LogLevel)

@@ -8,15 +8,15 @@ namespace PoeShared.Bindings;
 public abstract class BindableReactiveObject : DisposableReactiveObject, IBindableReactiveObject
 {
     private static long GlobalIdx;
-    private readonly string bindableObjectId = $"O#{Interlocked.Increment(ref GlobalIdx)}";
 
     private readonly SourceCache<IReactiveBinding, string> bindings = new(x => x.TargetPropertyPath);
 
     protected BindableReactiveObject()
     {
+        ObjectId = $"O#{Interlocked.Increment(ref GlobalIdx)}";
         Log = GetType().PrepareLogger()
-            .WithSuffix(bindableObjectId)
-            .WithSuffix(ToString);
+            .WithSuffix(ToString)
+            .WithSuffix(ObjectId);
         bindings.Connect()
             .OnItemRemoved(x => x.Dispose())
             .Bind(out var bindingsList)
@@ -27,6 +27,8 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
     }
 
     protected IFluentLog Log { get; }
+    
+    protected string ObjectId { get; }
 
     public IObservableCache<IReactiveBinding, string> Bindings { get; }
 

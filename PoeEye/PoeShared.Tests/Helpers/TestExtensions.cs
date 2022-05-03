@@ -55,7 +55,8 @@ public static class TestExtensions
         throw new TimeoutException($"Value {extractor} should have not been {expected}, but became in {elapsed}ms (timeout {timeout})");
     }
     
-    public static void ValueShouldBecome<T, T1>(this T instance, Expression<Func<T, T1>> extractor, T1 expected, int timeout = 1000) where T : INotifyPropertyChanged
+    public static void ValueShouldBecome<T, T1>(this T instance, Expression<Func<T, T1>> extractor, T1 expected, int timeout = 1000) 
+        where T : INotifyPropertyChanged
     {
         T1 latest = default;
         var log = Log.WithSuffix(instance).WithSuffix(extractor.ToString()).WithSuffix($"Expected: {expected}");
