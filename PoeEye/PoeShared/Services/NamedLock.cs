@@ -1,5 +1,9 @@
 namespace PoeShared.Services;
 
+/// <summary>
+///   Class that implements locking with timeout and logging of locked threads
+///   Logging is enabled only in debug configuration due to huge performance input
+/// </summary>
 public sealed class NamedLock
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromHours(1); 
@@ -102,12 +106,14 @@ public sealed class NamedLock
 
     private void LogIfEnabled(Func<string> messageSupplier)
     {
+#if DEBUG
         if (!EnableLogging)
         {
             return;
         }
 
         Log.DebugIfDebug(messageSupplier);
+#endif
     }
 
     private sealed class Gate
