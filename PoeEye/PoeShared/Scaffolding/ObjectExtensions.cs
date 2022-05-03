@@ -5,6 +5,7 @@ using CommandLine;
 using DynamicData;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
+using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
 
@@ -262,5 +263,20 @@ public static class ObjectExtensions
     public static TValue Eval<T, TValue>(this T instance, Func<T, TValue> extractor) where T : class
     {
         return EvalOrDefault(instance, extractor, default);
+    }
+
+    public static PropertyAccessor<TValue> GetPropertyAccessor<TValue>(
+        this object source, 
+        string propertyPath)
+    {
+        return new PropertyAccessor<TValue>(source, propertyPath);
+    }
+    
+    public static PropertyAccessor<TValue> GetPropertyAccessor<TSource, TValue>(
+        this TSource source, 
+        Expression<Func<TSource, TValue>> valueAccessor)
+    {
+        var propertyPath = Reflection.ExpressionToPropertyNames(valueAccessor.Body);
+        return new PropertyAccessor<TValue>(source, propertyPath);
     }
 }

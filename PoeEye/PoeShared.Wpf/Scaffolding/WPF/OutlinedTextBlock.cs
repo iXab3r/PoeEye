@@ -83,7 +83,7 @@ public class OutlinedTextBlock : FrameworkElement
         "TextWrapping",
         typeof(TextWrapping),
         typeof(OutlinedTextBlock),
-        new FrameworkPropertyMetadata(TextWrapping.NoWrap, OnFormattedTextUpdated));
+        new FrameworkPropertyMetadata(TextWrapping.Wrap, OnFormattedTextUpdated));
 
     private PathGeometry clipGeometry;
     private FormattedText formattedText;

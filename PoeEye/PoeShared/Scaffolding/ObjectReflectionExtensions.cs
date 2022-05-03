@@ -7,10 +7,10 @@ namespace PoeShared.Scaffolding;
 //FIXME Should be rewritten to expression trees
 public static class ObjectReflectionExtensions
 {
-    private static readonly ConcurrentDictionary<(Type type, string propertyName), PropertyInfo> PropertyAccessorByName = new ConcurrentDictionary<(Type type, string propertyName), PropertyInfo>();
+    private static readonly ConcurrentDictionary<(Type type, string propertyName), PropertyInfo> PropertyAccessorByName = new();
 
     private static readonly Regex PropertyPathRegexValidator = new Regex(@"^[\w\.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
+    
     public static T GetPropertyValue<T>(this object model, string propertyPath)
     {
         var propertyInfo = GetProperty(model, propertyPath);
@@ -126,4 +126,5 @@ public static class ObjectReflectionExtensions
         var root = rootProperty.propertyInfo.GetValue(model);
         return GetProperty(root, propertyParts.Skip(1).JoinStrings("."));
     }
+    
 }
