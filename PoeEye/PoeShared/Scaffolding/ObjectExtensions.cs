@@ -67,7 +67,7 @@ public static class ObjectExtensions
         var itemCount = 0;
         foreach (var item in instance)
         {
-            if (itemCount <= maxItemsToShow)
+            if (!maxItemsToShow.HasValue || itemCount <= maxItemsToShow)
             {
                 result.Append(separator);
                 result.Append(item.Dump());

@@ -73,6 +73,12 @@ public static class EnumerableExtensions
         return new ReadOnlyObservableCollection<T>(enumerable.ToObservableCollection());
     }
         
+    public static IDictionary<TKey, TValue> ToDictionaryWithReplacement<T, TKey, TValue>(this IEnumerable<T> enumerable,
+        Func<T, TKey> keyExtractor,
+        Func<T, TValue> valueExtractor)
+    {
+        return ToDictionary(enumerable, keyExtractor, valueExtractor, tuple => tuple.newValue);
+    }
     public static IDictionary<TKey, TValue> ToDictionaryWithThrow<T, TKey, TValue>(this IEnumerable<T> enumerable,
         Func<T, TKey> keyExtractor,
         Func<T, TValue> valueExtractor)
