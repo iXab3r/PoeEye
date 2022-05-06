@@ -81,6 +81,64 @@ public static class ChangeSetExtensions
         value = default;
         return false;
     }
+    
+    public static IObservable<IChangeSet<TOut>> SwitchCollectionIf<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Predicate<TIn> condition,
+        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector,
+        [NotNull] Func<TIn, IObservableList<TOut>> falseSelector)
+    {
+        return observable
+            .Select(x => condition(x) ? trueSelector(x) : falseSelector(x))
+            .Switch();
+    }
+
+    public static IObservable<IChangeSet<TOut>> SwitchCollectionIf<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Predicate<TIn> condition,
+        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
+    {
+        return SwitchCollectionIf(observable,  condition, trueSelector, x => new SourceList<TOut>());
+    }
+
+    public static IObservable<IChangeSet<TOut>> SwitchCollectionIfNotDefault<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
+    {
+        return SwitchCollectionIfNotDefault(observable, trueSelector, x => new SourceList<TOut>());
+    }
+
+    public static IObservable<IChangeSet<TOut>> SwitchCollectionIfNotDefault<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector,
+        [NotNull] Func<TIn, IObservableList<TOut>> falseSelector)
+    {
+        return SwitchCollectionIf(observable, x => !EqualityComparer<TIn>.Default.Equals(default, x), trueSelector);
+    }
+    
+    public static T GetOrAdd<T, TKey>(
+        this ISourceCache<T, TKey> instance, 
+        TKey key,
+        Func<TKey, T> factoryFunc)
+    {
+        var result = Optional<T>.None;
+        instance.Edit(items =>
+        {
+            var existingItem = items.Lookup(key);
+            if (existingItem.HasValue)
+            {
+                result = existingItem;
+            }
+                    
+            var newItem = factoryFunc(key);
+            result = Optional<T>.Create(newItem);
+        });
+        if (!result.HasValue)
+        {
+            throw new InvalidStateException($"Failed to get or add new item for key {key}");
+        }
+        return result.Value;
+    }
 
     public static ISourceList<T> ToSourceList<T>(this IEnumerable<T> items)
     {
