@@ -15,7 +15,7 @@ using SharpCompress.Readers;
 using Splat;
 using Squirrel;
 using ChecksumFailedException = PoeShared.Squirrel.Scaffolding.ChecksumFailedException;
-using ReleasePackage = PoeShared.Squirrel.Scaffolding.ReleasePackage;
+using ReleasePackage = PoeShared.Squirrel.Core.ReleasePackage;
 
 namespace PoeShared.Squirrel.Core;
 

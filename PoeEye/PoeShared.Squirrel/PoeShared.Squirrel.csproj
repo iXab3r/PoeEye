@@ -35,15 +35,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PoeShared.Squirrel.Shared\PoeShared.Squirrel.Shared.csproj" />
       <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
       <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
       <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="obj\Debug\net5-windows7\Updater\ApplicationUpdaterView.baml" />
-      <Content Include="obj\Debug\net5-windows7\Updater\UpdaterWindow.baml" />
-      <Content Include="obj\Debug\net5-windows7\Updater\UpdateSettingsView.baml" />
     </ItemGroup>
 
 </Project>

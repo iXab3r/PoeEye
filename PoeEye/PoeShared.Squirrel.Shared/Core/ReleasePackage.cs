@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using NuGet;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
+using PoeShared.Squirrel.Scaffolding;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Readers;
 using Splat;
 using Squirrel;
 
-namespace PoeShared.Squirrel.Scaffolding;
+namespace PoeShared.Squirrel.Core;
 
 public class ReleasePackage : IEnableLogger, IReleasePackage
 {

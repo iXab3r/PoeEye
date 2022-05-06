@@ -15,7 +15,7 @@ using Squirrel;
 using Squirrel.Shell;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
-using ReleasePackage = PoeShared.Squirrel.Scaffolding.ReleasePackage;
+using ReleasePackage = PoeShared.Squirrel.Core.ReleasePackage;
 
 namespace PoeShared.Squirrel.Core;
 

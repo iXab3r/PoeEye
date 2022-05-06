@@ -1,4 +1,4 @@
-using ReleasePackage = PoeShared.Squirrel.Scaffolding.ReleasePackage;
+using ReleasePackage = PoeShared.Squirrel.Core.ReleasePackage;
 
 namespace PoeShared.Squirrel.Core;
 

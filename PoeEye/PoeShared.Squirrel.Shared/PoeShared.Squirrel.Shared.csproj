@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <WarningsAsErrors />
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
+        <RootNamespace>PoeShared.Squirrel</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="squirrel.windows" Version="1.9.0"><NoWarn>NU1701;NU1608</NoWarn></PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+    </ItemGroup>
+    
+</Project>
