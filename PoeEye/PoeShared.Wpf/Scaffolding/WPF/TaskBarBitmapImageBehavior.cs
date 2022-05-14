@@ -3,7 +3,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Interactivity;
-using Hardcodet.Wpf.TaskbarNotification;
+using H.NotifyIcon;
 using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF;
