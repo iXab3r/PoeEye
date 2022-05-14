@@ -21,7 +21,7 @@ public readonly struct MicrophoneLineData
 
     public override string ToString()
     {
-        return $"{nameof(LineId)}: {LineId}, {nameof(Name)}: {Name}";
+        return $"{nameof(Name)}: {Name}, {nameof(LineId)}: {LineId}";
     }
 
     public bool Equals(MicrophoneLineData other)

@@ -1,17 +1,13 @@
-﻿using System.Windows;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Interactivity;
+﻿using System.Windows.Input;
 
 namespace PoeShared.Scaffolding.WPF;
 
-public sealed class OpenContextMenuOnClickBehavior : Behavior<FrameworkElement>
+public sealed class OpenContextMenuOnClickBehavior : OpenContextMenuBehavior
 {
     protected override void OnAttached()
     {
         base.OnAttached();
         AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObjectOnPreviewMouseLeftButtonDown;
-
     }
 
     protected override void OnDetaching()
@@ -22,18 +18,7 @@ public sealed class OpenContextMenuOnClickBehavior : Behavior<FrameworkElement>
 
     private void AssociatedObjectOnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (AssociatedObject?.ContextMenu == null)
-        {
-            return;
-        }
-        if (AssociatedObject.ContextMenu.IsOpen)
-        {
-            return;
-        }
-
-        AssociatedObject.ContextMenu.Placement = PlacementMode.Bottom;
-        AssociatedObject.ContextMenu.PlacementTarget = AssociatedObject;
-        AssociatedObject.ContextMenu.IsOpen = true;
+        OpenContextMenu();
         e.Handled = true;
     }
 }

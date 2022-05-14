@@ -32,15 +32,17 @@
         <TextBlock Text="{Binding Name}" />
     </DataTemplate>
     
-    <DataTemplate x:Key="NotificationTypeWrapperCheckBox" DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
+    <DataTemplate x:Key="NotificationTypeWrapperCheckBox" 
+                  DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
         <StackPanel Orientation="Horizontal" MinWidth="150">
             <eye:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
                          CommandParameter="{Binding}"
                          Width="26" Height="26" FontSize="22"
                          Style="{StaticResource FastButtonExStyle}"
-                         Padding="0" 
+                         ToolTip="{Binding Name, Converter={StaticResource StringFormatConverter}, ConverterParameter='Test notification {0}'}"
                          Icon="&#xf144;"/>
             <CheckBox Margin="5,0,0,0" IsHitTestVisible="False"
+                      ToolTip="{Binding Name, Converter={StaticResource StringFormatConverter}, ConverterParameter='Enable notification {0}'}"
                       IsChecked="{Binding IsSelected, Mode=OneWay}" Content="{Binding Name}" />
         </StackPanel>
     </DataTemplate>
@@ -80,7 +82,6 @@
         <Viewbox>
             <ToggleButton IsChecked="{Binding AudioEnabled}"
                           FontFamily="{StaticResource FontAwesome}"
-                          Focusable="False"
                           Content="&#xf05e;"
                           ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
                           materialDesign:ToggleButtonAssist.OnContent="&#xf028;"
@@ -105,6 +106,8 @@
                 
                 <i:Interaction.Behaviors>
                     <wpf:OpenContextMenuOnClickBehavior/>
+                    <wpf:OpenContextMenuOnKeyBehavior Key="Space"/>
+                    <wpf:OpenContextMenuOnKeyBehavior Key="Enter"/>
                 </i:Interaction.Behaviors>
             </ToggleButton>
         </Viewbox>
