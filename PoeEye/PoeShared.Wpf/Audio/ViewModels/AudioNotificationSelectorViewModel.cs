@@ -50,7 +50,7 @@ internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObj
             AudioNotificationType.Wob
         }.Select(x => x.ToString()).ToArray();
 
-        var dynamicNotifications = new SourceList<string>()
+        var dynamicNotifications = new SourceListEx<string>()
             .Connect()
             .Or(
                 new ObservableCollection<string>(defaultNotifications).ToObservableChangeSet(),

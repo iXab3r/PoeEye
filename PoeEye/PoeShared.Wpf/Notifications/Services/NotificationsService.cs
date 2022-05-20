@@ -32,7 +32,7 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
         this.notificationContainerFactory = notificationContainerFactory;
         overlayWindowController.IsEnabled = true;
 
-        itemsSource = new SourceList<INotificationContainerViewModel>().AddTo(Anchors);
+        itemsSource = new SourceListEx<INotificationContainerViewModel>().AddTo(Anchors);
         itemsSource
             .Connect()
             .DisposeMany()

@@ -11,7 +11,7 @@ internal sealed class JsonConfigSerializer : IConfigSerializer
 {
     private static readonly IFluentLog Log = typeof(JsonConfigSerializer).PrepareLogger();
 
-    private readonly SourceList<JsonConverter> converters = new();
+    private readonly SourceListEx<JsonConverter> converters = new();
     private readonly int MaxCharsToLog = 1024;
 
     private JsonSerializerSettings jsonSerializerSettings;

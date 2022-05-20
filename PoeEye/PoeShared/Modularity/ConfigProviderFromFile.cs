@@ -19,7 +19,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     private readonly IConfigSerializer configSerializer;
 
     private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigsByType = new();
-    private readonly SourceList<IConfigProviderStrategy> strategies = new();
+    private readonly SourceListEx<IConfigProviderStrategy> strategies = new();
     private readonly NamedLock fileLock = new("ConfigLock");
     private string loadedConfigurationFile;
 

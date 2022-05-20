@@ -10,6 +10,13 @@ namespace PoeShared.Scaffolding;
 
 public static class ChangeSetExtensions
 {
+    public static T EditGet<TItem, T>(this ISourceList<TItem> source, Func<IExtendedList<TItem>, T> supplier)
+    {
+        T result = default;
+        source.Edit(list => result = supplier(list));
+        return result;
+    }
+    
     public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this IObservableList<T> source)
     {
         return source.Connect();
@@ -36,7 +43,7 @@ public static class ChangeSetExtensions
     {
         Guard.ArgumentNotNull(source, nameof(source));
 
-        return new SourceList<T>(source);
+        return new SourceListEx<T>(source);
     }
     
     public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
@@ -98,14 +105,14 @@ public static class ChangeSetExtensions
         [NotNull] Predicate<TIn> condition,
         [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
     {
-        return SwitchCollectionIf(observable,  condition, trueSelector, x => new SourceList<TOut>());
+        return SwitchCollectionIf(observable,  condition, trueSelector, x => new SourceListEx<TOut>());
     }
 
     public static IObservable<IChangeSet<TOut>> SwitchCollectionIfNotDefault<TIn, TOut>(
         this IObservable<TIn> observable,
         [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
     {
-        return SwitchCollectionIfNotDefault(observable, trueSelector, x => new SourceList<TOut>());
+        return SwitchCollectionIfNotDefault(observable, trueSelector, x => new SourceListEx<TOut>());
     }
 
     public static IObservable<IChangeSet<TOut>> SwitchCollectionIfNotDefault<TIn, TOut>(
@@ -142,7 +149,7 @@ public static class ChangeSetExtensions
 
     public static ISourceList<T> ToSourceList<T>(this IEnumerable<T> items)
     {
-        var result = new SourceList<T>();
+        var result = new SourceListEx<T>();
         result.AddRange(items);
         return result;
     }
@@ -152,7 +159,7 @@ public static class ChangeSetExtensions
     {
         Guard.ArgumentNotNull(lists, nameof(lists));
 
-        var result = new SourceList<ISourceList<T>>();
+        var result = new SourceListEx<ISourceList<T>>();
         lists.ForEach(result.Add);
 
         return result.Or().ToSourceList();
@@ -230,7 +237,7 @@ public static class ChangeSetExtensions
 
     public static ISourceList<T> Concat<T>(this ISourceList<T> list, params T[] items)
     {
-        var newList = new SourceList<T>();
+        var newList = new SourceListEx<T>();
         newList.AddRange(items);
         return list.Concat(newList);
     }

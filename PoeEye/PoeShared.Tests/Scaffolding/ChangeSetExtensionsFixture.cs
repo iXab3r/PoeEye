@@ -15,7 +15,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
     {
         //Given
         var target = new SourceCache<(string, int), string>(x => x.Item1);
-        var source = new SourceList<(string, int)>();
+        var source = new SourceListEx<(string, int)>();
         using var anchor = target.PopulateFrom(source);
 
         //When
@@ -31,7 +31,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
     {
         //Given
         var target = new SourceCache<(string, int), string>(x => x.Item1);
-        var source = new SourceList<(string, int)>();
+        var source = new SourceListEx<(string, int)>();
         using var anchor = target.PopulateFrom(source);
         source.Add(("test", 1));
         target.Lookup("test").Value.ShouldBe(("test", 1));
@@ -48,7 +48,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
     {
         //Given
         var target = new SourceCache<(string, int), string>(x => x.Item1);
-        var source = new SourceList<(string, int)>();
+        var source = new SourceListEx<(string, int)>();
         using var anchor = target.PopulateFrom(source);
         source.Add(("test", 1));
         target.Lookup("test").Value.ShouldBe(("test", 1));

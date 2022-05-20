@@ -17,7 +17,7 @@ internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophone
     private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 
-    private readonly SourceList<MicrophoneLineData> microphoneLines = new();
+    private readonly SourceListEx<MicrophoneLineData> microphoneLines = new();
     private readonly MultimediaNotificationClient notificationClient = new();
     private readonly MMDeviceEnumerator deviceEnumerator;
 

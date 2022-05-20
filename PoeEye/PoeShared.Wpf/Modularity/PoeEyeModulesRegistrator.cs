@@ -1,4 +1,5 @@
 ﻿using DynamicData;
+using PoeShared.Scaffolding;
 using Unity;
 
 namespace PoeShared.Modularity;
@@ -7,7 +8,7 @@ internal sealed class PoeEyeModulesRegistrator : IPoeEyeModulesRegistrator, IPoe
 {
     private readonly IUnityContainer container;
 
-    private readonly SourceList<ISettingsViewModel> settings = new();
+    private readonly SourceListEx<ISettingsViewModel> settings = new();
 
     public PoeEyeModulesRegistrator(IUnityContainer container)
     {

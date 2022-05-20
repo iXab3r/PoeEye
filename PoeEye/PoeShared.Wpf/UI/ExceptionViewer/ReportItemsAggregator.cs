@@ -20,7 +20,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
     private readonly IClock clock;
     private readonly IAppArguments appArguments;
 
-    private readonly SourceList<ExceptionReportItem> reportItems = new();
+    private readonly SourceListEx<ExceptionReportItem> reportItems = new();
 
     public ReportItemsAggregator(
         ExceptionDialogConfig config,

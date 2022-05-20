@@ -23,10 +23,10 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
     private static readonly IFluentLog Log = typeof(KeyboardEventsSource).PrepareLogger();
     private readonly IClock clock;
     private readonly IScheduler inputScheduler;
-    private readonly SourceList<IKeyboardEventFilter> keyboardEventFilters = new();
+    private readonly SourceListEx<IKeyboardEventFilter> keyboardEventFilters = new();
 
     private readonly IKeyboardMouseEventsProvider keyboardMouseEventsProvider;
-    private readonly SourceList<IMouseEventFilter> mouseEventFilters = new();
+    private readonly SourceListEx<IMouseEventFilter> mouseEventFilters = new();
 
     public KeyboardEventsSource(
         IKeyboardMouseEventsProvider keyboardMouseEventsProvider,

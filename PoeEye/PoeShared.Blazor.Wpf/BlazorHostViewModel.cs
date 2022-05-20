@@ -12,7 +12,7 @@ public class BlazorHostViewModel : DisposableReactiveObject
 {
     public BlazorHostViewModel()
     {
-        Components = new SourceList<Type>();
+        Components = new SourceListEx<Type>();
         this.WhenAnyValue(x => x.View)
             .Where(x => x != null)
             .Take(1)

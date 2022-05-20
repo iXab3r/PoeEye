@@ -34,7 +34,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
     private readonly ConcurrentDictionary<Type, MethodInfo> reloadConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
     private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
 
-    private readonly ISourceList<ISettingsViewModel> moduleSettings = new SourceList<ISettingsViewModel>();
+    private readonly ISourceList<ISettingsViewModel> moduleSettings = new SourceListEx<ISettingsViewModel>();
         
     public GenericSettingsViewModel(
         [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,

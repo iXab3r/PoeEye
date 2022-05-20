@@ -18,7 +18,7 @@ internal class ComplexSoundLibrary : DisposableReactiveObject, ISoundLibrarySour
     public ComplexSoundLibrary(ISoundLibrarySource[] sources)
     {
         this.sources = sources;
-        new SourceList<string>().Connect()
+        new SourceListEx<string>().Connect()
             .Or(sources.Select(x => x.SourceName.ToObservableChangeSet()).ToArray())
             .Transform(x => x.ToLowerInvariant())
             .AddKey(x => x)

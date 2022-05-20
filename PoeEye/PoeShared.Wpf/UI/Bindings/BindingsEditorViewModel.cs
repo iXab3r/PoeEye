@@ -16,7 +16,7 @@ internal sealed class BindingsEditorViewModel : DisposableReactiveObject, IBindi
 
     public BindingsEditorViewModel()
     {
-        var bindablePropertiesSource = new SourceList<PropertyInfo>();
+        var bindablePropertiesSource = new SourceListEx<PropertyInfo>();
         bindablePropertiesSource
             .Connect()
             .Bind(out var bindableProperties)

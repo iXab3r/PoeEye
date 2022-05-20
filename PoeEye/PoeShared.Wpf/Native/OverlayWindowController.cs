@@ -25,7 +25,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
 
     private readonly IScheduler uiScheduler;
 
-    private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
+    private readonly ISourceList<OverlayWindowView> windows = new SourceListEx<OverlayWindowView>();
     private readonly IWindowTracker windowTracker;
 
     public OverlayWindowController(

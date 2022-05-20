@@ -21,7 +21,7 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
     private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
     private static readonly IComparer<ITreeViewItemViewModel> DefaultComparer = new SortExpressionComparer<ITreeViewItemViewModel>();
 
-    private readonly SourceList<ITreeViewItemViewModel> children = new();
+    private readonly SourceListEx<ITreeViewItemViewModel> children = new();
     protected readonly Fallback<string> TabName = new();
     private readonly ObservableAsPropertyHelper<bool> parentIsExpanded;
 

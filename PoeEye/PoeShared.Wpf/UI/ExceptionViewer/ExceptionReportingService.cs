@@ -25,7 +25,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
     private readonly IApplicationAccessor applicationAccessor;
     private readonly IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory;
     private readonly IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer;
-    private readonly SourceList<IExceptionReportItemProvider> reportItemProviders = new();
+    private readonly SourceListEx<IExceptionReportItemProvider> reportItemProviders = new();
     private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
     private IExceptionReportHandler reportHandler;
 
