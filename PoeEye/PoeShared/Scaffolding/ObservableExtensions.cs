@@ -176,6 +176,25 @@ public static class ObservableExtensions
             }
         });
     }
+    
+    public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(
+        this IObservable<TIn> observable, 
+        [NotNull] Func<TIn, TOut> onNext,
+        [NotNull] Func<TIn, TException, TOut> onError)
+        where TException : Exception
+    {
+        return observable.Select(input =>
+        {
+            try
+            {
+                return onNext(input);
+            }
+            catch (TException e)
+            {
+                return onError(input, e);
+            }
+        });
+    }
         
     public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext, [NotNull] Action<Exception> onError)
     {

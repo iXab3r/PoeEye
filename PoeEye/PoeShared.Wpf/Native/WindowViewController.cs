@@ -38,11 +38,13 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
         WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
 
         this.WhenAnyValue(x => x.Topmost)
+            .ObserveOn(Window.Dispatcher)
             .SubscribeSafe(x => owner.Topmost = x, Log.HandleUiException)
             .AddTo(Anchors);
 
         WhenDeactivated
             .Where(_ => Topmost)
+            .ObserveOn(Window.Dispatcher)
             .SubscribeSafe(() =>
             {
                 Log.Debug(() => $"Window is deactivated, reactivating {nameof(Topmost)} style");
