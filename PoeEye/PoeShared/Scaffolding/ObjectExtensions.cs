@@ -16,6 +16,16 @@ public static class ObjectExtensions
     private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> ReadablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
     private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> WriteablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
 
+    public static string ToJson<T>(this T instance)
+    {
+        if (instance == null)
+        {
+            return $"null<{typeof(T)}>";
+        }
+
+        return JsonConvert.SerializeObject(instance);
+    }
+    
     public static string Dump<T>(this T instance)
     {
         return ToStringSafe(instance);
