@@ -54,7 +54,25 @@ public static class TestExtensions
         var elapsed = sw.ElapsedMilliseconds;
         throw new TimeoutException($"Value {extractor} should have not been {expected}, but became in {elapsed}ms (timeout {timeout})");
     }
-    
+
+    public static void ShouldBecome<T, T1>(this T instance, Func<T, T1> extractor, T1 expected, int timeout = 1000)
+    {
+        var log = Log.WithSuffix(instance).WithSuffix(extractor.ToString()).WithSuffix($"Expected: {expected}");
+
+        var sw = Stopwatch.StartNew();
+
+        while (sw.ElapsedMilliseconds < timeout)
+        {
+            var value = extractor(instance);
+            if (EqualityComparer<T1>.Default.Equals(value, expected))
+            {
+                break;
+            }
+        }
+        var finalValue = extractor(instance);
+        finalValue.ShouldBe(expected);
+    }
+
     public static void ValueShouldBecome<T, T1>(this T instance, Expression<Func<T, T1>> extractor, T1 expected, int timeout = 1000) 
         where T : INotifyPropertyChanged
     {

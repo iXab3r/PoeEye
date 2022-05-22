@@ -169,7 +169,10 @@ public static class EnumerableExtensions
         return permutations.SelectMany(x => x);
     }
 
-    public static IEnumerable<TResult> SelectSafe<T, TResult>(this IEnumerable<T> source, Func<T, TResult> selector)
+    public static IEnumerable<TResult> SelectSafe<T, TResult>(
+        this IEnumerable<T> source,
+        Func<T, TResult> selector,
+        Action<T, Exception> errorConsumer)
     {
         foreach (var item in source)
         {
@@ -180,10 +183,11 @@ public static class EnumerableExtensions
                 result = selector(item);
                 success = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 success = false;
                 result = default;
+                errorConsumer(item, ex);
             }
 
             if (success)
@@ -191,5 +195,10 @@ public static class EnumerableExtensions
                 yield return result;
             }
         }
+    }
+    
+    public static IEnumerable<TResult> SelectSafe<T, TResult>(this IEnumerable<T> source, Func<T, TResult> selector)
+    {
+        return SelectSafe(source, selector, (_, _) => { });
     }
 }
