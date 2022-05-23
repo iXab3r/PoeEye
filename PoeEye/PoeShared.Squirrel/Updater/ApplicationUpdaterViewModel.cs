@@ -103,6 +103,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         this.RaiseWhenSourceValue(x => x.LatestAppliedVersion, updaterModel, x => x.LatestAppliedVersion, uiScheduler).AddTo(Anchors);
         this.RaiseWhenSourceValue(x => x.IgnoreDeltaUpdates, updaterModel, x => x.IgnoreDeltaUpdates, uiScheduler).AddTo(Anchors);
         this.RaiseWhenSourceValue(x => x.ProgressPercent, updaterModel, x => x.ProgressPercent, uiScheduler).AddTo(Anchors);
+        this.RaiseWhenSourceValue(x => x.LauncherExecutable, updaterModel, x => x.LauncherExecutable, uiScheduler).AddTo(Anchors);
         this.RaiseWhenSourceValue(x => x.UpdateSource, updaterModel, x => x.UpdateSource, uiScheduler).AddTo(Anchors);
 
         RestartCommand = CommandWrapper
@@ -188,10 +189,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public CommandWrapper OpenUri { get; }
 
-    public FileInfo GetLatestExecutable()
-    {
-        return updaterModel.GetLatestExecutable();
-    }
+    public FileInfo LauncherExecutable => updaterModel.LauncherExecutable;
 
     public async Task PrepareForceUpdate(IReleaseEntry targetRelease)
     {
@@ -347,7 +345,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             IsOpen = true;
             SetStatus("Restarting application...");
 
-            await updaterModel.RestartApplication();
+            await updaterModel.RestartApplicationViaLauncher();
         }
         catch (Exception ex)
         {

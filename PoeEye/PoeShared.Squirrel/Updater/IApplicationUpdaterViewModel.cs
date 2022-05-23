@@ -43,8 +43,8 @@ public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     bool CheckForUpdates { get; set; }
 
     [NotNull] CommandWrapper OpenUri { get; }
-
-    FileInfo GetLatestExecutable();
+    
+    FileInfo LauncherExecutable { get; }
 
     Task PrepareForceUpdate(IReleaseEntry targetRelease);
 }

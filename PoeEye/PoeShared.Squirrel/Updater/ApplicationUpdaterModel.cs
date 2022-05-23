@@ -31,9 +31,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     static ApplicationUpdaterModel()
     {
-        Binder
-            .Bind(x => new DirectoryInfo(Path.Combine(x.RootDirectory.FullName, x.appArguments.AppName)))
-            .To(x => x.AppRootDirectory);
     }
  
     public ApplicationUpdaterModel(
@@ -57,18 +54,21 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             }, Log.HandleUiException)
             .AddTo(Anchors);
             
-        var currentProcessName = Process.GetCurrentProcess().ProcessName + ".exe";
-        Log.Debug(() => $"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
-        ApplicationExecutableFileName = $"{appArguments.AppName}.exe";
-        Log.Debug(() => $"Application will be started via executing {ApplicationExecutableFileName}");
+        Log.Debug(() => $"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
+        AppRootDirectory = new DirectoryInfo(Path.Combine(RootDirectory.FullName, appArguments.AppName));
+        RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
+        LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
+        Log.Debug(() => $"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    public string ApplicationExecutableFileName { get; }
-    
     public DirectoryInfo RootDirectory { get; }
     
-    public DirectoryInfo AppRootDirectory { get; [UsedImplicitly] private set; }
+    public FileInfo RunningExecutable { get; }
+    
+    public FileInfo LauncherExecutable { get; }
+
+    public DirectoryInfo AppRootDirectory { get; }
 
     public DirectoryInfo MostRecentVersionAppFolder { get; set; }
 
@@ -182,40 +182,31 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         LatestUpdate = updateInfo;
     }
 
-    public async Task RestartApplication()
+    public Task RestartApplication()
+    {
+        return Restart(RunningExecutable);
+    }
+
+    public Task RestartApplicationViaLauncher()
+    {
+        return Restart(LauncherExecutable);
+    }
+
+    private async Task Restart(FileInfo executable)
     {
         using var unused = CreateIsBusyAnchor();
             
-        var executable = GetLatestExecutable();
         Log.Debug(
-            $"Restarting app, folder: {MostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
+            $"Restarting app, {executable}...");
 
-        var appArgs = new StringBuilder();
-        if (appArguments.IsDebugMode)
-        {
-            appArgs.Append($" -d");
-        }
-
-        Log.Debug(() => $"Starting application @ '{executable.FullName}', args: {appArgs} ...");
-        var updaterProcess = Process.Start(executable.FullName, appArgs.ToString());
+        Log.Debug(() => $"Starting application @ '{executable.FullName}', args: {appArguments.StartupArgs} ...");
+        var updaterProcess = Process.Start(executable.FullName, appArguments.StartupArgs);
         if (updaterProcess == null)
         {
             throw new FileNotFoundException($"Failed to start application @ '{executable.FullName}'");
         }
         Log.Debug(() => $"Process spawned, PID: {updaterProcess.Id}");
         await applicationAccessor.Exit();
-    }
-
-    public FileInfo GetLatestExecutable()
-    {
-        var appExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, ApplicationExecutableFileName));
-        Log.Debug(() => $"Application executable: {appExecutable} (exists: {appExecutable.Exists})");
-        Log.Debug(() => $"Running executable cmd line: {Environment.CommandLine}, app domain directory: {AppDomain.CurrentDomain.BaseDirectory}");
-        if (!appExecutable.Exists)
-        {
-            throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
-        }
-        return appExecutable;
     }
 
     private async Task<IPoeUpdateManager> CreateManager()

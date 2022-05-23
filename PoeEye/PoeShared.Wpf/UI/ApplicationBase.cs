@@ -55,6 +55,19 @@ public abstract class ApplicationBase : Application
             Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
 
             appArguments = Container.Resolve<IAppArguments>();
+            if (appArguments.IsDebugMode)
+            {
+                Log.Info(() => $"Attaching debugger");
+                if (Debugger.Launch())
+                {
+                    Log.Info(() => $"Attached debugger");
+                }
+                else
+                {
+                    Log.Warn("Failed to attach debugger");
+                }
+            }
+            
             metrics = Container.Resolve<IMetricsRoot>();
             InitializeLogging();
             Log.Debug(() => $"CmdLine: {Environment.CommandLine}");
