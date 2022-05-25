@@ -89,6 +89,17 @@ public static class ChangeSetExtensions
         return false;
     }
     
+    public static IObservable<IChangeSet<TOut, TKey>> SwitchCollectionIf<TIn, TOut, TKey>(
+        this IObservable<TIn> observable,
+        [NotNull] Predicate<TIn> condition,
+        [NotNull] Func<TIn, IObservableCache<TOut, TKey>> trueSelector,
+        [NotNull] Func<TIn, IObservableCache<TOut, TKey>> falseSelector)
+    {
+        return observable
+            .Select(x => condition(x) ? trueSelector(x) : falseSelector(x))
+            .Switch();
+    }
+    
     public static IObservable<IChangeSet<TOut>> SwitchCollectionIf<TIn, TOut>(
         this IObservable<TIn> observable,
         [NotNull] Predicate<TIn> condition,
@@ -107,18 +118,25 @@ public static class ChangeSetExtensions
     {
         return SwitchCollectionIf(observable,  condition, trueSelector, x => new SourceListEx<TOut>());
     }
-
-    public static IObservable<IChangeSet<TOut>> SwitchCollectionIfNotDefault<TIn, TOut>(
+    
+    public static IObservable<IChangeSet<TOut, TKey>> SwitchCollectionIf<TIn, TOut, TKey>(
         this IObservable<TIn> observable,
-        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
+        [NotNull] Predicate<TIn> condition,
+        [NotNull] Func<TIn, IObservableCache<TOut, TKey>> trueSelector)
     {
-        return SwitchCollectionIfNotDefault(observable, trueSelector, x => new SourceListEx<TOut>());
+        return SwitchCollectionIf(observable,  condition, trueSelector, x => new IntermediateCache<TOut, TKey>());
+    }
+    
+    public static IObservable<IChangeSet<TOut, TKey>> SwitchCollectionIfNotDefault<TIn, TOut, TKey>(
+        this IObservable<TIn> observable,
+        [NotNull] Func<TIn, IObservableCache<TOut, TKey>> trueSelector)
+    {
+        return SwitchCollectionIf(observable, x => !EqualityComparer<TIn>.Default.Equals(default, x), trueSelector);
     }
 
     public static IObservable<IChangeSet<TOut>> SwitchCollectionIfNotDefault<TIn, TOut>(
         this IObservable<TIn> observable,
-        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector,
-        [NotNull] Func<TIn, IObservableList<TOut>> falseSelector)
+        [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
     {
         return SwitchCollectionIf(observable, x => !EqualityComparer<TIn>.Default.Equals(default, x), trueSelector);
     }
