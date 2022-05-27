@@ -5,7 +5,27 @@ namespace PoeShared.Scaffolding;
 
 public abstract class DisposableReactiveObject : IDisposableReactiveObject
 {
-    public CompositeDisposable Anchors { get; } = new CompositeDisposable();
+    private readonly IFluentLog log;
+    private readonly INpcEventInvoker propertyChanged;
+
+    protected DisposableReactiveObject()
+    {
+        propertyChanged = new ConcurrentNpcEventInvoker(this);
+        log = GetType().PrepareLogger().WithPrefix(ToString);
+    }
+
+    public CompositeDisposable Anchors { get; } = new();
+
+    public event PropertyChangedEventHandler PropertyChanged
+    {
+        add => propertyChanged.Add(value);
+        remove => propertyChanged.Remove(value);
+    }
+
+    public void RaisePropertyChanged(string propertyName)
+    {
+        propertyChanged.Raise(propertyName);
+    }
 
     public virtual void Dispose()
     {
@@ -25,20 +45,14 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         return RaiseAndSet(ref backingField, newValue, propertyName);
     }
 
-    protected TRet RaiseAndSet<TRet>(ref TRet backingField,
+    protected TRet RaiseAndSet<TRet>(
+        ref TRet backingField,
         TRet newValue,
         [CallerMemberName] string propertyName = null)
     {
         backingField = newValue;
         RaisePropertyChanged(propertyName);
         return newValue;
-    }
-        
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public void RaisePropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     protected void AddDisposableResources<T>(Func<IEnumerable<T>> itemsSupplier) where T : IDisposable
@@ -60,6 +74,19 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
             item?.Dispose();
         }).AddTo(Anchors);
     }
+    
+    protected void EnsureNotDisposed()
+    {
+        if (Anchors.IsDisposed)
+        {
+            throw new ObjectDisposedException($"Object is already disposed: {this}");
+        }
+    }
+
+    protected void RaisePropertyChanged(params string[] properties)
+    {
+        properties.ForEach(RaisePropertyChanged);
+    }
 
     protected static void EnsureUiThread()
     {
@@ -77,18 +104,5 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         }
     }
 
-    protected void EnsureNotDisposed()
-    {
-        if (Anchors.IsDisposed)
-        {
-            throw new ObjectDisposedException($"Object is already disposed: {this}");
-        }
-    }
-
     protected static bool IsUiThread => Environment.CurrentManagedThreadId == 1;
-        
-    public void RaisePropertyChanged(params string[] properties)
-    {
-        properties.ForEach(RaisePropertyChanged);
-    }
 }

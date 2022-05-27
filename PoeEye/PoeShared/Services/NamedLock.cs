@@ -8,7 +8,7 @@ public sealed class NamedLock
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromHours(1); 
         
-    private readonly Gate gate;
+    private readonly GateHolder gate;
 #if DEBUG
     // ReSharper disable once RedundantNameQualifier
     private readonly System.Collections.Concurrent.ConcurrentDictionary<int, StackTrace> lockInfoByThreadId = new();
@@ -16,7 +16,7 @@ public sealed class NamedLock
     public NamedLock(string name)
     {
         Log = typeof(NamedLock).PrepareLogger().WithSuffix(ToString);
-        gate = new Gate(name);
+        gate = new GateHolder(name);
     }
 #if DEBUG
     public bool EnableLogging { get; set; }
@@ -26,6 +26,8 @@ public sealed class NamedLock
 #endif
     private IFluentLog Log { get; }
 
+    public object Gate => gate;
+    
     public IDisposable Enter(TimeSpan timeout)
     {
         
@@ -116,9 +118,9 @@ public sealed class NamedLock
 #endif
     }
 
-    private sealed class Gate
+    private sealed class GateHolder
     {
-        public Gate(string name)
+        public GateHolder(string name)
         {
             Name = name;
         }

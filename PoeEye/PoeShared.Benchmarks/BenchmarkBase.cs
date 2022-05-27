@@ -1,9 +1,12 @@
 ﻿
+using BenchmarkDotNet.Order;
+using PoeShared.Tests;
+
 namespace PoeShared.Benchmarks;
 
 [TestFixture]
 [Category("Benchmark")]
-public class BenchmarkBase
+public class BenchmarkBase : FixtureBase
 {
     protected IConfig Config => PrepareDefaultConfig();
 
@@ -31,20 +34,22 @@ public class BenchmarkBase
         BenchmarkRunner.Run(type: testType, methods: new[] { benchmarkMethod }, config);
     }
         
-    protected virtual IConfig PrepareConfig()
+    protected virtual ManualConfig PrepareConfig()
     {
-        var summaryStyle = DefaultConfig.Instance.SummaryStyle
+        var summaryStyle = DefaultConfig.Instance
+            .SummaryStyle
             .WithMaxParameterColumnWidth(40);
-            
+
         var result = DefaultConfig.Instance
             .WithOptions(ConfigOptions.DisableOptimizationsValidator)
             .WithOption(ConfigOptions.JoinSummary, false)
-            .WithSummaryStyle(summaryStyle);
+            .WithSummaryStyle(summaryStyle)
+            .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.Method));
             
         return result;
     }
 
-    protected IConfig PrepareDefaultConfig(string targetFrameworkMoniker =  "net7.0-windows7")
+    protected IConfig PrepareDefaultConfig(string targetFrameworkMoniker = "net6.0-windows10.0.19041")
     {
         var job = PrepareJob(targetFrameworkMoniker);
         var result = PrepareConfig()

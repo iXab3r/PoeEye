@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using DynamicData.Kernel;
 using JetBrains.Annotations;
+using PoeShared.Services;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
@@ -9,7 +10,12 @@ namespace PoeShared.Scaffolding;
 public static class ObservableExtensions
 {
     private static readonly Action NoOperation = () => { };
-    
+
+    public static IObservable<T> Synchronize<T>(this IObservable<T> observable, NamedLock gate)
+    {
+        return observable.Synchronize(gate.Gate);
+    }
+
     public static IObservable<T> RetryWithBackOff<T>(
         this IObservable<T> observable,
         Func<Exception, int, TimeSpan?> strategy)

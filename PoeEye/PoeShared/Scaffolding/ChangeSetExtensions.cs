@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
@@ -10,6 +11,64 @@ namespace PoeShared.Scaffolding;
 
 public static class ChangeSetExtensions
 {
+    /// <summary>
+    /// Automatically refresh downstream operator. The refresh is triggered when the observable receives a notification.
+    /// </summary>
+    /// <typeparam name="TObject">The type of object.</typeparam>
+    /// <typeparam name="TAny">A ignored type used for specifying what to auto refresh on.</typeparam>
+    /// <param name="source">The source observable change set.</param>
+    /// <param name="reevaluator">An observable which acts on items within the collection and produces a value when the item should be refreshed.</param>
+    /// <param name="changeSetBuffer">Batch up changes by specifying the buffer. This greatly increases performance when many elements require a refresh.</param>
+    /// <param name="scheduler">The scheduler.</param>
+    /// <returns>An observable change set with additional refresh changes.</returns>
+    public static IObservable<IChangeSet<TObject>> AutoRefreshOnObservableSynchronized<TObject, TAny>(
+        this IObservable<IChangeSet<TObject>> source, 
+        Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler? scheduler = null)
+    {
+        var gate = new object();
+        return source.Synchronize(gate).AutoRefreshOnObservable(o => reevaluator(o).Synchronize(gate), changeSetBuffer, scheduler);
+    }
+
+    /// <summary>
+    /// Automatically refresh downstream operator. The refresh is triggered when the observable receives a notification.
+    /// </summary>
+    /// <typeparam name="TObject">The object of the change set.</typeparam>
+    /// <typeparam name="TKey">The key of the change set.</typeparam>
+    /// <typeparam name="TAny">The type of evaluation.</typeparam>
+    /// <param name="source">The source observable change set.</param>
+    /// <param name="reevaluator">An observable which acts on items within the collection and produces a value when the item should be refreshed.</param>
+    /// <param name="changeSetBuffer">Batch up changes by specifying the buffer. This greatly increases performance when many elements require a refresh.</param>
+    /// <param name="scheduler">The scheduler.</param>
+    /// <returns>An observable change set with additional refresh changes.</returns>
+    public static IObservable<IChangeSet<TObject, TKey>> AutoRefreshOnObservableSynchronized<TObject, TKey, TAny>(this IObservable<IChangeSet<TObject, TKey>> source, Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler? scheduler = null)
+        where TKey : notnull
+    {
+        return source.AutoRefreshObservableSynchronized(reevaluator, changeSetBuffer, scheduler);
+    }
+
+    /// <summary>
+    /// Automatically refresh downstream operator. The refresh is triggered when the observable receives a notification.
+    /// </summary>
+    /// <typeparam name="TObject">The object of the change set.</typeparam>
+    /// <typeparam name="TKey">The key of the change set.</typeparam>
+    /// <typeparam name="TAny">The type of evaluation.</typeparam>
+    /// <param name="source">The source observable change set.</param>
+    /// <param name="reevaluator">An observable which acts on items within the collection and produces a value when the item should be refreshed.</param>
+    /// <param name="changeSetBuffer">Batch up changes by specifying the buffer. This greatly increases performance when many elements require a refresh.</param>
+    /// <param name="scheduler">The scheduler.</param>
+    /// <returns>An observable change set with additional refresh changes.</returns>
+    public static IObservable<IChangeSet<TObject, TKey>> 
+        AutoRefreshObservableSynchronized<TObject, TKey, TAny>(
+            this IObservable<IChangeSet<TObject, TKey>> source, 
+            Func<TObject, IObservable<TAny>> reevaluator, 
+            TimeSpan? changeSetBuffer = null, 
+            IScheduler? scheduler = null)
+        where TKey : notnull
+    {
+        var gate = new object();
+        return source.Synchronize(gate).AutoRefreshOnObservable((o, key) => reevaluator(o).Synchronize(gate), changeSetBuffer, scheduler);
+    }
+    
     public static T EditGet<TItem, T>(this ISourceList<TItem> source, Func<IExtendedList<TItem>, T> supplier)
     {
         T result = default;
@@ -39,11 +98,16 @@ public static class ChangeSetExtensions
         return source.Bind(result);
     }
 
-    public static ISourceList<T> ToSourceList<T>(this IObservable<IChangeSet<T>> source)
+    public static ISourceListEx<T> ToSourceListEx<T>(this IObservable<IChangeSet<T>> source)
     {
         Guard.ArgumentNotNull(source, nameof(source));
 
-        return new SourceListEx<T>(source);
+        return new SourceListEx<T>(source); 
+    }
+    
+    public static ISourceList<T> ToSourceList<T>(this IObservable<IChangeSet<T>> source)
+    {
+        return source.ToSourceListEx();
     }
     
     public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
@@ -165,6 +229,11 @@ public static class ChangeSetExtensions
         return result.Value;
     }
 
+    public static ISourceListEx<T> ToSourceListEx<T>(this IEnumerable<T> items)
+    {
+        return new SourceListEx<T>(items.ToSourceList());
+    }
+    
     public static ISourceList<T> ToSourceList<T>(this IEnumerable<T> items)
     {
         var result = new SourceListEx<T>();

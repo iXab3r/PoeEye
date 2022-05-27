@@ -9,9 +9,9 @@ namespace PoeShared.Scaffolding;
 /// <typeparam name="T"></typeparam>
 public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
 {
-    private readonly SourceList<T> sourceList;
+    private readonly ISourceList<T> sourceList;
 
-    public SourceListEx(SourceList<T> sourceList, IScheduler collectionScheduler = default)
+    public SourceListEx(ISourceList<T> sourceList, IScheduler collectionScheduler = default)
     {
         this.sourceList = sourceList.AddTo(Anchors);
         var collectionSource = sourceList.Connect();

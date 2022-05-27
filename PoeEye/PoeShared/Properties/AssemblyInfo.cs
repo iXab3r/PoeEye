@@ -22,6 +22,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyFileVersion("0.0.0.0")]
 [assembly: AssemblyMetadata("SquirrelAwareVersion", "0")]
 
+[assembly: InternalsVisibleTo("PoeShared.Benchmarks")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo("EyeAuras.Tests")]
 [assembly: InternalsVisibleTo("EyeAuras.Benchmarks")]

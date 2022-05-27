@@ -20,7 +20,6 @@
     <PackageReference Include="BidirectionalMap" Version="1.0.0" />
     <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
-    <PackageReference Include="DynamicData" Version="7.4.9" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.0.48" />
     <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9"><NoWarn>NU1701</NoWarn></PackageReference>
@@ -40,7 +39,6 @@
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
-    <PackageReference Include="ReactiveUI" Version="17.1.17" />
     <PackageReference Include="ReactiveUI.Validation" Version="1.4.1" />
     <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
     <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29"><NoWarn>NU1701</NoWarn></PackageReference>
