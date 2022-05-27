@@ -39,7 +39,7 @@ public class ConcurrentNpcEventInvokerFixture : FixtureBase
     }
     
     [Test]
-    [Repeat(100000)]
+    [Repeat(10000)]
     [TestCase(typeof(FakeViaReactiveObject))]
     [TestCase(typeof(FakeViaThreadSafeNpc))]
     public async Task ShouldNotHaveRaceConditionInNpcViaEvents(Type fakeType)
