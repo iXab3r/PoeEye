@@ -23,6 +23,7 @@ public class ConcurrentNpcEventInvokerFixture : FixtureBase
     [Retry(100000)]
     [TestCase(true)]
     [TestCase(false)]
+    [Ignore("Very poorly reproduces on build-server due to low number of cores")]
     public async Task ShouldHaveRaceConditionInNpcViaEvents(bool expectToSucceeed)
     {
         //Given
