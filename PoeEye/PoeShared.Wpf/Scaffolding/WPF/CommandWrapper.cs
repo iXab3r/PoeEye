@@ -1,10 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using PoeShared.Logging;
+using PoeShared.Modularity;
 using Prism.Commands;
 using ReactiveUI;
 
@@ -17,7 +20,8 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     private readonly ISubject<bool> isExecuting = new Subject<bool>();
     private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
     private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
-
+    private readonly IScheduler uiScheduler = SchedulerProvider.RedirectToUiScheduler;
+    
     private CommandWrapper(DelegateCommandBase command)
     {
         Guard.ArgumentNotNull(command, nameof(command));
@@ -25,15 +29,18 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         InnerCommand = command;
         Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
             .Select(x => command.IsActive)
+            .ObserveOn(uiScheduler)
             .SubscribeSafe(x => IsBusy = x, Log.HandleUiException)
             .AddTo(Anchors);
 
         isExecuting
+            .ObserveOn(uiScheduler)
             .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
             .AddTo(Anchors);
 
         raiseCanExecuteChangedRequests
-            .SubscribeSafe(command.RaiseCanExecuteChanged, Log.HandleUiException)
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(x => command.RaiseCanExecuteChanged(), Log.HandleUiException)
             .AddTo(Anchors);
     }
         
@@ -180,7 +187,8 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
         Guard.ArgumentNotNull(() => eventSource);
 
-        eventSource.SubscribeSafe(RaiseCanExecuteChanged, Log.HandleUiException).AddTo(Anchors);
+        eventSource
+            .SubscribeSafe(RaiseCanExecuteChanged, Log.HandleUiException).AddTo(Anchors);
         return this;
     }
 

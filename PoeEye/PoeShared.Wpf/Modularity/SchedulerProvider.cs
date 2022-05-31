@@ -22,10 +22,14 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
 
     public static ISchedulerProvider Instance => InstanceSupplier.Value;
 
+    public static IScheduler RedirectToUiScheduler => Instance.GetOrAdd(WellKnownSchedulers.RedirectToUI);
+
     public void Initialize(IUnityContainer container)
     {
         schedulers[WellKnownSchedulers.Background] = container.Resolve<IScheduler>(WellKnownSchedulers.Background);
         schedulers[WellKnownSchedulers.UI] = container.Resolve<IScheduler>(WellKnownSchedulers.UI);
+        schedulers[WellKnownSchedulers.RedirectToUI] = container.Resolve<IScheduler>(WellKnownSchedulers.RedirectToUI);
+        schedulers[WellKnownSchedulers.UIIdle] = container.Resolve<IScheduler>(WellKnownSchedulers.UIIdle);
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
