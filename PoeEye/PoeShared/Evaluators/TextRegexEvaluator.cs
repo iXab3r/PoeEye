@@ -23,7 +23,7 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
             .To(x => x.IsMatch);
         
         Binder
-            .BindIf(x => x.RegexMatch != default, x => x.RegexMatch.Value)
+            .BindIf(x => x.RegexMatch != default, x => ExtractMatchText(x.RegexMatch))
             .Else(x => default)
             .To(x => x.Match);
     }
@@ -48,6 +48,21 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
     public string Match { get; [UsedImplicitly] private set; }
 
     public string Error { get; [UsedImplicitly] private set; }
+
+    private static string ExtractMatchText(Match regexMatch)
+    {
+        if (regexMatch is not {Success: true})
+        {
+            return null;
+        }
+
+        if (regexMatch.Groups.Count <= 1)
+        {
+            return regexMatch.Value;
+        }
+
+        return regexMatch.Groups[1].Value;
+    }
 
     private Regex RecalculateRegex(string text, bool ignoreCase)
     {

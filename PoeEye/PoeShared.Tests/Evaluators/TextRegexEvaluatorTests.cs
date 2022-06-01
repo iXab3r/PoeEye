@@ -41,6 +41,37 @@ public class TextRegexEvaluatorTests : FixtureBase
         //Then
         instance.IsMatch.ShouldBe(expected);
     }
+    
+    [TestCase(null, null, null)]
+    [TestCase(null, "", null)]
+    [TestCase("", null, null)]
+    [TestCase("a", "b", null)]
+    [TestCase("", "", "")]
+    [TestCase("a", "a", "a")]
+    [TestCase("a", "(a)", "a")]
+    [TestCase("a", "(?:a)", "a")]
+    [TestCase("a", "(?'test'a)", "a")]
+    [TestCase("a b", "a", "a")]
+    [TestCase("a b", "a b", "a b")]
+    [TestCase("a b", "a (b)", "b")]
+    [TestCase("a b", "(?:a) (b)", "b")]
+    [TestCase("a b", "(?:a) (?'test'b)", "b")]
+    [TestCase("a b", "a (?'test'b)", "b")]
+    [TestCase("a b", "a (?:b)", "a b")]
+    [TestCase("a b c", "a (b) (c)", "b")]
+    [TestCase("a b c", "(?:a) (b) (c)", "b")]
+    public void ShouldFillMatch(string text, string expression, string expected )
+    {
+        //Given
+        var instance = CreateInstance();
+
+        //When
+        instance.Text = text;
+        instance.Expression = expression;
+
+        //Then
+        instance.Match.ShouldBe(expected);
+    }
 
     private TextRegexEvaluator CreateInstance()
     {
