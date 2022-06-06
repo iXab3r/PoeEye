@@ -111,19 +111,4 @@ internal struct LogData
 
         return message.ToString();
     }
-
-
-    /// <summary>
-    ///     Reset all properties back to default.
-    /// </summary>
-    internal void Reset()
-    {
-        LogLevel = FluentLogLevel.Trace;
-        Message = null;
-        PrefixProvider = null;
-        Exception = null;
-        MemberName = null;
-        FilePath = null;
-        LineNumber = 0;
-    }
 }

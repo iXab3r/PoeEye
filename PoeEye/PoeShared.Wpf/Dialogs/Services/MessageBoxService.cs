@@ -68,6 +68,7 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
 
     public async Task<bool> ShowConfirmation(string title, string content)
     {
+        Log.Info($"Showing message box: { new { title, content }}");
         var result = await ShowMessageBox(
             title,
             content,
@@ -76,6 +77,7 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
             MessageBoxElement.Yes,
             MessageBoxElement.No
         );
+        Log.Info($"Message box result: { new { title, result.DialogResult }}");
         return result.DialogResult == MessageBoxElement.Yes;
     }
 

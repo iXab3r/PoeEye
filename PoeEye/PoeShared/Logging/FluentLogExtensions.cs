@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 using DynamicData;
+using log4net.Core;
 
 namespace PoeShared.Logging;
 
@@ -26,28 +27,26 @@ public static class FluentLogExtensions
         log.Info(message);
 #endif
     }
-    
-    public static IFluentLog WithAction(this IFluentLog log, Action<string> messageConsumer)
+
+    public static IFluentLog WithAction(this IFluentLog log, Action<(FluentLogLevel Level, string Message)> messageConsumer)
     {
-        var writerAdapter = new LogWriterAdapter<string>(logData =>
+        return WithConsumer(log, logData =>
         {
-            log.Writer.WriteLog(logData);
             var message = logData.ToString();
             if (logData.Exception != null)
             {
                 message += Environment.NewLine + logData.Exception.Message + Environment.NewLine + logData.Exception.StackTrace;
             }
 
-            messageConsumer(message);
+            messageConsumer((logData.LogLevel, message));
         });
-        return new FluentLogBuilder(writerAdapter);
     }
-    
+
     public static IFluentLog CreateChildCollectionLogWriter(this IFluentLog log, ISourceList<string> collection)
     {
-        return log.WithAction(collection.Add);
+        return log.WithAction(x => collection.Add(x.Message));
     }
-        
+
     public static BenchmarkTimer CreateProfiler(this IFluentLog log, string benchmarkName, [CallerMemberName] string propertyName = null)
     {
         return new BenchmarkTimer(benchmarkName, log, propertyName);
@@ -62,12 +61,12 @@ public static class FluentLogExtensions
         });
         return log.WithLogData(newLogData);
     }
-        
+
     public static IFluentLog WithPrefix<T>(this IFluentLog log, T prefix)
     {
         return WithPrefix(log, () => $"{prefix}");
     }
-        
+
     public static IFluentLog WithSuffix(this IFluentLog log, Func<string> suffixSupplier)
     {
         var newLogData = log.Data.WithSuffix(() =>
@@ -77,7 +76,7 @@ public static class FluentLogExtensions
         });
         return log.WithLogData(newLogData);
     }
-        
+
     public static IFluentLog WithSuffix<T>(this IFluentLog log, T prefix)
     {
         return WithSuffix(log, () => $"{prefix}");
@@ -112,5 +111,15 @@ public static class FluentLogExtensions
             SharedLog.Instance.Log.Warn($"Failed to format log string for logger {log}, data: {new { log.Data.LogLevel, log.Data.Message, log.Data.Exception }}", e);
             return $"FORMATTING ERROR - {e.Message}";
         }
+    }
+
+    private static IFluentLog WithConsumer(this IFluentLog log, Action<LogData> messageConsumer)
+    {
+        var writerAdapter = new LogWriterAdapter<string>(logData =>
+        {
+            log.Writer.WriteLog(logData);
+            messageConsumer(logData);
+        });
+        return new FluentLogBuilder(writerAdapter);
     }
 }
