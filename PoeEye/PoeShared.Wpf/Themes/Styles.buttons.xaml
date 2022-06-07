@@ -22,8 +22,14 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}, Converter={StaticResource TrueToPositiveFalseToWarningBrushConverter}}"/>
     </Style>
-
+    
+    <Style TargetType="{x:Type ToggleButton}" x:Key="FlatToggleButton" BasedOn="{StaticResource MaterialDesignFlatToggleButton}">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}, Converter={StaticResource TrueToPositiveFalseToWarningBrushConverter}}"/>
+    </Style>
 
     <Style TargetType="{x:Type Button}" x:Key="FlatButton"
            BasedOn="{StaticResource MaterialDesignFlatButton}">

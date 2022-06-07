@@ -33,4 +33,15 @@ public static class AwesomeIcons
     public const string SignOut = "\uf08b";
     public const string CloudDownload = "\uf0ed";
     public const string CloudUpload = "\uf0ee";
+    public const string AngleDoubleLeft = "\uf100";
+    public const string AngleDoubleRight = "\uf101";
+    public const string AngleDoubleUp = "\uf102";
+    public const string AngleDoubleDown = "\uf103";
+    public const string AngleLeft = "\uf104";
+    public const string AngleRight = "\uf105";
+    public const string AngleUp = "\uf106";
+    public const string AngleDown = "\uf107";
+
+    public const string ArrowCircleDown = "\uf0ab";
+    public const string ArrowCircleOutlinedDown = "\uf01a";
 }
