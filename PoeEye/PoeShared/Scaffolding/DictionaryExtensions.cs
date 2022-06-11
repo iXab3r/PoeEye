@@ -4,7 +4,17 @@ namespace PoeShared.Scaffolding;
 
 public static class DictionaryExtensions
 {
-    public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+    public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+    {
+        if (dictionary.TryGetValue(key, out var result))
+        {
+            return result;
+        }
+
+        return default;
+    }
+    
+    public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
     {
         if (dictionary.TryGetValue(key, out var result))
         {
@@ -17,7 +27,7 @@ public static class DictionaryExtensions
     }
         
     public static TValue AddOrUpdate<TKey, TValue>(
-        this Dictionary<TKey, TValue> dictionary,
+        this IDictionary<TKey, TValue> dictionary,
         TKey key,
         TValue newValue,
         Func<TKey, TValue, TValue> updateValueFactory)
@@ -36,7 +46,7 @@ public static class DictionaryExtensions
     }
 
     public static bool TryRemove<TKey, TValue>(
-        this Dictionary<TKey, TValue> dictionary,
+        this IDictionary<TKey, TValue> dictionary,
         TKey key,
         out TValue value)
     {

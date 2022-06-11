@@ -42,7 +42,7 @@ internal sealed class NotificationContainerViewModel : DisposableReactiveObject,
         CloseCommand = CommandWrapper.Create(() => notification.CloseController.Close(), notification.WhenAnyValue(x => x.CloseController).Select(x => x != null));
 
         notification.WhenAnyValue(x => x.TimeToLive)
-            .Select(x => x > TimeSpan.Zero ? Observable.Timer(TimeSpan.Zero, UiConstants.UiThrottlingDelay, bgScheduler) : Observable.Empty<long>())
+            .Select(x => x > TimeSpan.Zero ? Observables.BlockingTimer(UiConstants.UiThrottlingDelay) : Observable.Empty<long>())
             .Switch()
             .ObserveOn(uiScheduler)
             .Subscribe(() =>

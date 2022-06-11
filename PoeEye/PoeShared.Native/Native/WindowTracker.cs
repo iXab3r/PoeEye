@@ -4,7 +4,6 @@ using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
 namespace PoeShared.Native;
 
@@ -26,7 +25,7 @@ public class WindowTracker : DisposableReactiveObject, IWindowTracker
         this.windowMatcher = windowMatcher;
         this.windowHandleProvider = windowHandleProvider;
 
-        var timerObservable = ObservableEx
+        var timerObservable = Observables
             .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
             .ToUnit();
             

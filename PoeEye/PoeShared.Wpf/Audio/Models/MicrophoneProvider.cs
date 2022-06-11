@@ -55,7 +55,7 @@ internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophone
             .AddTo(Anchors);
 
         Observable.Merge(
-                Observable.Timer(DateTimeOffset.Now, RetryTimeout).ToUnit(),
+                Observables.BlockingTimer(RetryTimeout).ToUnit(),
                 notificationClient.WhenDeviceAdded.Do(deviceId => Log.Debug(() => $"[Notification] Device added, id: {deviceId}")).ToUnit(),
                 notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug(() => $"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
                 notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug(() => $"[Notification] Device removed, id: {deviceId}")).ToUnit())

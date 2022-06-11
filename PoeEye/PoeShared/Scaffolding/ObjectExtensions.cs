@@ -47,6 +47,11 @@ public static class ObjectExtensions
     {
         return DumpToTable(instance, ", ");
     }
+    
+    public static string DumpToTable<T>(this IEnumerable<T> instance, int maxItemsToShow)
+    {
+        return instance.DumpToNamedTable(name: $"Items of type {typeof(T).Name}", maxItemsToShow: maxItemsToShow);
+    }
 
     public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
     {

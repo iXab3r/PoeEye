@@ -127,7 +127,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                     .Select(
                         timeout => timeout.curr <= TimeSpan.Zero
                             ? Observable.Never<long>()
-                            : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
+                            : Observables.BlockingTimer(timeout.curr))
                     .Switch()
                     .Select(_ => $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})"),
                 updaterModel

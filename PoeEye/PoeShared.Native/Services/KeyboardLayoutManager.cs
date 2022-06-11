@@ -20,7 +20,7 @@ internal sealed class KeyboardLayoutManager : DisposableReactiveObject, IKeyboar
 
     public KeyboardLayoutManager()
     {
-        Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(10))
+        Observables.BlockingTimer(TimeSpan.FromSeconds(10))
             .StartWithDefault()
             .SubscribeSafe(HandleKeyboardListUpdateRequest, Log.HandleException)
             .AddTo(Anchors);

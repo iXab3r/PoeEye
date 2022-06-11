@@ -67,7 +67,7 @@ internal sealed class RegionSelectorViewModel : OverlayViewModelBase, IRegionSel
             .AddTo(Anchors);
             
         this.WhenAnyValue(x => x.IsBusy)
-            .Select(x => x ? Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(1), uiScheduler).ToUnit() : Observable.Empty<Unit>())
+            .Select(x => x ? Observables.BlockingTimer( TimeSpan.FromSeconds(1)).ObserveOn(uiScheduler).ToUnit() : Observable.Empty<Unit>())
             .Switch()
             .SubscribeSafe(refreshRequest)
             .AddTo(Anchors);

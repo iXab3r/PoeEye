@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using DynamicData;
 using ReactiveUI;
-using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
 namespace PoeShared.Services;
 
@@ -26,7 +25,7 @@ internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCl
             .Select(_ =>
             {
                 Log.Debug(() => $"Cleanup period updated to {CleanupTimeout} with TTL set to {FileTimeToLive} with {directoriesSource.Count} target directories");
-                return CleanupTimeout > TimeSpan.Zero && FileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? ObservableEx.BlockingTimer(CleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
+                return CleanupTimeout > TimeSpan.Zero && FileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? Observables.BlockingTimer(CleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
             })
             .Switch()
             .Subscribe(() => HandleCleanupTimerTick(clock, FileTimeToLive ?? TimeSpan.MaxValue, directoriesSource.Items.ToArray()))
