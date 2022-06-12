@@ -2,11 +2,28 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
+using AutoFixture;
 using Moq;
 using Moq.Language.Flow;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Tests.Helpers;
+
+public static class FixtureExtensions
+{
+    public static void RegisterConfigProvider<TConfig>(
+        this Fixture container,
+        TConfig config) 
+        where TConfig : IPoeEyeConfig
+    {
+        var configProvider = new Mock<IConfigProvider<TConfig>>();
+        configProvider
+            .SetupGet(x => x.ActualConfig)
+            .Returns(config);
+        container.Register(() => configProvider.Object);
+    }
+}
 
 public static class MockExtensions
 {
