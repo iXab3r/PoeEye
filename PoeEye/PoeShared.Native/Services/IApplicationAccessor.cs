@@ -13,7 +13,7 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     
     IObservable<int> WhenTerminate { get; }
 
-    Task Exit();
+    void Exit();
 
     /// <summary>
     ///  Terminates instantly

@@ -50,6 +50,10 @@ public sealed class FileLock : DisposableReactiveObject
         {
             throw new ApplicationException("Failed to remove lock file");
         }
+        else
+        {
+            log.Info($"Removed lock file {lockFilePath}");
+        }
     }
 
     private static Stream PrepareLockFile(IFluentLog log, string lockFilePath)

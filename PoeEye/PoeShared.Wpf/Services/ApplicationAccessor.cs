@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using PoeShared.Scaffolding; 
@@ -17,7 +18,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 {
     private static readonly Process CurrentProcess = Process.GetCurrentProcess();
     private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger();
-    private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(10);
     private readonly IAppArguments appArguments;
     private readonly Application application;
     private readonly FileLock loadingFileLock;
@@ -101,7 +102,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Environment.Exit(exitCode);
     }
 
-    public async Task Exit()
+    public void Exit()
     {
         Log.Info(() => $"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
         lock (application)
@@ -117,15 +118,10 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         try
         {
             Shutdown();
-
-            Log.Info($"Awaiting for application termination for {TerminationTimeout}");
-            var exitCode = await WhenExit.Take(1).Timeout(TerminationTimeout);
-                
-            Log.Info($"Application termination signal was processed, exit code: {exitCode}");
-
-            await Task.Delay(TerminationTimeout);
+            Log.Info($"Awaiting for termination for {TerminationTimeout}");
+            Thread.Sleep(TerminationTimeout);
             Log.Warn($"Application should've terminated by now");
-            throw new ApplicationException("Something went wrong - application failed to Shutdown gracefully");
+            throw new InvalidStateException("Something went wrong - application failed to Shutdown gracefully");
         }
         catch (Exception e)
         {

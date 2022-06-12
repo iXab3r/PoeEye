@@ -206,7 +206,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             throw new FileNotFoundException($"Failed to start application @ '{executable.FullName}'");
         }
         Log.Debug(() => $"Process spawned, PID: {updaterProcess.Id}");
-        await applicationAccessor.Exit();
+        applicationAccessor.Exit();
     }
 
     private async Task<IPoeUpdateManager> CreateManager()
