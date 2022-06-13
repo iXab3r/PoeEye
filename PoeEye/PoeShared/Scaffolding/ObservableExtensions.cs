@@ -182,7 +182,15 @@ public static class ObservableExtensions
             }
         });
     }
-    
+
+    public static IObservable<TOut> SelectSafe<TIn, TOut>(
+        this IObservable<TIn> observable,
+        [NotNull] Func<TIn, TOut> onNext,
+        [NotNull] Func<TIn, Exception, TOut> onError)
+    {
+        return SelectSafe<TIn, TOut, Exception>(observable, onNext, onError);
+    }
+
     public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(
         this IObservable<TIn> observable, 
         [NotNull] Func<TIn, TOut> onNext,
