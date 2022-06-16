@@ -31,6 +31,15 @@ public static class FixtureExtensions
         container.Register(() => mock.Object);
     }
     
+    public static void RegisterFactory<T, TInput1, TInput2>(
+        this Fixture container,
+        Func<TInput1, TInput2, T> itemFactory)
+    {
+        var mock = new Mock<IFactory<T, TInput1, TInput2>>();
+        mock.Setup(x => x.Create(It.IsAny<TInput1>(), It.IsAny<TInput2>())).Returns(itemFactory);
+        container.Register(() => mock.Object);
+    }
+    
     public static void RegisterConfigProvider<TConfig>(
         this Fixture container,
         TConfig config) 
