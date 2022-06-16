@@ -332,9 +332,18 @@ public static class StringUtils
     /// </summary>
     /// <param name="compressedText">The compressed text.</param>
     /// <returns></returns>
-    public static string DecompressStringFromGZip(string compressedText)
+    public static string DecompressStringFromGZip(string compressedText, bool requirePrefix = false)
     {
         Guard.ArgumentNotNull(() => compressedText);
+
+        if (requirePrefix)
+        {
+            if (compressedText.StartsWith(GzipPrefix))
+            {
+                return DecompressStringFromGZip(compressedText[GzipPrefix.Length..]);
+            }
+            throw new ArgumentException($"Provided message must start with '{GzipPrefix}', got: {compressedText}");
+        }
 
         var gZipBuffer = Convert.FromBase64String(compressedText);
         using (var memoryStream = new MemoryStream())
