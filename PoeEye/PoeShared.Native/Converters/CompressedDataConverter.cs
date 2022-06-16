@@ -9,8 +9,6 @@ namespace PoeShared.Converters;
 
 public sealed class CompressedDataConverter : JsonConverter
 {
-    private static readonly string GzipPrefix = "GZip ";
-        
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         if (!(value is byte[] valueToEncode))
@@ -21,7 +19,7 @@ public sealed class CompressedDataConverter : JsonConverter
         var compressedData = Compress(valueToEncode);
         var compressedDataString = JsonConvert.SerializeObject(compressedData);
 
-        var serializedString = (GzipPrefix + compressedDataString.Trim('"')).SurroundWith('"');
+        var serializedString = (StringUtils.GzipPrefix + compressedDataString.Trim('"')).SurroundWith('"');
         writer.WriteRawValue(serializedString);
     }
 
@@ -29,9 +27,9 @@ public sealed class CompressedDataConverter : JsonConverter
     {
         var deserializedString = serializer.Deserialize<string>(reader);
             
-        if (deserializedString.StartsWith(GzipPrefix))
+        if (deserializedString.StartsWith(StringUtils.GzipPrefix))
         {
-            var compressedDataString = deserializedString.Substring(GzipPrefix.Length);
+            var compressedDataString = deserializedString.Substring(StringUtils.GzipPrefix.Length);
             var compressedData = JsonConvert.DeserializeObject<byte[]>(compressedDataString.SurroundWith('"'));
             if (compressedData != null)
             {

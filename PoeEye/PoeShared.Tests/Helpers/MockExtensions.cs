@@ -6,12 +6,31 @@ using AutoFixture;
 using Moq;
 using Moq.Language.Flow;
 using PoeShared.Modularity;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Tests.Helpers;
 
 public static class FixtureExtensions
 {
+    public static void RegisterFactory<T>(
+        this Fixture container,
+        Func<T> itemFactory)
+    {
+        var mock = new Mock<IFactory<T>>();
+        mock.Setup(x => x.Create()).Returns(itemFactory);
+        container.Register(() => mock.Object);
+    }
+    
+    public static void RegisterFactory<T, TInput>(
+        this Fixture container,
+        Func<TInput, T> itemFactory)
+    {
+        var mock = new Mock<IFactory<T, TInput>>();
+        mock.Setup(x => x.Create(It.IsAny<TInput>())).Returns(itemFactory);
+        container.Register(() => mock.Object);
+    }
+    
     public static void RegisterConfigProvider<TConfig>(
         this Fixture container,
         TConfig config) 

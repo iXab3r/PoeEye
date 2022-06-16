@@ -89,14 +89,14 @@ internal sealed class JsonConfigSerializer : IConfigSerializer
         Guard.ArgumentNotNull(() => data);
 
         var serialized = Serialize(data);
-        return StringExtensions.CompressStringToGZip(serialized);
+        return StringUtils.CompressStringToGZip(serialized);
     }
 
     public T Decompress<T>(string compressedData)
     {
         Guard.ArgumentNotNullOrEmpty(() => compressedData);
 
-        var serialized = StringExtensions.DecompressStringFromGZip(compressedData);
+        var serialized = StringUtils.DecompressStringFromGZip(compressedData);
         return Deserialize<T>(serialized);
     }
 

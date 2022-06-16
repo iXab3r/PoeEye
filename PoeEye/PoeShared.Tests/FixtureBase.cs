@@ -32,5 +32,15 @@ public abstract class FixtureBase
         SetUp();
     }
 
+    [TearDown]
+    public void TearDownTest()
+    {
+        Log.Debug("Tearing down test");
+        TearDown();
+        Log.Debug("Tear down completed");
+    }
+
     protected virtual void SetUp(){}
+    
+    protected virtual void TearDown(){}
 }
