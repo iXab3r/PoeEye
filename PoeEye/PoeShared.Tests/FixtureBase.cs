@@ -1,16 +1,19 @@
-﻿using System.Reactive.Concurrency;
+﻿using System;
+using System.Reactive.Concurrency;
 using System.Threading;
 using NUnit.Framework;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
+using Unity;
 
 namespace PoeShared.Tests;
 
 public abstract class FixtureBase
 {
     public Fixture Container { get; private set; }
+    public IUnityContainer UnityContainer { get; private set; }
     public IFluentLog Log { get; private set; }
 
     private static long GlobalRunIdx = 0;
@@ -29,6 +32,10 @@ public abstract class FixtureBase
         Container = new Fixture();
         Container.Customize(new AutoMoqCustomization());
         Container.OmitAutoProperties = true;
+
+        UnityContainer = new UnityContainer();
+        Container.Register(() => UnityContainer);
+        
         SetUp();
     }
 
