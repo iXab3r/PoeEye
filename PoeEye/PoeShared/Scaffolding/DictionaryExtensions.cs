@@ -25,7 +25,14 @@ public static class DictionaryExtensions
         dictionary[key] = newValue;
         return newValue;
     }
-        
+
+    public static void Add<TKey, TValue>(
+        this IDictionary<TKey, TValue> dictionary,
+        KeyValuePair<TKey, TValue> item)
+    {
+        dictionary.Add(item.Key, item.Value);
+    }
+    
     public static TValue AddOrUpdate<TKey, TValue>(
         this IDictionary<TKey, TValue> dictionary,
         TKey key,
