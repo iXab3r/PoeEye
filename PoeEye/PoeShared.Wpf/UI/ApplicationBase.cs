@@ -28,6 +28,7 @@ public abstract class ApplicationBase : Application
 
     protected ApplicationBase()
     {
+        Log = GetType().PrepareLogger().WithSuffix(ToString);
         try
         {
             AppDomain.CurrentDomain.DomainUnload += delegate
@@ -141,7 +142,7 @@ public abstract class ApplicationBase : Application
 
     public CompositeDisposable Anchors { get; } = new();
 
-    protected static IFluentLog Log => SharedLog.Instance.Log;
+    protected IFluentLog Log { get; }
 
     private void InitializeLogging()
     {

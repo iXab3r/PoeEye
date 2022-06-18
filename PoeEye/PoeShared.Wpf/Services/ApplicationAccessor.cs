@@ -18,7 +18,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 {
     private static readonly Process CurrentProcess = Process.GetCurrentProcess();
     private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger();
-    private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
     private readonly IAppArguments appArguments;
     private readonly Application application;
     private readonly FileLock loadingFileLock;
