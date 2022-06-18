@@ -35,7 +35,8 @@ public abstract class FixtureBase
 
         UnityContainer = new UnityContainer();
         Container.Register(() => UnityContainer);
-        
+        Container.Register(() => Log);
+
         SetUp();
     }
 
