@@ -68,7 +68,7 @@ public static class EnumHelper
                 Browsable = GetBrowsableOrDefault(value, () => true)
             };
             
-        return valuesAndDescriptions
+        var result = valuesAndDescriptions
             .Where(x => x.Browsable)
             .Select(x => new EnumValueWithDescription
             {
@@ -76,11 +76,13 @@ public static class EnumHelper
                 Description = x.Description
             })
             .ToArray();
+
+        return result;
     }
         
     public static EnumValueWithDescription[] GetValuesAndDescriptions(Type enumType)
     {
-        return GetValuesAndDescriptions(enumType, "Default");
+           return GetValuesAndDescriptions(enumType, "Default");
     }
 
     public static T SetFlags<T>(this T instance, T flagToSet) where T : struct
@@ -129,5 +131,10 @@ public static class EnumHelper
         public object Value { get; set; }
 
         public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Value}: {Description}";
+        }
     }
 }
