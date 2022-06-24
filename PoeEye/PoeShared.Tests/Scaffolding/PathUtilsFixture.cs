@@ -183,7 +183,7 @@ public class PathUtilsFixture : FixtureBase
     {
         //Given
         //When
-        var resultPath = PathUtils.ExpandPath(string.Empty, "..\\a\\b");
+        var resultPath = PathUtils.ExpandPath(string.Empty, "a\\b\\c\\..");
 
         //Then
         resultPath.ShouldBe("a\\b");
