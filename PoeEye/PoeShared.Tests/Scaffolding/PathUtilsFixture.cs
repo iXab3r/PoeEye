@@ -2,6 +2,7 @@
 using AutoFixture;
 using System;
 using System.Collections.Generic;
+using Meziantou.Framework;
 using PoeShared.Scaffolding;
 using Shouldly;
 
@@ -124,5 +125,82 @@ public class PathUtilsFixture : FixtureBase
 
         //Then
         result.ShouldBe(expected);
+    }
+
+    [Test]
+    [TestCase("a", "a")]
+    [TestCase("a\\b", "a\\b")]
+    [TestCase("a\\b\\c", "a\\b\\c")]
+    [TestCase("a\\..", ".")]
+    [TestCase("a\\b\\c\\..\\..", "a")]
+    [TestCase("a\\b\\c\\..", "a\\b")]
+    [TestCase("a\\.", "a")]
+    [TestCase(".\\b", "b")]
+    public void ShouldResolveRelativePath(string path, string expected)
+    {
+        //Given
+        var rootPath = FullPath.FromPath(".");
+
+        //When
+        var absolutePath = FullPath.FromPath(path);
+
+        var resultPath = absolutePath.MakePathRelativeTo(rootPath);
+
+
+        //Then
+        resultPath.ToString().ShouldBe(expected);
+    }
+    
+    [Test]
+    [TestCase("a", "a")]
+    [TestCase("a\\b", "a\\b")]
+    [TestCase("a\\b\\c", "a\\b\\c")]
+    [TestCase("a\\b\\c\\..\\..", "a")]
+    [TestCase("a\\b\\c\\..", "a\\b")]
+    [TestCase("a\\.", "a")]
+    [TestCase("a\\..", ".")]
+    [TestCase(".", "z\\y")]
+    [TestCase("..", "z")]
+    [TestCase(".\\b", "z\\y\\b")]
+    [TestCase("..\\b", "z\\b")]
+    [TestCase("..\\..\\b", "b")]
+    [TestCase(".\\..\\..\\b", "b")]
+    public void ShouldExpandPath(string path, string expected)
+    {
+        //Given
+        var rootPath = "z\\y";
+        
+        //When
+        var resultPath = PathUtils.ExpandPath(rootPath, path);
+
+
+        //Then
+        resultPath.ShouldBe(expected);
+    }
+
+    [Test]
+    public void ShouldSupportEmptyRootWhenExpandingPath()
+    {
+        //Given
+        //When
+        var resultPath = PathUtils.ExpandPath(string.Empty, "..\\a\\b");
+
+        //Then
+        resultPath.ShouldBe("a\\b");
+    }
+    
+    [Test]
+    [TestCase(".\\..\\..\\..\\b")]
+    public void ShouldThrowWhenPathIsNotValid(string path)
+    {
+        //Given
+        var rootPath = "z\\y";
+        
+        //When
+        var action = () => PathUtils.ExpandPath(rootPath, path);
+
+
+        //Then
+        action.ShouldThrow<FormatException>();
     }
 }

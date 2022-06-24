@@ -1,4 +1,6 @@
-﻿using Meziantou.Framework;
+﻿using System.Text;
+using JetBrains.Annotations;
+using Meziantou.Framework;
 
 namespace PoeShared.Scaffolding;
 
@@ -138,5 +140,56 @@ public static class PathUtils
                 return fullPath;
             }
         }
+    }
+
+    public static string ExpandPath([NotNull] string rootPath, [NotNull] string path)
+    {
+        if (rootPath == null)
+        {
+            throw new ArgumentNullException(nameof(rootPath));
+        }
+
+        if (path == null)
+        {
+            throw new ArgumentNullException(nameof(path));
+        }
+
+        var parts = path.Split(Path.DirectorySeparatorChar);
+        var result = new List<string>();
+
+        if (!string.IsNullOrEmpty(rootPath) && (parts[0] == "." || parts[0] == ".."))
+        {
+            result.AddRange(rootPath.Split(Path.DirectorySeparatorChar));
+        }
+
+        for (var i = 0; i < parts.Length; i++)
+        {
+            var part = parts[i];
+            if (part == "..")
+            {
+                if (result.Count > 0)
+                {
+                    result.RemoveAt(result.Count - 1);
+                }
+                else
+                {
+                    throw new FormatException($"Invalid path: {path}, root: {rootPath}");
+                }
+            } else if (part == ".")
+            {
+                //
+            }
+            else
+            {
+                result.Add(part);
+            }
+        }
+
+        if (result.Count == 0)
+        {
+            return ".";
+        }
+
+        return result.JoinStrings(Path.DirectorySeparatorChar);
     }
 }
