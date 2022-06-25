@@ -15,6 +15,11 @@ public static class StringUtils
     /// </summary>
     public static string ListDelimiter = "];[";
 
+    public static string ToSHA1(string value)
+    {
+        return ToHex(Encoding.Unicode.GetBytes(value ?? string.Empty));
+    }
+
     /// <summary>
     ///     Добавляет отформатированную строку и дополняет ее переводом каретки.
     /// </summary>

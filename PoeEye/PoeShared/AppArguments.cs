@@ -16,6 +16,9 @@ public class AppOptions : DisposableReactiveObject
 
     [Option('d', "debugMode", Default = false)]
     public bool IsDebugMode { get; set; }
+    
+    [Option('p', "profile", HelpText = "Profile name - allows to run multiple instances of an application")]
+    public string Profile { get; set; }
 
     [Option('l', "lazyMode", Default = false, HelpText = "Lazy mode - Prism modules will be loaded on-demand")]
     public bool IsLazyMode { get; set; }
@@ -29,6 +32,7 @@ public class AppOptions : DisposableReactiveObject
 
 public class AppArguments : AppOptions, IAppArguments
 {
+    private static readonly string DefaultProfileName = "release";
     private static readonly IFluentLog Log = typeof(AppArguments).PrepareLogger();
     private string appName;
 
@@ -38,17 +42,23 @@ public class AppArguments : AppOptions, IAppArguments
         set => appName = value ?? throw new ApplicationException($"{nameof(AppName)} must be set");
     }
 
-    public string AppTitle => $"{(IsDebugMode ? "[DEBUG] " : "")}{AppName} v{Version}".ToUpper();
+    public string AppTitle => $"{(Profile != DefaultProfileName ? $"[{Profile.ToUpper()}]" : string.Empty)}{AppName} v{Version}".ToUpper();
 
     public Version Version { get; }
 
     public string AppSupportMail { get; set; } = "";
 
-    public string AppDomainDirectory => AppDomain.CurrentDomain.BaseDirectory;
+    public string AppDomainDirectory { get; }
 
-    public string AppDataDirectory => IsWindows ? Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}") : $"~/{AppName}";
+    public string AppDataDirectory { get; }
 
-    public string LocalAppDataDirectory => IsWindows ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\{AppName}") : $"~/.{AppName}";
+    public string SharedAppDataDirectory => IsWindows
+        ? Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}")
+        : $"~/{AppName}";
+
+    public string LocalAppDataDirectory => IsWindows 
+        ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\{AppName}") 
+        : $"~/.{AppName}";
 
     public AppArguments()
     {
@@ -57,6 +67,7 @@ public class AppArguments : AppOptions, IAppArguments
         Version = entryAssembly.GetName().Version;
         ProcessId = Process.GetCurrentProcess().Id;
         IsElevated = true;
+        AppDomainDirectory = AppDomain.CurrentDomain.BaseDirectory;
         var args = Environment.GetCommandLineArgs();
         StartupArgs = args.Skip(1)
             .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
@@ -64,7 +75,7 @@ public class AppArguments : AppOptions, IAppArguments
             .JoinStrings(" ");
         ApplicationExecutablePath = args.First();
         ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
-        ApplicationDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+        
 #if NET5_0_OR_GREATER
             IsWindows = OperatingSystem.IsWindows();
             IsLinux = OperatingSystem.IsLinux();
@@ -79,6 +90,16 @@ public class AppArguments : AppOptions, IAppArguments
             SharedLog.Instance.InitializeLogging("Startup", this.AppName);
             throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
         }
+
+        if (string.IsNullOrEmpty(Profile))
+        {
+            Profile = IsDebugMode ? "debug" : DefaultProfileName;
+        }
+        else
+        {
+            IsDebugMode = Profile == "debug";
+        }
+        AppDataDirectory = Path.Combine(SharedAppDataDirectory, Profile);
 
         Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
         Log.Debug(() => $"Parsed args: {this.Dump()}");
@@ -98,8 +119,6 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string ApplicationExecutableName { get; }
         
-    public DirectoryInfo ApplicationDirectory { get; }
-
     public bool Parse(string[] args)
     {
         return Parse(this, args);
@@ -118,13 +137,18 @@ public class AppArguments : AppOptions, IAppArguments
         Log.Debug(() => $"Command line parser settings: {parser.Settings.Dump()}");
         var result = parser.ParseArguments<AppOptions>(args ?? Array.Empty<string>());
         Log.Debug(() => $"Command line parsing result: {result.Tag}, type: {result}");
-        if (result.Tag == ParserResultType.Parsed && result is Parsed<AppOptions> parsedResult)
+        switch (result)
         {
-            parsedResult.Value.CopyPropertiesTo(instance);
-            return true;
-        }
-
-        return false;
+            case Parsed<AppOptions> parsedResult:
+                parsedResult.Value.CopyPropertiesTo(instance);
+                return true;
+            case NotParsed<AppOptions> notParsed:
+                Log.Warn(() => $"Parsing failed:\n\t{notParsed.Errors.DumpToTable()}");
+                return false;
+            default:
+                Log.Warn(() => $"Parsing failed due to unknown error in parser: {result}");
+                return false;
+        } 
     }
 
     public override string ToString()
@@ -132,13 +156,13 @@ public class AppArguments : AppOptions, IAppArguments
         return new
         {
             AppName,
+            Profile,
             IsAutostart,
             AutostartFlag,
             AppSupportMail,
             AppDomainDirectory,
             AppDataDirectory,
             LocalAppDataDirectory,
-            IsDebugMode,
             ShowUpdater,
             StartupArgs,
             ApplicationPath = ApplicationExecutablePath,

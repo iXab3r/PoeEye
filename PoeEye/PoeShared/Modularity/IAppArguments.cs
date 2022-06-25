@@ -12,17 +12,21 @@ public interface IAppConfig
         
     string AppDataDirectory { [CanBeNull] get; }
     
+    string AppDomainDirectory { [CanBeNull] get; }
+    
+    string SharedAppDataDirectory { [CanBeNull] get; }
+    
     string LocalAppDataDirectory { [CanBeNull] get; }
         
     int ProcessId { get; }
 
     string ApplicationExecutableName { [CanBeNull] get; }
-        
-    DirectoryInfo ApplicationDirectory { get; }
 }
 
 public interface IAppArguments : IAppConfig
 {
+    string Profile { get; }
+    
     bool IsDebugMode { get; }
         
     bool IsLazyMode { get; }

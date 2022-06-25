@@ -23,8 +23,8 @@ internal class FileSoundLibrarySource : SoundLibrarySourceBase, IFileSoundLibrar
     {
         knownDirectories = new[]
             {
-                Path.Combine(appArguments.AppDataDirectory, "Resources", "Notifications"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? Assembly.GetExecutingAssembly().Location, "Resources", "Notifications"),
+                Path.Combine(appArguments.SharedAppDataDirectory, "Resources", "Notifications"),
+                Path.Combine(appArguments.AppDomainDirectory, "Resources", "Notifications"),
             }
             .Distinct()
             .Select(x => new DirectoryInfo(x)).ToArray();

@@ -85,14 +85,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
                 .DistinctUntilChanged();
     }
 
-    public void Reload()
-    {
-        Interlocked.Increment(ref loadCommandCounter);
-        Log.Debug(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
-
-        configProvider.Reload();
-    }
-
     public void Save(TConfig config)
     {
         Guard.ArgumentNotNull(config, nameof(config));

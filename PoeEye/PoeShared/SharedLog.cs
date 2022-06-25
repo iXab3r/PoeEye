@@ -37,9 +37,9 @@ public class SharedLog : DisposableReactiveObject
 
     public IFluentLog Log => LogInstanceSupplier.Value;
 
-    public void InitializeLogging(string configurationMode)
+    public void InitializeLogging(string profile)
     {
-        InitializeLogging(configurationMode, "PoeSharedUnknownApp");
+        InitializeLogging(profile, "PoeSharedUnknownApp");
     }
 
     public void LoadLogConfiguration(FileInfo logConfig)
@@ -52,12 +52,12 @@ public class SharedLog : DisposableReactiveObject
         Log.Info($"Logging settings loaded from {logConfig}");
     }
 
-    public void InitializeLogging(string configurationMode, string appName)
+    public void InitializeLogging(string profile, string appName)
     {
-        Guard.ArgumentNotNull(configurationMode, nameof(configurationMode));
+        Guard.ArgumentNotNull(profile, nameof(profile));
 
-        GlobalContext.Properties["configuration"] = configurationMode;
-        GlobalContext.Properties["CONFIGURATION"] = configurationMode;
+        GlobalContext.Properties["configuration"] = profile;
+        GlobalContext.Properties["CONFIGURATION"] = profile;
         GlobalContext.Properties["APPNAME"] = appName;
         GlobalContext.Properties["APPDATA"] = Environment.ExpandEnvironmentVariables("%APPDATA%");
         GlobalContext.Properties["LOCALAPPDATA"] = Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%");

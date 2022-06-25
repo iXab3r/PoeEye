@@ -50,6 +50,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         this.appArguments = appArguments;
 
         Log.Debug("Initializing crashes housekeeping");
+        cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.SharedAppDataDirectory, "crashes"))).AddTo(Anchors);
         cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
         cleanupService.CleanupTimeout = TimeSpan.FromHours(1);
         cleanupService.FileTimeToLive = TimeSpan.FromDays(2);

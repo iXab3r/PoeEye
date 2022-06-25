@@ -41,8 +41,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         this.applicationAccessor = applicationAccessor;
         this.appArguments = appArguments;
 
-        MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-        RootDirectory = new DirectoryInfo(Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%"));
+        MostRecentVersionAppFolder = new DirectoryInfo(appArguments.AppDomainDirectory);
+        RootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
             
         updateSourceProvider
             .WhenAnyValue(x => x.UpdateSource)
@@ -112,7 +112,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         if (appArguments.IsDebugMode)
         {
             Log.Warn("Debug mode detected, simulating update process without touching files");
-            newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
+            newVersionFolder = appArguments.AppDomainDirectory;
             for (var i = 0; i < 20; i++)
             {
                 CombinedProgressReporter(i*5, downloadReleaseTaskName);

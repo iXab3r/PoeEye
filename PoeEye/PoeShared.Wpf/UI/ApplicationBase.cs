@@ -68,9 +68,9 @@ public abstract class ApplicationBase : Application
                     Log.Warn("Failed to attach debugger");
                 }
             }
+            InitializeLogging();
             
             metrics = Container.Resolve<IMetricsRoot>();
-            InitializeLogging();
             Log.Debug(() => $"CmdLine: {Environment.CommandLine}");
             Log.Debug(() => $"Environment: {new { Environment.ProcessId, Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive, Environment.ProcessPath }})");
             Log.Debug(() => $"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
@@ -93,8 +93,8 @@ public abstract class ApplicationBase : Application
                 
             Log.Debug("Initializing housekeeping");
             var cleanupService = Container.Resolve<IFolderCleanerService>();
+            cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.SharedAppDataDirectory, "logs"))).AddTo(Anchors);
             cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
-            cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
             cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
             cleanupService.FileTimeToLive = TimeSpan.FromDays(14);
                 
@@ -146,16 +146,8 @@ public abstract class ApplicationBase : Application
 
     private void InitializeLogging()
     {
-        using var executionTimer = metrics.Measure.Gauge.Time(nameof(InitializeLogging));
         RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
-        if (appArguments.IsDebugMode)
-        {
-            SharedLog.Instance.InitializeLogging("Debug", appArguments.AppName);
-        }
-        else
-        {
-            SharedLog.Instance.InitializeLogging("Release", appArguments.AppName);
-        }
+        SharedLog.Instance.InitializeLogging(appArguments.Profile, appArguments.AppName);
 
         var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
         SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
