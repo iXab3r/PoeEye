@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reactive;
+using DynamicData;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity;
@@ -20,10 +21,12 @@ public interface IConfigProvider<TConfig>
 public interface IConfigProvider 
 {
     IObservable<Unit> ConfigHasChanged { [NotNull] get; }
-        
+    
+    IObservableCache<IPoeEyeConfig, string> Configs { get; }
+
     void Save();
-        
-    void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
+
+    void Save(IPoeEyeConfig config);
 
     TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();
 }

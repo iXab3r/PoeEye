@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reactive;
 using System.Reactive.Subjects;
+using DynamicData;
 
 namespace PoeShared.Modularity;
 
@@ -9,7 +10,7 @@ public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
     private static readonly IFluentLog Log = typeof(PoeEyeConfigProviderInMemory).PrepareLogger();
 
     private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
-    private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
+    private readonly SourceCache<IPoeEyeConfig, string> loadedConfigs = new(ConfigProviderUtils.GetConfigName);
 
     public PoeEyeConfigProviderInMemory(IAppArguments appArguments)
     {
@@ -25,40 +26,25 @@ public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
         }
     }
 
+    public IObservableCache<IPoeEyeConfig, string> Configs => loadedConfigs;
+
     public IObservable<Unit> ConfigHasChanged => configHasChanged;
-
-    public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
-    {
-        return Disposable.Empty;
-    }
-
-    public void Reload()
-    {
-        Log.Debug(() => $"[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
-
-        loadedConfigs.Clear();
-
-        configHasChanged.OnNext(Unit.Default);
-    }
 
     public void Save()
     {
         configHasChanged.OnNext(Unit.Default);
     }
 
-    public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
+    public void Save(IPoeEyeConfig config)
     {
-        loadedConfigs[typeof(TConfig)] = config;
+        loadedConfigs.AddOrUpdate(config);
         Save();
-    }
-
-    public void SaveToFile(FileInfo file)
-    {
-        throw new NotSupportedException();
     }
 
     public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
     {
-        return (TConfig) loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
+        return (TConfig) loadedConfigs.GetOrAdd(
+            ConfigProviderUtils.GetConfigName(typeof(TConfig)), 
+            key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
     }
 }

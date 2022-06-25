@@ -2,8 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reflection;
 using AutoFixture;
 using LiteDB;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using PoeShared.Modularity;
 using PoeShared.Tests.Helpers;
@@ -29,7 +31,7 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
 
     protected override void SetUp()
     {
-        var appDataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config");
+        var appDataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appdata");
         Log.Info($"AppData: {appDataDirectory} (exists: {Directory.Exists(appDataDirectory)})");
         appArguments = new Mock<IAppArguments>();
         appArguments
@@ -142,6 +144,70 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
         //Then
         loadedConfigA.ShouldBe(configA);
         loadedConfigB.ShouldBe(configB);
+    }
+
+    [Test]
+    public void ShouldMigrate()
+    {
+        //Given
+        var source = Container.Create<PoeEyeConfigProviderInMemory>();
+        var configA = new ConfigAlpha(){ Text = "test" };
+        var configB = new ConfigBeta(){ Content = "content" };
+        
+        source.Save(configA);
+        source.Save(configB);
+
+        var instance = CreateInstance();
+
+        var migrator = Container.Create<ConfigMigrator>();
+
+        //When
+        migrator.Migrate(source, instance);
+
+        //Then
+        foreach (var sourceConfig in source.Configs.Items)
+        {
+            var method = instance.GetType()
+                .GetMethod(nameof(instance.GetActualConfig))
+                .MakeGenericMethod(sourceConfig.GetType());
+            var result = (IPoeEyeConfig)method.Invoke(instance, Array.Empty<object>());
+            result.ShouldBe(sourceConfig);
+        }
+    }
+    
+    [Test]
+    public void ShouldMigrateMetadata()
+    {
+        //Given
+        var source = Container.Create<PoeEyeConfigProviderInMemory>();
+        var metadataConfig = new PoeConfigMetadata()
+        {
+            AssemblyName = "EyeAuras.Loader",
+            TypeName = "EyeAuras.Loader.Prism.PlusLoaderConfig",
+            ConfigValue = JToken.Parse(@"{
+        'AssemblyName': 'EyeAuras.Loader',
+        'TypeName': 'EyeAuras.Loader.Prism.PlusLoaderConfig',
+        'Version': 7,
+        'ConfigValue': {
+          'Username': 'Xab3r',
+          'Version': 7
+        }
+      }")
+        };
+        
+        source.Save(metadataConfig);
+
+        var instance = CreateInstance();
+
+        var migrator = Container.Create<ConfigMigrator>();
+
+        //When
+        migrator.Migrate(source, instance);
+
+        //Then
+        var src = source.Configs.Items.ToArray().Single();
+        var dst = source.Configs.Items.ToArray().Single();
+        src.ShouldBe(dst);
     }
     
     private IConfigProvider CreateInstance()

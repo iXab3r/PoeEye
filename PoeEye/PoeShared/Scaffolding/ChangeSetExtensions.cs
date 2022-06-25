@@ -217,6 +217,7 @@ public static class ChangeSetExtensions
             if (existingItem.HasValue)
             {
                 result = existingItem;
+                return;
             }
                     
             var newItem = factoryFunc(key);

@@ -11,7 +11,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
     private static readonly IFluentLog Log = typeof(ConfigProviderFromMultipleFiles).PrepareLogger();
     private readonly IConfigSerializer configSerializer;
 
-    private readonly SourceCache<IPoeEyeConfig, string> loadedConfigsByType = new(x => $"{x.GetType().Namespace}.{x.GetType().Name}");
+    private readonly SourceCache<IPoeEyeConfig, string> loadedConfigsByType = new(ConfigProviderUtils.GetConfigName);
     private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
     private readonly DirectoryInfo configDirectory;
     private readonly NamedLock fileLock = new("MultiFileConfigLock");
@@ -26,8 +26,8 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
 
         var candidates = new[]
             {
-                Path.Combine(appArguments.AppDomainDirectory, "config"),
-                appArguments.SharedAppDataDirectory
+                Path.Combine(appArguments.AppDomainDirectory, appArguments.Profile, "config"),
+                Path.Combine(appArguments.SharedAppDataDirectory, appArguments.Profile, "config")
             }
             .Select(x => new DirectoryInfo(x))
             .ToArray();
@@ -64,6 +64,8 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
     }
 
     public IObservable<Unit> ConfigHasChanged => configHasChanged;
+    
+    public IObservableCache<IPoeEyeConfig, string> Configs => loadedConfigsByType;
 
     public void Save()
     {
@@ -76,7 +78,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         }
     }
 
-    public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
+    public void Save(IPoeEyeConfig config)
     {
         using var @lock = fileLock.Enter();
         
@@ -86,37 +88,63 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
 
     public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
     {
+        if (typeof(PoeConfigMetadata).IsAssignableFrom(typeof(TConfig)))
+        {
+            throw new ArgumentException($"Provided config type {typeof(TConfig)} is of metadata type instead of an actual config");
+        }
+        
         using var @lock = fileLock.Enter();
 
-        var configName = GetConfigName(typeof(TConfig));
+        var configName = ConfigProviderUtils.GetConfigName(typeof(TConfig));
         if (loadedConfigsByType.TryGetValue(configName, out var existingConfig))
         {
-            return (TConfig) existingConfig;
+            if (existingConfig is TConfig eyeConfig)
+            {
+                return eyeConfig;
+            }
+
+            Log.Debug(() => $"Config is not of type {typeof(TConfig)}, but of {existingConfig.GetType()}, attempting to deserialize");
+            var result = DeserializeIfNeeded<TConfig>(existingConfig);
+            loadedConfigsByType.AddOrUpdate(result);
+            return GetActualConfig<TConfig>();
         }
         
         Log.Debug($"Config of type {typeof(TConfig)} is not loaded, loading it from storage");
         var config = LoadInternal<TConfig>();
         loadedConfigsByType.AddOrUpdate(config);
+        return config;
+    }
 
+    private TConfig DeserializeIfNeeded<TConfig>(IPoeEyeConfig config)
+    {
+        if (config is TConfig)
+        {
+            return (TConfig) config;
+        }
+        Log.Warn(() => $"Supplied config is not of expected type, expected: {typeof(TConfig)}, got: {config.GetType()}");
         if (config is not PoeConfigMetadata metadata)
         {
-            return config;
+            throw new InvalidStateException($"Expected config of type {typeof(TConfig)}, got: {config.GetType()}");
         }
-
         Log.Debug(() => $"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
         var serialized = configSerializer.Serialize(metadata);
         if (string.IsNullOrEmpty(serialized))
         {
-            throw new ApplicationException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
+            throw new InvalidStateException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
         }
 
         var deserialized = configSerializer.Deserialize<TConfig>(serialized);
+        if (deserialized is PoeConfigMetadata)
+        {
+            Log.Warn($"Failed to deserialize config metadata into {typeof(TConfig)}: {metadata}");
+            throw new InvalidStateException($"Failed to deserialize metadata: : {metadata}\n{metadata.ConfigValue}");
+        }
         return deserialized;
     }
     
     private void SaveInternal(IPoeEyeConfig config)
     {
-        var configFilePath = GetConfigFilePath(config.GetType());
+        var configFilePath = GetConfigFilePath(config);
         try
         {
             Log.Debug(() => $"Saving config to file '{configFilePath}'");
@@ -174,15 +202,20 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         }
     }
 
+    private string GetConfigFilePath(IPoeEyeConfig config)
+    {
+        return GetConfigFilePath(ConfigProviderUtils.GetConfigName(config));
+    }
+    
     private string GetConfigFilePath(Type configType)
     {
-        var configFilePath = Path.Combine(configDirectory.FullName, $"{GetConfigName(configType)}.cfg");
-        return configFilePath;
+        return GetConfigFilePath(ConfigProviderUtils.GetConfigName(configType));
     }
 
-    private string GetConfigName(Type configType)
+    private string GetConfigFilePath(string configName)
     {
-        return $"{configType.Namespace}.{configType.Name}";
+        var configFilePath = Path.Combine(configDirectory.FullName, $"{configName}.cfg");
+        return configFilePath;
     }
     
     private TConfig LoadInternal<TConfig>() where TConfig : new()

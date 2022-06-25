@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Reactive.Subjects;
+using DynamicData;
 
 namespace PoeShared.Modularity;
 
@@ -8,7 +9,8 @@ public sealed class ConfigProviderLiteDb : DisposableReactiveObject, IConfigProv
     private static readonly string DatabaseFileName = @"config.db";
     
     public IObservable<Unit> ConfigHasChanged { get; }
-    
+    public IObservableCache<IPoeEyeConfig, string> Configs { get; }
+
     private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
 
     public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
@@ -26,7 +28,7 @@ public sealed class ConfigProviderLiteDb : DisposableReactiveObject, IConfigProv
         throw new NotImplementedException();
     }
 
-    public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
+    public void Save(IPoeEyeConfig config)
     {
         throw new NotImplementedException();
     }

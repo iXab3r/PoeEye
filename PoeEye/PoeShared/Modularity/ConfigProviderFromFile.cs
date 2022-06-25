@@ -16,7 +16,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
     private readonly IConfigSerializer configSerializer;
 
-    private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigsByType = new();
+    private readonly SourceCache<IPoeEyeConfig, string> loadedConfigsByType = new(ConfigProviderUtils.GetConfigName);
     private readonly SourceListEx<IConfigProviderStrategy> strategies = new();
     private readonly NamedLock fileLock = new("ConfigLock");
     private string loadedConfigurationFile;
@@ -69,6 +69,8 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
     public string ConfigFilePath { [NotNull] get; }
 
+    public IObservableCache<IPoeEyeConfig, string> Configs => loadedConfigsByType;
+
     public IObservable<Unit> ConfigHasChanged => configHasChanged;
 
     public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
@@ -89,22 +91,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
                 .ToList()
                 .ForEach(x =>
                 {
-                    string configType;
-                    if (x is PoeConfigMetadata metadata)
-                    {
-                        configType = metadata.TypeName;
-                    }
-                    else
-                    {
-                        configType = x.GetType().FullName;
-                    }
-
-                    if (string.IsNullOrEmpty(configType))
-                    {
-                        throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
-                    }
-
-                    loadedConfigsByType[configType] = x;
+                    loadedConfigsByType.AddOrUpdate(x);
                 });
         }
 
@@ -112,17 +99,10 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         configHasChanged.OnNext(Unit.Default);
     }
 
-    public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
+    public void Save(IPoeEyeConfig config)
     {
         using var @lock = fileLock.Enter();
-
-        var configType = config.GetType().FullName;
-        if (string.IsNullOrEmpty(configType))
-        {
-            throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
-        }
-
-        loadedConfigsByType[configType] = config;
+        loadedConfigsByType.AddOrUpdate(config);
         Save();
     }
 
@@ -131,7 +111,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         using var @lock = fileLock.Enter();
 
         var metaConfig = new PoeEyeCombinedConfig();
-        loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
+        loadedConfigsByType.Items.ToList().ForEach(x => metaConfig.Add(x));
         Log.Debug(() => $"Saving all configs, metadata: {new {MetadataVersion = metaConfig.Version, Items = metaConfig.Items.Select(x => new {Type = x.GetType()}).ToArray()}.ToString().TakeChars(500)}");
 
         SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
@@ -152,13 +132,12 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
     public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
     {
-        using var @lock = fileLock.Enter();
-
-        var configType = typeof(TConfig).FullName;
-        if (string.IsNullOrEmpty(configType))
+        if (typeof(PoeConfigMetadata).IsAssignableFrom(typeof(TConfig)))
         {
-            throw new ApplicationException($"Failed to get {nameof(Type.FullName)} of type {typeof(TConfig)}");
+            throw new ArgumentException($"Provided config type {typeof(TConfig)} is of metadata type instead of an actual config");
         }
+        
+        using var @lock = fileLock.Enter();
 
         if (loadedConfigurationFile == null)
         {
@@ -166,7 +145,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             Reload();
         }
 
-        var config = loadedConfigsByType.GetOrAdd(configType, key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
+        var config = loadedConfigsByType.GetOrAdd(ConfigProviderUtils.GetConfigName(typeof(TConfig)), key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
 
         if (config is PoeConfigMetadata metadata)
         {
@@ -178,7 +157,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             }
 
             var deserialized = configSerializer.Deserialize<TConfig>(serialized);
-            loadedConfigsByType[configType] = deserialized;
+            loadedConfigsByType.AddOrUpdate(deserialized);
             return deserialized;
         }
 
