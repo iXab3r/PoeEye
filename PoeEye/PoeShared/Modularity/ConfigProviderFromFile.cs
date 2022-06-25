@@ -31,7 +31,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         var candidates = new[]
             {
                 AppDomain.CurrentDomain.BaseDirectory,
-                appArguments.SharedAppDataDirectory ?? string.Empty
+                appArguments.SharedAppDataDirectory
             }
             .Select(x => Path.Combine(x, appArguments.Profile, ConfigFileName))
             .Select(x => new {Path = x, Exists = File.Exists(x)})
@@ -306,6 +306,12 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     {
         const string DebugConfigFileName = @"configDebugMode.cfg";
         const string ReleaseConfigFileName = @"config.cfg";
+
+        if (string.IsNullOrEmpty(appArguments.Profile))
+        {
+            Log.Debug(() => $"Profile is not defined - skipping migration");
+            return;
+        }
 
         Log.Debug(() => $"Checking if legacy config file migration is needed for profile {appArguments.Profile}");
         var configName = appArguments.Profile.ToLower() switch

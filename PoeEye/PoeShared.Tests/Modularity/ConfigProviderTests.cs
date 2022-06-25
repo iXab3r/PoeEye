@@ -33,8 +33,15 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
         Log.Info($"AppData: {appDataDirectory} (exists: {Directory.Exists(appDataDirectory)})");
         appArguments = new Mock<IAppArguments>();
         appArguments
-            .SetupGet(x => x.AppDataDirectory)
+            .SetupGet(x => x.SharedAppDataDirectory)
             .Returns(appDataDirectory);
+        appArguments
+            .SetupGet(x => x.AppDomainDirectory)
+            .Returns(AppDomain.CurrentDomain.BaseDirectory);
+        
+        appArguments
+            .SetupGet(x => x.Profile)
+            .Returns("profile");
 
         appArguments.SetupGet(x => x.IsDebugMode).Returns(true);
         

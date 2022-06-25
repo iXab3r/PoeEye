@@ -27,7 +27,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         var candidates = new[]
             {
                 Path.Combine(appArguments.AppDomainDirectory, "config"),
-                appArguments.AppDataDirectory ?? string.Empty
+                appArguments.SharedAppDataDirectory
             }
             .Select(x => new DirectoryInfo(x))
             .ToArray();
