@@ -95,7 +95,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                 Log.Debug(() => $"[{this}] Processed OnNext");
             }
 
-            executionTime = TimeSpan.FromMilliseconds((Stopwatch.GetTimestamp() - now) / (float) Stopwatch.Frequency);
+            executionTime = TimeSpan.FromSeconds((Stopwatch.GetTimestamp() - now) / (float) Stopwatch.Frequency);
             lock (padlock)
             {
                 if (timer == null)
