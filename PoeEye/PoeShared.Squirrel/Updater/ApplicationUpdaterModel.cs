@@ -42,7 +42,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         this.appArguments = appArguments;
 
         MostRecentVersionAppFolder = new DirectoryInfo(appArguments.AppDomainDirectory);
-        RootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
+        AppRootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
+        RootDirectory = AppRootDirectory.Parent;
             
         updateSourceProvider
             .WhenAnyValue(x => x.UpdateSource)
@@ -55,7 +56,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             .AddTo(Anchors);
             
         Log.Debug(() => $"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
-        AppRootDirectory = new DirectoryInfo(Path.Combine(RootDirectory.FullName, appArguments.AppName));
         RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
         LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
         Log.Debug(() => $"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
