@@ -112,7 +112,18 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 throw new ArgumentException($"Converter to {typeof(T2)} expected source of type {typeof(T1)}, got {src.GetType()}");
             }
 
-            return converter.Convert(srcTyped);
+            if (srcTyped.Version != explicitConverterKey.SourceVersion)
+            {
+                throw new InvalidStateException($"Failed to perform conversion - source version is wrong, expected {explicitConverterKey.SourceVersion}, got {srcTyped.Version}: {explicitConverterKey}");
+            }
+            
+            var result = converter.Convert(srcTyped);
+            if (result.Version != explicitConverterKey.TargetVersion)
+            {
+                throw new InvalidStateException($"Failed to perform conversion - converted version is wrong, expected {explicitConverterKey.TargetVersion}, got {result.Version}: {explicitConverterKey}");
+            }
+            
+            return result;
         };
         convertersByMetadata[explicitConverterKey] = explicitConverter;
         RegisterImplicitConverters(explicitConverterKey);

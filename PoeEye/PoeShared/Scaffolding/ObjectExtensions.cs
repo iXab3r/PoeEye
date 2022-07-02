@@ -171,8 +171,10 @@ public static class ObjectExtensions
             .SelectMany(i => i.GetProperties(flags));
     }
 
-    public static void TransferPropertiesTo<TSource, TTarget>(this TSource source, TTarget target)
-        where TTarget : class, TSource
+    public static void TransferPropertiesTo<TSource, TTarget>(
+        this TSource source, 
+        TTarget target, 
+        params string[] propertiesToExclude)
     {
         Guard.ArgumentNotNull(source, nameof(source));
         Guard.ArgumentNotNull(target, nameof(target));
@@ -194,6 +196,12 @@ public static class ObjectExtensions
         {
             try
             {
+                if (propertiesToExclude.Contains(property.Name))
+                {
+                    skippedProperties.Add(property);
+                    continue;
+                }
+                
                 var settableProperty = targetProperties
                     .FirstOrDefault(x => x.Name == property.Name && x.PropertyType.IsAssignableFrom(property.PropertyType));
                 if (settableProperty == null)
