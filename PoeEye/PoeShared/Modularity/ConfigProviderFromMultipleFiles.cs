@@ -76,6 +76,9 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
             SaveInternal(config);
             Log.Info(() => $"Saved config of type {config.GetType()}");
         }
+        
+        Log.Debug(() => $"Saved config, sending notification about config update");
+        configHasChanged.OnNext(Unit.Default);
     }
 
     public void Save(IPoeEyeConfig config)

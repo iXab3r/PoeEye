@@ -1,6 +1,4 @@
-using System.Linq.Expressions;
-using System.Threading;
-
+using System.Reactive.Subjects;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using PoeShared.Services;
@@ -12,7 +10,8 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
 {
     private readonly IComparisonService comparisonService;
     private readonly IConfigProvider configProvider;
-        
+    private readonly Subject<string> reloadSignal = new(); 
+
     private int saveCommandCounter = 0;
     private int loadCommandCounter = 0;
 
@@ -27,9 +26,13 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
 
         this.comparisonService = comparisonService;
         this.configProvider = configProvider;
+
+        configProvider.ConfigHasChanged
+            .Select(x => $"Config change reported by provider {configProvider}")
+            .Subscribe(reloadSignal)
+            .AddTo(Anchors);
             
-        configProvider
-            .ConfigHasChanged
+        reloadSignal
             .StartWithDefault()
             .Select(
                 x =>
@@ -101,6 +104,7 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
         Log.Debug(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
         configProvider.Save(config);
+        reloadSignal.OnNext("Reloading after Save");
     }
         
     private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
