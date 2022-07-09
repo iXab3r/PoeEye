@@ -252,6 +252,6 @@ public sealed class MouseEventExtArgs : MouseEventArgs
 
     public override string ToString()
     {
-        return $"{nameof(Location)}: {Location}, {nameof(Button)}: {Button}, {nameof(Delta)}: {Delta}, {nameof(Modifiers)}: {Modifiers}, {nameof(Handled)}: {Handled}, {nameof(IsInjected)}: {IsInjected}";
+        return $"{nameof(Location)}: {Location}, {nameof(Button)}: {Button}, {nameof(Delta)}: {Delta}, {nameof(Modifiers)}: {Modifiers}, {nameof(Handled)}: {Handled}, {nameof(IsInjected)}: {IsInjected}, {nameof(Timestamp)}: {Timestamp}";
     }
 }
