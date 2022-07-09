@@ -40,7 +40,7 @@ public static class FixtureExtensions
         container.Register(() => mock.Object);
     }
     
-    public static void RegisterConfigProvider<TConfig>(
+    public static Mock<IConfigProvider<TConfig>> RegisterConfigProvider<TConfig>(
         this Fixture container,
         TConfig config) 
         where TConfig : IPoeEyeConfig
@@ -50,6 +50,7 @@ public static class FixtureExtensions
             .SetupGet(x => x.ActualConfig)
             .Returns(config);
         container.Register(() => configProvider.Object);
+        return configProvider;
     }
 }
 
