@@ -16,11 +16,11 @@ namespace PoeShared.Scaffolding.WPF;
 public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 {
     private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
+    private static readonly IScheduler UIScheduler = SchedulerProvider.RedirectToUiScheduler;
 
-    private readonly ISubject<bool> isExecuting = new Subject<bool>();
-    private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
-    private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
-    private readonly IScheduler uiScheduler = SchedulerProvider.RedirectToUiScheduler;
+    private readonly Subject<bool> isExecuting = new();
+    private readonly Subject<Exception> thrownExceptions = new();
+    private readonly Subject<Unit> raiseCanExecuteChangedRequests = new();
     
     private CommandWrapper(DelegateCommandBase command)
     {
@@ -29,17 +29,17 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         InnerCommand = command;
         Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
             .Select(x => command.IsActive)
-            .ObserveOn(uiScheduler)
+            .ObserveOn(UIScheduler)
             .SubscribeSafe(x => IsBusy = x, Log.HandleUiException)
             .AddTo(Anchors);
 
         isExecuting
-            .ObserveOn(uiScheduler)
+            .ObserveOn(UIScheduler)
             .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
             .AddTo(Anchors);
 
         raiseCanExecuteChangedRequests
-            .ObserveOn(uiScheduler)
+            .ObserveOn(UIScheduler)
             .SubscribeSafe(x => command.RaiseCanExecuteChanged(), Log.HandleUiException)
             .AddTo(Anchors);
     }
@@ -133,12 +133,12 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         
     public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute));
+        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(UIScheduler)));
     }
 
     public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(UIScheduler)));
     }
 
     public static CommandWrapper Create(Func<Task> execute)
@@ -148,7 +148,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 
     public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(UIScheduler)));
     }
 
     public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
