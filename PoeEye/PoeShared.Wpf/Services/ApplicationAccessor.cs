@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -16,8 +17,8 @@ namespace PoeShared.Services;
 
 internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicationAccessor
 {
-    private static readonly Process CurrentProcess = Process.GetCurrentProcess();
-    private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger();
+    private static readonly int CurrentProcessId = Environment.ProcessId;
+    private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger().WithSuffix($"App#{CurrentProcessId}");
     private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
     private readonly IAppArguments appArguments;
     private readonly Application application;
@@ -98,8 +99,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     public void Terminate(int exitCode)
     {
         ReportTermination(exitCode);
-        Log.Warn($"Closing application via Environment.Exit with code {exitCode}");
-        Environment.Exit(exitCode);
+        Log.Warn($"Closing application via Terminate with code {exitCode} for process {CurrentProcessId}");
+        Kernel32.TerminateProcess(new IntPtr(Environment.ProcessId), exitCode);
     }
 
     public void Exit()
