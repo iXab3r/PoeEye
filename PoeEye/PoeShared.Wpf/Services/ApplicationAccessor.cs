@@ -99,8 +99,18 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     public void Terminate(int exitCode)
     {
         ReportTermination(exitCode);
-        Log.Warn($"Closing application via Terminate with code {exitCode} for process {CurrentProcessId}");
-        Kernel32.TerminateProcess(new IntPtr(Environment.ProcessId), exitCode);
+
+        using var processHandle = Kernel32.GetCurrentProcess();
+        Log.Info($"Closing application via Terminate with code {exitCode}");
+        if (Kernel32.TerminateProcess(processHandle.DangerousGetHandle(), exitCode))
+        {
+            Log.Info($"Awaiting for process to exit for {TerminationTimeout}, handle: {processHandle}");
+            var waitResult = Kernel32.WaitForSingleObject(processHandle, (int) TerminationTimeout.TotalMilliseconds);
+            Log.Info($"Terminate process wait result: {waitResult}");
+        }
+        Log.Warn($"Failed to Terminate process", new Win32Exception());
+        Log.Info($"Closing application via Environment.Exit with code {exitCode}");
+        Environment.Exit(exitCode);
     }
 
     public void Exit()
@@ -111,9 +121,11 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             if (IsExiting)
             {
                 Log.Warn("Shutdown is already in progress");
-                return;
             }
-            IsExiting = true;
+            else
+            {
+                IsExiting = true;
+            }
         }
 
         try
