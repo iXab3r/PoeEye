@@ -1,10 +1,11 @@
 ﻿using System.Windows.Input;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Profiler;
 
-public interface IProfilerViewModel : IDisposableReactiveObject
+public interface IProfilerViewModel
 {
+    bool IsBusy { get; }
+    
     bool IsRunning { get; }
     
     bool IsCollecting { get; }

@@ -8,10 +8,8 @@ using Unity;
 
 namespace PoeShared.Squirrel.Prism;
 
-public sealed class UpdaterModule : IModule
+public sealed class UpdaterModule : DynamicModule
 {
-    private static readonly IFluentLog Log = typeof(UpdaterModule).PrepareLogger();
-
     private readonly IUnityContainer container;
 
     public UpdaterModule(IUnityContainer container)
@@ -21,12 +19,12 @@ public sealed class UpdaterModule : IModule
         this.container = container;
     }
 
-    public void RegisterTypes(IContainerRegistry containerRegistry)
+    protected override void RegisterTypesInternal(IContainerRegistry containerRegistry)
     {
         container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
     }
 
-    public void OnInitialized(IContainerProvider containerProvider)
+    protected override void OnInitializedInternal(IContainerProvider containerProvider)
     {
         var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
         registrator.RegisterSettingsEditor<UpdateSettingsConfig, UpdateSettingsViewModel>();
