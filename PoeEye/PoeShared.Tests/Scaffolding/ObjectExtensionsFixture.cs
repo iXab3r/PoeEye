@@ -28,4 +28,15 @@ public class ObjectExtensionsFixture
         //Then
 
     }
+
+    [Test]
+    public void ShouldDumpToTableSingleElement()
+    {
+        //Given
+        //When
+        var result = new[] {1}.DumpToTable(", ");
+
+        //Then
+        result.ShouldBe("1");
+    }
 }

@@ -84,7 +84,10 @@ public static class ObjectExtensions
         {
             if (!maxItemsToShow.HasValue || itemCount <= maxItemsToShow)
             {
-                result.Append(separator);
+                if (itemCount > 0)
+                {
+                    result.Append(separator);
+                }
                 result.Append(item.Dump());
             }
             itemCount++;
