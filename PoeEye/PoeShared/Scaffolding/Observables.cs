@@ -5,7 +5,6 @@ namespace PoeShared.Scaffolding;
 
 public static class Observables
 {
-    
 #if NET5_0_OR_GREATER
     public static IObservable<Unit> PeriodicAsync(
         TimeSpan period,
@@ -26,6 +25,9 @@ public static class Observables
         {
             var anchors = new CompositeDisposable();
             var periodic = new PeriodicTimer(period).AddTo(anchors);
+
+            var initialValue = await supplier(token);
+            observer.OnNext(initialValue);
 
             while (await periodic.WaitForNextTickAsync(token))
             {
@@ -48,7 +50,7 @@ public static class Observables
     /// <param name="amendPeriod"></param>
     /// <returns></returns>
     public static IObservable<long> BlockingTimer(TimeSpan period, string timerName = null, bool? amendPeriod = null)
-    {   
+    {
         return Observable.Create<long>(observer =>
         {
             var anchors = new CompositeDisposable();
