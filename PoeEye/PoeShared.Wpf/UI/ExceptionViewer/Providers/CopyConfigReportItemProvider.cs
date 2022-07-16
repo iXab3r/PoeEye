@@ -11,10 +11,14 @@ namespace PoeShared.UI.Providers;
 internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
 {
     private static readonly IFluentLog Log = typeof(CopyConfigReportItemProvider).PrepareLogger();
+    private readonly IAppArguments appArguments;
     private readonly IFactory<IConfigProvider> configProviderFactory;
 
-    public CopyConfigReportItemProvider(IFactory<IConfigProvider> configProviderFactory)
+    public CopyConfigReportItemProvider(
+        IAppArguments appArguments,
+        IFactory<IConfigProvider> configProviderFactory)
     {
+        this.appArguments = appArguments;
         this.configProviderFactory = configProviderFactory;
     }
 
@@ -22,6 +26,8 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
     {
         var result = new List<ExceptionReportItem>();
         TryToCopyConfigFromMemory(outputDirectory, result);
+
+        var configProvider = configProviderFactory.Create();
         TryToCopyExistingConfig(outputDirectory, result);
         return result;
     }
@@ -53,44 +59,56 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
         }
     }
 
-    private void TryToCopyExistingConfig(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
+    private void TryToCopyExistingConfig(
+        DirectoryInfo outputDirectory,
+        IList<ExceptionReportItem> reportItems)
     {
         try
         {
             var configProvider = configProviderFactory.Create();
-            if (configProvider is not ConfigProviderFromFile configProviderFromFile)
+            if (configProvider is ConfigProviderFromFile configProviderFromFile)
             {
-                return;
-            }
-
-            var existingConfig = configProviderFromFile.ConfigFilePath;
-            try
+                TryToCopyExistingConfig(configProviderFromFile, outputDirectory, reportItems);
+            } 
+            else
             {
-                if (!File.Exists(existingConfig))
-                {
-                    return;
-                }
-
-                Log.Debug("Preparing config copy for crash report");
-
-                var configCopy = new FileInfo(Path.Combine(outputDirectory.FullName, Path.GetFileName(existingConfig)));
-                Log.Debug(() => $"Copying existing configuration to {configCopy}");
-                File.Copy(existingConfig, configCopy.FullName);
-                reportItems.Add(new ExceptionReportItem()
-                {
-                    Description = $"Copy of {existingConfig}",
-                    Attachment = configCopy,
-                    Attached = false
-                });
-            }
-            catch (Exception e)
-            {
-                Log.Warn($"Failed to copy existing configuration from config provider {configProvider}, config: {existingConfig}", e);
+                Log.Warn($"Config provider of type {configProvider} is not supported");
             }
         }
         catch (Exception e)
         {
             Log.Warn("Failed to copy existing config", e);
+        }
+    }
+
+    private static void TryToCopyExistingConfig(
+        ConfigProviderFromFile configProvider,
+        DirectoryInfo outputDirectory, 
+        IList<ExceptionReportItem> reportItems)
+    {
+        var existingConfig = configProvider.ConfigFilePath;
+        try
+        {
+            if (!File.Exists(existingConfig))
+            {
+                return;
+            }
+
+            Log.Debug("Preparing config copy for crash report");
+
+            var configCopy = new FileInfo(Path.Combine(outputDirectory.FullName, Path.GetFileName(existingConfig)));
+            Log.Debug(() => $"Copying existing configuration to {configCopy}");
+            File.Copy(existingConfig, configCopy.FullName);
+            reportItems.Add(new ExceptionReportItem()
+            {
+                Description = $"Copy of {existingConfig}",
+                Attachment = configCopy,
+                Attached = false
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to copy existing configuration from config provider {configProvider}, config: {existingConfig}", e);
         }
     }
 }
