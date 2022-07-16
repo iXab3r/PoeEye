@@ -20,8 +20,8 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
 
     public IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory)
     {
-        const int logsToInclude = 5;
-        const int logsToAttach = 3;
+        const int logsToInclude = 7;
+        const int logsToAttach = 5;
         Log.Debug("Preparing log files for report...");
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var logFilesToInclude = new DirectoryInfo(logFilesRoot)

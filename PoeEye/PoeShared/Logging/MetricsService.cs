@@ -37,7 +37,7 @@ internal sealed class MetricsService : DisposableReactiveObject
         this.appArguments = appArguments;
 
         Observables.BlockingTimer( TimeSpan.FromSeconds(1))
-            .SubscribeSafe(() => Log.Metrics.Measure.Gauge.SetValue(appLifetimeCounter, stopwatch.ElapsedMilliseconds), Log.HandleException)
+            .SubscribeSafe(() => Metrics.Measure.Gauge.SetValue(appLifetimeCounter, stopwatch.ElapsedMilliseconds), Log.HandleException)
             .AddTo(Anchors);
             
         Observables.BlockingTimer(TimeSpan.FromSeconds(30))
