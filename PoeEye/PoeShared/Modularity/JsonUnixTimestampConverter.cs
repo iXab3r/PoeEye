@@ -14,5 +14,4 @@ public sealed class JsonUnixTimestampConverter : DateTimeConverterBase
     {
         return reader.Value == null ? DateTime.UnixEpoch : DateTimeUtils.ConvertFromUnixTimestamp(Convert.ToDouble(reader.Value));
     }
-
 }
