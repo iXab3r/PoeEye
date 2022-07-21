@@ -51,7 +51,7 @@ public class AppArguments : AppOptions, IAppArguments
     public string AppDomainDirectory { get; }
 
     public string AppDataDirectory { get; }
-
+    
     public string SharedAppDataDirectory => IsWindows
         ? Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}")
         : $"~/{AppName}";

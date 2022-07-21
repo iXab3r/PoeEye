@@ -21,6 +21,8 @@ public interface IAppConfig
     int ProcessId { get; }
 
     string ApplicationExecutableName { [CanBeNull] get; }
+    
+    string ApplicationExecutablePath { [CanBeNull] get; }
 }
 
 public interface IAppArguments : IAppConfig
