@@ -63,53 +63,53 @@ public static class PathUtils
         return (path ?? string.Empty).Count(x => x == Path.DirectorySeparatorChar);
     }
 
-    public static bool IsParentDir(string candidatePath, string fullPath)
+    public static bool IsParentDir(string candidatePath, string parentDir)
     {
-        if (candidatePath == fullPath || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(fullPath))
+        if (candidatePath == parentDir || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
         {
             return false;
         }
         
         var path1 = FullPath.FromPath(candidatePath);
-        var path2 = FullPath.FromPath(fullPath);
+        var path2 = FullPath.FromPath(parentDir);
         return path2.IsChildOf(path1);
     }
     
-    public static bool IsSubDir(string candidatePath, string fullPath)
+    public static bool IsSubDir(string candidatePath, string parentDir)
     {
-        if (candidatePath == fullPath || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(fullPath))
+        if (candidatePath == parentDir || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
         {
             return false;
         }
 
-        var separatorIdx = fullPath.IndexOf(Path.DirectorySeparatorChar);
+        var separatorIdx = parentDir.IndexOf(Path.DirectorySeparatorChar);
         var subfolderIdx = separatorIdx + 1;
-        if (separatorIdx <= 0 || subfolderIdx == fullPath.Length)
+        if (separatorIdx <= 0 || subfolderIdx == parentDir.Length)
         {
             // provided path does not have subdirectories
             return false;
         }
 
-        var subPath = fullPath[subfolderIdx..];
+        var subPath = parentDir[subfolderIdx..];
         var path1 = FullPath.FromPath(candidatePath);
         var path2 = FullPath.FromPath(subPath);
         return path1 == path2 || path2.IsChildOf(path1);
     }
     
-    public static bool IsDirOrSubDir(string candidatePath, string fullPath)
+    public static bool IsDirOrSubDir(string candidate, string parentDir)
     {
-        if (candidatePath == fullPath)
+        if (candidate == parentDir)
         {
             return true;
         }
         
-        if (string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(fullPath))
+        if (string.IsNullOrEmpty(candidate) || string.IsNullOrEmpty(parentDir))
         {
             return false;
         }
 
-        var path1 = FullPath.FromPath(candidatePath);
-        var path2 = FullPath.FromPath(fullPath);
+        var path1 = FullPath.FromPath(candidate);
+        var path2 = FullPath.FromPath(parentDir);
         return path2.IsChildOf(path1);
     }
     
