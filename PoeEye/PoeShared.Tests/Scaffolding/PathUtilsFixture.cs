@@ -2,6 +2,7 @@
 using AutoFixture;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Meziantou.Framework;
 using PoeShared.Scaffolding;
 using Shouldly;
@@ -59,6 +60,10 @@ public class PathUtilsFixture : FixtureBase
 
         //Then
         result.ShouldBe(expected);
+        if (!string.IsNullOrEmpty(folderPath) && !string.IsNullOrEmpty(fullPath))
+        {
+            new DirectoryInfo(folderPath).IsDirOrSubDir(new DirectoryInfo(fullPath)).ShouldBe(expected);
+        }
     }
     
     [Test]
@@ -93,6 +98,8 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("a", "b", false)]
     [TestCase("a\\b\\c", "a\\b\\c", false)]
     [TestCase("a", "a\\b\\c", true)]
+    [TestCase("a", "a\\B\\c", true)]
+    [TestCase("A", "a\\B\\c", true)]
     [TestCase("a\\b", "a\\b\\c", true)]
     [TestCase("b", "a\\b\\c", false)]
     [TestCase("a", "abc\\bcd\\c", false)]
@@ -105,6 +112,10 @@ public class PathUtilsFixture : FixtureBase
 
         //Then
         result.ShouldBe(expected);
+        if (!string.IsNullOrEmpty(folderPath) && !string.IsNullOrEmpty(fullPath))
+        {
+            new DirectoryInfo(folderPath).IsParentOf(new DirectoryInfo(fullPath)).ShouldBe(expected);
+        }
     }
 
     [Test]

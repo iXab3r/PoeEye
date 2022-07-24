@@ -17,12 +17,16 @@ public interface IAppConfig
     string SharedAppDataDirectory { [CanBeNull] get; }
     
     string LocalAppDataDirectory { [CanBeNull] get; }
-        
+    
     int ProcessId { get; }
 
     string ApplicationExecutableName { [CanBeNull] get; }
     
     string ApplicationExecutablePath { [CanBeNull] get; }
+    
+    DirectoryInfo EnvironmentLocalAppData { get; }
+    
+    DirectoryInfo EnvironmentAppData { get; }
 }
 
 public interface IAppArguments : IAppConfig

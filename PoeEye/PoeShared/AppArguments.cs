@@ -52,13 +52,9 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string AppDataDirectory { get; }
     
-    public string SharedAppDataDirectory => IsWindows
-        ? Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}")
-        : $"~/{AppName}";
+    public string SharedAppDataDirectory => Path.Combine(EnvironmentAppData.FullName, AppName);
 
-    public string LocalAppDataDirectory => IsWindows 
-        ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\{AppName}") 
-        : $"~/.{AppName}";
+    public string LocalAppDataDirectory => Path.Combine(EnvironmentLocalAppData.FullName, AppName);
 
     public AppArguments()
     {
@@ -116,6 +112,10 @@ public class AppArguments : AppOptions, IAppArguments
     public bool IsElevated { get; set; }
 
     public string ApplicationExecutablePath { get; }
+
+    public DirectoryInfo EnvironmentLocalAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%") : "~/");
+    
+    public DirectoryInfo EnvironmentAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%APPDATA%") : "~/");
 
     public string ApplicationExecutableName { get; }
         

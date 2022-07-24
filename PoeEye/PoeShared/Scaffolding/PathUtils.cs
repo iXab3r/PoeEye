@@ -6,6 +6,22 @@ namespace PoeShared.Scaffolding;
 
 public static class PathUtils
 {
+    private static readonly Func<string, string> PathConverter;
+    private static bool IsWindows { get; }
+    private static bool IsLinux { get; }
+
+    static PathUtils()
+    {
+#if NET5_0_OR_GREATER
+            IsWindows = OperatingSystem.IsWindows();
+            IsLinux = OperatingSystem.IsLinux();
+#else
+        IsWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+        IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+#endif
+        PathConverter = IsWindows ? x => x?.ToLower() : x => x;
+    }
+    
     public static string GetCommonRootDirectory(IReadOnlyList<string> paths)
     {
         return GetCommonRootDirectory(paths, Path.DirectorySeparatorChar);
@@ -70,8 +86,8 @@ public static class PathUtils
             return false;
         }
         
-        var path1 = FullPath.FromPath(candidatePath);
-        var path2 = FullPath.FromPath(parentDir);
+        var path1 = FullPath.FromPath(PathConverter(candidatePath));
+        var path2 = FullPath.FromPath(PathConverter(parentDir));
         return path2.IsChildOf(path1);
     }
     
@@ -91,8 +107,8 @@ public static class PathUtils
         }
 
         var subPath = parentDir[subfolderIdx..];
-        var path1 = FullPath.FromPath(candidatePath);
-        var path2 = FullPath.FromPath(subPath);
+        var path1 = FullPath.FromPath(PathConverter(candidatePath));
+        var path2 = FullPath.FromPath(PathConverter(subPath));
         return path1 == path2 || path2.IsChildOf(path1);
     }
     
@@ -108,8 +124,8 @@ public static class PathUtils
             return false;
         }
 
-        var path1 = FullPath.FromPath(candidate);
-        var path2 = FullPath.FromPath(parentDir);
+        var path1 = FullPath.FromPath(PathConverter(candidate));
+        var path2 = FullPath.FromPath(PathConverter(parentDir));
         return path2.IsChildOf(path1);
     }
     
