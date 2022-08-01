@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Cryptography;
@@ -10,46 +11,98 @@ using PoeShared.Logging;
 
 namespace PoeShared.Converters;
 
+/// <summary>
+///   Uses Windows DPAPI to protect data, key is linked to local machine
+/// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class SafeDataConverter : JsonConverter
 {
     private static readonly IFluentLog Log = typeof(SafeDataConverter).PrepareLogger();
 
+    /// <summary>
+    ///   Additional entropy makes it a bit harder to decrypt values without looking into how exactly DPAPI is called
+    /// </summary>
+    private static readonly byte[] AdditionalEntropy = { 2, 0, 2, 2, 0, 8, 0, 1 };
+    
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        if (!(value is SecureString secureString))
+        var rawValue = value switch
         {
-            throw new ArgumentException($"Expected instance of {nameof(SecureString)}, got {value?.GetType()}");
-        }
-        var bytesToEncode = Encoding.Default.GetBytes(secureString.ToUnsecuredString());
-        var encodedBytes = ProtectedData.Protect(bytesToEncode, null, DataProtectionScope.LocalMachine);
-        var serializedBytes = JsonConvert.SerializeObject(encodedBytes);
+            SecureString secureString => secureString.ToUnsecuredString(),
+            string str => str,
+            _ => SerializeToString(serializer, value)
+        };
+        var bytesToEncode = Encoding.Default.GetBytes(rawValue);
+        var encodedBytes = ProtectedData.Protect(bytesToEncode, AdditionalEntropy, DataProtectionScope.LocalMachine);
+        var serializedBytes = SerializeToString(serializer, encodedBytes);
         writer.WriteRawValue(serializedBytes);
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         var deserializedBytes = serializer.Deserialize<byte[]>(reader);
+        if (deserializedBytes == null)
+        {
+            return null;
+        }
 
+        string rawValue = default;
         try
         {
-            if (deserializedBytes != null)
-            {
-                var decodedBytes = ProtectedData.Unprotect(deserializedBytes, null, DataProtectionScope.LocalMachine);
-                var resultString = Encoding.Default.GetString(decodedBytes);
-                return resultString.ToSecuredString();
-            }
+            var decodedBytes = ProtectedData.Unprotect(deserializedBytes, AdditionalEntropy, DataProtectionScope.LocalMachine);
+            rawValue = Encoding.Default.GetString(decodedBytes);
         }
         catch (CryptographicException e)
         {
-            Log.Warn($"Failed to decrypt value {existingValue} into type {objectType}", e);
+            Log.Warn($"Failed to decrypt value {existingValue} with entropy into type {objectType}", e);
         }
 
-        return null;
+        try
+        {
+            var decodedBytes = ProtectedData.Unprotect(deserializedBytes, null, DataProtectionScope.LocalMachine);
+            rawValue = Encoding.Default.GetString(decodedBytes);
+        }
+        catch (CryptographicException e)
+        {
+            Log.Warn($"Failed to decrypt value {existingValue} without entropy into type {objectType}", e);
+        }
+
+        if (rawValue == null)
+        {
+            return null;
+        }
+
+        if (typeof(string) == objectType)
+        {
+            return rawValue;
+        }
+
+        if (typeof(SecureString) == objectType)
+        {
+            return rawValue.ToSecuredString();
+        }
+        
+        var result = DeserializeFromString(serializer, rawValue, objectType);
+        return result;
     }
 
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(SecureString);
+        return true;
+    }
+
+    private static object DeserializeFromString(JsonSerializer serializer, string json, Type objectType)
+    {
+        using var textReader = new StringReader(json);
+        using var jsonReader = new JsonTextReader(textReader);
+        var result = serializer.Deserialize(jsonReader, objectType);
+        return result;
+    }
+    
+    private static string SerializeToString(JsonSerializer serializer, object value)
+    {
+        using var textWriter = new StringWriter();
+        serializer.Serialize(textWriter, value);
+        return textWriter.ToString();
     }
 }
