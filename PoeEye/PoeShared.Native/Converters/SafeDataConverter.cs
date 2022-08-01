@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Security;
@@ -23,7 +24,7 @@ public sealed class SafeDataConverter : JsonConverter
     ///   Additional entropy makes it a bit harder to decrypt values without looking into how exactly DPAPI is called
     /// </summary>
     private static readonly byte[] AdditionalEntropy = { 2, 0, 2, 2, 0, 8, 0, 1 };
-    
+
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var rawValue = value switch
@@ -35,36 +36,35 @@ public sealed class SafeDataConverter : JsonConverter
         var bytesToEncode = Encoding.Default.GetBytes(rawValue);
         var encodedBytes = ProtectedData.Protect(bytesToEncode, AdditionalEntropy, DataProtectionScope.LocalMachine);
         var serializedBytes = SerializeToString(serializer, encodedBytes);
-        writer.WriteRawValue(serializedBytes);
+        var compressedBytes = StringUtils.CompressStringToGZip(serializedBytes, includePrefix: true);
+        writer.WriteValue(compressedBytes);
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        var deserializedBytes = serializer.Deserialize<byte[]>(reader);
-        if (deserializedBytes == null)
+        if (reader.Value is not string rawValue)
         {
             return null;
         }
+        if (StringUtils.IsGzip(rawValue))
+        {
+            rawValue = StringUtils.DecompressStringFromGZip(rawValue, true);
 
-        string rawValue = default;
-        try
-        {
-            var decodedBytes = ProtectedData.Unprotect(deserializedBytes, AdditionalEntropy, DataProtectionScope.LocalMachine);
-            rawValue = Encoding.Default.GetString(decodedBytes);
-        }
-        catch (CryptographicException e)
-        {
-            Log.Warn($"Failed to decrypt value {existingValue} with entropy into type {objectType}", e);
-        }
+            var deserializedBytes = (byte[])DeserializeFromString(serializer, rawValue, typeof(byte[]));
+            if (deserializedBytes == null || deserializedBytes.Length == 0)
+            {
+                return null;
+            }
 
-        try
-        {
-            var decodedBytes = ProtectedData.Unprotect(deserializedBytes, null, DataProtectionScope.LocalMachine);
-            rawValue = Encoding.Default.GetString(decodedBytes);
-        }
-        catch (CryptographicException e)
-        {
-            Log.Warn($"Failed to decrypt value {existingValue} without entropy into type {objectType}", e);
+            try
+            {
+                var decodedBytes = ProtectedData.Unprotect(deserializedBytes, AdditionalEntropy, DataProtectionScope.LocalMachine);
+                rawValue = Encoding.Default.GetString(decodedBytes);
+            }
+            catch (CryptographicException e)
+            {
+                Log.Warn($"Failed to decrypt array of size {deserializedBytes.Length} with entropy into type {objectType}", e);
+            }
         }
 
         if (rawValue == null)
@@ -102,7 +102,8 @@ public sealed class SafeDataConverter : JsonConverter
     private static string SerializeToString(JsonSerializer serializer, object value)
     {
         using var textWriter = new StringWriter();
-        serializer.Serialize(textWriter, value);
+        using var jsonWriter = new JsonTextWriter(textWriter);
+        serializer.Serialize(jsonWriter, value);
         return textWriter.ToString();
     }
 }

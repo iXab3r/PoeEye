@@ -75,19 +75,74 @@ public class SafeDataConverterTests : FixtureBase
     }
     
     [Test]
-    public void ShouldThrowOnSelfReferencingLoop()
+    public void ShouldProtectSecureClass()
     {
         //Given
         var settings = CreateInstance();
 
         //When
-        var action = () => JsonConvert.SerializeObject(new SecureContainerClass()
+        var serialized = JsonConvert.SerializeObject(new SecureContainerClass()
         {
-            SafeObject = new TestClass("a")
+            Container = new ContainerClass()
+            {
+                SafeObject = new TestClass("a")
+            }
         }, settings);
 
         //Then
-        action.ShouldThrow<JsonSerializationException>();
+        JsonConvert.DeserializeObject<SecureContainerClass>(serialized, settings).Container.SafeObject.Value.ShouldBe("a");
+    }
+    
+    [Test]
+    public void ShouldUnprotectContainer()
+    {
+        //Given
+        var settings = CreateInstance();
+
+        //When
+        var serialized = "{ 'SafeString': 'a' }";
+
+        //Then
+        JsonConvert.DeserializeObject<ContainerClass>(serialized, settings).SafeString.ShouldBe("a");
+    }
+
+    [Test]
+    public void ShouldProtectInherited()
+    {
+        //Given
+        var settings = CreateInstance();
+
+
+        //When
+        var serialized = JsonConvert.SerializeObject(new ShareAuraSubscriptionConfig()
+        {
+            UserName = "test".ToSecuredString(),
+            AuraTree = new TestClass("a"),
+            ShareId = "b"
+        }, settings);
+
+        //Then
+        var result = JsonConvert.DeserializeObject<ShareAuraSubscriptionConfig>(serialized, settings);
+        result.ShareId.ShouldBe("b");
+        result.UserName.ToUnsecuredString().ShouldBe("test");
+        result.AuraTree.Value.ShouldBe("a");
+    } 
+    
+    [Test]
+    public void ShouldThrowOnCircularReference()
+    {
+        //Given
+        var settings = CreateInstance();
+
+
+        //When
+        var serializeAction = () => JsonConvert.SerializeObject(new SecuredContainerClass()
+        {
+            SafeSecureString = "a".ToSecuredString()
+        }, settings);
+
+        //Then
+        serializeAction.ShouldThrow<JsonSerializationException>();
     }
 
     private JsonSerializerSettings CreateInstance()
@@ -95,10 +150,16 @@ public class SafeDataConverterTests : FixtureBase
         var result = new JsonSerializerSettings();
         return result;
     }
-
+    
     [JsonConverter(typeof(SafeDataConverter))]
-    private record SecureContainerClass : ContainerClass
+    private record SecuredContainerClass : ContainerClass
     {
+    }
+
+    private record SecureContainerClass
+    {
+        [JsonConverter(typeof(SafeDataConverter))]
+        public ContainerClass Container { get; set; }
     }
     
     private record ContainerClass
@@ -117,4 +178,23 @@ public class SafeDataConverterTests : FixtureBase
     }
 
     private sealed record TestClass(string Value);
+    
+    private sealed record ShareAuraSubscriptionConfig : AuraFolderSubscriptionConfig
+    {
+        public string ShareId { get; set; }
+        [JsonConverter(typeof(SafeDataConverter))] public SecureString UserName { get; set; }
+        public override bool IsValid => !string.IsNullOrEmpty(ShareId);
+        public override int Version { get; set; } = 1;
+    }
+    
+    private abstract record AuraFolderSubscriptionConfig 
+    {
+        [JsonConverter(typeof(SafeDataConverter))]
+        public TestClass AuraTree { get; set; }
+
+        [JsonIgnore]
+        public abstract bool IsValid { get; }
+    
+        public abstract int Version { get; set; }
+    }
 }
