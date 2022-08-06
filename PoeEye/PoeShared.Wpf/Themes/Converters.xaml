@@ -46,6 +46,7 @@
     
     <eyeConverters:IntPtrToHexadecimalConverter x:Key="IntPtrToHexadecimalConverter"/>
     <eyeConverters:StringFormatConverter x:Key="StringFormatConverter"/>
+    <eyeConverters:FileInfoToStringConverter x:Key="FileInfoToStringConverter"/>
     
     <eyeConverters:MultiBooleanOrConverter x:Key="MultiBooleanOrConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
     <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAndConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
