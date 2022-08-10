@@ -308,27 +308,19 @@ public static class StringUtils
         Guard.ArgumentNotNull(() => text);
 
         var buffer = Encoding.UTF8.GetBytes(text);
-        var memoryStream = new MemoryStream();
+        using var memoryStream = new MemoryStream();
         using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true))
         {
             gZipStream.Write(buffer, 0, buffer.Length);
         }
-
-        memoryStream.Position = 0;
-
-        var compressedData = new byte[memoryStream.Length];
-        memoryStream.Read(compressedData, 0, compressedData.Length);
-
-        var gZipBuffer = new byte[compressedData.Length + 4];
-        Buffer.BlockCopy(compressedData, 0, gZipBuffer, 4, compressedData.Length);
-        Buffer.BlockCopy(BitConverter.GetBytes(buffer.Length), 0, gZipBuffer, 0, 4);
+        var compressedBuffer = memoryStream.ToArray();
         if (includePrefix)
         {
-            return $"{GzipPrefix}{Convert.ToBase64String(gZipBuffer)}";
+            return $"{GzipPrefix}{Convert.ToBase64String(compressedBuffer)}";
         }
         else
         {
-            return Convert.ToBase64String(gZipBuffer);
+            return Convert.ToBase64String(compressedBuffer);
         }
     }
 
@@ -336,8 +328,77 @@ public static class StringUtils
     ///     Decompresses the string.
     /// </summary>
     /// <param name="compressedText">The compressed text.</param>
+    /// <param name="requirePrefix">Indicates whether compressed text must contain GZip prefix</param>
     /// <returns></returns>
     public static string DecompressStringFromGZip(string compressedText, bool requirePrefix = false)
+    {
+        Guard.ArgumentNotNull(() => compressedText);
+
+        try
+        {
+
+            var hasPrefix = compressedText.StartsWith(GzipPrefix);
+            if (requirePrefix && !hasPrefix)
+            {
+                throw new ArgumentException($"Provided message must start with '{GzipPrefix}', got: {compressedText}");
+            }
+            if (hasPrefix)
+            {
+                return DecompressStringFromGZip(compressedText[GzipPrefix.Length..]);
+            }
+
+            var compressedBuffer = Convert.FromBase64String(compressedText);
+            using (var decompressed = new MemoryStream())
+            using (var compressed = new MemoryStream(compressedBuffer))
+            {
+                compressed.Position = 0;
+                using (var gZipStream = new GZipStream(compressed, CompressionMode.Decompress))
+                {
+                    gZipStream.CopyTo(decompressed);
+                }
+
+                return Encoding.UTF8.GetString(decompressed.ToArray());
+            }
+        }
+        catch (InvalidDataException)
+        {
+            // try the old method as it seems that data either is malformed or compressed via legacy method
+            try
+            {
+                var legacyResult = DecompressStringFromGZipLegacy(compressedText, requirePrefix);
+                return legacyResult;
+            }
+            catch (Exception)
+            {
+                // we do not care about legacy exception
+            }
+            throw;
+        }
+    }
+
+    /// <summary>
+    ///     Парсит Enum из строки/числа, регистронезависимо
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="_value"></param>
+    /// <param name="_enumValue"></param>
+    /// <returns></returns>
+    public static bool TryParseEnum<T>(object _value, out T _enumValue) where T : struct
+    {
+        if (!typeof(T).IsEnum) throw new ArgumentException(string.Format("{0} is not Enum", typeof(T)));
+        _enumValue = default;
+        if (_value == null) return false;
+
+        var stringValue = _value.ToString();
+        return Enum.TryParse(stringValue, true, out _enumValue);
+    }
+        
+    [DllImport("Shlwapi.dll", CharSet = CharSet.Auto)]
+    private static extern long StrFormatByteSize(long _fileSize, [MarshalAs(UnmanagedType.LPTStr)] StringBuilder _buffer, int _bufferSize);
+    
+    
+    [Obsolete("Contains an error, kept here for compatibility reasons")]
+    private static string DecompressStringFromGZipLegacy(string compressedText, bool requirePrefix = false)
     {
         Guard.ArgumentNotNull(() => compressedText);
 
@@ -367,24 +428,4 @@ public static class StringUtils
             return Encoding.UTF8.GetString(buffer);
         }
     }
-
-    /// <summary>
-    ///     Парсит Enum из строки/числа, регистронезависимо
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="_value"></param>
-    /// <param name="_enumValue"></param>
-    /// <returns></returns>
-    public static bool TryParseEnum<T>(object _value, out T _enumValue) where T : struct
-    {
-        if (!typeof(T).IsEnum) throw new ArgumentException(string.Format("{0} is not Enum", typeof(T)));
-        _enumValue = default;
-        if (_value == null) return false;
-
-        var stringValue = _value.ToString();
-        return Enum.TryParse(stringValue, true, out _enumValue);
-    }
-        
-    [DllImport("Shlwapi.dll", CharSet = CharSet.Auto)]
-    private static extern long StrFormatByteSize(long _fileSize, [MarshalAs(UnmanagedType.LPTStr)] StringBuilder _buffer, int _bufferSize);
 }

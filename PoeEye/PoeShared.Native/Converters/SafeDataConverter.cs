@@ -93,17 +93,33 @@ public sealed class SafeDataConverter : JsonConverter
 
     private static object DeserializeFromString(JsonSerializer serializer, string json, Type objectType)
     {
-        using var textReader = new StringReader(json);
-        using var jsonReader = new JsonTextReader(textReader);
-        var result = serializer.Deserialize(jsonReader, objectType);
-        return result;
+        try
+        {
+            using var textReader = new StringReader(json);
+            using var jsonReader = new JsonTextReader(textReader);
+            var result = serializer.Deserialize(jsonReader, objectType);
+            return result;
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to deserialize object of type {objectType} from JSON string:\n{json}", e);
+            throw;
+        }
     }
     
     private static string SerializeToString(JsonSerializer serializer, object value)
     {
-        using var textWriter = new StringWriter();
-        using var jsonWriter = new JsonTextWriter(textWriter);
-        serializer.Serialize(jsonWriter, value);
-        return textWriter.ToString();
+        try
+        {
+            using var textWriter = new StringWriter();
+            using var jsonWriter = new JsonTextWriter(textWriter);
+            serializer.Serialize(jsonWriter, value);
+            return textWriter.ToString();
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to serialize {(value == null ? "null" : $"object of type {value.GetType()}")} to JSON string{(value == null ? string.Empty : $": {value}")}", e);
+            throw;
+        }
     }
 }
