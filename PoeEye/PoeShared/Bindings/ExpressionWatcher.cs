@@ -164,16 +164,35 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
 
     public void SetCurrentValue(object newValue)
     {
-        if (newValue != null && newValue is not TProperty)
+        object converted;
+        
+        switch (newValue)
         {
-            var error = new BindingException($"Failed to set current value value of {Source} from {Value} to {newValue} - invalid property type, expected {typeof(TProperty)}, got {newValue.GetType()}");
-            Log.Warn($"Could not set current value of watcher {this}", error);
-            Error = error;
-            return;
+            case null:
+                converted = null;
+                break;
+            case TProperty:
+                converted = newValue;
+                break;
+            default:
+            {
+                if (typeof(TProperty) == typeof(string))
+                {
+                    converted = newValue.ToString();
+                }
+                else
+                {
+                    var error = new BindingException($"Failed to set current value of {Source} from {Value} to {newValue} - failed to convert type, expected {typeof(TProperty)}, got {newValue.GetType()}");
+                    Log.Warn($"Could not set current value of watcher {this}", error);
+                    Error = error;
+                    return;
+                }
+                break;
+            }
         }
-            
-        var typedNewValue = newValue == null ? default : (TProperty)newValue;
-        SetCurrentValue(typedNewValue);
+
+        var typed = converted == null ? default : (TProperty)converted;
+        SetCurrentValue(typed);
     }
 
     private void HandleBinderException(object sender, ExceptionEventArgs e)
