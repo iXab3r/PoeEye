@@ -164,35 +164,43 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
 
     public void SetCurrentValue(object newValue)
     {
-        object converted;
+        if (!TryConvertToPropertyType(newValue, out var converted))
+        {
+            var error = new BindingException($"Failed to set current value of {Source} from {Value} to {newValue} - failed to convert type, expected {typeof(TProperty)}, got {newValue.GetType()}");
+            Log.Warn($"Could not set current value of watcher {this}", error);
+            Error = error;
+            return;
+        }
         
-        switch (newValue)
+        var typed = converted == null ? default : (TProperty)converted;
+        SetCurrentValue(typed);
+    }
+
+    private bool TryConvertToPropertyType(object value, out object result)
+    {
+        switch (value)
         {
             case null:
-                converted = null;
+                result = null;
                 break;
             case TProperty:
-                converted = newValue;
+                result = value;
                 break;
             default:
             {
                 if (typeof(TProperty) == typeof(string))
                 {
-                    converted = newValue.ToString();
+                    result = value.ToString();
                 }
                 else
                 {
-                    var error = new BindingException($"Failed to set current value of {Source} from {Value} to {newValue} - failed to convert type, expected {typeof(TProperty)}, got {newValue.GetType()}");
-                    Log.Warn($"Could not set current value of watcher {this}", error);
-                    Error = error;
-                    return;
+                    result = default;
+                    return false;
                 }
                 break;
             }
         }
-
-        var typed = converted == null ? default : (TProperty)converted;
-        SetCurrentValue(typed);
+        return true;
     }
 
     private void HandleBinderException(object sender, ExceptionEventArgs e)
