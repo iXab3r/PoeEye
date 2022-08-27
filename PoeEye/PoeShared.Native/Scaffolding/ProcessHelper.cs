@@ -11,6 +11,23 @@ public class ProcessHelper
 {
     private static readonly IFluentLog Log = typeof(ProcessHelper).PrepareLogger();
 
+    public static void RunCmd(string cmd, string arguments, TimeSpan? timeout = null)
+    {
+        Log.Info($"Preparing to execute application: {new {cmd, arguments, timeout}}");
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = cmd,
+            Arguments = arguments,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            ErrorDialog = true,
+        };
+        RunCmd(startInfo, timeout);
+    }
     public static void RunCmd(ProcessStartInfo processStartInfo, TimeSpan? timeout = null)
     {
         Log.Info($"Preparing to execute application: {new {cmdPath = processStartInfo.FileName, timeout}}");
@@ -82,9 +99,9 @@ public class ProcessHelper
             log = log.WithSuffix($"ExitCode: {process.ExitCode} @ {process.ExitTime}");
         }
         log.Info("Application has exited");
-        if (process.ExitCode != 0) 
+        if (process.ExitCode < 0) 
         {
-            throw new InvalidStateException("Process exited with non-zero exit code of: " + process.ExitCode);
+            Log.Warn("Process exited with non-zero exit code of: " + process.ExitCode);
         } 
             
         if (stderr.Any()) 

@@ -80,6 +80,19 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
         Log.Info($"Message box result: { new { title, result.DialogResult }}");
         return result.DialogResult == MessageBoxElement.Yes;
     }
+    
+    public async Task ShowMessage(string title, string content)
+    {
+        Log.Info($"Showing message box: { new { title, content }}");
+        var result = await ShowMessageBox(
+            title,
+            content,
+            string.Empty,
+            true,
+            MessageBoxElement.Ok
+        );
+        Log.Info($"Message box result: { new { title, result.DialogResult }}");
+    }
 
     public async Task<string> ShowInputBox(string title, string content, string contentHint)
     {

@@ -11,6 +11,8 @@ public interface IMessageBoxService : IDisposableReactiveObject
     public Task<MessageBoxElement> ShowDialog(string title, IMessageBoxViewModel content, params MessageBoxElement[] buttons);
         
     public Task<T> ShowDialog<T>(string title, IMessageBoxViewModel<T> content);
+
+    Task ShowMessage(string title, string content);
         
     public Task<bool> ShowConfirmation(
         string title,
