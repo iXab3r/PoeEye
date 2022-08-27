@@ -54,6 +54,7 @@ public class ReactiveBindingFixture : FixtureBase
         instance.TargetWatcher.HasValue.ShouldBe(true);
         instance.TargetWatcher.SupportsSetValue.ShouldBe(false);
         instance.TargetWatcher.CanSetValue.ShouldBe(false);
+        instance.Error.ShouldNotBeNull();
     }
         
     public sealed class SourceContainer : DisposableReactiveObject

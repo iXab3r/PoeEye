@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using JetBrains.Annotations;
 using PropertyBinder;
 using PropertyChanged;
 
@@ -12,7 +11,7 @@ internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
     static ReactiveBinding()
     {
         Binder
-            .Bind(x => x.SourceWatcher.HasValue && x.TargetWatcher.HasValue && x.Error == null)
+            .Bind(x => x.SourceWatcher.HasValue && x.TargetWatcher.HasValue)
             .To(x => x.IsActive);
             
         Binder.Bind(x => new[]
@@ -21,7 +20,7 @@ internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
             x.SourceWatcher.Error == null ? null : $"Source Watcher error: {x.SourceWatcher.Error}"
         }.Where(y => y != null).JoinStrings(Environment.NewLine)).To((x, v) => x.Error = string.IsNullOrEmpty(v) ? default : v);
             
-        Binder.BindIf(x => x.IsActive && x.SourceWatcher.HasValue && x.TargetWatcher.HasValue, x => x.SourceWatcher.Value)
+        Binder.BindIf(x => x.IsActive, x => x.SourceWatcher.Value)
             .ElseIf(x => x.TargetWatcher.HasValue, x => default)
             .To((x, v) =>
             {
@@ -56,7 +55,7 @@ internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
         
     public IValueWatcher TargetWatcher { get; }
         
-    public bool IsActive { get; [UsedImplicitly] private set; }
+    public bool IsActive { get; private set; }
 
     public override string ToString()
     {
