@@ -11,7 +11,25 @@ public class ProcessHelper
 {
     private static readonly IFluentLog Log = typeof(ProcessHelper).PrepareLogger();
 
-    public static void RunCmd(string cmd, string arguments, TimeSpan? timeout = null)
+    public static ProcessRunInfo RunCmdAs(string cmd, string arguments, bool showWindow = false)
+    {
+        Log.Info($"Preparing to execute application with admin permissions: {new {cmd, arguments}}");
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = cmd,
+            Arguments = arguments,
+            UseShellExecute = true,
+            RedirectStandardOutput = false,
+            RedirectStandardError = false,
+            CreateNoWindow = !showWindow,
+            WindowStyle = showWindow ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden,
+            ErrorDialog = true,
+            Verb = "runas"
+        };
+        return RunCmd(startInfo);
+    }
+    
+    public static ProcessRunInfo RunCmd(string cmd, string arguments, TimeSpan? timeout = null)
     {
         Log.Info($"Preparing to execute application: {new {cmd, arguments, timeout}}");
 
@@ -26,63 +44,76 @@ public class ProcessHelper
             WindowStyle = ProcessWindowStyle.Hidden,
             ErrorDialog = true,
         };
-        RunCmd(startInfo, timeout);
+        return RunCmd(startInfo, timeout);
     }
-    public static void RunCmd(ProcessStartInfo processStartInfo, TimeSpan? timeout = null)
+    public static ProcessRunInfo RunCmd(ProcessStartInfo processStartInfo, TimeSpan? timeout = null)
     {
-        Log.Info($"Preparing to execute application: {new {cmdPath = processStartInfo.FileName, timeout}}");
+        Log.Info(@$"Preparing to execute application: {new
+        {
+            processStartInfo.FileName,
+            processStartInfo.Arguments,
+            processStartInfo.UseShellExecute,
+            processStartInfo.Verb,
+            processStartInfo.CreateNoWindow,
+            processStartInfo.WindowStyle,
+            processStartInfo.RedirectStandardInput,
+            processStartInfo.RedirectStandardOutput,
+            processStartInfo.RedirectStandardError,
+            processStartInfo.LoadUserProfile,
+            processStartInfo.ErrorDialog,
+            timeout
+        }}");
         using var process = new Process();
         process.StartInfo = processStartInfo;
         var stderr = new List<string>();
+        var stdout = new List<string>();
 
         var processName = Path.GetFileName(processStartInfo.FileName);
         
         var log = Log.WithSuffix(processName);
-        if (processStartInfo.RedirectStandardOutput)
+        process.OutputDataReceived += (sender, eventArgs) =>
         {
-            process.OutputDataReceived += (sender, eventArgs) =>
+            if (string.IsNullOrEmpty(eventArgs.Data))
             {
-                if (string.IsNullOrEmpty(eventArgs.Data))
-                {
-                    return;
-                }
-                log.WithPrefix("STDOUT").Info(eventArgs.Data);
-            };
-        }
+                return;
+            }
+            log.WithPrefix("STDOUT").Info(eventArgs.Data);
+            stdout.Add(eventArgs.Data);
+        };
 
-        if (processStartInfo.RedirectStandardError)
-        {
-            process.ErrorDataReceived += (sender, eventArgs) => {
-                if (string.IsNullOrEmpty(eventArgs.Data))
-                {
-                    return;
-                }
-                log.WithPrefix("STDERR").Warn($"{eventArgs.Data}");
-                stderr.Add(eventArgs.Data);
-            };
-        }
+        process.ErrorDataReceived += (sender, eventArgs) => {
+            if (string.IsNullOrEmpty(eventArgs.Data))
+            {
+                return;
+            }
+            log.WithPrefix("STDERR").Warn($"{eventArgs.Data}");
+            stderr.Add(eventArgs.Data);
+        };
             
         Log.Info($"Starting process: {processStartInfo.FileName} {process.StartInfo.Arguments}");
         process.Start();
         try
         {
-            log = log.WithSuffix($"Id {process.Id} @ {process.StartTime}");
-            
-            log.Info(() => $"Starting to read process output");
-            if (process.StartInfo.RedirectStandardOutput)
-            {
-                process.BeginOutputReadLine();
-            }
-            if (process.StartInfo.RedirectStandardError)
-            {
-                process.BeginErrorReadLine();
-            }
-            log.Info(() => $"Started reading process output");
+            var processIdInfo = $"Id {process.Id} @ {process.StartTime}";
+            log = log.WithSuffix(processIdInfo);
         }
         catch (Exception e)
         {
             log.Warn($"Failed to get processId", e);
             log = log.WithSuffix($"Id Unknown");
+        }
+        
+        if (process.StartInfo.RedirectStandardOutput)
+        {
+            log.Info(() => $"Starting to read process output");
+            process.BeginOutputReadLine();
+            log.Info(() => $"Started reading process output");
+        }
+        if (process.StartInfo.RedirectStandardError)
+        {
+            log.Info(() => $"Starting to read process errors output");
+            process.BeginErrorReadLine();
+            log.Info(() => $"Started reading process errors output");
         }
         
         log.Info($"Awaiting {timeout} for process to exit");
@@ -102,12 +133,27 @@ public class ProcessHelper
         if (process.ExitCode < 0) 
         {
             Log.Warn("Process exited with non-zero exit code of: " + process.ExitCode);
-        } 
+        }
             
         if (stderr.Any()) 
         {
             throw new InvalidStateException("Process has written errors into output, exit code: " + process.ExitCode + Environment.NewLine + "ERRORS: " + Environment.NewLine + string.Join(Environment.NewLine, stderr));
         }
-        log.Info(() => $"Application has successfully completed");
+        return new ProcessRunInfo
+        {
+            ExitCode = process.ExitCode,
+            StdErr = stderr,
+            StdOut = stdout
+        };
+    }
+    
+    public readonly struct ProcessRunInfo
+    {
+        public int ExitCode { get; init; }
+        
+        public IReadOnlyList<string> StdErr { get; init; }
+        public IReadOnlyList<string> StdOut { get; init; }
+
+        public IReadOnlyList<string> Output => (StdOut ?? ArraySegment<string>.Empty).Concat(StdErr ?? ArraySegment<string>.Empty).ToList();
     }
 }
