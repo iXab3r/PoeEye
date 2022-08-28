@@ -38,7 +38,7 @@ public static class SchedulerExtensions
             }
             catch (Exception ex)
             {
-                inputException = ex;
+                inputException = new AggregateException($"Inner operation has failed - {ex.Message}", ex);
             }
             finally
             {
