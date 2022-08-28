@@ -340,4 +340,85 @@ public partial class UnsafeNative
 
     [DllImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
     private static extern bool CloseHandle(IntPtr handle);
+    
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr VirtualAlloc(
+        IntPtr lpAddress,
+        uint dwSize,
+        AllocationType flAllocationType,
+        MemoryProtection flProtect
+    );
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool VirtualFree(
+        IntPtr lpAddress,
+        uint dwSize,
+        FreeType dwFreeType
+    );
+    
+    /// <summary>
+    ///  After first call with 0, max level is returned in EAX 
+    ///  Level = 0..EAX,
+    ///  Buffer = 16+ bytes
+    /// </summary>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int GetCpuIdDelegate(uint level, byte[] buffer);
+
+    [Flags]
+    public enum AllocationType : uint
+    {
+        COMMIT = 0x1000,
+        RESERVE = 0x2000,
+        RESET = 0x80000,
+        LARGE_PAGES = 0x20000000,
+        PHYSICAL = 0x400000,
+        TOP_DOWN = 0x100000,
+        WRITE_WATCH = 0x200000
+    }
+    
+    [Flags]
+    public enum FreeType
+    {
+        DECOMMIT = 0x4000,
+        RELEASE = 0x8000,
+    }
+
+    [Flags]
+    public enum MemoryProtection : uint
+    {
+        EXECUTE = 0x10,
+        EXECUTE_READ = 0x20,
+        EXECUTE_READWRITE = 0x40,
+        EXECUTE_WRITECOPY = 0x80,
+        NOACCESS = 0x01,
+        READONLY = 0x02,
+        READWRITE = 0x04,
+        WRITECOPY = 0x08,
+        GUARD_Modifierflag = 0x100,
+        NOCACHE_Modifierflag = 0x200,
+        WRITECOMBINE_Modifierflag = 0x400
+    }
+    
+    public static T GetProcAddressOrThrow<T>(Kernel32.SafeLibraryHandle dllHandle, string procName) where T : class
+    {
+        if (dllHandle.IsInvalid)
+        {
+            throw new InvalidStateException($"DLL handle is invalid: {dllHandle}");
+        }
+        if (dllHandle.IsClosed)
+        {
+            throw new InvalidStateException($"DLL handle is closed: {dllHandle}");
+        }
+        var ptr = Kernel32.GetProcAddress(dllHandle, procName);
+        if (ptr == IntPtr.Zero)
+        {
+            throw new InvalidStateException($"Failed to find function {procName}");
+        }
+        var result = Marshal.GetDelegateForFunctionPointer(ptr, typeof(T));
+        if (result is not T typed)
+        {
+            throw new InvalidStateException($"Failed to cast delegate {result} to {typeof(T)}");
+        }
+        return typed;
+    }
 }
