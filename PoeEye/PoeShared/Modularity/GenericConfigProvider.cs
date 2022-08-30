@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace PoeShared.Modularity;
 
-public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
+public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWithLogger, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
 {
     private readonly IComparisonService comparisonService;
     private readonly IConfigProvider configProvider;
@@ -22,7 +22,7 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
         Guard.ArgumentNotNull(comparisonService, nameof(comparisonService));
         Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
-        Log = GetType().PrepareLogger();
+        Log.Debug($"Initializing config provider for {typeof(TConfig)}");
 
         this.comparisonService = comparisonService;
         this.configProvider = configProvider;
@@ -73,8 +73,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, I
         configProvider.Save();
     }
         
-    private IFluentLog Log { get; }
-
     public TConfig ActualConfig { get; private set; }
 
     public IObservable<TConfig> WhenChanged { get; }
