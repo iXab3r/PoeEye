@@ -19,6 +19,20 @@ public static class StringExtensions
             .ToArray();
     }
 
+    public static string TakeMidChars(this string str, int maxChars)
+    {
+        if (str == null || str.Length <= maxChars)
+        {
+            return str;
+        }
+
+        var suffix = $" ({maxChars}+{str.Length - maxChars} chars)";
+
+        var right = maxChars / 2;
+        var left = maxChars - right;
+        return str[..left] + "..." + str[^right..] + suffix;
+    }
+    
     public static string TakeChars(this string str, int maxChars)
     {
         if (str == null || str.Length <= maxChars)
@@ -26,7 +40,7 @@ public static class StringExtensions
             return str;
         }
 
-        return str[..maxChars] + $"... ({maxChars} chars, omitted {str.Length - maxChars} chars)";
+        return str[..maxChars] + $"... ({maxChars}+{str.Length - maxChars} chars)";
     }
 
     public static string JoinStrings(this IEnumerable<string> obj, char separator)

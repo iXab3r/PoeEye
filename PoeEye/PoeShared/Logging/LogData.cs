@@ -7,6 +7,8 @@ namespace PoeShared.Logging;
 /// </summary>
 internal struct LogData
 {
+    private const int DefaultMaxLineLength = 4096;
+    
     /// <summary>
     ///     Gets or sets the trace level.
     /// </summary>
@@ -59,6 +61,8 @@ internal struct LogData
     /// </value>
     public int LineNumber { get; set; }
 
+    public int? MaxLineLength { get; set; }
+
     public readonly LogData WithSuffix(Func<string> provider)
     {
         var result = this;
@@ -102,7 +106,7 @@ internal struct LogData
             message.Append(PrefixProvider());
         }
                 
-        message.Append(Message);
+        message.Append(Message.TakeMidChars(MaxLineLength ?? DefaultMaxLineLength));
 
         if (SuffixProvider != null)
         {
