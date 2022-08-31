@@ -113,9 +113,9 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string ApplicationExecutablePath { get; }
 
-    public DirectoryInfo EnvironmentLocalAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%") : "~/");
+    public DirectoryInfo EnvironmentLocalAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%") : Environment.ExpandEnvironmentVariables($@"$HOME"));
     
-    public DirectoryInfo EnvironmentAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%APPDATA%") : "~/");
+    public DirectoryInfo EnvironmentAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%APPDATA%") : "/var");
 
     public string ApplicationExecutableName { get; }
         
