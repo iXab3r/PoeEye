@@ -1,3 +1,4 @@
+using PoeShared.Modularity;
 using Unity;
 using Unity.Extension;
 using Unity.Lifetime;
@@ -7,6 +8,13 @@ namespace PoeShared.Scaffolding;
 public static class UnityContainerExtensions
 {
     private static readonly IFluentLog Log = typeof(UnityContainerExtensions).PrepareLogger();
+
+    public static IUnityContainer ReplaceConfigMetadata<T>(this IUnityContainer container, string sourceTypeName)
+    {
+        var migrationService = container.Resolve<IPoeConfigMetadataReplacementService>();
+        migrationService.AddMetadataReplacement("sourceTypeName", typeof(T));
+        return container;
+    }
 
     public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
     {
