@@ -16,10 +16,8 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor;
 
-public abstract class DisposableReactiveComponent : DisposableReactiveObject, IHasError
+public abstract class DisposableReactiveComponent : DisposableReactiveObjectWithLogger, IHasError
 {
-    private static readonly IFluentLog Log = typeof(DisposableReactiveComponent).PrepareLogger();
-
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> CollectionProperties = new();
 
     public IStringLocalizer Localizer { get; set; }
