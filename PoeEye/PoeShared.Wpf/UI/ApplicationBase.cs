@@ -147,7 +147,7 @@ public abstract class ApplicationBase : Application
     private void InitializeLogging()
     {
         RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
-        SharedLog.Instance.InitializeLogging(appArguments.Profile, appArguments.AppName);
+        SharedLog.Instance.InitializeLogging(appArguments);
 
         var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
         SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));

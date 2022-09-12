@@ -8,6 +8,7 @@ using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using PoeShared.Modularity;
 
 namespace PoeShared;
 
@@ -37,9 +38,20 @@ public class SharedLog : DisposableReactiveObject
 
     public IFluentLog Log => LogInstanceSupplier.Value;
 
-    public void InitializeLogging(string profile)
+    public void InitializeLogging(IAppArguments appArguments)
     {
-        InitializeLogging(profile, "PoeSharedUnknownApp");
+        Guard.ArgumentNotNull(appArguments.Profile, nameof(appArguments.Profile));
+
+        GlobalContext.Properties["configuration"] = appArguments.Profile;
+        GlobalContext.Properties["CONFIGURATION"] = appArguments.Profile;
+        GlobalContext.Properties["APPNAME"] = appArguments.AppName;
+        GlobalContext.Properties["APPDATA"] = appArguments.AppDataDirectory;
+        GlobalContext.Properties["LOCALAPPDATA"] = appArguments.LocalAppDataDirectory;
+
+        var startupInfo =
+            $"Logging for app {GlobalContext.Properties["APPNAME"]} in '{GlobalContext.Properties["CONFIGURATION"]}' mode initialized";
+        Console.WriteLine(startupInfo);
+        Trace.WriteLine(startupInfo);
     }
 
     public void LoadLogConfiguration(FileInfo logConfig)
@@ -50,22 +62,6 @@ public class SharedLog : DisposableReactiveObject
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         XmlConfigurator.ConfigureAndWatch(repository, logConfig);
         Log.Info($"Logging settings loaded from {logConfig}");
-    }
-
-    public void InitializeLogging(string profile, string appName)
-    {
-        Guard.ArgumentNotNull(profile, nameof(profile));
-
-        GlobalContext.Properties["configuration"] = profile;
-        GlobalContext.Properties["CONFIGURATION"] = profile;
-        GlobalContext.Properties["APPNAME"] = appName;
-        GlobalContext.Properties["APPDATA"] = Environment.ExpandEnvironmentVariables("%APPDATA%");
-        GlobalContext.Properties["LOCALAPPDATA"] = Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%");
-
-        var startupInfo =
-            $"Logging for app {GlobalContext.Properties["APPNAME"]} in '{GlobalContext.Properties["CONFIGURATION"]}' mode initialized";
-        Console.WriteLine(startupInfo);
-        Trace.WriteLine(startupInfo);
     }
 
     public void SwitchLoggingLevel(Level loggingLevel)

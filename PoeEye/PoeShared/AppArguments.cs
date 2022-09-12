@@ -81,12 +81,9 @@ public class AppArguments : AppOptions, IAppArguments
 #endif
             
         var arguments = Environment.GetCommandLineArgs();
-        if (!Parse(arguments))
-        {
-            SharedLog.Instance.InitializeLogging("Startup", this.AppName);
-            throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
-        }
+        Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
 
+        var parsed = Parse(arguments);
         if (string.IsNullOrEmpty(Profile))
         {
             Profile = IsDebugMode ? "debug" : DefaultProfileName;
@@ -96,8 +93,12 @@ public class AppArguments : AppOptions, IAppArguments
             IsDebugMode = Profile == "debug";
         }
         AppDataDirectory = Path.Combine(SharedAppDataDirectory, Profile);
-
-        Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
+        
+        if (!parsed)
+        {
+            SharedLog.Instance.InitializeLogging(this);
+            throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
+        }
         Log.Debug(() => $"Parsed args: {this.Dump()}");
     }
 
