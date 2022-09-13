@@ -12,7 +12,7 @@ public static class UnityContainerExtensions
     public static IUnityContainer ReplaceConfigMetadata<T>(this IUnityContainer container, string sourceTypeName)
     {
         var migrationService = container.Resolve<IPoeConfigMetadataReplacementService>();
-        migrationService.AddMetadataReplacement("sourceTypeName", typeof(T));
+        migrationService.AddMetadataReplacement(sourceTypeName, typeof(T));
         return container;
     }
 
