@@ -16,28 +16,21 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
     private int loadCommandCounter = 0;
 
     public GenericConfigProvider(
-        [NotNull] IComparisonService comparisonService,
-        [NotNull] IConfigProvider configProvider)
+        IPoeConfigMetadataReplacementService metadataReplacementService,
+        IComparisonService comparisonService,
+        IConfigProvider configProvider)
     {
-        Guard.ArgumentNotNull(comparisonService, nameof(comparisonService));
-        Guard.ArgumentNotNull(configProvider, nameof(configProvider));
-
-        Log.Debug($"Initializing config provider for {typeof(TConfig)}");
+        Log.Debug($"Initializing config provider");
 
         this.comparisonService = comparisonService;
         this.configProvider = configProvider;
-
-        configProvider.ConfigHasChanged
-            .Select(x => $"Config change reported by provider {configProvider}")
-            .Subscribe(reloadSignal)
-            .AddTo(Anchors);
-            
+        
         reloadSignal
-            .StartWithDefault()
+            .StartWith("initial signal")
             .Select(
                 x =>
                 {
-                    Log.Debug(() => $"Refreshing ActualConfig...");
+                    Log.Debug(() => $"Refreshing actual config, reason: {x}");
                     var result = configProvider.GetActualConfig<TConfig>();
                     Log.Debug(() => "Refreshed actual config");
                     return result;
@@ -45,6 +38,18 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
             .Subscribe(x => ActualConfig = x)
             .AddTo(Anchors);
 
+        metadataReplacementService
+            .WatchForAddedReplacements(typeof(TConfig))
+            .Skip(1)
+            .Select(sourceTypeName => $"Detected that type synonym was added for config: {sourceTypeName}")
+            .Subscribe(reloadSignal)
+            .AddTo(Anchors);
+
+        configProvider.ConfigHasChanged
+            .Select(x => $"Config change reported by provider {configProvider}")
+            .Subscribe(reloadSignal)
+            .AddTo(Anchors);
+        
         var changes = this
             .WhenAnyValue(x => x.ActualConfig)
             .WithPrevious((prev, curr) => new {prev, curr})

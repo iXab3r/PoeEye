@@ -74,36 +74,7 @@ public static class ObjectExtensions
         string separator,
         int? maxItemsToShow)
     {
-        if (instance == null)
-        {
-            return instance.Dump();
-        }
-        var result = new StringBuilder();
-        var itemCount = 0;
-        foreach (var item in instance)
-        {
-            if (!maxItemsToShow.HasValue || itemCount <= maxItemsToShow)
-            {
-                if (itemCount > 0)
-                {
-                    result.Append(separator);
-                }
-                result.Append(item.Dump());
-            }
-            itemCount++;
-        }
-
-        if (itemCount > maxItemsToShow)
-        {
-            result.Append(separator);
-            result.Append($"and {itemCount - maxItemsToShow} more...");
-        }
-
-        if (!string.IsNullOrEmpty(name))
-        {
-            result.Insert(0, $"{name}({itemCount}):");
-        }
-        return result.ToString();
+        return DumpToTableInternal(instance, name, separator, maxItemsToShow);
     }
     
     public static string DumpToHex(this byte[] value, int bytesPerLine = 32)
@@ -131,6 +102,12 @@ public static class ObjectExtensions
         if (item is IntPtr ptr)
         {
             return ptr.ToHexadecimal();
+        }
+
+        if (item is IEnumerable enumerable)
+        {
+            return DumpToTableInternal(enumerable, $"Enumerable of {typeof(T)}", separator: ", ", Int32.MaxValue);
+            
         }
         return item == null ? "null" : item.ToString();
     }
@@ -304,5 +281,43 @@ public static class ObjectExtensions
     {
         var propertyPath = Reflection.ExpressionToPropertyNames(valueAccessor.Body);
         return new PropertyAccessor<TValue>(source, propertyPath);
+    }
+    
+    private static string DumpToTableInternal(
+        this IEnumerable instance, 
+        string name,
+        string separator,
+        int? maxItemsToShow)
+    {
+        if (instance == null)
+        {
+            return instance.Dump();
+        }
+        var result = new StringBuilder();
+        var itemCount = 0;
+        foreach (var item in instance)
+        {
+            if (!maxItemsToShow.HasValue || itemCount <= maxItemsToShow)
+            {
+                if (itemCount > 0)
+                {
+                    result.Append(separator);
+                }
+                result.Append(item.Dump());
+            }
+            itemCount++;
+        }
+
+        if (itemCount > maxItemsToShow)
+        {
+            result.Append(separator);
+            result.Append($"and {itemCount - maxItemsToShow} more...");
+        }
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            result.Insert(0, $"{name}({itemCount}):");
+        }
+        return result.ToString();
     }
 }

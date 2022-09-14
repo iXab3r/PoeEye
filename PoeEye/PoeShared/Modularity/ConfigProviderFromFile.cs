@@ -22,6 +22,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     private string loadedConfigurationFile;
 
     public ConfigProviderFromFile(
+        IPoeConfigMetadataReplacementService replacementService,
         IConfigSerializer configSerializer,
         IAppArguments appArguments)
     {
@@ -64,6 +65,14 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
                         errorContext.Error);
                     errorContext.Handled = true;
                 })
+            .AddTo(Anchors);
+
+        replacementService
+            .Replacements
+            .ToObservableChangeSet()
+            .Where(x => loadedConfigurationFile != null)
+            .OnItemAdded(x => Log.Error($"Replacement registered AFTER initial config file was loaded - IT WILL NOT BE APPLIED RETROACTIVELY: {x}"))
+            .Subscribe()
             .AddTo(Anchors);
     }
 

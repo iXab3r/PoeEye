@@ -8,10 +8,10 @@ namespace PoeShared.Tests.Helpers;
 
 public static class ObservableExtensions
 {
-    public static IReadOnlyCollection<T> Listen<T>(this IObservable<T> observable)
+    public static IReadOnlyObservableCollection<T> Listen<T>(this IObservable<T> observable)
     {
-        var result = new ConcurrentQueue<T>();
-        observable.Subscribe(result.Enqueue);
+        var result = new SynchronizedObservableCollection<T>();
+        observable.Subscribe(result.Add);
         return result;
     }
 }

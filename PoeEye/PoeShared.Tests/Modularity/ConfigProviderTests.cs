@@ -29,6 +29,9 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
 
     private Mock<IAppArguments> appArguments;
 
+    private IPoeConfigMetadataReplacementService metadataReplacementService;
+    private IPoeConfigConverterMigrationService poeConfigConverterMigrationService;
+
     protected override void SetUp()
     {
         var appDataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appdata");
@@ -46,14 +49,14 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
             .Returns("profile");
 
         appArguments.SetupGet(x => x.IsDebugMode).Returns(true);
-        
-        var configConverter = new PoeConfigConverter(
-            new PoeConfigMetadataReplacementService(),
-            new PoeConfigConverterMigrationService());
-        var configSerializer = new JsonConfigSerializer(configConverter);
-        
-        Container.Register<IConfigSerializer>(() => configSerializer);
+
+        metadataReplacementService = new PoeConfigMetadataReplacementService();
+        poeConfigConverterMigrationService = new PoeConfigConverterMigrationService();
+
+        Container.Register(() => metadataReplacementService);
+        Container.Register(() => poeConfigConverterMigrationService);
         Container.Register(() => appArguments.Object);
+        Container.Register<IConfigSerializer>(() => Container.Create<JsonConfigSerializer>());
 
         if (Directory.Exists(appDataDirectory))
         {
