@@ -16,7 +16,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
     private int loadCommandCounter = 0;
 
     public GenericConfigProvider(
-        IPoeConfigMetadataReplacementService metadataReplacementService,
         IComparisonService comparisonService,
         IConfigProvider configProvider)
     {
@@ -36,13 +35,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
                     return result;
                 })
             .Subscribe(x => ActualConfig = x)
-            .AddTo(Anchors);
-
-        metadataReplacementService
-            .WatchForAddedReplacements(typeof(TConfig))
-            .Skip(1)
-            .Select(sourceTypeName => $"Detected that type synonym was added for config: {sourceTypeName}")
-            .Subscribe(reloadSignal)
             .AddTo(Anchors);
 
         configProvider.ConfigHasChanged

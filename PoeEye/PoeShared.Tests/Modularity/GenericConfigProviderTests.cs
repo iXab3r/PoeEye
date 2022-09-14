@@ -14,11 +14,9 @@ public class GenericConfigProviderTests : FixtureBase
 {
     private Mock<IConfigProvider> configProvider;
     private Mock<IComparisonService> comparisonService;
-    private Mock<IPoeConfigMetadataReplacementService> metadataReplacementService;
 
     private ISubject<Unit> configHasChangedSink;
     private IntermediateCache<IPoeEyeConfig, string> configsCache;
-    private ISubject<PoeConfigMetadata> metadataSink;
 
     protected override void SetUp()
     {
@@ -26,11 +24,6 @@ public class GenericConfigProviderTests : FixtureBase
         configHasChangedSink = new Subject<Unit>();
 
         comparisonService = Container.RegisterMock<IComparisonService>();
-        metadataReplacementService = Container.RegisterMock<IPoeConfigMetadataReplacementService>();
-
-        metadataSink = new Subject<PoeConfigMetadata>();
-        metadataReplacementService.Setup(x => x.Watch(It.IsAny<PoeConfigMetadata>()))
-            .Returns(metadataSink);
         
         configProvider = Container.RegisterMock<IConfigProvider>();
         configProvider.SetupGet(x => x.Configs).Returns(configsCache);
