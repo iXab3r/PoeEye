@@ -104,10 +104,9 @@ public static class ObjectExtensions
             return ptr.ToHexadecimal();
         }
 
-        if (item is IEnumerable enumerable)
+        if (item is IEnumerable enumerable and not string)
         {
             return DumpToTableInternal(enumerable, $"Enumerable of {typeof(T)}", separator: ", ", Int32.MaxValue);
-            
         }
         return item == null ? "null" : item.ToString();
     }
