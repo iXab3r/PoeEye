@@ -63,9 +63,6 @@ public sealed class TaskWindowSeeker : BaseWindowSeeker
             return true;
         }
 
-        //Accept windows that
-        // - have no owner and are not Tool windows OR
-        // - have an owner and are App windows
         if (handle.Parent != null)
         {
             // skip - this is child window
