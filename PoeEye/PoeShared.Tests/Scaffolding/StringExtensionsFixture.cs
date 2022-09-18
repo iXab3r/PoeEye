@@ -37,7 +37,7 @@ public class StringExtensionsFixture : FixtureBase
         //Given
 
         //When
-        var result = input.TakeMidChars(maxChars);
+        var result = input.TakeMidChars(maxChars, addSuffix: true);
 
         //Then
         result.ShouldBe(expected);
