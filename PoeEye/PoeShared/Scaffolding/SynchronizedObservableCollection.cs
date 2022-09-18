@@ -17,6 +17,11 @@ public sealed class SynchronizedObservableCollection<T> : DisposableReactiveObje
     private readonly string collectionId = $"Collection<{typeof(T).Name}>#{Interlocked.Increment(ref collectionIdx)}";
     private readonly NamedLock syncRoot;
 
+    public SynchronizedObservableCollection(IEnumerable<T> enumerable) : this()
+    {
+        collection.AddRange(enumerable);
+    }
+
     public SynchronizedObservableCollection()
     {
         syncRoot = new NamedLock($"{collectionId} Lock");

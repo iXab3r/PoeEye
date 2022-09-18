@@ -315,7 +315,7 @@ public static class ObjectExtensions
 
         if (!string.IsNullOrEmpty(name))
         {
-            result.Insert(0, $"{name}({itemCount}):");
+            result.Insert(0, $"{name}({itemCount}):{separator}");
         }
         return result.ToString();
     }

@@ -1,4 +1,5 @@
 ﻿using App.Metrics;
+using Microsoft.Extensions.Logging;
 using PoeShared.Caching;
 using PoeShared.Evaluators;
 using PoeShared.Modularity;
@@ -25,6 +26,8 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IPoeConfigConverterMigrationService, PoeConfigConverterMigrationService>()
             .RegisterSingleton<IPoeConfigMetadataReplacementService,PoeConfigMetadataReplacementService>()
             .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
+            .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
+            .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
             .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
             
         Container
