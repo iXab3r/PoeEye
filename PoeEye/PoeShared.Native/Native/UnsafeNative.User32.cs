@@ -26,18 +26,6 @@ public partial class UnsafeNative
         KLF_SETFORPROCESS = 0x00000100
     }
 
-    [Flags]
-    public enum WindowExStyles : long
-    {
-        AppWindow = 0x40000,
-        ToolWindow = 0x80,
-    }
-
-    public enum WindowLong
-    {
-        ExStyle = -20,
-    }
-
     /// <summary>
     ///     Indicates whether various virtual keys are down. This parameter can be one or more of the following values.
     ///     https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
@@ -89,12 +77,6 @@ public partial class UnsafeNative
 
     [DllImport("gdi32.dll")]
     static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2,int cx, int cy);
-
-    [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
-    private static extern int GetWindowLong32(IntPtr hWnd, WindowLong nIndex);
-
-    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
-    private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, WindowLong nIndex);
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetMenu(IntPtr hwnd);
@@ -166,16 +148,6 @@ public partial class UnsafeNative
         }
 
         return new IntPtr(GetClassLong32(hWnd, (int) i));
-    }
-
-    public static IntPtr GetWindowLong(IntPtr hWnd, WindowLong i)
-    {
-        if (IntPtr.Size == 8)
-        {
-            return GetWindowLongPtr64(hWnd, i);
-        }
-
-        return new IntPtr(GetWindowLong32(hWnd, i));
     }
 
     public static IntPtr WindowFromPoint(Point point)

@@ -32,6 +32,8 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     
                     <st:StackPanel Orientation="Vertical">
+                        <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowInTaskbar}">Show in taskbar</CheckBox>    
+                        <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowTitleBar}">Show title bar</CheckBox>    
                         <GroupBox Header="Color picker">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:ColorPickerEx x:Name="ColorPickerEx" Color="{Binding Color}" PickerDock="Right" />

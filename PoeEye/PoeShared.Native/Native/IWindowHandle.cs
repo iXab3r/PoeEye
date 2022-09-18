@@ -48,4 +48,8 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     bool IsVisible { get; }
         
     bool IsIconic { get; }
+    
+    IWindowHandle Owner { get; }
+    
+    IWindowHandle Parent { get; }
 }

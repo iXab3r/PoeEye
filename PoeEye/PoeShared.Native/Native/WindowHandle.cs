@@ -22,6 +22,8 @@ internal sealed class WindowHandle : IWindowHandle
     private readonly Lazy<string> classSupplier;
     private readonly Lazy<Icon> iconSupplier;
     private readonly Lazy<BitmapSource> iconBitmapSupplier;
+    private readonly Lazy<IWindowHandle> ownerSupplier;
+    private readonly Lazy<IWindowHandle> parentSupplier;
     private readonly Lazy<User32.WindowStyles> windowStyle;
     private readonly Lazy<User32.WindowStylesEx> windowStyleEx;
     private readonly Lazy<(int processId, int threadId)> processIdSupplier;
@@ -48,7 +50,17 @@ internal sealed class WindowHandle : IWindowHandle
 
             return (processId: processId, threadId: threadId);
         });
-            
+
+        ownerSupplier = new Lazy<IWindowHandle>(() =>
+        {
+            var ownerHandle = User32.GetWindow(Handle, User32.GetWindowCommands.GW_OWNER);
+            return ownerHandle == IntPtr.Zero ? default : new WindowHandle(ownerHandle);
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
+        parentSupplier = new Lazy<IWindowHandle>(() =>
+        {
+            var parentHandle = UnsafeNative.GetParent(Handle);
+            return parentHandle == IntPtr.Zero ? default : new WindowHandle(parentHandle);
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
         classSupplier = new Lazy<string>(() => UnsafeNative.GetWindowClass(handle), LazyThreadSafetyMode.ExecutionAndPublication);
         iconSupplier = new Lazy<Icon>(() => GetWindowIcon(handle), LazyThreadSafetyMode.ExecutionAndPublication);
         windowStyle = new Lazy<User32.WindowStyles>(() => (User32.WindowStyles)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_STYLE));
@@ -219,6 +231,9 @@ internal sealed class WindowHandle : IWindowHandle
     public bool IsVisible => User32.IsWindowVisible(Handle);
 
     public bool IsIconic => User32.IsIconic(Handle);
+
+    public IWindowHandle Owner => ownerSupplier.Value;
+    public IWindowHandle Parent => parentSupplier.Value;
 
     private static Icon GetWindowIcon(IntPtr handle)
     {

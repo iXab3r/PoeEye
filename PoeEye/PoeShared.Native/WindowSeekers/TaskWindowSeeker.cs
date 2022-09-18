@@ -48,35 +48,31 @@ public sealed class TaskWindowSeeker : BaseWindowSeeker
         return InspectWindow(handle, addHandler);
     }
 
-    private bool InspectWindow(IWindowHandle handle, Action<IWindowHandle> addHandler)
+    /// <summary>
+    /// Delegate that is called by EnumWindow
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <param name="addWindowHandler"></param>
+    /// <returns>True to skip(duh) the window</returns>
+    private bool InspectWindow(IWindowHandle handle, Action<IWindowHandle> addWindowHandler)
     {
-        //Code taken from: http://www.thescarms.com/VBasic/alttab.aspx
-
-        //Reject empty titles
+        //Some parts are taken from http://www.thescarms.com/VBasic/alttab.aspx
         if (string.IsNullOrEmpty(handle.Title))
         {
+            //skip - empty titles will not allow for evaluation
             return true;
         }
 
         //Accept windows that
-        // - are visible
-        // - do not have a parent
         // - have no owner and are not Tool windows OR
         // - have an owner and are App windows
-        if ((long) UnsafeNative.GetParent(handle.Handle) != 0)
+        if (handle.Parent != null)
         {
+            // skip - this is child window
             return true;
         }
 
-        var hasOwner = (long) User32.GetWindow(handle.Handle, User32.GetWindowCommands.GW_OWNER) != 0;
-        var exStyle = (UnsafeNative.WindowExStyles) UnsafeNative.GetWindowLong(handle.Handle, UnsafeNative.WindowLong.ExStyle);
-
-        if ((exStyle & UnsafeNative.WindowExStyles.ToolWindow) == 0 && !hasOwner || //unowned non-tool window
-            (exStyle & UnsafeNative.WindowExStyles.AppWindow) == UnsafeNative.WindowExStyles.AppWindow && hasOwner)
-        {
-            addHandler(handle);
-        }
-
+        addWindowHandler(handle);
         return true;
     }
         

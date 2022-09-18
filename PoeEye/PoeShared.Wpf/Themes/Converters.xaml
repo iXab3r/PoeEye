@@ -40,6 +40,7 @@
     <eyeConverters:MultilineToSinglelineConverter x:Key="MultilineToSinglelineConverter"/>
     <eyeConverters:KeyToStringConverter x:Key="KeyToStringConverter"/>
     <eyeConverters:FirstOrDefaultMultiValueConverter x:Key="FirstOrDefaultMultiValueConverter"/>
+    <eyeConverters:StringToMidConverter x:Key="StringToMidConverter" />
     
     <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />

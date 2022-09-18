@@ -19,14 +19,14 @@ public static class StringExtensions
             .ToArray();
     }
 
-    public static string TakeMidChars(this string str, int maxChars)
+    public static string TakeMidChars(this string str, int maxChars, bool addSuffix = false)
     {
         if (str == null || str.Length <= maxChars)
         {
             return str;
         }
 
-        var suffix = $" ({maxChars}+{str.Length - maxChars} chars)";
+        var suffix = addSuffix ? $" ({maxChars}+{str.Length - maxChars} chars)" : string.Empty;
 
         var right = maxChars / 2;
         var left = maxChars - right;
