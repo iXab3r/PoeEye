@@ -20,6 +20,7 @@ public static class AwesomeIcons
     public const string CloudUpload = "\uf0ee";
     public const string CogIcon = "\uf013";
     public const string CollapsedDirectory = "\uf114";
+    public const string Download = "\uf019";
     public const string EditIcon = "\uf044";
     public const string ErrorIcon = "\uf06a";
     public const string ExpandedDirectory = "\uf115";
