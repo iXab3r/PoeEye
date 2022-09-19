@@ -13,21 +13,43 @@ public static class PathUtils
     static PathUtils()
     {
 #if NET5_0_OR_GREATER
-            IsWindows = OperatingSystem.IsWindows();
-            IsLinux = OperatingSystem.IsLinux();
+        IsWindows = OperatingSystem.IsWindows();
+        IsLinux = OperatingSystem.IsLinux();
 #else
         IsWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
         IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 #endif
         PathConverter = IsWindows ? x => x?.ToLower() : x => x;
     }
-    
-    public static string GetCommonRootDirectory(IReadOnlyList<string> paths)
+
+    public static string GetRootDirectory(IReadOnlyList<string> paths)
     {
-        return GetCommonRootDirectory(paths, Path.DirectorySeparatorChar);
+        if (paths.IsEmpty())
+        {
+            throw new ArgumentException("At least one path must be supplied");
+        }
+        
+        var roots = paths.Select(GetRootDirectory).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToArray();
+
+        if (roots.Length == 1)
+        {
+            return roots[0];
+        }
+        
+        if (!roots.Any())
+        {
+            throw new ArgumentException($"There is no common root for paths {paths.DumpToString()}");
+        }
+
+        throw new ArgumentException($"There are multiple potential roots: {roots.DumpToString()}");
+    }
+
+    public static string GetLongestCommonPath(IReadOnlyList<string> paths)
+    {
+        return GetLongestCommonPath(paths, Path.DirectorySeparatorChar);
     }
     
-    public static string GetCommonRootDirectory(IReadOnlyList<string> paths, char separator)
+    public static string GetLongestCommonPath(IReadOnlyList<string> paths, char separator)
     {
         if (paths.IsEmpty())
         {

@@ -21,11 +21,37 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("a", "a\\b\\c", "a\\c\\d")]
     [TestCase("a\\b", "a\\b")]
     [TestCase("a\\b", "a\\b", "a\\b\\c")]
-    public void ShouldGetCommonRootDirectory(string expected, params string[] paths)
+    public void ShouldGetLongestCommonPath(string expected, params string[] paths)
     {
         //Given
         //When
-        var resultSupplier = () => PathUtils.GetCommonRootDirectory(paths);
+        var resultSupplier = () => PathUtils.GetLongestCommonPath(paths);
+
+        //Then
+        if (expected == null)
+        {
+            resultSupplier.ShouldThrow<Exception>();
+        }
+        else
+        {
+            resultSupplier().ShouldBe(expected);
+        }
+    }
+    
+    [Test]
+    [TestCase(null, null)]
+    [TestCase(null, "")]
+    [TestCase(null, "a", "b")]
+    [TestCase("a", "a")]
+    [TestCase("a", "a\\b", "a\\c")]
+    [TestCase("a", "a\\b\\c", "a\\c\\d")]
+    [TestCase("a", "a\\b")]
+    [TestCase("a", "a\\b", "a\\b\\c")]
+    public void ShouldGetRootPath(string expected, params string[] paths)
+    {
+        //Given
+        //When
+        var resultSupplier = () => PathUtils.GetRootDirectory(paths);
 
         //Then
         if (expected == null)
