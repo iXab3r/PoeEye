@@ -128,7 +128,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
     private void ReloadConfig(ISettingsViewModel viewModel)
     {
         var configType = GetConfigType(viewModel);
-        Log.Debug(() => $"[PoeSettingsViewModel.ReloadConfig] Loading viewModel {viewModel} (configType {configType}");
+        Log.Info(() => $"[PoeSettingsViewModel.ReloadConfig] Loading data into view model {viewModel} (configType {configType}");
         var invocationMethod = reloadConfigByType.GetOrAdd(configType, x => ReloadConfigMethod.MakeGenericMethod(x));
         invocationMethod.Invoke(this, new object[] {viewModel});
     }
@@ -136,7 +136,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
     private void SaveConfig(ISettingsViewModel viewModel)
     {
         var configType = GetConfigType(viewModel);
-        Log.Debug(() => $"[PoeSettingsViewModel.SaveConfig] Saving viewModel {viewModel} (configType {configType}");
+        Log.Info(() => $"[PoeSettingsViewModel.SaveConfig] Saving view model {viewModel} (configType {configType}");
         var invocationMethod = saveConfigByType.GetOrAdd(configType, x => SaveConfigMethod.MakeGenericMethod(x));
         invocationMethod.Invoke(this, new object[] {viewModel});
     }
@@ -151,6 +151,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
     private void SaveTypedConfig<TConfig>(ISettingsViewModel<TConfig> viewModel)
         where TConfig : class, IPoeEyeConfig, new()
     {
+
         var configProvider = container.Resolve<IConfigProvider<TConfig>>();
         var config = viewModel.Save();
         configProvider.Save(config);
