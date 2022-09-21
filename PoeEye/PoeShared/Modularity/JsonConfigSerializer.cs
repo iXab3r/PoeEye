@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Reactive.Subjects;
+using System.Runtime.Serialization;
 using DynamicData;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -7,15 +8,12 @@ using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity;
 
-internal sealed class JsonConfigSerializer : IConfigSerializer
+internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger, IConfigSerializer
 {
-    private static readonly IFluentLog Log = typeof(JsonConfigSerializer).PrepareLogger();
-
     private readonly SourceListEx<JsonConverter> converters = new();
     private readonly int MaxCharsToLog = 1024;
 
     private JsonSerializerSettings jsonSerializerSettings;
-    private readonly ISubject<ErrorContext> thrownExceptions = new Subject<ErrorContext>();
 
     public JsonConfigSerializer(PoeConfigConverter configConverter)
     {
@@ -24,10 +22,9 @@ internal sealed class JsonConfigSerializer : IConfigSerializer
             .Connect()
             .ToUnit()
             .StartWith(Unit.Default)
-            .Subscribe(ReinitializeSerializerSettings);
+            .Subscribe(ReinitializeSerializerSettings)
+            .AddTo(Anchors);
     }
-
-    public IObservable<ErrorContext> ThrownExceptions => thrownExceptions;
 
     public void RegisterConverter(JsonConverter converter)
     {
@@ -120,7 +117,9 @@ internal sealed class JsonConfigSerializer : IConfigSerializer
         {
             return;
         }
-        thrownExceptions.OnNext(args.ErrorContext);
+
+        var errorMessage = $"Serializer encountered error: { new { sender, args.CurrentObject, args.ErrorContext.OriginalObject, args.ErrorContext.Path, args.ErrorContext.Member, args.ErrorContext.Handled } }";
+        Log.Error(errorMessage, args.ErrorContext.Error);
     }
         
     public T DeserializeOrDefault<T>(

@@ -49,18 +49,6 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
             Log.Info($"Creating configuration directory: {configDirectory.FullName}");
             Directory.CreateDirectory(configDirectory.FullName);
         }
-
-        configSerializer.ThrownExceptions
-            .Subscribe(
-                errorContext =>
-                {
-                    //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
-                    Log.Warn(
-                        $"[PoeEyeConfigProviderFromFile.SerializerError] Suppressing serializer error ! Path: {errorContext.Path}, Member: {errorContext.Member}, Handled: {errorContext.Handled}",
-                        errorContext.Error);
-                    errorContext.Handled = true;
-                })
-            .AddTo(Anchors);
     }
 
     public IObservable<Unit> ConfigHasChanged => configHasChanged;

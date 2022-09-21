@@ -55,18 +55,6 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             throw new ApplicationException($"Failed to get configuration file path");
         }
 
-        configSerializer.ThrownExceptions
-            .Subscribe(
-                errorContext =>
-                {
-                    //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
-                    Log.Warn(
-                        $"[PoeEyeConfigProviderFromFile.SerializerError] Suppressing serializer error ! Path: {errorContext.Path}, Member: {errorContext.Member}, Handled: {errorContext.Handled}",
-                        errorContext.Error);
-                    errorContext.Handled = true;
-                })
-            .AddTo(Anchors);
-
         replacementService
             .Replacements
             .ToObservableChangeSet()
