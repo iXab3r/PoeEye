@@ -22,7 +22,18 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
 
     public static ISchedulerProvider Instance => InstanceSupplier.Value;
 
-    public static IScheduler RedirectToUiScheduler => Instance.GetOrAdd(WellKnownSchedulers.RedirectToUI);
+    public static IScheduler RedirectToUiScheduler
+    {
+        get
+        {
+            if (Instance.TryGet(WellKnownSchedulers.RedirectToUI, out var result))
+            {
+                return result;
+            }
+
+            throw new InvalidOperationException("Redirect to UI scheduler is not initialized yet");
+        }
+    }
 
     public void Initialize(IUnityContainer container)
     {
@@ -35,10 +46,25 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
     public IScheduler GetOrAdd(string name)
     {
-        Log.Debug(() => $"Retrieving scheduler...");
+        Log.Debug(() => $"Retrieving scheduler {name}");
         return schedulers.GetOrAdd(name, x => CreateEnforcedThreadScheduler(name, ThreadPriority.Normal));
     }
-    
+
+    public bool TryGet(string name, out IScheduler scheduler)
+    {
+        Log.Debug(() => $"Trying to retrieve scheduler {name}");
+        var result = schedulers.TryGetValue(name, out scheduler);
+        if (result)
+        {
+            Log.Debug($"Retrieved scheduler {name}: {scheduler}");
+        }
+        else
+        {
+            Log.Warn($"Failed to retrieve scheduler {name}");
+        }
+        return result;
+    }
+
     public IScheduler Add(string name, ThreadPriority threadPriority)
     {
         if (schedulers.TryGetValue(name, out var existing))

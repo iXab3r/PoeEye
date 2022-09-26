@@ -1,4 +1,5 @@
-﻿using System.Reactive.Concurrency;
+﻿using System;
+using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -75,26 +76,17 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
     private void InitializeSchedulers()
     {
         var defaultDispatcher = Dispatcher.CurrentDispatcher;
-        Log.Debug(() => $"Dispatcher set to: {defaultDispatcher}");
+        Log.Info(() => $"Dispatcher set to: {defaultDispatcher}");
         var syncContext = new DispatcherSynchronizationContext(defaultDispatcher);
-        Log.Debug(() => $"Synchronization context: {syncContext}");
+        Log.Info(() => $"Synchronization context: {syncContext}");
         SynchronizationContext.SetSynchronizationContext(syncContext);
         var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-        Log.Debug(() => $"Task scheduler: {taskScheduler}");
-        Log.Debug(() => $"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
+        Log.Info(() => $"Task scheduler: {taskScheduler}");
+        Log.Info(() => $"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
         
         var uiThread = Thread.CurrentThread;
         Container
-            .RegisterSingleton<ISchedulerProvider>(x =>
-            {
-                var result = SchedulerProvider.Instance;
-                if (result is SchedulerProvider provider)
-                {
-                    provider.Initialize(x);
-                }
-
-                return result;
-            })
+            .RegisterSingleton<ISchedulerProvider>(x => SchedulerProvider.Instance)
             .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UI, x => defaultDispatcher)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.UI, x =>
             {
@@ -114,5 +106,16 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.InputHook, ThreadPriority.Highest))
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SharedThread, ThreadPriority.Normal))
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.SendInput, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SendInput, ThreadPriority.Highest));
+
+        var schedulerProvider = Container.Resolve<ISchedulerProvider>();
+        if (schedulerProvider is SchedulerProvider provider)
+        {
+            Log.Info($"Initializing scheduler provider: {provider}");
+            provider.Initialize(Container);
+        }
+        else
+        {
+            throw new InvalidOperationException($"Something went wrong - seems that type of {typeof(ISchedulerProvider)} is not {typeof(SchedulerProvider)}, but {schedulerProvider.GetType()}");
+        }
     }
 }
