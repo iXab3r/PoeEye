@@ -50,10 +50,10 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         this.appArguments = appArguments;
 
         Log.Debug("Initializing crashes housekeeping");
-        cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.SharedAppDataDirectory, "crashes"))).AddTo(Anchors);
-        cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes"))).AddTo(Anchors);
-        cleanupService.CleanupTimeout = TimeSpan.FromHours(1);
-        cleanupService.FileTimeToLive = TimeSpan.FromDays(2);
+        cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.SharedAppDataDirectory, "reports"))).AddTo(Anchors);
+        cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "reports"))).AddTo(Anchors);
+        cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
+        cleanupService.FileTimeToLive = TimeSpan.FromDays(1);
 
         AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
         Dispatcher.CurrentDispatcher.UnhandledException += DispatcherOnUnhandledException;

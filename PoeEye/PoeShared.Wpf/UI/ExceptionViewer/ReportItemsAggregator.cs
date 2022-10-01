@@ -56,7 +56,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
         {
             Log.Info($"Preparing report items infrastructure");
             Status = "Preparing infrastructure...";
-            var crashReportDirectoryPath = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "crashes", $"{appArguments.AppName} {appArguments.Version} {appArguments.Profile} Id{CurrentProcessId} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}"));
+            var crashReportDirectoryPath = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "reports", $"{appArguments.AppName} {appArguments.Version} {appArguments.Profile} Id{CurrentProcessId} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}"));
             if (crashReportDirectoryPath.Exists)
             {
                 Log.Warn($"Removing existing directory with crash data {crashReportDirectoryPath.FullName}");
