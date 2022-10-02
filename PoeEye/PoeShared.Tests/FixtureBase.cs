@@ -5,6 +5,8 @@ using NUnit.Framework;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using PoeShared.Logging;
+using PoeShared.Modularity;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Unity;
 
@@ -36,6 +38,15 @@ public abstract class FixtureBase
         UnityContainer = new UnityContainer();
         Container.Register(() => UnityContainer);
         Container.Register(() => Log);
+
+        if (!SchedulerProvider.Instance.TryGet(WellKnownSchedulers.Background, out var _))
+        {
+            SchedulerProvider.Instance.Add(WellKnownSchedulers.Background, Scheduler.Default);
+        }
+        if (!SchedulerProvider.Instance.TryGet(WellKnownSchedulers.RedirectToUI, out var _))
+        {
+            SchedulerProvider.Instance.Add(WellKnownSchedulers.RedirectToUI, Scheduler.Immediate);
+        }
 
         SetUp();
     }

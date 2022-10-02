@@ -37,10 +37,10 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
 
     public void Initialize(IUnityContainer container)
     {
-        schedulers[WellKnownSchedulers.Background] = container.Resolve<IScheduler>(WellKnownSchedulers.Background);
-        schedulers[WellKnownSchedulers.UI] = container.Resolve<IScheduler>(WellKnownSchedulers.UI);
-        schedulers[WellKnownSchedulers.RedirectToUI] = container.Resolve<IScheduler>(WellKnownSchedulers.RedirectToUI);
-        schedulers[WellKnownSchedulers.UIIdle] = container.Resolve<IScheduler>(WellKnownSchedulers.UIIdle);
+        Add(WellKnownSchedulers.Background, container.Resolve<IScheduler>(WellKnownSchedulers.Background));
+        Add(WellKnownSchedulers.UI, container.Resolve<IScheduler>(WellKnownSchedulers.UI));
+        Add(WellKnownSchedulers.RedirectToUI, container.Resolve<IScheduler>(WellKnownSchedulers.RedirectToUI));
+        Add(WellKnownSchedulers.UIIdle, container.Resolve<IScheduler>(WellKnownSchedulers.UIIdle));
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
@@ -73,11 +73,17 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         }
 
         var newScheduler = CreateEnforcedThreadScheduler(name, priority: threadPriority);
-        if (!schedulers.TryAdd(name, newScheduler))
+        return Add(name, newScheduler);
+    }
+
+    public IScheduler Add(string name, IScheduler scheduler)
+    {
+        if (!schedulers.TryAdd(name, scheduler))
         {
             throw new InvalidOperationException($"Failed to add scheduler {name} to collection: {schedulers.DumpToString()}");
         }
-        return newScheduler;
+
+        return scheduler;
     }
 
     private IScheduler CreateEnforcedThreadScheduler(string name, ThreadPriority priority)

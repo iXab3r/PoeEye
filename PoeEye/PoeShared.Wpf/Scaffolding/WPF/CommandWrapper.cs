@@ -16,40 +16,52 @@ namespace PoeShared.Scaffolding.WPF;
 public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 {
     private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
-    private static readonly IScheduler UIScheduler = SchedulerProvider.RedirectToUiScheduler;
 
     private readonly Subject<bool> isExecuting = new();
     private readonly Subject<Exception> thrownExceptions = new();
     private readonly Subject<Unit> raiseCanExecuteChangedRequests = new();
     
-    private CommandWrapper(DelegateCommandBase command)
-    {
-        Guard.ArgumentNotNull(command, nameof(command));
-
-        InnerCommand = command;
-        Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
-            .Select(x => command.IsActive)
-            .ObserveOn(UIScheduler)
-            .SubscribeSafe(x => IsBusy = x, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        isExecuting
-            .ObserveOn(UIScheduler)
-            .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        raiseCanExecuteChangedRequests
-            .ObserveOn(UIScheduler)
-            .SubscribeSafe(x => command.RaiseCanExecuteChanged(), Log.HandleUiException)
-            .AddTo(Anchors);
-    }
-        
-    public IObservable<Exception> ThrownExceptions => thrownExceptions;
-
     private CommandWrapper(ICommand command)
     {
         InnerCommand = command;
     }
+
+    public static CommandWrapper FromDelegateCommand(DelegateCommandBase command, IScheduler uiScheduler)
+    {
+        var result = new CommandWrapper(command);
+        
+        Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
+            .Select(x => command.IsActive)
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(x => result.IsBusy = x, Log.HandleUiException)
+            .AddTo(result.Anchors);
+
+        result.isExecuting
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
+            .AddTo(result.Anchors);
+
+        result.raiseCanExecuteChangedRequests
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(x => command.RaiseCanExecuteChanged(), Log.HandleUiException)
+            .AddTo(result.Anchors);
+
+        return result;
+    }
+    
+    public static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
+    {
+        var result = new CommandWrapper(command);
+        command.IsExecuting.SubscribeSafe(x => result.IsBusy = x, Log.HandleUiException).AddTo(result.Anchors);
+        command.ThrownExceptions.SubscribeSafe(result.HandleException, Log.HandleUiException).AddTo(result.Anchors);
+        result.raiseCanExecuteChangedRequests
+            .SubscribeSafe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"), Log.HandleUiException)
+            .AddTo(result.Anchors);
+
+        return result;
+    }
+        
+    public IObservable<Exception> ThrownExceptions => thrownExceptions;
 
     public bool IsBusy { get; set; }
 
@@ -118,37 +130,25 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
         return Create(new DelegateCommand(execute));
     }
-
-    private static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
-    {
-        var result = new CommandWrapper(command);
-        command.IsExecuting.SubscribeSafe(x => result.IsBusy = x, Log.HandleUiException).AddTo(result.Anchors);
-        command.ThrownExceptions.SubscribeSafe(result.HandleException, Log.HandleUiException).AddTo(result.Anchors);
-        result.raiseCanExecuteChangedRequests
-            .SubscribeSafe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"), Log.HandleUiException)
-            .AddTo(result.Anchors);
-
-        return result;
-    }
         
     public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(UIScheduler)));
+        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));
     }
 
     public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(UIScheduler)));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));
+    }
+    
+    public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
+    {
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));
     }
 
     public static CommandWrapper Create(Func<Task> execute)
     {
         return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
-    }
-
-    public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
-    {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(UIScheduler)));
     }
 
     public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)

@@ -13,4 +13,7 @@ public interface ISchedulerProvider
     
     [NotNull]
     IScheduler Add([NotNull] string name, ThreadPriority threadPriority);
+    
+    [NotNull]
+    IScheduler Add([NotNull] string name, IScheduler scheduler);
 }
