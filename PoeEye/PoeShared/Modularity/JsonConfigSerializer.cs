@@ -3,7 +3,6 @@ using System.Reactive.Subjects;
 using System.Runtime.Serialization;
 using DynamicData;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity;
@@ -106,6 +105,7 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
             Error = HandleSerializerError,
             NullValueHandling = NullValueHandling.Ignore,
         };
+        newSettings.ContractResolver = new PoeSharedContractResolver();
         converters.Items.ForEach(newSettings.Converters.Add);
 
         jsonSerializerSettings = newSettings;

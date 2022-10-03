@@ -2,11 +2,11 @@
 
 internal sealed record PoeConfigMigrationConverterKey
 {
-    public Type SourceType { get; set; }
+    public Type LegacyType { get; set; }
 
     public int SourceVersion { get; set; }
 
-    public Type TargetType { get; set; }
+    public Type ActualType { get; set; }
 
     public int TargetVersion { get; set; }
 

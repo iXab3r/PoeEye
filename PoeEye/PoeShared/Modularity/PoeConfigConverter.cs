@@ -136,7 +136,12 @@ internal sealed class PoeConfigConverter : JsonConverter
         var metadata = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType)
             ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
             : serializer.Deserialize<PoeConfigMetadata>(reader);
-        return replacementService.ReplaceIfNeeded(metadata);
+        var result = replacementService.ReplaceIfNeeded(metadata);
+        if (result == null)
+        {
+            throw new ArgumentException($"Replacement service returned null for metadata: {metadata}");
+        }
+        return result;
     }
 
     private object DeserializeMetadataValue(PoeConfigMetadata metadata, JsonSerializer serializer, Type resolvedValueType)
@@ -165,16 +170,16 @@ internal sealed class PoeConfigConverter : JsonConverter
                 Log.Debug(() => $"Found converter {converterKvp.Key}");
                 var sourceMetadata = new PoeConfigMetadata()
                 {
-                    TypeName = converterKvp.Key.SourceType.FullName,
+                    TypeName = converterKvp.Key.LegacyType.FullName,
                     Version = converterKvp.Key.SourceVersion,
                     ConfigValue = metadata.ConfigValue,
                 };
 
-                var convertedValue = DeserializeMetadataValue(sourceMetadata, serializer, converterKvp.Key.SourceType);
-                Log.Debug(() => $"Deserialized config v{metadata.Version} into interim value of type {converterKvp.Key.SourceType} v{sourceMetadata.Version}");
+                var convertedValue = DeserializeMetadataValue(sourceMetadata, serializer, converterKvp.Key.LegacyType);
+                Log.Debug(() => $"Deserialized config v{metadata.Version} into interim value of type {converterKvp.Key.LegacyType} v{sourceMetadata.Version}");
                 try
                 {
-                    var result = converterKvp.Value.Invoke(convertedValue);
+                    var result = converterKvp.Converter(convertedValue);
                     Log.Debug(() => $"Successfully used converter {converterKvp.Key}");
                     return result;
                 }

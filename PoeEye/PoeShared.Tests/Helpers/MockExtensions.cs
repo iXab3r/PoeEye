@@ -59,6 +59,12 @@ public static class FixtureExtensions
         container.Register(() => mock.Object);
         return mock;
     }
+    
+    public static Mock<T> Register<T>(this Fixture container, Mock<T> mock) where T : class
+    {
+        container.Register(() => mock.Object);
+        return mock;
+    }
 }
 
 public static class MockExtensions

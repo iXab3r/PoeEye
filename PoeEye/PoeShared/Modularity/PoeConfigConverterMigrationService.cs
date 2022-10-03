@@ -15,20 +15,21 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
     public bool AutomaticallyLoadConverters { get; set; } = true;
 
-    public bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out KeyValuePair<PoeConfigMigrationConverterKey, Func<object, object>> result)
+    public bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out PoeConfigMigrationConverter result)
     {
         using var @lock = migrationsLock.Enter();
         var logger = Log.WithSuffix($"{targetType} v{sourceVersion} => v{targetVersion}");
         logger.Debug(() => $"Looking up converter");
         var converterKvp = convertersByMetadata
-            .FirstOrDefault(x => x.Key.TargetType == targetType && x.Key.SourceVersion == sourceVersion && x.Key.TargetVersion == targetVersion);
+            .FirstOrDefault(x => x.Key.ActualType == targetType && x.Key.SourceVersion == sourceVersion && x.Key.TargetVersion == targetVersion);
         if (converterKvp.Value != null)
         {
             Log.Debug(() => $"Found converter: {converterKvp}");
-            result = converterKvp;
+            result = new PoeConfigMigrationConverter { Key = converterKvp.Key, Converter = converterKvp.Value };
             return true;
         }
-        else if (AutomaticallyLoadConverters)
+
+        if (AutomaticallyLoadConverters)
         {
             Log.Debug(() => $"Could not find converter, searching in all appdomain assemblies");
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -41,10 +42,8 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 Log.Debug("Repeating lookup process again after processing");
                 return TryGetConverter(targetType, sourceVersion, targetVersion, out result);
             }
-            else
-            {
-                Log.Debug(() => $"No additional assemblies to process");
-            }
+
+            Log.Debug(() => $"No additional assemblies to process");
         }
 
         Log.Debug(() => $"Could not find matching converter");
@@ -89,9 +88,9 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
         var explicitConverterKey = new PoeConfigMigrationConverterKey
         {
-            SourceType = typeV1,
+            LegacyType = typeV1,
             SourceVersion = sampleV1.Version,
-            TargetType = typeV2,
+            ActualType = typeV2,
             TargetVersion = sampleV2.Version
         };
         if (convertersByMetadata.TryGetValue(explicitConverterKey, out var existingConverter))
@@ -186,14 +185,14 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
         // registering V3 to V4 automatically creates V1 => V4
         // V1 => V2, V2 => V3, V1 => V3 (implicit), V3 => V4, V1 => V4 (implicit)
 
-        var previousConverter = convertersByMetadata.FirstOrDefault(x => x.Key.TargetType == converterKey.SourceType && x.Key.TargetVersion == converterKey.SourceVersion);
+        var previousConverter = convertersByMetadata.FirstOrDefault(x => x.Key.ActualType == converterKey.LegacyType && x.Key.TargetVersion == converterKey.SourceVersion);
         if (previousConverter.Value != null)
         {
             var implicitConverterKey = new PoeConfigMigrationConverterKey
             {
-                SourceType = previousConverter.Key.SourceType,
+                LegacyType = previousConverter.Key.LegacyType,
                 SourceVersion = previousConverter.Key.SourceVersion,
-                TargetType = converterKey.TargetType,
+                ActualType = converterKey.ActualType,
                 TargetVersion = converterKey.TargetVersion,
                 IsImplicit = true
             };
@@ -216,14 +215,14 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
         // registering V2 => V3 and then V1 => V2 automatically creates V1 => V3
         // now we have V2 => V3, V1 => V2, V1 => V3 (implicit)
-        var nextConverter = convertersByMetadata.FirstOrDefault(x => x.Key.SourceType == converterKey.TargetType && x.Key.SourceVersion == converterKey.TargetVersion);
+        var nextConverter = convertersByMetadata.FirstOrDefault(x => x.Key.LegacyType == converterKey.ActualType && x.Key.SourceVersion == converterKey.TargetVersion);
         if (nextConverter.Value != null)
         {
             var implicitConverterKey = new PoeConfigMigrationConverterKey
             {
-                SourceType = converterKey.SourceType,
+                LegacyType = converterKey.LegacyType,
                 SourceVersion = converterKey.SourceVersion,
-                TargetType = nextConverter.Key.TargetType,
+                ActualType = nextConverter.Key.ActualType,
                 TargetVersion = nextConverter.Key.TargetVersion,
                 IsImplicit = true
             };
