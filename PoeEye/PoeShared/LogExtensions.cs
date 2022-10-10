@@ -37,7 +37,7 @@ public static class LogExtensions
         SharedLog.Instance.Errors.OnNext(exception);
     }
         
-    public static void LogIfThrows(this IFluentLog This, LogLevel level, string message, Action block)
+    public static void LogIfThrows(this IFluentLog logger, LogLevel level, string message, Action block)
     {
         try
         {
@@ -48,16 +48,16 @@ public static class LogExtensions
             switch (level)
             {
                 case LogLevel.Debug:
-                    This.Debug(message ?? "", ex);
+                    logger.Debug(message ?? "", ex);
                     break;
                 case LogLevel.Info:
-                    This.Info(message ?? "", ex);
+                    logger.Info(message ?? "", ex);
                     break;
                 case LogLevel.Warn:
-                    This.Warn(message ?? "", ex);
+                    logger.Warn(message ?? "", ex);
                     break;
                 case LogLevel.Error:
-                    This.Error(message ?? "", ex);
+                    logger.Error(message ?? "", ex);
                     break;
             }
 
@@ -65,7 +65,7 @@ public static class LogExtensions
         }
     }
 
-    public static async Task LogIfThrows(this IFluentLog This, LogLevel level, string message, Func<Task> block)
+    public static async Task LogIfThrows(this IFluentLog logger, LogLevel level, string message, Func<Task> block)
     {
         try
         {
@@ -76,16 +76,16 @@ public static class LogExtensions
             switch (level)
             {
                 case LogLevel.Debug:
-                    This.Debug(message ?? "", ex);
+                    logger.Debug(message ?? "", ex);
                     break;
                 case LogLevel.Info:
-                    This.Info(message ?? "", ex);
+                    logger.Info(message ?? "", ex);
                     break;
                 case LogLevel.Warn:
-                    This.Warn(message ?? "", ex);
+                    logger.Warn(message ?? "", ex);
                     break;
                 case LogLevel.Error:
-                    This.Error(message ?? "", ex);
+                    logger.Error(message ?? "", ex);
                     break;
             }
 
@@ -93,7 +93,7 @@ public static class LogExtensions
         }
     }
 
-    public static async Task<T> LogIfThrows<T>(this IFluentLog This, LogLevel level, string message, Func<Task<T>> block)
+    public static async Task<T> LogIfThrows<T>(this IFluentLog logger, LogLevel level, string message, Func<Task<T>> block)
     {
         try
         {
@@ -104,16 +104,16 @@ public static class LogExtensions
             switch (level)
             {
                 case LogLevel.Debug:
-                    This.Debug(message ?? "", ex);
+                    logger.Debug(message ?? "", ex);
                     break;
                 case LogLevel.Info:
-                    This.Info(message ?? "", ex);
+                    logger.Info(message ?? "", ex);
                     break;
                 case LogLevel.Warn:
-                    This.Warn(message ?? "", ex);
+                    logger.Warn(message ?? "", ex);
                     break;
                 case LogLevel.Error:
-                    This.Error(message ?? "", ex);
+                    logger.Error(message ?? "", ex);
                     break;
             }
 
