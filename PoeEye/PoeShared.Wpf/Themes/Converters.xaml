@@ -167,6 +167,7 @@
     <eyeConverters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />
     <eyeConverters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
     <eyeConverters:DataSizeToHumanReadableStringConverter x:Key="DataSizeToHumanReadableStringConverter" />
+    <eyeConverters:EqualityConverter x:Key="EqualToNullConverter" TrueValue="{x:Null}" FalseValue="{StaticResource FalseValue}" />
     <eyeConverters:EqualityConverter x:Key="EqualToTrueConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
     <eyeConverters:EqualityConverter x:Key="EqualToFalseConverter" TrueValue="{StaticResource FalseValue}" FalseValue="{StaticResource TrueValue}" />
     <eyeConverters:EqualityConverter x:Key="EqualToVisibleConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />

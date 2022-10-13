@@ -29,12 +29,12 @@ public sealed class EqualityConverter : IMultiValueConverter, IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var result = value?.Equals(parameter) ?? false;
+        var result = Equals(value, parameter);
         return result ? TrueValue : FalseValue;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return value?.Equals(true) == true ? parameter : Binding.DoNothing;
+        return Equals(value, true) ? parameter : Binding.DoNothing;
     }
 }

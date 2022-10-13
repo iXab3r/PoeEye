@@ -2,7 +2,8 @@
                               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                               xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
                               xmlns:eye="clr-namespace:PoeShared.UI"
-                              xmlns:system="clr-namespace:System;assembly=System.Runtime">
+                              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+                              xmlns:themes="clr-namespace:PoeShared.Themes">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.text.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
@@ -41,10 +42,13 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsPressed" Value="true" />
                         <Trigger Property="IsChecked" Value="true">
-                            <Setter Property="Text" TargetName="CheckboxIcon" Value="&#xf046;" />
+                            <Setter Property="Text" TargetName="CheckboxIcon" Value="{x:Static themes:AwesomeIcons.CheckboxSquareChecked}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="false">
-                            <Setter Property="Text" TargetName="CheckboxIcon" Value="&#xf096;" />
+                            <Setter Property="Text" TargetName="CheckboxIcon" Value="{x:Static themes:AwesomeIcons.CheckboxSquareEmpty}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter Property="Text" TargetName="CheckboxIcon" Value="{x:Static themes:AwesomeIcons.CheckboxSquareMinus}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" Value="0.56" />
