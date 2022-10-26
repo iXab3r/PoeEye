@@ -1,7 +1,8 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:eye="clr-namespace:PoeShared.UI">
+                    xmlns:eye="clr-namespace:PoeShared.UI"
+                    xmlns:dd="urn:gong-wpf-dragdrop">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -126,7 +127,7 @@
                                       x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
                                       Style="{StaticResource MaterialDesignExpandCollapseToggleStyle}"
                                       Foreground="{TemplateBinding Foreground}"
-                                      Margin="8 0 8 0"
+                                      Margin="2 0 2 0"
                                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(eye:TreeViewAssist.IsExpandable), Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                                       VerticalAlignment="Center"/>
                         
@@ -142,7 +143,10 @@
                                 Opacity="0"
                                 Background="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"/>
 
-                        <Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" x:Name="ContentGrid" Background="{TemplateBinding Background}">
+                        <Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" x:Name="ContentGrid" Background="{TemplateBinding Background}"
+                              dd:DragDrop.IsDragSource="True"
+                              dd:DragDrop.UseDefaultDragAdorner="True"
+                              dd:DragDrop.UseDefaultEffectDataTemplate="True">
                             <wpf:Ripple Feedback="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"
                                         Focusable="False"
                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
@@ -159,7 +163,7 @@
                                         ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:TreeViewAssist.AdditionalTemplate)}"
                                         ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:TreeViewAssist.AdditionalTemplateSelector)}"                                        
                                         Visibility="Collapsed" />
-
+                        
                         <StackPanel Grid.Column="1" Grid.Row="2"
                                     x:Name="ItemsPanel"
                                     Margin="-5 0 0 0"
