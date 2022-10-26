@@ -18,7 +18,7 @@ public static class AwesomeIcons
     public const string OnEnterActionsIcon = "\uf090";
     public const string WhileActiveActionsIcon = "\uf021";
     public const string OnExitActionsIcon = "\uf08b";
-    public const string EnablingConditionIcon = StopIcon;
+    public const string EnablingConditionIcon = PlayOutlinedIcon;
     public const string EnablingConditionNotActiveIcon = StopOutlinedIcon;
     public const string CloseIcon = "\uf00d";
     public const string CloudDownload = "\uf0ed";
@@ -46,6 +46,7 @@ public static class AwesomeIcons
     public const string TriggerIcon = "\uf0e7";
     public const string LinkIcon = "\uf0c1";
     public const string PadlockIcon = "\uf023";
+    public const string PlayOutlinedIcon = "\uf01d";
     public const string PauseIcon = "\uf04c";
     public const string RepeatIcon = "\uf01e";
     public const string QuestionCircleIcon = "\uf29c";
