@@ -18,6 +18,8 @@ public static class AwesomeIcons
     public const string OnEnterActionsIcon = "\uf090";
     public const string WhileActiveActionsIcon = "\uf021";
     public const string OnExitActionsIcon = "\uf08b";
+    public const string EnablingConditionIcon = StopIcon;
+    public const string EnablingConditionNotActiveIcon = StopOutlinedIcon;
     public const string CloseIcon = "\uf00d";
     public const string CloudDownload = "\uf0ed";
     public const string CloudUpload = "\uf0ee";
@@ -53,6 +55,8 @@ public static class AwesomeIcons
     public const string SignIn = "\uf090";
     public const string SignOut = "\uf08b";
     public const string SpaceIcon = " ";
+    public const string StopOutlinedIcon = "\uf28e";
+    public const string StopIcon = "\uf28d";
     public const string Undo = "\uf0e2";
     public const string UnlinkIcon = "\uf127";
     public const string WarningIcon = "\uf071";

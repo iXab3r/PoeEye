@@ -55,10 +55,12 @@
     <Color x:Key="PositiveColor">LimeGreen</Color>
     <Color x:Key="WarningColor">Orange</Color>
     <Color x:Key="NegativeColor">IndianRed</Color>
+    <Color x:Key="NeutralColor">Yellow</Color>
     
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource MouseOverAccentColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="NegativeBrush" Color="{StaticResource NegativeColor}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="PositiveBrush" Color="{StaticResource PositiveColor}" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="NeutralBrush" Color="{StaticResource NeutralColor}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="NegativePositiveBrush" Color="{StaticResource PositiveColor}" ice:Freeze="True" />
     

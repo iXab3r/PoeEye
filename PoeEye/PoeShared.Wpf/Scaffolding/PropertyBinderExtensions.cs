@@ -23,12 +23,13 @@ public static class PropertyBinderExtensions
 
     public static void To<T, TContext>(this PropertyRuleBuilder<T, TContext> builder, Action<TContext, T> action, Func<TContext, IScheduler> schedulerSelector) where TContext : class
     {
+        var builderClosure = builder;
         builder.To((x, v) =>
         {
             var scheduler = schedulerSelector(x);
             if (scheduler == null)
             {
-                throw new ArgumentException($"Failed to get {typeof(IScheduler)} from context {x}");
+                throw new ArgumentException($"Failed to get {typeof(IScheduler)} from context {x}, builder: {builderClosure}");
             }
             scheduler.Schedule(() => action(x, v));
         });
