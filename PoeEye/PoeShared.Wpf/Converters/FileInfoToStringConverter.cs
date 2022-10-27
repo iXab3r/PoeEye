@@ -19,7 +19,7 @@ public class FileInfoToStringConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is not string valueString)
+        if (value is not string valueString || string.IsNullOrEmpty(valueString))
         {
             return Binding.DoNothing;
         }
