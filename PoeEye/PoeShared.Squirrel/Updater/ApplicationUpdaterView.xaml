@@ -3,7 +3,8 @@
                               xmlns:fa="http://schemas.fontawesome.io/icons/"
                               xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
                               xmlns:eye="http://coderush.net/poeeye/"
-                              xmlns:st="http://schemas.spicytaco.io/">
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:themes="clr-namespace:PoeShared.Themes;assembly=PoeShared.Wpf">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -50,18 +51,19 @@
                                 <TextBlock Text="Install" />
                                 <StackPanel Orientation="Horizontal" Margin="15,0,0,0"
                                             Visibility="{Binding TotalUpdateSize, Converter={StaticResource GreaterThanZero64BitToVisibleConverter}}">
-                                    <fa:FontAwesome Icon="Download"
-                                                    Margin="5,0"
-                                                    VerticalAlignment="Center"
-                                                    FontSize="14" />
+                                    <TextBlock Style="{StaticResource IconTextBlock}"
+                                               Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                                               Foreground="{StaticResource MouseOverAccentBrushKey}"
+                                               Margin="5,0"
+                                               Text="{x:Static themes:AwesomeIcons.Download}"/>
                                     <TextBlock Text="{Binding TotalUpdateSize, Converter={StaticResource DataSizeToHumanReadableStringConverter}}" />
                                 </StackPanel>
-                                <fa:FontAwesome Icon="Certificate"
-                                                Margin="5,0"
-                                                Foreground="{StaticResource PositiveBrush}"
-                                                VerticalAlignment="Center"
-                                                Visibility="{Binding IsDeltaUpdate, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                                                FontSize="10" />
+                                <TextBlock Style="{StaticResource IconTextBlock}"
+                                           Foreground="{StaticResource PositiveBrush}"
+                                           Margin="5,0"
+                                           FontSize="10" 
+                                           Visibility="{Binding IsDeltaUpdate, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                                           Text="{x:Static themes:AwesomeIcons.Certificate}"/>
                             </StackPanel>
                         </eye:ButtonEx.Content>
                         <eye:ButtonEx.Visibility>
@@ -101,24 +103,24 @@
                                Text="{Binding StatusText}" />
                 </Grid>
             </DockPanel>
-
-            <fa:FontAwesome Icon="Refresh"
-                            Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                            Foreground="{StaticResource MouseOverAccentBrushKey}"
-                            VerticalAlignment="Center"
-                            FontSize="32" />
-
-            <fa:FontAwesome Icon="ArrowCircleUp"
-                            Visibility="{Binding LatestUpdate, Converter={StaticResource NullToCollapsedConverter}}"
-                            Foreground="{StaticResource MouseOverAccentBrushKey}"
-                            VerticalAlignment="Center"
-                            FontSize="32" />
-
-            <fa:FontAwesome Icon="CheckCircle"
-                            Visibility="{Binding LatestAppliedVersion, Converter={StaticResource NullToCollapsedConverter}}"
-                            Foreground="{StaticResource PositiveBrush}"
-                            VerticalAlignment="Center"
-                            FontSize="32" />
+            
+            <TextBlock Style="{StaticResource IconTextBlock}"
+                       Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                       Foreground="{StaticResource MouseOverAccentBrushKey}"
+                       FontSize="32"
+                       Text="{x:Static themes:AwesomeIcons.Refresh}"/>
+            
+            <TextBlock Style="{StaticResource IconTextBlock}"
+                       Visibility="{Binding LatestUpdate, Converter={StaticResource NullToCollapsedConverter}}"
+                       Foreground="{StaticResource MouseOverAccentBrushKey}"
+                       FontSize="32"
+                       Text="{x:Static themes:AwesomeIcons.ArrowCircleUp}"/>
+            
+            <TextBlock Style="{StaticResource IconTextBlock}"
+                       Visibility="{Binding LatestAppliedVersion, Converter={StaticResource NullToCollapsedConverter}}"
+                       Foreground="{StaticResource MouseOverAccentBrushKey}"
+                       FontSize="32"
+                       Text="{x:Static themes:AwesomeIcons.CheckCircle}"/>
         </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>
