@@ -80,6 +80,11 @@ internal sealed class NaiveMemoryCache<TKey, TValue> : DisposableReactiveObject,
         removedItem = default;
         return false;
     }
+    
+    public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
+    {
+        return GetOrUpdate(key, (key, _) => valueFactory(key));
+    }
 
     public TValue GetOrUpdate(TKey key, Func<TKey, TValue, TValue> updateValue)
     {
@@ -165,37 +170,17 @@ internal sealed class NaiveMemoryCache<TKey, TValue> : DisposableReactiveObject,
 
         public KeySemaphore(TKey key)
         {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(() => $"Initialized new key lock {id} for {key}");
-            }
             this.key = key;
         }
 
         public void Wait()
         {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(() => $"[{this}] Awaiting for entry");
-            }
             semaphoreSlim.Wait();
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(() => $"[{this}] Entered");
-            }
         }
             
         public void Release()
         {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(() => $"[{this}] Awaiting for release");
-            }
             semaphoreSlim.Release();
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(() => $"[{this}] Released");
-            }
         }
 
         public override string ToString()

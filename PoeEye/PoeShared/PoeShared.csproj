@@ -12,6 +12,7 @@
         <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
         <PackageReference Include="BidirectionalMap" Version="1.0.0" />
         <PackageReference Include="ByteSize" Version="2.1.1" />
+        <PackageReference Include="Castle.Core" Version="5.1.0" />
         <PackageReference Include="Combinatorics" Version="1.1.0.19" />
         <PackageReference Include="CommandLineParser" Version="2.7.82" />
         <PackageReference Include="DynamicData" Version="7.8.5" />
@@ -28,8 +29,10 @@
         <PackageReference Include="shortid" Version="3.0.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.12" />
         <PackageReference Include="System.Reactive" Version="5.0.0" />
-        <PackageReference Include="Unity" Version="5.10.3" />
         <PackageReference Include="CompareNETObjects" Version="4.65.0" />
+        <PackageReference Include="Unity" Version="5.11.5" />
+        <PackageReference Include="Unity.Abstractions" Version="5.11.5" />
+        <PackageReference Include="Unity.Container" Version="5.11.5" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\PoeShared.Generators\PoeShared.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />

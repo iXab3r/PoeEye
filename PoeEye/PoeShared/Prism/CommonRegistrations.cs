@@ -40,7 +40,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IMetrics>(x => x.Resolve<IMetricsRoot>());
 
         Container
-            .RegisterType( typeof(IFactory<,,,>), typeof(Factory<,,,>))
+            .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
             .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
             .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
             .RegisterType(typeof(IFactory<>),  typeof(Factory<>))
@@ -51,5 +51,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterType(typeof(IMemoryCache<,>),  typeof(NaiveMemoryCache<,>))
             .RegisterType<IFolderCleanerService, FolderCleanerService>()
             .RegisterType<ISharedResourceLatch, SharedResourceLatch>();
+        
+        Container.RegisterCachingProxyFactory();;
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace PoeShared.Prism;
+﻿using PoeShared.Caching;
 
-public sealed class LambdaFactory<TOut> : IFactory<TOut>
+namespace PoeShared.Prism;
+
+public sealed class LambdaFactory<TOut> : ICachingProxyFactory<TOut>
 {
     private readonly Func<TOut> factoryFunc;
 

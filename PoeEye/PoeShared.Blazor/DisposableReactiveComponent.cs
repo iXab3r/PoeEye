@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using DynamicData.Binding;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -25,14 +28,19 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
     public IJSRuntime JsRuntime { get; set; }
 
     public IHttpContextAccessor HttpContextAccessor { get; set; }
+    
+    public NavigationManager NavigationManager { get; set; }
+    
+    public IDictionary<string, StringValues> QueryParameters { get; set; }
 
     public string Error { get; protected set; }
 
     public async Task OnParametersSetAsync()
     {
+        
         await HandleSetParametersAsync();
     }
-        
+    
     public async Task OnInitializedAsync()
     {
         await HandleInitializedAsync();

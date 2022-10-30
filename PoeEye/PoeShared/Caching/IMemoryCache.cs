@@ -25,5 +25,7 @@ public interface IMemoryCache<TKey, TValue>
     
     public bool TryGetValue(TKey key, out TValue value);
         
+    public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory);
+    
     public TValue GetOrUpdate(TKey key, Func<TKey, TValue, TValue> updateValue);
 }

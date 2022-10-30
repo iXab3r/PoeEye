@@ -1,9 +1,10 @@
 ﻿
+using PoeShared.Caching;
 using Unity;
 
 namespace PoeShared.Prism;
 
-internal sealed class Factory<T> : IFactory<T>, INamedFactory<T>
+internal sealed class Factory<T> : INamedFactory<T>, ICachingProxyFactory<T>
 {
     private readonly IUnityContainer container;
 

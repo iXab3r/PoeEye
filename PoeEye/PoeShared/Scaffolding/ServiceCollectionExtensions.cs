@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using PoeShared.Caching;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 
 namespace PoeShared.Scaffolding;
@@ -57,7 +59,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
         services.AddSingleton<IFactory<TService>, Factory<TService>>();
     }
-    
+
     internal sealed class Factory<T> : IFactory<T>
     {
         private readonly Func<T> factoryFunc;

@@ -19,22 +19,22 @@ public static class UnityContainerExtensions
     public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
     {
         instance.RegisterSingleton(typeof(TTo));
-            
+
         foreach (var type in types)
         {
             instance.RegisterType(type, typeof(TTo), new ContainerControlledLifetimeManager());
         }
-            
+
         return instance;
     }
-        
+
     public static IUnityContainer RegisterType<TTo>(this IUnityContainer instance, params Type[] types)
     {
         foreach (var type in types)
         {
             instance.RegisterType(type, typeof(TTo));
         }
-            
+
         return instance;
     }
 
@@ -42,12 +42,12 @@ public static class UnityContainerExtensions
     {
         return instance.RegisterFactory<TTo>(func, new ContainerControlledLifetimeManager());
     }
-        
+
     public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, string name, Func<IUnityContainer, object> func)
     {
         return instance.RegisterFactory<TTo>(name, func, new ContainerControlledLifetimeManager());
     }
-        
+
     public static IUnityContainer AddNewExtensionIfNotExists<TExtension>(this IUnityContainer container)
         where TExtension : UnityContainerExtension
     {
@@ -56,7 +56,7 @@ public static class UnityContainerExtensions
             Log.Warn($"Extension of type {typeof(TExtension)} is already added - ignoring request");
             return container;
         }
-            
+
         Log.Debug(() => $"Adding new extension of type {typeof(TExtension)} to container, registered types: {container.Registrations.Count()}");
         return container.AddNewExtension<TExtension>();
     }
