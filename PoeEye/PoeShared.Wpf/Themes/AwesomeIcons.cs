@@ -66,4 +66,5 @@ public static class AwesomeIcons
     public const string Undo = "\uf0e2";
     public const string Unlink = "\uf127";
     public const string Warning = "\uf071";
+    public const string Wiki = "\uf266";
 }
