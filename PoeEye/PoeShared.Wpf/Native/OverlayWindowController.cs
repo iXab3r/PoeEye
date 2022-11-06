@@ -90,7 +90,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     {
         return windows.Items
             .Select(x => x.DataContext)
-            .OfType<OverlayWindowViewModel>()
+            .OfType<OverlayWindowContainer>()
             .Select(x => x.Content)
             .ToArray();
     }
@@ -98,8 +98,8 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     public IDisposable RegisterChild(IOverlayViewModel viewModel)
     {
         Guard.ArgumentNotNull(viewModel, nameof(viewModel));
-        OverlayWindowView overlayWindow = default;
-        var logger = Log.WithSuffix(viewModel).WithSuffix(() => overlayWindow);
+        OverlayWindowView window = default;
+        var logger = Log.WithSuffix(viewModel).WithSuffix(() => window);
 
         var childAnchors = new CompositeDisposable();
         Disposable.Create(() =>
@@ -110,13 +110,13 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         }).AddTo(childAnchors);
 
         logger.Debug(() =>"Initializing window container view model");
-        var overlayWindowViewModel = new OverlayWindowViewModel(logger)
+        var windowContainer = new OverlayWindowContainer(logger)
         {
             Content = viewModel
         };
-        overlayWindowViewModel.AddTo(childAnchors);
-        logger.Debug(() => $"Initialized window container: {overlayWindowViewModel}");
-        overlayWindow = new OverlayWindowView
+        windowContainer.AddTo(childAnchors);
+        logger.Debug(() => $"Initialized window container: {windowContainer}");
+        window = new OverlayWindowView
         {
             Title = $"{viewModel.Id} {overlayControllerId} {windowTracker}",
             Visibility = Visibility.Collapsed,
@@ -125,75 +125,74 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
             Topmost = true,
         };
         logger.Info(() => $"Created overlay window");
-        overlayWindow.DataContext = overlayWindowViewModel;
+        window.DataContext = windowContainer;
         logger.Debug(() => $"Assigned data context");
 
-        var activationController = new ActivationController(overlayWindow);
+        var activationController = new ActivationController(window);
         viewModel.SetActivationController(activationController);
 
         this.WhenAnyValue(x => x.ShowWireframes)
             .ObserveOn(uiScheduler)
-            .SubscribeSafe(() => overlayWindowViewModel.ShowWireframes = ShowWireframes, Log.HandleUiException)
+            .SubscribeSafe(() => windowContainer.ShowWireframes = ShowWireframes, Log.HandleUiException)
             .AddTo(childAnchors);
 
-        overlayWindow.WhenLoaded
-            .Do(args => logger.Debug(() => $"Overlay is loaded, window: {args.Sender}"))
+        window.WhenLoaded()
+            .Do(args => logger.Debug(() => $"Overlay is loaded"))
             .SubscribeSafe(() =>
             {
-                logger.Debug(() => $"Assigning overlay view {overlayWindow} to view-model {viewModel}");
-                viewModel.SetOverlayWindow(overlayWindow);
-            }, Log.HandleUiException)
+                logger.Debug(() => $"Assigning overlay view {window} to view-model {viewModel}");
+                viewModel.SetOverlayWindow(window);
+            }, logger.HandleUiException)
             .AddTo(childAnchors);
             
         Observable.Merge(
                 this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Controller IsVisible change, {x.prev} => {x.curr}"), 
                 viewModel.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Overlay IsVisible change, {x.prev} => {x.curr}"), 
                 windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
-                overlayWindow.WhenLoaded.Select(_ => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
+                window.WhenLoaded().Select(_ => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
             .ObserveOn(uiScheduler)
             .SubscribeSafe(reason =>
             {
                 logger.Debug(() => $"Processing visibility change, reason: {reason}");
-                HandleVisibilityChange(logger, overlayWindow, viewModel);
-            }, Log.HandleUiException)
+                HandleVisibilityChange(logger, window, viewModel);
+            }, logger.HandleUiException)
             .AddTo(childAnchors);
 
-        overlayWindow
-            .WhenLoaded
+        window.WhenLoaded()
             .Select(_ => viewModel.WhenAnyValue(x => x.OverlayMode))
             .Switch()
             .ObserveOn(uiScheduler)
             .SubscribeSafe(x =>
             {
                 logger.Debug(() => $"Changing overlay mode to {x}");
-                overlayWindow.SetOverlayMode(x);
-            }, Log.HandleUiException)
+                window.SetOverlayMode(x);
+            }, logger.HandleUiException)
             .AddTo(childAnchors);
 
-        overlayWindow
+        window
             .WhenRendered
             .Take(1)
             .Do(_ => { logger.Debug(() => $"Overlay is rendered"); })
-            .SubscribeToErrors(Log.HandleUiException)
+            .SubscribeToErrors(logger.HandleUiException)
             .AddTo(childAnchors);
 
-        windows.Add(overlayWindow);
+        windows.Add(window);
 
         Disposable.Create(() =>
         {
             logger.Info($"Closing overlay");
-            overlayWindow.Close();
+            window.Close();
         }).AddTo(childAnchors);
             
         Disposable.Create(() =>
         {
             logger.Debug(() => $"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
-            windows.Remove(overlayWindow);
+            windows.Remove(window);
         }).AddTo(childAnchors);
 
         childAnchors.AddTo(Anchors);
 
-        Log.Info($"Overlay view initialized: {overlayWindow}");
+        Log.Info($"Overlay view initialized: {window}");
         logger.Debug(() => $"Registration completed");
 
         return childAnchors;

@@ -10,31 +10,9 @@
 
     <DataTemplate DataType="{x:Type eye:GenericSettingsViewModel}">
         <DockPanel LastChildFill="True">
-            <DockPanel.InputBindings>
-                <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />
-            </DockPanel.InputBindings>
-            <Border DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Margin="0,5,0,0" BorderThickness="0,2,0,0">
-                <DockPanel>
-                    <eye:ButtonEx
-                        DockPanel.Dock="Right"
-                        Margin="5,5"
-                        Width="120"
-                        Content="Cancel"
-                        HorizontalAlignment="Right"
-                        Command="{Binding CancelCommand}" />
-                    <eye:ButtonEx
-                        DockPanel.Dock="Left"
-                        Margin="5,5"
-                        Width="160"
-                        Content="Save"
-                        HorizontalAlignment="Left"
-                        Command="{Binding SaveConfigCommand}" />
-                </DockPanel>
-            </Border>
-
             <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto">
                 <Grid IsSharedSizeScope="True">
-                    <ItemsControl ItemsSource="{Binding ModulesSettings}" Focusable="False">
+                    <ItemsControl ItemsSource="{Binding ModulesSettings}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
                                 <ContentPresenter Margin="0,0,0,0" Content="{Binding}" />

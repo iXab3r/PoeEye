@@ -33,4 +33,9 @@ public class CloseController<T> : ICloseController<T>
     {
         closeAction(value);
     }
+
+    public void Close()
+    {
+        Close(default);
+    }
 }

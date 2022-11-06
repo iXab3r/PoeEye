@@ -1,75 +1,59 @@
-using System;
+﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using DynamicData;
+using JetBrains.Annotations;
 using PoeShared.Dialogs.ViewModels;
-using PoeShared.Prism;
-using PoeShared.Scaffolding; 
+using PoeShared.Dialogs.Views;
 using PoeShared.Logging;
+using PoeShared.Native;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using PoeShared.Services;
 using PoeShared.UI;
-using ReactiveUI;
+using PropertyBinder;
 
 namespace PoeShared.Dialogs.Services;
 
-internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxService
+internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IMessageBoxService
 {
-    private static readonly IFluentLog Log = typeof(MessageBoxService).PrepareLogger();
+    private static readonly Binder<MessageBoxService> Binder = new();
 
-    private readonly IFactory<InputMessageBoxViewModel> inputMessageBoxFactory;
-    private readonly IFactory<TextMessageBoxViewModel> textMessageBoxFactory;
-    private readonly IFactory<MessageBoxHostWithContentViewModelBase> messageBoxFactory;
+    private static long dialogIdx;
+
+    private readonly IApplicationAccessor applicationAccessor;
+    private readonly IFactory<MessageBoxViewModel> genericMessageBoxFactory;
+    private readonly SourceListEx<IMessageBoxViewModel> messageBoxes = new();
+
+    static MessageBoxService()
+    {
+        Binder.Bind(x => x.messageBoxes.Collection.Count > 0).To(x => x.IsOpen);
+    }
 
     public MessageBoxService(
-        IFactory<InputMessageBoxViewModel> inputMessageBoxFactory,
-        IFactory<TextMessageBoxViewModel> textMessageBoxFactory,
-        IFactory<MessageBoxHostWithContentViewModelBase> messageBoxFactory)
+        IApplicationAccessor applicationAccessor,
+        IFactory<MessageBoxViewModel> genericMessageBoxFactory)
     {
-        this.inputMessageBoxFactory = inputMessageBoxFactory;
-        this.textMessageBoxFactory = textMessageBoxFactory;
-        this.messageBoxFactory = messageBoxFactory;
+        this.applicationAccessor = applicationAccessor;
+        this.genericMessageBoxFactory = genericMessageBoxFactory;
+        
+        Binder.Attach(this).AddTo(Anchors);
     }
 
-    public IMessageBoxHost MessageBox { get; private set; }
+    public bool IsOpen { get; [UsedImplicitly] private set; }
 
-    public async Task<MessageBoxElement> ShowDialog(string title, IMessageBoxViewModel content, params MessageBoxElement[] buttons)
+    public async Task<T> ShowDialog<T>(IMessageBoxViewModel<T> content)
     {
-        Log.Debug(() => $"Showing message box {new {title, content, buttons}}");
-
-        using var newMessageBox = messageBoxFactory.Create();
-        newMessageBox.Content = content;
-        newMessageBox.Title = title;
-        newMessageBox.AvailableCommands.Clear();
-        newMessageBox.AvailableCommands.Add(buttons);
-        var result = await Show(newMessageBox);
-        return result;
-    }
-
-    public Task<MessageBoxElement> ShowDialog(string title, object content, params MessageBoxElement[] buttons)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<T> ShowDialog<T>(string title, IMessageBoxViewModel<T> content)
-    {
-        Log.Debug(() => $"Showing message box with generic content {new {title, content}}");
-
-        using var newMessageBox = messageBoxFactory.Create();
-        newMessageBox.Content = content;
-        newMessageBox.Title = title;
-
-        var dialogCloseController = new CloseController<T>(_ => newMessageBox.Close());
-        var capturingCloseController = new CapturingCloseController<T>();
-        var closeController = new ForwardingCloseController<T>(capturingCloseController, dialogCloseController);
-        content.CloseController = closeController;
-            
-        await ShowDialog(newMessageBox);
-        return capturingCloseController.Result;
+        return await ShowMessageBox(content);
     }
 
     public async Task<bool> ShowConfirmation(string title, string content)
     {
         Log.Info($"Showing message box: { new { title, content }}");
-        var result = await ShowMessageBox(
+        var result = await ShowInputBox(
             title,
             content,
             string.Empty,
@@ -80,11 +64,11 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
         Log.Info($"Message box result: { new { title, result.DialogResult }}");
         return result.DialogResult == MessageBoxElement.Yes;
     }
-    
+
     public async Task ShowMessage(string title, string content)
     {
         Log.Info($"Showing message box: { new { title, content }}");
-        var result = await ShowMessageBox(
+        var result = await ShowInputBox(
             title,
             content,
             string.Empty,
@@ -96,14 +80,18 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
 
     public async Task<string> ShowInputBox(string title, string content, string contentHint)
     {
-        using var inputBox = inputMessageBoxFactory.Create();
-        inputBox.Content = content;
-        inputBox.ContentHint = contentHint;
-        var result = await ShowDialog(title, inputBox);
-        return result;
+        var result = await ShowInputBox(
+            title,
+            content,
+            string.Empty,
+            true,
+            MessageBoxElement.Ok,
+            MessageBoxElement.Cancel
+        );
+        return result.DialogResult == MessageBoxElement.Ok ? result.InputContent : default;
     }
 
-    public async Task<(MessageBoxElement DialogResult, string InputContent)> ShowMessageBox(
+    public async Task<(MessageBoxElement DialogResult, string InputContent)> ShowInputBox(
         string title,
         string content,
         string contentHint,
@@ -113,40 +101,80 @@ internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxS
     {
         Log.Debug(() => $"Showing message box {new {title, content, contentHint, isReadOnly, buttons}}");
 
-        using var newMessageBox = textMessageBoxFactory.Create();
-        newMessageBox.Content = content;
-        newMessageBox.ContentHint = contentHint;
-        newMessageBox.Title = title;
-        newMessageBox.IsReadOnly = isReadOnly;
-        newMessageBox.AvailableCommands.Clear();
-        newMessageBox.AvailableCommands.Add(buttons);
-        var result = await Show(newMessageBox);
-        return (result, newMessageBox.Content);
+        var textContent = new MessageBoxTextContent()
+        {
+            Hint = contentHint,
+            Text = content,
+            IsReadOnly = isReadOnly
+        };
+        var result = await ShowDialog(title, textContent, buttons);
+        return (result, textContent.Text);
     }
 
-    private async Task<MessageBoxElement> Show(IMessageBoxHostViewModel newMessageBox)
+    public async Task<MessageBoxElement> ShowDialog(string title, object content, params MessageBoxElement[] buttons)
     {
-        await ShowDialog(newMessageBox);
-        return newMessageBox.Result;
+        using var newMessageBox = genericMessageBoxFactory.Create();
+        newMessageBox.Content = content;
+        newMessageBox.Title = title;
+        newMessageBox.Buttons.AddRange(buttons);
+        var result = await ShowDialog(newMessageBox);
+        return result;
     }
-        
-    private async Task ShowDialog(IMessageBoxHostViewModel newMessageBox)
+
+    private async Task<T> ShowMessageBox<T>(IMessageBoxViewModel<T> messageBox)
     {
-        var currentMessageBox = MessageBox;
-        if (currentMessageBox != null)
+        using var windowAnchors = new CompositeDisposable();
+
+        var dialogId = $"Dialog#{Interlocked.Increment(ref dialogIdx)}";
+        var log = Log.WithSuffix(dialogId);
+        log.Info($"Creating new window for content: {messageBox}");
+        
+        messageBoxes.Add(messageBox);
+        Disposable.Create(() => messageBoxes.Remove(messageBox)).AddTo(windowAnchors);
+        
+        var windowContainer = new MessageBoxContainerViewModel(log)
         {
-            Log.Warn($"Currently already showing message box {newMessageBox}");
-        }
-            
-        try
+            Content = messageBox,
+        };
+        var window = new MessageBoxWindow
         {
-            MessageBox = newMessageBox;
-            newMessageBox.IsOpen = true;
-            await newMessageBox.WhenAnyValue(x => x.IsOpen).Where(x => !x).Take(1);
-        }
-        finally
+            Owner = applicationAccessor.MainWindow,
+            DataContext = windowContainer
+        };
+        
+        window.WhenLoaded()
+            .Do(args => log.Debug(() => $"Message box is loaded"))
+            .SubscribeSafe(() =>
+            {
+                log.Debug(() => $"Assigning overlay view {this} to view-model {messageBox}");
+                messageBox.SetOverlayWindow(window);
+            }, log.HandleUiException)
+            .AddTo(windowAnchors);
+        
+        log.Info($"Created new window: {window}");
+
+        Disposable.Create(() =>
         {
-            MessageBox = currentMessageBox;
-        }
+            try
+            {
+                log.Info($"Closing window {window}");
+                window.Close();
+                log.Info($"Closed window {window}");
+            }
+            catch (Exception e)
+            {
+                log.Warn($"Failed to close window {window}",e);
+            }
+        }).AddTo(windowAnchors);
+        
+        var dialogCloseController = new CloseController<T>(_ => window.Close());
+        var capturingCloseController = new CapturingCloseController<T>();
+        var closeController = new ForwardingCloseController<T>(capturingCloseController, dialogCloseController);
+        messageBox.CloseController = closeController;
+        
+        log.Info("Showing window"); 
+        var result = window.ShowDialog();
+        log.Info($"Window was closed, result: {result}");
+        return capturingCloseController.Result;
     }
 }

@@ -9,25 +9,27 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 
-    <DataTemplate DataType="{x:Type viewModels:InputMessageBoxViewModel}">
-        <st:AutoGrid Columns="*,Auto,Auto" Rows="*,Auto" ChildMargin="5">
-            <TextBox Grid.ColumnSpan="3"
-                     wpf:FocusHelper.IsFocused="True"
-                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                     MinHeight="60"
-                     VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                     AcceptsReturn="True"
-                     TextWrapping="Wrap"
-                     materialDesign:HintAssist.IsFloating="{Binding ContentHint, Converter={StaticResource NullToFalseConverter}}"
-                     IsReadOnly="{Binding IsReadOnly}"
-                     IsReadOnlyCaretVisible="True"
-                     materialDesign:HintAssist.Hint="{Binding ContentHint}"
-                     Text="{Binding Content}"
-                     VerticalScrollBarVisibility="Auto" />
+    <DataTemplate DataType="{x:Type viewModels:MessageBoxTextContent}">
+        <TextBox wpf:FocusHelper.IsFocused="True"
+                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                 MinHeight="60"
+                 VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 materialDesign:HintAssist.IsFloating="{Binding Hint, Converter={StaticResource NullToFalseConverter}}"
+                 IsReadOnly="{Binding IsReadOnly}"
+                 IsReadOnlyCaretVisible="True"
+                 materialDesign:HintAssist.Hint="{Binding Hint}"
+                 Text="{Binding Text}"
+                 Background="Transparent"
+                 VerticalScrollBarVisibility="Auto" />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type viewModels:MessageBoxViewModel}">
+        <st:AutoGrid Columns="*" Rows="*, Auto" ChildMargin="5">
+            <ui:CachedContentControl x:Name="MessageBoxContent" Content="{Binding Content}"/>
             
-            <ui:ButtonEx Grid.Row="1" Grid.Column="2" Content="OK" Command="{Binding ConfirmCommand}" />
-            <ui:ButtonEx Grid.Row="1" Grid.Column="3" Content="Cancel" Command="{Binding CancelCommand}" />
         </st:AutoGrid>
     </DataTemplate>
 </ui:SharedResourceDictionary>

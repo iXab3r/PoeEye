@@ -8,11 +8,13 @@
     <Color x:Key="TransparentColorKey">#00000000</Color>
     <Color x:Key="OverlayBorderColorKey">#1A6A73</Color>
     <Color x:Key="OverlayTitleBackgroundColorKey">#343E3D</Color>
+    <Color x:Key="OverlayTitleColorKey">#EEC64C</Color>
     <Color x:Key="OverlayAlternateBackgroundColorKey">#303030</Color>
     <Color x:Key="OverlayBackgroundColorKey">#292C2A</Color>
     <Color x:Key="OverlayForegroundColorKey">White</Color>
     <SolidColorBrush x:Key="TransparentBrushKey" Color="{StaticResource TransparentColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayBorderBrushKey" Color="{StaticResource OverlayBorderColorKey}" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="OverlayTitleBrushKey" Color="{StaticResource OverlayTitleColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayTitleBackgroundBrushKey" Color="{StaticResource OverlayTitleBackgroundColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayAlternateBackgroundBrushKey" Color="{StaticResource OverlayAlternateBackgroundColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayBackgroundBrushKey" Color="{StaticResource OverlayBackgroundColorKey}" ice:Freeze="True"/>
@@ -41,6 +43,8 @@
     <Color x:Key="OverlayWindowTitleBackgroundColorKey">#343E3D</Color>
     <Color x:Key="OverlayWindowBackgroundColorKey">#292C2A</Color>
     <Color x:Key="OverlayWindowTextColorKey">#EEC64C</Color>
+    <Color x:Key="PopupWindowBackgroundColorKey">#FF424242</Color>
+
     <Color x:Key="MouseOverAccentColorKey">#80d8ff</Color>
     <Color x:Key="ButtonTextAccentColorKey">#EEC64C</Color>
 
@@ -49,6 +53,7 @@
     <SolidColorBrush x:Key="OverlayWindowTitleBackgroundBrushKey" Color="{StaticResource OverlayWindowTitleBackgroundColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayWindowTitleLightBackgroundBrushKey" Opacity="0.90" Color="{StaticResource OverlayWindowTitleBackgroundColorKey}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="OverlayWindowBackgroundBrushKey" Color="{StaticResource OverlayWindowBackgroundColorKey}" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="PopupWindowBackgroundBrushKey" Color="{StaticResource PopupWindowBackgroundColorKey}" ice:Freeze="True"/>
     
     <SolidColorBrush x:Key="MouseOverAccentBrushKey" Color="{StaticResource MouseOverAccentColorKey}" ice:Freeze="True"/>
     

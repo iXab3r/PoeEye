@@ -6,24 +6,24 @@ namespace PoeShared.Dialogs.Services;
 
 public interface IMessageBoxService : IDisposableReactiveObject
 {
-    IMessageBoxHost MessageBox { get; }
-        
-    public Task<MessageBoxElement> ShowDialog(string title, IMessageBoxViewModel content, params MessageBoxElement[] buttons);
-        
-    public Task<T> ShowDialog<T>(string title, IMessageBoxViewModel<T> content);
+    bool IsOpen { get; }
+    
+    Task<T> ShowDialog<T>(IMessageBoxViewModel<T> content);
 
+    Task<MessageBoxElement> ShowDialog(string title, object content, params MessageBoxElement[] buttons);
+    
     Task ShowMessage(string title, string content);
         
-    public Task<bool> ShowConfirmation(
+    Task<bool> ShowConfirmation(
         string title,
         string content);
         
-    public Task<string> ShowInputBox(
+    Task<string> ShowInputBox(
         string title,
         string content,
         string contentHint);
 
-    public Task<(MessageBoxElement DialogResult, string InputContent)> ShowMessageBox(
+    Task<(MessageBoxElement DialogResult, string InputContent)> ShowInputBox(
         string title,
         string content,
         string contentHint,

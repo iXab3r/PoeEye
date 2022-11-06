@@ -1,4 +1,4 @@
-﻿<native:TransparentWindow
+﻿<native:WindowBase
     x:Class="PoeShared.Native.OverlayWindowView"
     x:Name="WindowRoot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,7 +10,7 @@
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
     xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
+    d:DataContext="{d:DesignInstance native:OverlayWindowContainer}"
     WindowStartupLocation="Manual"
     Focusable="{Binding Content.IsLocked, Converter={StaticResource NotConverter}}"
     IsTabStop="False"
@@ -20,8 +20,8 @@
     UseLayoutRounding="True">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}" 
-                      CornerRadius="0" CaptionHeight="0" 
+        <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}"
+                      CornerRadius="0" CaptionHeight="0"
                       ResizeBorderThickness="{Binding ResizeBorderThickness, Mode=OneWay}" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
@@ -29,7 +29,7 @@
             <eye:SharedResourceDictionary.MergedDictionaries>
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
             </eye:SharedResourceDictionary.MergedDictionaries>
-            
+
             <Style x:Key="OverlayCloseButtonStyle" TargetType="{x:Type Button}"
                    BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
                 <Setter Property="Content" Value="&#xf09c;" />
@@ -56,10 +56,10 @@
             <Setter Property="MaxWidth" Value="{Binding MaxWidth, Mode=OneWay}" />
             <Setter Property="MinHeight" Value="{Binding MinHeight, Mode=OneWay}" />
             <Setter Property="MaxHeight" Value="{Binding MaxHeight, Mode=OneWay}" />
-            
+
             <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
             <Setter Property="TargetAspectRatio" Value="{Binding Content.TargetAspectRatio, Mode=OneWay}" />
-            
+
             <Setter Property="ResizeMode" Value="NoResize" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="AllowsTransparency" Value="True" />
@@ -76,7 +76,7 @@
 
                 <!-- Header -->
                 <Grid Grid.Row="0" Height="36" Visibility="{Binding Content.EnableHeader, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
-                    <Border 
+                    <Border
                         wpf:EnableDragHelper.EnableDrag="True"
                         Background="{StaticResource OverlayWindowTitleBackgroundBrushKey}"
                         BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
@@ -118,7 +118,7 @@
                             </Button>
                             <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
                                        Text="{Binding Content.Title}"
-                                       Foreground="#EEC64C"
+                                       Foreground="{StaticResource OverlayTitleBrushKey}"
                                        HorizontalAlignment="Center"
                                        FontWeight="Bold" />
                         </StackPanel>
@@ -126,12 +126,19 @@
                 </Grid>
 
                 <Border Grid.Row="1"
+                        x:Name="WindowBorder"
                         BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
-                        BorderThickness="1"
-                        Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}" />
+                        BorderThickness="1">
+                    <Border.Visibility>
+                        <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToHiddenConverter}">
+                            <Binding Path="Content.IsLocked" Converter="{StaticResource NotConverter}" />
+                            <Binding Path="Content.ShowResizeThumbs" />
+                        </MultiBinding>
+                    </Border.Visibility>
+                </Border>
 
                 <!-- Body -->
-                <native:ContentControlEx Grid.Row="1" 
+                <native:ContentControlEx Grid.Row="1"
                                          Focusable="{Binding Content.IsLocked, Converter={StaticResource NotConverter}}" IsTabStop="False"
                                          Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
                                          Content="{Binding Content}"
@@ -211,23 +218,24 @@
 
             </StackPanel>
         </Border>
-        
-        <Grid Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
-            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" 
-                   IsHitTestVisible="False" 
+
+        <Grid Visibility="{Binding ElementName=WindowBorder, Path=Visibility}">
+
+            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}"
+                   IsHitTestVisible="False"
                    Width="{Binding ResizeThumbSize}"
-                   Height="{Binding ResizeThumbSize}"/>
+                   Height="{Binding ResizeThumbSize}" />
             <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"
                    Width="{Binding ResizeThumbSize}"
-                   Height="{Binding ResizeThumbSize}"/>
+                   Height="{Binding ResizeThumbSize}" />
             <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"
                    Width="{Binding ResizeThumbSize}"
-                   Height="{Binding ResizeThumbSize}"/>
+                   Height="{Binding ResizeThumbSize}" />
             <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"
                    Width="{Binding ResizeThumbSize}"
-                   Height="{Binding ResizeThumbSize}"/>
+                   Height="{Binding ResizeThumbSize}" />
         </Grid>
-        
+
         <scaffolding:DataPiping.DataPipes>
             <scaffolding:DataPipeCollection>
                 <scaffolding:DataPipe
@@ -237,4 +245,4 @@
         </scaffolding:DataPiping.DataPipes>
     </Grid>
 
-</native:TransparentWindow>
+</native:WindowBase>

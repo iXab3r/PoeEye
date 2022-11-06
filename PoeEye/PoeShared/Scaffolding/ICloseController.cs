@@ -5,7 +5,7 @@ public interface ICloseController
     void Close();
 }
     
-public interface ICloseController<in TValue>
+public interface ICloseController<in TValue> : ICloseController
 {
     void Close(TValue value);
 }

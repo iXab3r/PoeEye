@@ -78,7 +78,9 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     public bool LastExitWasGraceful { get; }
         
     public bool LastLoadWasSuccessful { get; }
-        
+    
+    public Window MainWindow => application.MainWindow;
+
     public void ReportIsLoaded()
     {
         if (IsLoaded)

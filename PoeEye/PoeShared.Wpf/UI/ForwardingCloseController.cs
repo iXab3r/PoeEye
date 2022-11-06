@@ -18,4 +18,12 @@ public sealed class ForwardingCloseController<T> : ICloseController<T>
             closeController.Close(value);
         }
     }
+
+    public void Close()
+    {
+        foreach (var closeController in controllers)
+        {
+            closeController.Close();
+        }
+    }
 }

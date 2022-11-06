@@ -10,4 +10,8 @@ public class CapturingCloseController<T> : ICloseController<T>
     {
         Result = value;
     }
+
+    public void Close()
+    {
+    }
 }

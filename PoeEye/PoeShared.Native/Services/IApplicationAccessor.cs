@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PoeShared.Services;
 
@@ -30,6 +31,8 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     bool LastExitWasGraceful { get; }
         
     bool LastLoadWasSuccessful { get; }
+    
+    Window MainWindow { get; }
 
     void ReportIsLoaded();
 }

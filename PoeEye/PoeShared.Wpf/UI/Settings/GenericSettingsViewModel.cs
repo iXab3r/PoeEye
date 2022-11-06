@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -30,83 +31,50 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGene
     private static readonly MethodInfo SaveConfigMethod = typeof(GenericSettingsViewModel)
         .GetMethod(nameof(SaveTypedConfig), BindingFlags.Instance | BindingFlags.NonPublic);
 
+    [NotNull] private readonly IPoeEyeModulesEnumerator modulesEnumerator;
     private readonly IUnityContainer container;
-    private readonly ConcurrentDictionary<Type, MethodInfo> reloadConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
-    private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
+    private readonly ConcurrentDictionary<Type, MethodInfo> reloadConfigByType = new();
+    private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new();
 
     private readonly ISourceList<ISettingsViewModel> moduleSettings = new SourceListEx<ISettingsViewModel>();
         
     public GenericSettingsViewModel(
         [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
         [NotNull] IUnityContainer container,
-        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        [Dependency(WellKnownSchedulers.RedirectToUI)] IScheduler uiScheduler)
     {
         Guard.ArgumentNotNull(modulesEnumerator, nameof(modulesEnumerator));
         Guard.ArgumentNotNull(container, nameof(container));
+        this.modulesEnumerator = modulesEnumerator;
         this.container = container;
-
-        modulesEnumerator
-            .Settings
-            .Connect()
-            .StartWithDefault()
-            .CombineLatest(this.WhenAnyValue(x => x.IsOpen)
-                    .Where(x => x)
-                    .Take(1),
-                (unit, b) => Unit.Default)
-            .Select(x => modulesEnumerator.Settings.Items.ToArray())
-            .SubscribeSafe(ReloadModulesList, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.IsOpen)
-            .WithPrevious((prev, curr) => new {prev, curr})
-            .DistinctUntilChanged()
-            .Where(x => x.curr && x.prev == false)
-            .SubscribeSafe(ReloadConfigs, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        SaveConfigCommand = new DelegateCommand(
-            () =>
-            {
-                SaveConfigs();
-                IsOpen = false;
-            });
-
-        CancelCommand = new DelegateCommand(() => IsOpen = false);
 
         moduleSettings
             .Connect()
             .ObserveOn(uiScheduler)
-            .Bind(out var moduleSettingsSource)
+            .BindToCollection(out var moduleSettingsSource)
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
         ModulesSettings = moduleSettingsSource;
+        ReloadConfigs();
     }
 
-    public ReadOnlyObservableCollection<ISettingsViewModel> ModulesSettings { get; } 
+    public IReadOnlyObservableCollection<ISettingsViewModel> ModulesSettings { get; }
 
-    public bool IsOpen { get; set; }
-
-    public ICommand SaveConfigCommand { get; }
-
-    public ICommand CancelCommand { get; }
-
-    private void ReloadModulesList(ISettingsViewModel[] viewModels)
+    public void ReloadConfigs()
     {
-        moduleSettings.Edit(list =>
-        {
-            list.Clear();
-            list.AddRange(viewModels);
-        });
-    }
-
-    private void ReloadConfigs()
-    {
+        ReloadModulesList(modulesEnumerator.Settings.Items);
         moduleSettings.Items.ForEach(ReloadConfig);
     }
 
-    private void SaveConfigs()
+    public void SaveConfigs()
     {
+        Log.Info($"Saving settings");
         moduleSettings.Items.ForEach(SaveConfig);
+    }
+
+    private void ReloadModulesList(IEnumerable<ISettingsViewModel> viewModels)
+    {
+        moduleSettings.EditDiff(viewModels);
     }
 
     private Type GetConfigType(ISettingsViewModel viewModel)

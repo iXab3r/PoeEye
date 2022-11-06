@@ -5,65 +5,44 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using DynamicData.Binding;
 using PInvoke;
 using PoeShared.Scaffolding;
-using PoeShared.Logging;
 using PropertyBinder;
 using PropertyChanged;
 using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using KeyEventHandler = System.Windows.Input.KeyEventHandler;
 using Point = System.Drawing.Point;
-using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
 
-public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayViewModel
+public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewModel
 {
     private static readonly Binder<OverlayViewModelBase> Binder = new();
-    private static long GlobalWindowId;
 
-    private readonly ObservableAsPropertyHelper<PointF> dpi;
     private readonly CommandWrapper lockWindowCommand;
     private readonly CommandWrapper makeLayeredCommand;
     private readonly CommandWrapper makeTransparentCommand;
-    private readonly Dispatcher uiDispatcher;
     private readonly CommandWrapper unlockWindowCommand;
-    private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
 
     private bool isLocked = true;
 
     static OverlayViewModelBase()
     {
-        Binder.BindAction(x => x.Log.Info($"Title updated to {x.Title}"));
     }
 
     protected OverlayViewModelBase()
     {
-        Log = GetType().PrepareLogger().WithSuffix(Id).WithSuffix(ToString);
-        Title = GetType().ToString();
-        uiDispatcher = Dispatcher.CurrentDispatcher;
         Log.Info("Created overlay view model");
 
         lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
         unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
         makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
         makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
-
-        dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi))
-            .Switch()
-            .Do(x => Log.Debug(() => $"DPI updated to {x}"))
-            .ToProperty(this, x => x.Dpi)
-            .AddTo(Anchors);
 
         this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
             .SubscribeSafe(() =>
@@ -80,29 +59,7 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 makeTransparentCommand.RaiseCanExecuteChanged();
             }, Log.HandleUiException)
             .AddTo(Anchors);
-
-        this.WhenValueChanged(x => x.OverlayWindow, false)
-            .Take(1)
-            .Select(x => x.WhenLoaded())
-            .Switch()
-            .SubscribeSafe(whenLoaded)
-            .AddTo(Anchors);
-        whenLoaded.SubscribeSafe(_ =>
-        {
-            if (IsLoaded)
-            {
-                Log.Warn("Window received multiple 'loaded' events");
-                throw new ApplicationException($"Window has already been loaded: {this}");
-            }
-
-            Log.Debug("Window has been loaded, changing status");
-            IsLoaded = true;
-        }, Log.HandleUiException).AddTo(Anchors);
-
-        WhenKeyDown = this.WhenAnyValue(x => x.OverlayWindow)
-            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyDown += h, h => window.KeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
-            .Switch();
-
+       
         this.WhenAnyValue(x => x.IsLocked)
             .Select(isLocked => isLocked == false ? WhenKeyDown : Observable.Empty<EventPattern<KeyEventArgs>>())
             .Switch()
@@ -111,25 +68,25 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
                 if (x.EventArgs.Key is Key.Down or Key.S)
                 {
                     var bounds = NativeBounds;
-                    NativeBounds = new Rectangle(bounds.X, bounds.Y + 1, bounds.Width, bounds.Height);
+                    NativeBounds = bounds with {Y = bounds.Y + 1};
                     x.EventArgs.Handled = true;
                 }
                 else if (x.EventArgs.Key is Key.Up or Key.W)
                 {
                     var bounds = NativeBounds;
-                    NativeBounds = new Rectangle(bounds.X, bounds.Y - 1, bounds.Width, bounds.Height);
+                    NativeBounds = bounds with {Y = bounds.Y - 1};
                     x.EventArgs.Handled = true;
                 }
                 else if (x.EventArgs.Key is Key.Left or Key.A)
                 {
                     var bounds = NativeBounds;
-                    NativeBounds = new Rectangle(bounds.X - 1, bounds.Y, bounds.Width, bounds.Height);
+                    NativeBounds = bounds with {X = bounds.X - 1};
                     x.EventArgs.Handled = true;
                 }
                 else if (x.EventArgs.Key is Key.Right or Key.D)
                 {
                     var bounds = NativeBounds;
-                    NativeBounds = new Rectangle(bounds.X + 1, bounds.Y, bounds.Width, bounds.Height);
+                    NativeBounds = bounds with {X = bounds.X + 1};
                     x.EventArgs.Handled = true;
                 }
                 else if (x.EventArgs.Key is Key.R)
@@ -142,48 +99,13 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
         Log.Info("Initialized overlay view model");
 
-        this.WhenAnyValue(x => x.OverlayWindow)
-            .SwitchIfNotDefault(x => x.Observe(ConstantAspectRatioWindow.NativeBoundsProperty, y => y.NativeBounds).Select(y => new { Window = x, ActualBounds = y }))
-            .Subscribe(x =>
-            {
-                // always on UI thread
-                Log.Debug(() => $"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
-                NativeBounds = x.ActualBounds;
-                Log.Debug(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
-            })
-            .AddTo(Anchors); 
-
-        this.WhenAnyValue(x => x.OverlayWindow)
-            .SwitchIfNotDefault(x => this.WhenAnyValue(y => y.NativeBounds)
-                .Select(y => new { Window = x, DesiredBounds = y })
-                .ObserveOnIfNeeded(x.Dispatcher))
-            .Subscribe(x =>
-            {
-                // always on UI thread, possible recursive assignment
-                var overlayBounds = x.Window.NativeBounds;
-                Log.Debug(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
-                x.Window.NativeBounds = x.DesiredBounds;
-                Log.Debug(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
-            })
-            .AddTo(Anchors);
-
         Binder.Attach(this).AddTo(Anchors);
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
     }
 
-    protected IObservable<Unit> WhenLoaded => whenLoaded;
-
-    protected IFluentLog Log { get; }
-
     public bool GrowUpwards { get; set; }
 
-    public Size DefaultSize { get; set; }
-
-    public string OverlayDescription => $"{(OverlayWindow == null ? "NOWINDOW" : OverlayWindow.Name)}";
-
     public float Opacity { get; set; }
-
-    public double? TargetAspectRatio { get; set; }
 
     public System.Windows.Point ViewModelLocation { get; set; }
 
@@ -195,22 +117,8 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
 
     public ICommand LockWindowCommand => lockWindowCommand;
 
-    public TransparentWindow OverlayWindow { get; private set; }
-
-    public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
-
-    public bool IsVisible { get; set; } = true;
-
-    public PointF Dpi => dpi.Value;
-
-    public Rectangle NativeBounds { get; set; }
-
-    public Size MinSize { get; set; } = new Size(0, 0);
-
-    public Size MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
-
-    public bool IsLoaded { get; private set; }
-
+    public bool ShowResizeThumbs { get; set; } = true;
+    
     [DoNotNotify]
     public bool IsLocked
     {
@@ -226,19 +134,9 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
         }
     }
 
-    public bool EnableHeader { get; set; } = true;
-
-    public bool IsUnlockable { get; protected set; }
-
-    public bool ShowInTaskbar { get; set; }
+    public bool IsUnlockable { get; protected set; } = true;
 
     public OverlayMode OverlayMode { get; set; }
-
-    public SizeToContent SizeToContent { get; protected set; } = SizeToContent.Manual;
-
-    public string Id { get; } = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
-
-    public string Title { get; protected set; }
 
     public virtual void ResetToDefault()
     {
@@ -264,44 +162,6 @@ public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayV
     public virtual void SetActivationController(IActivationController controller)
     {
         Guard.ArgumentNotNull(controller, nameof(controller));
-    }
-
-    public void SetOverlayWindow(TransparentWindow owner)
-    {
-        Guard.ArgumentNotNull(owner, nameof(owner));
-
-        if (this.OverlayWindow != null)
-        {
-            throw new InvalidOperationException($"Window is already assigned");
-        }
-
-        Log.Info(() => $"Assigning overlay window: {owner}");
-
-        Log.Info(() => $"Syncing window parameters with view model");
-        owner.NativeBounds = NativeBounds;
-
-        OverlayWindow = owner;
-        Log.Info(() => $"Overlay window is assigned: {OverlayWindow}");
-    }
-
-    public override string ToString()
-    {
-        return $"OverlayVM {Id} Bounds: {NativeBounds}";
-    }
-
-    public DispatcherOperation BeginInvoke(Action dispatcherAction)
-    {
-        return uiDispatcher.BeginInvoke(() =>
-        {
-            try
-            {
-                dispatcherAction();
-            }
-            catch (Exception e)
-            {
-                Log.Warn($"Failed to execute operation on dispatcher", e);
-            }
-        });
     }
 
     protected virtual void ApplyConfig(IOverlayConfig config)
