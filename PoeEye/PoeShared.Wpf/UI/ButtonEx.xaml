@@ -58,6 +58,8 @@
                         IsHitTestVisible="{TemplateBinding IsHitTestVisible}"
                         ToolTip="{TemplateBinding ToolTip}">
                         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="2.5"
+                                       HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                                       VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                        x:Name="ButtonBox">
                             <ContentPresenter x:Name="ContentLabel"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"

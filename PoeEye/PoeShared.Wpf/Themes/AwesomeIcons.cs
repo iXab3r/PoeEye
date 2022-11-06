@@ -50,6 +50,7 @@ public static class AwesomeIcons
     public const string LinkIcon = "\uf0c1";
     public const string Padlock = "\uf023";
     public const string PlayOutlined = "\uf01d";
+    public const string PlusCircle = "\uf055";
     public const string Pause = "\uf04c";
     public const string PowerOff = "\uf011";
     public const string Repeat = "\uf01e";
