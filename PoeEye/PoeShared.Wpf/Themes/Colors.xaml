@@ -56,6 +56,7 @@
     <SolidColorBrush x:Key="PopupWindowBackgroundBrushKey" Color="{StaticResource PopupWindowBackgroundColorKey}" ice:Freeze="True"/>
     
     <SolidColorBrush x:Key="MouseOverAccentBrushKey" Color="{StaticResource MouseOverAccentColorKey}" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="MouseOverLightAccentBrushKey" Color="{StaticResource MouseOverAccentColorKey}" Opacity="0.6" ice:Freeze="True"/>
     
     <Color x:Key="PositiveColor">LimeGreen</Color>
     <Color x:Key="WarningColor">Orange</Color>
