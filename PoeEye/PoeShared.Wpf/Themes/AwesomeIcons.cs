@@ -38,6 +38,7 @@ public static class AwesomeIcons
     public const string File = "\uf016";
     public const string FileText = "\uf0f6";
     public const string FileImage = "\uf1c5";
+    public const string Keyboard = "\uf11c";
     public const string Hourglass = "\uf252";
     public const string Incognito = "\uf2a7";
     public const string InfoIcon = "\uf05a";
@@ -48,6 +49,7 @@ public static class AwesomeIcons
     public const string IsNotLoaded = "\uf070";
     public const string Trigger = "\uf0e7";
     public const string LinkIcon = "\uf0c1";
+    public const string MousePointer = "\uf245";
     public const string Padlock = "\uf023";
     public const string PlayOutlined = "\uf01d";
     public const string PlusCircle = "\uf055";

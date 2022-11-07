@@ -78,7 +78,6 @@
                 <TextBlock HorizontalAlignment="Right">Start/stop recording</TextBlock>
                 <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
                     <eye:HotKeyBox 
-                        MinWidth="140"
                         HorizontalAlignment="Left"
                         AcceptsModifiers="False"
                         AcceptsTab="False"

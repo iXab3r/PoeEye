@@ -1,60 +1,125 @@
 <eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:eye="clr-namespace:PoeShared.UI"
-                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                              xmlns:eye="clr-namespace:PoeShared.UI"
+                              xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:themes="clr-namespace:PoeShared.Themes">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.textbox.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.buttons.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
-    
+
     <Style TargetType="{x:Type eye:HotKeyBox}">
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
-        <Setter Property="AcceptsReturn" Value="True"/>
-        <Setter Property="AcceptsTab" Value="False"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}"/>
-        <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys"/>
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="AcceptsTab" Value="False" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="MinWidth" Value="60" />
+        <Setter Property="MinHeight" Value="25" />
+        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
+        <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:HotKeyBox}">
-                    <Border Focusable="False"
+                    <Border x:Name="PART_ContentHost" Focusable="False"
                             MinHeight="{TemplateBinding MinHeight}"
+                            MinWidth="{TemplateBinding MinWidth}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}">
-                        <TextBox x:Name="PART_TextBox"
-                             ToolTip="{TemplateBinding ToolTip}"
-                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"    
-                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                             FontFamily="{TemplateBinding FontFamily}"
-                             FontSize="{TemplateBinding FontSize}"
-                             Foreground="{TemplateBinding Foreground}"
-                             HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                             IsTabStop="{TemplateBinding IsTabStop}"
-                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                             Text="{TemplateBinding Text}"
-                             Focusable="{TemplateBinding Focusable}"
-                             materialDesign:HintAssist.IsFloating="False"
-                             Validation.ErrorTemplate="{TemplateBinding Validation.ErrorTemplate}"
-                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
-                             AcceptsReturn="{TemplateBinding AcceptsReturn}"
-                             AcceptsTab="{TemplateBinding AcceptsTab}">
-                        <TextBox.ContextMenu>
-                            <ContextMenu IsEnabled="False"/>
-                        </TextBox.ContextMenu>
-                    </TextBox>
+                        <st:StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="PART_TextBox"
+                                     st:StackPanel.Fill="Fill"
+                                     Style="{StaticResource MinimalTextBoxStyle}"
+                                     FontFamily="{StaticResource FontAwesome}"
+                                     ToolTip="{TemplateBinding ToolTip}"
+                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                     FontSize="{TemplateBinding FontSize}"
+                                     Foreground="{TemplateBinding Foreground}"
+                                     HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                     IsTabStop="{TemplateBinding IsTabStop}"
+                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                     Focusable="{TemplateBinding Focusable}"
+                                     materialDesign:HintAssist.IsFloating="False"
+                                     Validation.ErrorTemplate="{TemplateBinding Validation.ErrorTemplate}"
+                                     VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                     AcceptsReturn="{TemplateBinding AcceptsReturn}"
+                                     AcceptsTab="{TemplateBinding AcceptsTab}"
+                                     Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     BorderThickness="0"
+                                     wpf:FocusHelper.IsFocused="{TemplateBinding IsInEditMode}"
+                                     ContextMenu="{x:Null}">
+                            </TextBox>
+                            <ToggleButton Grid.Column="1" x:Name="PART_EditModeToggle"
+                                          Height="20" Width="20"
+                                          HorizontalAlignment="Right"
+                                          Margin="5,0"
+                                          Style="{StaticResource FlatToggleButton}"
+                                          Visibility="Collapsed"
+                                          IsChecked="{Binding IsInEditMode, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <TextBlock Text="{x:Static themes:AwesomeIcons.EditIcon}" Style="{StaticResource IconTextBlock}" />
+                            </ToggleButton>
+                        </st:StackPanel>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PART_EditModeToggle" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsInEditMode" Value="True">
+                            <Setter TargetName="PART_EditModeToggle" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="HotKey" Value="{x:Null}">
+                            <Setter TargetName="PART_EditModeToggle" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="HotKey" Value="{x:Static eye:HotkeyGesture.Empty}">
+                            <Setter TargetName="PART_EditModeToggle" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="Transparent" />
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 1" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+                        </MultiTrigger>
+
+                        <!-- IsKeyboardFocused -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsKeyboardFocused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 2" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </MultiTrigger>
+
+                        <!-- IsMouseOver -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <ObjectDataProvider x:Key="HotkeyModeEnumDataProvider"
                         MethodName="GetValuesAndDescriptions"
                         ObjectType="wpf:EnumHelper">

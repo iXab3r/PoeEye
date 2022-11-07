@@ -34,6 +34,19 @@
                     <st:StackPanel Orientation="Vertical">
                         <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowInTaskbar}">Show in taskbar</CheckBox>    
                         <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowTitleBar}">Show title bar</CheckBox>    
+                        
+                        
+                        <GroupBox Header="Color picker">
+                            <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                                <eye:HotKeyBox
+                                    x:Name="HotkeyEditor" />
+                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsModifiers, Mode=TwoWay}">AcceptsModifiers</CheckBox>    
+                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsTab, Mode=TwoWay}">AcceptsTab</CheckBox>    
+                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseKeys, Mode=TwoWay}">AcceptsMouseKeys</CheckBox>    
+                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseWheel, Mode=TwoWay}">AcceptsMouseWheel</CheckBox>    
+                            </st:StackPanel>
+                        </GroupBox>
+
                         <GroupBox Header="Color picker">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:ColorPickerEx x:Name="ColorPickerEx" Color="{Binding Color}" PickerDock="Right" />

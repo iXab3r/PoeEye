@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -7,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using PInvoke;
 using PoeShared.Native;
+using PoeShared.Scaffolding;
+using PoeShared.Themes;
 using Control = System.Windows.Controls.Control;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
@@ -17,13 +23,13 @@ namespace PoeShared.UI;
 public class HotKeyBox : Control
 {
     public const string PART_TextBox = "PART_TextBox";
-    private static readonly ISet<Key> EscapeKeys = new HashSet<Key> { Key.Escape, Key.Back, Key.Delete };
+    private static readonly ISet<Key> EscapeKeys = new HashSet<Key> {Key.Escape, Key.Back, Key.Delete};
 
     public static readonly DependencyProperty HotKeyProperty = DependencyProperty.Register(
         "HotKey",
         typeof(HotkeyGesture),
         typeof(HotKeyBox),
-        new FrameworkPropertyMetadata(default(HotkeyGesture), OnHotKeyChanged) { BindsTwoWayByDefault = true });
+        new FrameworkPropertyMetadata(default(HotkeyGesture)) {BindsTwoWayByDefault = true});
 
     public static readonly DependencyProperty AreModifierKeysRequiredProperty = DependencyProperty.Register(
         "AreModifierKeysRequired",
@@ -63,10 +69,14 @@ public class HotKeyBox : Control
     /// <returns>The identifier for the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsTab" /> dependency property.</returns>
     public static readonly DependencyProperty AcceptsTabProperty = DependencyProperty.Register(nameof(TextBoxBase.AcceptsTab), typeof(bool), typeof(HotKeyBox), new FrameworkPropertyMetadata(false));
 
+    public static readonly DependencyProperty IsInEditModeProperty = DependencyProperty.Register(nameof(IsInEditMode), typeof(bool), typeof(HotKeyBox), new PropertyMetadata(default(bool)));
+
     public static readonly DependencyProperty TextProperty = TextPropertyKey.DependencyProperty;
+
+    private readonly CompositeDisposable anchors = new();
+
     private HotkeyGesture lastKeyDown;
     private DateTime lastKeyDownTimestamp;
-
     private TextBox textBox;
 
     static HotKeyBox()
@@ -77,107 +87,66 @@ public class HotKeyBox : Control
 
     public bool AcceptsModifiers
     {
-        get => (bool)GetValue(AcceptsModifiersProperty);
+        get => (bool) GetValue(AcceptsModifiersProperty);
         set => SetValue(AcceptsModifiersProperty, value);
     }
 
     public bool AcceptsMouseWheel
     {
-        get => (bool)GetValue(AcceptsMouseWheelProperty);
+        get => (bool) GetValue(AcceptsMouseWheelProperty);
         set => SetValue(AcceptsMouseWheelProperty, value);
     }
 
     public bool AcceptsReturn
     {
-        get => (bool)GetValue(AcceptsReturnProperty);
+        get => (bool) GetValue(AcceptsReturnProperty);
         set => SetValue(AcceptsReturnProperty, value);
     }
 
     public bool AcceptsTab
     {
-        get => (bool)GetValue(AcceptsTabProperty);
+        get => (bool) GetValue(AcceptsTabProperty);
         set => SetValue(AcceptsTabProperty, value);
     }
 
     public bool AcceptsMouseKeys
     {
-        get => (bool)GetValue(AcceptsMouseKeysProperty);
+        get => (bool) GetValue(AcceptsMouseKeysProperty);
         set => SetValue(AcceptsMouseKeysProperty, value);
     }
 
     public HotkeyGesture HotKey
     {
-        get => (HotkeyGesture)GetValue(HotKeyProperty);
+        get => (HotkeyGesture) GetValue(HotKeyProperty);
         set => SetValue(HotKeyProperty, value);
     }
 
     public bool AreModifierKeysRequired
     {
-        get => (bool)GetValue(AreModifierKeysRequiredProperty);
+        get => (bool) GetValue(AreModifierKeysRequiredProperty);
         set => SetValue(AreModifierKeysRequiredProperty, value);
     }
 
     public string Watermark
     {
-        get => (string)GetValue(WatermarkProperty);
+        get => (string) GetValue(WatermarkProperty);
         set => SetValue(WatermarkProperty, value);
     }
 
     public string Text
     {
-        get => (string)GetValue(TextProperty);
+        get => (string) GetValue(TextProperty);
         private set => SetValue(TextPropertyKey, value);
     }
 
-    private static void OnHotKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public bool IsInEditMode
     {
-        var ctrl = (HotKeyBox)d;
-        ctrl.UpdateText();
-    }
-
-    private static void OnGotFocus(object sender, RoutedEventArgs e)
-    {
-        var hotKeyBox = (HotKeyBox)sender;
-
-        // If we're an editable HotKeyBox, forward focus to the TextBox or previous element
-        if (e.Handled)
-        {
-            return;
-        }
-
-        if (!hotKeyBox.Focusable || hotKeyBox.textBox == null)
-        {
-            return;
-        }
-
-        if (!Equals(e.OriginalSource, hotKeyBox))
-        {
-            return;
-        }
-
-        // MoveFocus takes a TraversalRequest as its argument.
-        var request = new TraversalRequest(
-            (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
-                ? FocusNavigationDirection.Previous
-                : FocusNavigationDirection.Next);
-        // Gets the element with keyboard focus.
-        var elementWithFocus = Keyboard.FocusedElement as UIElement;
-        // Change keyboard focus.
-        elementWithFocus?.MoveFocus(request);
-        e.Handled = true;
+        get { return (bool) GetValue(IsInEditModeProperty); }
+        set { SetValue(IsInEditModeProperty, value); }
     }
 
     public override void OnApplyTemplate()
     {
-        if (textBox != null)
-        {
-            textBox.PreviewMouseDown -= TextBoxOnPreviewMouseDown;
-            textBox.PreviewKeyDown -= TextBoxOnPreviewKeyDown;
-            textBox.GotFocus -= TextBoxOnGotFocus;
-            textBox.LostFocus -= TextBoxOnLostFocus;
-            textBox.TextChanged -= TextBoxOnTextChanged;
-        }
-
         base.OnApplyTemplate();
 
         textBox = Template.FindName(PART_TextBox, this) as TextBox;
@@ -186,18 +155,84 @@ public class HotKeyBox : Control
             return;
         }
 
-        textBox.PreviewKeyDown += TextBoxOnPreviewKeyDown;
-        textBox.PreviewMouseDown += TextBoxOnPreviewMouseDown;
-        textBox.PreviewMouseWheel += TextBoxOnPreviewMouseWheel;
+        var keyboardEvents = Observable.Using(() =>
+        {
+            textBox.PreviewKeyDown += TextBoxOnPreviewKeyDown;
+            textBox.GotFocus += TextBoxOnGotFocus;
+            textBox.LostFocus += TextBoxOnLostFocus;
+            textBox.TextChanged += TextBoxOnTextChanged;
+            return Disposable.Create(() =>
+            {
+                textBox.PreviewKeyDown -= TextBoxOnPreviewKeyDown;
+                textBox.GotFocus -= TextBoxOnGotFocus;
+                textBox.LostFocus -= TextBoxOnLostFocus;
+                textBox.TextChanged -= TextBoxOnTextChanged;
+            });
+        }, disposable => Observable.Never<Unit>());
+        
+        var mouseEvents = Observable.Using(() =>
+        {
+            CaptureMouse();
+            this.PreviewMouseDown += TextBoxOnPreviewMouseDown;
+            this.PreviewMouseWheel += TextBoxOnPreviewMouseWheel;
+            return Disposable.Create(() =>
+            {
+                ReleaseMouseCapture();
+                this.PreviewMouseDown -= TextBoxOnPreviewMouseDown;
+                this.PreviewMouseWheel -= TextBoxOnPreviewMouseWheel;
+            });
+        }, disposable => Observable.Never<Unit>());
+        
+        this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
+            .Select(x => x && (AcceptsMouseWheel || AcceptsMouseKeys) ? mouseEvents : Observable.Empty<Unit>())
+            .Switch()
+            .Subscribe()
+            .AddTo(anchors);
 
-        textBox.GotFocus += TextBoxOnGotFocus;
-        textBox.LostFocus += TextBoxOnLostFocus;
-        textBox.TextChanged += TextBoxOnTextChanged;
-        UpdateText();
+        this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
+            .Select(x => x ? keyboardEvents : Observable.Empty<Unit>())
+            .Switch()
+            .Subscribe()
+            .AddTo(anchors);
+
+        var focusLost = this.Observe(IsKeyboardFocusWithinProperty, x => x.IsKeyboardFocusWithin)
+            .Where(x => x == false);
+        
+        this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
+            .Select(x => x ? focusLost : Observable.Empty<bool>())
+            .Switch()
+            .Subscribe(_ => IsInEditMode = false)
+            .AddTo(anchors);
+
+        var hotkeySource = this.Observe(HotKeyProperty, x => x.HotKey)
+            .Select(x => x ?? HotkeyGesture.Empty)
+            .Select(x => x.ToString());
+        
+        this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
+            .Select(x => x ? Observable.Return(PrepareTooltip()) : hotkeySource)
+            .Switch()
+            .Subscribe(x => Text = x)
+            .AddTo(anchors);
+    }
+
+    private string PrepareTooltip()
+    {
+        var result = new List<string> {AwesomeIcons.Keyboard};
+        if (AcceptsMouseKeys || AcceptsMouseWheel)
+        {
+            result.Add(AwesomeIcons.MousePointer);
+        }
+        result.Add(" Press...");
+        return result.JoinStrings(" ");
     }
 
     private void TextBoxOnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
+        if (!IsInEditMode)
+        {
+            throw new InvalidStateException("HotkeyBox is not in EditMode");
+        }
+        
         if (!AcceptsMouseWheel)
         {
             return;
@@ -212,11 +247,17 @@ public class HotKeyBox : Control
         {
             HotKey = new HotkeyGesture(e.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, currentModifierKeys);
             e.Handled = true;
+            IsInEditMode = false;
         }
     }
 
     private void TextBoxOnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
+        if (!IsInEditMode)
+        {
+            throw new InvalidStateException("HotkeyBox is not in EditMode");
+        }
+        
         if (!AcceptsMouseKeys)
         {
             return;
@@ -231,26 +272,31 @@ public class HotKeyBox : Control
         {
             HotKey = new HotkeyGesture(MouseButton.XButton1, currentModifierKeys);
             e.Handled = true;
+            IsInEditMode = false;
         }
         else if (e.XButton2 == MouseButtonState.Pressed)
         {
             HotKey = new HotkeyGesture(MouseButton.XButton2, currentModifierKeys);
             e.Handled = true;
+            IsInEditMode = false;
         }
         else if (e.MiddleButton == MouseButtonState.Pressed)
         {
             HotKey = new HotkeyGesture(MouseButton.Middle, currentModifierKeys);
             e.Handled = true;
+            IsInEditMode = false;
         }
-        else if (e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2)
+        else if (e.LeftButton == MouseButtonState.Pressed)
         {
             HotKey = new HotkeyGesture(MouseButton.Left, currentModifierKeys);
             e.Handled = true;
+            IsInEditMode = false;
         }
-        else if (e.RightButton == MouseButtonState.Pressed && e.ClickCount == 2)
+        else if (e.RightButton == MouseButtonState.Pressed)
         {
             HotKey = new HotkeyGesture(MouseButton.Right, currentModifierKeys);
             e.Handled = true;
+            IsInEditMode = false;
         }
     }
 
@@ -266,7 +312,7 @@ public class HotKeyBox : Control
 
     private void ComponentDispatcherOnThreadPreprocessMessage(ref MSG msgRaw, ref bool handled)
     {
-        var msg = (User32.WindowMessage)msgRaw.message;
+        var msg = (User32.WindowMessage) msgRaw.message;
         if (msg == User32.WindowMessage.WM_HOTKEY)
         {
             handled = true;
@@ -280,6 +326,10 @@ public class HotKeyBox : Control
 
     private void TextBoxOnPreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (!IsInEditMode)
+        {
+            throw new InvalidStateException("HotkeyBox is not in EditMode");
+        }
         var key = e.Key == Key.System
             ? e.SystemKey
             : e.Key;
@@ -310,21 +360,16 @@ public class HotKeyBox : Control
         if (isClearHotKey && !isDoubleClick)
         {
             HotKey = null;
+            IsInEditMode = false;
         }
         else if (currentModifierKeys != ModifierKeys.None || !AreModifierKeysRequired)
         {
             HotKey = currentHotKey;
+            IsInEditMode = false;
         }
 
-        UpdateText();
         lastKeyDown = currentHotKey;
         lastKeyDownTimestamp = DateTime.Now;
-    }
-
-    private void UpdateText()
-    {
-        var hotkey = HotKey ?? new HotkeyGesture(Key.None);
-        Text = hotkey.ToString();
     }
 
     private bool TryGetModifiers(out ModifierKeys modifierKeys)
@@ -339,5 +384,37 @@ public class HotKeyBox : Control
 
         modifierKeys = ModifierKeys.None;
         return currentModifierKeys == ModifierKeys.None;
+    }
+
+    private static void OnGotFocus(object sender, RoutedEventArgs e)
+    {
+        var hotKeyBox = (HotKeyBox) sender;
+
+        // If we're an editable HotKeyBox, forward focus to the TextBox or previous element
+        if (e.Handled)
+        {
+            return;
+        }
+
+        if (!hotKeyBox.Focusable || hotKeyBox.textBox == null)
+        {
+            return;
+        }
+
+        if (!Equals(e.OriginalSource, hotKeyBox))
+        {
+            return;
+        }
+
+        // MoveFocus takes a TraversalRequest as its argument.
+        var request = new TraversalRequest(
+            (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
+                ? FocusNavigationDirection.Previous
+                : FocusNavigationDirection.Next);
+        // Gets the element with keyboard focus.
+        var elementWithFocus = Keyboard.FocusedElement as UIElement;
+        // Change keyboard focus.
+        elementWithFocus?.MoveFocus(request);
+        e.Handled = true;
     }
 }
