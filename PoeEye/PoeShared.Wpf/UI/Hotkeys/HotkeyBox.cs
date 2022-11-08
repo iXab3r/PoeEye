@@ -169,18 +169,20 @@ public class HotKeyBox : Control
                 textBox.TextChanged -= TextBoxOnTextChanged;
             });
         }, disposable => Observable.Never<Unit>());
-        
+
         var mouseEvents = Observable.Using(() =>
         {
-            textBox.PreviewMouseDown += TextBoxOnPreviewMouseDown;
-            this.PreviewMouseWheel += TextBoxOnPreviewMouseWheel;
+            textBox.CaptureMouse();
+            textBox.PreviewMouseWheel += TextBoxOnPreviewMouseWheel;
+            textBox.PreviewMouseDown += OnPreviewMouseDown;
             return Disposable.Create(() =>
             {
-                textBox.PreviewMouseDown -= TextBoxOnPreviewMouseDown;
-                this.PreviewMouseWheel -= TextBoxOnPreviewMouseWheel;
+                textBox.ReleaseMouseCapture();
+                textBox.PreviewMouseDown -= OnPreviewMouseDown;
+                textBox.PreviewMouseWheel -= TextBoxOnPreviewMouseWheel;
             });
         }, disposable => Observable.Never<Unit>());
-        
+
         this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
             .Select(x => x && (AcceptsMouseWheel || AcceptsMouseKeys) ? mouseEvents : Observable.Empty<Unit>())
             .Switch()
@@ -195,7 +197,7 @@ public class HotKeyBox : Control
 
         var focusLost = this.Observe(IsKeyboardFocusWithinProperty, x => x.IsKeyboardFocusWithin)
             .Where(x => x == false);
-        
+
         this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
             .Select(x => x ? focusLost : Observable.Empty<bool>())
             .Switch()
@@ -205,7 +207,7 @@ public class HotKeyBox : Control
         var hotkeySource = this.Observe(HotKeyProperty, x => x.HotKey)
             .Select(x => x ?? HotkeyGesture.Empty)
             .Select(x => x.ToString());
-        
+
         this.Observe(IsInEditModeProperty, x => x.IsInEditMode)
             .Select(x => x ? Observable.Return(PrepareTooltip()) : hotkeySource)
             .Switch()
@@ -213,49 +215,13 @@ public class HotKeyBox : Control
             .AddTo(anchors);
     }
 
-    private string PrepareTooltip()
-    {
-        var result = new List<string> {AwesomeIcons.Keyboard};
-        if (AcceptsMouseKeys || AcceptsMouseWheel)
-        {
-            result.Add(AwesomeIcons.MousePointer);
-        }
-        result.Add(" Press...");
-        return result.JoinStrings(" ");
-    }
-
-    private void TextBoxOnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         if (!IsInEditMode)
         {
             throw new InvalidStateException("HotkeyBox is not in EditMode");
         }
-        
-        if (!AcceptsMouseWheel)
-        {
-            return;
-        }
 
-        if (!TryGetModifiers(out var currentModifierKeys))
-        {
-            return;
-        }
-
-        if (e.Delta != 0)
-        {
-            HotKey = new HotkeyGesture(e.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, currentModifierKeys);
-            e.Handled = true;
-            IsInEditMode = false;
-        }
-    }
-
-    private void TextBoxOnPreviewMouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (!IsInEditMode)
-        {
-            throw new InvalidStateException("HotkeyBox is not in EditMode");
-        }
-        
         if (!AcceptsMouseKeys)
         {
             return;
@@ -284,15 +250,52 @@ public class HotKeyBox : Control
             e.Handled = true;
             IsInEditMode = false;
         }
-        else if (e.LeftButton == MouseButtonState.Pressed)
+        else if (e.RightButton == MouseButtonState.Pressed)
+        {
+            HotKey = new HotkeyGesture(MouseButton.Right, currentModifierKeys);
+            e.Handled = true;
+            IsInEditMode = false;
+        }
+        else if (e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2)
         {
             HotKey = new HotkeyGesture(MouseButton.Left, currentModifierKeys);
             e.Handled = true;
             IsInEditMode = false;
         }
-        else if (e.RightButton == MouseButtonState.Pressed)
+    }
+
+    private string PrepareTooltip()
+    {
+        var result = new List<string> {AwesomeIcons.Keyboard};
+        if (AcceptsMouseKeys || AcceptsMouseWheel)
         {
-            HotKey = new HotkeyGesture(MouseButton.Right, currentModifierKeys);
+            result.Add(AwesomeIcons.MousePointer);
+        }
+
+        result.Add(" Press...");
+        return result.JoinStrings(" ");
+    }
+
+    private void TextBoxOnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!IsInEditMode)
+        {
+            throw new InvalidStateException("HotkeyBox is not in EditMode");
+        }
+
+        if (!AcceptsMouseWheel)
+        {
+            return;
+        }
+
+        if (!TryGetModifiers(out var currentModifierKeys))
+        {
+            return;
+        }
+
+        if (e.Delta != 0)
+        {
+            HotKey = new HotkeyGesture(e.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, currentModifierKeys);
             e.Handled = true;
             IsInEditMode = false;
         }
@@ -328,6 +331,7 @@ public class HotKeyBox : Control
         {
             throw new InvalidStateException("HotkeyBox is not in EditMode");
         }
+
         var key = e.Key == Key.System
             ? e.SystemKey
             : e.Key;
