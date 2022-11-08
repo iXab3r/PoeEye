@@ -58,6 +58,7 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
                 notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug(() => $"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
                 notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug(() => $"[Notification] Device removed, id: {deviceId}")).ToUnit())
             .Throttle(ThrottlingTimeout)
+            .StartWithDefault()
             .Select(x => EnumerateLines())
             .DistinctUntilChanged(x => x.Dump())
             .SubscribeSafe(newLines =>
