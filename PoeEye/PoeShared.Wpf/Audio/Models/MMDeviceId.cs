@@ -4,7 +4,7 @@ namespace PoeShared.Audio.Models;
 
 public readonly struct MMDeviceId
 {
-    public static readonly MMDeviceId All = new MMDeviceId("all", "All microphones");
+    public static readonly MMDeviceId All = new MMDeviceId("all", "All devices");
         
     public MMDeviceId(string lineId, string name)
     {

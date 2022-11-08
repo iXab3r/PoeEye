@@ -1,8 +1,16 @@
-using System.Collections.ObjectModel;
 using JetBrains.Annotations;
 using NAudio.CoreAudioApi;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Models;
+
+public interface IMMCaptureDeviceProvider : IMMDeviceProvider
+{
+}
+
+public interface IMMRenderDeviceProvider : IMMDeviceProvider
+{
+}
 
 public interface IMMDeviceProvider
 {
@@ -10,5 +18,5 @@ public interface IMMDeviceProvider
     MMDevice GetMixerControl([NotNull] string lineId);
 
     [NotNull]
-    ReadOnlyObservableCollection<MMDeviceId> Microphones { get; }
+    IReadOnlyObservableCollection<MMDeviceId> Devices { get; }
 }

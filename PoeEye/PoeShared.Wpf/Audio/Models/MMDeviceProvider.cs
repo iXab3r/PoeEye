@@ -1,19 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using DynamicData;
 using NAudio.CoreAudioApi;
 using NAudio.Utils;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Audio.Models;
 
-internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProvider
+internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogger, IMMDeviceProvider
 {
-    private static readonly IFluentLog Log = typeof(MMDeviceProvider).PrepareLogger();
     private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 
@@ -29,15 +26,16 @@ internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProv
         return result;
     }
 
-    public MMDeviceProvider()
+    public MMDeviceProviderBase(DataFlow dataFlow)
     {
+        DataFlow = dataFlow;
         deviceEnumerator = new MMDeviceEnumerator().AddTo(Anchors);
         microphoneLines
             .Connect()
-            .Bind(out var microphones)
+            .BindToCollection(out var microphones)
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
-        Microphones = microphones;
+        Devices = microphones;
 
         Observable
             .Start(() =>
@@ -82,8 +80,10 @@ internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProv
             .AddTo(Anchors);
     }
 
-    public ReadOnlyObservableCollection<MMDeviceId> Microphones { get; }
-
+    public IReadOnlyObservableCollection<MMDeviceId> Devices { get; }
+    
+    public DataFlow DataFlow { get; }
+    
     private IEnumerable<MMDeviceId> EnumerateLines()
     {
         yield return MMDeviceId.All;
@@ -104,6 +104,6 @@ internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProv
 
     private MMDevice[] EnumerateLinesInternal()
     {
-        return deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active).ToArray();
+        return deviceEnumerator.EnumerateAudioEndPoints(DataFlow, DeviceState.Active).ToArray();
     }
 }
