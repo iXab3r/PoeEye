@@ -10,5 +10,5 @@ public interface IMMDeviceProvider
     MMDevice GetMixerControl([NotNull] string lineId);
 
     [NotNull]
-    ReadOnlyObservableCollection<MMDeviceLineData> Microphones { get; }
+    ReadOnlyObservableCollection<MMDeviceId> Microphones { get; }
 }

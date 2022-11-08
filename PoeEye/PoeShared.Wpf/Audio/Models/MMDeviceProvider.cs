@@ -17,7 +17,7 @@ internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProv
     private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 
-    private readonly SourceListEx<MMDeviceLineData> microphoneLines = new();
+    private readonly SourceListEx<MMDeviceId> microphoneLines = new();
     private readonly MultimediaNotificationClient notificationClient = new();
     private readonly MMDeviceEnumerator deviceEnumerator;
 
@@ -82,18 +82,18 @@ internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProv
             .AddTo(Anchors);
     }
 
-    public ReadOnlyObservableCollection<MMDeviceLineData> Microphones { get; }
+    public ReadOnlyObservableCollection<MMDeviceId> Microphones { get; }
 
-    private IEnumerable<MMDeviceLineData> EnumerateLines()
+    private IEnumerable<MMDeviceId> EnumerateLines()
     {
-        yield return MMDeviceLineData.All;
+        yield return MMDeviceId.All;
 
         var devices = EnumerateLinesInternal();
         try
         {
             foreach (var device in devices)
             {
-                yield return new MMDeviceLineData(lineId: device.ID, name: device.FriendlyName);
+                yield return new MMDeviceId(lineId: device.ID, name: device.FriendlyName);
             }
         }
         finally
