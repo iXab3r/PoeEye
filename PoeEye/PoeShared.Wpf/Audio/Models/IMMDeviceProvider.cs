@@ -4,11 +4,11 @@ using NAudio.CoreAudioApi;
 
 namespace PoeShared.Audio.Models;
 
-public interface IMicrophoneProvider
+public interface IMMDeviceProvider
 {
     [CanBeNull]
     MMDevice GetMixerControl([NotNull] string lineId);
 
     [NotNull]
-    ReadOnlyObservableCollection<MicrophoneLineData> Microphones { get; }
+    ReadOnlyObservableCollection<MMDeviceLineData> Microphones { get; }
 }

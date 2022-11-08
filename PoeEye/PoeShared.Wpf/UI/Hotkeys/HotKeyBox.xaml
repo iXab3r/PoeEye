@@ -23,6 +23,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="MinWidth" Value="60" />
         <Setter Property="MinHeight" Value="25" />
+        <Setter Property="Height" Value="25" />
         <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
         <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys" />
         <Setter Property="Template">
@@ -76,6 +77,7 @@
                         </Trigger>
                         <Trigger Property="IsInEditMode" Value="True">
                             <Setter TargetName="PART_EditModeToggle" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_EditModeToggle" Property="IsTabStop" Value="False" />
                         </Trigger>
                         <Trigger Property="HotKey" Value="{x:Null}">
                             <Setter TargetName="PART_EditModeToggle" Property="Visibility" Value="Visible" />

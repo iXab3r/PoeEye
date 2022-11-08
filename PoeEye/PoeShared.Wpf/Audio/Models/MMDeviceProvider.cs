@@ -11,13 +11,13 @@ using PoeShared.Logging;
 
 namespace PoeShared.Audio.Models;
 
-internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophoneProvider
+internal sealed class MMDeviceProvider : DisposableReactiveObject, IMMDeviceProvider
 {
-    private static readonly IFluentLog Log = typeof(MicrophoneProvider).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(MMDeviceProvider).PrepareLogger();
     private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 
-    private readonly SourceListEx<MicrophoneLineData> microphoneLines = new();
+    private readonly SourceListEx<MMDeviceLineData> microphoneLines = new();
     private readonly MultimediaNotificationClient notificationClient = new();
     private readonly MMDeviceEnumerator deviceEnumerator;
 
@@ -29,7 +29,7 @@ internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophone
         return result;
     }
 
-    public MicrophoneProvider()
+    public MMDeviceProvider()
     {
         deviceEnumerator = new MMDeviceEnumerator().AddTo(Anchors);
         microphoneLines
@@ -82,18 +82,18 @@ internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophone
             .AddTo(Anchors);
     }
 
-    public ReadOnlyObservableCollection<MicrophoneLineData> Microphones { get; }
+    public ReadOnlyObservableCollection<MMDeviceLineData> Microphones { get; }
 
-    private IEnumerable<MicrophoneLineData> EnumerateLines()
+    private IEnumerable<MMDeviceLineData> EnumerateLines()
     {
-        yield return MicrophoneLineData.All;
+        yield return MMDeviceLineData.All;
 
         var devices = EnumerateLinesInternal();
         try
         {
             foreach (var device in devices)
             {
-                yield return new MicrophoneLineData(lineId: device.ID, name: device.FriendlyName);
+                yield return new MMDeviceLineData(lineId: device.ID, name: device.FriendlyName);
             }
         }
         finally

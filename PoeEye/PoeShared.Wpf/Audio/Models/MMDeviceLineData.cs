@@ -2,11 +2,11 @@
 
 namespace PoeShared.Audio.Models;
 
-public readonly struct MicrophoneLineData
+public readonly struct MMDeviceLineData
 {
-    public static readonly MicrophoneLineData All = new MicrophoneLineData("all", "All microphones");
+    public static readonly MMDeviceLineData All = new MMDeviceLineData("all", "All microphones");
         
-    public MicrophoneLineData(string lineId, string name)
+    public MMDeviceLineData(string lineId, string name)
     {
         LineId = lineId;
         Name = name;
@@ -24,7 +24,7 @@ public readonly struct MicrophoneLineData
         return $"{nameof(Name)}: {Name}, {nameof(LineId)}: {LineId}";
     }
 
-    public bool Equals(MicrophoneLineData other)
+    public bool Equals(MMDeviceLineData other)
     {
         return string.Equals(LineId, other.LineId);
     }
@@ -36,7 +36,7 @@ public readonly struct MicrophoneLineData
             return false;
         }
 
-        return obj is MicrophoneLineData other && Equals(other);
+        return obj is MMDeviceLineData other && Equals(other);
     }
 
     public override int GetHashCode()

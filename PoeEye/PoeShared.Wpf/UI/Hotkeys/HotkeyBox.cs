@@ -172,13 +172,11 @@ public class HotKeyBox : Control
         
         var mouseEvents = Observable.Using(() =>
         {
-            CaptureMouse();
-            this.PreviewMouseDown += TextBoxOnPreviewMouseDown;
+            textBox.PreviewMouseDown += TextBoxOnPreviewMouseDown;
             this.PreviewMouseWheel += TextBoxOnPreviewMouseWheel;
             return Disposable.Create(() =>
             {
-                ReleaseMouseCapture();
-                this.PreviewMouseDown -= TextBoxOnPreviewMouseDown;
+                textBox.PreviewMouseDown -= TextBoxOnPreviewMouseDown;
                 this.PreviewMouseWheel -= TextBoxOnPreviewMouseWheel;
             });
         }, disposable => Observable.Never<Unit>());
