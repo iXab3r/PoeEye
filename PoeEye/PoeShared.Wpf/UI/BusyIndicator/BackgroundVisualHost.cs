@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
@@ -170,10 +171,7 @@ internal static class BackgroundVisualHost
             IsVisibleWeakEventManager.AddListener(parent, this);
             LoadedWeakEventManager.AddListener(parent, this);
 
-            if (parent.IsVisible)
-            {
-                AddChild();
-            }
+            Loaded();
         }
 
         bool IWeakEventListener.ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
@@ -320,14 +318,14 @@ internal static class BackgroundVisualHost
                         return;
                     }
 
-                    var child = createElement();
-                    SetElementId(child, id);
-                    root.Children.Add(child);
+                    var result = createElement();
+                    SetElementId(result, id);
+                    root.Children.Add(result);
 
-                    Canvas.SetLeft(child, bounds.X);
-                    Canvas.SetTop(child, bounds.Y);
-                    child.SetCurrentValue(WidthProperty, bounds.Width);
-                    child.SetCurrentValue(HeightProperty, bounds.Height);
+                    Canvas.SetLeft(result, bounds.X);
+                    Canvas.SetTop(result, bounds.Y);
+                    result.SetCurrentValue(WidthProperty, bounds.Width);
+                    result.SetCurrentValue(HeightProperty, bounds.Height);
                 });
         }
 

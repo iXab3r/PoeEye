@@ -5,11 +5,22 @@
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
-
-    <Style x:Key="DefaultBusyStyle" TargetType="{x:Type Control}">
+    
+    <Style x:Key="ContentControlBusyIndicatorStyle" TargetType="{x:Type eye:CachedContentControl}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type Control}">
+                <ControlTemplate TargetType="{x:Type eye:CachedContentControl}">
+                    <eye:CachedContentControl Content="{Binding}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DefaultBusyStyle" TargetType="{x:Type eye:CachedContentControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type eye:CachedContentControl}">
                     <Grid>
                         <Border Background="Gray" Opacity="0.2" />
                         <materialDesign:Card

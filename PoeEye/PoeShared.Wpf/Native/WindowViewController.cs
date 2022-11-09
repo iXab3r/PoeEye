@@ -108,7 +108,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
 
     public void TakeScreenshot(string fileName)
     {
-        CreateBitmapFromVisual(Window, fileName);
+        CreateBitmapFromVisual(Window?.Content as Visual ?? Window, fileName);
     }
 
     public void Minimize()
