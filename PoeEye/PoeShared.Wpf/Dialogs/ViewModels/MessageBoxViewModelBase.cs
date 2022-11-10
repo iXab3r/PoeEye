@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Native;
@@ -14,8 +16,10 @@ public abstract class MessageBoxViewModelBase<T> : WindowViewModelBase, IMessage
 {
     protected MessageBoxViewModelBase()
     {
+        var screen = System.Windows.Forms.Screen.PrimaryScreen;
         SizeToContent = SizeToContent.WidthAndHeight;
         MinSize = new WinSize(200, 100);
+        MaxSize = new WinSize(screen.Bounds.Width, screen.Bounds.Height).Scale(1.25f);
         ShowInTaskbar = true;
         EnableHeader = false;
         

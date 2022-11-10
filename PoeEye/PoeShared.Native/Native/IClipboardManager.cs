@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using JetBrains.Annotations;
 
@@ -11,6 +12,12 @@ public interface IClipboardManager
     int ClipboardSetRetryCount { get; }
 
     void SetText([NotNull] string text);
+
+    bool ContainsText();
+
+    bool ContainsFileDropList();
+
+    IReadOnlyList<string> GetFileDropList();
 
     IDataObject GetDataObject();
 

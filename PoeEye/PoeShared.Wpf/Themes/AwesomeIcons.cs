@@ -60,6 +60,7 @@ public static class AwesomeIcons
     public const string Refresh = "\uf021";
     public const string RotateLeft = Undo;
     public const string RotateRight = Repeat;
+    public const string Save = "\uf0c7";
     public const string Search = "\uf002";
     public const string SignIn = "\uf090";
     public const string SignOut = "\uf08b";
