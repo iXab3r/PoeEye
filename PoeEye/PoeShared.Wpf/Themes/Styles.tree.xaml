@@ -144,9 +144,7 @@
                                 Background="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"/>
 
                         <Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" x:Name="ContentGrid" Background="{TemplateBinding Background}"
-                              dd:DragDrop.IsDragSource="True"
-                              dd:DragDrop.UseDefaultDragAdorner="True"
-                              dd:DragDrop.UseDefaultEffectDataTemplate="True">
+                              dd:DragDrop.IsDragSource="True">
                             <wpf:Ripple Feedback="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"
                                         Focusable="False"
                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"

@@ -314,8 +314,6 @@
                             dd:DragDrop.DragHandler="{TemplateBinding DragSource}"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
-                            dd:DragDrop.UseDefaultDragAdorner="True"
-                            dd:DragDrop.UseDefaultEffectDataTemplate="True"
                             dd:DragDrop.DragDropCopyKeyState="ControlKey"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                             ItemsSource="{TemplateBinding CollectionView}">

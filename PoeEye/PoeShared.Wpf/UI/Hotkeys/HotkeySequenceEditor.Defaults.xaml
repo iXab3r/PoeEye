@@ -1,7 +1,8 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:st="http://schemas.spicytaco.io/"
-                             xmlns:eye="clr-namespace:PoeShared.UI">
+                             xmlns:eye="clr-namespace:PoeShared.UI"
+                             xmlns:dd="urn:gong-wpf-dragdrop">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
