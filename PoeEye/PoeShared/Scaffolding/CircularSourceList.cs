@@ -9,6 +9,7 @@ public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservabl
 
     public CircularSourceList(int capacity)
     {
+        this.RaiseWhenSourceValue(x => x.Count, innerList, x => x.Count).AddTo(Anchors);
         this.capacity = capacity;
     }
 

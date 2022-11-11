@@ -30,7 +30,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
 
     static MessageBoxService()
     {
-        Binder.Bind(x => x.messageBoxes.Collection.Count > 0).To(x => x.IsOpen);
+        Binder.Bind(x => x.messageBoxes.Count > 0).To(x => x.IsOpen);
     }
 
     public MessageBoxService(

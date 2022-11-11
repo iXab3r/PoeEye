@@ -2,7 +2,7 @@
 
 namespace PoeShared.Scaffolding;
 
-public interface ISourceListEx<T> : ISourceList<T>
+public interface ISourceListEx<T> : ISourceList<T>, IEnumerable<T>, IDisposableReactiveObject
 {
     /// <summary>
     ///   Reactive collection that holds all items and provides notification, will have same items as Items if no scheduler is provided

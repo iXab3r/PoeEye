@@ -21,6 +21,7 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
         }
         collectionSource.BindToCollection(out var collection).Subscribe().AddTo(Anchors);
         Collection = collection;
+        this.RaiseWhenSourceValue(x => x.Count, collection, x => x.Count).AddTo(Anchors);
     }
 
     public SourceListEx(IObservable<IChangeSet<T>> source) : this(new SourceList<T>(source))
@@ -33,10 +34,6 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     
     public IReadOnlyObservableCollection<T> Collection { get; }
     
-    /// <summary>
-    /// DOES NOT HAVE NPC ! This is by design of SourceList as subscribing to CountChanged establishes separate subscription to ReaderWriter which has some side effects and erratic behavior in some cases
-    /// Probably could be taken from Collection, but it should be analyzed thoroughly first
-    /// </summary>
     public int Count => sourceList.Count; 
 
     public IObservable<int> CountChanged => sourceList.CountChanged;
@@ -56,5 +53,15 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     public IObservable<IChangeSet<T>> Preview(Func<T, bool> predicate = null)
     {
         return sourceList.Preview(predicate);
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        return Collection.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
