@@ -338,12 +338,14 @@ public class ConstantAspectRatioWindow : Window
                 break;
             }
             case User32.WindowMessage.WM_DPICHANGED:
-                Dpi = GetDpiFromHwndSource(PresentationSource.FromVisual(this) as HwndSource);
-                if (DpiAware)
+                if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
                 {
-                    handled = true;
+                    Dpi = GetDpiFromHwndSource(hwndSource);
+                    if (DpiAware)
+                    {
+                        handled = true;
+                    }
                 }
-
                 break;
         }
 

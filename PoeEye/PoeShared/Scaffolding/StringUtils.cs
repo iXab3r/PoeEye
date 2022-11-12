@@ -365,7 +365,9 @@ public static class StringUtils
             // try the old method as it seems that data either is malformed or compressed via legacy method
             try
             {
+#pragma warning disable CS0618 left here for backward compatibility reasons
                 var legacyResult = DecompressStringFromGZipLegacy(compressedText, requirePrefix);
+#pragma warning restore CS0618
                 return legacyResult;
             }
             catch (Exception)

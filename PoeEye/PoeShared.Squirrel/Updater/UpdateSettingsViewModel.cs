@@ -30,7 +30,7 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
     {
         this.configProvider = configProvider;
 
-        var knownSources = new SynchronizedObservableCollection<UpdateSourceInfo>();
+        var knownSources = new ReadOnlyObservableCollectionEx<UpdateSourceInfo>();
         updateSourceProvider.WhenAnyValue(x => x.KnownSources)
             .SubscribeSafe(x =>
             {

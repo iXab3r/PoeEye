@@ -23,7 +23,7 @@ public static class ChangeSetExtensions
     /// <returns>An observable change set with additional refresh changes.</returns>
     public static IObservable<IChangeSet<TObject>> AutoRefreshOnObservableSynchronized<TObject, TAny>(
         this IObservable<IChangeSet<TObject>> source, 
-        Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler? scheduler = null)
+        Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler scheduler = null)
     {
         var gate = new object();
         return source.Synchronize(gate).AutoRefreshOnObservable(o => reevaluator(o).Synchronize(gate), changeSetBuffer, scheduler);
@@ -40,7 +40,7 @@ public static class ChangeSetExtensions
     /// <param name="changeSetBuffer">Batch up changes by specifying the buffer. This greatly increases performance when many elements require a refresh.</param>
     /// <param name="scheduler">The scheduler.</param>
     /// <returns>An observable change set with additional refresh changes.</returns>
-    public static IObservable<IChangeSet<TObject, TKey>> AutoRefreshOnObservableSynchronized<TObject, TKey, TAny>(this IObservable<IChangeSet<TObject, TKey>> source, Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler? scheduler = null)
+    public static IObservable<IChangeSet<TObject, TKey>> AutoRefreshOnObservableSynchronized<TObject, TKey, TAny>(this IObservable<IChangeSet<TObject, TKey>> source, Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler scheduler = null)
         where TKey : notnull
     {
         return source.AutoRefreshObservableSynchronized(reevaluator, changeSetBuffer, scheduler);
@@ -62,7 +62,7 @@ public static class ChangeSetExtensions
             this IObservable<IChangeSet<TObject, TKey>> source, 
             Func<TObject, IObservable<TAny>> reevaluator, 
             TimeSpan? changeSetBuffer = null, 
-            IScheduler? scheduler = null)
+            IScheduler scheduler = null)
         where TKey : notnull
     {
         var gate = new object();
@@ -98,7 +98,7 @@ public static class ChangeSetExtensions
     
     public static IObservable<IChangeSet<T>> BindToCollection<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
     {
-        var result = new SynchronizedObservableCollection<T>();
+        var result = new ReadOnlyObservableCollectionEx<T>();
         collection = result;
         return source.Bind(result);
     }
@@ -337,7 +337,9 @@ public static class ChangeSetExtensions
 
     public static ISourceList<T> Concat<T>(this ISourceList<T> list, params ISourceList<T>[] lists)
     {
+#pragma warning disable CS0618 This is currently the only way
         return new[] { list }.Concat(lists).ToSourceList();
+#pragma warning restore CS0618
     }
 
     public static IObservable<int> CountIf<T>(this IObservable<IChangeSet<T>> source)

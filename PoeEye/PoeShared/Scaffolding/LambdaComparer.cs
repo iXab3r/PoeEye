@@ -9,7 +9,7 @@ public sealed class LambdaComparer<T> : IComparer<T>
         this.comparer = comparer;
     }
 
-    public int Compare(T? x, T? y)
+    public int Compare(T x, T y)
     {
         return comparer(x, y);
     }

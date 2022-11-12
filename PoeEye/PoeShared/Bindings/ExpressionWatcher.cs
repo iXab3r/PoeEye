@@ -172,8 +172,15 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
             return;
         }
         
-        var typed = converted == null ? default : (TProperty)converted;
-        SetCurrentValue(typed);
+        if (converted == null && default(TProperty) != null)
+        {
+            Log.Warn($"Target Property is of type {typeof(TProperty)} which is non-nullable, ignoring SetCurrentValue({newValue}) request");
+        }
+        else
+        {
+            var typed = (TProperty)converted;
+            SetCurrentValue(typed);
+        }
     }
 
     private bool TryConvertToPropertyType(object value, out object result)

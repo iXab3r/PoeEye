@@ -66,8 +66,6 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
         return GetEnumerator();
     }
 
-    public T this[int index] => Collection[index];
-
     public event NotifyCollectionChangedEventHandler CollectionChanged
     {
         add => Collection.CollectionChanged += value;
