@@ -156,6 +156,13 @@ public class RxTests : FixtureBase
     }
     
     [Test]
+    [Repeat(100)]
+    public void ShouldObserveInSerializedWayOnMaxProcessorCount()
+    {
+        ShouldObserveInSerializedWay(Environment.ProcessorCount, bgScheduler: true, synchronizePreScheduler: false, synchronizePostScheduler: false);
+    }
+    
+    [Test]
     [TestCase(8, false, true, false)]
     [TestCase(8, false, false, true)]
     [TestCase(8, true, false, false)]
