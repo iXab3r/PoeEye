@@ -257,10 +257,10 @@ public static class ChangeSetExtensions
 
         return result.Or().ToSourceList();
     }
-
-    public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservableCache<T, TKey> cache, TKey key)
+    
+    public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservable<Change<T, TKey>> events)
     {
-        var result = cache.Watch(key).Select(x => x.Reason switch
+        return events.Select(x => x.Reason switch
         {
             ChangeReason.Add => x.Current,
             ChangeReason.Update => x.Current,
@@ -268,7 +268,11 @@ public static class ChangeSetExtensions
             //ChangeReason.Remove x.Current contains removed element, which seems wrong
             _ => default
         });
-        
+    }
+    
+    public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservableCache<T, TKey> cache, TKey key)
+    {
+        var result = cache.Watch(key).WatchCurrentValue();
         return cache.Lookup(key).HasValue ? result : result.StartWithDefault();
     }
 
