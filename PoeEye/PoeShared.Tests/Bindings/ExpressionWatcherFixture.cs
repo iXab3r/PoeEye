@@ -210,7 +210,7 @@ public class ExpressionWatcherFixture : FixtureBase
 
         //Then
         instance.Error.ShouldBeNull();
-        instance.Value.ShouldBe(default);
+        instance.Value.ShouldBe(1);
     }
         
     [Test]
