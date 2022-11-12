@@ -154,10 +154,14 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
             Log.Info($"[{name}] Got {nameof(IKeyboardMouseEvents)} source: {events}");
             return events;
         }
-
-        public override string ToString()
+        
+        protected override void FormatToString(ToStringBuilder builder)
         {
-            return $"Hook#{hookId} {name} using {Source}";
+            base.FormatToString(builder);
+            builder.Append("Hook");
+            builder.AppendParameter(nameof(hookId), hookId);
+            builder.AppendParameter(nameof(name), name);
+            builder.AppendParameter(nameof(Source), Source);
         }
     }
 }

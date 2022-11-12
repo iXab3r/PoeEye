@@ -62,8 +62,11 @@ internal abstract class BaseListener : DisposableReactiveObject
 
     protected abstract bool Callback(WinHookCallbackData data);
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"Listener Hook: {Handle}{(IsReady ? null : "(not ready)")}";
+        base.FormatToString(builder);
+        builder.Append("Listener");
+        builder.AppendParameter("Hook", Handle);
+        builder.AppendParameter("IsReady", IsReady ? null : "(not ready)");
     }
 }

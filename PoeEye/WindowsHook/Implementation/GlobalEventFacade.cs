@@ -2,6 +2,8 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
+using PoeShared.Scaffolding;
+
 namespace WindowsHook.Implementation;
 
 internal class GlobalEventFacade : EventFacade
@@ -16,8 +18,9 @@ internal class GlobalEventFacade : EventFacade
         return new GlobalKeyListener();
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"Global {base.ToString()}";
+        base.FormatToString(builder);
+        builder.Append("Global");
     }
 }

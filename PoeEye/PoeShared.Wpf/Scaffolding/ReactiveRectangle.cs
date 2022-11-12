@@ -98,9 +98,11 @@ public sealed class ReactiveRectangle : BindableReactiveObject
         this.RaiseIfChanged(nameof(RegionWidth), previousValue.Width, newValue.Width);
         this.RaiseIfChanged(nameof(RegionHeight), previousValue.Height, newValue.Height);
     }
-        
-    public override string ToString()
+
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"Region({bounds})";
+        base.FormatToString(builder);
+        builder.Append("Region");
+        builder.AppendParameter(nameof(Bounds), bounds);
     }
 }

@@ -27,9 +27,11 @@ public sealed class FileLock : DisposableReactiveObject
 
     public bool Exists => File.Exists(LockFile.FullName);
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"FileLock: {LockFile.Name}";
+        base.FormatToString(builder);
+        builder.Append(nameof(FileLock));
+        builder.AppendParameter(nameof(LockFile), LockFile.FullName);
     }
 
     private static void CleanupLockFile(IFluentLog log, string lockFilePath)

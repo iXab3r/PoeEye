@@ -68,4 +68,10 @@ internal abstract class WindowContainerBase<T> : DisposableReactiveObject where 
         var minSide = Math.Min(nativeBounds.Width, nativeBounds.Height);
         return (minSide / 25d).EnsureInRange(MIN_THUMB_SIZE, MAX_THUMB_SIZE);
     }
+
+    protected override void FormatToString(ToStringBuilder builder)
+    {
+        base.FormatToString(builder);
+        builder.AppendParameter(nameof(Content), Content);
+    }
 }

@@ -148,9 +148,13 @@ public class SharedResourceRepositoryFixture : FixtureBase
             Key = key;
         }
 
-        public override string ToString()
+        protected override void FormatToString(ToStringBuilder builder)
         {
-            return $"Resource, Key: {Key}, Id: {ResourceId}, RefCount: {RefCount}";
+            base.FormatToString(builder);
+            builder.Append("Resource");
+            builder.AppendParameter(nameof(Key), Key);
+            builder.AppendParameter(nameof(ResourceId), ResourceId);
+            builder.AppendParameter(nameof(RefCount), RefCount);
         }
     }
 }

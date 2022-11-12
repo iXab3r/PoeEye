@@ -52,8 +52,12 @@ internal sealed class RandomPeriodSelector : ValidatableReactiveObject<RandomPer
         return RandomizeValue ? rng.GenerateDelay(LowerValue, UpperValue) : LowerValue;
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"RandomSelector([{LowerValue};{UpperValue}], randomize: {RandomizeValue})";
+        base.FormatToString(builder);
+        builder.Append(nameof(RandomPeriodSelector));
+        builder.AppendParameter(nameof(LowerValue), LowerValue);
+        builder.AppendParameter(nameof(UpperValue), UpperValue);
+        builder.AppendParameter(nameof(RandomizeValue), RandomizeValue);
     }
 }

@@ -48,8 +48,11 @@ public sealed class SharedResourceLatch : DisposableReactiveObject, ISharedResou
         });
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"{Name}Latch({counter})";
+        base.FormatToString(builder);
+        builder.Append(nameof(SharedResourceLatch));
+        builder.AppendParameter(nameof(Name), Name);
+        builder.AppendParameter(nameof(counter), counter);
     }
 }

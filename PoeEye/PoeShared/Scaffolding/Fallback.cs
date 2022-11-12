@@ -65,8 +65,11 @@ public sealed class Fallback<T> : DisposableReactiveObject
         return SetValue(default(T));
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"{Value} (default {DefaultValue}, hasValue: {HasActualValue})";
+        base.FormatToString(builder);
+        builder.Append("Fallback");
+        builder.AppendParameter(nameof(DefaultValue), DefaultValue);
+        builder.AppendParameter(nameof(HasActualValue), HasActualValue);
     }
 }

@@ -140,11 +140,6 @@ public class BinderPerformanceModelFixture : BenchmarkBase
         {
             Binder.Attach(this).AddTo(Anchors);
         }
-
-        public override string ToString()
-        {
-            return "Binder";
-        }
     }
         
     public sealed class PropertyHelperViewModel : BaseViewModel
@@ -176,11 +171,6 @@ public class BinderPerformanceModelFixture : BenchmarkBase
             get => sum.Value;
             protected set => throw new NotImplementedException();
         }
-
-        public override string ToString()
-        {
-            return "PropertyHelper";
-        }
     }
         
     public sealed class ReactiveViewModel : BaseViewModel
@@ -200,10 +190,5 @@ public class BinderPerformanceModelFixture : BenchmarkBase
         public override int? DataPlusOne { get; protected set; }
 
         public override int? Sum { get; protected set; }
-            
-        public override string ToString()
-        {
-            return "Reactive";
-        }
     }
 }

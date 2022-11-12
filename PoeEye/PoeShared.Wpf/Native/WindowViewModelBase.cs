@@ -130,11 +130,14 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     public double? TargetAspectRatio { get; set; }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"Window {Id} Bounds: {NativeBounds}";
+        base.FormatToString(builder);
+        builder.Append("Window");
+        builder.AppendParameter(nameof(Id), Id);
+        builder.AppendParameter(nameof(NativeBounds), NativeBounds);
     }
-    
+
     public void SetOverlayWindow(TransparentWindow owner)
     {
         Guard.ArgumentNotNull(owner, nameof(owner));

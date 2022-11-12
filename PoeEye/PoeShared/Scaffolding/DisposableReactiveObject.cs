@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace PoeShared.Scaffolding;
 
@@ -88,9 +89,20 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         properties.ForEach(RaisePropertyChanged);
     }
 
+    public sealed override string ToString()
+    {
+        var builder = new ToStringBuilder(this);
+        FormatToString(builder);
+        return builder.ToString();
+    }
+
+    protected virtual void FormatToString(ToStringBuilder builder)
+    {
+    }
+
     protected static void EnsureUiThread()
     {
-        if (!IsUiThread)
+        if (!IsOnUiThread)
         {
             throw new InvalidOperationException($"Operation must be completed on UI thread");
         }
@@ -98,11 +110,11 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         
     protected static void EnsureNonUiThread()
     {
-        if (IsUiThread)
+        if (IsOnUiThread)
         {
             throw new InvalidOperationException($"Operation must be completed on non-UI thread");
         }
     }
 
-    protected static bool IsUiThread => Environment.CurrentManagedThreadId == 1;
+    protected static bool IsOnUiThread => Environment.CurrentManagedThreadId == 1;
 }

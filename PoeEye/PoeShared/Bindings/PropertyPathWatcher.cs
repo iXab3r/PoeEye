@@ -92,9 +92,13 @@ public sealed class PropertyPathWatcher : ExpressionWatcherBase
             
         return result.ToString();
     }
-
-    public override string ToString()
+    
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"PPW {PropertyPath}, src: {(Source == default ? "not set" : Source.ToString())}, {(HasValue ? $"value: {Value}" : $"hasValue: {HasValue}")}";
+        base.FormatToString(builder);
+        builder.Append($"PPW {PropertyPath}");
+        builder.AppendParameter(nameof(Source), Source == default ? "not set" : Source.ToString());
+        builder.AppendParameter(nameof(Value), Value);
+        builder.AppendParameter(nameof(HasValue), HasValue);
     }
 }

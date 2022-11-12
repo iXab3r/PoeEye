@@ -2,6 +2,8 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
+using PoeShared.Scaffolding;
+
 namespace WindowsHook.Implementation;
 
 internal class AppEventFacade : EventFacade
@@ -15,9 +17,10 @@ internal class AppEventFacade : EventFacade
     {
         return new AppKeyListener();
     }
-        
-    public override string ToString()
+
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"App {base.ToString()}";
+        base.FormatToString(builder);
+        builder.Append("App");
     }
 }

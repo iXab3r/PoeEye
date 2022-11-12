@@ -34,8 +34,13 @@ internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewM
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"{Content} {Content?.OverlayMode}";
+        base.FormatToString(builder);
+        var content = Content;
+        if (content != null)
+        {
+            builder.AppendParameter(nameof(Content.OverlayMode), content.OverlayMode);
+        }
     }
 }

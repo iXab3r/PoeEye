@@ -140,8 +140,9 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
         return sink.Synchronize(padlock).Subscribe(observer);
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return toStringSupplier.Value;
+        base.FormatToString(builder);
+        builder.Append(toStringSupplier.Value);
     }
 }

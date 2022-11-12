@@ -34,10 +34,12 @@ public class ExpressionWatcher : ExpressionWatcherBase
         get => base.ConditionExpression;
         set => base.ConditionExpression = value;
     }
-
-    public override string ToString()
+    
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"ExpressionWatcher, source: {SourceExpression}, condition: {ConditionExpression}";
+        base.FormatToString(builder);
+        builder.Append($"EW: {SourceExpression}");
+        builder.AppendParameter(nameof(ConditionExpression), ConditionExpression);
     }
 }
 
@@ -246,9 +248,12 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         }
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"EW: {SourceExpression}, source: {(Source == default ? "not set" : Source.ToString())}, {(HasValue ? $"value: {Value}" : $"hasValue: {HasValue}")}";
+        base.FormatToString(builder);
+        builder.Append($"EW: {SourceExpression}");
+        builder.AppendParameter(nameof(Source), Source == default ? "not set" : Source.ToString());
+        builder.AppendParameter(nameof(HasValue), HasValue ? $"value: {Value}" : $"hasValue: {HasValue}");
     }
 
     private static bool CanPrepareSetter(Expression<Func<TSource, TProperty>> propertyAccessor)

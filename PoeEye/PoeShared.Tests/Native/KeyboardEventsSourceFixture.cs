@@ -15,7 +15,7 @@ using WindowsHook;
 using Moq;
 using NUnit.Framework;
 using PoeShared.Native;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using Shouldly;
@@ -51,7 +51,7 @@ public class KeyboardEventsSourceFixture
         var wrappersReady = Enumerable.Range(0, hooksCount).Select(x => new ManualResetEvent(false)).ToArray();
         var hookFormReady = new ManualResetEvent(false);
         HookForm hookForm;
-            
+
         var bgThread = new Thread(x =>
         {
             try
@@ -75,11 +75,10 @@ public class KeyboardEventsSourceFixture
             {
                 Log.Debug(() => $"Hook form thread terminated");
             }
-                
         })
         {
-            IsBackground = true, 
-            ApartmentState = ApartmentState.STA, 
+            IsBackground = true,
+            ApartmentState = ApartmentState.STA,
             Name = "HotkeyTracker"
         };
         bgThread.Start();
@@ -102,15 +101,14 @@ public class KeyboardEventsSourceFixture
                     wrapper.Start();
                     wrappersReady[idx].Set();
                 });
-                
         }).Start();
-            
+
         Log.Debug("Awaiting for hook form to be ready");
         hookFormReady.WaitOne();
 
         Log.Debug("Awaiting for all wrappers to be created");
         WaitHandle.WaitAll(wrappersCreated);
-           
+
         //When
         Log.Debug("GCing");
         GC.Collect();
@@ -119,7 +117,7 @@ public class KeyboardEventsSourceFixture
         startEvent.Set();
         Log.Debug("Awaiting for all wrappers to be ready");
         WaitHandle.WaitAll(wrappersReady);
-            
+
         Log.Debug("Sending key event");
         Thread.Sleep(3000);
         //simulator.Keyboard.KeyPress(VirtualKeyCode.F1);
@@ -129,7 +127,7 @@ public class KeyboardEventsSourceFixture
         wrappers.All(x => x.Events.Count > 0).ShouldBe(true);
         wrappers.All(x => x.Events.Count == 1).ShouldBe(true);
     }
-        
+
     private sealed class HookForm : Window
     {
         private readonly CompositeDisposable anchors = new CompositeDisposable();
@@ -195,9 +193,11 @@ public class KeyboardEventsSourceFixture
             Events.Enqueue(e);
         }
 
-        public override string ToString()
+        protected override void FormatToString(ToStringBuilder builder)
         {
-            return $"Hook {HookId}";
+            base.FormatToString(builder);
+            builder.Append("Hook");
+            builder.AppendParameter(nameof(HookId), HookId);
         }
     }
 

@@ -67,9 +67,10 @@ public sealed class Item : DisposableReactiveObject, IComparable<Item>, IEquatab
     {
         return Value;
     }
-        
-    public override string ToString()
+
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"{Value}";
+        base.FormatToString(builder);
+        builder.AppendParameter(nameof(Value), Value);
     }
 }

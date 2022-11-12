@@ -425,9 +425,13 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
         return result.Merge();
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"{(IsEnabled ? default : "DISABLED ")}Hotkey {HotkeyMode} {hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR ")}{(IsActive ? " Active" : default)}";
+        base.FormatToString(builder);
+        builder.Append($"{(IsEnabled ? default : "DISABLED ")}Hotkey");
+        builder.AppendParameter(nameof(HotkeyMode), HotkeyMode);
+        builder.AppendParameter("Keys", hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR "));
+        builder.AppendParameter(nameof(IsActive), IsActive);
     }
 
     private static ModifierKeys KeyToModifier(Key key)

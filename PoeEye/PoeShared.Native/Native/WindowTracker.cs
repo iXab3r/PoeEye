@@ -63,9 +63,10 @@ public class WindowTracker : DisposableReactiveObject, IWindowTracker
 
     public int ActiveProcessId => ActiveWindow?.ProcessId ?? default;
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"#Tracker{Name}";
+        base.FormatToString(builder);
+        builder.AppendParameter(nameof(Name), Name);
     }
 
     private void WindowActivated(IntPtr hwnd, string title, int processId)

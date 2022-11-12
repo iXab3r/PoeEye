@@ -112,26 +112,26 @@ internal abstract class EventFacade : DisposableReactiveObject, IKeyboardMouseEv
 
     protected abstract MouseListener CreateMouseListener();
     protected abstract KeyListener CreateKeyListener();
-
-    public override string ToString()
+    
+    
+    
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        var result = new StringBuilder("Facade");
-
+        base.FormatToString(builder);
+        builder.Append($"EventFacade");
         if (Anchors.IsDisposed)
         {
-            result.Append(" Disposed");
+            builder.AppendParameter("IsDisposed", true);
         }
-
+        
         if (mouseListener.IsValueCreated)
         {
-            result.Append($" Mouse: {mouseListener.Value}");
+            builder.AppendParameter("Mouse", mouseListener.Value);
         }
-
+        
         if (keyListener.IsValueCreated)
         {
-            result.Append($" Keyboard: {keyListener.Value}");
+            builder.AppendParameter("Keyboard", keyListener.Value);
         }
-
-        return result.ToString();
     }
 }

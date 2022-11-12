@@ -57,9 +57,14 @@ internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
         
     public bool IsActive { get; private set; }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"Binding({(IsActive ? "active" : "NOT active")}) {SourceWatcher} => {TargetWatcher} ({TargetPropertyPath})";
+        base.FormatToString(builder);
+        builder.Append("Binding");
+        builder.AppendParameter(nameof(IsActive), IsActive ? "active" : "NOT active");
+        builder.AppendParameter(nameof(SourceWatcher), SourceWatcher);
+        builder.AppendParameter(nameof(TargetWatcher), TargetWatcher);
+        builder.AppendParameter(nameof(TargetPropertyPath), TargetPropertyPath);
     }
 }
     

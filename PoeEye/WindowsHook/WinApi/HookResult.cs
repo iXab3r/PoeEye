@@ -165,9 +165,15 @@ public abstract class HookResult : DisposableReactiveObject
     {
         return User32.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
     }
-
-    public override string ToString()
+    
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return $"HookResult#{HookId}({HookType}){(Anchors.IsDisposed ? " Disposed" : string.Empty)} @ thread {NativeThreadId}(managed {ManagedThreadId})";
+        base.FormatToString(builder);
+        builder.Append($"HookResult");
+        builder.AppendParameter(nameof(HookId), HookId);
+        builder.AppendParameter(nameof(HookType), HookType);
+        builder.AppendParameter(nameof(NativeThreadId), NativeThreadId);
+        builder.AppendParameter(nameof(ManagedThreadId), ManagedThreadId);
+        builder.AppendParameter("IsDisposed", Anchors.IsDisposed ? " Disposed" : string.Empty);
     }
 }

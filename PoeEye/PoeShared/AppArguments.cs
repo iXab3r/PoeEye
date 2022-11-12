@@ -152,9 +152,10 @@ public class AppArguments : AppOptions, IAppArguments
         } 
     }
 
-    public override string ToString()
+    protected override void FormatToString(ToStringBuilder builder)
     {
-        return new
+        base.FormatToString(builder);
+        builder.Append(new
         {
             AppName,
             Profile,
@@ -168,6 +169,6 @@ public class AppArguments : AppOptions, IAppArguments
             StartupArgs,
             ApplicationPath = ApplicationExecutablePath,
             ApplicationName = ApplicationExecutableName
-        }.Dump();
+        }.Dump());
     }
 }

@@ -134,11 +134,6 @@ public class BinderPerformanceCollectionsFixture : BenchmarkBase
             get => count.Value;
             protected set => throw new System.NotImplementedException();
         }
-            
-        public override string ToString()
-        {
-            return "PropertyHelper";
-        }
     }
         
     public sealed class BinderTestCollection : TestCollectionBase
@@ -159,11 +154,6 @@ public class BinderPerformanceCollectionsFixture : BenchmarkBase
         public override int Sum { get; protected set; }
 
         public override int Count { get; protected set; }
-            
-        public override string ToString()
-        {
-            return "Binder";
-        }
     }
         
     public sealed class ReactiveTestCollection : TestCollectionBase
@@ -185,10 +175,5 @@ public class BinderPerformanceCollectionsFixture : BenchmarkBase
         public override int Sum { get; protected set; }
 
         public override int Count { get; protected set; }
-            
-        public override string ToString()
-        {
-            return "Reactive";
-        }
     }
 }
