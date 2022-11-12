@@ -1,4 +1,5 @@
-﻿using System.Reactive.Concurrency;
+﻿using System.Collections.Specialized;
+using System.Reactive.Concurrency;
 using DynamicData;
 
 namespace PoeShared.Scaffolding;
@@ -63,5 +64,13 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    public T this[int index] => Collection[index];
+
+    public event NotifyCollectionChangedEventHandler CollectionChanged
+    {
+        add => Collection.CollectionChanged += value;
+        remove => Collection.CollectionChanged -= value;
     }
 }

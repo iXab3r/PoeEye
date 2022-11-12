@@ -147,6 +147,7 @@ public sealed class SynchronizedObservableCollection<T> : DisposableReactiveObje
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
+        using var @lock = syncRoot.Enter();
         var handler = CollectionChanged;
         handler?.Invoke(this, e);
     }
