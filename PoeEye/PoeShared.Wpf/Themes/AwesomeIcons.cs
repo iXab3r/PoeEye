@@ -71,4 +71,5 @@ public static class AwesomeIcons
     public const string Unlink = "\uf127";
     public const string Warning = "\uf071";
     public const string Wiki = "\uf266";
+    public const string Youtube = "\uf167";
 }
