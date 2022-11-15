@@ -159,7 +159,11 @@ public class RxTests : FixtureBase
     [Repeat(100)]
     public void ShouldObserveInSerializedWayOnMaxProcessorCount()
     {
-        ShouldObserveInSerializedWay(Environment.ProcessorCount, bgScheduler: true, synchronizePreScheduler: false, synchronizePostScheduler: false);
+        ShouldObserveInSerializedWay(
+            Environment.ProcessorCount, 
+            bgScheduler: true, 
+            synchronizePreScheduler: false, 
+            synchronizePostScheduler: false);
     }
     
     [Test]
@@ -218,7 +222,7 @@ public class RxTests : FixtureBase
         //Then
         allStart.Set();
         Task.WaitAll(tasks.ToArray());
-        consumer.ShouldBecome(x => x.Count, max * 2, timeout: max * 20);
+        consumer.ShouldBecome(x => x.Count, max * 2, timeout: max * 1000);
         var resultingItems = consumer.ToArray();
         for (var i = 0; i < resultingItems.Length; i += 2)
         {
