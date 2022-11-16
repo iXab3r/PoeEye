@@ -59,13 +59,21 @@ public class AppArguments : AppOptions, IAppArguments
     public AppArguments()
     {
         Log.Debug(() => $"CmdLine: {Environment.CommandLine}");
-        Log.Debug(() => $"Environment: {new { Environment.ProcessId, Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive, Environment.ProcessPath }})");
         Log.Debug(() => $"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
         Log.Debug(() => $"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
         Log.Debug(() => $"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
         Log.Debug(() => $"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
         Log.Debug(() => $"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
         Log.Debug(() => $"Is Elevated: {IsElevated}");
+        Log.Debug(() => $"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
+
+#if NET5_0_OR_GREATER
+        IsWindows = OperatingSystem.IsWindows();
+        IsLinux = OperatingSystem.IsLinux();
+#else
+        IsWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+        IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+#endif
         
         var entryAssembly = Assembly.GetEntryAssembly() ?? throw new InvalidOperationException("Entry assembly is not specified");
         AppName = (entryAssembly.GetCustomAttribute<AssemblyProductAttribute>() ?? throw new InvalidOperationException($"{nameof(AssemblyProductAttribute)} is not specified on assembly {entryAssembly}")).Product;
@@ -81,13 +89,8 @@ public class AppArguments : AppOptions, IAppArguments
         ApplicationExecutablePath = args.First();
         ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
         
-#if NET5_0_OR_GREATER
-            IsWindows = OperatingSystem.IsWindows();
-            IsLinux = OperatingSystem.IsLinux();
-#else
-        IsWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
-        IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
-#endif
+        Log.Debug(() => $"Process: {new { ApplicationExecutablePath, ProcessId }})");
+
             
         var arguments = Environment.GetCommandLineArgs();
         Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
