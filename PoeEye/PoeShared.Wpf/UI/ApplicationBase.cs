@@ -142,7 +142,7 @@ public abstract class ApplicationBase : Application
         SharedLog.Instance.InitializeLogging(appArguments);
 
         var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
-        SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
+        SharedLog.Instance.LoadLogConfiguration(appArguments, new FileInfo(logFileConfigPath));
         SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
         Container.Resolve<IExceptionReportingService>();
     }

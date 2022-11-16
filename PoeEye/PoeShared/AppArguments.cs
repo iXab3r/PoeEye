@@ -58,15 +58,6 @@ public class AppArguments : AppOptions, IAppArguments
 
     public AppArguments()
     {
-        Log.Debug(() => $"CmdLine: {Environment.CommandLine}");
-        Log.Debug(() => $"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
-        Log.Debug(() => $"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
-        Log.Debug(() => $"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
-        Log.Debug(() => $"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
-        Log.Debug(() => $"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
-        Log.Debug(() => $"Is Elevated: {IsElevated}");
-        Log.Debug(() => $"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
-
 #if NET5_0_OR_GREATER
         IsWindows = OperatingSystem.IsWindows();
         IsLinux = OperatingSystem.IsLinux();
@@ -88,13 +79,8 @@ public class AppArguments : AppOptions, IAppArguments
             .JoinStrings(" ");
         ApplicationExecutablePath = args.First();
         ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
-        
-        Log.Debug(() => $"Process: {new { ApplicationExecutablePath, ProcessId }})");
 
-            
         var arguments = Environment.GetCommandLineArgs();
-        Log.Debug(() => $"Arguments: {arguments.DumpToString()}");
-
         var parsed = Parse(arguments);
         if (string.IsNullOrEmpty(Profile))
         {
@@ -111,7 +97,6 @@ public class AppArguments : AppOptions, IAppArguments
             SharedLog.Instance.InitializeLogging(this);
             throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
         }
-        Log.Debug(() => $"Parsed args: {this.Dump()}");
     }
 
     public bool IsWindows { get; }
@@ -131,7 +116,7 @@ public class AppArguments : AppOptions, IAppArguments
     public DirectoryInfo EnvironmentAppData => new(IsWindows ? Environment.ExpandEnvironmentVariables($@"%APPDATA%") : "/var/roaming");
 
     public string ApplicationExecutableName { get; }
-        
+    
     public bool Parse(string[] args)
     {
         return Parse(this, args);
@@ -139,7 +124,7 @@ public class AppArguments : AppOptions, IAppArguments
 
     private static bool Parse(AppOptions instance, string[] args)
     {
-        Log.Debug(() => $"Parsing command line args: {args.DumpToString()}");
+        Log.Info(() => $"Parsing command line args: {args.DumpToString()}");
         var parser = new Parser(
             settings =>
             {
@@ -147,9 +132,9 @@ public class AppArguments : AppOptions, IAppArguments
                 settings.IgnoreUnknownArguments = true;
                 settings.ParsingCulture = CultureInfo.InvariantCulture;
             });
-        Log.Debug(() => $"Command line parser settings: {parser.Settings.Dump()}");
+        Log.Info(() => $"Command line parser settings: {parser.Settings.Dump()}");
         var result = parser.ParseArguments<AppOptions>(args ?? Array.Empty<string>());
-        Log.Debug(() => $"Command line parsing result: {result.Tag}, type: {result}");
+        Log.Info(() => $"Command line parsing result: {result.Tag}, type: {result}");
         switch (result)
         {
             case Parsed<AppOptions> parsedResult:

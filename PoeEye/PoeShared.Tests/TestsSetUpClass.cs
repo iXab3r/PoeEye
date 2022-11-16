@@ -16,7 +16,7 @@ public class TestsSetUpClass
     public void RunBeforeAnyTests()
     {
 #if DEBUG
-        SharedLog.Instance.LoadLogConfiguration(new FileInfo("log4net.tests.config"));
+        SharedLog.Instance.LoadLogConfiguration(new AppArguments(), new FileInfo("log4net.tests.config"));
         SharedLog.Instance.Log.Info("Logging is enabled");
         Binder.SetTracer(new BinderLogger());
         Binder.DebugMode = true;

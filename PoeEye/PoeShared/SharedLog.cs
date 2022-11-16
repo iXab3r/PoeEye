@@ -54,7 +54,7 @@ public class SharedLog : DisposableReactiveObject
         Trace.WriteLine(startupInfo);
     }
 
-    public void LoadLogConfiguration(FileInfo logConfig)
+    public void LoadLogConfiguration(IAppArguments appArguments, FileInfo logConfig)
     {
         Guard.ArgumentNotNull(logConfig, nameof(logConfig));
         Guard.ArgumentIsTrue(() => logConfig.Exists);
@@ -62,6 +62,17 @@ public class SharedLog : DisposableReactiveObject
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         XmlConfigurator.ConfigureAndWatch(repository, logConfig);
         Log.Info($"Logging settings loaded from {logConfig}");
+        
+        Log.Info($"Parsed args: {appArguments.Dump()}");
+        Log.Info($"CmdLine: {Environment.CommandLine}");
+        Log.Info($"CommandLineArgs: {Environment.GetCommandLineArgs()}");
+        Log.Info($"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
+        Log.Info($"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
+        Log.Info($"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
+        Log.Info($"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
+        Log.Info($"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
+        Log.Info($"Is Elevated: {appArguments.IsElevated}");
+        Log.Info($"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
     }
 
     public void SwitchLoggingLevel(Level loggingLevel)
