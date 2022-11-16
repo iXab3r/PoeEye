@@ -71,14 +71,6 @@ public abstract class ApplicationBase : Application
             InitializeLogging();
             
             metrics = Container.Resolve<IMetricsRoot>();
-            Log.Debug(() => $"CmdLine: {Environment.CommandLine}");
-            Log.Debug(() => $"Environment: {new { Environment.ProcessId, Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive, Environment.ProcessPath }})");
-            Log.Debug(() => $"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
-            Log.Debug(() => $"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
-            Log.Debug(() => $"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
-            Log.Debug(() => $"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
-            Log.Debug(() => $"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
-            Log.Debug(() => $"Is Elevated: {appArguments.IsElevated}");
                 
             Log.Debug(() => $"UI Scheduler: {RxApp.MainThreadScheduler}");
             RxApp.MainThreadScheduler = Container.Resolve<IScheduler>(WellKnownSchedulers.UI);
