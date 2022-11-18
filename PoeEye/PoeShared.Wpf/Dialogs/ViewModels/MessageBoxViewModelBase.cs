@@ -20,7 +20,7 @@ public abstract class MessageBoxViewModelBase<T> : WindowViewModelBase, IMessage
         SizeToContent = SizeToContent.WidthAndHeight;
         MinSize = new WinSize(200, 100);
         MaxSize = new WinSize(screen.Bounds.Width, screen.Bounds.Height).Scale(1.25f);
-        ShowInTaskbar = true;
+        ShowInTaskbar = false;
         EnableHeader = false;
         
         WhenKeyDown

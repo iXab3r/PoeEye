@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using DynamicData;
 using JetBrains.Annotations;
 using PoeShared.Dialogs.ViewModels;
@@ -27,6 +29,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
     private readonly IApplicationAccessor applicationAccessor;
     private readonly IFactory<MessageBoxViewModel> genericMessageBoxFactory;
     private readonly SourceListEx<IMessageBoxViewModel> messageBoxes = new();
+    private Stack<Window> windowStack = new();
 
     static MessageBoxService()
     {
@@ -136,12 +139,16 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
         {
             Content = messageBox,
         };
+
+        var mainWindow = applicationAccessor.MainWindow;
         var window = new MessageBoxWindow
         {
-            Owner = applicationAccessor.MainWindow,
+            Owner = windowStack.Count <= 0 ? mainWindow : windowStack.Peek(),
             DataContext = windowContainer
         };
-        
+        windowStack.Push(window);
+        Disposable.Create(() => windowStack.Pop()).AddTo(windowAnchors);
+
         window.WhenLoaded()
             .Do(args => log.Debug(() => $"Message box is loaded"))
             .SubscribeSafe(() =>
@@ -172,7 +179,13 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
         var closeController = new ForwardingCloseController<T>(capturingCloseController, dialogCloseController);
         messageBox.CloseController = closeController;
         
-        log.Info("Showing window"); 
+        log.Info("Showing window");
+        window.WhenLoaded().Subscribe(() =>
+        {
+            // there is a problem with child windows being obstructed by parent window despite the fact that Owner is set
+            window.Topmost = true;
+            window.Topmost = false;
+        }).AddTo(windowAnchors);
         var result = window.ShowDialog();
         log.Info($"Window was closed, result: {result}");
         return capturingCloseController.Result;

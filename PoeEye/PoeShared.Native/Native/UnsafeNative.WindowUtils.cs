@@ -273,6 +273,11 @@ public partial class UnsafeNative
         return User32.GetForegroundWindow();
     }
 
+    public static void ActivateWindow(IntPtr window)
+    {
+        ActivateWindow(new WindowHandle(window));
+    }
+    
     public static void ActivateWindow(IWindowHandle window)
     {
         ActivateWindow(window, TimeSpan.FromMilliseconds(500));
