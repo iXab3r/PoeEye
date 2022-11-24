@@ -32,6 +32,7 @@ public sealed class NativeRegistrations : UnityContainerExtension
             .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
             .RegisterSingleton<IKeyboardLayoutManager, KeyboardLayoutManager>()
             .RegisterSingleton<ISevenZipWrapper, SevenZipWrapper>()
+            .RegisterSingleton<IWindowBoundsTrackerFactory, WindowBoundsTrackerFactory>()
             .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
             .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
             .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
@@ -39,6 +40,8 @@ public sealed class NativeRegistrations : UnityContainerExtension
         Container
             .RegisterType<IWindowSeeker, TaskWindowSeeker>()
             .RegisterType<IHttpClient, GenericHttpClient>();
+
+        Container.RegisterFactory<IWindowBoundsTracker>(x => x.Resolve<IWindowBoundsTrackerFactory>().CreateTracker());
             
         if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
         {
