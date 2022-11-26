@@ -6,13 +6,11 @@ namespace PoeShared.Scaffolding;
 
 public abstract class DisposableReactiveObject : IDisposableReactiveObject
 {
-    private readonly IFluentLog log;
     private readonly INpcEventInvoker propertyChanged;
 
     protected DisposableReactiveObject()
     {
         propertyChanged = new ConcurrentNpcEventInvoker(this);
-        log = GetType().PrepareLogger().WithPrefix(ToString);
     }
 
     public CompositeDisposable Anchors { get; } = new();

@@ -23,7 +23,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     {
         ResourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
         refCountGate = new NamedLock(ResourceId);
-        Log = GetType().PrepareLogger().WithSuffix(ResourceId).WithSuffix(() => $"x{RefCount}").WithSuffix(ToString);
+        Log = GetType().PrepareLogger().WithSuffix(ToString);
         Log.Debug(() => $"Resource is created");
         Disposable.Create(() => Log.Debug("Resource anchors are being disposed")).AddTo(Anchors);
     }
