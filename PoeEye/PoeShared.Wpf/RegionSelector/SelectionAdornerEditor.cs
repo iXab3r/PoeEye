@@ -215,11 +215,28 @@ public class SelectionAdornerEditor : ReactiveControl
         try
         {
             var mousePosition = e.GetPosition(this);
-            if (IsBoxSelectionEnabled && e.ChangedButton == MouseButton.Left && TryToCalculateSelection(mousePosition, AnchorPoint, ActualSize, out var selection))
+
+            if (e.ChangedButton == MouseButton.Left)
             {
-                AdaptSelection(selection);
+                if (IsBoxSelectionEnabled)
+                {
+                    if (TryToCalculateSelection(mousePosition, AnchorPoint, ActualSize, out var selection))
+                    {
+                        AdaptSelection(selection);
+                    }
+                    else
+                    {
+                        Reset();
+                    }
+                }
+                else
+                {
+                    Reset();
+                }
+                
                 e.Handled = true;
             }
+            
         }
         finally
         {
@@ -231,14 +248,16 @@ public class SelectionAdornerEditor : ReactiveControl
     {
         if (e.ChangedButton == MouseButton.Left)
         {
-           
             var mousePosition = e.GetPosition(this);
             AnchorPoint = mousePosition;
 
-            if (!IsBoxSelectionEnabled && TryToCalculateSelectionForPoint(mousePosition,  AnchorPoint, ActualSize, out var selection))
+            if (!IsBoxSelectionEnabled)
             {
-                AdaptSelection(selection);
-            }
+                if (TryToCalculateSelectionForPoint(mousePosition, AnchorPoint, ActualSize, out var selection))
+                {
+                    AdaptSelection(selection);
+                } 
+            } 
         }
         else
         {
@@ -260,7 +279,7 @@ public class SelectionAdornerEditor : ReactiveControl
             if (TryToCalculateSelection(MousePosition, AnchorPoint, ActualSize, out var selection))
             {
                 ApplySelection(selection);
-            }
+            } 
         }
         else if (e.LeftButton == MouseButtonState.Pressed)
         {
