@@ -13,6 +13,7 @@ using PoeShared.Logging;
 using PoeShared.Notifications.Services;
 using PoeShared.Notifications.ViewModels;
 using PoeShared.Profiler;
+using PoeShared.RegionSelector;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -60,12 +61,13 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IHotkeyTracker, HotkeyTracker>()
             .RegisterType<ISingleInstanceValidationHelper, SingleInstanceValidationHelper>()
             .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
-            .RegisterType<ISelectionAdornerViewModel, SelectionAdornerViewModel>()
+            .RegisterType<ISelectionAdornerLegacy, SelectionAdornerLegacy>()
             .RegisterType<IBindingsEditorViewModel, BindingsEditorViewModel>()
-            .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
+            .RegisterType<IWindowRegionSelector, WindowRegionSelector>()
             .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
             .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
             .RegisterType<IReportItemsAggregator, ReportItemsAggregator>()
+            .RegisterType<ISelectionAdorner, SelectionAdorner>()
             .RegisterType<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
             .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()

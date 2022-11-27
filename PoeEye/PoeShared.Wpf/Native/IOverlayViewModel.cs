@@ -1,6 +1,5 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
-using WpfPoint = System.Windows.Point;
 
 namespace PoeShared.Native;
 

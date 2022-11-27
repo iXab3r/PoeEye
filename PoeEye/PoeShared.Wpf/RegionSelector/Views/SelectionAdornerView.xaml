@@ -9,7 +9,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
-    <DataTemplate DataType="{x:Type viewModels:SelectionAdornerViewModel}">
+    <DataTemplate DataType="{x:Type viewModels:SelectionAdornerLegacy}">
         <Grid>
             <Grid x:Name="SelectionAdorner" Cursor="{x:Static Cursors.Cross}"
                   IsHitTestVisible="{Binding IsVisible}"

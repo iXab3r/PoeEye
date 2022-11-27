@@ -3,12 +3,6 @@ using System.Drawing;
 using System.Windows;
 using System.Windows.Media;
 using PoeShared.Native;
-using WinSize = System.Drawing.Size;
-using WinPoint = System.Drawing.Point;
-using WinRect = System.Drawing.Rectangle;
-using WpfPoint = System.Windows.Point;
-using WpfSize = System.Windows.Size;
-using WpfRect = System.Windows.Rect;
 
 namespace PoeShared.Scaffolding;
 

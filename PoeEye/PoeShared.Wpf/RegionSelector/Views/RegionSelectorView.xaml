@@ -10,7 +10,7 @@
     
     <blue:MultiplyDoubleConverter x:Key="MultiplyDoubleDivideByThreeConverter" Factor="0.33" />
 
-    <DataTemplate DataType="{x:Type viewModels:RegionSelectorViewModel}">
+    <DataTemplate DataType="{x:Type viewModels:WindowRegionSelector}">
         <ui:AdornedControl IsAdornerVisible="True">
             <ui:AdornedControl.AdornerContent>
                 <Grid>

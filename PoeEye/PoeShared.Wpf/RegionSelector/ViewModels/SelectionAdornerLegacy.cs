@@ -18,20 +18,14 @@ using PropertyBinder;
 using ReactiveUI;
 using Unity;
 using WindowsHook;
-using WinSize = System.Drawing.Size;
-using WinPoint = System.Drawing.Point;
-using WinRectangle = System.Drawing.Rectangle;
-using WpfRect = System.Windows.Rect;
-using WinRect = System.Drawing.Rectangle;
-using WpfSize = System.Windows.Size;
 
 namespace PoeShared.RegionSelector.ViewModels;
 
-internal sealed class SelectionAdornerViewModel : DisposableReactiveObject, ISelectionAdornerViewModel
+internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelectionAdornerLegacy
 {
-    private static readonly IFluentLog Log = typeof(SelectionAdornerViewModel).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(SelectionAdornerLegacy).PrepareLogger();
     private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
-    private static readonly Binder<SelectionAdornerViewModel> Binder = new();
+    private static readonly Binder<SelectionAdornerLegacy> Binder = new();
 
     private readonly IKeyboardEventsSource keyboardEventsSource;
     private readonly IWindowTracker mainWindowTracker;
@@ -40,7 +34,7 @@ internal sealed class SelectionAdornerViewModel : DisposableReactiveObject, ISel
     private readonly ObservableAsPropertyHelper<bool> selectionIsNotEmptySource;
     private readonly IScheduler uiScheduler;
 
-    static SelectionAdornerViewModel()
+    static SelectionAdornerLegacy()
     {
         Binder
             .BindIf(x => x.ProjectionBounds.IsNotEmptyArea(), x => ScreenRegionUtils.CalculateProjection(
@@ -59,7 +53,7 @@ internal sealed class SelectionAdornerViewModel : DisposableReactiveObject, ISel
             .To((x, v) => x.ProjectedMousePosition = v);
     }
         
-    public SelectionAdornerViewModel(
+    public SelectionAdornerLegacy(
         [NotNull] IKeyboardEventsSource keyboardEventsSource,
         [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
         [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)

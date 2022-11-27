@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Drawing;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
-using PropertyBinder;
-using WinSize = System.Drawing.Size;
 
 namespace PoeShared.Dialogs.ViewModels;
 

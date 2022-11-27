@@ -18,38 +18,38 @@ internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IS
 
     private readonly IWindowViewController viewController;
     private readonly IOverlayWindowController overlayController;
-    private readonly IRegionSelectorViewModel regionSelector;
+    private readonly IWindowRegionSelector windowRegionSelector;
 
     public ScreenRegionSelectorService(
         [Dependency(WellKnownWindows.MainWindow)] IWindowViewController viewController,
         [Dependency(WellKnownWindows.AllWindows)] IOverlayWindowController overlayController,
         [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler,
-        IFactory<IRegionSelectorViewModel> regionSelectorWindowFactory)
+        IFactory<IWindowRegionSelector> regionSelectorWindowFactory)
     {
         Log.Debug(() => $"Initializing region selector service");
         this.viewController = viewController;
         this.overlayController = overlayController;
-        regionSelector = regionSelectorWindowFactory.Create();
-        regionSelector.IsVisible = false;
+        windowRegionSelector = regionSelectorWindowFactory.Create();
+        windowRegionSelector.IsVisible = false;
         uiScheduler.Schedule(() =>
         {
             Log.Debug(() => $"Registering region selector overlay");
-            overlayController.RegisterChild(regionSelector).AddTo(Anchors);
+            overlayController.RegisterChild(windowRegionSelector).AddTo(Anchors);
         });
     }
 
     public async Task<RegionSelectorResult> SelectRegion(Size minSelection)
     {
         var workingArea = SystemInformation.VirtualScreen;
-        regionSelector.NativeBounds = workingArea;
-        using var regionSelectorAnchors = regionSelector.Show();
+        windowRegionSelector.NativeBounds = workingArea;
+        using var regionSelectorAnchors = windowRegionSelector.Show();
 
-        Log.Debug(() => $"Showing new selector window: {regionSelector}");
+        Log.Debug(() => $"Showing new selector window: {windowRegionSelector}");
         viewController.Minimize();
         try
         {
-            Log.Debug(() => $"Awaiting for selection result from {regionSelector}");
-            return await regionSelector.StartSelection(minSelection);
+            Log.Debug(() => $"Awaiting for selection result from {windowRegionSelector}");
+            return await windowRegionSelector.StartSelection(minSelection);
         }
         catch (Exception ex)
         {

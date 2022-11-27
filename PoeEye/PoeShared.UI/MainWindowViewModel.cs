@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using EyeAuras.OnTopReplica;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Blazor;
 using PoeShared.Prism;
@@ -14,6 +15,7 @@ using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI.Bindings;
 using PoeShared.UI.Blazor;
+using PropertyBinder;
 using Unity;
 using Size = System.Drawing.Size;
 
@@ -21,14 +23,24 @@ namespace PoeShared.UI;
 
 internal sealed class MainWindowViewModel : DisposableReactiveObject
 {
-    public AutoCompleteSandboxViewModel AutoCompleteSandbox { get; }
+    private static readonly Binder<MainWindowViewModel> Binder = new();
     private readonly IScreenRegionSelectorService regionSelectorService;
+
+    static MainWindowViewModel()
+    {
+        Binder.Bind(x => x.ProjectionBounds.Bounds).To(x => x.SelectionAdorner.ProjectionBounds);
+        Binder.Bind(x => x.SelectionAdorner.ProjectionBounds).To(x => x.ProjectionBounds.Bounds);
+        
+        Binder.Bind(x => x.SelectionProjected.Bounds).To(x => x.SelectionAdorner.SelectionProjected);
+        Binder.Bind(x => x.SelectionAdorner.SelectionProjected).To(x => x.SelectionProjected.Bounds);
+    }
 
     public MainWindowViewModel(
         IFactory<BlazorSandboxViewModel> blazorHostViewModelFactory,
         IAudioNotificationSelectorViewModel audioNotificationSelector,
         IRandomPeriodSelector randomPeriodSelector,
-        ISelectionAdornerViewModel selectionAdorner,
+        ISelectionAdornerLegacy selectionAdornerLegacy,
+        SelectionAdorner selectionAdorner,
         IScreenRegionSelectorService regionSelectorService,
         NotificationSandboxViewModel notificationSandbox,
         ExceptionSandboxViewModel exceptionSandbox,
@@ -36,12 +48,13 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         AutoCompleteSandboxViewModel autoCompleteSandbox,
         BindingsSandboxViewModel bindingsSandbox)
     {
+        SelectionAdorner = selectionAdorner.AddTo(Anchors);
         AutoCompleteSandbox = autoCompleteSandbox;
         this.regionSelectorService = regionSelectorService;
         BindingsSandbox = bindingsSandbox.AddTo(Anchors);
         NotificationSandbox = notificationSandbox.AddTo(Anchors);
         ExceptionSandbox = exceptionSandbox.AddTo(Anchors);
-        SelectionAdorner = selectionAdorner.AddTo(Anchors);
+        SelectionAdornerLegacy = selectionAdornerLegacy.AddTo(Anchors);
         AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
         RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
         HotkeySequenceEditor = hotkeySequenceEditor.AddTo(Anchors);
@@ -56,7 +69,19 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         RandomPeriodSelector.LowerValue = TimeSpan.FromSeconds(3);
         RandomPeriodSelector.UpperValue = TimeSpan.FromSeconds(3);
         NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
-        StartSelectionCommand = CommandWrapper.Create(HandleSelectionCommandExecuted);
+        StartSelectionBoxCommand = CommandWrapper.Create(async () =>
+        {
+            SelectionRectangle = await SelectionAdorner.StartSelection(supportBoxSelection: true).Take(1);
+        });
+        StartSelectionPointCommand = CommandWrapper.Create(async () =>
+        {
+            SelectionRectangle = await SelectionAdorner.StartSelection(supportBoxSelection: false).Take(1);
+        });
+        StartSelectionPointStreamCommand = CommandWrapper.Create(async () =>
+        {
+            await SelectionAdorner.StartSelection(supportBoxSelection: false)
+                .Do(x => SelectionRectangle = x);
+        });
         SetCachedControlContentCommand = CommandWrapper.Create<object>(arg =>
         {
             if (arg is string name)
@@ -75,26 +100,28 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
 
         SelectRegionCommnad = CommandWrapper.Create(SelectRegionExecuted);
         BlazorSandbox = blazorHostViewModelFactory.Create();
+        Binder.Attach(this).AddTo(Anchors);
     }
 
-    private async Task SelectRegionExecuted()
-    {
-        SelectedRegion = await regionSelectorService.SelectRegion(new Size(20, 20));
-    }
+    public SelectionAdorner SelectionAdorner { get; }
+    public AutoCompleteSandboxViewModel AutoCompleteSandbox { get; }
 
     public NotificationSandboxViewModel NotificationSandbox { get; }
     public ExceptionSandboxViewModel ExceptionSandbox { get; }
     public BindingsSandboxViewModel BindingsSandbox { get; }
     public BlazorSandboxViewModel BlazorSandbox { get; }
-    public ICommand StartSelectionCommand { get; }
-    
+    public ICommand StartSelectionBoxCommand { get; }
+    public ICommand StartSelectionPointCommand { get; }
+    public ICommand StartSelectionPointStreamCommand { get; }
+
     public Color Color { get; set; }
 
     public System.Drawing.Rectangle SelectionRectangle { get; set; }
 
-    public Rect SelectionRect { get; set; }
+    public ReactiveRectangle SelectionProjected { get; } = new();
+    public ReactiveRectangle ProjectionBounds { get; } = new();
 
-    public ISelectionAdornerViewModel SelectionAdorner { get; }
+    public ISelectionAdornerLegacy SelectionAdornerLegacy { get; }
 
     public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
@@ -107,7 +134,7 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     public CommandWrapper LongCommand { get; }
 
     public CommandWrapper ErrorCommand { get; }
-
+    
     public ICommand NextRandomPeriodCommand { get; }
 
     public ICommand SetCachedControlContentCommand { get; }
@@ -122,8 +149,8 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
 
     public CommandWrapper ShowBlazorWindow { get; }
 
-    private async Task HandleSelectionCommandExecuted()
+    private async Task SelectRegionExecuted()
     {
-        SelectionRect = await SelectionAdorner.StartSelection().Take(1);
+        SelectedRegion = await regionSelectorService.SelectRegion(new Size(20, 20));
     }
 }

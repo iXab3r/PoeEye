@@ -6,9 +6,6 @@ using System.Windows.Forms;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using Point = System.Windows.Point;
-using WinPoint = System.Drawing.Point;
-using WinSize = System.Drawing.Size;
 
 namespace PoeShared.Notifications.ViewModels;
 
@@ -42,9 +39,9 @@ internal sealed class OverlayNotificationsContainerViewModel : OverlayViewModelB
     {
         //FIXME Show not only on primary
         var primaryMonitorSize = SystemInformation.PrimaryMonitorSize;
-        var anchorPoint = new Point((float)primaryMonitorSize.Width / 2, (float) primaryMonitorSize.Height / 16);
-        var anchorOffset = new Point(- (float)currentBounds.Width / 2, 0);
-        var topLeft = new Point(anchorPoint.X + anchorOffset.X + offset.X, anchorPoint.Y + anchorOffset.Y + offset.Y).ToWinPoint();
+        var anchorPoint = new WpfPoint((float)primaryMonitorSize.Width / 2, (float) primaryMonitorSize.Height / 16);
+        var anchorOffset = new WpfPoint(- (float)currentBounds.Width / 2, 0);
+        var topLeft = new WpfPoint(anchorPoint.X + anchorOffset.X + offset.X, anchorPoint.Y + anchorOffset.Y + offset.Y).ToWinPoint();
         return new Rectangle(topLeft, currentBounds.Size);
     }
 }

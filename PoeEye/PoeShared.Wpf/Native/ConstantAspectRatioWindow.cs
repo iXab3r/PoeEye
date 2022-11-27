@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -13,7 +12,6 @@ using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.UI;
-using Point = System.Drawing.Point;
 
 namespace PoeShared.Native;
 
@@ -306,8 +304,8 @@ public class ConstantAspectRatioWindow : Window
 
                 var initialBounds = dragParams.Value.InitialBounds;
                 var aspectRatio = TargetAspectRatio.Value;
-                var minSize = new System.Windows.Size(MinWidth, MinHeight).Scale(Dpi).ToWinSize();
-                var maxSize = new System.Windows.Size(MaxWidth, MaxHeight).Scale(Dpi).ToWinSize();
+                var minSize = new WpfSize(MinWidth, MinHeight).Scale(Dpi).ToWinSize();
+                var maxSize = new WpfSize(MaxWidth, MaxHeight).Scale(Dpi).ToWinSize();
                 var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
                 var logSuffix = $"initial bounds: {initialBounds}, targetAspectRatio: {aspectRatio}, move bounds: {bounds}";
 
@@ -400,8 +398,8 @@ public class ConstantAspectRatioWindow : Window
 
     private struct DragParams
     {
-        public Rectangle InitialBounds { get; set; }
+        public WinRect InitialBounds { get; set; }
         public double InitialAspectRatio { get; set; }
-        public Point InitialMousePosition { get; set; }
+        public WinPoint InitialMousePosition { get; set; }
     }
 }

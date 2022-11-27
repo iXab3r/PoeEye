@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="PoeShared.UI.RectangleEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:st="http://schemas.spicytaco.io/"
+             xmlns:ui="clr-namespace:PoeShared.UI"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300" x:Name="Root">
+    <st:AutoGrid DataContext="{Binding ElementName=Root}" Rows="40, 40" Orientation="Vertical" ChildMargin="10,7.5,0,0">
+        <st:AutoGrid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="45" Width="Auto"/>
+            <ColumnDefinition MinWidth="65" Width="Auto"/>
+        </st:AutoGrid.ColumnDefinitions>
+        <ui:NumericUpDownEx
+            Value="{Binding Value.RegionX, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+            materialDesign:HintAssist.Hint="{Binding LabelX, TargetNullValue=X}"
+            materialDesign:HintAssist.IsFloating="True"
+            Maximum="32000" Minimum="-32000" Interval="1" />
+
+        <ui:NumericUpDownEx
+            Value="{Binding Value.RegionY, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+            materialDesign:HintAssist.Hint="{Binding LabelY, TargetNullValue=Y}"
+            materialDesign:HintAssist.IsFloating="True"
+            Maximum="32000" Minimum="-32000" Interval="1" />
+
+        <ui:NumericUpDownEx
+            Value="{Binding Value.RegionWidth, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+            materialDesign:HintAssist.Hint="{Binding LabelWidth, TargetNullValue=Width}"
+            materialDesign:HintAssist.IsFloating="True"
+            Maximum="65535" Interval="1" />
+
+        <ui:NumericUpDownEx
+            Value="{Binding Value.RegionHeight, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+            materialDesign:HintAssist.Hint="{Binding LabelHeight, TargetNullValue=Height}"
+            materialDesign:HintAssist.IsFloating="True"
+            Maximum="65535" Interval="1" />
+    </st:AutoGrid>
+</UserControl>

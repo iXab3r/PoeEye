@@ -18,23 +18,19 @@ using PoeShared.UI;
 using PoeShared.WindowSeekers;
 using ReactiveUI;
 using Unity;
-using Point = System.Drawing.Point;
-using WinSize = System.Drawing.Size;
-using WinPoint = System.Drawing.Point;
-using WinRectangle = System.Drawing.Rectangle;
 
 namespace PoeShared.RegionSelector.ViewModels;
 
-internal sealed class RegionSelectorViewModel : OverlayViewModelBase, IRegionSelectorViewModel
+internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegionSelector
 {
     private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromMilliseconds(250);
     private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
     private static readonly double MinSelectionArea = 20;
     private readonly TaskWindowSeeker windowSeeker;
 
-    public RegionSelectorViewModel(
+    public WindowRegionSelector(
         IFactory<TaskWindowSeeker> taskWindowSeekerFactory,
-        [NotNull] ISelectionAdornerViewModel selectionAdorner,
+        [NotNull] ISelectionAdornerLegacy selectionAdorner,
         [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
         Title = "Region Selector";
@@ -106,7 +102,7 @@ internal sealed class RegionSelectorViewModel : OverlayViewModelBase, IRegionSel
             .AddTo(Anchors);
     }
 
-    public ISelectionAdornerViewModel SelectionAdorner { get; }
+    public ISelectionAdornerLegacy SelectionAdorner { get; }
 
     public bool IsBusy { get; private set; }
 
@@ -136,7 +132,7 @@ internal sealed class RegionSelectorViewModel : OverlayViewModelBase, IRegionSel
                     }
                     else
                     {
-                        var result = new WinRectangle(selection.X, selection.Y, 0, 0);
+                        var result = new WinRect(selection.X, selection.Y, 0, 0);
                         Log.Debug(() => $"Selected region({x}, screen: {selection}) is less than required({minSelection}, converting selection {selection} to {result}");
                         return result;
                     }
@@ -183,7 +179,7 @@ internal sealed class RegionSelectorViewModel : OverlayViewModelBase, IRegionSel
 
     private static (IWindowHandle window, Rectangle selection) FindMatchingWindow(Rectangle selection, IEnumerable<IWindowHandle> windows)
     {
-        var topLeft = new Point(selection.Left, selection.Top);
+        var topLeft = new WinPoint(selection.Left, selection.Top);
         var intersections = windows
             .Where(x => x.ProcessId != CurrentProcessId)
             .Where(x => UnsafeNative.WindowIsVisible(x.Handle))

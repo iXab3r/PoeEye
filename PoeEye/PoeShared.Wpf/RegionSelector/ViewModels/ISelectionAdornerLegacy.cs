@@ -2,16 +2,10 @@
 using System.Windows;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding; 
-using WinSize = System.Drawing.Size;
-using WinPoint = System.Drawing.Point;
-using WinRectangle = System.Drawing.Rectangle;
-using WpfRect = System.Windows.Rect;
-using WinRect = System.Drawing.Rectangle;
-using WpfSize = System.Windows.Size;
 
 namespace PoeShared.RegionSelector.ViewModels;
 
-public interface ISelectionAdornerViewModel : IDisposableReactiveObject
+public interface ISelectionAdornerLegacy : IDisposableReactiveObject
 {
     Size RenderSize { get; }
 

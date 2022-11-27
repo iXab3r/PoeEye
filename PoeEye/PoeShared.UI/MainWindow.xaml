@@ -9,6 +9,7 @@
                          mc:Ignorable="d"
                          xmlns:eye="http://coderush.net/poeeye/"
                          xmlns:system="clr-namespace:System;assembly=System.Runtime"
+                         xmlns:regionSelector="clr-namespace:PoeShared.RegionSelector;assembly=PoeShared.Wpf"
                          WindowStartupLocation="CenterScreen"
                          UseLayoutRounding="True"
                          ShowIconOnTitleBar="True"
@@ -174,7 +175,71 @@
                     </st:StackPanel>
                 </ScrollViewer>
             </TabItem>
+            
             <TabItem Header="SelectionAdorner">
+                <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
+                    <st:StackPanel Orientation="Horizontal">
+                        <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}" Content="Box"/>
+                        <eye:ButtonEx Command="{Binding StartSelectionPointCommand}" Content="Point"/>
+                        <eye:ButtonEx Command="{Binding StartSelectionPointStreamCommand}" Content="Point Stream"/>
+                        
+                        <TextBlock Text="Bounds"/>
+                        <eye:RectangleEditor Value="{Binding ProjectionBounds}"/>
+                        <TextBlock Text="Selection"/>
+                        <eye:RectangleEditor Value="{Binding SelectionProjected}"/>
+                    </st:StackPanel>
+                    <st:StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=IsInEditMode}">Is EditMode</CheckBox>
+                        <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=IsBoxSelectionEnabled}">Box selection</CheckBox>
+                        <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=ShowCrosshair}">Show crosshair</CheckBox>
+                        <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=ShowBackground}">Show background</CheckBox>
+                        <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=ShowProjected}">Show projected</CheckBox>
+                    </st:StackPanel>
+                    <st:StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsKeyboardFocused, StringFormat='IsKeyboardFocused: {0}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsKeyboardFocusWithin, StringFormat='IsKeyboardFocusWithin: {0}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseCaptured, StringFormat='IsMouseCaptured: {0}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseCaptureWithin, StringFormat='IsMouseCaptureWithin: {0}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseOver, StringFormat='IsMouseOver: {0}'}"/>
+                    </st:StackPanel>
+                    <st:StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=ActualWidth, StringFormat='ActualWidth: {0:F1}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=ActualHeight, StringFormat='ActualHeight: {0:F1}'}"/>
+                    </st:StackPanel>
+                    <st:StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=AnchorPoint, StringFormat='AnchorPoint: {0:F1}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=MousePosition, StringFormat='MousePosition: {0:F1}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=Selection, StringFormat='Selection: {0:F1}'}"/>
+                    </st:StackPanel>
+                    <st:StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=ProjectionBounds, StringFormat='ProjectionBounds: {0:F1}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=MousePositionProjected, StringFormat='MousePositionProjected: {0:F1}'}"/>
+                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=.SelectionProjected, StringFormat='SelectionProjected: {0:F1}'}"/>
+                    </st:StackPanel>
+                    <st:StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding SelectionRectangle, StringFormat='SelectionRectangle: {0:F1}'}"/>
+                    </st:StackPanel>
+                    <eye:AdornedControl MinWidth="300" MinHeight="300" MaxWidth="500" MaxHeight="500"
+                                        IsAdornerVisible="True">
+                        <eye:AdornedControl.AdornerContent>
+                            <Grid>
+                                <regionSelector:SelectionAdornerEditor 
+                                    x:Name="SelectionAdornerEditor" 
+                                    IsInEditMode="{Binding SelectionAdorner.IsInEditMode}"
+                                    IsBoxSelectionEnabled="{Binding SelectionAdorner.IsBoxSelectionEnabled}"
+                                    SelectionProjected="{Binding SelectionAdorner.SelectionProjected}"
+                                    MousePositionProjected="{Binding SelectionAdorner.MousePositionProjected}"
+                                    ProjectionBounds="{Binding SelectionAdorner.ProjectionBounds}"
+                                    />
+                            </Grid>
+                        </eye:AdornedControl.AdornerContent>
+                        <Grid>
+                            <Rectangle Fill="Gray" Stroke="Red"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </Grid>
+                    </eye:AdornedControl>
+                </st:StackPanel>
+            </TabItem>
+            <TabItem Header="SelectionAdorner (Legacy)">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
                     <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
                         <eye:ButtonEx Command="{Binding SelectRegionCommnad}">Select Window</eye:ButtonEx>
@@ -182,11 +247,9 @@
                     </st:StackPanel>
 
                     <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                        <eye:ButtonEx Command="{Binding StartSelectionCommand}">Start selection</eye:ButtonEx>
-                        <CheckBox IsChecked="{Binding SelectionAdorner.ShowCrosshair}">Show crosshair</CheckBox>
-                        <CheckBox IsChecked="{Binding SelectionAdorner.ShowBackground}">Show background</CheckBox>
-                        <TextBlock Text="Rect"></TextBlock>
-                        <TextBlock Text="{Binding SelectionRect}"></TextBlock>
+                        <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}">Start selection</eye:ButtonEx>
+                        <CheckBox IsChecked="{Binding SelectionAdornerLegacy.ShowCrosshair}">Show crosshair</CheckBox>
+                        <CheckBox IsChecked="{Binding SelectionAdornerLegacy.ShowBackground}">Show background</CheckBox>
                         <TextBlock Text="Rectangle"></TextBlock>
                         <TextBlock Text="{Binding SelectionRectangle}"></TextBlock>
                     </st:StackPanel>
@@ -194,7 +257,7 @@
                         IsAdornerVisible="True">
                         <eye:AdornedControl.AdornerContent>
                             <Grid>
-                                <eye:CachedContentControl Content="{Binding SelectionAdorner}" />
+                                <eye:CachedContentControl Content="{Binding SelectionAdornerLegacy}" />
                             </Grid>
                         </eye:AdornedControl.AdornerContent>
                         <Grid>

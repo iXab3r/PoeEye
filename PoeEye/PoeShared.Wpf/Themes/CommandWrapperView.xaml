@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:eye="clr-namespace:PoeShared.UI"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    mc:Ignorable="d"
                     xmlns:s="clr-namespace:PoeShared.Scaffolding.WPF">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
@@ -103,7 +106,8 @@
     </Style>
 
     <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ErrorIconTextBlock}"
-           x:Key="CommandWrapperIndicatorErrorStyleKey">
+           x:Key="CommandWrapperIndicatorErrorStyleKey"
+           d:DataContext="{d:DesignInstance s:CommandWrapper}">
 
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
@@ -146,7 +150,8 @@
     </Style>
 
     <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ErrorIconTextBlock}"
-           x:Key="CommandWrapperIndicatorSuccessStyleKey">
+           x:Key="CommandWrapperIndicatorSuccessStyleKey"
+           d:DataContext="{d:DesignInstance s:CommandWrapper}">
 
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />

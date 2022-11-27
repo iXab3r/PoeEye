@@ -22,6 +22,11 @@ internal sealed class RectangleConverter : IMultiValueConverter
             throw new ArgumentException("Invalid values length, expected 2(Width,Height) or 4(X,Y,Width,Height)");
         }
 
+        if (values.Any(x => x == DependencyProperty.UnsetValue))
+        {
+            return Binding.DoNothing;
+        }
+
         var dimensions = values.Select(System.Convert.ToDouble).ToArray();
         if (dimensions.Any(x => !double.IsFinite(x)))
         {

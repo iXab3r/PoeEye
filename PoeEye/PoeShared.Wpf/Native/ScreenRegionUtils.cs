@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Forms;
 using PoeShared.Scaffolding;
-using WinRect = System.Drawing.Rectangle;
-using WinSize = System.Drawing.Size;
-using WpfSize = System.Windows.Size;
-using WpfRect = System.Windows.Rect;
 
 namespace PoeShared.Native;
 
 public static class ScreenRegionUtils
 {
-    public static Rectangle CalculateBounds(Rectangle selection,
-        Size selectorSize,
+    public static Rectangle CalculateBounds(
+        Rectangle selection,
+        WinSize selectorSize,
         Rectangle clientBounds)
     {
         return CalculateBounds(selection, selectorSize, clientBounds, Rectangle.Empty);
     }
 
-    public static Rectangle CalculateProjection(WpfRect selection,
+    public static Rectangle CalculateProjection(
+        WpfRect selection,
         WpfSize selectorSize,
         WinRect projectionAreaBounds)
     {
@@ -27,7 +26,49 @@ public static class ScreenRegionUtils
         return result;
     }
 
-    public static Rectangle CalculateProjection(WpfRect selection,
+    public static WpfRect CalculateProjection(
+        WinRect projectedSelection,
+        WpfSize selectorSize,
+        WinRect projectionAreaBounds)
+    {
+        var offset = new WinPoint(-projectionAreaBounds.Location.X, -projectionAreaBounds.Location.Y);
+        var result = CalculateProjection(projectedSelection.OffsetBy(offset), selectorSize, projectionAreaBounds.Size);
+        return result;
+    }
+
+    public static WpfRect CalculateProjection(
+        WinRect projectedSelection,
+        WpfSize selectorSize,
+        WinSize projectionAreaSize)
+    {
+        if (projectedSelection.IsEmptyArea() || selectorSize.IsEmptyArea() || projectionAreaSize.IsEmptyArea())
+        {
+            return new WpfRect();
+        }
+            
+        var selectionPercent = new WpfRect
+        {
+            X = (float)projectedSelection.X / projectionAreaSize.Width,
+            Y = (float)projectedSelection.Y / projectionAreaSize.Height,
+            Height = (float)projectedSelection.Height / projectionAreaSize.Height,
+            Width = (float)projectedSelection.Width / projectionAreaSize.Width
+        };
+            
+        var destinationRegion = new WpfRect
+        {
+            X = selectionPercent.X * selectorSize.Width,
+            Y = selectionPercent.Y * selectorSize.Height,
+            Width = selectionPercent.Width * selectorSize.Width,
+            Height = selectionPercent.Height * selectorSize.Height
+        };
+
+        var result = new WpfRect(default, selectorSize);
+        result.Intersect(destinationRegion);
+        return !result.IntersectsWith(destinationRegion) ? new WpfRect() : result;
+    }
+
+    public static Rectangle CalculateProjection(
+        WpfRect selection,
         WpfSize selectorSize,
         WinSize projectionAreaSize)
     {
@@ -59,14 +100,14 @@ public static class ScreenRegionUtils
             Height = (int)Math.Ceiling(destinationRegion.Height),
         };
 
-        var projectionBounds = new Rectangle(Point.Empty, projectionAreaSize);
+        var projectionBounds = new Rectangle(WinPoint.Empty, projectionAreaSize);
         result.Intersect(projectionBounds);
         return !result.IntersectsWith(projectionBounds) ? Rectangle.Empty : result;
     }
 
     [Obsolete("Replaced by CalculateProjection")]
     public static Rectangle CalculateBounds(Rectangle selection,
-        Size selectorSize,
+        WinSize selectorSize,
         Rectangle clientBounds,
         Rectangle clientRegionBounds)
     {
@@ -128,29 +169,29 @@ public static class ScreenRegionUtils
         return destinationRect;
     }
 
-    public static Point ToScreenCoordinates(double absoluteX, double absoluteY)
+    public static WinPoint ToScreenCoordinates(double absoluteX, double absoluteY)
     {
         return ToScreenCoordinates(absoluteX, absoluteY, SystemInformation.VirtualScreen);
     }
 
-    public static Point ToScreenCoordinates(double absoluteX, double absoluteY, Rectangle screenBounds)
+    public static WinPoint ToScreenCoordinates(double absoluteX, double absoluteY, Rectangle screenBounds)
     {
-        return new Point(
+        return new WinPoint(
             ToScreenCoordinates(absoluteX, screenBounds.X, screenBounds.Width),
             ToScreenCoordinates(absoluteY, screenBounds.Y, screenBounds.Height));
     }
 
-    public static Point ToScreenCoordinates(PointF winInputCoordinates)
+    public static WinPoint ToScreenCoordinates(PointF winInputCoordinates)
     {
         return ToScreenCoordinates(winInputCoordinates.X, winInputCoordinates.Y);
     }
 
-    public static (double X, double Y) ToWinInputCoordinates(Point screenCoordinates, Rectangle screenBounds)
+    public static (double X, double Y) ToWinInputCoordinates(WinPoint screenCoordinates, Rectangle screenBounds)
     {
         return (ToWinInputCoordinates(screenCoordinates.X, screenBounds.X, screenBounds.Width), ToWinInputCoordinates(screenCoordinates.Y, screenBounds.Y, screenBounds.Height));
     }
 
-    public static (double X, double Y) ToWinInputCoordinates(Point screenCoordinates)
+    public static (double X, double Y) ToWinInputCoordinates(WinPoint screenCoordinates)
     {
         return ToWinInputCoordinates(screenCoordinates, SystemInformation.VirtualScreen);
     }
