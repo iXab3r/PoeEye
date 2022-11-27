@@ -88,6 +88,15 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="IsHitTestVisible" Value="True" />
     </Style>
+    
+    <Style TargetType="{x:Type TextBlock}" x:Key="NotificationIconTextBlock" BasedOn="{StaticResource IconTextBlock}">
+        <Setter Property="Text" Value="{x:Static themes:AwesomeIcons.Exclamation}" />
+        <Setter Property="Foreground" Value="{StaticResource NeutralBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="IsHitTestVisible" Value="True" />
+    </Style>
 
 
     <Style TargetType="{x:Type TextBox}" x:Key="CircleTextBox">
