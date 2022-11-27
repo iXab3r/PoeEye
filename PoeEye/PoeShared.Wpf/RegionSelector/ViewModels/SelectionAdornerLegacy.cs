@@ -21,6 +21,7 @@ using WindowsHook;
 
 namespace PoeShared.RegionSelector.ViewModels;
 
+[Obsolete("Replaced with ISelectionAdorner")]
 internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelectionAdornerLegacy
 {
     private static readonly IFluentLog Log = typeof(SelectionAdornerLegacy).PrepareLogger();

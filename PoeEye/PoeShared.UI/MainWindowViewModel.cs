@@ -39,7 +39,6 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         IFactory<BlazorSandboxViewModel> blazorHostViewModelFactory,
         IAudioNotificationSelectorViewModel audioNotificationSelector,
         IRandomPeriodSelector randomPeriodSelector,
-        ISelectionAdornerLegacy selectionAdornerLegacy,
         SelectionAdorner selectionAdorner,
         IScreenRegionSelectorService regionSelectorService,
         NotificationSandboxViewModel notificationSandbox,
@@ -54,7 +53,6 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         BindingsSandbox = bindingsSandbox.AddTo(Anchors);
         NotificationSandbox = notificationSandbox.AddTo(Anchors);
         ExceptionSandbox = exceptionSandbox.AddTo(Anchors);
-        SelectionAdornerLegacy = selectionAdornerLegacy.AddTo(Anchors);
         AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
         RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
         HotkeySequenceEditor = hotkeySequenceEditor.AddTo(Anchors);
@@ -120,8 +118,6 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
 
     public ReactiveRectangle SelectionProjected { get; } = new();
     public ReactiveRectangle ProjectionBounds { get; } = new();
-
-    public ISelectionAdornerLegacy SelectionAdornerLegacy { get; }
 
     public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 

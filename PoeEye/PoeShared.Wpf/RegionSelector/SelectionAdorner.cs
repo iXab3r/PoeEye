@@ -16,6 +16,10 @@ public interface ISelectionAdorner : IDisposableReactiveObject
     
     public bool IsInEditMode { get; set; }
     
+    public bool ShowBackground { get; set; }
+    
+    public bool ShowCrosshair { get; set; } 
+    
     public WinRect ProjectionBounds { get; set; }
 
     public WinRect SelectionProjected { get; set; }
@@ -43,6 +47,10 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
     public bool IsVisible { get; set; }
     
     public bool IsInEditMode { get; set; }
+    
+    public bool ShowBackground { get; set; } = true;
+    
+    public bool ShowCrosshair { get; set; } = true;
 
     public WinRect ProjectionBounds { get; set; }
 

@@ -219,6 +219,7 @@
                     <st:StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding SelectionRectangle, StringFormat='SelectionRectangle: {0:F1}'}"/>
                     </st:StackPanel>
+                    <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}">Start REGION selection</eye:ButtonEx>
                     <eye:AdornedControl MinWidth="300" MinHeight="300" MaxWidth="500" MaxHeight="500"
                                         IsAdornerVisible="True">
                         <eye:AdornedControl.AdornerContent>
@@ -235,33 +236,6 @@
                         </eye:AdornedControl.AdornerContent>
                         <Grid>
                             <Rectangle Fill="Gray" Stroke="Red"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                        </Grid>
-                    </eye:AdornedControl>
-                </st:StackPanel>
-            </TabItem>
-            <TabItem Header="SelectionAdorner (Legacy)">
-                <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
-                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                        <eye:ButtonEx Command="{Binding SelectRegionCommnad}">Select Window</eye:ButtonEx>
-                        <TextBlock Text="{Binding SelectedRegion}"></TextBlock>
-                    </st:StackPanel>
-
-                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                        <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}">Start selection</eye:ButtonEx>
-                        <CheckBox IsChecked="{Binding SelectionAdornerLegacy.ShowCrosshair}">Show crosshair</CheckBox>
-                        <CheckBox IsChecked="{Binding SelectionAdornerLegacy.ShowBackground}">Show background</CheckBox>
-                        <TextBlock Text="Rectangle"></TextBlock>
-                        <TextBlock Text="{Binding SelectionRectangle}"></TextBlock>
-                    </st:StackPanel>
-                    <eye:AdornedControl
-                        IsAdornerVisible="True">
-                        <eye:AdornedControl.AdornerContent>
-                            <Grid>
-                                <eye:CachedContentControl Content="{Binding SelectionAdornerLegacy}" />
-                            </Grid>
-                        </eye:AdornedControl.AdornerContent>
-                        <Grid>
-                            <Rectangle Fill="Gray" Stroke="Red" MinHeight="600" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                         </Grid>
                     </eye:AdornedControl>
                 </st:StackPanel>

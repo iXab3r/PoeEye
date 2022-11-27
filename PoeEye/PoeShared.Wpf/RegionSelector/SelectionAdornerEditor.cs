@@ -160,6 +160,7 @@ public class SelectionAdornerEditor : ReactiveControl
             MouseMove += OnMouseMove;
             PreviewMouseDown += OnPreviewMouseDown;
             PreviewMouseUp += OnPreviewMouseUp;
+            PreviewKeyDown += OnPreviewKeyDown;
             CaptureMouse();
             Focus();
 
@@ -168,6 +169,7 @@ public class SelectionAdornerEditor : ReactiveControl
                 MouseMove -= OnMouseMove;
                 PreviewMouseDown -= OnPreviewMouseDown;
                 PreviewMouseUp -= OnPreviewMouseUp;
+                PreviewKeyDown -= OnPreviewKeyDown;
                 ReleaseMouseCapture();
             });
         }, disposable => Observable.Never<Unit>());
@@ -178,19 +180,6 @@ public class SelectionAdornerEditor : ReactiveControl
             .Where(x => x == false)
             .Select(x => true);
 
-        var keyDownSource = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => PreviewKeyDown += h, h => PreviewKeyDown -= h)
-            .Where(x => x.EventArgs.Key == Key.Escape)
-            .Select(x => true);
-
-        var mouseDownSource = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => PreviewMouseDown += h, h => PreviewMouseDown -= h)
-            .Where(x => x.EventArgs.ChangedButton == MouseButton.Right)
-            .Select(x => true);
-
-        var cancelEditModeSource = Observable.Merge(
-            keyboardFocusLost,
-            keyDownSource,
-            mouseDownSource);
-
         isInEditModeSource
             .Select(x => x ? mouseEvents : Observable.Empty<Unit>())
             .Switch()
@@ -198,14 +187,21 @@ public class SelectionAdornerEditor : ReactiveControl
             .AddTo(Anchors);
 
         isInEditModeSource
-            .Select(x => x ? cancelEditModeSource : Observable.Empty<bool>())
+            .Select(x => x ? keyboardFocusLost : Observable.Empty<bool>())
             .Switch()
             .Subscribe(_ =>
             {
-                AnchorPoint = default;
-                IsInEditMode = false;
+                Reset();
             })
             .AddTo(Anchors);
+    }
+
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            Reset();
+        }
     }
 
     private void OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -232,19 +228,22 @@ public class SelectionAdornerEditor : ReactiveControl
 
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton != MouseButton.Left)
+        if (e.ChangedButton == MouseButton.Left)
         {
-            return;
+           
+            var mousePosition = e.GetPosition(this);
+            AnchorPoint = mousePosition;
+
+            if (!IsBoxSelectionEnabled && TryToCalculateSelectionForPoint(mousePosition,  AnchorPoint, ActualSize, out var selection))
+            {
+                AdaptSelection(selection);
+            }
         }
-
-        var mousePosition = e.GetPosition(this);
-        AnchorPoint = mousePosition;
-
+        else
+        {
+            Reset();
+        }
         e.Handled = true;
-        if (!IsBoxSelectionEnabled && TryToCalculateSelectionForPoint(mousePosition,  AnchorPoint, ActualSize, out var selection))
-        {
-            AdaptSelection(selection);
-        }
     }
 
     private void OnMouseMove(object sender, MouseEventArgs e)
@@ -269,6 +268,12 @@ public class SelectionAdornerEditor : ReactiveControl
                 AdaptSelection(selection);
             }
         }
+    }
+
+    private void Reset()
+    {
+        AnchorPoint = default;
+        IsInEditMode = false;
     }
 
     private static Point CalculatePosition(Point mousePositionAbs, Size actualSize)

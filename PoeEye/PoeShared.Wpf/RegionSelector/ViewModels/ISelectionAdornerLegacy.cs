@@ -5,7 +5,8 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.RegionSelector.ViewModels;
 
-public interface ISelectionAdornerLegacy : IDisposableReactiveObject
+[Obsolete("Replaced with ISelectionAdorner")]
+internal interface ISelectionAdornerLegacy : IDisposableReactiveObject
 {
     Size RenderSize { get; }
 
