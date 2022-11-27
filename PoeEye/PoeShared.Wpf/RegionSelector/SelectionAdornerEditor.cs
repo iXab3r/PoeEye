@@ -69,6 +69,7 @@ public class SelectionAdornerEditor : ReactiveControl
                 x.ActualSize,
                 x.ProjectionBounds
             ))
+            .WithDependency(x => x.IsInEditMode)
             .To((x, v) => x.Selection = v);
     }
 

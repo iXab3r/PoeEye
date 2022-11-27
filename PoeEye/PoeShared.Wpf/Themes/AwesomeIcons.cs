@@ -2,7 +2,7 @@
 
 public static class AwesomeIcons
 {
-
+    public const string Adjust = "\uf042";
     public const string AngleDoubleDown = "\uf103";
     public const string AngleDoubleLeft = "\uf100";
     public const string AngleDoubleRight = "\uf101";
