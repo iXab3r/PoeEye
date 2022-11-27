@@ -133,6 +133,18 @@
     <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="{StaticResource PoeItemRarityUniqueColor}" ice:Freeze="True" />
     <SolidColorBrush x:Key="PoeItemRarityRelicBrush" Color="{StaticResource PoeItemRarityRelicColor}" ice:Freeze="True" />
 
+    <!-- Change this to any pure hue i.e. no more than 2 rgb components set and at least 1 set to FF -->
+    <LinearGradientBrush x:Key="HueBrush" StartPoint="0,0" EndPoint="1,0">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Color="#FF0000" Offset="0" />
+            <GradientStop Color="#FFFF00" Offset="0.167" />
+            <GradientStop Color="#00FF00" Offset="0.333" />
+            <GradientStop Color="#00FFFF" Offset="0.5" />
+            <GradientStop Color="#0000FF" Offset="0.667" />
+            <GradientStop Color="#FF00FF" Offset="0.833" />
+            <GradientStop Color="#FF0000" Offset="1" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
     
     <DrawingBrush x:Key="DashedAccentBorderBrush" Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile" ice:Freeze="True">
         <DrawingBrush.Drawing>
