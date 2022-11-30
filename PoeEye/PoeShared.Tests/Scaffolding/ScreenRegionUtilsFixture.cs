@@ -257,7 +257,10 @@ public class ScreenRegionUtilsFixture : FixtureBase
         var result = ScreenRegionUtils.CalculateProjection(projected, selector, clientSize);
 
         //Then
-        result.ShouldBe(expected);
+        result.X.ShouldBe(expected.X, 1e-1);
+        result.Y.ShouldBe(expected.Y, 1e-1);
+        result.Width.ShouldBe(expected.Width, 1e-1);
+        result.Height.ShouldBe(expected.Height, 1e-1);
     }
 
     public static IEnumerable<NamedTestCaseData> ShouldCalculateBoundsCases()
