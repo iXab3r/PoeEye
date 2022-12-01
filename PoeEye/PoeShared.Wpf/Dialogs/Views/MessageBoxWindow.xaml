@@ -9,7 +9,6 @@
                               xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
                               xmlns:st="http://schemas.spicytaco.io/"
                               xmlns:viewModels="clr-namespace:PoeShared.Dialogs.ViewModels"
-                              xmlns:themes="clr-namespace:PoeShared.Themes"
                               xmlns:views="clr-namespace:PoeShared.Dialogs.Views"
                               mc:Ignorable="d"
                               d:DataContext="{d:DesignInstance views:MessageBoxContainerViewModel}"
@@ -21,13 +20,10 @@
                               Focusable="True"
                               Title="{Binding Content.Title}"
                               Foreground="{StaticResource OverlayForegroundBrushKey}"
-                              UseLayoutRounding="True">
-    <WindowChrome.WindowChrome>
-        <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}"
-                      CornerRadius="10" CaptionHeight="0"
-                      ResizeBorderThickness="{Binding ResizeBorderThickness, Mode=OneWay}" />
-    </WindowChrome.WindowChrome>
-
+                              UseLayoutRounding="True"
+                              Background="{StaticResource PopupWindowBackgroundBrushKey}"
+                              BorderBrush="{StaticResource OverlayBorderBrushKey}"
+                              BorderThickness="1">
     <Window.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
@@ -49,57 +45,40 @@
             <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
             <Setter Property="TargetAspectRatio" Value="{Binding Content.TargetAspectRatio, Mode=OneWay}" />
 
-            <Setter Property="ResizeMode" Value="NoResize" />
-            <Setter Property="WindowStyle" Value="None" />
-            <Setter Property="AllowsTransparency" Value="True" />
+            <Setter Property="ResizeMode" Value="CanResizeWithGrip" />
+            <Setter Property="WindowStyle" Value="SingleBorderWindow" />
         </Style>
     </native:TransparentWindow.Style>
 
-    <Border
-        CornerRadius="10"
-        Background="{StaticResource PopupWindowBackgroundBrushKey}"
-        BorderBrush="{StaticResource OverlayBorderBrushKey}"
-        BorderThickness="1">
-        <eye:CachedContentControl Content="{Binding Content}" Margin="5">
-            <eye:CachedContentControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type viewModels:MessageBoxViewModel}">
-                    <st:StackPanel Orientation="Vertical">
-                        <Grid>
-                            <Border Background="Transparent" wpf:EnableDragHelper.EnableDrag="True"/>
-                            <st:StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Title}" FontSize="16" Margin="5,0,0,0" FontWeight="Bold"/>
-                                <Separator Visibility="Hidden" st:StackPanel.Fill="Fill" />
-                                <eye:ButtonEx Icon="{x:Static themes:AwesomeIcons.CloseIcon}"
-                                              Command="{Binding CloseCommand}" Width="30" Height="30"/>
-                            </st:StackPanel>
-                        </Grid>
-                       
-                        <eye:CachedContentControl IsTabStop="False"
-                                                  st:StackPanel.Fill="Fill"
-                                                  Content="{Binding}"/>
-                        <ItemsControl ItemsSource="{Binding Buttons}"
-                                      x:Name="CommandListControl">
-                            <ItemsControl.ItemContainerStyle>
-                                <Style>
-                                    <Setter Property="st:StackPanel.Fill" Value="Fill" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <st:StackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <eye:ButtonEx Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=DataContext.CloseCommand}"
-                                                  CommandParameter="{Binding}"
-                                                  Content="{Binding Caption}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </st:StackPanel>
-                </DataTemplate>
-            </eye:CachedContentControl.ContentTemplate>
-        </eye:CachedContentControl>
-    </Border>
+    <eye:CachedContentControl Content="{Binding Content}" Margin="5">
+        <eye:CachedContentControl.ContentTemplate>
+            <DataTemplate DataType="{x:Type viewModels:MessageBoxViewModel}">
+                <st:StackPanel Orientation="Vertical">
+                    <eye:CachedContentControl IsTabStop="False"
+                                              st:StackPanel.Fill="Fill"
+                                              Content="{Binding}"/>
+                    <ItemsControl ItemsSource="{Binding Buttons}"
+                                  x:Name="CommandListControl">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="st:StackPanel.Fill" Value="Fill" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <st:StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <eye:ButtonEx Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=DataContext.CloseCommand}"
+                                              CommandParameter="{Binding}"
+                                              Content="{Binding Caption}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </st:StackPanel>
+            </DataTemplate>
+        </eye:CachedContentControl.ContentTemplate>
+    </eye:CachedContentControl>
 </native:WindowBase>

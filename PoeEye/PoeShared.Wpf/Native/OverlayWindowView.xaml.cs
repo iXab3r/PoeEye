@@ -10,6 +10,13 @@ public partial class OverlayWindowView
     public OverlayWindowView()
     {
         InitializeComponent();
+        BorderThickness = new Thickness(0);
+        ShowTitleBar = false;
+        ShowSystemMenu = false;
+        ShowCloseButton = false;
+        ShowMinButton = false;
+        ShowMaxRestoreButton = false;
+        ShowSystemMenuOnRightClick = false;
         SizeChanged += OnSizeChanged;
         this.WhenLoaded().SubscribeSafe(OnLoaded, Log.HandleUiException).AddTo(Anchors);
     }

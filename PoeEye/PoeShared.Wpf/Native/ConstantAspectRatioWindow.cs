@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using MahApps.Metro.Controls;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
@@ -15,7 +16,7 @@ using PoeShared.UI;
 
 namespace PoeShared.Native;
 
-public class ConstantAspectRatioWindow : Window
+public class ConstantAspectRatioWindow : MetroWindow
 {
     private const float DefaultPixelsPerInch = 96.0F;
 

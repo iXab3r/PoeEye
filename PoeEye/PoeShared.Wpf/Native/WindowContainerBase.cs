@@ -57,8 +57,8 @@ internal abstract class WindowContainerBase<T> : DisposableReactiveObject where 
     public double MaxHeight { get; [UsedImplicitly] private set; }
     public double ResizeThumbSize { get; [UsedImplicitly] protected set; }
     public bool ShowWireframes { get; set; }
-    public double GlassFrameThickness { get; protected set; }
-    public double ResizeBorderThickness { get; protected set; }
+    public double GlassFrameThickness { get; protected set; } = 1;
+    public double ResizeBorderThickness { get; protected set; } = 1;
     public Rectangle NativeBounds { get; set; }
     
     protected IFluentLog Log { get; }
