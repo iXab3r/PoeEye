@@ -41,6 +41,8 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
     public bool IsDisposed => Anchors.IsDisposed;
 
+    public ReaderWriterLockSlim Gate => resourceGate;
+
     protected IFluentLog Log { get; }
 
     public IDisposable RentReadLock()

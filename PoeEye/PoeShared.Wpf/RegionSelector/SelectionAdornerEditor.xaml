@@ -30,10 +30,11 @@
                               Background="Transparent">
                             <Grid IsHitTestVisible="False">
                                 <Border
-                                    BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
-                                    BorderThickness="1" />
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"/>
                                 <Canvas>
-                                    <Path Fill="Black" Opacity="{Binding BackgroundOpacity, RelativeSource={RelativeSource TemplatedParent}}"
+                                    <Path Fill="Black" 
+                                          Opacity="{Binding BackgroundOpacity, RelativeSource={RelativeSource TemplatedParent}}"
                                           Visibility="{Binding ShowBackground, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
                                         <Path.Data>
                                             <CombinedGeometry GeometryCombineMode="Exclude">
@@ -100,9 +101,9 @@
                                     <Grid
                                         x:Name="SelectionCrosshair">
                                         <Grid.Visibility>
-                                            <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
-                                                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ShowCrosshair" />
-                                            </MultiBinding>
+                                            <Binding RelativeSource="{RelativeSource TemplatedParent}" 
+                                                     Path="ShowCrosshair" 
+                                                     Converter="{StaticResource TrueToVisibleFalseToCollapsedConverter}" />
                                         </Grid.Visibility>
                                         <Line
                                             x:Name="CrosshairHorizontalLine"

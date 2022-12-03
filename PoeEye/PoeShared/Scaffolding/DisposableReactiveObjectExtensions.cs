@@ -14,14 +14,7 @@ public static class DisposableReactiveObjectExtensions
             .DisposePrevious()
             .Subscribe(x => latest = x)
             .AddTo(anchors);
-        Disposable.Create(() =>
-        {
-            if (ReferenceEquals(latest, default))
-            {
-                return;
-            }
-            latest.Dispose();
-        }).AddTo(anchors);
+        Disposable.Create(() => latest?.Dispose()).AddTo(anchors);
         return anchors;
     }
 }

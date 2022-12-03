@@ -7,7 +7,7 @@ public interface ISharedResource : IDisposable
     IDisposable RentReadLock();
 
     IDisposable RentWriteLock();
-        
+    
     bool IsDisposed { get; }
 
     bool TryRent();

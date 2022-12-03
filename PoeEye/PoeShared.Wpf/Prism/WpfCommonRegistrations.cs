@@ -68,6 +68,8 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
             .RegisterType<IReportItemsAggregator, ReportItemsAggregator>()
             .RegisterType<ISelectionAdorner, SelectionAdorner>()
+            .RegisterType<IOpenFileDialog, NativeFileDialog>()
+            .RegisterType<ISaveFileDialog, NativeFileDialog>()
             .RegisterType<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
             .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
