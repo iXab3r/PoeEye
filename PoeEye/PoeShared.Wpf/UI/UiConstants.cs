@@ -13,6 +13,7 @@ public static class UiConstants
     public static readonly TimeSpan Day = TimeSpan.FromDays(1);
     public static readonly TimeSpan Week = TimeSpan.FromDays(7);
     public static readonly int UiThrottlingDelayInMilliseconds = (int)UiThrottlingDelay.TotalMilliseconds;
+    public static readonly int UiAnimationDelayInMilliseconds = (int)UiAnimationDelay.TotalMilliseconds;
     public static readonly double WeekInMilliseconds = Week.TotalMilliseconds;
     public static readonly double ArtificialVeryLongDelayInMilliseconds = ArtificialVeryLongDelay.TotalMilliseconds;
 }

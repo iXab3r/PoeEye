@@ -32,6 +32,7 @@ public static class AwesomeIcons
     public const string CheckboxSquareEmpty = "\uf096";
     public const string CheckboxSquareMinus = "\uf147";
     public const string Download = "\uf019";
+    public const string Eyedropper = "\uf1fb";
     public const string EditIcon = "\uf044";
     public const string ErrorIcon = "\uf06a";
     public const string ExpandedDirectory = "\uf115";
