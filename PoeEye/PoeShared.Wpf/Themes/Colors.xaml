@@ -66,22 +66,6 @@
     <SolidColorBrush x:Key="MahAccentBrush" Color="{StaticResource MahApps.Colors.Accent}" ice:Freeze="True" />
     <SolidColorBrush x:Key="MahLightAccentBrush" Color="{StaticResource MahApps.Colors.Accent}" Opacity="0.6" ice:Freeze="True" />
     
-    <LinearGradientBrush x:Key="MahAccentDoubleGradientBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
-        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
-        <GradientStop Color="Transparent" Offset="1" />
-    </LinearGradientBrush>
-    
-    <LinearGradientBrush x:Key="MahGroupBoxHeaderBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
-        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.2" />
-        <GradientStop Color="Transparent" Offset="0.8" />
-    </LinearGradientBrush>
-    
-    <LinearGradientBrush x:Key="MahGroupBoxLightHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
-        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
-        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.1" />
-        <GradientStop Color="Transparent" Offset="0.8" />
-    </LinearGradientBrush>
 
     <Color x:Key="PositiveColor">LimeGreen</Color>
     <Color x:Key="WarningColor">Orange</Color>
@@ -144,6 +128,29 @@
             <GradientStop Color="#FF00FF" Offset="0.833" />
             <GradientStop Color="#FF0000" Offset="1" />
         </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="MahAccentDoubleGradientBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
+        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
+        <GradientStop Color="Transparent" Offset="1" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="MahGroupBoxHeaderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
+        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.2" />
+        <GradientStop Color="Transparent" Offset="0.8" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="MahGroupBoxLightHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
+        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
+        <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.1" />
+        <GradientStop Color="Transparent" Offset="0.8" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="MahGroupBoxNeutralHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
+        <GradientStop Color="{StaticResource NeutralColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource NeutralColor}" Offset="0.1" />
+        <GradientStop Color="Transparent" Offset="0.8" />
     </LinearGradientBrush>
     
     <DrawingBrush x:Key="DashedAccentBorderBrush" Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile" ice:Freeze="True">
