@@ -7,48 +7,14 @@
              mc:Ignorable="d"
              d:DesignHeight="30" d:DesignWidth="600" x:Name="Root">
     <UserControl.Resources>
-            <ControlTemplate x:Key="SimpleSlider" TargetType="{x:Type Slider}">
-                    <Border SnapsToDevicePixels="true" 
-                            BorderBrush="{TemplateBinding BorderBrush}" 
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                            <Grid>
-                                    <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*" MinHeight="{TemplateBinding MinHeight}"/>
-                                            <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-
-                                    <Rectangle x:Name="PART_SelectionRange"/>
-
-                                    <Track x:Name="PART_Track" Grid.Row="1">
-                                            <Track.Thumb>
-                                                    <Thumb x:Name="Thumb">
-                                                            <Thumb.Template>
-                                                                    <ControlTemplate TargetType="Thumb">
-                                                                            <Border Background="{x:Static SystemColors.ControlBrush}" 
-                                                                                       BorderBrush="Black"
-                                                                                       BorderThickness="1" 
-                                                                                       Width="30"
-                                                                                       Height="10"
-                                                                                       Margin="0,2"
-                                                                                       SnapsToDevicePixels="True"/>
-                                                                    </ControlTemplate>
-                                                            </Thumb.Template>
-                                                    </Thumb>
-                                            </Track.Thumb>
-                                    </Track>
-                            </Grid>
-                    </Border>
-            </ControlTemplate>
-
-            <ResourceDictionary x:Key="MyResources">
-                    <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ComboBox.xaml" />
-                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
-                            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
-                    </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
-            
+            <ui:SharedResourceDictionary x:Key="MyResources">
+                    <ui:SharedResourceDictionary.MergedDictionaries>
+                            <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ComboBox.xaml" />
+                            <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
+                            <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
+                            <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.slider.xaml" />
+                    </ui:SharedResourceDictionary.MergedDictionaries>
+            </ui:SharedResourceDictionary>
     </UserControl.Resources>    
         
     <Grid >
@@ -89,15 +55,15 @@
                             Minimum="{Binding ElementName=Root, Path=Minimum}"
                             Maximum="{Binding ElementName=Root, Path=Maximum}"
                             Value="{Binding ElementName=Root, Path=LowerValue}"
-                            Template="{StaticResource SimpleSlider}"
                             TickFrequency="1"
+                            Style="{StaticResource FastSlider}"
                             Margin="0,0,30,0" />
                     <Slider x:Name="UpperSlider"
                             Minimum="{Binding ElementName=Root, Path=Minimum}"
                             Maximum="{Binding ElementName=Root, Path=Maximum}"
                             Value="{Binding ElementName=Root, Path=UpperValue}"
-                            Template="{StaticResource SimpleSlider}"
                             TickFrequency="1"
+                            Style="{StaticResource FastSlider}"
                             Margin="30,0,0,0" />
                     
             </Grid>

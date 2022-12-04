@@ -15,12 +15,12 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.radiobutton.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.textbox.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.menu.xaml" />
-        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.menu.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.tree.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.scroll.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.combobox.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.busyindicator.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.groupbox.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.slider.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type ContentControl}">

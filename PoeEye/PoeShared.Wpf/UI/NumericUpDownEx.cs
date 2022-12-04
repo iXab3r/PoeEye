@@ -136,7 +136,7 @@ public class NumericUpDownEx : NumericUpDown
             var currentValue = Value.Value;
 
             var totalSteps = positionDelta.X + positionDelta.Y;
-            var deltaSteps = Interval * Math.Round(totalSteps);
+            var deltaSteps = Interval * Math.Round(totalSteps / Math.Min(SystemParameters.MinimumHorizontalDragDistance, SystemParameters.MinimumVerticalDragDistance));
             var calculatedValue = currentValue + deltaSteps;
         
             SetCurrentValue(ValueProperty, calculatedValue);
