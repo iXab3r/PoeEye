@@ -47,25 +47,49 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
     public IDisposable RentReadLock()
     {
-        Log.Debug(() => "Renting read lock");
+        Log.Debug(() => "Renting Read lock");
         EnsureIsAlive();
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+        WriteLog($"Renting Read lock: {resourceGate}");
+#endif
         resourceGate.EnterReadLock();
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+        WriteLog($"Entered Read lock: {resourceGate}");
+#endif
         return Disposable.Create(() =>
         {
-            Log.Debug(() => "Releasing read lock");
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+            WriteLog($"Releasing Read lock: {resourceGate}");
+#endif
+            Log.Debug(() => "Releasing Read lock");
             resourceGate.ExitReadLock();
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+            WriteLog($"Released Read lock: {resourceGate}");
+#endif
         });
     }
 
     public IDisposable RentWriteLock()
     {
-        Log.Debug(() => "Renting write lock");
+        Log.Debug(() => "Renting Write lock");
         EnsureIsAlive();
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+        WriteLog($"Renting Write lock: {resourceGate}");
+#endif
         resourceGate.EnterWriteLock();
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+        WriteLog($"Entered Write lock: {resourceGate}");
+#endif
         return Disposable.Create(() =>
         {
-            Log.Debug(() => "Releasing write lock");
+            Log.Debug(() => "Releasing Write lock");
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+            WriteLog($"Releasing Write lock: {resourceGate}");
+#endif
             resourceGate.ExitWriteLock();
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+            WriteLog($"Released Write lock: {resourceGate}");
+#endif
         });
     }
 
@@ -186,7 +210,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
         private readonly System.Collections.Concurrent.ConcurrentQueue<string> log = new(new[] { $"[{Thread.CurrentThread.ManagedThreadId,2}] Created {new StackTrace()}" });
-        private readonly int maxLogLength = 30;
+        private readonly int maxLogLength = 100;
 
         private void WriteLog(string message)
         {
