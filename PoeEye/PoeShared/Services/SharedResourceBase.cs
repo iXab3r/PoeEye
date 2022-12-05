@@ -14,8 +14,8 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     public string ResourceId { get; }
 
     /// <summary>
-    ///   RefCount is needed to share the same unmanaged Bitmap across multiple users
-    ///   That allows to avoid extra memory allocations and collect memory much more quickly than usual GC cycle
+    ///   RefCount is needed to share the same unmanaged Bitmap/Image/etc across multiple threads and control lifecycle
+    ///   That allows to avoid extra memory allocations 
     /// </summary>
     private long refCount = 1;
 
@@ -47,10 +47,10 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
     public IDisposable RentReadLock()
     {
-        Log.Debug(() => "Renting Read lock");
+        Log.Debug(() => "Entering Read lock");
         EnsureIsAlive();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-        WriteLog($"Renting Read lock: {resourceGate}");
+        WriteLog($"Entering Read lock: {resourceGate}");
 #endif
         resourceGate.EnterReadLock();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
@@ -59,22 +59,22 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
         return Disposable.Create(() =>
         {
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-            WriteLog($"Releasing Read lock: {resourceGate}");
+            WriteLog($"Exiting Read lock: {resourceGate}");
 #endif
-            Log.Debug(() => "Releasing Read lock");
+            Log.Debug(() => "Exiting Read lock");
             resourceGate.ExitReadLock();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-            WriteLog($"Released Read lock: {resourceGate}");
+            WriteLog($"Exited Read lock: {resourceGate}");
 #endif
         });
     }
 
     public IDisposable RentWriteLock()
     {
-        Log.Debug(() => "Renting Write lock");
+        Log.Debug(() => "Entering Write lock");
         EnsureIsAlive();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-        WriteLog($"Renting Write lock: {resourceGate}");
+        WriteLog($"Entering Write lock: {resourceGate}");
 #endif
         resourceGate.EnterWriteLock();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
@@ -82,13 +82,13 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 #endif
         return Disposable.Create(() =>
         {
-            Log.Debug(() => "Releasing Write lock");
+            Log.Debug(() => "Exiting Write lock");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-            WriteLog($"Releasing Write lock: {resourceGate}");
+            WriteLog($"Exiting Write lock: {resourceGate}");
 #endif
             resourceGate.ExitWriteLock();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
-            WriteLog($"Released Write lock: {resourceGate}");
+            WriteLog($"Exited Write lock: {resourceGate}");
 #endif
         });
     }
@@ -210,7 +210,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
         private readonly System.Collections.Concurrent.ConcurrentQueue<string> log = new(new[] { $"[{Thread.CurrentThread.ManagedThreadId,2}] Created {new StackTrace()}" });
-        private readonly int maxLogLength = 100;
+        private readonly int maxLogLength = 30;
 
         private void WriteLog(string message)
         {
