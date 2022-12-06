@@ -9,6 +9,10 @@ public interface ISharedResource : IDisposable
     IDisposable RentWriteLock();
     
     bool IsDisposed { get; }
+    
+    bool IsWriteLockHeld { get; }
+    
+    bool IsReadLockHeld { get; }
 
     bool TryRent();
 

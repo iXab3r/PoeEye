@@ -9,6 +9,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     private static readonly long MaxRefCount = 1024;
 
     private static long GlobalIdx;
+    private static long AliveResourcesCount;
     private readonly ReaderWriterLockSlim resourceGate = new(LockRecursionPolicy.SupportsRecursion);
     private readonly NamedLock refCountGate;
     public string ResourceId { get; }
@@ -24,8 +25,15 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
         ResourceId = $"Resource#{Interlocked.Increment(ref GlobalIdx)}";
         refCountGate = new NamedLock(ResourceId);
         Log = GetType().PrepareLogger().WithSuffix(ToString);
-        Log.Debug(() => $"Resource is created");
-        Disposable.Create(() => Log.Debug("Resource anchors are being disposed")).AddTo(Anchors);
+        
+        var beforeAliveCount = Interlocked.Increment(ref AliveResourcesCount);
+        Log.Debug(() => $"Resource of type {GetType()} is created, alive items count: {beforeAliveCount}");
+
+        Disposable.Create(() =>
+        {
+            var afterAliveCount = Interlocked.Decrement(ref AliveResourcesCount);
+            Log.Debug(() => $"Resource of type {GetType()} has been disposed, alive items count: {afterAliveCount}");
+        }).AddTo(Anchors);
     }
 
     public long RefCount
@@ -40,6 +48,10 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     }
 
     public bool IsDisposed => Anchors.IsDisposed;
+    
+    public bool IsWriteLockHeld => Gate.IsWriteLockHeld;
+    
+    public bool IsReadLockHeld => Gate.IsReadLockHeld;
 
     public ReaderWriterLockSlim Gate => resourceGate;
 
