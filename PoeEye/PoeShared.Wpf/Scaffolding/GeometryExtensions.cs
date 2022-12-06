@@ -262,9 +262,9 @@ public static class GeometryExtensions
         return new WinSize((int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
     }
         
-    public static WinSize Scale(this WinSize sourceSize, float dpi)
+    public static WinSize Scale(this WinSize sourceSize, float factorX, float factorY)
     {
-        return new WinSize((int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
+        return new WinSize((int)(sourceSize.Width * factorX), (int)(sourceSize.Height * factorY));
     }
 
     public static Rect ScaleToWpf(this WinRect sourceSize, PointF dpi)

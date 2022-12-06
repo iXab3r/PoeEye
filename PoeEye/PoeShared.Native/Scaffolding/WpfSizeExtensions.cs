@@ -4,7 +4,7 @@ using Size = System.Windows.Size;
 
 namespace PoeShared.Scaffolding;
 
-public static class SizeExtensions
+public static class WpfSizeExtensions
 {
     public static Size Scale(this Size size, double factor)
     {
