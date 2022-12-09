@@ -57,10 +57,11 @@
                                      Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text, Mode=OneWay}"
                                      IsReadOnly="True"
                                      BorderThickness="0"
+                                     IsHitTestVisible="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled}"
                                      wpf:FocusHelper.IsFocused="{TemplateBinding IsInEditMode}"
                                      ContextMenu="{x:Null}">
                             </TextBox>
-                            <ToggleButton Grid.Column="1" x:Name="PART_EditModeToggle"
+                            <ToggleButton x:Name="PART_EditModeToggle"
                                           Height="20" Width="20"
                                           HorizontalAlignment="Right"
                                           Margin="5,0"
