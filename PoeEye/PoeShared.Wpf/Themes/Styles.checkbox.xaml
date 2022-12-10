@@ -147,6 +147,8 @@
                            Content="{TemplateBinding Content}"
                            Margin="{TemplateBinding Padding}"
                            Focusable="{TemplateBinding Focusable}"
+                           ToolTipService.ShowOnDisabled="True"
+                           ToolTipService.InitialShowDelay="0"
                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
 

@@ -2,10 +2,10 @@
 
 namespace PoeShared.UI;
 
-public class TreeViewAssist
+public class TextBoxAssist
 {
     public static readonly DependencyProperty IsExpandableProperty = DependencyProperty.RegisterAttached(
-        "IsExpandable", typeof(bool), typeof(TreeViewAssist), new PropertyMetadata(true));
+        "IsExpandable", typeof(bool), typeof(TextBoxAssist), new PropertyMetadata(default(bool)));
 
     public static void SetIsExpandable(DependencyObject element, bool value)
     {

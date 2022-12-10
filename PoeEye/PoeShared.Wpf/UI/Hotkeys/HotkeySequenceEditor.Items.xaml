@@ -15,46 +15,62 @@
                 BorderBrush="{x:Null}"
                 Background="{StaticResource SequenceEditorTextBackground}"
                 Cursor="Hand"
-                ToolTip="{Binding Text}"
                 TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
                 Height="36" MinWidth="64" VerticalAlignment="Center"
                 CornerRadius="5"
                 Padding="5,0">
             <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                <TextBlock Text="{Binding Text, Converter={StaticResource MultilineToSinglelineConverter}}"
-                           MaxWidth="128"
-                           TextTrimming="CharacterEllipsis"
-                           st:StackPanel.Fill="Fill"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource SequenceEditorTextForeground}" />
-                <materialDesign:PopupBox VerticalContentAlignment="Stretch"
-                                         x:Name="EditPopup"
-                                         Visibility="Collapsed"
-                                         Padding="0"
-                                         PopupMode="Click"
-                                         StaysOpen="True"
-                                         PlacementMode="LeftAndAlignMiddles">
-                    <materialDesign:PopupBox.ToggleContent>
-                        <TextBlock Style="{StaticResource IconTextBlock}"
-                                   Text="&#xf044;"
-                                   Foreground="{StaticResource SequenceEditorTextForeground}" />
-                    </materialDesign:PopupBox.ToggleContent>
-                    <TextBox Width="300" Height="150"
-                             TextWrapping="Wrap"
-                             Padding="4"
-                             AcceptsReturn="True"
-                             Foreground="{StaticResource SequenceEditorTextForeground}"
-                             VerticalContentAlignment="Stretch"
-                             HorizontalContentAlignment="Stretch"
-                             wpf:FocusHelper.IsFocused="True"
-                             Style="{StaticResource HotkeySequenceTextBoxStyle}"
-                             Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
-                        <i:Interaction.Behaviors>
-                            <wpf:SelectAllOnFocusBehavior WaitForText="True"/>
-                        </i:Interaction.Behaviors>
-                    </TextBox>
-                </materialDesign:PopupBox>
+                <st:StackPanel Orientation="Horizontal" Fill="Fill" Background="Transparent">
+                    <TextBlock x:Name="ActualTextBlock" 
+                               Text="{Binding Text, Converter={StaticResource MultilineToSinglelineConverter}}"
+                               MaxWidth="250"
+                               TextTrimming="CharacterEllipsis"
+                               st:StackPanel.Fill="Fill"
+                               HorizontalAlignment="Center"
+                               ToolTip="{Binding Text}"
+                               Foreground="{StaticResource SequenceEditorTextForeground}" />
+                    <CheckBox ToolTip="Expand editor"
+                              x:Name="EditorToggle"
+                              Style="{StaticResource ToggleCheckBoxStyle}">
+                        <TextBlock Text="&#xf044;" Style="{StaticResource IconTextBlock}" />
+                    </CheckBox>
+                    
+                    <i:Interaction.Triggers>
+                        <wpf:MouseLeftButtonDownTrigger ClickCount="2">
+                            <wpf:SetPropertyAction TargetObject="{Binding ElementName=EditorToggle}" PropertyName="IsChecked" PropertyValue="{StaticResource TrueValue}" />
+                        </wpf:MouseLeftButtonDownTrigger>
+                    </i:Interaction.Triggers>
+                </st:StackPanel>
 
+                <materialDesign:PopupEx
+                    x:Name="EditorPopup"
+                    PlacementTarget="{Binding ElementName=ActualTextBlock}"
+                    Placement="Relative"
+                    Width="300"
+                    Height="200"
+                    StaysOpen="False"
+                    IsOpen="{Binding ElementName=EditorToggle, Path=IsChecked}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
+
+                    <Border Background="{StaticResource OverlayBackgroundBrushKey}"
+                            BorderBrush="{StaticResource MouseOverAccentBrushKey}"
+                            BorderThickness="1">
+                        <TextBox Width="NaN" Height="NaN"
+                                 TextWrapping="Wrap"
+                                 Padding="4"
+                                 AcceptsReturn="True"
+                                 Foreground="{StaticResource OverlayForegroundBrushKey}"
+                                 VerticalContentAlignment="Stretch"
+                                 HorizontalContentAlignment="Stretch"
+                                 Style="{StaticResource HotkeySequenceTextBoxStyle}"
+                                 Text="{Binding Text, UpdateSourceTrigger=LostFocus}">
+                            <i:Interaction.Behaviors>
+                                <wpf:SelectAllOnFocusBehavior WaitForText="True" />
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </Border>
+                </materialDesign:PopupEx>
             </st:StackPanel>
 
         </Border>
@@ -63,7 +79,6 @@
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
                          Value="True">
                 <Setter TargetName="TextItem" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
-                <Setter TargetName="EditPopup" Property="Visibility" Value="Visible" />
                 <Setter TargetName="TextItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
                 <Setter TargetName="TextItem" Property="Background" Value="{StaticResource SequenceEditorBackground}" />
             </DataTrigger>
@@ -119,7 +134,7 @@
                     HorizontalContentAlignment="Center"
                     FontWeight="Bold"
                     FontSize="16"
-                    Padding="5,0"/>
+                    Padding="5,0" />
             </Border>
             <Border x:Name="MouseItem"
                     BorderThickness="1"
@@ -135,7 +150,7 @@
 
             <i:Interaction.Triggers>
                 <wpf:MouseLeftButtonDownTrigger ClickCount="2">
-                    <wpf:SetPropertyAction TargetObject="{Binding}" PropertyName="IsInEditMode" PropertyValue="{StaticResource TrueValue}"/>
+                    <wpf:SetPropertyAction TargetObject="{Binding}" PropertyName="IsInEditMode" PropertyValue="{StaticResource TrueValue}" />
                 </wpf:MouseLeftButtonDownTrigger>
             </i:Interaction.Triggers>
         </st:StackPanel>
