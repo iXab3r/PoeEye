@@ -151,6 +151,15 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                         }
                     }
 
+                    if (hotkeyData.IsHandled)
+                    {
+                        Log.Debug(() => $"Hotkey is marked as handled - it will not be seen by the system {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown})");
+                    }
+                    else
+                    {
+                        Log.Debug(() => $"Hotkey is not marked as handled - it will be seen by the system {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown})");
+                    }
+
                     return true;
                 })
             .WithPrevious()

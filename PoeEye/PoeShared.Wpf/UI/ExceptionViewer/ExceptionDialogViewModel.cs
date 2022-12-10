@@ -13,6 +13,7 @@ using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
 using Microsoft.Win32;
+using PoeShared.Dialogs.Services;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -39,6 +40,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
     private readonly IUniqueIdGenerator idGenerator;
 
     private readonly ISevenZipWrapper sevenZipWrapper;
+    private readonly IMessageBoxService messageBoxService;
 
     static ExceptionDialogViewModel()
     {
@@ -56,12 +58,14 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
         IUniqueIdGenerator idGenerator,
         ISevenZipWrapper sevenZipWrapper,
         ICloseController closeController,
+        IMessageBoxService messageBoxService,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
         this.appArguments = appArguments;
         this.reportItemsAggregator = reportItemsAggregator;
         this.idGenerator = idGenerator;
         this.sevenZipWrapper = sevenZipWrapper;
+        this.messageBoxService = messageBoxService;
 
         this.RaiseWhenSourceValue(x => x.AppName, this, x => x.Config).AddTo(Anchors);
         CloseCommand = CommandWrapper.Create(closeController.Close);
@@ -138,6 +142,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
             Log.Debug(() => $"Report sent to {Config.ReportHandler}: {result}");
             SentReportId = result;
             Status = $"Report sent";
+            await messageBoxService.ShowMessage("Report sent successfully", $"Your report has Id {result}. Feel free to send this Id via Discord or by any other means if you consider this bug important, this will speed up processing process");
         }
         catch (Exception ex)
         {

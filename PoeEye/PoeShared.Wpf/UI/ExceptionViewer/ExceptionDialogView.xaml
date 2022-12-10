@@ -87,7 +87,7 @@
 
         <Grid Grid.Row="2" IsEnabled="{Binding SaveReportCommand.IsBusy, Converter={StaticResource NotConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="100" />
+                <ColumnDefinition Width="Auto" MinWidth="100" MaxWidth="300" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
