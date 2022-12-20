@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
@@ -10,6 +11,7 @@ using DynamicData.Binding;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
@@ -37,7 +39,6 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
 
     public async Task OnParametersSetAsync()
     {
-        
         await HandleSetParametersAsync();
     }
     
@@ -64,9 +65,6 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
                 .SubscribeSafe(x => RaisePropertyChanged(x.Name), Log.HandleException)
                 .AddTo(Anchors);
         }
-
-        await JsRuntime.InvokeVoidAsync("enableCarousel");
-        await JsRuntime.InvokeVoidAsync("enableLightbox");
     }
 
     protected virtual async Task HandleInitializedAsync()
