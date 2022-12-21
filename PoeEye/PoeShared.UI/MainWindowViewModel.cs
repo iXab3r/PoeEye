@@ -69,16 +69,15 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
         StartSelectionBoxCommand = CommandWrapper.Create(async () =>
         {
-            SelectionRectangle = await SelectionAdorner.StartSelection(supportBoxSelection: true).Take(1);
+            SelectionRectangle = await SelectionAdorner.SelectVirtualRegion().Take(1);
         });
         StartSelectionPointCommand = CommandWrapper.Create(async () =>
         {
-            SelectionRectangle = await SelectionAdorner.StartSelection(supportBoxSelection: false).Take(1);
+            SelectionRectangle = await SelectionAdorner.SelectVirtualPoint().Select(x => new System.Drawing.Rectangle(x, new Size(1, 1))).Take(1);
         });
         StartSelectionPointStreamCommand = CommandWrapper.Create(async () =>
         {
-            await SelectionAdorner.StartSelection(supportBoxSelection: false)
-                .Do(x => SelectionRectangle = x);
+            await SelectionAdorner.SelectVirtualPoint().Select(x => new System.Drawing.Rectangle(x, new Size(1, 1))).Do(x => SelectionRectangle = x);
         });
         SetCachedControlContentCommand = CommandWrapper.Create<object>(arg =>
         {

@@ -46,9 +46,7 @@ public interface ISelectionAdorner : IDisposableReactiveObject
     /// Selection relative to top-left corner
     /// </summary>
     WinRect Selection { get; }
-    
-    IObservable<WinRect> StartSelection(bool supportBoxSelection = true);
-    
+
     IObservable<WinRect> SelectRegion();
     
     IObservable<WinPoint> SelectPoint();
