@@ -13,5 +13,10 @@ public enum AudioNotificationType
     Minions,
     Pizzicato,
     Silence,
-    Keyboard
+    Keyboard,
+    Twinkle,
+    SingleCricket,
+    Cricket,
+    Droplet,
+    Cuckoo,
 }
