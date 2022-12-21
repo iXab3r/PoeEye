@@ -47,9 +47,21 @@ public static class GeometryExtensions
         return new(rect.Left + (float)rect.Width / 2, rect.Top + (float)rect.Height / 2);
     }
         
-    public static WinPoint Center(this WinRect rect)
+    public static WinPoint Center(this WinRect point)
     {
-        return new((int)Math.Round(rect.Left + (float)rect.Width / 2), (int)Math.Round(rect.Top + (float)rect.Height / 2));
+        return new((int)Math.Round(point.Left + (float)point.Width / 2), (int)Math.Round(point.Top + (float)point.Height / 2));
+    }
+    
+    public static WinPoint Negate(this WinPoint point)
+    {
+        return new WinPoint(-point.X, -point.Y);
+    }
+    
+    public static WinPoint OffsetBy(this WinPoint point, WinPoint offset)
+    {
+        var result = point;
+        result.Offset(offset);
+        return result;
     }
 
     public static Rectangle IntersectWith(this Rectangle rect, Rectangle otherRectangle)

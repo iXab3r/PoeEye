@@ -12,23 +12,50 @@ namespace PoeShared.RegionSelector;
 
 public interface ISelectionAdorner : IDisposableReactiveObject
 {
-    public bool IsVisible { get; set; }
+    bool IsVisible { get; set; }
     
-    public bool IsInEditMode { get; set; }
+    bool IsInEditMode { get; set; }
     
-    public bool ShowBackground { get; set; }
+    bool ShowBackground { get; set; }
     
-    public bool ShowCrosshair { get; set; } 
+    bool ShowCrosshair { get; set; } 
     
-    public WinRect ProjectionBounds { get; set; }
-
-    public WinRect SelectionProjected { get; set; }
-
-    public WinPoint MousePositionProjected { get; set; }
-
     bool IsBoxSelectionEnabled { get; set; }
     
+    /// <summary>
+    /// "Virtual" bounds of selection region which will be used for mapping
+    /// </summary>
+    WinRect ProjectionBounds { get; set; }
+    
+    /// <summary>
+    /// Selection region mapped to virtual bounds
+    /// </summary>
+    WinRect SelectionProjected { get; set; }
+
+    /// <summary>
+    /// Mouse position mapped to virtual bounds
+    /// </summary>
+    WinPoint MousePositionProjected { get; set; }
+
+    /// <summary>
+    /// Mouse position relative to top-left corner 
+    /// </summary>
+    WinPoint MousePosition { get; }
+
+    /// <summary>
+    /// Selection relative to top-left corner
+    /// </summary>
+    WinRect Selection { get; }
+    
     IObservable<WinRect> StartSelection(bool supportBoxSelection = true);
+    
+    IObservable<WinRect> SelectRegion();
+    
+    IObservable<WinPoint> SelectPoint();
+    
+    IObservable<WinRect> SelectVirtualRegion();
+    
+    IObservable<WinPoint> SelectVirtualPoint();
 }
 
 public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorner
@@ -37,6 +64,13 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
 
     static SelectionAdorner()
     {
+        Binder.BindIf(x => !x.SelectionProjected.IsEmpty, x => x.SelectionProjected.OffsetBy(x.ProjectionBounds.Location.Negate()))
+            .Else(x => default)
+            .To(x => x.Selection);
+        Binder
+            .BindIf(x => !x.MousePositionProjected.IsEmpty, x  => x.MousePositionProjected.OffsetBy(x.ProjectionBounds.Location.Negate()))
+            .Else(x => default)
+            .To(x => x.MousePosition);
     }
 
     public SelectionAdorner()
@@ -54,6 +88,10 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
 
     public WinRect ProjectionBounds { get; set; }
 
+    public WinPoint MousePosition { get; [UsedImplicitly] private set; }
+    
+    public WinRect Selection { get; [UsedImplicitly] private set; }
+
     public WinRect SelectionProjected { get; set; }
 
     public WinPoint MousePositionProjected { get; set; }
@@ -61,6 +99,11 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
     public bool IsBoxSelectionEnabled { get; set; }
     
     public IObservable<WinRect> StartSelection(bool supportBoxSelection = true)
+    {
+        return StartSelection(true, supportBoxSelection);
+    }
+
+    public IObservable<WinRect> StartSelection(bool isVirtual, bool supportBoxSelection)
     {
         return Observable.Create<WinRect>(observer =>
         {
@@ -76,7 +119,8 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
                 SelectionProjected = WinRect.Empty;
             }).AddTo(anchors);
 
-            this.WhenAnyValue(x => x.SelectionProjected)
+            var selectionSource = isVirtual ? this.WhenAnyValue(x => x.SelectionProjected) : this.WhenAnyValue(x => x.Selection);
+            selectionSource
                 .Skip(1)
                 .TakeUntil(this.WhenAnyValue(x => x.IsInEditMode).Where(x => x == false))
                 .Subscribe(observer)
@@ -84,5 +128,25 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
 
             return anchors;
         });
+    }
+
+    public IObservable<WinRect> SelectRegion()
+    {
+        return StartSelection(isVirtual: false, supportBoxSelection: true);
+    }
+
+    public IObservable<WinPoint> SelectPoint()
+    {
+        return StartSelection(isVirtual: false, supportBoxSelection: false).Select(x => x.Location);
+    }
+
+    public IObservable<WinRect> SelectVirtualRegion()
+    {
+        return StartSelection(isVirtual: true, supportBoxSelection: true);
+    }
+
+    public IObservable<WinPoint> SelectVirtualPoint()
+    {
+        return StartSelection(isVirtual: true, supportBoxSelection: false).Select(x => x.Location);
     }
 }
