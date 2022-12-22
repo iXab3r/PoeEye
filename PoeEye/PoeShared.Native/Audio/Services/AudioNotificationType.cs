@@ -19,4 +19,6 @@ public enum AudioNotificationType
     Cricket,
     Droplet,
     Cuckoo,
+    OwlHoot1,
+    OwlHoot2,
 }
