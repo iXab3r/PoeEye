@@ -73,13 +73,15 @@ public class ConstantAspectRatioWindow : MetroWindow
                     // Update window size
                     var thisWindow = new WindowInteropHelper(this).Handle;
                     var bounds = UnsafeNative.GetWindowRect(thisWindow);
-                    var newBounds = aspectRatioSizeCalculator.Calculate(targetAspectRatio.Value, bounds, bounds, prioritizeHeight: targetAspectRatio.Value >= 1);
+                    var newBounds = aspectRatioSizeCalculator.Calculate(targetAspectRatio.Value, bounds, bounds,
+                        prioritizeHeight: targetAspectRatio.Value >= 1);
                     if (newBounds == bounds)
                     {
                         return;
                     }
 
-                    Log.Debug(() => $"Setting initial window bounds, TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, desired bounds: {newBounds}");
+                    Log.Debug(() =>
+                        $"Setting initial window bounds, TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, desired bounds: {newBounds}");
                     NativeBounds = newBounds;
                 }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -102,7 +104,8 @@ public class ConstantAspectRatioWindow : MetroWindow
 
     public IScheduler Scheduler { get; }
 
-    public string NativeWindowId => WindowHandle == IntPtr.Zero ? $"Native window not created yet" : WindowHandle.ToHexadecimal();
+    public string NativeWindowId =>
+        WindowHandle == IntPtr.Zero ? $"Native window not created yet" : WindowHandle.ToHexadecimal();
 
     public string WindowId { get; } = $"Wnd#{Interlocked.Increment(ref GlobalWindowId)}";
 
@@ -185,9 +188,11 @@ public class ConstantAspectRatioWindow : MetroWindow
                 // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
                 if (isUpdatingActualBounds)
                 {
-                    Log.Debug(() => $"Native bounds changed as a part of actual bounds update: {x.Previous} => {x.Current}");
+                    Log.Debug(() =>
+                        $"Native bounds changed as a part of actual bounds update: {x.Previous} => {x.Current}");
                     return;
                 }
+
                 Log.Debug(() => $"Native bounds changed, setting windows rect: {x.Previous} => {x.Current}");
                 UnsafeNative.SetWindowRect(WindowHandle, x.Current);
                 var actualBounds = UnsafeNative.GetWindowRect(WindowHandle);
@@ -201,7 +206,7 @@ public class ConstantAspectRatioWindow : MetroWindow
                 }
             }, Log.HandleUiException)
             .AddTo(Anchors);
-        
+
         this.Observe(ActualBoundsProperty, x => x.ActualBounds)
             .WithPrevious()
             .Where(x => x.Current != x.Previous)
@@ -211,6 +216,7 @@ public class ConstantAspectRatioWindow : MetroWindow
                 {
                     return;
                 }
+
                 Log.Debug(() => $"Actual bounds have changed: {x.Previous} => {x.Current}");
                 try
                 {
@@ -221,6 +227,7 @@ public class ConstantAspectRatioWindow : MetroWindow
                 {
                     isUpdatingActualBounds = false;
                 }
+
                 Log.Debug(() => $"Propagated actual bounds: {x.Current}");
             }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -237,9 +244,41 @@ public class ConstantAspectRatioWindow : MetroWindow
         var msg = (User32.WindowMessage)msgRaw;
         switch (msg)
         {
-            case User32.WindowMessage.WM_WINDOWPOSCHANGED when Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS)) is UnsafeNative.WINDOWPOS wp:
+            case User32.WindowMessage.WM_GETMINMAXINFO
+                when Marshal.PtrToStructure(lParam, typeof(User32.MINMAXINFO)) is User32.MINMAXINFO minmax:
+            {
+                Log.WithSuffix(msg).Debug(() => $"OS has requested window MinMaxInfo, structure value: {minmax.ToJson()}");
+                minmax.ptMinTrackSize = new POINT(); // there is a problem with WPF Window which measures MinSize incorrectly 
+                Marshal.StructureToPtr(minmax, lParam, true);
+                Log.WithSuffix(msg).Debug(() => $"Overriding MinMaxInfo with new value: {minmax.ToJson()}");
+                break;
+            }
+            case User32.WindowMessage.WM_WINDOWPOSCHANGING
+                when Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS)) is UnsafeNative.WINDOWPOS wp:
+            {
+                var desiredBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
+                Log.WithSuffix(msg).Debug(() => $"Window position is being changed to {desiredBounds}");
+                break;
+            }
+            case User32.WindowMessage.WM_SIZING
+                when Marshal.PtrToStructure(lParam, typeof(RECT)) is RECT bounds:
+            {
+                Log.WithSuffix(msg).Debug(() => $"Window size is being changed to {bounds}");
+                break;
+            }
+            case User32.WindowMessage.WM_SIZE:
+            {
+                // The low-order word of lParam specifies the new width of the client area.
+                // The high-order word of lParam specifies the new height of the client area.
+                var newSize = new WinSize(lParam.LoWord(), lParam.HiWord());
+                Log.WithSuffix(msg).Debug(() => $"Window size has been changed to {newSize}");
+                break;
+            }
+            case User32.WindowMessage.WM_WINDOWPOSCHANGED
+                when Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS)) is UnsafeNative.WINDOWPOS wp:
             {
                 var newBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
+                Log.WithSuffix(msg).Debug(() => $"Window position has been changed to {newBounds}");
                 var currentBounds = ActualBounds;
                 if (newBounds != currentBounds)
                 {
@@ -250,7 +289,8 @@ public class ConstantAspectRatioWindow : MetroWindow
 
                 break;
             }
-        } 
+        }
+
         return IntPtr.Zero;
     }
 
@@ -261,7 +301,7 @@ public class ConstantAspectRatioWindow : MetroWindow
 
     private IntPtr WindowDragHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (handled || TargetAspectRatio == null )
+        if (handled || TargetAspectRatio == null)
         {
             return IntPtr.Zero;
         }
@@ -286,6 +326,7 @@ public class ConstantAspectRatioWindow : MetroWindow
                 {
                     break;
                 }
+
                 Log.Debug(() => $"Drag mode completed, initialBounds: {dragParams?.InitialBounds} => {ActualBounds}");
                 dragParams = null;
                 break;
@@ -308,7 +349,8 @@ public class ConstantAspectRatioWindow : MetroWindow
                 var minSize = new WpfSize(MinWidth, MinHeight).Scale(Dpi).ToWinSize();
                 var maxSize = new WpfSize(MaxWidth, MaxHeight).Scale(Dpi).ToWinSize();
                 var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
-                var logSuffix = $"initial bounds: {initialBounds}, targetAspectRatio: {aspectRatio}, move bounds: {bounds}";
+                var logSuffix =
+                    $"initial bounds: {initialBounds}, targetAspectRatio: {aspectRatio}, move bounds: {bounds}";
 
                 if (bounds.Size == initialBounds.Size)
                 {
@@ -316,7 +358,8 @@ public class ConstantAspectRatioWindow : MetroWindow
                     break;
                 }
 
-                var newBounds = aspectRatioSizeCalculator.Calculate(aspectRatio, bounds, initialBounds, prioritizeHeight: aspectRatio >= 1);
+                var newBounds = aspectRatioSizeCalculator.Calculate(aspectRatio, bounds, initialBounds,
+                    prioritizeHeight: aspectRatio >= 1);
                 Log.WithSuffix(logSuffix).Debug(() => $"Calculated updated bounds: {newBounds}");
                 newBounds.Width = newBounds.Width.EnsureInRange(minSize.Width, maxSize.Width);
                 newBounds.Height = newBounds.Height.EnsureInRange(minSize.Height, maxSize.Height);
@@ -345,6 +388,7 @@ public class ConstantAspectRatioWindow : MetroWindow
                         handled = true;
                     }
                 }
+
                 break;
         }
 
@@ -383,7 +427,8 @@ public class ConstantAspectRatioWindow : MetroWindow
             return default;
         }
 
-        var dpiResult = SHCore.GetDpiForMonitor(handleMonitor, MONITOR_DPI_TYPE.MDT_DEFAULT, out var dpiX, out var dpiY);
+        var dpiResult =
+            SHCore.GetDpiForMonitor(handleMonitor, MONITOR_DPI_TYPE.MDT_DEFAULT, out var dpiX, out var dpiY);
         if (dpiResult.Failed)
         {
             return default;

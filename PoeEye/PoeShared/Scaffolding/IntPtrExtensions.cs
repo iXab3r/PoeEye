@@ -7,4 +7,14 @@ public static class IntPtrExtensions
         var handle = value.ToInt64();
         return handle.ToHexadecimal();
     }
+
+    public static ushort LoWord(this IntPtr value)
+    {
+        return unchecked((ushort)((uint)value & ushort.MaxValue));
+    }
+    
+    public static ushort HiWord(this IntPtr value)
+    {
+        return unchecked((ushort)((uint)value >> 16));
+    }
 }
