@@ -2,7 +2,6 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
-using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace WindowsHook.WinApi;
@@ -24,8 +23,4 @@ internal static class MouseNativeMethods
     /// </remarks>
     [DllImport("user32")]
     internal static extern int GetDoubleClickTime();
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool GetCursorPos(ref Point pt);
 }

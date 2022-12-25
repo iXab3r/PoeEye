@@ -173,12 +173,6 @@ public partial class UnsafeNative
         }
     }
 
-    public static Point GetMousePosition() 
-    {
-        User32.GetCursorPos(out var pt);
-        return new Point(pt.x, pt.y);
-    }
-
     public static string GetWindowTitle(IntPtr hwnd)
     {
         try

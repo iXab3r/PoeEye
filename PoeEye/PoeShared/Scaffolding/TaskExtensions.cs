@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Threading;
 
 namespace PoeShared.Scaffolding;
@@ -5,26 +6,56 @@ namespace PoeShared.Scaffolding;
 public static class TaskExtensions
 {
     private static readonly IFluentLog Log = typeof(TaskExtensions).PrepareLogger();
+    private static readonly int MinWaitHandleTimeoutInMs = 20;
 
     public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout)
     {
         Sleep(cancellationToken, timeout, Log);
     }
-    
-    public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout, IFluentLog log)
+
+    public static void Sleep(this CancellationToken cancellationToken, int millisecondsTimeout, IFluentLog log)
     {
         var sw = Stopwatch.StartNew();
-        log.Debug(() => $"Sleeping for {timeout}");
-        var cancelled = cancellationToken.WaitHandle.WaitOne(timeout);
-        sw.Stop();
-        if (cancelled)
+        bool cancelled;
+        if (millisecondsTimeout < MinWaitHandleTimeoutInMs)
         {
-            log.Warn(() => $"Sleep for {timeout} was interrupted after {sw.Elapsed}");
+            log.Debug(() => $"Sleeping for {millisecondsTimeout}ms using context-switching");
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (sw.ElapsedMilliseconds >= millisecondsTimeout)
+                {
+                    break;
+                }
+                Thread.Sleep(1);
+            }
+            cancelled = cancellationToken.IsCancellationRequested;
         }
         else
         {
-            log.Debug(() => $"Sleep for {timeout} has completed after {sw.Elapsed}");
+            log.Debug(() => $"Sleeping for {millisecondsTimeout}ms");
+            cancelled = cancellationToken.WaitHandle.WaitOne(millisecondsTimeout);
         }
+        sw.Stop();
+        if (cancelled)
+        {
+            log.Warn(() => $"Sleep for {millisecondsTimeout} was interrupted after {sw.ElapsedMilliseconds}ms");
+        }
+        else
+        {
+            if (sw.ElapsedMilliseconds > millisecondsTimeout * 2)
+            {
+                log.Warn(() => $"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms which is much longer than expected");
+            }
+            else
+            {
+                log.Debug(() => $"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms");
+            }
+        }
+    }
+    
+    public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout, IFluentLog log)
+    {
+        Sleep(cancellationToken, (int)timeout.TotalMilliseconds, log);
     }
     
     public static async Task<TResult> TimeoutAfter<TResult>(this Task<TResult> task, TimeSpan timeout)

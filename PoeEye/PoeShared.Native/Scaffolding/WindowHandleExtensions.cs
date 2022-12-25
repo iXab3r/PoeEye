@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using PInvoke;
 
 namespace PoeShared.Scaffolding;
