@@ -3,7 +3,8 @@
                              xmlns:eye="clr-namespace:PoeShared.UI"
                              xmlns:system="clr-namespace:System;assembly=System.Runtime"
                              xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
-                             xmlns:themes="clr-namespace:PoeShared.Themes">
+                             xmlns:themes="clr-namespace:PoeShared.Themes"
+                             xmlns:st="http://schemas.spicytaco.io/">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -74,7 +75,7 @@
         <Setter Property="IsHitTestVisible" Value="True" />
         <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
     </Style>
-
+    
     <Style TargetType="{x:Type TextBlock}" x:Key="ErrorIconTextBlock" BasedOn="{StaticResource IconTextBlock}">
         <Setter Property="Text" Value="{x:Static themes:AwesomeIcons.ErrorIcon}" />
         <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
@@ -167,5 +168,24 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
+    
+    <ControlTemplate x:Key="InformationIconLabelTemplate" TargetType="{x:Type Label}">
+        <st:StackPanel Orientation="Horizontal" ToolTip="{TemplateBinding ToolTip}" 
+                       IsHitTestVisible="True" 
+                       Background="Transparent">
+            <Label Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                   HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                   VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                   Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Converter={StaticResource NullToCollapsedConverter}}"/>
+            <TextBlock Style="{StaticResource InformationIconTextBlock}"
+                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ToolTip, Converter={StaticResource NullToCollapsedConverter}}"/>
+        </st:StackPanel>
+    </ControlTemplate>
+    
+    <Style x:Key="InformationIconLabel" TargetType="{x:Type Label}">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template" Value="{StaticResource InformationIconLabelTemplate}"/>
+    </Style>
 </eye:SharedResourceDictionary>

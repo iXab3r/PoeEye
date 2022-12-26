@@ -6,18 +6,18 @@ namespace PoeShared.UI;
 public enum UserInputBlockType
 {
     [EnumMember(Value = nameof(None))]
-    [Description("Allow user input")]
+    [Description("Disabled")]
     None,
     [EnumMember(Value = nameof(All))]
-    [Description("Block all input")]
+    [Description("Block All input")]
     All,
     [EnumMember(Value = nameof(Keyboard))]
-    [Description("Block keyboard input")]
+    [Description("Block Keyboard input")]
     Keyboard,
     [EnumMember(Value = nameof(Mouse))]
-    [Description("Block mouse input")]
+    [Description("Block Mouse input")]
     Mouse,
     [EnumMember(Value = nameof(MouseMove))]
-    [Description("Block mouse movement")]
+    [Description("Block Mouse movement")]
     MouseMove
 }
