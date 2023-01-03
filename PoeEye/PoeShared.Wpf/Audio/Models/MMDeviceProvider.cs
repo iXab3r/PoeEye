@@ -79,9 +79,19 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
                 }
             }, Log.HandleUiException)
             .AddTo(Anchors);
+
+        DevicesById = Devices
+            .ToObservableChangeSet()
+            .Transform(deviceId => new {Mixer = GetMixerControl(deviceId.LineId), DeviceId = deviceId})
+            .AddKey(x => x.DeviceId)
+            .Transform(x => x.Mixer)
+            .DisposeMany()
+            .AsObservableCache();
     }
 
     public IReadOnlyObservableCollection<MMDeviceId> Devices { get; }
+    
+    public IObservableCache<MMDevice, MMDeviceId> DevicesById { get; }
     
     public DataFlow DataFlow { get; }
     

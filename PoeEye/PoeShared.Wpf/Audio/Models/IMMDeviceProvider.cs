@@ -1,3 +1,4 @@
+using DynamicData;
 using JetBrains.Annotations;
 using NAudio.CoreAudioApi;
 using PoeShared.Scaffolding;
@@ -14,6 +15,8 @@ public interface IMMRenderDeviceProvider : IMMDeviceProvider
 
 public interface IMMDeviceProvider
 {
+    IObservableCache<MMDevice, MMDeviceId> DevicesById { get; }
+    
     [CanBeNull]
     MMDevice GetMixerControl([NotNull] string lineId);
 
