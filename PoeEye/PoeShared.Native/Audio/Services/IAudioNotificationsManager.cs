@@ -9,6 +9,8 @@ namespace PoeShared.Audio.Services;
 public interface IAudioNotificationsManager
 {
     ReadOnlyObservableCollection<string> Notifications { get; }
+    
+    WaveOutDevice OutputDevice { get; set; }
 
     Task PlayNotification(AudioNotificationType notificationType);
 
@@ -17,6 +19,5 @@ public interface IAudioNotificationsManager
     /// <param name="volume">Volume, 1.0 is full scale</param>
     Task PlayNotification([NotNull] string notificationName, float volume);
     Task PlayNotification([NotNull] string notificationName, float volume, CancellationToken cancellationToken);
-    Task PlayNotification([NotNull] string notificationName, float volume, WaveOutDevice waveOutDevice, CancellationToken cancellationToken);
     string AddFromFile([NotNull] FileInfo soundFile);
 }

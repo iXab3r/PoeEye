@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using NAudio.Wave;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
@@ -42,6 +43,8 @@ internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAud
     }
 
     public ReadOnlyObservableCollection<string> Notifications => soundLibrarySource.SourceName;
+    
+    public WaveOutDevice OutputDevice { get; set; }
 
     public Task PlayNotification(AudioNotificationType notificationType)
     {
@@ -60,7 +63,7 @@ internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAud
 
     public Task PlayNotification(string notificationName, float volume, CancellationToken cancellationToken)
     {
-        return PlayNotification(notificationName, volume, WaveOutDevice.DefaultDevice, CancellationToken.None);
+        return PlayNotification(notificationName, volume, OutputDevice, CancellationToken.None);
     }
 
     public Task PlayNotification(string notificationName, float volume, WaveOutDevice waveOutDevice, CancellationToken cancellationToken)
@@ -87,7 +90,7 @@ internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAud
             Volume = volume,
             CancellationToken = cancellationToken,
             WaveData = notificationData,
-            OutputDevice = waveOutDevice
+            OutputDevice = waveOutDevice ?? WaveOutDevice.DefaultDevice
         });
     }
 
