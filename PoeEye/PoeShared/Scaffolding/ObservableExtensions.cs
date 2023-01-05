@@ -43,6 +43,13 @@ public static class ObservableExtensions
     {
         return SubscribeSafe(source, onNext, onError, NoOperation);
     }
+    
+    public static IObservable<T> EnableIf<T>(this IObservable<T> source, IObservable<bool> condition)
+    {
+        return condition
+            .Select(x => x ? source : Observable.Empty<T>())
+            .Switch();
+    }
         
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted)
     {
