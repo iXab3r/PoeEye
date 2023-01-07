@@ -25,7 +25,7 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
 
     private readonly IAudioPlayer audioPlayer;
     private readonly ISourceCache<WaveOutDevice, string> devicesSource = new SourceCache<WaveOutDevice, string>(x => x.Id);
-    private readonly MultimediaNotificationClient notificationClient = new MultimediaNotificationClient();
+    private readonly MultimediaNotificationClient notificationClient = new();
     private readonly MMDeviceEnumerator deviceEnumerator;
 
     public WaveOutDeviceSelectorViewModel(

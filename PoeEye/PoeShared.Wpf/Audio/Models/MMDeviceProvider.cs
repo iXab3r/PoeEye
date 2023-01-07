@@ -14,7 +14,7 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
     private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 
-    private readonly SourceListEx<MMDeviceId> microphoneLines = new();
+    private readonly SourceListEx<MMDeviceId> lines = new();
     private readonly MultimediaNotificationClient notificationClient = new();
     private readonly MMDeviceEnumerator deviceEnumerator;
 
@@ -30,7 +30,7 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
     {
         DataFlow = dataFlow;
         deviceEnumerator = new MMDeviceEnumerator().AddTo(Anchors);
-        microphoneLines
+        lines
             .Connect()
             .BindToCollection(out var microphones)
             .SubscribeToErrors(Log.HandleUiException)
@@ -63,19 +63,19 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
             .DistinctUntilChanged(x => x.Dump())
             .SubscribeSafe(newLines =>
             {
-                Log.Debug(() => $"Microphone lines list changed:\n\tCurrent lines list:\n\t\t{microphoneLines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
-                var linesToAdd = newLines.Except(microphoneLines.Items).ToArray();
+                Log.Debug(() => $"Microphone lines list changed:\n\tCurrent lines list:\n\t\t{lines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
+                var linesToAdd = newLines.Except(lines.Items).ToArray();
                 if (linesToAdd.Any())
                 {
                     Log.Debug(() => $"Adding microphone lines: {linesToAdd.Dump()}");
-                    microphoneLines.AddRange(linesToAdd);
+                    lines.AddRange(linesToAdd);
                 }
 
-                var linesToRemove = microphoneLines.Items.Except(newLines).ToArray();
+                var linesToRemove = lines.Items.Except(newLines).ToArray();
                 if (linesToRemove.Any())
                 {
                     Log.Debug(() => $"Removing microphone lines: {linesToRemove.Dump()}");
-                    microphoneLines.RemoveMany(linesToRemove);
+                    lines.RemoveMany(linesToRemove);
                 }
             }, Log.HandleUiException)
             .AddTo(Anchors);
