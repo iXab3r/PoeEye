@@ -1,11 +1,24 @@
 <eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                               xmlns:viewModels1="clr-namespace:PoeShared.Audio.ViewModels"
-                              xmlns:eye="clr-namespace:PoeShared.UI">
+                              xmlns:eye="clr-namespace:PoeShared.UI"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:editors="http://wpfcontrols.com/"
+                              xmlns:models1="clr-namespace:PoeShared.Audio.Models">
     <DataTemplate DataType="{x:Type viewModels1:WaveOutDeviceSelectorViewModel}">
-        <ComboBox ItemsSource="{Binding Devices}"
-                  SelectedItem="{Binding SelectedItem}"
-                  ToolTip="Select Audio Output device"
-                  DisplayMemberPath="Name" />
+        <st:StackPanel st:AutoGrid.RowHeightOverride="40" Orientation="Horizontal" >
+            <editors:AutoCompleteComboBox st:StackPanel.Fill="Fill"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                          ToolTip="Microphone line"
+                                          Provider="{Binding KnownDevices}"
+                                          Text="{Binding SelectedItem.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <editors:AutoCompleteComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models1:MMDeviceId}">
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </editors:AutoCompleteComboBox.ItemTemplate>
+            </editors:AutoCompleteComboBox>
+        </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>

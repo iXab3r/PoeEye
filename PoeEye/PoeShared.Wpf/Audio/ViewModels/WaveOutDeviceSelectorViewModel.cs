@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using AutoCompleteTextBox.Editors;
 using DynamicData;
 using NAudio.CoreAudioApi;
 using NAudio.Utils;
@@ -39,7 +40,7 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
             .OnItemRemoved(x => Log.Debug(() => $"Removed WaveOut device: {x}"))
             .OnItemUpdated((prev, curr) => Log.Debug(() => $"Updated WaveOut device, previous: {prev}, current: {curr}"))
             .ObserveOn(uiScheduler)
-            .Bind(out var devices)
+            .BindToCollection(out var devices)
             .SubscribeToErrors(Log.HandleException)
             .AddTo(Anchors);
         Devices = devices;
@@ -74,12 +75,16 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
             .Where(x => x == null)
             .SubscribeSafe(_ => SelectedItem = WaveOutDevice.DefaultDevice, Log.HandleException)
             .AddTo(Anchors);
+        
+        KnownDevices = new AutoCompleteSuggestionProvider<WaveOutDevice>(devices);
     }
 
     public WaveOutDevice SelectedItem { get; set; }
 
-    public ReadOnlyObservableCollection<WaveOutDevice> Devices { get; }
+    public IReadOnlyObservableCollection<WaveOutDevice> Devices { get; }
         
+    public IComboSuggestionProvider KnownDevices { get; }
+    
     public void SelectById(string deviceId)
     {
         if (string.IsNullOrEmpty(deviceId) || SelectedItem?.Id == deviceId)

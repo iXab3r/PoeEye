@@ -28,11 +28,11 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
         Log.Debug(() => $"Retrieving MMDevices");
 
         using var deviceEnumerator = new MMDeviceEnumerator();
-        var mmDevices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+        var mmDevices =  deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
         try
         {
             Log.Debug(() => $"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
-            var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(idx =>
+            var waveOutDevices = Enumerable.Range(1, WaveOut.DeviceCount).Select(idx =>
             {
                 try
                 {

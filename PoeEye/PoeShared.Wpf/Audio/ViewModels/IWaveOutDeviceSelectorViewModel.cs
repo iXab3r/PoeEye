@@ -8,7 +8,7 @@ public interface IWaveOutDeviceSelectorViewModel : IDisposableReactiveObject
 {
     WaveOutDevice SelectedItem { get; set; }
         
-    ReadOnlyObservableCollection<WaveOutDevice> Devices { get; }
+    IReadOnlyObservableCollection<WaveOutDevice> Devices { get; }
 
     void SelectById(string deviceId);
 }
