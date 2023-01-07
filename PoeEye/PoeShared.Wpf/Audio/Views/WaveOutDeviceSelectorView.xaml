@@ -4,7 +4,8 @@
                               xmlns:eye="clr-namespace:PoeShared.UI"
                               xmlns:st="http://schemas.spicytaco.io/"
                               xmlns:editors="http://wpfcontrols.com/"
-                              xmlns:models1="clr-namespace:PoeShared.Audio.Models">
+                              xmlns:models1="clr-namespace:PoeShared.Audio.Models"
+                              xmlns:services="clr-namespace:PoeShared.Audio.Services;assembly=PoeShared.Native">
     <DataTemplate DataType="{x:Type viewModels1:WaveOutDeviceSelectorViewModel}">
         <st:StackPanel st:AutoGrid.RowHeightOverride="40" Orientation="Horizontal" >
             <editors:AutoCompleteComboBox st:StackPanel.Fill="Fill"
@@ -14,7 +15,7 @@
                                           Text="{Binding SelectedItem.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <editors:AutoCompleteComboBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models1:MMDeviceId}">
+                    <DataTemplate DataType="{x:Type services:WaveOutDevice}">
                         <TextBlock Text="{Binding Name}"/>
                     </DataTemplate>
                 </editors:AutoCompleteComboBox.ItemTemplate>
