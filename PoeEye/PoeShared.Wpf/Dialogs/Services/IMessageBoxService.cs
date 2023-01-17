@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using PoeShared.Dialogs.ViewModels;
 using PoeShared.Scaffolding; 
 
 namespace PoeShared.Dialogs.Services;
 
-public interface IMessageBoxService : IDisposableReactiveObject
+public interface IMessageBoxService : INotifyPropertyChanged
 {
     bool IsOpen { get; }
     

@@ -1,7 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System.Linq.Dynamic.Core;
+﻿using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.CustomTypeProviders;
-using System.Linq.Expressions;
 using System.Reflection;
 using PropertyBinder;
 
@@ -16,7 +14,7 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
     protected static readonly Binder<ExpressionWatcherBase> Binder = new();
 
-    private static readonly PassthroughLinkCustomTypeProvider CustomTypeProvider = new PassthroughLinkCustomTypeProvider();
+    private static readonly PassthroughLinkCustomTypeProvider CustomTypeProvider = new();
 
     static ExpressionWatcherBase()
     {
