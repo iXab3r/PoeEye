@@ -69,6 +69,7 @@ public static class AwesomeIcons
     public const string Space = " ";
     public const string StopOutlined = "\uf28e";
     public const string Stop = "\uf28d";
+    public const string Thermometer = "\uf2c7";
     public const string Undo = "\uf0e2";
     public const string Unlink = "\uf127";
     public const string Warning = "\uf071";
