@@ -17,8 +17,30 @@ public class ScrollViewerExtensions
 
     private static void AutoScrollPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
     {
-        var scrollViewer = sender as ScrollViewer ?? sender.FindChild<ScrollViewer>(string.Empty);
-        if ((bool) args.NewValue)
+        var element = sender as FrameworkElement;
+        if (element == null)
+        {
+            return;
+        }
+
+        if (!element.IsLoaded)
+        {
+            element.Loaded += delegate
+            {
+                AutoScrollPropertyChanged(sender, args);
+            };
+        }
+        else
+        {
+            BindToScrollViewer(element, (bool)args.NewValue);
+        }
+    }
+
+
+    private static void BindToScrollViewer(DependencyObject root, bool scrollToEnd)
+    {
+        var scrollViewer = root as ScrollViewer ?? root.FindChild<ScrollViewer>(string.Empty);
+        if (scrollToEnd)
         {
             scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             scrollViewer.ScrollToEnd();
