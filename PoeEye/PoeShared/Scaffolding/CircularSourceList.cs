@@ -2,6 +2,10 @@
 
 namespace PoeShared.Scaffolding;
 
+/// <summary>
+/// Not thread safe ! There is a bug in ChangeAwareList(?) that leads to ArgumentOutOfRange in some cases
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservableList<T>
 {
     private readonly int capacity;
