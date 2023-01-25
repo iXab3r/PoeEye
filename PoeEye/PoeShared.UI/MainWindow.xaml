@@ -36,8 +36,7 @@
                         <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowInTaskbar}">Show in taskbar</CheckBox>    
                         <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowTitleBar}">Show title bar</CheckBox>    
                         
-                        
-                        <GroupBox Header="Color picker">
+                        <Expander Header="Color picker">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:HotKeyBox
                                     x:Name="HotkeyEditor" />
@@ -46,9 +45,23 @@
                                 <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseKeys, Mode=TwoWay}">AcceptsMouseKeys</CheckBox>    
                                 <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseWheel, Mode=TwoWay}">AcceptsMouseWheel</CheckBox>    
                             </st:StackPanel>
-                        </GroupBox>
+                        </Expander>
+                        
+                        <Expander Header="Range slider">
+                            <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
+                                <Slider Value="{Binding ElementName=RangeSlider, Path=LowerValue}"  
+                                        TickFrequency="{Binding ElementName=RangeSlider, Path=TickFrequency}"
+                                        Minimum="{Binding ElementName=RangeSlider, Path=Minimum}" 
+                                        Maximum="{Binding ElementName=RangeSlider, Path=Maximum}" />
+                                <eye:RangeSlider st:StackPanel.Fill="Fill" x:Name="RangeSlider" Minimum="0" Maximum="100" TickFrequency="0.01"/>
+                                <Slider Value="{Binding ElementName=RangeSlider, Path=UpperValue}" 
+                                        TickFrequency="{Binding ElementName=RangeSlider, Path=TickFrequency}"
+                                        Minimum="{Binding ElementName=RangeSlider, Path=Minimum}" 
+                                        Maximum="{Binding ElementName=RangeSlider, Path=Maximum}" />
+                            </st:StackPanel>
+                        </Expander>
 
-                        <GroupBox Header="Color picker">
+                        <Expander Header="Color picker">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:ColorPickerEx x:Name="ColorPickerEx" Color="{Binding Color}" PickerDock="Right" />
                                 <eye:ColorPickerEx Color="{Binding Color}" PickerDock="Left" />
@@ -56,23 +69,23 @@
                                 <TextBlock Text="{Binding ElementName=ColorPickerEx, Path=ColorWithoutAlpha, Converter={StaticResource ColorToStringConverter}, StringFormat='Color w/Alpha: {0}'}" />
                                 <TextBlock Text="{Binding ElementName=ColorPickerEx, Path=Alpha, StringFormat='Alpha: {0}'}" />
                             </st:StackPanel>
-                        </GroupBox>
+                        </Expander>
                         
-                        <GroupBox Header="Numeric up/down">
+                        <Expander Header="Numeric up/down">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:NumericUpDownEx Value="100" Width="100" IsMouseDragEnabled="True" />
                                 <eye:NumericUpDownEx Value="1000" Width="100" />
                             </st:StackPanel>
-                        </GroupBox>
+                        </Expander>
                         
-                        <GroupBox Header="Random period selector">
+                        <Expander Header="Random period selector">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:CachedContentControl Content="{Binding RandomPeriodSelector}" />
                                 <eye:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
                                 <TextBlock Text="{Binding RandomPeriod}" />
                             </st:StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Fallback">
+                        </Expander>
+                        <Expander Header="Fallback">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <TextBox MinWidth="120" Text="{Binding FallbackValue.Value}" materialDesign:TextFieldAssist.SuffixText="value" />
                                 <TextBox MinWidth="120" Text="{Binding FallbackValue.DefaultValue}" materialDesign:TextFieldAssist.SuffixText="default" />
@@ -81,16 +94,16 @@
                                 <TextBlock Text="{Binding FallbackValue.HasActualValue, StringFormat='HasValue: {0}'}" />
                                 <TextBlock Text="{Binding FallbackValue.DefaultValue, StringFormat='Default: {0}'}" />
                             </st:StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Box with hint">
+                        </Expander>
+                        <Expander Header="Box with hint">
                             <st:StackPanel Orientation="Horizontal">
                                 <TextBlock Text="" />
                                 <TextBox materialDesign:HintAssist.Hint="With hint" />
                                 <TextBlock Text="Box without hint" />
                                 <TextBox />
                             </st:StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Audio notification selector">
+                        </Expander>
+                        <Expander Header="Audio notification selector">
                             <st:StackPanel Orientation="Horizontal" >
                                 <eye:CachedContentControl Content="{Binding AudioNotificationSelector}"
                                                           Height="32" Width="32"
@@ -98,8 +111,8 @@
                                 <eye:CachedContentControl Content="{Binding AudioNotificationSelector}"
                                                           Width="200"/>
                             </st:StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Outlined Textblock">
+                        </Expander>
+                        <Expander Header="Outlined Textblock">
                             <st:StackPanel Orientation="Vertical">
                                 <st:StackPanel Orientation="Horizontal">
                                     <TextBox x:Name="OutlinedTextBlockText"
@@ -125,8 +138,8 @@
                                                            StrokeThickness="{Binding ElementName=OutlinedTextBlockStrokeThickness, Path=Value}" />
                                 </Border>
                             </st:StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Cached content control">
+                        </Expander>
+                        <Expander Header="Cached content control">
                             <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
                                 <eye:CachedContentControl Content="{Binding FakeDelay}" BorderBrush="Red" BorderThickness="1" Width="100" />
                                 <TextBlock Text="LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NullToCollapsedConverter}}" Width="120" />
@@ -149,8 +162,8 @@
                                     </Button.CommandParameter>
                                 </Button>
                             </st:StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Combobox">
+                        </Expander>
+                        <Expander Header="Combobox">
                             <ComboBox Width="200">
                                 <ComboBoxItem>Item 1</ComboBoxItem>
                                 <ComboBoxItem>Item 2</ComboBoxItem>
@@ -171,7 +184,7 @@
                                 <ComboBoxItem>Item 17</ComboBoxItem>
                                 <ComboBoxItem>Item 18</ComboBoxItem>
                             </ComboBox>
-                        </GroupBox>
+                        </Expander>
                     </st:StackPanel>
                 </ScrollViewer>
             </TabItem>

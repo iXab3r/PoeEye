@@ -45,10 +45,9 @@
                             Background="{Binding ElementName=Root, Path=TrackBackground}"
                             CornerRadius="5"/>
                 
-                    <Border BorderThickness="0,1,0,0" 
-                            BorderBrush="Black" 
-                            VerticalAlignment="Center" 
-                            Height="1" 
+                    <Border VerticalAlignment="Center" 
+                            Height="2"
+                            Background="{DynamicResource PrimaryHueMidBrush}"
                             Margin="5,0,5,0"/>
             
                     <Slider x:Name="LowerSlider"
@@ -57,14 +56,14 @@
                             Value="{Binding ElementName=Root, Path=LowerValue}"
                             TickFrequency="{Binding ElementName=Root, Path=TickFrequency}"
                             Style="{StaticResource FastSlider}"
-                            Margin="0,0,30,0" />
+                            Margin="0,0,14,0" />
                     <Slider x:Name="UpperSlider"
                             Minimum="{Binding ElementName=Root, Path=Minimum}"
                             Maximum="{Binding ElementName=Root, Path=Maximum}"
                             Value="{Binding ElementName=Root, Path=UpperValue}"
                             TickFrequency="{Binding ElementName=Root, Path=TickFrequency}"
                             Style="{StaticResource FastSlider}"
-                            Margin="30,0,0,0" />
+                            Margin="14,0,0,0" />
                     
             </Grid>
     </Grid>

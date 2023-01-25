@@ -7,6 +7,7 @@
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.slider.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="FastSliderThumb" TargetType="Thumb">
@@ -20,6 +21,7 @@
     </ControlTemplate>
 
     <Style x:Key="FastSlider" TargetType="{x:Type Slider}">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Slider}">
@@ -34,10 +36,12 @@
                             </Grid.RowDefinitions>
 
                             <Rectangle x:Name="PART_SelectionRange" />
-                            
+
                             <Track x:Name="PART_Track" Grid.Row="1">
                                 <Track.Thumb>
-                                    <Thumb x:Name="Thumb" Template="{StaticResource FastSliderThumb}" />
+                                    <Thumb x:Name="Thumb" 
+                                           Foreground="{TemplateBinding Foreground}"
+                                           Template="{StaticResource MaterialDesignSliderThumb}" />
                                 </Track.Thumb>
                             </Track>
                         </Grid>
