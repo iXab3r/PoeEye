@@ -309,13 +309,29 @@ public static class ObservableExtensions
         return instance.ToProperty(instancePropertyExtractor, sourceObservable, default, false, scheduler);
     }
     
+    /// <summary>
+    /// https://www.zerobugbuild.com/?p=192
+    /// This is a problem that comes up when the UI dispatcher can’t keep up with inbound activity.
+    /// the example I saw on a project was a price stream that had to be displayed on the UI that could get very busy.
+    /// If more than one new price arrives on background threads in between dispatcher time slices, there is no point displaying anything but the most recent price – in fact we want the UI to “catch up” by dropping all but the most recent undisplayed price.
+    /// So the operation is like an ObserveOn that drops all but the most recent events. Here’s a picture of what’s happening – notice how price 2 is dropped and how prices are only published during the dispatcher time slice:
+    /// The key idea here is that we keep track of the notification to be pushed on to the target scheduler in pendingNotification – and whenever an event is received, we swap the pendingNotification for the new notification. We ensure the new notification will be scheduled for dispatch on the target scheduler – but we may not need to do this…
+    /// If the previousNotification is null we know that either (a) there was no previous notification as this is the first one or (b) the previousNotification was already dispatched. How to we know this? Because in the scheduler action that does the dispatch we swap the pendingNotification for null! So if previousNotification is null, we know we must schedule a new dispatch action.
+    /// This approach keeps the checks, locks and scheduled actions to a minimum.
+    /// Notes and credits:
+    /// I’ve gone round the houses a few times on this implementation – my own attempts to improve it to use CAS rather than lock ran into bugs, so the code below is largely due to Lee Campbell, and edited for RX 2.0 support by Wilka Hudson. For an interesting discussion on this approach see this thread on the official RX forum.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="scheduler"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IObservable<T> ObserveLatestOn<T>(this IObservable<T> source, IScheduler scheduler)
     {
         return Observable.Create<T>(observer =>
         {
-            Notification<T> outsideNotification = null;
+            Notification<T> outsideNotification;
             var gate = new object();
-            bool active = false;
+            var active = false;
             var cancelable = new MultipleAssignmentDisposable();
             var disposable = source.Materialize().Subscribe(thisNotification =>
             {
@@ -331,14 +347,14 @@ public static class ObservableExtensions
                 {
                     cancelable.Disposable = scheduler.Schedule(self =>
                     {
-                        Notification<T> localNotification = null;
+                        Notification<T> localNotification;
                         lock (gate)
                         {
                             localNotification = outsideNotification;
                             outsideNotification = null;
                         }
                         localNotification.Accept(observer);
-                        bool hasPendingNotification = false;
+                        bool hasPendingNotification;
                         lock (gate)
                         {
                             hasPendingNotification = active = (outsideNotification != null);
@@ -352,5 +368,22 @@ public static class ObservableExtensions
             });
             return new CompositeDisposable(disposable, cancelable);
         });
+    }
+
+    /// <summary>
+    /// Allows to attach TTL to each value of the stream. If next value is not produced in expected time slice, fallback value is sent into stream as replacement until next value is propagated.
+    /// </summary>
+    /// <returns></returns>
+    public static IObservable<T> WithExpirationTime<T>(
+        this IObservable<T> source, 
+        TimeSpan expirationTime,
+        Func<T, T> fallbackValueSupplier)
+    {
+        if (expirationTime <= TimeSpan.Zero)
+        {
+            return source;
+        }
+        return source
+            .Select(x => Observable.Return(x).Concat(Observable.Timer(expirationTime).Select(_ => fallbackValueSupplier(x)).Take(1))).Switch();
     }
 }
