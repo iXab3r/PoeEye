@@ -26,19 +26,19 @@
         </Grid.ColumnDefinitions>
             <ui:NumericUpDownEx Grid.Column="0" 
                                  Margin="2.5,0" MinWidth="40"
-                                 StringFormat="F0"
+                                 StringFormat="{Binding ElementName=Root, Path=TickFrequency, Converter={StaticResource NumericToStringFormatConverter}}"
                                  Value="{Binding ElementName=LowerSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
                                  Minimum="{Binding ElementName=Root, Path=Minimum}"
                                  Maximum="{Binding ElementName=Root, Path=Maximum}"
-                                 Interval="1" />
+                                 Interval="{Binding ElementName=Root, Path=TickFrequency}" />
             
             <ui:NumericUpDownEx Grid.Column="2" 
                                  Margin="2.5,0" MinWidth="40"
-                                 StringFormat="F0"
+                                 StringFormat="{Binding ElementName=Root, Path=TickFrequency, Converter={StaticResource NumericToStringFormatConverter}}"
                                  Value="{Binding ElementName=UpperSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
                                  Minimum="{Binding ElementName=Root, Path=Minimum}"
                                  Maximum="{Binding ElementName=Root, Path=Maximum}"
-                                 Interval="1" />
+                                 Interval="{Binding ElementName=Root, Path=TickFrequency}" />
             
             <Grid Grid.Column="1">
                     <Border Margin="0, 7.5"
@@ -55,14 +55,14 @@
                             Minimum="{Binding ElementName=Root, Path=Minimum}"
                             Maximum="{Binding ElementName=Root, Path=Maximum}"
                             Value="{Binding ElementName=Root, Path=LowerValue}"
-                            TickFrequency="1"
+                            TickFrequency="{Binding ElementName=Root, Path=TickFrequency}"
                             Style="{StaticResource FastSlider}"
                             Margin="0,0,30,0" />
                     <Slider x:Name="UpperSlider"
                             Minimum="{Binding ElementName=Root, Path=Minimum}"
                             Maximum="{Binding ElementName=Root, Path=Maximum}"
                             Value="{Binding ElementName=Root, Path=UpperValue}"
-                            TickFrequency="1"
+                            TickFrequency="{Binding ElementName=Root, Path=TickFrequency}"
                             Style="{StaticResource FastSlider}"
                             Margin="30,0,0,0" />
                     

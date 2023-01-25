@@ -65,6 +65,7 @@
     <eyeConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
     <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverter" AllowAlpha="True"/>
     <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverterWithoutAlpha" AllowAlpha="False"/>
+    <eyeConverters:NumericToStringFormatConverter x:Key="NumericToStringFormatConverter" />
     
     <kent:MapConverter x:Key="ZeroToTrueConverter" FallbackValue="{StaticResource FalseValue}" FallbackBehavior="ReturnFallbackValue">
         <kent:Mapping To="{StaticResource TrueValue}">

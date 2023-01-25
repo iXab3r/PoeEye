@@ -8,24 +8,20 @@ namespace PoeShared.UI
 {
     public partial class RangeSlider : UserControl
     {
-        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent(
-            "ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<double[]>), typeof(RangeSlider));
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent("ValueChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<double[]>), typeof(RangeSlider));
 
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register("Minimum", typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(0d));
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(0d));
 
-        public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register("Maximum", typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(1d));
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(1d));
 
-        public static readonly DependencyProperty LowerValueProperty =
-            DependencyProperty.Register("LowerValue", typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty LowerValueProperty = DependencyProperty.Register(nameof(LowerValue), typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        public static readonly DependencyProperty UpperValueProperty =
-            DependencyProperty.Register("UpperValue", typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty UpperValueProperty = DependencyProperty.Register(nameof(UpperValue), typeof(double), typeof(RangeSlider), new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        public static readonly DependencyProperty TrackBackgroundProperty = DependencyProperty.Register(
-            nameof(TrackBackground), typeof(Brush), typeof(RangeSlider), new PropertyMetadata(default(Brush)));
+        public static readonly DependencyProperty TrackBackgroundProperty = DependencyProperty.Register(nameof(TrackBackground), typeof(Brush), typeof(RangeSlider), new PropertyMetadata(default(Brush)));
 
+        public static readonly DependencyProperty TickFrequencyProperty = DependencyProperty.Register(nameof(TickFrequency), typeof(double), typeof(RangeSlider), new PropertyMetadata(default(double)));
+        
         public RangeSlider()
         {
             InitializeComponent();
@@ -61,6 +57,12 @@ namespace PoeShared.UI
         {
             get => (double) GetValue(MaximumProperty);
             set => SetValue(MaximumProperty, value);
+        }
+        
+        public double TickFrequency
+        {
+            get { return (double) GetValue(TickFrequencyProperty); }
+            set { SetValue(TickFrequencyProperty, value); }
         }
 
         void RangeSlider_Loaded(object sender, RoutedEventArgs e)
