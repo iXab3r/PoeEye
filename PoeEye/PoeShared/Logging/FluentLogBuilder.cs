@@ -17,13 +17,13 @@ internal sealed class FluentLogBuilder : IFluentLog
         
     public IMetrics Metrics => App.Metrics.Metrics.Instance ?? throw new InvalidOperationException("Metrics are not initialized yet");
 
-    public bool IsDebugEnabled => logWriter.IsDebugEnabled;
+    public bool IsDebugEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Debug;
 
-    public bool IsInfoEnabled => logWriter.IsInfoEnabled;
+    public bool IsInfoEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Info;
 
-    public bool IsWarnEnabled => logWriter.IsWarnEnabled;
+    public bool IsWarnEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Warn;
 
-    public bool IsErrorEnabled => logWriter.IsErrorEnabled;
+    public bool IsErrorEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Error;
 
     LogData IFluentLog.Data => logData;
 

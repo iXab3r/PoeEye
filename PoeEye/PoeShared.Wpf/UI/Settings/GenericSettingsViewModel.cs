@@ -69,7 +69,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLog
 
     public void SaveConfigs()
     {
-        Log.Info($"Saving settings");
+        Log.Info(() => $"Saving settings");
         moduleSettings.Items.ForEach(SaveConfig);
     }
 

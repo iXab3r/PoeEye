@@ -45,7 +45,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             .AutoConnect();
         WhenExit.SubscribeSafe(x =>
         {
-            Log.Info($"Application exit requested, exit code: {x}");
+            Log.Info(() => $"Application exit requested, exit code: {x}");
             IsExiting = true;
         }, Log.HandleException).AddTo(Anchors);
 
@@ -103,15 +103,15 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         ReportTermination(exitCode);
 
         using var processHandle = Kernel32.GetCurrentProcess();
-        Log.Info($"Closing application via Terminate with code {exitCode}");
+        Log.Info(() => $"Closing application via Terminate with code {exitCode}");
         if (Kernel32.TerminateProcess(processHandle.DangerousGetHandle(), exitCode))
         {
-            Log.Info($"Awaiting for process to exit for {TerminationTimeout}, handle: {processHandle}");
+            Log.Info(() => $"Awaiting for process to exit for {TerminationTimeout}, handle: {processHandle}");
             var waitResult = Kernel32.WaitForSingleObject(processHandle, (int) TerminationTimeout.TotalMilliseconds);
-            Log.Info($"Terminate process wait result: {waitResult}");
+            Log.Info(() => $"Terminate process wait result: {waitResult}");
         }
         Log.Warn($"Failed to Terminate process", new Win32Exception());
-        Log.Info($"Closing application via Environment.Exit with code {exitCode}");
+        Log.Info(() => $"Closing application via Environment.Exit with code {exitCode}");
         Environment.Exit(exitCode);
     }
 
@@ -133,7 +133,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         try
         {
             Shutdown();
-            Log.Info($"Awaiting for termination for {TerminationTimeout}");
+            Log.Info(() => $"Awaiting for termination for {TerminationTimeout}");
             Thread.Sleep(TerminationTimeout);
             Log.Warn($"Application should've terminated by now");
             throw new InvalidStateException("Something went wrong - application failed to Shutdown gracefully");

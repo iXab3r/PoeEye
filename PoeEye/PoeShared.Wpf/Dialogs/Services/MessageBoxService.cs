@@ -55,7 +55,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
 
     public async Task<bool> ShowConfirmation(string title, string content)
     {
-        Log.Info($"Showing message box: { new { title, content }}");
+        Log.Info(() => $"Showing message box: { new { title, content }}");
         var result = await ShowInputBox(
             title,
             content,
@@ -64,13 +64,13 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
             MessageBoxElement.Yes,
             MessageBoxElement.No
         );
-        Log.Info($"Message box result: { new { title, result.DialogResult }}");
+        Log.Info(() => $"Message box result: { new { title, result.DialogResult }}");
         return result.DialogResult == MessageBoxElement.Yes;
     }
 
     public async Task ShowMessage(string title, string content)
     {
-        Log.Info($"Showing message box: { new { title, content }}");
+        Log.Info(() => $"Showing message box: { new { title, content }}");
         var result = await ShowInputBox(
             title,
             content,
@@ -78,7 +78,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
             true,
             MessageBoxElement.Ok
         );
-        Log.Info($"Message box result: { new { title, result.DialogResult }}");
+        Log.Info(() => $"Message box result: { new { title, result.DialogResult }}");
     }
 
     public async Task<string> ShowInputBox(string title, string content, string contentHint)
@@ -130,7 +130,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
 
         var dialogId = $"Dialog#{Interlocked.Increment(ref dialogIdx)}";
         var log = Log.WithSuffix(dialogId);
-        log.Info($"Creating new window for content: {messageBox}");
+        log.Info(() => $"Creating new window for content: {messageBox}");
         
         messageBoxes.Add(messageBox);
         Disposable.Create(() => messageBoxes.Remove(messageBox)).AddTo(windowAnchors);
@@ -158,15 +158,15 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
             }, log.HandleUiException)
             .AddTo(windowAnchors);
         
-        log.Info($"Created new window: {window}");
+        log.Info(() => $"Created new window: {window}");
 
         Disposable.Create(() =>
         {
             try
             {
-                log.Info($"Closing window {window}");
+                log.Info(() => $"Closing window {window}");
                 window.Close();
-                log.Info($"Closed window {window}");
+                log.Info(() => $"Closed window {window}");
             }
             catch (Exception e)
             {
@@ -187,7 +187,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
             window.Topmost = false;
         }).AddTo(windowAnchors);
         var result = window.ShowDialog();
-        log.Info($"Window was closed, result: {result}");
+        log.Info(() => $"Window was closed, result: {result}");
         return capturingCloseController.Result;
     }
 }

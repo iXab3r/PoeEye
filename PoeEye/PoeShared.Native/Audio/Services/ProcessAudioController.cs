@@ -24,7 +24,7 @@ internal sealed class ProcessAudioController : DisposableReactiveObjectWithLogge
         SetIsMuted((sessionControl, volumeController) =>
         {
             var newState = !volumeController.IsMuted;
-            Log.Info($"Matched process {sessionControl.Process}, toggling {nameof(SimpleAudioVolume.IsMuted)} using {volumeController}, isMuted: {volumeController.IsMuted} => {newState}");
+            Log.Info(() => $"Matched process {sessionControl.Process}, toggling {nameof(SimpleAudioVolume.IsMuted)} using {volumeController}, isMuted: {volumeController.IsMuted} => {newState}");
             volumeController.IsMuted = newState;
         }, processMatcher);
     }
@@ -72,7 +72,7 @@ internal sealed class ProcessAudioController : DisposableReactiveObjectWithLogge
     {
         SetIsMuted((sessionControl, volumeController) =>
         {
-            Log.Info($"Matched process {sessionControl.Process}, setting {nameof(SimpleAudioVolume.IsMuted)} to {isMuted} using {volumeController}");
+            Log.Info(() => $"Matched process {sessionControl.Process}, setting {nameof(SimpleAudioVolume.IsMuted)} to {isMuted} using {volumeController}");
             volumeController.IsMuted = isMuted;
         }, processMatcher);
     }

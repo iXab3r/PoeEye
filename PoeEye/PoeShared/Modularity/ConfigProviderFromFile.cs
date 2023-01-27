@@ -26,7 +26,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         IConfigSerializer configSerializer,
         IAppArguments appArguments)
     {
-        Log.Info($"Initializing config provider, profile: {appArguments.Profile}");
+        Log.Info(() => $"Initializing config provider, profile: {appArguments.Profile}");
         MigrateLegacyConfig(appArguments);
         this.configSerializer = configSerializer;
         var candidates = new[]
@@ -42,12 +42,12 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         if (existingFilePath != null)
         {
             ConfigFilePath = existingFilePath.Path;
-            Log.Info($"Using existing configuration file @ {ConfigFilePath}");
+            Log.Info(() => $"Using existing configuration file @ {ConfigFilePath}");
         }
         else
         {
             ConfigFilePath = candidates.Last().Path;
-            Log.Info($"Configuration file not found, using path {ConfigFilePath}");
+            Log.Info(() => $"Configuration file not found, using path {ConfigFilePath}");
         }
 
         if (string.IsNullOrEmpty(ConfigFilePath))
@@ -138,7 +138,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (loadedConfigurationFile == null)
         {
-            Log.Info($"Forcing to load initial configuration from file");
+            Log.Info(() => $"Forcing to load initial configuration from file");
             Reload();
         }
 
@@ -299,7 +299,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (string.IsNullOrEmpty(configName))
         {
-            Log.Info($"Non-legacy profile {appArguments.Profile} - skipping migration");
+            Log.Info(() => $"Non-legacy profile {appArguments.Profile} - skipping migration");
             return;
         }
 

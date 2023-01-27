@@ -151,7 +151,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
         var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
         var size = DefaultSize.IsNotEmpty() ? DefaultSize : MinSize;
         NativeBounds = new Rectangle(center, size);
-        Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
+        Log.Info(() => $"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
 
         if (UnlockWindowCommand.CanExecute(null))
         {

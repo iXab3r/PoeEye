@@ -28,7 +28,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
         IAppArguments appArguments,
         [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
     {
-        Log.Info($"Report items aggregator initialized, config: {config}");
+        Log.Info(() => $"Report items aggregator initialized, config: {config}");
         if (!config.IsValid)
         {
             throw new ArgumentException($"Provided exception dialog config is not valid: {config}");
@@ -54,7 +54,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
     {
         try
         {
-            Log.Info($"Preparing report items infrastructure");
+            Log.Info(() => $"Preparing report items infrastructure");
             Status = "Preparing infrastructure...";
             var crashReportDirectoryPath = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "reports", $"{appArguments.AppName} {appArguments.Version} {appArguments.Profile} Id{CurrentProcessId} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}"));
             if (crashReportDirectoryPath.Exists)

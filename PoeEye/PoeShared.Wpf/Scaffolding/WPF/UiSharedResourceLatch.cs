@@ -37,7 +37,7 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
         this.isBusyAnchor = new SerialDisposable().AddTo(Anchors);
         this.pauseLatch = new SharedResourceLatch($"UI-Pause").AddTo(Anchors);
         this.isBusyLatch = new SharedResourceLatch($"UI-IsBusy").AddTo(Anchors);
-        Log.Info($"UI latch is initialized");
+        Log.Info(() => $"UI latch is initialized");
 
         isBusyLatch.WhenAnyValue(x => x.IsBusy)
             .SubscribeSafe(HandleIsBusyChange, Log.HandleUiException)
@@ -94,9 +94,9 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
                 Log.Debug("Scheduling IsBusy reset");
                 isBusyAnchor.Disposable = uiIdleScheduler.Schedule(() =>
                 {
-                    Log.Info($"Resetting IsBusy: {IsBusy} => false");
+                    Log.Info(() => $"Resetting IsBusy: {IsBusy} => false");
                     IsBusy = false;
-                    Log.Info($"Reset IsBusy to {IsBusy}");
+                    Log.Info(() => $"Reset IsBusy to {IsBusy}");
                 });
                 Log.Debug("Scheduled IsBusy reset");
                 break;

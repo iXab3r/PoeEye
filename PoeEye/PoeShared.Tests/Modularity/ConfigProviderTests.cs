@@ -35,7 +35,7 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
     protected override void SetUp()
     {
         var appDataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appdata");
-        Log.Info($"AppData: {appDataDirectory} (exists: {Directory.Exists(appDataDirectory)})");
+        Log.Info(() => $"AppData: {appDataDirectory} (exists: {Directory.Exists(appDataDirectory)})");
         appArguments = new Mock<IAppArguments>();
         appArguments
             .SetupGet(x => x.SharedAppDataDirectory)
@@ -61,10 +61,10 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
         if (Directory.Exists(appDataDirectory))
         {
             var filesToRemove = Directory.GetFiles(appDataDirectory);
-            Log.Info($"Cleaning up directory {appDataDirectory}, files: {filesToRemove.DumpToString()}");
+            Log.Info(() => $"Cleaning up directory {appDataDirectory}, files: {filesToRemove.DumpToString()}");
             foreach (var file in filesToRemove)
             {
-                Log.Info($"Removing file {file}");
+                Log.Info(() => $"Removing file {file}");
                 File.Delete(file);
             }
         }

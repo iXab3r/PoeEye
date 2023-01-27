@@ -36,17 +36,17 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         if (existingDirectory != null)
         {
             configDirectory = existingDirectory;
-            Log.Info($"Using existing configuration directory {configDirectory}");
+            Log.Info(() => $"Using existing configuration directory {configDirectory}");
         }
         else
         {
             configDirectory = candidates.Last();
-            Log.Info($"Configuration directory not found, using {configDirectory}");
+            Log.Info(() => $"Configuration directory not found, using {configDirectory}");
         }
 
         if (!configDirectory.Exists)
         {
-            Log.Info($"Creating configuration directory: {configDirectory.FullName}");
+            Log.Info(() => $"Creating configuration directory: {configDirectory.FullName}");
             Directory.CreateDirectory(configDirectory.FullName);
         }
     }

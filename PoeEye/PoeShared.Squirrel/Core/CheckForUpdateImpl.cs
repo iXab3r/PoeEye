@@ -116,7 +116,7 @@ internal class CheckForUpdateImpl : IEnableLogger
             updateUrlOrPath = updateUrlOrPath.Substring(0, updateUrlOrPath.Length - 1);
         }
 
-        Log.Info($"Downloading RELEASES file from {updateUrlOrPath}");
+        Log.Info(() => $"Downloading RELEASES file from {updateUrlOrPath}");
 
         var retries = 3;
 
@@ -161,7 +161,7 @@ internal class CheckForUpdateImpl : IEnableLogger
             
     private static async Task<string> LoadLocalReleases(string updateUrlOrPath)
     {
-        Log.Info($"Reading RELEASES file from {updateUrlOrPath}");
+        Log.Info(() => $"Reading RELEASES file from {updateUrlOrPath}");
 
         if (!Directory.Exists(updateUrlOrPath))
         {
@@ -245,7 +245,7 @@ internal class CheckForUpdateImpl : IEnableLogger
                 throw new Exception("File was read but contents were invalid");
             }
 
-            Log.Info($"Using existing staging user ID: {ret.ToString()}");
+            Log.Info(() => $"Using existing staging user ID: {ret.ToString()}");
             return ret;
         }
         catch (Exception ex)
@@ -268,7 +268,7 @@ internal class CheckForUpdateImpl : IEnableLogger
         try
         {
             File.WriteAllText(stagedUserIdFile, ret.ToString(), Encoding.UTF8);
-            Log.Info($"Generated new staging user ID: {ret}");
+            Log.Info(() => $"Generated new staging user ID: {ret}");
             return ret;
         }
         catch (Exception ex)

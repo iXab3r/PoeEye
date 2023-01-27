@@ -82,7 +82,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
                 .ForEach(
                     x =>
                     {
-                        Log.Info($"{x} was in old package but not in new one, deleting");
+                        Log.Info(() => $"{x} was in old package but not in new one, deleting");
                         File.Delete(Path.Combine(workingPath, x));
                     });
 
@@ -93,11 +93,11 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
                 .ForEach(
                     x =>
                     {
-                        Log.Info($"Updating metadata file: {x}");
+                        Log.Info(() => $"Updating metadata file: {x}");
                         File.Copy(Path.Combine(deltaPath, x), Path.Combine(workingPath, x), true);
                     });
 
-            Log.Info($"Repacking into full package: {outputFile}");
+            Log.Info(() => $"Repacking into full package: {outputFile}");
             using (var za = ZipArchive.Create())
             using (var tgt = File.OpenWrite(outputFile ?? throw new ArgumentNullException(nameof(outputFile))))
             {
@@ -125,7 +125,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
 
         if (!baseFileListing.ContainsKey(relativePath))
         {
-            Log.Info($"{relativePath} not found in base package, marking as new");
+            Log.Info(() => $"{relativePath} not found in base package, marking as new");
             return;
         }
 
@@ -134,7 +134,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
 
         if (BytesAreIdentical(oldData, newData))
         {
-            Log.Info($"{relativePath} hasn't changed, writing dummy file");
+            Log.Info(() => $"{relativePath} hasn't changed, writing dummy file");
 
             File.Create(targetFile.FullName + ".diff").Dispose();
             File.Create(targetFile.FullName + ".shasum").Dispose();
@@ -142,7 +142,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
             return;
         }
 
-        Log.Info($"Delta patching {baseFileListing[relativePath]} => {targetFile.FullName}");
+        Log.Info(() => $"Delta patching {baseFileListing[relativePath]} => {targetFile.FullName}");
         var msDelta = new MsDeltaCompression();
 
         if (targetFile.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) ||
@@ -203,7 +203,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
             // NB: Zero-length diffs indicate the file hasn't actually changed
             if (new FileInfo(inputFile).Length == 0)
             {
-                Log.Info($"{relativeFilePath} exists unchanged, skipping");
+                Log.Info(() => $"{relativeFilePath} exists unchanged, skipping");
                 return;
             }
 
@@ -212,7 +212,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
                 using (var of = File.OpenWrite(tempTargetFile))
                 using (var inf = File.OpenRead(finalTarget))
                 {
-                    Log.Info($"Applying BSDiff to {relativeFilePath}");
+                    Log.Info(() => $"Applying BSDiff to {relativeFilePath}");
                     BinaryPatchUtility.Apply(inf, () => File.OpenRead(inputFile), of);
                 }
 
@@ -220,7 +220,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
             }
             else if (relativeFilePath.EndsWith(".diff", StringComparison.InvariantCultureIgnoreCase))
             {
-                Log.Info($"Applying MSDiff to {relativeFilePath}");
+                Log.Info(() => $"Applying MSDiff to {relativeFilePath}");
                 var msDelta = new MsDeltaCompression();
                 msDelta.ApplyDelta(inputFile, finalTarget, tempTargetFile);
 
@@ -231,7 +231,7 @@ public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
                 using (var of = File.OpenWrite(tempTargetFile))
                 using (var inf = File.OpenRead(inputFile))
                 {
-                    Log.Info($"Adding new file: {relativeFilePath}");
+                    Log.Info(() => $"Adding new file: {relativeFilePath}");
                     inf.CopyTo(of);
                 }
             }

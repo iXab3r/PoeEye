@@ -34,7 +34,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
         [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler)
     {
         Guard.ArgumentNotNull(clock, nameof(clock));
-        Log.Info($"Mouse&keyboard event source initialization started");
+        Log.Info(() => $"Mouse&keyboard event source initialization started");
 
         this.keyboardMouseEventsProvider = keyboardMouseEventsProvider;
         this.inputScheduler = inputScheduler;
@@ -172,19 +172,19 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
     {
         return Observable.Create<InputEventData>(subscriber =>
         {
-            Log.Info($"[{hookName}] Configuring subscription...");
+            Log.Info(() => $"[{hookName}] Configuring subscription...");
             var sw = Stopwatch.StartNew();
             var activeAnchors = new CompositeDisposable();
-            Disposable.Create(() => Log.Info($"[{hookName}] Unsubscribing")).AddTo(activeAnchors);
+            Disposable.Create(() => Log.Info(() => $"[{hookName}] Unsubscribing")).AddTo(activeAnchors);
 
-            Log.Info($"Sending subscription to {scheduler}");
+            Log.Info(() => $"Sending subscription to {scheduler}");
 
             var result = new Subject<InputEventData>();
             result.Subscribe(subscriber).AddTo(activeAnchors);
                 
             scheduler.Schedule(() =>
             {
-                Log.Info($"[{hookName}] Subscribing...");
+                Log.Info(() => $"[{hookName}] Subscribing...");
                 keyboardMouseEvents
                     .Select(hookMethod)
                     .Switch()
@@ -193,7 +193,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
                     .Subscribe(result)
                     .AddTo(activeAnchors);
                 sw.Stop();
-                Log.Info($"[{hookName}] Configuration took {sw.ElapsedMilliseconds:F0}ms");
+                Log.Info(() => $"[{hookName}] Configuration took {sw.ElapsedMilliseconds:F0}ms");
             }).AddTo(activeAnchors);
 
             return activeAnchors;
@@ -202,7 +202,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
 
     private IObservable<InputEventData> InitializeKeyboardHook(IKeyboardEvents keyboardEvents)
     {
-        Log.Info($"Hooking Keyboard using {keyboardEvents}");
+        Log.Info(() => $"Hooking Keyboard using {keyboardEvents}");
         var keyDown = Observable
             .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                 h => keyboardEvents.KeyDown += h,
@@ -229,7 +229,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
 
     private IObservable<InputEventData> InitializeMouseButtonsHook(IMouseEvents mouseEvents)
     {
-        Log.Info($"Hooking Mouse buttons using {mouseEvents}");
+        Log.Info(() => $"Hooking Mouse buttons using {mouseEvents}");
 
         var mouseDown = Observable
             .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -250,7 +250,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
 
     private IObservable<InputEventData> InitializeMouseWheelHook(IMouseEvents mouseEvents)
     {
-        Log.Info($"Hooking Mouse Wheel using {mouseEvents}");
+        Log.Info(() => $"Hooking Mouse Wheel using {mouseEvents}");
 
         var mouseWheel = Observable
             .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -265,7 +265,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
 
     private IObservable<InputEventData> InitializeMouseMoveHook(IMouseEvents mouseEvents)
     {
-        Log.Info($"Hooking Mouse Move (possible performance hit !) using {mouseEvents}");
+        Log.Info(() => $"Hooking Mouse Move (possible performance hit !) using {mouseEvents}");
 
         var mouseMove = Observable
             .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -279,7 +279,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
         
     private IObservable<InputEventData> InitializeMouseRaw(IMouseEvents mouseEvents)
     {
-        Log.Info($"Hooking Mouse Raw (possible performance hit !) using {mouseEvents}");
+        Log.Info(() => $"Hooking Mouse Raw (possible performance hit !) using {mouseEvents}");
 
         var mouseMove = Observable
             .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -293,7 +293,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
         
     private IObservable<InputEventData> InitializeKeyboardRaw(IKeyboardEvents keyboardEvents)
     {
-        Log.Info($"Hooking Keyboard Raw (possible performance hit !) using {keyboardEvents}");
+        Log.Info(() => $"Hooking Keyboard Raw (possible performance hit !) using {keyboardEvents}");
 
         var mouseMove = Observable
             .FromEventPattern<KeyEventHandler, KeyEventArgs>(

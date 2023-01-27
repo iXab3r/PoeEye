@@ -36,7 +36,7 @@ internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAud
         this.soundLibrarySource = soundLibrarySource;
         this.fileSoundLibrarySource = fileSoundLibrarySource;
 
-        Log.Info($"Initializing sound subsystem...");
+        Log.Info(() => $"Initializing sound subsystem...");
         knownNotifications[AudioNotificationType.Silence.ToString()] = Array.Empty<byte>();
 
         bgScheduler.Schedule(Initialize).AddTo(Anchors);
@@ -132,6 +132,6 @@ internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAud
         }
 
         Log.Debug(() => $"Known notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
-        Log.Info($"Loaded {knownNotifications.Count} audio notifications");
+        Log.Info(() => $"Loaded {knownNotifications.Count} audio notifications");
     }
 }

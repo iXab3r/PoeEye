@@ -13,19 +13,19 @@ public sealed class ConfigMigrator
 
     public void Migrate(IConfigProvider source, IConfigProvider target)
     {
-        Log.Info($"Migrating configuration from {source} to {target}");
+        Log.Info(() => $"Migrating configuration from {source} to {target}");
         if (source is ConfigProviderFromFile fromFile)
         {
-            Log.Info($"Reloading single-file config");
+            Log.Info(() => $"Reloading single-file config");
             fromFile.Reload();
-            Log.Info($"Reloaded single-file config");
+            Log.Info(() => $"Reloaded single-file config");
         }
         
         foreach (var poeEyeConfig in source.Configs.Items)
         {
-            Log.Info($"Saving configuration {poeEyeConfig.GetType()}");
+            Log.Info(() => $"Saving configuration {poeEyeConfig.GetType()}");
             target.Save(poeEyeConfig);
-            Log.Info($"Saved configuration {poeEyeConfig.GetType()}");
+            Log.Info(() => $"Saved configuration {poeEyeConfig.GetType()}");
         }
         
         if (source is ConfigProviderFromFile fromFileConfig)
@@ -40,7 +40,7 @@ public sealed class ConfigMigrator
             {
                 if (File.Exists(filePath))
                 {
-                    Log.Info($"Removing config file {filePath}");
+                    Log.Info(() => $"Removing config file {filePath}");
                     File.Delete(filePath);
                 }
             }

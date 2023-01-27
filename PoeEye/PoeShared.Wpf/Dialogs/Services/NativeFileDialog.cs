@@ -23,7 +23,7 @@ internal sealed class NativeFileDialog : DisposableReactiveObjectWithLogger, ISa
     
     FileInfo IOpenFileDialog.ShowDialog()
     {
-        Log.Info($"Showing Open file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
+        Log.Info(() => $"Showing Open file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
         var dialog = new OpenFileDialog()
         {
             Title = Title, 
@@ -42,13 +42,13 @@ internal sealed class NativeFileDialog : DisposableReactiveObjectWithLogger, ISa
 
         var result = new FileInfo(dialog.FileName);
         LastFile = result;
-        Log.Info($"User has selected file {result} (exists: {result.Exists})");
+        Log.Info(() => $"User has selected file {result} (exists: {result.Exists})");
         return result;
     }
 
     FileInfo ISaveFileDialog.ShowDialog()
     {
-        Log.Info($"Showing Save file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
+        Log.Info(() => $"Showing Save file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
         var dialog = new SaveFileDialog
         {
             Title = Title, 
@@ -67,7 +67,7 @@ internal sealed class NativeFileDialog : DisposableReactiveObjectWithLogger, ISa
 
         var result = new FileInfo(dialog.FileName);
         LastFile = result;
-        Log.Info($"User has selected file {result} (exists: {result.Exists})");
+        Log.Info(() => $"User has selected file {result} (exists: {result.Exists})");
         return result;
     }
 }

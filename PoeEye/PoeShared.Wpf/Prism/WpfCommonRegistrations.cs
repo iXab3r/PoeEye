@@ -115,7 +115,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
         var schedulerProvider = Container.Resolve<ISchedulerProvider>();
         if (schedulerProvider is SchedulerProvider provider)
         {
-            Log.Info($"Initializing scheduler provider: {provider}");
+            Log.Info(() => $"Initializing scheduler provider: {provider}");
             provider.Initialize(Container);
         }
         else

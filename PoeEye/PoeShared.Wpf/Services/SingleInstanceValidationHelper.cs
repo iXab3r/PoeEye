@@ -26,9 +26,9 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
         applicationAccessor.WhenTerminate
             .Select(x => $"Terminate with code {x}").Subscribe(x =>
             {
-                Log.Info($"Detected application termination with code {x}, disposing mutex to avoid leak");
+                Log.Info(() => $"Detected application termination with code {x}, disposing mutex to avoid leak");
                 Dispose();
-                Log.Info($"Processed application termination");
+                Log.Info(() => $"Processed application termination");
             })
             .AddTo(Anchors);
         AcquireMutexOrShutdown(MutexId, applicationAccessor, parent).AddTo(Anchors);

@@ -475,7 +475,7 @@ public partial class UnsafeNative
                 return 0;
             }
 
-            Log.Info($"Main window {mainWindowHandle.ToHexadecimal()} threadId is {threadId}");
+            Log.Info(() => $"Main window {mainWindowHandle.ToHexadecimal()} threadId is {threadId}");
             mainWindowThreadId = threadId;
             return mainWindowThreadId;
         }

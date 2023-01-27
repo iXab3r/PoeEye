@@ -16,7 +16,7 @@ public class WorkerThread : DisposableReactiveObject
     {
         this.action = action;
         Log = GetType().PrepareLogger().WithSuffix($"WT {threadName}");
-        Log.Info($"Initializing buffered event log source");
+        Log.Info(() => $"Initializing buffered event log source");
         consumerTokenSource = new CancellationTokenSource();
         consumerThread = new Thread(() => DoWork(Log,consumerTokenSource, action))
         {
@@ -39,7 +39,7 @@ public class WorkerThread : DisposableReactiveObject
 
             Log.Debug(() => $"Disposed successfully");
         }).AddTo(Anchors);
-        Log.Info($"Initialization completed");
+        Log.Info(() => $"Initialization completed");
     }
 
     private static void DoWork(IFluentLog log, CancellationTokenSource cancellationTokenSource, Action<CancellationTokenSource> consumer)

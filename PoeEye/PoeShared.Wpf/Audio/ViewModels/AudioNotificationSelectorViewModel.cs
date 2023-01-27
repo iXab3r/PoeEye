@@ -151,7 +151,7 @@ internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObj
         
     private void AddSoundCommandExecuted()
     {
-        Log.Info($"Showing OpenFileDialog to user");
+        Log.Info(() => $"Showing OpenFileDialog to user");
 
         var op = new OpenFileDialog
         {

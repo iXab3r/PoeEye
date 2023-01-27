@@ -36,7 +36,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
         Log = GetType().PrepareLogger().WithSuffix(overlayControllerId);
-        Log.Info($"Creating overlay window controller using {windowTracker}");
+        Log.Info(() => $"Creating overlay window controller using {windowTracker}");
 
         this.windowTracker = windowTracker;
         this.uiScheduler = uiScheduler;
@@ -192,7 +192,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
 
         childAnchors.AddTo(Anchors);
 
-        Log.Info($"Overlay view initialized: {window}");
+        Log.Info(() => $"Overlay view initialized: {window}");
         logger.Debug(() => $"Registration completed");
 
         return childAnchors;

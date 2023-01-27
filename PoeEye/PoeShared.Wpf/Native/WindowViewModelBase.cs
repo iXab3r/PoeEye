@@ -27,7 +27,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     static WindowViewModelBase()
     {
-        Binder.BindAction(x => x.Log.Info($"Title updated to {x.Title}"));
+        Binder.BindAction(x => x.Log.Info(() => $"Title updated to {x.Title}"));
     }
 
     protected WindowViewModelBase()

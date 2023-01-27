@@ -20,7 +20,6 @@ public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBool
         
     public string Annotation { [UsedImplicitly] get; }
         
-        
     public static bool operator true(AnnotatedBoolean x) => x.Value == true;
     public static bool operator false(AnnotatedBoolean x) => x.Value == false;
          

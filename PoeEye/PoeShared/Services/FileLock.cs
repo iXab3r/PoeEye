@@ -40,7 +40,7 @@ public sealed class FileLock : DisposableReactiveObject
         var lockFileExists = File.Exists(lockFilePath);
         if (lockFileExists)
         {
-            log.Info($"Removing lock file {lockFilePath}");
+            log.Info(() => $"Removing lock file {lockFilePath}");
             File.Delete(lockFilePath);
         }
         else
@@ -54,7 +54,7 @@ public sealed class FileLock : DisposableReactiveObject
         }
         else
         {
-            log.Info($"Removed lock file {lockFilePath}");
+            log.Info(() => $"Removed lock file {lockFilePath}");
         }
     }
 

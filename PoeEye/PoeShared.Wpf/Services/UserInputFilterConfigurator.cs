@@ -97,13 +97,13 @@ internal sealed class UserInputFilterConfigurator : DisposableReactiveObject, IU
 
             if (state.IsWhitelisted)
             {
-                Log.Info($"Ignoring whitelisted hotkey {hotkey}, state: {state}");
+                Log.Info(() => $"Ignoring whitelisted hotkey {hotkey}, state: {state}");
                 return false;
             }
 
             if (state.TimeSinceExclusionFromWhitelist < AllowedTimeframeForWhitelistedItems)
             {
-                Log.Info($"Ignoring hotkey {hotkey} - it is excluded from whitelist very recently and should still be ignored, state: {state}");
+                Log.Info(() => $"Ignoring hotkey {hotkey} - it is excluded from whitelist very recently and should still be ignored, state: {state}");
                 return false;
             }
         }

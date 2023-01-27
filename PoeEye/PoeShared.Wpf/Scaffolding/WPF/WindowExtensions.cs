@@ -14,18 +14,18 @@ public static class WindowExtensions {
     {
         var hwnd = new WindowInteropHelper(instance).EnsureHandle();
         var hwndSource = HwndSource.FromHwnd(hwnd) ?? throw new ApplicationException($"Something went wrong - failed to create {nameof(HwndSource)} for handle {hwnd.ToHexadecimal()}");
-        Log.Info($"Adding hook to {instance}");
+        Log.Info(() => $"Adding hook to {instance}");
         hwndSource.AddHook(hook);
         return Disposable.Create(() =>
         {
-            Log.Info($"Removing hook from {instance}");
+            Log.Info(() => $"Removing hook from {instance}");
             hwndSource.RemoveHook(hook);
         });
     }
 
     public static IDisposable LogWndProc(this Window instance, string prefix)
     {
-        Log.Info($"[{prefix}] Registering log hook to {instance}");
+        Log.Info(() => $"[{prefix}] Registering log hook to {instance}");
         return RegisterWndProc(instance,
             (IntPtr hwnd, int msgRaw, IntPtr param, IntPtr lParam, ref bool handled) =>
             {

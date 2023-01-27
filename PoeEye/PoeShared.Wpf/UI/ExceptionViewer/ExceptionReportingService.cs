@@ -101,7 +101,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
 
     private void ShowExceptionDialog(Exception exception)
     {
-        Log.Info($"Preparing config for exception {exception}");
+        Log.Info(() => $"Preparing config for exception {exception}");
         var config = PrepareConfigSafe(exception);
 
         Log.Info("Creating report items aggregator");

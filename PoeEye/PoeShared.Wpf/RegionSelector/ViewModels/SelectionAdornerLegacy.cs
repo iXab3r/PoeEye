@@ -140,7 +140,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                         mainWindowTracker.WhenAnyValue(x => x.ActiveProcessId).Where(x => StopWhenAppFocusLost).Where(x => x != CurrentProcessId).Select(x => $"main window lost focus - processId changed"),
                         keyboardEventsSource.WhenKeyDown.Where(x => x.KeyData == Keys.Escape).Do(x => x.Handled = true).Select(x => $"{x.KeyData} pressed"),
                         keyboardEventsSource.WhenMouseDown.Where(x => x.Button != MouseButtons.Left).Do(x => x.Handled = true).Select(x => $"mouse {x.Button} pressed"))
-                    .Do(reason => Log.Info($"Closing SelectionAdorner, reason: {reason}, activeWindow: {mainWindowTracker.ActiveWindowTitle}, activeProcess: {mainWindowTracker.ActiveProcessId}, currentProcess: {CurrentProcessId}"))
+                    .Do(reason => Log.Info(() => $"Closing SelectionAdorner, reason: {reason}, activeWindow: {mainWindowTracker.ActiveWindowTitle}, activeProcess: {mainWindowTracker.ActiveProcessId}, currentProcess: {CurrentProcessId}"))
                     .ObserveOn(uiScheduler)
                     .SubscribeSafe(subscriber.OnCompleted, Log.HandleUiException)
                     .AddTo(selectionAnchors);

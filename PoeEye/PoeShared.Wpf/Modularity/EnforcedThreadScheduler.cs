@@ -15,7 +15,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
     public EnforcedThreadScheduler(Thread thread, IScheduler threadScheduler)
     {
         Log = GetType().PrepareLogger();
-        Log.Info($"Using existing thread scheduler: {threadScheduler}");
+        Log.Info(() => $"Using existing thread scheduler: {threadScheduler}");
         this.threadScheduler = threadScheduler;
         this.schedulerThread = thread;
     }
@@ -24,10 +24,10 @@ public sealed class EnforcedThreadScheduler : IScheduler
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Log = GetType().PrepareLogger().WithSuffix($"SchedulerName: {name}");
-        Log.Info($"Initializing new scheduler {name}");
+        Log.Info(() => $"Initializing new scheduler {name}");
         threadScheduler = new EventLoopScheduler(start =>
         {
-            Log.Info($"Initializing thread for scheduler {name} with priority {priority}");
+            Log.Info(() => $"Initializing thread for scheduler {name} with priority {priority}");
             if (schedulerThread != null)
             {
                 throw new InvalidOperationException("This method must(and will in current implementation) be called only once");
@@ -40,7 +40,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
             };
             Log.Debug(() => $"Setting apartment state for thread {schedulerThread.Name}");
             schedulerThread.SetApartmentState(ApartmentState.STA);
-            Log.Info($"Scheduler {name} with thread {schedulerThread.Name} initialized");
+            Log.Info(() => $"Scheduler {name} with thread {schedulerThread.Name} initialized");
             return schedulerThread;
         });
     }

@@ -70,10 +70,10 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
                 {
                     lock (hookGate)
                     {
-                        Log.Info($"Processed unsubscription, refCount: {refCount} => {refCount - 1}");
+                        Log.Info(() => $"Processed unsubscription, refCount: {refCount} => {refCount - 1}");
                         if (--refCount > 0)
                         {
-                            Log.Info($"Preserving value as we still have {refCount} subs left, value: {activeValue}");
+                            Log.Info(() => $"Preserving value as we still have {refCount} subs left, value: {activeValue}");
                             return;
                         }
 
@@ -82,7 +82,7 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
                             throw new InvalidOperationException("Something went wrong - hook handler is not created");
                         }
                         
-                        Log.Info($"Disposing value as we don't have subs left: {activeValue}");
+                        Log.Info(() => $"Disposing value as we don't have subs left: {activeValue}");
                         activeValue.Dispose();
                         activeValue = null;
                     }
@@ -90,13 +90,13 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
 
                 lock (hookGate)
                 {
-                    Log.Info($"Initializing new subscription, refCount: {refCount} => {refCount+1}");
+                    Log.Info(() => $"Initializing new subscription, refCount: {refCount} => {refCount+1}");
                     refCount++;
                     if (activeValue == null)
                     {
                         Log.Info("Creating new value");
                         activeValue = factoryFunc();
-                        Log.Info($"Created value: {activeValue}");
+                        Log.Info(() => $"Created value: {activeValue}");
                     }
 
                     if (activeValue == null)
@@ -125,14 +125,14 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
 
         public HookHandler(string name, IFactory<IKeyboardMouseEvents> factory)
         {
-            Log.Info($"Creating hook source {this}");
+            Log.Info(() => $"Creating hook source {this}");
             this.name = name;
             constuctorThreadId = Kernel32.GetCurrentThreadId();
             Source = Hook(name, factory);
-            Log.Info($"Created hook source {this} on thread {constuctorThreadId}");
+            Log.Info(() => $"Created hook source {this} on thread {constuctorThreadId}");
             Disposable.Create(() =>
             {
-                Log.Info($"Disposing hook source {this}");
+                Log.Info(() => $"Disposing hook source {this}");
                 var disposeThreadId = Kernel32.GetCurrentThreadId();
                 if (disposeThreadId != constuctorThreadId)
                 {
@@ -140,7 +140,7 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
                     throw new InvalidOperationException($"Disposing hook {this} on an invalid thread, expected {constuctorThreadId}, got {disposeThreadId}");
                 }
                 Source.Dispose();
-                Log.Info($"Disposed hook source {this}");
+                Log.Info(() => $"Disposed hook source {this}");
             }).AddTo(Anchors);
         }
 
@@ -148,10 +148,10 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
 
         private static IKeyboardMouseEvents Hook(string name, IFactory<IKeyboardMouseEvents> factory)
         {
-            Log.Info($"[{name}] Performing input events hook");
-            Log.Info($"[{name}] Getting {nameof(IKeyboardMouseEvents)} source");
+            Log.Info(() => $"[{name}] Performing input events hook");
+            Log.Info(() => $"[{name}] Getting {nameof(IKeyboardMouseEvents)} source");
             var events = factory.Create();
-            Log.Info($"[{name}] Got {nameof(IKeyboardMouseEvents)} source: {events}");
+            Log.Info(() => $"[{name}] Got {nameof(IKeyboardMouseEvents)} source: {events}");
             return events;
         }
         

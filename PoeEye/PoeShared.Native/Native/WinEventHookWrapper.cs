@@ -36,9 +36,9 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         eventDelegate = WinEventDelegateProc;
         Log.Debug(() => $"New WinEvent hook created, args: {hookArgs}");
 
-        Disposable.Create(() => Log.Info($"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
+        Disposable.Create(() => Log.Info(() => $"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
         Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
-        Disposable.Create(() => Log.Info($"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
+        Disposable.Create(() => Log.Info(() => $"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
     }
     private IFluentLog Log { get; }
 
@@ -79,7 +79,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
     private void Run()
     {
-        Log.Info($"Starting up event sink, args: {hookArgs}");
+        Log.Info(() => $"Starting up event sink, args: {hookArgs}");
         RegisterHook().AddTo(Anchors);
         Log.Debug(() => $"Initializing event sink, args: {hookArgs}");
         EventLoop.RunWindowEventLoop(Log);
@@ -87,7 +87,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
     private IDisposable RegisterHook()
     {
-        Log.Info($"Registering hook, args: {hookArgs}");
+        Log.Info(() => $"Registering hook, args: {hookArgs}");
             
         var hook = User32.SetWinEventHook(
             hookArgs.EventMin,
@@ -119,14 +119,14 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         {
             try
             {
-                log.Info($"Event loop started");
+                log.Info(() => $"Event loop started");
                 while(GetMessage(out var msg, IntPtr.Zero, 0, 0 ))
                 { 
                     try
                     {
                         if (msg.Message == WM_QUIT)
                         {
-                            log.Info($"Received {nameof(WM_QUIT)}, breaking event loop");
+                            log.Info(() => $"Received {nameof(WM_QUIT)}, breaking event loop");
                             break;
                         }
                         TranslateMessage(ref msg); 
@@ -145,7 +145,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             }
             finally
             {
-                log.Info($"Event loop completed");
+                log.Info(() => $"Event loop completed");
             }
         }
             

@@ -139,7 +139,7 @@ public class ConstantAspectRatioWindow : MetroWindow
 
     private void OnClosed(object sender, EventArgs e)
     {
-        Log.Info($"Window is closed, source: {this}");
+        Log.Info(() => $"Window is closed, source: {this}");
 
         Anchors.Dispose();
     }
@@ -157,7 +157,7 @@ public class ConstantAspectRatioWindow : MetroWindow
 
     private void OnLoaded(object sender, EventArgs ea)
     {
-        Log.Info($"Window is loaded");
+        Log.Info(() => $"Window is loaded");
         Log.Debug(() => $"Resolving {nameof(HwndSource)} for {WindowHandle}");
         var hwndSource = (HwndSource)PresentationSource.FromVisual(this);
         if (hwndSource == null)
