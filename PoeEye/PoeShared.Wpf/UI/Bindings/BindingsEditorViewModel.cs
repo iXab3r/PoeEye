@@ -10,10 +10,8 @@ using ReactiveUI;
 
 namespace PoeShared.UI.Bindings;
 
-internal sealed class BindingsEditorViewModel : DisposableReactiveObject, IBindingsEditorViewModel
+internal sealed class BindingsEditorViewModel : DisposableReactiveObjectWithLogger, IBindingsEditorViewModel
 {
-    private static readonly IFluentLog Log = typeof(BindingsEditorViewModel).PrepareLogger();
-
     public BindingsEditorViewModel()
     {
         var bindablePropertiesSource = new SourceListEx<PropertyInfo>();
@@ -47,18 +45,6 @@ internal sealed class BindingsEditorViewModel : DisposableReactiveObject, IBindi
         RemoveBindingCommand = CommandWrapper.Create<object>(RemoveBinding);
     }
 
-    private void RemoveBinding(object arg)
-    {
-        if (arg is string propertyName)
-        {
-            Source.RemoveBinding(propertyName);
-        }
-        else
-        {
-            throw new ArgumentOutOfRangeException(nameof(arg), $"Unknown argument: {arg}");
-        }
-    }
-
     public ReadOnlyObservableCollection<PropertyInfo> BindableProperties { get; }
 
     public DisposableReactiveObject ValueSource { get; set; }
@@ -75,6 +61,23 @@ internal sealed class BindingsEditorViewModel : DisposableReactiveObject, IBindi
 
     private void AddBinding()
     {
-        var binding = Source.AddOrUpdateBinding(TargetProperty, ValueSource, string.IsNullOrEmpty(ValueSourceExpression) ? TargetProperty : ValueSourceExpression);
+        var sourcePath = string.IsNullOrEmpty(ValueSourceExpression) ? TargetProperty : ValueSourceExpression;
+        var targetPath = TargetProperty;
+        Log.Debug(() => $"Adding new binding to {Source}: { new { targetPath, Source, sourcePath  } }");
+        var binding = Source.AddOrUpdateBinding(targetPropertyPath: targetPath, source: ValueSource, sourcePropertyPath: sourcePath);
+        Log.Debug(() => $"Added new binding: {binding}");
+    }
+    
+    private void RemoveBinding(object arg)
+    {
+        if (arg is string targetPropertyPath)
+        {
+            Log.Debug(() => $"Removing binding of {Source}, path: {targetPropertyPath}");
+            Source.RemoveBinding(targetPropertyPath);
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(arg), $"Unknown argument: {arg}");
+        }
     }
 }

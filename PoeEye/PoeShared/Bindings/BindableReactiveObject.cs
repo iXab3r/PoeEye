@@ -34,16 +34,16 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
 
     public ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
 
-    public void RemoveBinding(string targetPropertyName)
+    public void RemoveBinding(string targetPropertyPath)
     {
-        if (string.IsNullOrEmpty(targetPropertyName))
+        if (string.IsNullOrEmpty(targetPropertyPath))
         {
             return;
         }
-        var existingBindingsToRemove = bindings.Items.Where(x => x.TargetPropertyPath.StartsWith(targetPropertyName)).ToArray();
+        var existingBindingsToRemove = bindings.Items.Where(x => x.TargetPropertyPath.StartsWith(targetPropertyPath)).ToArray();
         if (existingBindingsToRemove.Any())
         {
-            Log.Debug(() => $"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyName}:\n\t{existingBindingsToRemove.DumpToTable()}");
+            Log.Debug(() => $"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyPath}:\n\t{existingBindingsToRemove.DumpToTable()}");
             existingBindingsToRemove.ForEach(RemoveBinding);
         }
     }
@@ -54,32 +54,32 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         bindings.Clear();
     }
 
-    public IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject
+    public IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyPath, TSource source, string sourcePropertyPath) where TSource : DisposableReactiveObject
     {
-        Log.Debug(() => $"Adding binding for '{targetPropertyName}', source path: {sourcePath}, source: {source}");
+        Log.Debug(() => $"Adding binding for '{targetPropertyPath}', source path: {sourcePropertyPath}, source: {source}");
             
-        var sourceWatcher = new PropertyPathWatcher() { Source = source, PropertyPath = sourcePath };
-        var targetWatcher = new PropertyPathWatcher() { Source = this, PropertyPath = targetPropertyName };
-        var newBinding = new ReactiveBinding(targetPropertyName, sourceWatcher, targetWatcher);
+        var sourceWatcher = new PropertyPathWatcher() { Source = source, PropertyPath = sourcePropertyPath };
+        var targetWatcher = new PropertyPathWatcher() { Source = this, PropertyPath = targetPropertyPath };
+        var newBinding = new ReactiveBinding(targetPropertyPath, sourceWatcher, targetWatcher);
         return AddOrUpdateBinding(newBinding);
     }
 
-    public IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyName)
+    public IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyPath)
     {
         var targetWatcher = new PropertyPathWatcher
         {
-            PropertyPath = targetPropertyName,
+            PropertyPath = targetPropertyPath,
         };
 
-        var binding = new ReactiveBinding(targetPropertyName, valueSource, targetWatcher);
+        var binding = new ReactiveBinding(targetPropertyPath, valueSource, targetWatcher);
         var anchor = AddOrUpdateBinding(binding);
         targetWatcher.Source = this;
         return anchor;
     }
 
-    public IReactiveBinding ResolveBinding(string targetPropertyName)
+    public IReactiveBinding ResolveBinding(string propertyPath)
     {
-        var result = bindings.Lookup(targetPropertyName);
+        var result = bindings.Lookup(propertyPath);
         return result.HasValue ? result.Value : default;
     }
 
@@ -107,7 +107,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         return binding;
     }
 
-    private IEnumerable<string> IteratePath(string propertyPath)
+    private static IEnumerable<string> IteratePath(string propertyPath)
     {
         var propertyParts = propertyPath.Split('.').SkipLast(1);
         var combined = new StringBuilder(propertyPath.Length);
@@ -116,7 +116,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         {
             combined.Append(part);
             yield return combined.ToString();
-            combined.Append(".");
+            combined.Append('.');
         }
     }
 }

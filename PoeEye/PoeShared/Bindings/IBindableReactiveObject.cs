@@ -7,9 +7,9 @@ public interface IBindableReactiveObject : IDisposableReactiveObject
 {
     IObservableCache<IReactiveBinding, string> Bindings { get; }
     ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
-    void RemoveBinding(string targetPropertyName);
+    void RemoveBinding(string targetPropertyPath);
     void ClearBindings();
-    IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyName, TSource source, string sourcePath) where TSource : DisposableReactiveObject;
-    IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyName);
-    IReactiveBinding ResolveBinding(string targetPropertyName);
+    IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyPath, TSource source, string sourcePropertyPath) where TSource : DisposableReactiveObject;
+    IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyPath);
+    IReactiveBinding ResolveBinding(string propertyPath);
 }
