@@ -21,7 +21,7 @@ public static class DependencyObjectExtensions
         {
             var item = tree.Dequeue();
             var count = VisualTreeHelper.GetChildrenCount(item);
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 var child = VisualTreeHelper.GetChild(item, i);
                 tree.Enqueue(child);
@@ -41,7 +41,7 @@ public static class DependencyObjectExtensions
     }
 
     public static void SetCurrentValueIfChanged<T, TValue>(
-        this T component, DependencyProperty dependencyProperty, 
+        this T component, DependencyProperty dependencyProperty,
         TValue value)
         where T : DependencyObject
     {
@@ -51,14 +51,14 @@ public static class DependencyObjectExtensions
             component.SetCurrentValue(dependencyProperty, value);
         }
     }
-        
+
     public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty, Func<T, TValue> selector)
         where T : DependencyObject
     {
         return Observe(component, dependencyProperty)
             .Select(_ => selector(component));
     }
-        
+
     public static IObservable<EventArgs> Observe<T>(this T component, DependencyProperty dependencyProperty)
         where T : DependencyObject
     {
@@ -71,7 +71,7 @@ public static class DependencyObjectExtensions
             return Disposable.Create(() => property.RemoveValueChanged(component, update));
         }).StartWithDefault();
     }
-        
+
     public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty)
         where T : DependencyObject
     {
@@ -132,7 +132,7 @@ public static class DependencyObjectExtensions
         var dependencyObject2 = initial;
         for (;
              dependencyObject1 != null;
-             dependencyObject1 = dependencyObject1 is Visual || dependencyObject1 is Visual3D
+             dependencyObject1 = dependencyObject1 is Visual or Visual3D
                  ? VisualTreeHelper.GetParent(dependencyObject1)
                  : LogicalTreeHelper.GetParent(dependencyObject1))
         {
@@ -163,5 +163,27 @@ public static class DependencyObjectExtensions
         } while (current != null && !(current is T));
 
         return current as T;
+    }
+
+    public static IEnumerable<DependencyObject> VisualAncestorsAndSelf(this DependencyObject obj)
+    {
+        while (obj != null)
+        {
+            yield return obj;
+            if (obj is Visual or Visual3D)
+            {
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+            else if (obj is FrameworkContentElement element)
+            {
+                // When called with a non-visual such as a TextElement, walk up the
+                // logical tree instead.
+                obj = element.Parent;
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 }
