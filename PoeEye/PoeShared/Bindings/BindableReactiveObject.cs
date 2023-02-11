@@ -61,7 +61,8 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         var sourceWatcher = new PropertyPathWatcher() { Source = source, PropertyPath = sourcePropertyPath };
         var targetWatcher = new PropertyPathWatcher() { Source = this, PropertyPath = targetPropertyPath };
         var newBinding = new ReactiveBinding(targetPropertyPath, sourceWatcher, targetWatcher);
-        return AddOrUpdateBinding(newBinding);
+        AddOrUpdateBinding(newBinding);
+        return newBinding;
     }
 
     public IReactiveBinding AddOrUpdateBinding(IValueProvider valueSource, string targetPropertyPath)
@@ -72,9 +73,9 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         };
 
         var binding = new ReactiveBinding(targetPropertyPath, valueSource, targetWatcher);
-        var anchor = AddOrUpdateBinding(binding);
+        AddOrUpdateBinding(binding);
         targetWatcher.Source = this;
-        return anchor;
+        return binding;
     }
 
     public IReactiveBinding ResolveBinding(string propertyPath)
@@ -89,7 +90,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         bindings.Remove(binding);
     }
 
-    internal IReactiveBinding AddOrUpdateBinding(IReactiveBinding binding)
+    public void AddOrUpdateBinding(IReactiveBinding binding)
     {
         Log.Debug(() => $"Adding binding with key {binding.TargetPropertyPath}: {binding}");
             
@@ -104,7 +105,6 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         RemoveBinding(binding.TargetPropertyPath);
 
         bindings.AddOrUpdate(binding);
-        return binding;
     }
 
     private static IEnumerable<string> IteratePath(string propertyPath)

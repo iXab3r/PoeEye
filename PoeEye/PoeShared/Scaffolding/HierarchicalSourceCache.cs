@@ -80,6 +80,8 @@ public sealed class HierarchicalSourceCache<TObject, TKey> : DisposableReactiveO
             .AddTo(Anchors);
     }
 
+    public IObservableCache<TObject, TKey> LocalCache => cache;
+    
     public IHierarchicalSourceCache<TObject, TKey> Parent { get; set; }
     
     public IObservableCache<TObject, TKey> Effective => effectiveCache;

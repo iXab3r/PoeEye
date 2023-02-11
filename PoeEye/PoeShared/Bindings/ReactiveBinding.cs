@@ -4,7 +4,7 @@ using PropertyChanged;
 
 namespace PoeShared.Bindings;
 
-internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
+public class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
 {
     private static readonly Binder<ReactiveBinding> Binder = new();
 
@@ -36,11 +36,11 @@ internal class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
             });
     }
         
-    public ReactiveBinding(string targetPropertyPath, IValueProvider sourceWatcher, IValueWatcher targetWatcher)
+    public ReactiveBinding(string targetPropertyPath, IValueProvider sourceValueProvider, IValueWatcher targetWatcher)
     {
         Log = typeof(ReactiveBinding).PrepareLogger().WithSuffix(ToString);
         TargetPropertyPath = targetPropertyPath;
-        SourceWatcher = sourceWatcher.AddTo(Anchors);
+        SourceWatcher = sourceValueProvider.AddTo(Anchors);
         TargetWatcher = targetWatcher.AddTo(Anchors);
         Binder.Attach(this).AddTo(Anchors);
     }

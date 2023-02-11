@@ -269,6 +269,11 @@ public static class ChangeSetExtensions
             _ => default
         });
     }
+
+    public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservable<IChangeSet<T, TKey>> events, TKey key)
+    {
+        return events.Watch(key).WatchCurrentValue();
+    }
     
     public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservableCache<T, TKey> cache, TKey key)
     {

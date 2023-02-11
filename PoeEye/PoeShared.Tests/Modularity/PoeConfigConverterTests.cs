@@ -288,6 +288,26 @@ public class PoeConfigConverterTests : FixtureBase
         //Then
         metadata.ShouldBeSameAs(destinationMetadata);
     }
+
+    [Test]
+    [Ignore("Does not work because currently everything is hard-wired onto IPoeEyeConfig")]
+    public void ShouldSerializeMetadataContainer()
+    {
+        //Given
+        var instance = CreateInstance();
+        var config = new SampleMetadataContainerConfig()
+        {
+            Metadata = PoeConfigMetadata.FromValue("string value")
+        };
+        var serialized = instance.Serialize(config);
+
+        //When
+        var deserialized = instance.Deserialize<SampleMetadataContainerConfig>(serialized);
+
+        //Then
+        //var metadata = (PoeConfigMetadata<string>) deserialized.Metadata;
+        //metadata.Value.ShouldBe("string value");
+    }
         
     private static string PrepareSerialized(string fileName)
     {

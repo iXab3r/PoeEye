@@ -15,6 +15,7 @@ public static class BindableReactiveObjectExtensions
         var targetWatcher = new ExpressionWatcher<TTarget, TProperty>(targetProperty);
         targetWatcher.Source = instance;
         var newBinding = new ReactiveBinding(targetProperty.GetMemberName(), sourceWatcher, targetWatcher);
-        return instance.AddOrUpdateBinding(newBinding);
+        instance.AddOrUpdateBinding(newBinding);
+        return newBinding;
     }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -26,6 +27,19 @@ public record PoeConfigMetadata : IPoeEyeConfig
         }
         AssemblyName = type.Assembly.GetName().Name;
         TypeName = type.FullName;
+    }
+
+    public static PoeConfigMetadata FromValue(object value)
+    {
+        if (value == null)
+        {
+            throw new ArgumentNullException(nameof(value), "Provided value must not be null");
+        }
+
+        var type = value.GetType();
+        var genericMetadataType = typeof(PoeConfigMetadata<>).MakeGenericType(type);
+        var genericMetadata = (PoeConfigMetadata)Activator.CreateInstance(genericMetadataType, new[] { value });
+        return genericMetadata;
     }
 
     public override string ToString()

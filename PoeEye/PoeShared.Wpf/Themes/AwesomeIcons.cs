@@ -21,6 +21,7 @@ public static class AwesomeIcons
     public const string WhileActiveActions = "\uf021";
     public const string OnExitActions = "\uf08b";
     public const string EnablingCondition = PowerOff;
+    public const string CaretRight = "\uf0da";
     public const string Certificate = "\uf0a3";
     public const string CheckCircle = "\uf058";
     public const string CloseIcon = "\uf00d";
