@@ -173,17 +173,19 @@ internal class SourceCacheAccessorFixture<TObject> : FixtureBase where TObject :
     }
 
     [Test]
-    public void ShouldThrowIfAssigningValueWithoutCache()
+    public void ShouldNotThrowIfAssigningValueWithoutCache()
     {
         //Given
         var instance = CreateInstance("test");
         instance.IsEnabled = true;
 
         //When
-        Action action = () => instance.Value = new TObject(){ Key = "test", Value = 2};
+        var newValue = new TObject() {Key = "test", Value = 2};
+        instance.Value = newValue;
 
         //Then  
-        action.ShouldThrow<InvalidOperationException>();
+        instance.Value.ShouldBe(newValue);
+        instance.IsEnabled.ShouldBeTrue();
     }
 
     [Test]
