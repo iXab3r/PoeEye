@@ -37,9 +37,14 @@ public class ScrollViewerExtensions
     }
 
 
-    private static void BindToScrollViewer(DependencyObject root, bool scrollToEnd)
+    private static void BindToScrollViewer(FrameworkElement root, bool scrollToEnd)
     {
         var scrollViewer = root as ScrollViewer ?? root.FindChild<ScrollViewer>(string.Empty);
+        if (scrollViewer == null)
+        {
+            root.SizeChanged += ElementOnSizeChanged;
+            return;
+        }
         if (scrollToEnd)
         {
             scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
@@ -49,6 +54,13 @@ public class ScrollViewerExtensions
         {
             scrollViewer.ScrollChanged -= ScrollViewer_ScrollChanged;
         }
+    }
+
+    private static void ElementOnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var root = (FrameworkElement)sender;
+        root.SizeChanged -= ElementOnSizeChanged;
+        BindToScrollViewer(root, GetAutoScroll(root));
     }
 
     private static void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)

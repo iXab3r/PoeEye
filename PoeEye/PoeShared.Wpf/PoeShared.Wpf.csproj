@@ -155,4 +155,7 @@
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <MauiXaml Include="Themes\Styles.datagrid.xaml" />
+  </ItemGroup>
 </Project>
