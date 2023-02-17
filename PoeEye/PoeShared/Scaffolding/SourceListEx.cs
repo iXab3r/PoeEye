@@ -1,6 +1,8 @@
 ﻿using System.Collections.Specialized;
 using System.Reactive.Concurrency;
 using DynamicData;
+using JetBrains.Annotations;
+using PropertyBinder;
 
 namespace PoeShared.Scaffolding;
 
@@ -10,19 +12,22 @@ namespace PoeShared.Scaffolding;
 /// <typeparam name="T"></typeparam>
 public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
 {
+    private static readonly Binder<SourceListEx<T>> Binder = new();
     private readonly ISourceList<T> sourceList;
+    private readonly IReadOnlyObservableCollection<T> collection;
 
-    public SourceListEx(ISourceList<T> sourceList, IScheduler collectionScheduler = default)
+    static SourceListEx()
+    {
+    }
+    
+    public SourceListEx(ISourceList<T> sourceList)
     {
         this.sourceList = sourceList.AddTo(Anchors);
+        sourceList.CountChanged.Subscribe(x => Count = x).AddTo(Anchors);
+        
         var collectionSource = sourceList.Connect();
-        if (collectionScheduler != null)
-        {
-            collectionSource.ObserveOn(collectionScheduler);
-        }
-        collectionSource.BindToCollection(out var collection).Subscribe().AddTo(Anchors);
-        Collection = collection;
-        this.RaiseWhenSourceValue(x => x.Count, collection, x => x.Count).AddTo(Anchors);
+        collectionSource.BindToCollection(out collection).Subscribe().AddTo(Anchors);
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     public SourceListEx(IObservable<IChangeSet<T>> source) : this(new SourceList<T>(source))
@@ -32,10 +37,8 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     public SourceListEx() : this(new SourceList<T>())
     {
     }
-    
-    public IReadOnlyObservableCollection<T> Collection { get; }
-    
-    public int Count => sourceList.Count; 
+
+    public int Count { get; [UsedImplicitly] private set; }
 
     public IObservable<int> CountChanged => sourceList.CountChanged;
 
@@ -58,7 +61,7 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
 
     public IEnumerator<T> GetEnumerator()
     {
-        return Collection.GetEnumerator();
+        return sourceList.Items.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -66,9 +69,10 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
         return GetEnumerator();
     }
 
+    //FIXME Dirty way of getting NON-THREAD-SAFE notifications. Bad.
     public event NotifyCollectionChangedEventHandler CollectionChanged
     {
-        add => Collection.CollectionChanged += value;
-        remove => Collection.CollectionChanged -= value;
+        add => collection.CollectionChanged += value;
+        remove => collection.CollectionChanged -= value;
     }
 }

@@ -81,8 +81,8 @@ public class ReadOnlyObservableCollectionExTests : FixtureBase
         Task.WaitAll(producer, consumer);
     }
 
-    private ReadOnlyObservableCollectionEx<long> CreateInstance()
+    private ObservableCollectionEx<long> CreateInstance()
     {
-        return new ReadOnlyObservableCollectionEx<long>();
+        return new ObservableCollectionEx<long>();
     }
 }

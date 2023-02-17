@@ -98,7 +98,7 @@ public static class ChangeSetExtensions
     
     public static IObservable<IChangeSet<T>> BindToCollection<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
     {
-        var result = new ReadOnlyObservableCollectionEx<T>();
+        var result = new ObservableCollectionEx<T>();
         collection = result;
         return source.Bind(result);
     }

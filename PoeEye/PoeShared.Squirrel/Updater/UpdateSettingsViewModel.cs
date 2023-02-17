@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -30,7 +31,7 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
     {
         this.configProvider = configProvider;
 
-        var knownSources = new ReadOnlyObservableCollectionEx<UpdateSourceInfo>();
+        var knownSources = new ObservableCollectionEx<UpdateSourceInfo>();
         updateSourceProvider.WhenAnyValue(x => x.KnownSources)
             .SubscribeSafe(x =>
             {

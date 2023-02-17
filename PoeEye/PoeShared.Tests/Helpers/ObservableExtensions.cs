@@ -10,7 +10,7 @@ public static class ObservableExtensions
 {
     public static IReadOnlyObservableCollection<T> Listen<T>(this IObservable<T> observable)
     {
-        var result = new ReadOnlyObservableCollectionEx<T>();
+        var result = new ObservableCollectionEx<T>();
         observable.Subscribe(result.Add);
         return result;
     }

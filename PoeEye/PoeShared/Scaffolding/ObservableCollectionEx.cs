@@ -3,40 +3,42 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using DynamicData.Binding;
 using PoeShared.Services;
+using PropertyBinder;
 using PropertyChanged;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
 
 [DoNotNotify]
-public sealed class ReadOnlyObservableCollectionEx<T> : DisposableReactiveObject, IObservableCollection<T>, IReadOnlyObservableCollection<T>
+public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObservableCollection<T>, IReadOnlyObservableCollection<T>
 {
     private static long collectionIdx;
 
     private readonly ObservableCollectionExtended<T> collection = new();
     private readonly string collectionId = $"Collection<{typeof(T).Name}>#{Interlocked.Increment(ref collectionIdx)}";
 
-    public ReadOnlyObservableCollectionEx(IEnumerable<T> enumerable) : this()
+    private static readonly Binder<ObservableCollectionEx<T>> Binder = new();
+
+    static ObservableCollectionEx()
+    {
+        Binder.Bind(x => x.collection.Count).To(x => x.Count);
+    }
+
+    public ObservableCollectionEx(IEnumerable<T> enumerable) : this()
     {
         collection.AddRange(enumerable);
     }
 
-    public ReadOnlyObservableCollectionEx()
+    public ObservableCollectionEx()
     {
         SyncRoot = new NamedLock($"{collectionId} Lock");
-        this.RaiseWhenSourceValue(x => x.Count, collection, x => x.Count).AddTo(Anchors);
         collection.CollectionChanged += OnCollectionChanged;
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     public NamedLock SyncRoot { get; }
 
-    public int Count
-    {
-        get
-        {
-            return collection.Count;
-        }
-    }
+    public int Count { get; private set; }
 
     public bool IsReadOnly => false;
 

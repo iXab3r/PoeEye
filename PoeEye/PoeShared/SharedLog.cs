@@ -57,7 +57,10 @@ public class SharedLog : DisposableReactiveObject
     public void LoadLogConfiguration(IAppArguments appArguments, FileInfo logConfig)
     {
         Guard.ArgumentNotNull(logConfig, nameof(logConfig));
-        Guard.ArgumentIsTrue(() => logConfig.Exists);
+        if (!logConfig.Exists)
+        {
+            throw new FileNotFoundException($"Log config file not found: {logConfig.FullName}", logConfig.FullName);
+        }
 
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         XmlConfigurator.ConfigureAndWatch(repository, logConfig);
