@@ -117,7 +117,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         Log.Info("Exception dialog window was closed");
     }
 
-    private void BinderExceptionHandler(object sender, ExceptionEventArgs e)
+    private void BinderExceptionHandler(object sender, BindingExceptionEventArgs e)
     {
         ReportCrash(e.Exception, $"BinderException, sender: {sender}");
     }

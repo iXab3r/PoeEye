@@ -212,7 +212,7 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         return true;
     }
 
-    private void HandleBinderException(object sender, ExceptionEventArgs e)
+    private void HandleBinderException(object sender, BindingExceptionEventArgs e)
     {
         Error = e.Exception;
         e.Handled = true;
