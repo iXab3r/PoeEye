@@ -19,13 +19,16 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     static SourceListEx()
     {
     }
-    
-    public SourceListEx(ISourceList<T> sourceList)
+
+    public SourceListEx(ISourceList<T> sourceList, IScheduler scheduler = null)
     {
         this.sourceList = sourceList.AddTo(Anchors);
         sourceList.CountChanged.Subscribe(x => Count = x).AddTo(Anchors);
-        
         var collectionSource = sourceList.Connect();
+        if (scheduler != null)
+        {
+            collectionSource = collectionSource.ObserveOn(scheduler);
+        }
         collectionSource.BindToCollection(out collection).Subscribe().AddTo(Anchors);
         Binder.Attach(this).AddTo(Anchors);
     }
@@ -61,7 +64,7 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
 
     public IEnumerator<T> GetEnumerator()
     {
-        return sourceList.Items.GetEnumerator();
+        return collection.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()

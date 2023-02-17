@@ -1,21 +1,16 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using DynamicData.Binding;
-using PoeShared.Services;
+using JetBrains.Annotations;
 using PropertyBinder;
 using PropertyChanged;
-using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
 
 [DoNotNotify]
 public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObservableCollection<T>, IReadOnlyObservableCollection<T>
 {
-    private static long collectionIdx;
-
     private readonly ObservableCollectionExtended<T> collection = new();
-    private readonly string collectionId = $"Collection<{typeof(T).Name}>#{Interlocked.Increment(ref collectionIdx)}";
 
     private static readonly Binder<ObservableCollectionEx<T>> Binder = new();
 
@@ -31,14 +26,11 @@ public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObser
 
     public ObservableCollectionEx()
     {
-        SyncRoot = new NamedLock($"{collectionId} Lock");
         collection.CollectionChanged += OnCollectionChanged;
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    public NamedLock SyncRoot { get; }
-
-    public int Count { get; private set; }
+    public int Count { get; [UsedImplicitly] private set; }
 
     public bool IsReadOnly => false;
 
@@ -96,14 +88,8 @@ public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObser
 
     public T this[int index]
     {
-        get
-        {
-            return collection[index];
-        }
-        set
-        {
-            collection[index] = value;
-        }
+        get => collection[index];
+        set => collection[index] = value;
     }
 
     public IDisposable SuspendCount()
@@ -130,7 +116,6 @@ public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObser
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        var handler = CollectionChanged;
-        handler?.Invoke(this, e);
+        CollectionChanged?.Invoke(this, e);
     }
 }

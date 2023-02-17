@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using DynamicData;
@@ -96,11 +97,51 @@ public static class ChangeSetExtensions
         return source.RemoveKey().BindToCollection(out collection);
     }
     
+    public static IObservable<NotifyCollectionChangedEventArgs> ToNotifyCollectionChanged<T>(this IObservable<IChangeSet<T>> source)
+    {
+        return Observable.Create<NotifyCollectionChangedEventArgs>(observer =>
+        {
+
+            var anchors = new CompositeDisposable();
+            source
+                .ForEachChange(x =>
+                {
+                    NotifyCollectionChangedEventArgs changedEventArgs;
+                    if (x.Type == ChangeType.Range && x.Reason is not ListChangeReason.Clear or ListChangeReason.Refresh)
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+                    switch (x.Reason)
+                    {
+                        case ListChangeReason.Add:
+                            changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new[] {x.Item.Current}, x.Item.CurrentIndex);
+                            break;
+                        case ListChangeReason.Replace:
+                            changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, new[] {x.Item.Current}, new[] {x.Item.Previous.Value}, x.Item.CurrentIndex);
+                            break;
+                        case ListChangeReason.Remove:
+                            changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { x.Item.Current }, x.Item.CurrentIndex);
+                            break;
+                        case ListChangeReason.Clear:
+                            changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    observer.OnNext(changedEventArgs);
+                })
+                .Subscribe()
+                .AddTo(anchors);
+            
+            return anchors;
+        });
+    }
+    
     public static IObservable<IChangeSet<T>> BindToCollection<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
     {
         var result = new ObservableCollectionEx<T>();
         collection = result;
-        return source.Bind(result);
+        return source.Bind(result, resetThreshold: int.MaxValue); // never reset to avoid breaking PropertyBinder
     }
 
     public static ISourceListEx<T> ToSourceListEx<T>(this IObservable<IChangeSet<T>> source)
