@@ -101,6 +101,11 @@ public static class PathUtils
         return (path ?? string.Empty).Count(x => x == Path.DirectorySeparatorChar);
     }
 
+    public static bool IsSamePath(string first, string second)
+    {
+        return string.Equals(first, second, StringComparison.OrdinalIgnoreCase);
+    }
+
     public static bool IsParentDir(string candidatePath, string parentDir)
     {
         if (candidatePath == parentDir || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
