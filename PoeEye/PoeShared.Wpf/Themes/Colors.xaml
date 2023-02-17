@@ -21,6 +21,8 @@
     <SolidColorBrush x:Key="OverlayAlternateBackgroundBrushKey" Color="{StaticResource OverlayAlternateBackgroundColorKey}" ice:Freeze="True" />
     <SolidColorBrush x:Key="OverlayBackgroundBrushKey" Color="{StaticResource OverlayBackgroundColorKey}" ice:Freeze="True" />
     <SolidColorBrush x:Key="OverlayForegroundBrushKey" Color="{StaticResource OverlayForegroundColorKey}" ice:Freeze="True" />
+    
+    <DataTemplate x:Key="EmptyTemplate"/>
 
     <DrawingBrush x:Key="CheckerboardBrushKey" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
         <DrawingBrush.Drawing>
