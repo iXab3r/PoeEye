@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
+using Force.DeepCloner;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
@@ -29,6 +30,6 @@ public abstract class HotkeySequenceItem : DisposableReactiveObject, ICloneable
     
     public object Clone()
     {
-        return this.CloneJson();
+        return this.DeepClone();
     }
 }

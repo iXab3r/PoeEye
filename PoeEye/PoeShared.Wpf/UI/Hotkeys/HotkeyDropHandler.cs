@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Force.DeepCloner;
 using GongSolutions.Wpf.DragDrop;
 using PoeShared.Scaffolding;
 

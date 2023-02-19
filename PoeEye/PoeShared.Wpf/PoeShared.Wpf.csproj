@@ -20,6 +20,7 @@
     <PackageReference Include="BidirectionalMap" Version="1.0.0" />
     <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
+    <PackageReference Include="DeepCloner" Version="0.10.2" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="Font.Awesome" Version="5.15.4" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.0.48" />
