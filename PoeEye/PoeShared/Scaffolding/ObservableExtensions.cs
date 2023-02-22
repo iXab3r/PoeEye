@@ -286,6 +286,13 @@ public static class ObservableExtensions
 
         return source.Catch(source.SubscribeOn(scheduler).DelaySubscription(timeSpan).Retry());
     }
+    
+    public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSourceProperty>(
+        [NotNull] this IObservable<TSourceProperty> sourceObservable)
+    {
+        var result = new ObservableAsPropertyHelper<TSourceProperty>(sourceObservable, onChanged:src => { }, onChanging: null, initialValue: default, deferSubscription: false);
+        return result;
+    }
         
     public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSource, TSourceProperty>(
         [NotNull] this IObservable<TSourceProperty> sourceObservable,
