@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net6</TargetFramework>
         <AssemblyTitle>PoeShared.Blazor</AssemblyTitle>
         <Product>PoeShared.Blazor</Product>
         <Copyright>Copyright © Xab3r 2022</Copyright>
