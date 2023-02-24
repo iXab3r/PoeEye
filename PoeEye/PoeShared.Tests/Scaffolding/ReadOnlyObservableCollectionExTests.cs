@@ -4,7 +4,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using ABI.Windows.ApplicationModel.Email;
 using DynamicData;
 using PoeShared.Scaffolding;
 using Shouldly;

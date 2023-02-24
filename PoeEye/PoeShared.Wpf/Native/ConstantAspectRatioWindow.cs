@@ -13,6 +13,7 @@ using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.UI;
+using PoeShared.Modularity;
 
 namespace PoeShared.Native;
 

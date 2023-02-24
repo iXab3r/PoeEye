@@ -1,25 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <UseWPF>true</UseWPF>
-        <UseWindowsForms>True</UseWindowsForms>
-        <AssemblyName>WindowsHook</AssemblyName>
-        <RootNamespace>WindowsHook</RootNamespace>
-        <TargetFramework>net6-windows7</TargetFramework>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <PackageProjectUrl>https://github.com/iXab3r/WindowsHook</PackageProjectUrl>
-        <PackageIcon>mouse-keyboard-hook-logo64x64.png</PackageIcon>
-        <PackageIconUrl />
-        <RepositoryUrl>https://github.com/topstarai/WindowsHook</RepositoryUrl>
-        <Authors>Mark Kang</Authors>
-        <PackageTags>hook, .net core, wpf, winform, global, spy,event, mouse, keyboard</PackageTags>
-        <PackageId>WindowsHook</PackageId>
-        <PackageLicenseFile>README.md</PackageLicenseFile>
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="PInvoke.User32" Version="0.6.49" />
-      <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
-    </ItemGroup>
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+    <AssemblyName>WindowsHook</AssemblyName>
+    <RootNamespace>WindowsHook</RootNamespace>
+    <TargetFramework>net7-windows</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageProjectUrl>https://github.com/iXab3r/WindowsHook</PackageProjectUrl>
+    <PackageIcon>mouse-keyboard-hook-logo64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryUrl>https://github.com/topstarai/WindowsHook</RepositoryUrl>
+    <Authors>Mark Kang</Authors>
+    <PackageTags>hook, .net core, wpf, winform, global, spy,event, mouse, keyboard</PackageTags>
+    <PackageId>WindowsHook</PackageId>
+    <PackageLicenseFile>README.md</PackageLicenseFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="PInvoke.User32" Version="0.6.49" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <IncludeAssets>All</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
+  </ItemGroup>
 </Project>

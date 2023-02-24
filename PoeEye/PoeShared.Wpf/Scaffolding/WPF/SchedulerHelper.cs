@@ -1,4 +1,5 @@
-﻿using System.Reactive.Concurrency;
+﻿using PoeShared.Modularity;
+using System.Reactive.Concurrency;
 
 namespace PoeShared.Scaffolding.WPF;
 

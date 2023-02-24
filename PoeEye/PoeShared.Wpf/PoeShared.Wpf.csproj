@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{38C9EBE2-2AC9-465F-8A2A-49DFB1CB9383}</ProjectGuid>
-    <TargetFramework>net6-windows10.0.20348.0</TargetFramework>
+    <TargetFramework>net7-windows</TargetFramework>
     <AssemblyTitle>PoeShared.Wpf</AssemblyTitle>
     <Product>PoeShared.Wpf</Product>
     <Description>PoeEye Shared Wpf classes</Description>
@@ -12,40 +12,50 @@
     <LangVersion>10</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>PoeShared</RootNamespace>
-    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
+    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;UA306_A;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="App.Metrics" Version="4.2.0" />
     <PackageReference Include="AutoCompleteTextBox" Version="1.2.3" />
     <PackageReference Include="BidirectionalMap" Version="1.0.0" />
-    <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0"><NoWarn>NU1701</NoWarn></PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
+    <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="DeepCloner" Version="0.10.2" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="Font.Awesome" Version="5.15.4" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.0.48" />
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
     <PackageReference Include="JetBrains.Profiler.SelfApi" Version="2.2.0" />
-    <PackageReference Include="Kent.Boogaart.Converters" Version="1.3.1"><NoWarn>NU1701</NoWarn></PackageReference>
-    <PackageReference Include="Kent.Boogaart.HelperTrinity" Version="1.5.2"><NoWarn>NU1701</NoWarn></PackageReference>
+    <PackageReference Include="Kent.Boogaart.Converters" Version="1.3.1">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.4"><NoWarn>NU1701</NoWarn></PackageReference>
+    <PackageReference Include="MahApps.Metro" Version="2.4.4">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.1.6" />
     <PackageReference Include="PInvoke.SHCore" Version="0.6.49" />
     <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="Prism.Core" Version="7.2.0.1367" />
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
-    <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />
-    <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
+    <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <IncludeAssets>All</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="ReactiveUI.Validation" Version="1.4.1" />
     <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
-    <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29"><NoWarn>NU1701</NoWarn></PackageReference>
-    <PackageReference Include="StartupHelper" Version="1.0.2.0"><NoWarn>NU1701</NoWarn></PackageReference>
+    <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="Syroot.Windows.IO.KnownFolders" Version="1.2.3" />
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.0" />
+    <PackageReference Include="StartupHelper" Version="1.0.3.4" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\gong-wpf-dragdrop\src\GongSolutions.WPF.DragDrop\GongSolutions.WPF.DragDrop.csproj" />
