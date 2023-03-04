@@ -226,25 +226,26 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
             throw new InvalidOperationException($"Source is not set, could not set value {newValue}");
         }
 
-        Log.Debug(() => $"Updating value: {Value} => {newValue}");
+        var beforeUpdate = Value;
+        Log.Debug(() => $"Updating value: {beforeUpdate} => {newValue}");
         try
         {
             Error = default;
             assignmentActionSupplier.Value(Source, newValue);
-            var current = Value;
-            if (EqualityComparer<TProperty>.Default.Equals(newValue, current))
+            var afterUpdate = Value;
+            if (EqualityComparer<TProperty>.Default.Equals(newValue, afterUpdate))
             {
-                Log.Debug(() => $"Updated value to {Value}");
+                Log.Debug(() => $"Updated value to {afterUpdate}, source: {Source}");
             }
             else
             {
-                throw new InvalidStateException($"Failed to update value to {newValue}, currently it is {current}");
+                Log.Debug(() => $"Failed to update value to {newValue}, currently it is {afterUpdate}, source: {Source}");
             }
         }
         catch (Exception e)
         {
             Error = new BindingException($"Failed to set value {newValue}, watcher: {this} - {e}", e);
-            Log.Warn($"Failed to change value of {Source} from {Value} to {newValue}", e);
+            Log.Warn($"Failed to change value of {Source} from {beforeUpdate} to {newValue}", e);
         }
     }
 
