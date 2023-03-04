@@ -10,21 +10,12 @@ namespace PoeShared.Squirrel.Prism;
 
 public sealed class UpdaterModule : DynamicModule
 {
-    private readonly IUnityContainer container;
-
-    public UpdaterModule(IUnityContainer container)
-    {
-        Guard.ArgumentNotNull(container, nameof(container));
-
-        this.container = container;
-    }
-
-    protected override void RegisterTypesInternal(IContainerRegistry containerRegistry)
+    protected override void RegisterTypesInternal(IUnityContainer container)
     {
         container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
     }
 
-    protected override void OnInitializedInternal(IContainerProvider containerProvider)
+    protected override void OnInitializedInternal(IUnityContainer container)
     {
         var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
         registrator.RegisterSettingsEditor<UpdateSettingsConfig, UpdateSettingsViewModel>();

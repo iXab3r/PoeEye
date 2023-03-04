@@ -15,6 +15,7 @@
 
      <ItemGroup>
          <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
+         <ProjectReference Include="..\PoeShared.Squirrel\PoeShared.Squirrel.csproj" />
          <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
          <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
      </ItemGroup>
@@ -27,15 +28,24 @@
      </ItemGroup>
 
      <ItemGroup>
-       <Folder Include="Services" />
-     </ItemGroup>
-
-     <ItemGroup>
        <None Update="wwwroot4wpf\app.css">
          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
        </None>
        <None Update="wwwroot4wpf\index.html">
          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
        </None>
+     </ItemGroup>
+
+     <ItemGroup>
+       <Page Update="Installer\WebViewInstallWindow.xaml">
+         <Generator>MSBuild:Compile</Generator>
+         <XamlRuntime>Wpf</XamlRuntime>
+         <SubType>Designer</SubType>
+       </Page>
+     </ItemGroup>
+
+     <ItemGroup>
+       <None Remove="Resources\WebView.ico" />
+       <Resource Include="Resources\WebView.ico" />
      </ItemGroup>
 </Project>

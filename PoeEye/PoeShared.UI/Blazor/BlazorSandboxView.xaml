@@ -4,6 +4,9 @@
                               xmlns:blazor="clr-namespace:PoeShared.UI.Blazor"
                               xmlns:st="http://schemas.spicytaco.io/">
     <DataTemplate DataType="{x:Type blazor:BlazorSandboxViewModel}">
-        <eye:CachedContentControl Content="{Binding WebViewHost}"/>
+        <st:StackPanel Orientation="Vertical">
+            <eye:ButtonEx Content="Show Installer" Command="{Binding ShowInstaller}"/>
+            <eye:CachedContentControl Content="{Binding WebViewHost}" st:StackPanel.Fill="Fill"/>
+        </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>

@@ -1,4 +1,5 @@
-﻿using PoeShared.Squirrel.Updater;
+﻿using PoeShared.Squirrel.Core;
+using PoeShared.Squirrel.Updater;
 using Unity;
 using Unity.Extension;
 
@@ -12,6 +13,7 @@ public sealed class UpdaterRegistrations : UnityContainerExtension
             .RegisterSingleton<IUpdateSourceProvider, UpdateSourceProviderFromConfig>()
             .RegisterSingleton<IUpdaterWindowDisplayer, UpdaterWindowDisplayer>()
             .RegisterSingleton<ISquirrelEventsHandler, SquirrelEventsHandler>()
+            .RegisterSingleton<IFileDownloader, BasicAuthFileDownloader>()
             .RegisterSingleton<IApplicationUpdaterViewModel, ApplicationUpdaterViewModel>()
             .RegisterSingleton<IApplicationUpdaterModel, ApplicationUpdaterModel>();
 

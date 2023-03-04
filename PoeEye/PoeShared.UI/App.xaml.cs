@@ -1,7 +1,10 @@
 ﻿using System.Windows;
+using PoeShared.Blazor.Wpf.Prism;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using PoeShared.Squirrel.Prism;
 using PoeShared.Wpf.Scaffolding;
 using Unity;
 using Unity.Lifetime;
@@ -16,7 +19,10 @@ public partial class App : ApplicationBase
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-            
+
+        Container.AddNewExtensionIfNotExists<BlazorWpfExtensions>();
+        Container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
+        
         Container
             .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();
             
