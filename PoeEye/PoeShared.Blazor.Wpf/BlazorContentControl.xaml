@@ -1,0 +1,30 @@
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:dd="urn:gong-wpf-dragdrop"
+                              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                              xmlns:themes="clr-namespace:PoeShared.Themes;assembly=PoeShared.Wpf"
+                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                              xmlns:wpf="clr-namespace:PoeShared.Blazor.Wpf"
+                              xmlns:wpf1="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
+                              mc:Ignorable="d">
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
+    
+    <ControlTemplate x:Key="CachedControlControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
+        <wpf1:BlazorWebView x:Name="PART_WebView">
+        </wpf1:BlazorWebView>
+    </ControlTemplate>
+
+    <Style x:Key="DefaultBlazorContentControlStyle" TargetType="{x:Type wpf:BlazorContentControl}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template" Value="{StaticResource CachedControlControlTemplate}">
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type wpf:BlazorContentControl}" BasedOn="{StaticResource DefaultBlazorContentControlStyle}" />
+</eye:SharedResourceDictionary>

@@ -2,11 +2,23 @@
                               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                               xmlns:eye="http://coderush.net/poeeye/"
                               xmlns:blazor="clr-namespace:PoeShared.UI.Blazor"
-                              xmlns:st="http://schemas.spicytaco.io/">
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:wpf="clr-namespace:PoeShared.Blazor.Wpf;assembly=PoeShared.Blazor.Wpf">
     <DataTemplate DataType="{x:Type blazor:BlazorSandboxViewModel}">
         <st:StackPanel Orientation="Vertical">
             <eye:ButtonEx Content="Show Installer" Command="{Binding ShowInstaller}"/>
-            <eye:CachedContentControl Content="{Binding WebViewHost}" st:StackPanel.Fill="Fill"/>
+            <GroupBox  st:StackPanel.Fill="Fill">
+                <GroupBox.Header>
+                    Control-based
+                </GroupBox.Header>
+                <wpf:BlazorContentControl ViewType="{x:Type blazor:MainCounterView}" Content="{Binding MainCounter}"/>
+            </GroupBox>
+            <GroupBox  st:StackPanel.Fill="Fill">
+                <GroupBox.Header>
+                    Control-based
+                </GroupBox.Header>
+                <wpf:BlazorContentControl ViewType="{x:Type blazor:MainCounterView}" Content="{Binding MainCounter}"/>
+            </GroupBox>
         </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>

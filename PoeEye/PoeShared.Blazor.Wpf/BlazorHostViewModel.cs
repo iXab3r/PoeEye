@@ -28,6 +28,7 @@ public class BlazorHostViewModel : DisposableReactiveObject
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddBlazorWebView();
+        serviceCollection.AddWpfBlazorWebView();
         view.Services = serviceCollection.BuildServiceProvider();
 
         Components

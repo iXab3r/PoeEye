@@ -49,7 +49,7 @@
       <Compile Update="FakeDelayNumberViewModel.cs">
         <DependentUpon>FakeDelayNumberView.xaml</DependentUpon>
       </Compile>
-      <Compile Update="Blazor\MainCounter.cs">
+      <Compile Update="Blazor\MainCounter.Viewcs">
         <DependentUpon>Main.razor</DependentUpon>
       </Compile>
     </ItemGroup>

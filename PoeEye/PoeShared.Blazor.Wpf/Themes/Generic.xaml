@@ -4,5 +4,6 @@
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/BlazorHostView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/Installer/WebViewInstaller.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/BlazorContentControl.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 </eye:SharedResourceDictionary>

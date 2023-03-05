@@ -23,8 +23,8 @@
      <ItemGroup>
          <PackageReference Include="FluentValidation" Version="9.5.1" />
          <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
-         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="6.0.2" />
-         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.200-preview.13.2865" />
+         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="7.0.3" />
+         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="7.0.59" />
      </ItemGroup>
 
      <ItemGroup>
@@ -47,5 +47,9 @@
      <ItemGroup>
        <None Remove="Resources\WebView.ico" />
        <Resource Include="Resources\WebView.ico" />
+     </ItemGroup>
+
+     <ItemGroup>
+       <MauiXaml Include="BlazorContentControl.xaml" />
      </ItemGroup>
 </Project>
