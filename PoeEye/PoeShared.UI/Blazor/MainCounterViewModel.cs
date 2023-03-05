@@ -3,7 +3,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Blazor;
 
-public class MainCounterViewModel : DisposableReactiveComponent
+public class MainCounterViewModel : DisposableReactiveObject
 {
     public MainCounterViewModel()
     {

@@ -37,7 +37,7 @@ public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReacti
     }
 }
 
-public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where T : DisposableReactiveComponent
+public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where T : IDisposableReactiveObject
 {
     private static readonly IFluentLog Log = typeof(BlazorReactiveComponent<T>).PrepareLogger();
 
@@ -49,7 +49,6 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
             {
                 Log.Debug(() => $"Initializing instance of {this} ({GetType()})");
         
-                dataContext.JsRuntime = JsRuntime;
                 dataContext.PropertyChanged += async (sender, args) =>
                 {
                     Log.Debug(() => $"Component property has changed: {args.PropertyName}, requesting redraw");
