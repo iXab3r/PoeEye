@@ -29,7 +29,8 @@ public static class ReactiveObjectExtensions
         var sourcePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(sourcePropertyExtractor.Body));
 
         var result = source
-            .WhenAnyValue(sourcePropertyExtractor);
+            .WhenAnyProperty(sourcePropertyExtractor)
+            .Skip(1);
 
         if (scheduler != null)
         {
