@@ -15,15 +15,24 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
     
-    <ControlTemplate x:Key="CachedControlControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
-        <wpf1:BlazorWebView x:Name="PART_WebView">
-        </wpf1:BlazorWebView>
+    <ControlTemplate x:Key="BlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
+        <wpf1:BlazorWebView x:Name="PART_WebView"/>
+    </ControlTemplate>
+    
+    <ControlTemplate x:Key="TemporaryBlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
+        <TextBlock Text="Not installed"/>
     </ControlTemplate>
 
     <Style x:Key="DefaultBlazorContentControlStyle" TargetType="{x:Type wpf:BlazorContentControl}">
         <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Template" Value="{StaticResource CachedControlControlTemplate}">
-        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True">
+                <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="False">
+                <Setter Property="Template" Value="{StaticResource TemporaryBlazorContentControlTemplate}"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type wpf:BlazorContentControl}" BasedOn="{StaticResource DefaultBlazorContentControlStyle}" />

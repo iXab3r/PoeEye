@@ -9,5 +9,6 @@ public sealed class BlazorWpfExtensions : UnityContainerExtension
     protected override void Initialize()
     {
         Container.RegisterSingleton<IWebViewInstallerDisplayer, WebViewInstallerDisplayer>();
+        Container.RegisterFactory<IWebViewAccessor>(x => WebViewAccessor.Instance);
     }
 }

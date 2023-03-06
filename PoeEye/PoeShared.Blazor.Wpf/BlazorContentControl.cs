@@ -56,7 +56,7 @@ public class BlazorContentControl : ReactiveControl
         webView = Template.FindName(PART_WebView, this) as BlazorWebView;
         if (webView == null)
         {
-            throw new ArgumentException($"Could not find part {PART_WebView}");
+            return;
         }
 
         var serviceCollection = new ServiceCollection();

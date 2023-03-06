@@ -7,6 +7,7 @@
     <DataTemplate DataType="{x:Type blazor:BlazorSandboxViewModel}">
         <st:StackPanel Orientation="Vertical">
             <eye:ButtonEx Content="Show Installer" Command="{Binding ShowInstaller}"/>
+            <CheckBox IsChecked="{Binding WebViewAccessor.IsInstalled}">IsInstalled</CheckBox>
             <GroupBox  st:StackPanel.Fill="Fill">
                 <GroupBox.Header>
                     Control-based

@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
@@ -21,19 +22,25 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
     static WebViewInstaller()
     {
         Binder.Bind(x => x.DownloadAndInstallCommand.IsBusy || x.RefreshCommand.IsBusy).To(x => x.IsBusy);
+        Binder.Bind(x => x.webViewAccessor.IsInstalled).To(x => x.IsInstalled);
+        Binder.Bind(x => x.webViewAccessor.InstallType).To(x => x.BrowserInstallType);
+        Binder.Bind(x => x.webViewAccessor.AvailableBrowserVersion).To(x => x.BrowserVersion);
     }
 
     private readonly WebViewInstallerArgs args;
     private readonly IWindowViewController viewController;
+    private readonly IWebViewAccessor webViewAccessor;
     private readonly IFileDownloader fileDownloader;
 
     public WebViewInstaller(
         WebViewInstallerArgs args,
         IWindowViewController viewController,
+        IWebViewAccessor webViewAccessor,
         IFileDownloader fileDownloader)
     {
         this.args = args;
         this.viewController = viewController;
+        this.webViewAccessor = webViewAccessor;
         this.fileDownloader = fileDownloader;
         RefreshCommand = CommandWrapper.Create(Refresh);
 
@@ -43,11 +50,9 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    public string Status { get; private set; }
+    public bool IsInstalled { get; [UsedImplicitly] private set; }
     
-    public bool IsInstalled { get; private set; }
-    
-    public bool IsBusy { get; private set; }
+    public bool IsBusy { get; [UsedImplicitly] private set; }
     
     public CommandWrapper RefreshCommand { get; }
     
@@ -55,9 +60,9 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
     
     public CommandWrapper CloseWindow { get; }
     
-    public string BrowserVersion { get; private set; }
+    public string BrowserVersion { get; [UsedImplicitly] private set; }
     
-    public WebViewInstallType BrowserInstallType { get; private set; }
+    public WebViewInstallType BrowserInstallType { get; [UsedImplicitly] private set; }
 
     public Uri DownloadLink { get; } = new("https://go.microsoft.com/fwlink/p/?LinkId=2124703", UriKind.Absolute);
 
@@ -104,8 +109,6 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
 
     public void Refresh()
     {
-        BrowserVersion = WebViewUtils.GetAvailableBrowserVersion();
-        BrowserInstallType = WebViewUtils.GetInstallTypeFromVersion(BrowserVersion);
-        IsInstalled = BrowserInstallType != WebViewInstallType.NotInstalled;
+        WebViewAccessor.Instance.Refresh();
     }
 }
