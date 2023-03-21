@@ -63,18 +63,18 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
             .DistinctUntilChanged(x => x.Dump())
             .SubscribeSafe(newLines =>
             {
-                Log.Debug(() => $"Microphone lines list changed:\n\tCurrent lines list:\n\t\t{lines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
+                Log.Debug(() => $"Lines list changed:\n\tCurrent lines list:\n\t\t{lines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
                 var linesToAdd = newLines.Except(lines.Items).ToArray();
                 if (linesToAdd.Any())
                 {
-                    Log.Debug(() => $"Adding microphone lines: {linesToAdd.Dump()}");
+                    Log.Debug(() => $"Adding lines: {linesToAdd.Dump()}");
                     lines.AddRange(linesToAdd);
                 }
 
                 var linesToRemove = lines.Items.Except(newLines).ToArray();
                 if (linesToRemove.Any())
                 {
-                    Log.Debug(() => $"Removing microphone lines: {linesToRemove.Dump()}");
+                    Log.Debug(() => $"Removing lines: {linesToRemove.Dump()}");
                     lines.RemoveMany(linesToRemove);
                 }
             }, Log.HandleUiException)

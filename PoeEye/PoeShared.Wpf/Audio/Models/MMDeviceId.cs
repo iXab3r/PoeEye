@@ -5,6 +5,8 @@ namespace PoeShared.Audio.Models;
 public readonly struct MMDeviceId
 {
     public static readonly MMDeviceId All = new MMDeviceId("all", "All devices");
+    public static readonly MMDeviceId DefaultOutput = new MMDeviceId("defaultOutput", "Default output devices");
+    public static readonly MMDeviceId DefaultInput = new MMDeviceId("defaultInput", "Default output devices");
         
     public MMDeviceId(string lineId, string name)
     {
@@ -43,4 +45,6 @@ public readonly struct MMDeviceId
     {
         return LineId != null ? LineId.GetHashCode() : 0;
     }
+    
+     
 }

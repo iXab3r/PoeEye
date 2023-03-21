@@ -29,8 +29,10 @@
     
     <ItemGroup>
       <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
+      <PackageReference Include="ScottPlot.WPF" Version="5.0.2-beta" />
       <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
       <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29" />
+      <PackageReference Include="WPFSVL" Version="1.0.0" />
     </ItemGroup>
     
     <ItemGroup>
@@ -57,6 +59,10 @@
     <ItemGroup>
       <None Remove="Resources\giphy.gif" />
       <Resource Include="Resources\giphy.gif" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <MauiXaml Include="Audio\AudioSandbox.xaml" />
     </ItemGroup>
     
 </Project>

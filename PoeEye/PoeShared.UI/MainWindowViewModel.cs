@@ -13,6 +13,7 @@ using PoeShared.Scaffolding;
 using PoeShared.RegionSelector;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.UI.Audio;
 using PoeShared.UI.Bindings;
 using PoeShared.UI.Blazor;
 using PropertyBinder;
@@ -45,10 +46,12 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         ExceptionSandboxViewModel exceptionSandbox,
         IHotkeySequenceEditorViewModel hotkeySequenceEditor,
         AutoCompleteSandboxViewModel autoCompleteSandbox,
-        BindingsSandboxViewModel bindingsSandbox)
+        BindingsSandboxViewModel bindingsSandbox,
+        AudioSandbox audioSandbox)
     {
         SelectionAdorner = selectionAdorner.AddTo(Anchors);
         AutoCompleteSandbox = autoCompleteSandbox;
+        AudioSandbox = audioSandbox;
         this.regionSelectorService = regionSelectorService;
         BindingsSandbox = bindingsSandbox.AddTo(Anchors);
         NotificationSandbox = notificationSandbox.AddTo(Anchors);
@@ -102,6 +105,7 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
 
     public SelectionAdorner SelectionAdorner { get; }
     public AutoCompleteSandboxViewModel AutoCompleteSandbox { get; }
+    public AudioSandbox AudioSandbox { get; }
 
     public NotificationSandboxViewModel NotificationSandbox { get; }
     public ExceptionSandboxViewModel ExceptionSandbox { get; }
