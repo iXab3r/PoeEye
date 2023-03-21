@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using CSCore.CoreAudioAPI;
-using PoeShared.Logging;
+using NAudio.CoreAudioApi;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Services;
@@ -11,80 +10,47 @@ internal sealed class ProcessAudioController : DisposableReactiveObjectWithLogge
 {
     public void SetIsMutedByProcessId(bool isMuted, int processId)
     {
-        SetIsMuted(isMuted, x => x.Id == processId);
+        SetIsMuted(isMuted, processId);
     }
-    
+
     public void SetIsMutedByProcessName(bool isMuted, string processName)
     {
-        SetIsMuted(isMuted, x => x.ProcessName == processName);
+        var processId = Process.GetProcessesByName(processName);
+        processId.ForEach(process => SetIsMutedByProcessId(isMuted, process.Id));
     }
 
-    public void ToggleIsMuted(Predicate<Process> processMatcher)
+    private static void SetIsMuted(Action<AudioSessionControl, SimpleAudioVolume> controller, int targetProcessId)
     {
-        SetIsMuted((sessionControl, volumeController) =>
-        {
-            var newState = !volumeController.IsMuted;
-            Log.Info(() => $"Matched process {sessionControl.Process}, toggling {nameof(SimpleAudioVolume.IsMuted)} using {volumeController}, isMuted: {volumeController.IsMuted} => {newState}");
-            volumeController.IsMuted = newState;
-        }, processMatcher);
-    }
+        using var enumerator = new MMDeviceEnumerator();
+        using var captureDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-    private void SetIsMuted(Action<AudioSessionControl2, SimpleAudioVolume> controller, Predicate<Process> processMatcher)
-    {
-        foreach (var sessionManager in GetDefaultAudioSessionManager2(DataFlow.Render))
+        for (var idx = 0; idx < captureDevice.AudioSessionManager.Sessions.Count; idx++)
         {
-            using (sessionManager)
-            using (var sessionEnumerator = sessionManager.GetSessionEnumerator())
+            var session = captureDevice.AudioSessionManager.Sessions[idx];
+
+            uint processId = default;
+            try
             {
-                foreach (var session in sessionEnumerator)
-                {
-                    using var sessionControl = session.QueryInterface<AudioSessionControl2>();
-                    if (sessionControl.IsDisposed)
-                    {
-                        continue;
-                    }
+                processId = session.GetProcessID;
+            }
+            catch (Exception e)
+            {
+                // do nothing, some processes will not be available
+            }
 
-                    try
-                    {
-                        if (!processMatcher(sessionControl.Process))
-                        {
-                            continue;
-                        }
-                        
-                        using var simpleVolume = session.QueryInterface<SimpleAudioVolume>();
-                        if (simpleVolume.IsDisposed)
-                        {
-                            continue;
-                        }
-                        
-                        controller(sessionControl, simpleVolume);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Warn($"Failed to execute predicate for process {sessionControl.Process}", e);
-                    }
-                }
+            if (processId == targetProcessId)
+            {
+                controller(session, session.SimpleAudioVolume);
             }
         }
     }
-    
-    public void SetIsMuted(bool isMuted, Predicate<Process> processMatcher)
+
+    private void SetIsMuted(bool isMuted, int processId)
     {
         SetIsMuted((sessionControl, volumeController) =>
         {
-            Log.Info(() => $"Matched process {sessionControl.Process}, setting {nameof(SimpleAudioVolume.IsMuted)} to {isMuted} using {volumeController}");
-            volumeController.IsMuted = isMuted;
-        }, processMatcher);
-    }
-
-    private static IEnumerable<AudioSessionManager2> GetDefaultAudioSessionManager2(DataFlow dataFlow)
-    {
-        using var enumerator = new MMDeviceEnumerator();
-        using var devices = enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active);
-        foreach (var device in devices)
-        {
-            var sessionManager = AudioSessionManager2.FromMMDevice(device);
-            yield return sessionManager;
-        }
+            Log.Info(() => $"Matched process {sessionControl.GetProcessID}, setting {nameof(SimpleAudioVolume.Mute)} to {isMuted} using {volumeController}");
+            volumeController.Mute = isMuted;
+        }, processId);
     }
 }
