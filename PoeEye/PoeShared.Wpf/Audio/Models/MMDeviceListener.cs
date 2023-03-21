@@ -1,28 +1,49 @@
 ﻿using System;
-using System.Buffers;
 using System.Diagnostics;
-using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using PoeShared.Scaffolding;
+using AudioClientShareMode = NAudio.CoreAudioApi.AudioClientShareMode;
+using DataFlow = NAudio.CoreAudioApi.DataFlow;
+using MMDevice = NAudio.CoreAudioApi.MMDevice;
 
 namespace PoeShared.Audio.Models;
 
 public sealed class MMDeviceListener : DisposableReactiveObjectWithLogger
 {
+    private readonly IWaveIn wasapiCapture;
     private readonly WaveFormat captureFormat;
     private readonly ISubject<MMAudioBuffer> bufferSource = new Subject<MMAudioBuffer>();
 
-    public MMDeviceListener(MMDevice device, WaveFormat captureFormat)
+    public MMDeviceListener(MMDevice device, WaveFormat captureFormat) : this(ToCaptureSession(device), captureFormat)
     {
-        this.captureFormat = captureFormat;
-        Device = device;
+        if (device.DataFlow != DataFlow.Render)
+        {
+            return;
+        }
 
-        var wasapiCapture = device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
+        var silenceProvider = new SilenceProvider(wasapiCapture.WaveFormat);
+        var wasapiOut = new WasapiOut(device, AudioClientShareMode.Shared, false, 250);
+        wasapiOut.Init(silenceProvider);
+        wasapiOut.Play();
+        Disposable.Create(() =>
+        {
+            if (wasapiOut.PlaybackState != PlaybackState.Stopped)
+            {
+                wasapiOut.Stop();
+            }
+            wasapiOut.Dispose();
+        }).AddTo(Anchors);
+    }
+    
+    public MMDeviceListener(IWaveIn wasapiCapture, WaveFormat captureFormat)
+    {
+        this.wasapiCapture = wasapiCapture.AddTo(Anchors);
+        this.captureFormat = captureFormat;
+
         var bufferedWaveInProvider = new BufferedWaveProvider(wasapiCapture.WaveFormat)
         {
             ReadFully = true,
@@ -47,28 +68,16 @@ public sealed class MMDeviceListener : DisposableReactiveObjectWithLogger
 
         wasapiCapture.StartRecording();
 
-        if (device.DataFlow == DataFlow.Render)
-        {
-            var silenceProvider = new SilenceProvider(wasapiCapture.WaveFormat);
-            var wasapiOut = new WasapiOut(device, AudioClientShareMode.Shared, false, 250);
-            wasapiOut.Init(silenceProvider);
-            wasapiOut.Play();
-            Disposable.Create(() =>
-            {
-                if (wasapiOut.PlaybackState != PlaybackState.Stopped)
-                {
-                    wasapiOut.Stop();
-                }
-                wasapiOut.Dispose();
-            }).AddTo(Anchors);
-        }
 
         Buffers = bufferSource;
     }
 
-    public MMDevice Device { get; }
-
     public IObservable<MMAudioBuffer> Buffers { get; }
+
+    private static IWaveIn ToCaptureSession(MMDevice device)
+    {
+        return device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
+    }
     
     private static IWaveProvider BuildPipeline(
         IWaveProvider provider, 

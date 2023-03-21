@@ -14,6 +14,11 @@ public class LogarithmicConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
+<<<<<<< HEAD
         throw new NotImplementedException();
+=======
+        var logarithmicValue = System.Convert.ToDouble(value);
+        return logarithmicValue > 0 ? (Math.Pow(10, logarithmicValue) - 1) / 9 : 0;
+>>>>>>> 4b10f3d7 (Fixed related to audio capture)
     }
 }

@@ -15,7 +15,9 @@
     <DataTemplate DataType="{x:Type audio:AudioSandbox}">
         <st:StackPanel Orientation="Vertical">
             <st:StackPanel Orientation="Horizontal">
-                <ComboBox ItemsSource="{Binding Devices}" SelectedItem="{Binding DeviceId}" 
+                <ComboBox ItemsSource="{Binding Devices}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding DeviceId}" 
                           st:StackPanel.Fill="Fill"/>
                 <TextBlock Text="{Binding MinSample, StringFormat='Min: {0:F5}'}" MinWidth="100"/>
                 <TextBlock Text="{Binding MaxSample, StringFormat='Max: {0:F5}'}" MinWidth="100" />
@@ -24,8 +26,7 @@
                 <TextBlock Text="{Binding AllTimeMaxSample, StringFormat='All Time Max: {0:F5}'}" MinWidth="100" />
                 <Slider Minimum="0" Maximum="0.1" Value="{Binding TargetLevel}" MinWidth="200"></Slider>
             </st:StackPanel>
-            <wpf:WpfPlot x:Name="AudioPlot" st:StackPanel.Fill="Fill" Background="Transparent" />
-
+            <wpf:WpfPlot x:Name="AudioPlot" st:StackPanel.Fill="Fill" Background="{DynamicResource MaterialDesignPaper}" />
             <eye:DataPiping.DataPipes>
                 <eye:DataPipeCollection>
                     <eye:DataPipe
