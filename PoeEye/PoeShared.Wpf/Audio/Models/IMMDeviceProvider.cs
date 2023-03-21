@@ -20,6 +20,8 @@ public interface IMMDeviceProvider
     [CanBeNull]
     MMDevice GetMixerControl([NotNull] string lineId);
 
+    MMDevice GetDevice(MMDeviceId deviceId);
+
     [NotNull]
     IReadOnlyObservableCollection<MMDeviceId> Devices { get; }
 }

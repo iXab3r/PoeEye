@@ -15,7 +15,7 @@ namespace PoeShared.UI.Audio;
 
 internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
 {
-    public AudioSandbox(IMMCaptureDeviceProvider deviceProvider)
+    public AudioSandbox(IMMRenderDeviceProvider deviceProvider)
     {
         new[]
             {
@@ -31,10 +31,13 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
         Devices = devices;
         DeviceId = MMDeviceId.DefaultOutput;
 
-        var bufferDuration = TimeSpan.FromMilliseconds(50);
+        var bufferDuration = TimeSpan.FromMilliseconds(100);
+        var totalBufferDuration = TimeSpan.FromMilliseconds(1000);
         var waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(48000, 2);
-        var byteSize = waveFormat.BitsPerSample / 8;
-        AudioBuffer = new double[(int) (waveFormat.SampleRate * bufferDuration.TotalMilliseconds / 1000)];
+        var bufferBytesToRead = (int) (bufferDuration.TotalSeconds *  waveFormat.AverageBytesPerSecond);
+        var totalBufferBytes = (int) (totalBufferDuration.TotalSeconds * waveFormat.AverageBytesPerSecond);
+        var bytesPerSample = waveFormat.BitsPerSample / 8;
+        AudioBuffer = new CircularBuffer<double>(new double[totalBufferBytes / bytesPerSample]);
 
         var bufferedWaveProvider = new BufferedWaveProvider(waveFormat)
         {
@@ -78,7 +81,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
         var fftSampleAggregator = new FftSampleAggregator()
         {
             PerformFFT = true,
-            NotificationCount = AudioBuffer.Length
+            NotificationCount = AudioBuffer.Count
         };
         fftSampleAggregator.MaximumCalculated += FftSampleAggregatorOnMaximumCalculated;
 
@@ -92,22 +95,20 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
 
                 if (bufferedWaveProvider.BufferedDuration > bufferDuration)
                 {
-                    var bytesToRead = new byte[AudioBuffer.Length * byteSize];
+                    var bytesToRead = new byte[bufferBytesToRead];
                     var bytesRead = bufferedWaveProvider.Read(bytesToRead, 0, bytesToRead.Length);
                     bufferedWaveProvider.ClearBuffer();
 
-                    var samples = new float[bytesRead / byteSize];
+                    var samples = new float[bytesRead / bytesPerSample];
                     Buffer.BlockCopy(bytesToRead, 0, samples, 0, bytesRead);
 
                     samples.ForEach(fftSampleAggregator.Add);
-
-                    var coordinates = samples.Select((x, idx) => (double) x).ToArray();
-                    coordinates.CopyTo(AudioBuffer, 0);
+                    samples.ForEach(x => AudioBuffer.PushBack(x));
 
                     var plot = Plot;
                     if (plot != null)
                     {
-                        dispatcher.Invoke(() =>
+                        dispatcher.BeginInvoke(() =>
                         {
                             var currentLimits = plot.Plot.GetAxisLimits().Rect;
 
@@ -127,10 +128,9 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
             .Take(1)
             .Subscribe(x =>
             {
-                x.Plot.FigureBackground = Colors.Transparent;
-                var plot = x.Plot.Add.Signal(AudioBuffer);
+                var plot = x.Plot.Add.Signal(AudioBuffer, period: totalBufferDuration.TotalSeconds);
                 var line = x.Plot.Add.Scatter(ScatterBuffer);
-                line.LineStyle.Width = 5;
+                line.LineStyle.Width = 2;
             })
             .AddTo(Anchors);
 
@@ -139,7 +139,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
             .Subscribe(x =>
             {
                 ScatterBuffer[0] = new Coordinates(0, TargetLevel);
-                ScatterBuffer[1] = new Coordinates(AudioBuffer.Length, TargetLevel);
+                ScatterBuffer[1] = new Coordinates(AudioBuffer.Count, TargetLevel);
                 Plot?.Refresh();
             })
             .AddTo(Anchors);
@@ -171,7 +171,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
 
     public WpfPlot Plot { get; set; }
 
-    public double[] AudioBuffer { get; }
+    public CircularBuffer<double> AudioBuffer { get; }
     
     public Coordinates[] ScatterBuffer { get; }
 }

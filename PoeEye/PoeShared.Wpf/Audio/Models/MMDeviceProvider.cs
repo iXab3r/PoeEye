@@ -26,6 +26,11 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
         return result;
     }
 
+    public MMDevice GetDevice(MMDeviceId deviceId)
+    {
+        return GetMixerControl(deviceId.LineId);
+    }
+
     public MMDeviceProviderBase(DataFlow dataFlow)
     {
         DataFlow = dataFlow;

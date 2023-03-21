@@ -6,5 +6,7 @@ public readonly record struct MMAudioBuffer(byte[] Buffer, TimeSpan CaptureTimes
 {
     public int BufferLength { get; } = Buffer.Length;
 
+    public Span<byte> Memory => new(Buffer);
+    
     public TimeSpan TimeSinceLastBuffer { get; } = previousTimestamp == null || previousTimestamp.Value == TimeSpan.Zero ? TimeSpan.Zero : CaptureTimestamp - previousTimestamp.Value;
 }
