@@ -7,12 +7,12 @@ internal static class LogDataExtensions
         return logData.WithPrefix(() => prefix.Dump());
     }
     
-    public static LogData WithPrefix(this LogData logData, Func<string> prefixSupplier)
+    public static LogData WithPrefix(this LogData logData, Func<string> prefixSupplier, bool brackets = true)
     {
         return logData.WithPrefixProvider(() =>
         {
             var prefix = SafeInvoke(logData, prefixSupplier);
-            return string.IsNullOrEmpty(prefix) ? null : $"[{prefix}] ";
+            return string.IsNullOrEmpty(prefix) || !brackets ? prefix : $"[{prefix}] ";
         });
     }
 
@@ -21,12 +21,12 @@ internal static class LogDataExtensions
         return logData.WithSuffix(() => suffix.Dump());
     }
     
-    public static LogData WithSuffix(this LogData logData, Func<string> suffixSupplier)
+    public static LogData WithSuffix(this LogData logData, Func<string> suffixSupplier, bool brackets = true)
     {
         return logData.WithSuffixProvider(() =>
         {
             var suffix = SafeInvoke(logData, suffixSupplier);
-            return string.IsNullOrEmpty(suffix) ? null : $" [{suffix}]";
+            return string.IsNullOrEmpty(suffix) || !brackets ? suffix : $" [{suffix}]";
         });
     }
     

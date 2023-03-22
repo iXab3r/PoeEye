@@ -59,7 +59,7 @@ public class FluentLogBuilderFixture
         instance.Info($"info");
 
         //Then
-        var expectedTable = @$"[test1] info, Items: 3, #1 a, #2 b, #3 c";
-        logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == expectedTable &&  y.LogLevel == FluentLogLevel.Info)));
+        var expectedMessage = @$"[test1] info, Items: 3, #1 a, #2 b, #3 c";
+        logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == expectedMessage &&  y.LogLevel == FluentLogLevel.Info)));
     }
 }

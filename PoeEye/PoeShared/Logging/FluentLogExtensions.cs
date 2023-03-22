@@ -106,7 +106,7 @@ public static class FluentLogExtensions
             }
 
             return $"{separator}Items: {count}{result}";
-        });
+        }, brackets: false);
         return log.WithLogData(newLogData);
     }
 
