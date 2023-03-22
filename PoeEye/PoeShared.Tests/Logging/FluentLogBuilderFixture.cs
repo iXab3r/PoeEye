@@ -23,7 +23,7 @@ public class FluentLogBuilderFixture
     public void ShouldLog()
     {
         //Given
-        var instance = new FluentLogBuilder(logWriter.Object);
+        var instance = (IFluentLog)new FluentLogBuilder(logWriter.Object);
 
         //When
         instance.Info($"info");

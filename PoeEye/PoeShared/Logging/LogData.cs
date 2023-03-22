@@ -5,7 +5,7 @@ namespace PoeShared.Logging;
 /// <summary>
 ///     A class holding log data before being written.
 /// </summary>
-internal struct LogData
+internal record struct LogData
 {
     private const int DefaultMaxLineLength = 4096;
     
@@ -62,22 +62,6 @@ internal struct LogData
     public int LineNumber { get; set; }
 
     public int? MaxLineLength { get; set; }
-
-    public readonly LogData WithSuffix(Func<string> provider)
-    {
-        var result = this;
-        var initialSuffixProvider = this.SuffixProvider;
-        result.SuffixProvider = () => $"{provider()}{initialSuffixProvider?.Invoke()}";
-        return result;
-    }
-        
-    public readonly LogData WithPrefix(Func<string> provider)
-    {
-        var result = this;
-        var initial = this.PrefixProvider;
-        result.PrefixProvider = () => $"{initial?.Invoke()}{provider()}";
-        return result;
-    }
 
     /// <summary>
     ///     Returns a <see cref="System.String" /> that represents this instance.

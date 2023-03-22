@@ -65,6 +65,11 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         }).AddTo(Anchors);
     }
     
+    protected void AddDisposeAction(Action action) 
+    {
+        Disposable.Create(action).AddTo(Anchors);
+    }
+    
     protected void AddDisposableResource<T>(Func<T> accessor) where T : IDisposable
     {
         Disposable.Create(() =>

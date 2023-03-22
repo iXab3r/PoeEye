@@ -13,14 +13,14 @@ public static class FluentLogExtensions
         log.Debug(message);
 #endif
     }
-    
+
     public static void WarnIfDebug(this IFluentLog log, Func<string> message)
     {
 #if DEBUG
         log.Warn(message);
 #endif
     }
-    
+
     public static void InfoIfDebug(this IFluentLog log, Func<string> message)
     {
 #if DEBUG
@@ -51,35 +51,45 @@ public static class FluentLogExtensions
     {
         return new BenchmarkTimer(benchmarkName, log, propertyName);
     }
-
+    
     public static IFluentLog WithPrefix(this IFluentLog log, Func<string> prefixSupplier)
     {
-        var newLogData = log.Data.WithPrefix(() =>
-        {
-            var prefix = SafeInvoke(log, prefixSupplier);
-            return string.IsNullOrEmpty(prefix) ? null : $"[{prefix}] ";
-        });
-        return log.WithLogData(newLogData);
+        return log.WithLogData(log.Data.WithPrefix(prefixSupplier));
     }
 
     public static IFluentLog WithPrefix<T>(this IFluentLog log, T prefix)
     {
-        return WithPrefix(log, () => $"{prefix}");
+        return log.WithLogData(log.Data.WithPrefix(prefix));
     }
 
     public static IFluentLog WithSuffix(this IFluentLog log, Func<string> suffixSupplier)
     {
-        var newLogData = log.Data.WithSuffix(() =>
-        {
-            var suffix = SafeInvoke(log, suffixSupplier);
-            return string.IsNullOrEmpty(suffix) ? null : $" [{suffix}]";
-        });
-        return log.WithLogData(newLogData);
+        return log.WithLogData(log.Data.WithSuffix(suffixSupplier));
     }
 
-    public static IFluentLog WithSuffix<T>(this IFluentLog log, T prefix)
+    public static IFluentLog WithSuffix<T>(this IFluentLog log, T suffix)
     {
-        return WithSuffix(log, () => $"{prefix}");
+        return log.WithLogData(log.Data.WithSuffix(suffix));
+    }
+    
+    public static void AddPrefix(this IFluentLog log, Func<string> prefixSupplier)
+    {
+        log.Data = log.Data.WithPrefix(prefixSupplier);
+    }
+
+    public static void AddPrefix<T>(this IFluentLog log, T prefix)
+    {
+        log.Data = log.Data.WithPrefix(prefix);
+    }
+
+    public static void AddSuffix(this IFluentLog log, Func<string> suffixSupplier)
+    {
+        log.Data = log.Data.WithSuffix(suffixSupplier);
+    }
+
+    public static void AddSuffix<T>(this IFluentLog log, T suffix)
+    {
+        log.Data = log.Data.WithSuffix(suffix);
     }
 
     public static IFluentLog WithTable<T>(this IFluentLog log, IEnumerable<T> items, string separator = "\n\t")
@@ -100,19 +110,6 @@ public static class FluentLogExtensions
         return log.WithLogData(newLogData);
     }
 
-    private static string SafeInvoke(IFluentLog log, Func<string> supplier)
-    {
-        try
-        {
-            return supplier();
-        }
-        catch (Exception e)
-        {
-            SharedLog.Instance.Log.Warn($"Failed to format log string for logger {log}, data: {new { log.Data.LogLevel, log.Data.Message, log.Data.Exception }}", e);
-            return $"FORMATTING ERROR - {e.Message}";
-        }
-    }
-
     private static IFluentLog WithConsumer(this IFluentLog log, Action<LogData> messageConsumer)
     {
         var writerAdapter = new LogWriterAdapter<string>(logData =>
@@ -120,6 +117,11 @@ public static class FluentLogExtensions
             log.Writer.WriteLog(logData);
             messageConsumer(logData);
         });
-        return new FluentLogBuilder(writerAdapter);
+        return new FluentLogBuilder(writerAdapter, log.Data);
+    }
+    
+    private static IFluentLog WithLogData(this IFluentLog log, LogData newLogData)
+    {
+        return new FluentLogBuilder(log.Writer, newLogData);
     }
 }
