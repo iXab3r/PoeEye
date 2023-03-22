@@ -35,6 +35,7 @@
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.1.6" />
+    <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.3" />
     <PackageReference Include="PInvoke.SHCore" Version="0.6.49" />
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />

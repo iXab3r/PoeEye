@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -12,13 +11,15 @@ using MMDevice = NAudio.CoreAudioApi.MMDevice;
 
 namespace PoeShared.Audio.Models;
 
-public sealed class MMDeviceListener : DisposableReactiveObjectWithLogger
+public sealed class MMDeviceListener : WaveInListener
 {
     private readonly IWaveIn wasapiCapture;
-    private readonly WaveFormat captureFormat;
-    private readonly ISubject<MMAudioBuffer> bufferSource = new Subject<MMAudioBuffer>();
 
-    public MMDeviceListener(MMDevice device, WaveFormat captureFormat) : this(ToCaptureSession(device), captureFormat)
+    public MMDeviceListener(MMDeviceId deviceId, IMMDeviceProvider deviceProvider, WaveFormat captureFormat) : this(deviceProvider.GetDevice(deviceId), captureFormat)
+    {
+    }
+    
+    public MMDeviceListener(MMDevice device, WaveFormat outputFormat) : this(ToCaptureSession(device), outputFormat)
     {
         if (device.DataFlow != DataFlow.Render)
         {
@@ -39,63 +40,18 @@ public sealed class MMDeviceListener : DisposableReactiveObjectWithLogger
         }).AddTo(Anchors);
     }
     
-    public MMDeviceListener(IWaveIn wasapiCapture, WaveFormat captureFormat)
+    public MMDeviceListener(IWaveIn wasapiCapture, WaveFormat outputFormat) : base(outputFormat)
     {
         this.wasapiCapture = wasapiCapture.AddTo(Anchors);
-        this.captureFormat = captureFormat;
-
-        var bufferedWaveInProvider = new BufferedWaveProvider(wasapiCapture.WaveFormat)
-        {
-            ReadFully = true,
-            DiscardOnBufferOverflow = true
-        };
-        var resampler = BuildPipeline(bufferedWaveInProvider, bufferedWaveInProvider.WaveFormat, captureFormat, out var multiplier);
-
-        MMAudioBuffer lastNotification = default;
-        Observable.FromEventPattern<WaveInEventArgs>(h => wasapiCapture.DataAvailable += h, h => wasapiCapture.DataAvailable -= h)
-            .Subscribe(x =>
-            {
-                bufferedWaveInProvider.AddSamples(x.EventArgs.Buffer, 0, x.EventArgs.BytesRecorded);
-
-                var bytesToRead = (int) (x.EventArgs.BytesRecorded * multiplier);
-                var buffer = new byte[bytesToRead];
-                var converted = resampler.Read(buffer, 0, bytesToRead);
-                var bufferNotification = new MMAudioBuffer(buffer, Stopwatch.GetElapsedTime(0), lastNotification.CaptureTimestamp);
-                lastNotification = bufferNotification;
-                bufferSource.OnNext(bufferNotification);
-            })
-            .AddTo(Anchors);
-
-        wasapiCapture.StartRecording();
-
-
-        Buffers = bufferSource;
     }
-
-    public IObservable<MMAudioBuffer> Buffers { get; }
 
     private static IWaveIn ToCaptureSession(MMDevice device)
     {
         return device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
     }
-    
-    private static IWaveProvider BuildPipeline(
-        IWaveProvider provider, 
-        WaveFormat input,
-        WaveFormat output, 
-        out float multiplier)
+
+    protected override IWaveIn GetSource()
     {
-        multiplier = 1.0f;
-        if (input.Channels == output.Channels && input.SampleRate == output.SampleRate)
-        {
-            return provider;
-        }
-
-        provider = new MediaFoundationResampler(provider, output);
-        multiplier *= (float) input.SampleRate / output.SampleRate;
-        multiplier *= (float) input.Channels / output.Channels;
-
-        multiplier = 1.0f / multiplier;
-        return provider;
+        return wasapiCapture;
     }
 }
