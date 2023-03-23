@@ -54,7 +54,7 @@ public static class FluentLogExtensions
     
     public static IFluentLog WithPrefix(this IFluentLog log, Func<string> prefixSupplier)
     {
-        return log.WithLogData(log.Data.WithPrefix(prefixSupplier));
+        return log.WithLogData(log.Data.WithPrefix(prefixSupplier, brackets: true));
     }
 
     public static IFluentLog WithPrefix<T>(this IFluentLog log, T prefix)
@@ -64,7 +64,7 @@ public static class FluentLogExtensions
 
     public static IFluentLog WithSuffix(this IFluentLog log, Func<string> suffixSupplier)
     {
-        return log.WithLogData(log.Data.WithSuffix(suffixSupplier));
+        return log.WithLogData(log.Data.WithSuffix(suffixSupplier, brackets: true));
     }
 
     public static IFluentLog WithSuffix<T>(this IFluentLog log, T suffix)
@@ -74,7 +74,7 @@ public static class FluentLogExtensions
     
     public static void AddPrefix(this IFluentLog log, Func<string> prefixSupplier)
     {
-        log.Data = log.Data.WithPrefix(prefixSupplier);
+        log.Data = log.Data.WithPrefix(prefixSupplier, brackets: true);
     }
 
     public static void AddPrefix<T>(this IFluentLog log, T prefix)
@@ -84,7 +84,7 @@ public static class FluentLogExtensions
 
     public static void AddSuffix(this IFluentLog log, Func<string> suffixSupplier)
     {
-        log.Data = log.Data.WithSuffix(suffixSupplier);
+        log.Data = log.Data.WithSuffix(suffixSupplier, brackets: true);
     }
 
     public static void AddSuffix<T>(this IFluentLog log, T suffix)
