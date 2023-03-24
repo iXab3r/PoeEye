@@ -1,7 +1,6 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace PoeShared.Scaffolding.WPF;
+namespace PoeShared.Common;
 
 public interface IBusyController : INotifyPropertyChanged
 {

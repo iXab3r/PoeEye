@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Native;
+﻿namespace PoeShared.Common;
 
 public interface ICanBeSelected : IHasSelected
 {
