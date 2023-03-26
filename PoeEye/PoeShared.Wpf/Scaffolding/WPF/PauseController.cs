@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using PoeShared.Common;
 using PoeShared.Services;
 using PropertyBinder;
 

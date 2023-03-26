@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows.Threading;
+using PoeShared.Common;
 using PoeShared.Modularity;
 
 namespace PoeShared.Scaffolding;

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using DynamicData;
 using JetBrains.Annotations;
+using PoeShared.Common;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 
