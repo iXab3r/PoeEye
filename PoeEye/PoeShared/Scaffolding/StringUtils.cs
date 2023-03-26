@@ -9,17 +9,22 @@ namespace PoeShared.Scaffolding;
 public static class StringUtils
 {
     public static readonly string GzipPrefix = "GZip ";
-
+    
     /// <summary>
     ///     Разделитель, который используется при формировании списков
     /// </summary>
     public static string ListDelimiter = "];[";
 
-    public static string ToSHA1(string value)
+    public static string ToUnicodeHex(string value)
     {
-        return ToHex(Encoding.Unicode.GetBytes(value ?? string.Empty));
+        return ToHex(Encoding.Unicode.GetBytes(value ?? string.Empty), _separator: null);
     }
 
+    public static string ToMD5(string value)
+    {
+        return ToHex(System.Security.Cryptography.MD5.Create().ComputeHash(Encoding.Unicode.GetBytes(value)), _separator: null);
+    }
+    
     /// <summary>
     ///     Добавляет отформатированную строку и дополняет ее переводом каретки.
     /// </summary>

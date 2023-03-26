@@ -39,7 +39,7 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
 
     public async Task OnParametersSetAsync()
     {
-        await HandleSetParametersAsync();
+        await HandleParametersSetAsync();
     }
     
     public async Task OnInitializedAsync()
@@ -67,13 +67,23 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
         }
     }
 
+    public async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await HandleAfterRenderAsync(firstRender);
+    }
+
+    protected virtual async Task HandleAfterRenderAsync(bool firstRender)
+    {
+    }
+
     protected virtual async Task HandleInitializedAsync()
     {
     }
         
-    protected virtual async Task HandleSetParametersAsync()
+    protected virtual async Task HandleParametersSetAsync()
     {
     }
+    
 
     protected virtual async Task<FluentValidation.Results.ValidationResult> Validate()
     {
