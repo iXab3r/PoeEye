@@ -33,18 +33,7 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             .Connect()
             .OnItemAdded(assembly =>
             {
-                Type[] types;
-                try
-                {
-                    types = assembly.GetTypes();
-                }
-                catch (Exception e)
-                {
-                    Log.Warn($"Failed to get types from {new {x = assembly, assembly.Location}}", e);
-                    types = Type.EmptyTypes;
-                }
-                
-                Log.Debug(() => $"Assembly is now tracked({types.Length} types): {assembly}");
+                Log.Debug(() => $"Assembly is now tracked: {assembly}");
                 loadedSink.OnNext(assembly);
             })
             .BindToCollection(out var loaded)
