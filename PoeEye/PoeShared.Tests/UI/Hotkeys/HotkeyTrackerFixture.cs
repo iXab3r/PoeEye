@@ -7,6 +7,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using NUnit.Framework;
+using PoeShared.Hotkeys;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Tests.Helpers;

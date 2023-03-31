@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace PoeShared.UI;
+namespace PoeShared.Hotkeys;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum HotkeyMode

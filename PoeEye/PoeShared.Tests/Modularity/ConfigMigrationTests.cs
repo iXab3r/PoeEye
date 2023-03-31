@@ -2,6 +2,7 @@
 using System;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using PoeShared.Services;
 using Shouldly;
 
 namespace PoeShared.Tests.Modularity;
@@ -112,8 +113,14 @@ public class ConfigMigrationTests : FixtureBase
 
     protected override void SetUp()
     {
-        migrationService = new PoeConfigConverterMigrationService() { AutomaticallyLoadConverters = false };
-        replacementService = new PoeConfigMetadataReplacementService();
+        var assemblyTracker = new AssemblyTracker();
+        migrationService = new PoeConfigConverterMigrationService(assemblyTracker)
+        {
+            AutomaticallyLoadConverters = false
+        };
+        migrationService.Clear();
+        
+        replacementService = new PoeConfigMetadataReplacementService(assemblyTracker);
         configConverter = new PoeConfigConverter(replacementService, migrationService);
     }
 
@@ -238,7 +245,6 @@ public class ConfigMigrationTests : FixtureBase
     {
         //Given
         migrationService.AutomaticallyLoadConverters = true;
-        RegisterAll();
 
         //When
         var result = migrationService.TryGetConverter(targetType, sourceVersion, targetVersion, out var converterResult);
@@ -256,6 +262,19 @@ public class ConfigMigrationTests : FixtureBase
         }
     }
 
+    [Test]
+    public void ShouldThrowOnDuplicateRegistration()
+    {
+        //Given
+        migrationService.AutomaticallyLoadConverters = true;
+
+        //When
+        var action = () => RegisterAll();
+
+        //Then
+        action.ShouldThrow<InvalidOperationException>();
+    }
+    
     [Test]
     public void ShouldReplaceIfNeeded()
     {

@@ -50,8 +50,8 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
 
         appArguments.SetupGet(x => x.IsDebugMode).Returns(true);
 
-        metadataReplacementService = new PoeConfigMetadataReplacementService();
-        poeConfigConverterMigrationService = new PoeConfigConverterMigrationService();
+        metadataReplacementService = Container.Create<PoeConfigMetadataReplacementService>();
+        poeConfigConverterMigrationService = Container.Create<PoeConfigConverterMigrationService>();
 
         Container.Register(() => metadataReplacementService);
         Container.Register(() => poeConfigConverterMigrationService);

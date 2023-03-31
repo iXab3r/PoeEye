@@ -16,13 +16,13 @@ internal sealed class FluentLogBuilder : IFluentLog
         
     public IMetrics Metrics => App.Metrics.Metrics.Instance ?? throw new InvalidOperationException("Metrics are not initialized yet");
 
-    public bool IsDebugEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Debug;
+    public bool IsDebugEnabled =>  logWriter.IsDebugEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Debug;
 
-    public bool IsInfoEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Info;
+    public bool IsInfoEnabled =>  logWriter.IsInfoEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Info;
 
-    public bool IsWarnEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Warn;
+    public bool IsWarnEnabled => logWriter.IsWarnEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Warn;
 
-    public bool IsErrorEnabled => FluentLogSettings.Instance.MinLogLevel == null ? logWriter.IsDebugEnabled : FluentLogSettings.Instance.MinLogLevel <= FluentLogLevel.Error;
+    public bool IsErrorEnabled => logWriter.IsErrorEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Error;
 
     public LogData Data { get; set; }
 }

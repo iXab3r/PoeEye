@@ -50,7 +50,7 @@ public record PoeConfigMetadata : IPoeEyeConfig
 
 public sealed record PoeConfigMetadata<T> : PoeConfigMetadata where T : IPoeEyeConfig
 {
-    public PoeConfigMetadata()
+    public PoeConfigMetadata() : base(typeof(T))
     {
     }
 

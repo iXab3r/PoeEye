@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using PoeShared.Hotkeys;
 using PoeShared.Scaffolding; 
 
 namespace PoeShared.UI;

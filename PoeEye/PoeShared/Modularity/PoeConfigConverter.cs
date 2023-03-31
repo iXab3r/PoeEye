@@ -159,7 +159,7 @@ internal sealed class PoeConfigConverter : JsonConverter
             return DeserializeFromToken(metadata.ConfigValue, serializer, resolvedValueType);
         }
 
-        Log.Warn(() => $"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
+        Log.Info(() => $"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
 
         if (metadata.Version != null)
         {
@@ -180,7 +180,7 @@ internal sealed class PoeConfigConverter : JsonConverter
                 try
                 {
                     var result = converterKvp.Converter(convertedValue);
-                    Log.Debug(() => $"Successfully used converter {converterKvp.Key}");
+                    Log.Info(() => $"Successfully used converter {converterKvp.Key}");
                     return result;
                 }
                 catch (Exception e)

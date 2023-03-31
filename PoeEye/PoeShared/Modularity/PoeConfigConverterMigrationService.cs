@@ -1,19 +1,40 @@
 ﻿using System.Reflection;
 using PoeShared.Services;
+using ReactiveUI;
 
 namespace PoeShared.Modularity;
 
 internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObject, IPoeConfigConverterMigrationService
 {
     private static readonly IFluentLog Log = typeof(PoeConfigConverterMigrationService).PrepareLogger();
-    private static readonly MethodInfo RegistrationMethod = typeof(PoeConfigConverterMigrationService).GetMethod(nameof(RegisterMetadataConverter), BindingFlags.Instance | BindingFlags.Public) ?? throw new ApplicationException($"Failed to find registration method");
+
+    private static readonly MethodInfo RegistrationMethod = typeof(PoeConfigConverterMigrationService).GetMethod(nameof(RegisterMetadataConverter), BindingFlags.Instance | BindingFlags.Public) ??
+                                                            throw new ApplicationException($"Failed to find registration method");
 
     private readonly Dictionary<PoeConfigMigrationConverterKey, Func<object, object>> convertersByMetadata = new();
-    private readonly HashSet<Assembly> processedAssemblies = new();
     private readonly Dictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new();
-    private readonly NamedLock migrationsLock = new("ConfigMigrationServiceMigrations"); 
+    private readonly NamedLock migrationsLock = new("ConfigMigrationServiceMigrations");
 
+    public PoeConfigConverterMigrationService(IAssemblyTracker assemblyTracker)
+    {
+        this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
+            .Select(x => x
+                ? assemblyTracker.WhenLoaded.Distinct()
+                : Observable.Empty<Assembly>())
+            .Switch()
+            .Subscribe(LoadConvertersFromAssembly)
+            .AddTo(Anchors);
+    }
+    
     public bool AutomaticallyLoadConverters { get; set; } = true;
+
+    public void Clear()
+    {
+        using var @lock = migrationsLock.Enter();
+
+        convertersByMetadata.Clear();
+        versionedConfigByType.Clear();
+    }
 
     public bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out PoeConfigMigrationConverter result)
     {
@@ -25,25 +46,8 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
         if (converterKvp.Value != null)
         {
             Log.Debug(() => $"Found converter: {converterKvp}");
-            result = new PoeConfigMigrationConverter { Key = converterKvp.Key, Converter = converterKvp.Value };
+            result = new PoeConfigMigrationConverter {Key = converterKvp.Key, Converter = converterKvp.Value};
             return true;
-        }
-
-        if (AutomaticallyLoadConverters)
-        {
-            Log.Debug(() => $"Could not find converter, searching in all appdomain assemblies");
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            Log.Debug(() => $"AppDomain contains {assemblies.Length} assemblies, processed: {processedAssemblies.Count}");
-            var unprocessedAssemblies = assemblies.Except(processedAssemblies).ToArray();
-            if (unprocessedAssemblies.Any())
-            {
-                Log.Debug(() => $"Found {unprocessedAssemblies.Length} unprocessed assemblies, loading converters");
-                unprocessedAssemblies.ForEach(LoadConvertersFromAssembly);
-                Log.Debug("Repeating lookup process again after processing");
-                return TryGetConverter(targetType, sourceVersion, targetVersion, out result);
-            }
-
-            Log.Debug(() => $"No additional assemblies to process");
         }
 
         Log.Debug(() => $"Could not find matching converter");
@@ -97,6 +101,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
         {
             throw new InvalidOperationException($"Converter for {explicitConverterKey} is already registered: {existingConverter}");
         }
+
         Log.Debug(() => $"Registering explicit converter: {explicitConverterKey}");
 
         Func<object, object> explicitConverter = src =>
@@ -115,13 +120,13 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
             {
                 throw new InvalidStateException($"Failed to perform conversion - source version is wrong, expected {explicitConverterKey.SourceVersion}, got {srcTyped.Version}: {explicitConverterKey}");
             }
-            
+
             var result = converter.Convert(srcTyped);
             if (result.Version != explicitConverterKey.TargetVersion)
             {
                 throw new InvalidStateException($"Failed to perform conversion - converted version is wrong, expected {explicitConverterKey.TargetVersion}, got {result.Version}: {explicitConverterKey}");
             }
-            
+
             return result;
         };
         convertersByMetadata[explicitConverterKey] = explicitConverter;
@@ -147,16 +152,17 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     private void LoadConvertersFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.GetName().Name);
-        if (processedAssemblies.Contains(assembly))
-        {
-            logger.Warn("Assembly is already processed");
-            return;
-        }
-
         logger.Debug(() => "Loading converters from assembly");
+
         try
         {
-            var matchingTypes = assembly.GetTypes().Where(x => !x.IsAbstract).Select(x => new { InstanceType = x, ConverterType = ResolveMetadataConverterType(x) }).Where(x => x.ConverterType != null).ToArray();
+            var matchingTypes = assembly.GetTypes().Where(x => !x.IsAbstract)
+                .Select(x => new {InstanceType = x, ConverterType = ResolveMetadataConverterType(x)}).Where(x => x.ConverterType != null).ToArray();
+            if (!matchingTypes.Any())
+            {
+                return;
+            }
+            logger.Debug(() => $"Detected converters in assembly:\n\t{matchingTypes.DumpToTable()}");
             foreach (var converterType in matchingTypes)
             {
                 logger.Debug(() => $"Creating new converter: {converterType}");
@@ -164,17 +170,13 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 var sourceConfigType = converterType.ConverterType.GetGenericArguments()[0];
                 var targetConfigType = converterType.ConverterType.GetGenericArguments()[1];
                 var registrationMethodTyped = RegistrationMethod.MakeGenericMethod(sourceConfigType, targetConfigType);
-                registrationMethodTyped.Invoke(this, new[] { converter });
+                registrationMethodTyped.Invoke(this, new[] {converter});
                 logger.Debug(() => $"Successfully registered converter {converter}");
             }
         }
         catch (Exception e)
         {
-            logger.Error($"Failed to load converters from assembly {assembly}", e);
-        }
-        finally
-        {
-            processedAssemblies.Add(assembly);
+            logger.Warn($"Failed to load converters from assembly {new { assembly, assembly.Location }}", e);
         }
     }
 

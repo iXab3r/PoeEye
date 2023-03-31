@@ -4,7 +4,8 @@
                               xmlns:eye="clr-namespace:PoeShared.UI"
                               xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
                               xmlns:st="http://schemas.spicytaco.io/"
-                              xmlns:themes="clr-namespace:PoeShared.Themes">
+                              xmlns:themes="clr-namespace:PoeShared.Themes"
+                              xmlns:hotkeys="clr-namespace:PoeShared.Hotkeys;assembly=PoeShared">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.textbox.xaml" />
@@ -127,7 +128,7 @@
                         MethodName="GetValuesAndDescriptions"
                         ObjectType="wpf:EnumHelper">
         <ObjectDataProvider.MethodParameters>
-            <x:TypeExtension TypeName="eye:HotkeyMode" />
+            <x:TypeExtension TypeName="hotkeys:HotkeyMode" />
         </ObjectDataProvider.MethodParameters>
     </ObjectDataProvider>
 </eye:SharedResourceDictionary>

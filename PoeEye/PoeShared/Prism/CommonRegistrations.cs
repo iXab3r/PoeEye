@@ -23,8 +23,9 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
             .RegisterSingleton<IAppArguments, AppArguments>()
             .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
+            .RegisterSingleton<IAssemblyTracker, AssemblyTracker>()
             .RegisterSingleton<IPoeConfigConverterMigrationService, PoeConfigConverterMigrationService>()
-            .RegisterSingleton<IPoeConfigMetadataReplacementService,PoeConfigMetadataReplacementService>()
+            .RegisterSingleton<PoeConfigMetadataReplacementService>(typeof(IPoeConfigMetadataReplacementRepository), typeof(IPoeConfigMetadataReplacementService))
             .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
             .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
@@ -52,6 +53,6 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterType<IFolderCleanerService, FolderCleanerService>()
             .RegisterType<ISharedResourceLatch, SharedResourceLatch>();
         
-        Container.RegisterCachingProxyFactory();;
+        Container.RegisterCachingProxyFactory();
     }
 }

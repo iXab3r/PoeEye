@@ -29,14 +29,14 @@
                     <RadioButton
                         Style="{StaticResource FastTabRadioButton}"
                         ToolTip="Text by exact match"
-                        IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Text}}">
+                        IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators:TextEvaluatorType.Text}}">
                         <RadioButton.Content>
                             <materialDesign:PackIcon Kind="Text" Height="16" Width="16"/>
                         </RadioButton.Content>
                     </RadioButton>
                     <RadioButton
                         Style="{StaticResource FastTabRadioButton}"
-                        IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Regex}}"
+                        IsChecked="{Binding EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators:TextEvaluatorType.Regex}}"
                         ToolTip="Regular expression">
                         <RadioButton.Content>
                             <materialDesign:PackIcon Kind="Regex" Height="16" Width="16"/>
@@ -44,7 +44,7 @@
                     </RadioButton>
                     <RadioButton
                         Style="{StaticResource FastTabRadioButton}"
-                        IsChecked="{Binding Path=EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators1:TextEvaluatorType.Lambda}}"
+                        IsChecked="{Binding Path=EvaluatorType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static evaluators:TextEvaluatorType.Lambda}}"
                         ToolTip='C# Lambda that converts input string to boolean. Use "x" (without quotes) to get current value, e.g. x == "text" or int.Parse(x) == 6'>
                         <RadioButton.Content>
                             <TextBlock Text="C#"/>

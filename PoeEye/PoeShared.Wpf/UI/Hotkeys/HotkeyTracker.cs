@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
 using JetBrains.Annotations;
+using PoeShared.Hotkeys;
 using WindowsHook;
 using PoeShared.Native;
 using PoeShared.Prism;

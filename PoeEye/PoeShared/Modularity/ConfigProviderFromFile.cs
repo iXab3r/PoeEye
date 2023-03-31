@@ -22,7 +22,6 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     private string loadedConfigurationFile;
 
     public ConfigProviderFromFile(
-        IPoeConfigMetadataReplacementService replacementService,
         IConfigSerializer configSerializer,
         IAppArguments appArguments)
     {
@@ -54,14 +53,6 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         {
             throw new ApplicationException($"Failed to get configuration file path");
         }
-
-        replacementService
-            .Replacements
-            .ToObservableChangeSet()
-            .Where(x => loadedConfigurationFile != null)
-            .OnItemAdded(x => Log.Error($"Replacement registered AFTER initial config file was loaded - IT WILL NOT BE APPLIED RETROACTIVELY: {x}"))
-            .Subscribe()
-            .AddTo(Anchors);
     }
 
     public string ConfigFilePath { [NotNull] get; }
