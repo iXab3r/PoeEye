@@ -17,13 +17,13 @@
             Value="{Binding Value.RegionX, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
             materialDesign:HintAssist.Hint="{Binding LabelX, TargetNullValue=X}"
             materialDesign:HintAssist.IsFloating="True"
-            Maximum="32000" Minimum="-32000" Interval="1" />
+            Maximum="32767" Minimum="-32768" Interval="1" />
 
         <ui:NumericUpDownEx
             Value="{Binding Value.RegionY, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
             materialDesign:HintAssist.Hint="{Binding LabelY, TargetNullValue=Y}"
             materialDesign:HintAssist.IsFloating="True"
-            Maximum="32000" Minimum="-32000" Interval="1" />
+            Maximum="32767" Minimum="-32768" Interval="1" />
 
         <ui:NumericUpDownEx
             Value="{Binding Value.RegionWidth, Mode=TwoWay, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
