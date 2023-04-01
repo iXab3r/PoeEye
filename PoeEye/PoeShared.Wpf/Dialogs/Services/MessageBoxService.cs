@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI;
 using PropertyBinder;
+using Unity;
 
 namespace PoeShared.Dialogs.Services;
 
@@ -28,6 +30,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
 
     private readonly IApplicationAccessor applicationAccessor;
     private readonly IFactory<MessageBoxViewModel> genericMessageBoxFactory;
+    private readonly IScheduler uiScheduler;
     private readonly SourceListEx<IMessageBoxViewModel> messageBoxes = new();
     private Stack<Window> windowStack = new();
 
@@ -38,11 +41,13 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
 
     public MessageBoxService(
         IApplicationAccessor applicationAccessor,
-        IFactory<MessageBoxViewModel> genericMessageBoxFactory)
+        IFactory<MessageBoxViewModel> genericMessageBoxFactory, 
+        [Dependency(WellKnownSchedulers.RedirectToUI)] IScheduler uiScheduler)
     {
         this.applicationAccessor = applicationAccessor;
         this.genericMessageBoxFactory = genericMessageBoxFactory;
-        
+        this.uiScheduler = uiScheduler;
+
         Binder.Attach(this).AddTo(Anchors);
     }
 
@@ -126,6 +131,11 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
 
     private async Task<T> ShowMessageBox<T>(IMessageBoxViewModel<T> messageBox)
     {
+        if (!IsOnUiThread)
+        {
+            return await Observable.FromAsync(() => ShowMessageBox(messageBox)).SubscribeOn(uiScheduler);
+        }
+        
         using var windowAnchors = new CompositeDisposable();
 
         var dialogId = $"Dialog#{Interlocked.Increment(ref dialogIdx)}";

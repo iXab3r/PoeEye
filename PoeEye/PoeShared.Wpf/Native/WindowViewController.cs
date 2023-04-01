@@ -19,7 +19,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
     {
         Window = owner;
         Handle = new WindowInteropHelper(owner).EnsureHandle();
-        Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}, title: {owner.Title}");
+        Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}");
         Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
         WhenRendered = Observable
