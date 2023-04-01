@@ -75,14 +75,29 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
     public void Activate()
     {
         Log.Debug("Activating window");
+        if (!Window.Dispatcher.CheckAccess())
+        {
+            Log.Debug("Rescheduling to window dispatcher");
+            Window.Dispatcher.Invoke(Activate);
+            return;
+        }
         Window.Activate();
+        Log.Debug("Activated window");
     }
 
     public void Close(bool? result)
     {
         Log.Debug(() => $"Closing window, result: {result}");
+        if (!Window.Dispatcher.CheckAccess())
+        {
+            Log.Debug("Rescheduling to window dispatcher");
+            Window.Dispatcher.Invoke(() => Close(result));
+            return;
+        }
+        
         Window.DialogResult = result;
         Window.Close();
+        Log.Debug("Closed window");
     }
 
     public void Close()

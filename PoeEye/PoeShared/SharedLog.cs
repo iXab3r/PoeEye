@@ -65,7 +65,11 @@ public class SharedLog : DisposableReactiveObject
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         XmlConfigurator.ConfigureAndWatch(repository, logConfig);
         Log.Info(() => $"Logging settings loaded from {logConfig}");
-        
+        DumpApplicationInfo(appArguments);
+    }
+
+    public void DumpApplicationInfo(IAppArguments appArguments)
+    {
         Log.Info(() => $"Parsed args: {appArguments.Dump()}");
         Log.Info(() => $"CmdLine: {Environment.CommandLine}");
         Log.Info(() => $"CommandLineArgs: {Environment.GetCommandLineArgs()}");
@@ -109,6 +113,11 @@ public class SharedLog : DisposableReactiveObject
         var root = repository.Root;
         Log.Debug(() => $"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
         root.AddAppender(appender);
+        if (!repository.Configured)
+        {
+            Log.Debug(() => $"Repository is not configured, invoking basic configuration");
+            BasicConfigurator.Configure(repository);
+        }
         repository.RaiseConfigurationChanged(EventArgs.Empty);
 
         return Disposable.Create(() =>
