@@ -11,6 +11,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
     private readonly SourceListEx<MetadataReplacement> replacementsSource = new();
     private readonly IObservableCache<MetadataReplacement, string> replacementsBySourceType;
     private readonly NamedLock substitutionsLock = new("ConfigMigrationServiceSubstitutions");
+    private readonly ConcurrentQueue<Assembly> unprocessedAssemblies = new();
 
     public PoeConfigMetadataReplacementService(IAssemblyTracker assemblyTracker)
     {
@@ -27,7 +28,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
                 ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>() != null).Distinct()
                 : Observable.Empty<Assembly>())
             .Switch()
-            .Subscribe(LoadMetadataReplacementsFromAssembly)
+            .Subscribe(unprocessedAssemblies.Enqueue)
             .AddTo(Anchors);
     }
 
@@ -79,6 +80,8 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
         using var @lock = substitutionsLock.Enter();
 
+        EnsureQueueIsProcessed();
+        
         if (!replacementsBySourceType.TryGetValue(metadata.TypeName, out var resolvedMetadata))
         {
             return metadata;
@@ -93,6 +96,15 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
         return replacement;
     }
 
+    private void EnsureQueueIsProcessed()
+    {
+        while (unprocessedAssemblies.TryDequeue(out var assembly))
+        { 
+            Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count}), processing {assembly}");
+            LoadMetadataReplacementsFromAssembly(assembly);
+        }
+    }
+    
     private void LoadMetadataReplacementsFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.GetName().Name);

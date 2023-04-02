@@ -15,6 +15,8 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     private readonly Dictionary<Type, IPoeEyeConfigVersioned> versionedConfigByType = new();
     private readonly NamedLock migrationsLock = new("ConfigMigrationServiceMigrations");
 
+    private readonly ConcurrentQueue<Assembly> unprocessedAssemblies = new();
+
     public PoeConfigConverterMigrationService(IAssemblyTracker assemblyTracker)
     {
         this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
@@ -22,7 +24,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null).Distinct()
                 : Observable.Empty<Assembly>())
             .Switch()
-            .Subscribe(LoadConvertersFromAssembly)
+            .Subscribe(unprocessedAssemblies.Enqueue)
             .AddTo(Anchors);
     }
     
@@ -39,6 +41,9 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     public bool TryGetConverter(Type targetType, int sourceVersion, int targetVersion, out PoeConfigMigrationConverter result)
     {
         using var @lock = migrationsLock.Enter();
+
+        EnsureQueueIsProcessed();
+        
         var logger = Log.WithSuffix($"{targetType} v{sourceVersion} => v{targetVersion}");
         logger.Debug(() => $"Looking up converter");
         var converterKvp = convertersByMetadata
@@ -131,6 +136,15 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
         };
         convertersByMetadata[explicitConverterKey] = explicitConverter;
         RegisterImplicitConverters(explicitConverterKey);
+    }
+
+    private void EnsureQueueIsProcessed()
+    {
+        while (unprocessedAssemblies.TryDequeue(out var assembly))
+        {
+            Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count}), processing {assembly}");
+            LoadConvertersFromAssembly(assembly);
+        }
     }
 
     private static Type ResolveMetadataConverterType(Type type)
