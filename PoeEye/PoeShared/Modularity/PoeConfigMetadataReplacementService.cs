@@ -43,6 +43,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
     public void Clear()
     {
+        unprocessedAssemblies.Clear();
         replacementsSource.Clear();
     }
 

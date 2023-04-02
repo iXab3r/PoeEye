@@ -39,6 +39,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     {
         using var @lock = migrationsLock.Enter();
 
+        unprocessedAssemblies.Clear();
         convertersByMetadata.Clear();
         versionedConfigByType.Clear();
     }
@@ -80,6 +81,9 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     public void RegisterMetadataConverter<T1, T2>(ConfigMetadataConverter<T1, T2> converter) where T1 : IPoeEyeConfigVersioned, new() where T2 : IPoeEyeConfigVersioned, new()
     {
         using var @lock = migrationsLock.Enter();
+        
+        EnsureQueueIsProcessed();
+        
         var typeV1 = typeof(T1);
         var typeV2 = typeof(T2);
         var assemblyV1 = typeV1.Assembly;
