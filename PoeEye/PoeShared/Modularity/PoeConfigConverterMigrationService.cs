@@ -24,7 +24,12 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null).Distinct()
                 : Observable.Empty<Assembly>())
             .Switch()
-            .Subscribe(unprocessedAssemblies.Enqueue)
+            .Subscribe(x =>
+            {
+                Log.Info($"Adding assembly {x} to processing queue");
+                unprocessedAssemblies.Enqueue(x);
+                Log.Info($"Added assembly {x} to processing queue");
+            })
             .AddTo(Anchors);
     }
     
