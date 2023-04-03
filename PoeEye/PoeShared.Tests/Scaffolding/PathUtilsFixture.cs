@@ -37,7 +37,7 @@ public class PathUtilsFixture : FixtureBase
             resultSupplier().ShouldBe(expected);
         }
     }
-    
+
     [Test]
     [TestCase(null, null)]
     [TestCase(null, "")]
@@ -63,7 +63,7 @@ public class PathUtilsFixture : FixtureBase
             resultSupplier().ShouldBe(expected);
         }
     }
-    
+
     [Test]
     [TestCase(null, null, true)]
     [TestCase("", "", true)]
@@ -91,7 +91,7 @@ public class PathUtilsFixture : FixtureBase
             new DirectoryInfo(folderPath).IsDirOrSubDir(new DirectoryInfo(fullPath)).ShouldBe(expected);
         }
     }
-    
+
     [Test]
     [TestCase(null, null, false)]
     [TestCase("", "", false)]
@@ -114,7 +114,7 @@ public class PathUtilsFixture : FixtureBase
         //Then
         result.ShouldBe(expected);
     }
-    
+
     [Test]
     [TestCase(null, null, false)]
     [TestCase("", "", false)]
@@ -187,7 +187,7 @@ public class PathUtilsFixture : FixtureBase
         //Then
         resultPath.ToString().ShouldBe(expected);
     }
-    
+
     [Test]
     [TestCase("a", "a")]
     [TestCase("a\\b", "a\\b")]
@@ -206,7 +206,7 @@ public class PathUtilsFixture : FixtureBase
     {
         //Given
         var rootPath = "z\\y";
-        
+
         //When
         var resultPath = PathUtils.ExpandPath(rootPath, path);
 
@@ -225,19 +225,74 @@ public class PathUtilsFixture : FixtureBase
         //Then
         resultPath.ShouldBe("a\\b");
     }
-    
+
     [Test]
     [TestCase(".\\..\\..\\..\\b")]
     public void ShouldThrowWhenPathIsNotValid(string path)
     {
         //Given
         var rootPath = "z\\y";
-        
+
         //When
         var action = () => PathUtils.ExpandPath(rootPath, path);
 
 
         //Then
         action.ShouldThrow<FormatException>();
+    }
+
+    [Test]
+    [TestCase("a", 0)]
+    [TestCase("a\\b", 1)]
+    [TestCase("a\\b\\c", 2)]
+    [TestCase("a\\b\\c\\..\\..", 4)]
+    [TestCase("a\\b\\c\\..", 3)]
+    [TestCase("a\\.", 1)]
+    [TestCase("a\\..", 1)]
+    [TestCase(".", 0)]
+    [TestCase("..", 0)]
+    [TestCase("a/b", 1)]
+    [TestCase("a/b/c", 2)]
+    [TestCase("a/b/c/../..", 4)]
+    [TestCase("a/b/c/..", 3)]
+    [TestCase("a/.", 1)]
+    [TestCase("a/..", 1)]
+    public void ShouldGetDepth(string path, int expectedDepth)
+    {
+        //Given
+        //When
+        var depth = PathUtils.GetDepth(path);
+
+        //Then
+        depth.ShouldBe(expectedDepth);
+    }
+
+    [Test]
+    [TestCase("a", "a", true)]
+    [TestCase("a", "b", false)]
+    [TestCase("/a", "/a", true)]
+    [TestCase("/a", "a/", false)]
+    [TestCase("/a", "a\\", false)]
+    public void ShouldCalculateIsSamePath(string first, string second, bool expected)
+    {
+        //Given
+        //When
+        var result = PathUtils.IsSamePath(first, second);
+
+        //Then
+        result.ShouldBe(expected);
+    }
+
+    [Test]
+    public void ShouldCalculatePlatformSpecificIsSamePath()
+    {
+        //Given
+        var first = Path.Combine("a", "b");
+
+        //When
+        var second = PathUtils.IsWindows ? "a\\b" : "/a/b";
+
+        //Then
+        PathUtils.IsSamePath(first, second).ShouldBe(true);
     }
 }

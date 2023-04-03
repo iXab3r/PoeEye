@@ -7,8 +7,8 @@ namespace PoeShared.Scaffolding;
 public static class PathUtils
 {
     private static readonly Func<string, string> PathConverter;
-    private static bool IsWindows { get; }
-    private static bool IsLinux { get; }
+    public static bool IsWindows { get; }
+    public static bool IsLinux { get; }
 
     static PathUtils()
     {
@@ -84,7 +84,7 @@ public static class PathUtils
  
         return commonPath;
     }
-    
+
     public static string GetRootDirectory(string path)
     {
         if (string.IsNullOrEmpty(path))
@@ -93,17 +93,21 @@ public static class PathUtils
         }
 
         var separatorIdx = path.IndexOf(Path.DirectorySeparatorChar);
+        if (separatorIdx < 0)
+        {
+            separatorIdx = path.IndexOf(Path.AltDirectorySeparatorChar);
+        }
         return separatorIdx <= 0 ? path : path.Substring(0, separatorIdx);
     }
 
     public static int GetDepth(string path)
     {
-        return (path ?? string.Empty).Count(x => x == Path.DirectorySeparatorChar);
+        return string.IsNullOrWhiteSpace(path) ? 0 : path.Count(x => x == Path.DirectorySeparatorChar || x == Path.AltDirectorySeparatorChar);
     }
 
     public static bool IsSamePath(string first, string second)
     {
-        return string.Equals(first, second, StringComparison.OrdinalIgnoreCase);
+        return first.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).SequenceEqual(second.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
     }
 
     public static bool IsParentDir(string candidatePath, string parentDir)
