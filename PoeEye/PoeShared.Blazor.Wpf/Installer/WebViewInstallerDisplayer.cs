@@ -6,11 +6,11 @@ namespace PoeShared.Blazor.Wpf.Installer;
 
 internal sealed class WebViewInstallerDisplayer : IWebViewInstallerDisplayer
 {
-    private readonly IFactory<WebViewInstaller, IWindowViewController, WebViewInstallerArgs> webViewInstallerFactory;
+    private readonly IFactory<WebViewInstallerWindow, IWindowViewController, WebViewInstallerArgs> webViewInstallerFactory;
     private readonly IFactory<WebViewInstallWindow> windowFactory;
 
     public WebViewInstallerDisplayer(
-        IFactory<WebViewInstaller, IWindowViewController, WebViewInstallerArgs> webViewInstallerFactory,
+        IFactory<WebViewInstallerWindow, IWindowViewController, WebViewInstallerArgs> webViewInstallerFactory,
         IFactory<WebViewInstallWindow> windowFactory)
     {
         this.webViewInstallerFactory = webViewInstallerFactory;

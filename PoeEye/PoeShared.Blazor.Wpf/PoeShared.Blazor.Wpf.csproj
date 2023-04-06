@@ -31,7 +31,7 @@
        <None Update="wwwroot4wpf\app.css">
          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
        </None>
-       <None Update="wwwroot4wpf\index.html">
+       <None Update="wwwroot4wpf\_Host.cshtml">
          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
        </None>
      </ItemGroup>
@@ -51,5 +51,10 @@
 
      <ItemGroup>
        <MauiXaml Include="BlazorContentControl.xaml" />
+     </ItemGroup>
+
+     <ItemGroup>
+       <None Remove="wwwroot\_Host.cshtml" />
+       <Content Include="wwwroot\_Host.cshtml" />
      </ItemGroup>
 </Project>

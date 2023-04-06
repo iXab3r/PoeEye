@@ -1,71 +1,39 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using JetBrains.Annotations;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using PoeShared.Squirrel.Core;
 using PoeShared.UI;
 using PropertyBinder;
-using ReactiveUI;
 
 namespace PoeShared.Blazor.Wpf.Installer;
 
-internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
+internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger, IWebViewInstaller
 {
+    private readonly IFileDownloader fileDownloader;
     private static readonly Binder<WebViewInstaller> Binder = new();
 
     static WebViewInstaller()
     {
-        Binder.Bind(x => x.DownloadAndInstallCommand.IsBusy || x.RefreshCommand.IsBusy).To(x => x.IsBusy);
-        Binder.Bind(x => x.webViewAccessor.IsInstalled).To(x => x.IsInstalled);
-        Binder.Bind(x => x.webViewAccessor.InstallType).To(x => x.BrowserInstallType);
-        Binder.Bind(x => x.webViewAccessor.AvailableBrowserVersion).To(x => x.BrowserVersion);
     }
 
-    private readonly WebViewInstallerArgs args;
-    private readonly IWindowViewController viewController;
-    private readonly IWebViewAccessor webViewAccessor;
-    private readonly IFileDownloader fileDownloader;
-
     public WebViewInstaller(
-        WebViewInstallerArgs args,
-        IWindowViewController viewController,
         IWebViewAccessor webViewAccessor,
         IFileDownloader fileDownloader)
     {
-        this.args = args;
-        this.viewController = viewController;
-        this.webViewAccessor = webViewAccessor;
+        WebViewAccessor = webViewAccessor;
         this.fileDownloader = fileDownloader;
-        RefreshCommand = CommandWrapper.Create(Refresh);
-
-        DownloadAndInstallCommand = CommandWrapper.Create(DownloadAndInstall, this.WhenAnyValue(x => x.IsInstalled).Select(x => true));
-        CloseWindow = CommandWrapper.Create(viewController.Close);
-        Refresh();
+        WebViewAccessor.Refresh();
+        
         Binder.Attach(this).AddTo(Anchors);
     }
-
-    public bool IsInstalled { get; [UsedImplicitly] private set; }
     
-    public bool IsBusy { get; [UsedImplicitly] private set; }
-    
-    public CommandWrapper RefreshCommand { get; }
-    
-    public CommandWrapper DownloadAndInstallCommand { get; }
-    
-    public CommandWrapper CloseWindow { get; }
-    
-    public string BrowserVersion { get; [UsedImplicitly] private set; }
-    
-    public WebViewInstallType BrowserInstallType { get; [UsedImplicitly] private set; }
+    public IWebViewAccessor WebViewAccessor { get; }
 
     public Uri DownloadLink { get; } = new("https://go.microsoft.com/fwlink/p/?LinkId=2124703", UriKind.Absolute);
-
+    
     public async Task DownloadAndInstall()
     {
         await Task.Delay(UiConstants.ArtificialVeryShortDelay);
@@ -80,7 +48,10 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
             Directory.CreateDirectory(tempFolder);
             var installerPath = new FileInfo(Path.Combine(tempFolder, "MicrosoftEdgeWebview2Setup.exe"));
             Log.Debug(() => $"Downloading installer to {installerPath.FullName} from {DownloadLink}");
-            await fileDownloader.DownloadFile(DownloadLink.ToString(), installerPath.FullName, progressPercent => { });
+            await fileDownloader.DownloadFile(DownloadLink.ToString(), installerPath.FullName, progressPercent =>
+            {
+                Log.Info($"Downloading installer from {DownloadLink}... {progressPercent}%");
+            });
             installerPath.Refresh();
             Log.Debug(() => $"Downloaded installer to {installerPath.FullName}, exists: {installerPath.Exists}");
             if (!installerPath.Exists)
@@ -99,16 +70,15 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger
             {
                 throw new InvalidStateException($"Installed returned ExitCode: {result.ExitCode} which indicates installation failure");
             }
-            Refresh();
+            WebViewAccessor.Refresh();
+            if (!WebViewAccessor.IsInstalled)
+            {
+                throw new InvalidStateException($"Failed to install from file {installerPath.FullName} - WebView is not discovered after installation");
+            }
         }
         finally
         {
             Directory.Delete(tempFolder, recursive: true);
         }
-    }
-
-    public void Refresh()
-    {
-        WebViewAccessor.Instance.Refresh();
     }
 }

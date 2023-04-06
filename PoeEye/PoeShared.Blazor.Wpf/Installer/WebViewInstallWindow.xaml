@@ -4,10 +4,6 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:eye="http://coderush.net/poeeye/"
-                 xmlns:st="http://schemas.spicytaco.io/"
-                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                 xmlns:logging="clr-namespace:PoeShared.Logging;assembly=PoeShared"
-                 xmlns:themes="clr-namespace:PoeShared.Themes;assembly=PoeShared.Wpf"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:installer="clr-namespace:PoeShared.Blazor.Wpf.Installer"
                  mc:Ignorable="d"
@@ -32,7 +28,7 @@
                  RenderOptions.EdgeMode="Aliased"
                  SizeToContent="Height"
                  ShowMaxRestoreButton="False"
-                 d:DataContext="{d:DesignInstance installer:WebViewInstaller}"
+                 d:DataContext="{d:DesignInstance installer:WebViewInstallerWindow}"
                  x:ClassModifier="internal">
-    <eye:CachedContentControl Content="{Binding}"></eye:CachedContentControl>
+    <eye:CachedContentControl Content="{Binding}"/>
 </mah:MetroWindow>

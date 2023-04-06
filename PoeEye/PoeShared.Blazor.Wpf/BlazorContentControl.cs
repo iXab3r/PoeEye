@@ -91,6 +91,6 @@ public class BlazorContentControl : ReactiveControl
             .AddTo(Anchors);
         
 
-        webView.HostPage = "wwwroot4wpf/index.html";
+        webView.HostPage = "wwwroot/_Host.cshtml";
     }
 }
