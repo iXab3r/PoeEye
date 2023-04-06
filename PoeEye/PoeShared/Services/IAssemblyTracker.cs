@@ -2,7 +2,7 @@
 
 namespace PoeShared.Services;
 
-internal interface IAssemblyTracker
+public interface IAssemblyTracker
 {
     IReadOnlyObservableCollection<Assembly> LoadedAssemblies { get; }
     
