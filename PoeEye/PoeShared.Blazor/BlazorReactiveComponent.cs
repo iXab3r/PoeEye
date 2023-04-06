@@ -2,17 +2,13 @@
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Blazor;
 
 public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReactiveObject
 {

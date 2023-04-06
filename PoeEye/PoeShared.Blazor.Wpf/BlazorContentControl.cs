@@ -66,31 +66,40 @@ public class BlazorContentControl : ReactiveControl
         webView.Services = serviceCollection.BuildServiceProvider();
 
         this.WhenAnyValue(x => x.ViewType)
-            .CombineLatest(this.WhenAnyValue(x => x.Content), (viewType, content) => new { viewType, content })
-            .Subscribe(x =>
+            .Subscribe(viewType =>
             {
                 webView.RootComponents.Clear();
-                if (x == null || x.content == null || x.viewType == null)
+                if (viewType == null)
                 {
                     return;
                 }
                 
-                var view = (BlazorReactiveComponent)Activator.CreateInstance(x.viewType) ?? throw new ArgumentNullException();
-                view.DataContext = x.content;
-                serviceCollection.RemoveAll(x.viewType);
-                serviceCollection.TryAdd(new ServiceDescriptor(x.viewType, view));
+                View = (BlazorReactiveComponent)Activator.CreateInstance(viewType) ?? throw new ArgumentNullException();
+                serviceCollection.RemoveAll(viewType);
+                serviceCollection.TryAdd(new ServiceDescriptor(viewType, View));
                 webView.Services = serviceCollection.BuildServiceProvider();
-
-                var rootComponent = new RootComponent
+                var rootComponent =  new RootComponent
                 {
                     Selector = "#app",
-                    ComponentType = x.viewType
+                    ComponentType = viewType
                 };
                 webView.RootComponents.Add(rootComponent);
             })
             .AddTo(Anchors);
+
+        this.WhenAnyValue(x => x.Content, x => x.View)
+            .Subscribe(x =>
+            {
+                if (x.Item2 != null)
+                {
+                    x.Item2.DataContext = x.Item1;
+                }
+            })
+            .AddTo(Anchors);
         
 
-        webView.HostPage = "wwwroot/_Host.cshtml";
+        webView.HostPage = "wwwroot/_Host.html";
     }
+    
+    public BlazorReactiveComponent View { get; private set; }
 }

@@ -28,10 +28,7 @@
      </ItemGroup>
 
      <ItemGroup>
-       <None Update="wwwroot4wpf\app.css">
-         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-       </None>
-       <None Update="wwwroot4wpf\_Host.cshtml">
+       <None Update="wwwroot\app.css">
          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
        </None>
      </ItemGroup>
@@ -54,7 +51,9 @@
      </ItemGroup>
 
      <ItemGroup>
-       <None Remove="wwwroot\_Host.cshtml" />
-       <Content Include="wwwroot\_Host.cshtml" />
+       <None Remove="wwwroot\_Host.html" />
+       <Content Include="wwwroot\_Host.html">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+       </Content>
      </ItemGroup>
 </Project>
