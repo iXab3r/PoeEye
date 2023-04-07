@@ -36,5 +36,8 @@
        <Content Update="wwwroot\blazor.utils.js">
          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
        </Content>
+       <Content Update="wwwroot\placeholder.md">
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+       </Content>
      </ItemGroup>
 </Project>
