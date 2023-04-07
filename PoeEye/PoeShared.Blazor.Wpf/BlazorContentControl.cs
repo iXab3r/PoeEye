@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Drawing;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using ReactiveUI;
 
@@ -34,8 +37,10 @@ public class BlazorContentControl : ReactiveControl
 
     public BlazorContentControl()
     {
-        
+        OpenDevTools = CommandWrapper.Create(() => webView?.WebView.CoreWebView2.OpenDevToolsWindow());   
     }
+    
+    public ICommand OpenDevTools { get; }
 
     public Type ViewType
     {
@@ -58,10 +63,16 @@ public class BlazorContentControl : ReactiveControl
         {
             return;
         }
-
+        
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddBlazorWebView();
         serviceCollection.AddWpfBlazorWebView();
+        
+        foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
+        {
+            serviceCollection.Add(serviceDescriptor);
+        }
+        
         serviceCollection.TryAdd<IComponentActivator, BlazorComponentActivator>(ServiceLifetime.Singleton);
         webView.Services = serviceCollection.BuildServiceProvider();
 
@@ -99,7 +110,14 @@ public class BlazorContentControl : ReactiveControl
         
 
         webView.HostPage = "wwwroot/_Host.html";
+        webView.Initialized += WebViewOnInitialized;
     }
-    
+
+    private void WebViewOnInitialized(object sender, EventArgs e)
+    {
+        webView.WebView.CoreWebView2.Settings.AreDevToolsEnabled = true;
+        webView.WebView.DefaultBackgroundColor = Color.GreenYellow;
+    }
+
     public BlazorReactiveComponent View { get; private set; }
 }

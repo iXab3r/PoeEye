@@ -1,4 +1,4 @@
- <Project Sdk="Microsoft.NET.Sdk">
+ <Project Sdk="Microsoft.NET.Sdk.Razor">
 
      <PropertyGroup>
          <TargetFramework>net7-windows7.0</TargetFramework>
@@ -28,32 +28,13 @@
      </ItemGroup>
 
      <ItemGroup>
-       <None Update="wwwroot\app.css">
-         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-       </None>
-     </ItemGroup>
-
-     <ItemGroup>
-       <Page Update="Installer\WebViewInstallWindow.xaml">
-         <Generator>MSBuild:Compile</Generator>
-         <XamlRuntime>Wpf</XamlRuntime>
-         <SubType>Designer</SubType>
-       </Page>
-     </ItemGroup>
-
-     <ItemGroup>
        <None Remove="Resources\WebView.ico" />
        <Resource Include="Resources\WebView.ico" />
      </ItemGroup>
 
      <ItemGroup>
-       <MauiXaml Include="BlazorContentControl.xaml" />
-     </ItemGroup>
-
-     <ItemGroup>
-       <None Remove="wwwroot\_Host.html" />
-       <Content Include="wwwroot\_Host.html">
-         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+       <Content Update="wwwroot\blazor.utils.js">
+         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
        </Content>
      </ItemGroup>
 </Project>
