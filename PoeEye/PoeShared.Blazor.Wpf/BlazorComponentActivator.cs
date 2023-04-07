@@ -14,8 +14,13 @@ internal sealed class BlazorComponentActivator : IComponentActivator
     }
 
     /// <inheritdoc />
-    public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type componentType)
+    public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] [JetBrains.Annotations.NotNull] Type componentType)
     {
+        if (componentType == null)
+        {
+            throw new ArgumentNullException(nameof(componentType));
+        }
+
         if (!typeof(IComponent).IsAssignableFrom(componentType))
         {
             throw new ArgumentException($"The type {componentType.FullName} does not implement {nameof(IComponent)}.", nameof(componentType));

@@ -14,23 +14,29 @@
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
-    
+
     <ControlTemplate x:Key="BlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
-        <wpf1:BlazorWebView x:Name="PART_WebView"/>
+        <Grid Background="Transparent">
+            <Grid.InputBindings>
+                <KeyBinding Gesture="F12" Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}"/>
+            </Grid.InputBindings>
+
+            <wpf1:BlazorWebView x:Name="PART_WebView" Background="Transparent"/>
+        </Grid>
     </ControlTemplate>
-    
+
     <ControlTemplate x:Key="TemporaryBlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
-        <TextBlock Text="Not installed"/>
+        <TextBlock Text="WebView2 is not installed" />
     </ControlTemplate>
 
     <Style x:Key="DefaultBlazorContentControlStyle" TargetType="{x:Type wpf:BlazorContentControl}">
-        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Focusable" Value="False" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True">
-                <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}"/>
+                <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="False">
-                <Setter Property="Template" Value="{StaticResource TemporaryBlazorContentControlTemplate}"/>
+                <Setter Property="Template" Value="{StaticResource TemporaryBlazorContentControlTemplate}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

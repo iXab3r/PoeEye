@@ -1,4 +1,8 @@
-﻿namespace PoeShared.Themes;
+﻿using System.Linq;
+using System.Text;
+using PoeShared.Scaffolding;
+
+namespace PoeShared.Themes;
 
 public static class AwesomeIcons
 {
@@ -77,4 +81,14 @@ public static class AwesomeIcons
     public const string Warning = "\uf071";
     public const string Wiki = "\uf266";
     public const string Youtube = "\uf167";
+
+    public static string ToHtml(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        return input.Select(x => $"&#{(ushort) x};").JoinStrings(string.Empty);
+    }
 }

@@ -143,6 +143,13 @@ public static class ChangeSetExtensions
         collection = result;
         return source.Bind(result, resetThreshold: int.MaxValue); // never reset to avoid breaking PropertyBinder
     }
+    
+    public static IObservable<IChangeSet<T>> BindToCollectionSynchronized<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
+    {
+        var result = new SynchronizedObservableCollectionEx<T>();
+        collection = result;
+        return source.Bind(result, resetThreshold: int.MaxValue); // never reset to avoid breaking PropertyBinder
+    }
 
     public static ISourceListEx<T> ToSourceListEx<T>(this IObservable<IChangeSet<T>> source)
     {
