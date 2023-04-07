@@ -191,7 +191,9 @@ public class RxTests : FixtureBase
 
         if (bgScheduler)
         {
+#pragma warning disable CS0618 // ok for test purposes
             producer = producer.ObserveOn(Scheduler.TaskPool);
+#pragma warning restore CS0618
         }
 
         if (synchronizePostScheduler)

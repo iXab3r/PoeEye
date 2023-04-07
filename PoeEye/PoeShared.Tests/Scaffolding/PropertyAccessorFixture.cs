@@ -56,7 +56,7 @@ public class PropertyAccessorFixture
         var accessor = testClass.GetPropertyAccessor<int>(nameof(testClass.StringProperty));
 
         //When
-        var action = () => accessor.Value.NoOp();
+        var action = () => accessor.Value.SuppressWarning();
 
         //Then
         action.ShouldThrow<InvalidCastException>();
@@ -70,7 +70,7 @@ public class PropertyAccessorFixture
         var accessor = testClass.GetPropertyAccessor<int>("non-existing property");
 
         //When
-        var action = () => accessor.Value.NoOp();
+        var action = () => accessor.Value.SuppressWarning();
 
         //Then
         action.ShouldThrow<ArgumentException>();
@@ -81,7 +81,7 @@ public class PropertyAccessorFixture
     {
         //Given
         //When
-        var action = () => new PropertyAccessor<string>(null!, "test").NoOp();
+        var action = () => new PropertyAccessor<string>(null!, "test").SuppressWarning();
 
         //Then
         action.ShouldThrow<ArgumentException>();

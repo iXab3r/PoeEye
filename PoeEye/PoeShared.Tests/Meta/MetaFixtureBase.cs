@@ -10,7 +10,7 @@ namespace PoeShared.Tests.Meta;
 
 public abstract class MetaFixtureBase : FixtureBase
 {
-    private static readonly IFluentLog Log = typeof(MetaFixtureBase).PrepareLogger();
+    private new static readonly IFluentLog Log = typeof(MetaFixtureBase).PrepareLogger();
 
     public static IReadOnlyList<ModuleDefMD> AllModules { get; }
 

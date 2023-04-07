@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Web;
 using PoeShared.Prism;
 
 namespace PoeShared.Communications;
@@ -61,7 +60,7 @@ internal sealed class NameValueCollectionToQueryStringConverter : IConverter<Nam
 
     private string ConvertToParam(string key, string value)
     {
-        return $"{key}={HttpUtility.UrlEncode(value)}";
+        return $"{key}={System.Web.HttpUtility.UrlEncode(value)}";
     }
 
     private KeyValuePair<string, string> ConvertToKvp(string key, string value)

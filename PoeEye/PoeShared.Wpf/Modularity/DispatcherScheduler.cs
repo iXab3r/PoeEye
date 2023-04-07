@@ -22,7 +22,7 @@ public sealed class DispatcherScheduler : LocalScheduler, ISchedulerPeriodic
     {
         get
         {
-            var dispatcher = System.Windows.Threading.Dispatcher.FromThread(Thread.CurrentThread);
+            var dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
             if (dispatcher == null)
             {
                 throw new InvalidOperationException("NO_DISPATCHER_CURRENT_THREAD");

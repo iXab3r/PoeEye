@@ -318,7 +318,9 @@ public class ScreenRegionUtilsFixture : FixtureBase
         //Given
 
         //When
+#pragma warning disable CS0618 // for test purposes
         var result = ScreenRegionUtils.CalculateBounds(selection, selector, clientBounds);
+#pragma warning restore CS0618
 
         //Then
         result.ShouldBe(expected);

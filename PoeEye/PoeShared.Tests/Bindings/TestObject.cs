@@ -1,8 +1,10 @@
 ﻿using System;
 using PoeShared.Scaffolding;
+using PropertyChanged;
 
 namespace PoeShared.Tests.Bindings;
 
+[SuppressPropertyChangedWarnings]
 public class TestObject : DisposableReactiveObject
 {
     public int intField;

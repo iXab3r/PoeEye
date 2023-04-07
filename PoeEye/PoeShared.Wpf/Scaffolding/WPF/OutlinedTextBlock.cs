@@ -277,6 +277,7 @@ public class OutlinedTextBlock : FrameworkElement
             return;
         }
 
+#pragma warning disable CS0618 // works just fine on an older API, ignore for now
         formattedText = new FormattedText(
             Text ?? string.Empty,
             CultureInfo.CurrentUICulture,
@@ -286,6 +287,7 @@ public class OutlinedTextBlock : FrameworkElement
             Brushes.Black,
             new NumberSubstitution(),
             TextFormattingMode.Ideal);
+#pragma warning restore CS0618
 
         UpdateFormattedText();
     }

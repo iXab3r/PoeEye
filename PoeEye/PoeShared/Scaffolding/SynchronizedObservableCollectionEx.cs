@@ -1,11 +1,20 @@
 ﻿using System.Collections.Specialized;
 using DynamicData.Binding;
 using PoeShared.Services;
+using PropertyBinder;
+using PropertyChanged;
 
 namespace PoeShared.Scaffolding;
 
+[DoNotNotify]
 public sealed class SynchronizedObservableCollectionEx<T> : DisposableReactiveObject, IObservableCollection<T>, IReadOnlyObservableCollection<T>
 {
+    private static readonly Binder<SynchronizedObservableCollectionEx<T>> Binder = new();
+
+    static SynchronizedObservableCollectionEx()
+    {
+    }
+
     private readonly ObservableCollectionEx<T> collection = new();
 
     private readonly NamedLock gate = new NamedLock("SynchronizedObservableCollectionEx");
@@ -13,6 +22,8 @@ public sealed class SynchronizedObservableCollectionEx<T> : DisposableReactiveOb
     public SynchronizedObservableCollectionEx()
     {
         collection.CollectionChanged += CollectionOnCollectionChanged;
+        this.RaiseWhenSourceValue(x => x.Count, collection, x => x.Count).AddTo(Anchors);
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     private void CollectionOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

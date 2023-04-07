@@ -54,7 +54,7 @@ public class ColorToStringConverter : DependencyObject, IValueConverter
             }
             throw new FormatException($"Supplied data of type {value.GetType()} is not supported");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return DependencyProperty.UnsetValue;
         }

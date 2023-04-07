@@ -1,3 +1,5 @@
+using PropertyChanged;
+
 namespace PoeShared.Benchmarks.PropertyBinder;
 
 public class BinderPerformanceModelFixture : BenchmarkBase
@@ -106,6 +108,7 @@ public class BinderPerformanceModelFixture : BenchmarkBase
         yield return new PropertyHelperViewModel();
     }
         
+    [SuppressPropertyChangedWarnings]
     public abstract class BaseViewModel : DisposableReactiveObject
     {
 

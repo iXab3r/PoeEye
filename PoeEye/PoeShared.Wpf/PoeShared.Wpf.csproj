@@ -5,14 +5,14 @@
     <AssemblyTitle>PoeShared.Wpf</AssemblyTitle>
     <Product>PoeShared.Wpf</Product>
     <Description>PoeEye Shared Wpf classes</Description>
-    <Copyright>Copyright © Xab3r 2020</Copyright>
+    <Copyright>Copyright © Xab3r 2023</Copyright>
     <UseWpf>true</UseWpf>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
     <LangVersion>10</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>PoeShared</RootNamespace>
-    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;UA306_A;UA306_A4;</NoWarn>
+    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;UA306_A;UA306_A4;UA306_A2;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="App.Metrics" Version="4.2.0" />

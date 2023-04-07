@@ -78,7 +78,9 @@ public class KeyboardEventsSourceFixture
         })
         {
             IsBackground = true,
+#pragma warning disable CS0618 // ok for test purposes
             ApartmentState = ApartmentState.STA,
+#pragma warning restore CS0618
             Name = "HotkeyTracker"
         };
         bgThread.Start();

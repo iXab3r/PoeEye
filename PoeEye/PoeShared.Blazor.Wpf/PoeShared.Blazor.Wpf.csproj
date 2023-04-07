@@ -4,7 +4,7 @@
          <TargetFramework>net7-windows7.0</TargetFramework>
          <AssemblyTitle>PoeShared.Blazor</AssemblyTitle>
          <Product>PoeShared.Blazor</Product>
-         <Copyright>Copyright © Xab3r 2022</Copyright>
+         <Copyright>Copyright © Xab3r 2023</Copyright>
          <Configurations>Debug;Release</Configurations>
          <Platforms>AnyCPU</Platforms>
          <UseWpf>true</UseWpf>
@@ -35,9 +35,6 @@
      <ItemGroup>
        <Content Update="wwwroot\blazor.utils.js">
          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-       </Content>
-       <Content Update="wwwroot\placeholder.md">
-         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
        </Content>
      </ItemGroup>
 </Project>

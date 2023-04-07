@@ -61,7 +61,9 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<IHotkeyTracker, HotkeyTracker>()
             .RegisterType<ISingleInstanceValidationHelper, SingleInstanceValidationHelper>()
             .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
+#pragma warning disable CS0618 // legacy registration
             .RegisterType<ISelectionAdornerLegacy, SelectionAdornerLegacy>()
+#pragma warning restore CS0618
             .RegisterType<IBindingsEditorViewModel, BindingsEditorViewModel>()
             .RegisterType<IWindowRegionSelector, WindowRegionSelector>()
             .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()

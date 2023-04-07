@@ -8,6 +8,7 @@ namespace PoeShared.Native;
 
 public static class ScreenRegionUtils
 {
+    [Obsolete("Replaced by CalculateProjection")]
     public static Rectangle CalculateBounds(
         Rectangle selection,
         WinSize selectorSize,

@@ -14,7 +14,7 @@ public static class ObjectExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <typeparam name="T"></typeparam>
-    public static void NoOp<T>(this T source)
+    public static void SuppressWarning<T>(this T source)
     {
     }
 }

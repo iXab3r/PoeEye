@@ -1,3 +1,5 @@
+using PropertyChanged;
+
 namespace PoeShared.Benchmarks.PropertyBinder;
 
 public class BinderPerformanceCollectionsFixture : BenchmarkBase
@@ -96,6 +98,7 @@ public class BinderPerformanceCollectionsFixture : BenchmarkBase
         instance.Count.ShouldBe(2);
     }
         
+    [SuppressPropertyChangedWarnings]
     public abstract class TestCollectionBase : DisposableReactiveObject
     {
         public ObservableCollection<int> Collection { get; } = new();

@@ -23,8 +23,6 @@ namespace PoeShared.RegionSelector.ViewModels;
 
 internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegionSelector
 {
-    private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromMilliseconds(250);
-    private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
     private static readonly double MinSelectionArea = 20;
     private readonly TaskWindowSeeker windowSeeker;
 
@@ -181,7 +179,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
     {
         var topLeft = new WinPoint(selection.Left, selection.Top);
         var intersections = windows
-            .Where(x => x.ProcessId != CurrentProcessId)
+            .Where(x => x.ProcessId != Environment.ProcessId)
             .Where(x => UnsafeNative.WindowIsVisible(x.Handle))
             .Where(x => x.ClientBounds.IsNotEmptyArea())
             .Where(x => x.ClientBounds.Contains(topLeft))

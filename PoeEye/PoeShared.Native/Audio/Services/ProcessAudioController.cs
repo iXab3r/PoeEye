@@ -33,7 +33,7 @@ internal sealed class ProcessAudioController : DisposableReactiveObjectWithLogge
             {
                 processId = session.GetProcessID;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // do nothing, some processes will not be available
             }

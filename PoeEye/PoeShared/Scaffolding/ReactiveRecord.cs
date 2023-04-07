@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#pragma warning disable CS0067
+using System.ComponentModel;
 
 namespace PoeShared.Scaffolding;
 

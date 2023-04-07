@@ -394,7 +394,7 @@ public static class ChangeSetExtensions
 
     public static ISourceList<T> Concat<T>(this ISourceList<T> list, params ISourceList<T>[] lists)
     {
-#pragma warning disable CS0618 This is currently the only way
+#pragma warning disable CS0618 // This is currently the only way
         return new[] { list }.Concat(lists).ToSourceList();
 #pragma warning restore CS0618
     }
