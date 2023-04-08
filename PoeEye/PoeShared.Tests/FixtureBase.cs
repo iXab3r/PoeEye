@@ -26,6 +26,14 @@ public abstract class FixtureBase
         Log = GetType().PrepareLogger().WithSuffix(() => runIdx);
     }
 
+    [OneTimeSetUp]
+    public void OneTimeSetUpTest()
+    {
+        Log.Debug("OneTimeSetUp starting");
+        OneTimeSetUp();
+        Log.Debug("OneTimeSetUp completed");
+    }
+
     [SetUp]
     public void SetUpTest()
     {
@@ -62,4 +70,5 @@ public abstract class FixtureBase
     protected virtual void SetUp(){}
     
     protected virtual void TearDown(){}
+    protected virtual void OneTimeSetUp(){}
 }
