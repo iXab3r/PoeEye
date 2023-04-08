@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using DynamicData.Binding;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -37,6 +39,29 @@ public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReacti
     public void RaisePropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    
+    protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
+        TRet newValue,
+        [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<TRet>.Default.Equals(backingField, newValue))
+        {
+            return newValue;
+        }
+
+        return RaiseAndSet(ref backingField, newValue, propertyName);
+    }
+    
+    protected TRet RaiseAndSet<TRet>(
+        ref TRet backingField,
+        TRet newValue,
+        [CallerMemberName] string propertyName = null)
+    {
+        backingField = newValue;
+        RaisePropertyChanged(propertyName);
+        return newValue;
     }
 }
 
