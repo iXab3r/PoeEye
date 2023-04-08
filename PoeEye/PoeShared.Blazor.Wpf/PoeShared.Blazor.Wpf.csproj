@@ -8,7 +8,6 @@
          <Configurations>Debug;Release</Configurations>
          <Platforms>AnyCPU</Platforms>
          <UseWpf>true</UseWpf>
-         <LangVersion>10</LangVersion>
          <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
          <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
      </PropertyGroup>
@@ -29,12 +28,17 @@
 
      <ItemGroup>
        <None Remove="Resources\WebView.ico" />
+       <None Include="wwwroot\index.html" />
        <Resource Include="Resources\WebView.ico" />
      </ItemGroup>
 
      <ItemGroup>
        <Content Update="wwwroot\blazor.utils.js">
          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+       </Content>
+       <Content Update="index">
+         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
        </Content>
      </ItemGroup>
 </Project>

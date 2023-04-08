@@ -8,11 +8,12 @@
         <st:StackPanel Orientation="Vertical">
             <eye:ButtonEx Content="Show Installer" Command="{Binding ShowInstaller}"/>
             <CheckBox IsChecked="{Binding WebViewAccessor.IsInstalled}">IsInstalled</CheckBox>
+            <CheckBox IsChecked="{Binding MainCounterAlt}">Alt View</CheckBox>
             <GroupBox  st:StackPanel.Fill="Fill">
                 <GroupBox.Header>
                     Control-based
                 </GroupBox.Header>
-                <wpf:BlazorContentControl ViewType="{x:Type blazor:MainCounterView}" Content="{Binding MainCounter}"/>
+                <wpf:BlazorContentControl ViewType="{Binding MainCounterViewType}" Content="{Binding MainCounter}"/>
             </GroupBox>
             <GroupBox  st:StackPanel.Fill="Fill">
                 <GroupBox.Header>

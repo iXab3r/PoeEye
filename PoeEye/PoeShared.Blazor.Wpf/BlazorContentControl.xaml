@@ -21,7 +21,7 @@
                 <KeyBinding Gesture="F12" Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}"/>
             </Grid.InputBindings>
 
-            <wpf1:BlazorWebView x:Name="PART_WebView" Background="Transparent"/>
+            <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}"/>
         </Grid>
     </ControlTemplate>
 

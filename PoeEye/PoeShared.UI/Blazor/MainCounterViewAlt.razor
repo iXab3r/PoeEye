@@ -1,0 +1,12 @@
+﻿@inherits PoeShared.Blazor.BlazorReactiveComponent<PoeShared.UI.Blazor.MainCounterViewModel>
+<h3>MainCounterViewAlt</h3>
+
+<p>The current count is: @DataContext.Count</p>
+<button @onclick="IncrementCount">Count</button>
+
+@code {
+    void IncrementCount()
+    {
+        DataContext.Count++;
+    }
+}

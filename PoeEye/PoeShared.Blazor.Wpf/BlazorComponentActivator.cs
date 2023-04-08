@@ -6,15 +6,19 @@ namespace PoeShared.Blazor.Wpf;
 
 internal sealed class BlazorComponentActivator : IComponentActivator
 {
-    private readonly IServiceProvider serviceProvider;
+    private readonly Func<IServiceProvider> serviceProviderSupplier;
 
-    public BlazorComponentActivator(IServiceProvider serviceProvider)
+    public BlazorComponentActivator(IServiceProvider serviceProvider) : this(() => serviceProvider)
     {
-        this.serviceProvider = serviceProvider;
+    }
+    
+    public BlazorComponentActivator(Func<IServiceProvider> serviceProviderSupplier)
+    {
+        this.serviceProviderSupplier = serviceProviderSupplier;
     }
 
     /// <inheritdoc />
-    public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] [JetBrains.Annotations.NotNull] Type componentType)
+    public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type componentType)
     {
         if (componentType == null)
         {
@@ -28,6 +32,7 @@ internal sealed class BlazorComponentActivator : IComponentActivator
 
         if (typeof(BlazorReactiveComponent).IsAssignableFrom(componentType))
         {
+            var serviceProvider = serviceProviderSupplier();
             return (IComponent)serviceProvider.GetService(componentType);
         }
         else

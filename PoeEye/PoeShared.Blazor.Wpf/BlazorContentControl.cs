@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,18 +20,13 @@ using ReactiveUI;
 
 namespace PoeShared.Blazor.Wpf;
 
-[TemplatePart(Name = PART_WebView, Type = typeof(CheckBox))]
 public class BlazorContentControl : ReactiveControl
 {
-    public const string PART_WebView = "PART_WebView";
-
     public static readonly DependencyProperty ViewTypeProperty = DependencyProperty.Register(
         nameof(ViewType), typeof(Type), typeof(BlazorContentControl), new PropertyMetadata(default(Type)));
 
     public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
         nameof(Content), typeof(object), typeof(BlazorContentControl), new PropertyMetadata(default(object)));
-
-    private BlazorWebView webView;
 
     static BlazorContentControl()
     {
@@ -37,7 +35,56 @@ public class BlazorContentControl : ReactiveControl
 
     public BlazorContentControl()
     {
-        OpenDevTools = CommandWrapper.Create(() => webView?.WebView.CoreWebView2.OpenDevToolsWindow());   
+        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());   
+        
+        this.WhenAnyValue(x => x.ViewType)
+            .ObserveOnDispatcher()
+            .Subscribe(async viewType =>
+            {
+                if (WebView != null)
+                {
+                    await WebView.DisposeAsync();
+                    WebView = null;
+
+                    if (View is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+
+                    View = null;
+                }
+
+                if (viewType == null)
+                {
+                    return;
+                }
+                
+                var serviceCollection = new ServiceCollection();
+                serviceCollection.AddBlazorWebView();
+                serviceCollection.AddWpfBlazorWebView();
+                foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
+                {
+                    serviceCollection.Add(serviceDescriptor);
+                }
+
+                serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
+                var view = Activator.CreateInstance(viewType) ?? throw new ArgumentNullException();
+                serviceCollection.TryAdd(new ServiceDescriptor(viewType, view));
+                
+                var webView = new BlazorWebViewEx();
+                webView.Services = serviceCollection.BuildServiceProvider();
+                new RootComponent
+                {
+                    Selector = $"#app",
+                    ComponentType = viewType
+                }.AddTo(webView.RootComponents);
+                webView.Initialized += WebViewOnInitialized;
+                webView.HostPage = "index.html";
+                
+                View = view;
+                WebView = webView;
+            })
+            .AddTo(Anchors);
     }
     
     public ICommand OpenDevTools { get; }
@@ -53,71 +100,32 @@ public class BlazorContentControl : ReactiveControl
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
     }
+    
+    /// <summary>
+    /// We have to dynamically recreate WebView when needed as it is EXTREMELY unfriendly for any changes of associated properties
+    /// </summary>
+    public BlazorWebViewEx WebView { get; private set; }
 
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
-        webView = Template.FindName(PART_WebView, this) as BlazorWebView;
-        if (webView == null)
-        {
-            return;
-        }
-        
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddBlazorWebView();
-        serviceCollection.AddWpfBlazorWebView();
-        
-        foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
-        {
-            serviceCollection.Add(serviceDescriptor);
-        }
-        
-        serviceCollection.TryAdd<IComponentActivator, BlazorComponentActivator>(ServiceLifetime.Singleton);
-        webView.Services = serviceCollection.BuildServiceProvider();
-
-        this.WhenAnyValue(x => x.ViewType)
-            .Subscribe(viewType =>
-            {
-                webView.RootComponents.Clear();
-                if (viewType == null)
-                {
-                    return;
-                }
-                
-                View = (BlazorReactiveComponent)Activator.CreateInstance(viewType) ?? throw new ArgumentNullException();
-                serviceCollection.RemoveAll(viewType);
-                serviceCollection.TryAdd(new ServiceDescriptor(viewType, View));
-                webView.Services = serviceCollection.BuildServiceProvider();
-                var rootComponent =  new RootComponent
-                {
-                    Selector = "#app",
-                    ComponentType = viewType
-                };
-                webView.RootComponents.Add(rootComponent);
-            })
-            .AddTo(Anchors);
-
         this.WhenAnyValue(x => x.Content, x => x.View)
             .Subscribe(x =>
             {
-                if (x.Item2 != null)
+                if (x.Item2 is BlazorReactiveComponent blazorReactiveComponent)
                 {
-                    x.Item2.DataContext = x.Item1;
+                    blazorReactiveComponent.DataContext = x.Item1;
                 }
             })
             .AddTo(Anchors);
-        
-
-        webView.HostPage = "wwwroot/_Host.html";
-        webView.Initialized += WebViewOnInitialized;
     }
 
     private void WebViewOnInitialized(object sender, EventArgs e)
     {
-        webView.WebView.CoreWebView2.Settings.AreDevToolsEnabled = true;
-        webView.WebView.DefaultBackgroundColor = Color.GreenYellow;
+        var webView = (BlazorWebViewEx)sender;
+        webView.Initialized -= WebViewOnInitialized;
     }
 
-    public BlazorReactiveComponent View { get; private set; }
+    public object View { get; private set; }
 }
