@@ -111,11 +111,13 @@
     --eye-OverlayForegroundColorKey: White;
 }
 
-body {
+body, html, .app {
     background-color: var(--eye-MaterialDesignPaperDark);
     color: var(--eye-MaterialDesignBody);
     font-family: var(--eye-font-family);
     font-size: 12px;
+    width: 100vw;
+    height: 100vh;
 }
 
 .scroller {
