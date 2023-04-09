@@ -37,7 +37,7 @@
          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
        </Content>
-       <Content Update="wwwroot\css\blazor.utils.js">
+       <Content Update="wwwroot\js\blazor.utils.js">
          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
        </Content>
      </ItemGroup>

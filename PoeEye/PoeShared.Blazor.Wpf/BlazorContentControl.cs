@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
@@ -157,4 +158,20 @@ public class BlazorContentControl : ReactiveControl
     }
     
     public object View { get; private set; }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if(e.OriginalSource is not WebView2)
+        {
+            base.OnKeyDown(e);
+        }
+    }
+
+    protected override void OnKeyUp(KeyEventArgs e)
+    {
+        if(e.OriginalSource is not WebView2)
+        {
+            base.OnKeyUp(e); 
+        }
+    }
 }

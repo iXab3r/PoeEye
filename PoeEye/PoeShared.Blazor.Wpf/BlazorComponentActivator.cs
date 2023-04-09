@@ -33,11 +33,12 @@ internal sealed class BlazorComponentActivator : IComponentActivator
         if (typeof(BlazorReactiveComponent).IsAssignableFrom(componentType))
         {
             var serviceProvider = serviceProviderSupplier();
-            return (IComponent)serviceProvider.GetService(componentType);
+            var result = (IComponent)serviceProvider.GetService(componentType);
+            if (result != null)
+            {
+                return result;
+            } 
         }
-        else
-        {
-            return (IComponent) Activator.CreateInstance(componentType);
-        }
+        return (IComponent) Activator.CreateInstance(componentType);
     }
 }
