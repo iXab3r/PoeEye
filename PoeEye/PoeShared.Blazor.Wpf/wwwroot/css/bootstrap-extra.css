@@ -1,0 +1,28 @@
+﻿.table {
+    font-family: 'Roboto', sans-serif;
+    color: #dee2e6;
+}
+
+.badge {
+    align-items: center;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.form-content {
+    padding: 0 0.375rem;
+}
+
+.form-control{
+    padding: 0 0.375rem;
+}
+
+.dropdown-menu {
+    padding: 10px;
+}
+
+h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+    line-height: 1;
+}

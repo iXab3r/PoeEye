@@ -1,0 +1,40 @@
+﻿@inherits BlazorReactiveComponent
+
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
+        @if (Type != null)
+        {
+            <DynamicComponent Type="@Type" Parameters="@Parameters"/>
+        }
+        else
+        {
+            <div>Type is not selected</div>
+        }
+    </ChildContent>
+    <ErrorContent>
+        <div class="border p-4 text-danger">
+            Component has crashed
+            <button @onclick="Recover">Try to recover</button>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [Parameter]
+    public Type Type { get; set; }
+    
+    [Parameter]
+    public Dictionary<string, object> Parameters { get; set; }
+    
+    private ErrorBoundary errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private void Recover()
+    {
+        errorBoundary?.Recover();
+    }
+}

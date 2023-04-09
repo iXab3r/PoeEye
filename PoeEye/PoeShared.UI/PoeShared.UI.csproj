@@ -60,6 +60,9 @@
       <Compile Update="Blazor\MainCounterView.cs">
         <DependentUpon>MainCounterView.razor</DependentUpon>
       </Compile>
+      <Compile Update="Blazor\SlowView.cs">
+        <DependentUpon>SlowView.razor</DependentUpon>
+      </Compile>
     </ItemGroup>
     
     <ItemGroup>

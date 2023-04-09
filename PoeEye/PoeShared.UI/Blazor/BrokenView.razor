@@ -1,0 +1,29 @@
+﻿<h3>BrokenView</h3>
+
+<div>without Error boundary <ExceptionPanel/></div>
+
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
+        <div>with Error boundary <ExceptionPanel/></div>
+    </ChildContent>
+    <ErrorContent>
+        <div class="border p-4 text-danger">
+            Something has gone wrong - we crashed
+            <button @onclick="Recover">Try to recover</button>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    private ErrorBoundary errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private void Recover()
+    {
+        errorBoundary?.Recover();
+    }
+}

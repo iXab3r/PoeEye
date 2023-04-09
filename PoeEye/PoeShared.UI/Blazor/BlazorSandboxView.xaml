@@ -8,7 +8,20 @@
         <st:StackPanel Orientation="Vertical">
             <eye:ButtonEx Content="Show Installer" Command="{Binding ShowInstaller}"/>
             <CheckBox IsChecked="{Binding WebViewAccessor.IsInstalled}">IsInstalled</CheckBox>
-            <CheckBox IsChecked="{Binding MainCounterAlt}">Alt View</CheckBox>
+            <st:StackPanel Orientation="Horizontal">
+                <RadioButton
+                    IsChecked="{Binding ViewType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static blazor:ViewTypeEnum.Main}}"
+                    Content="Main" />
+                <RadioButton
+                    IsChecked="{Binding Path=ViewType, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static blazor:ViewTypeEnum.Alt}}"
+                    Content="Alternative" />
+                <RadioButton
+                    IsChecked="{Binding Path=ViewType, Converter={StaticResource EqualToNullConverter}, ConverterParameter={x:Static blazor:ViewTypeEnum.Broken}}"
+                    Content="Broken" />
+                <RadioButton
+                    IsChecked="{Binding Path=ViewType, Converter={StaticResource EqualToNullConverter}, ConverterParameter={x:Static blazor:ViewTypeEnum.Slow}}"
+                    Content="Slow" />
+            </st:StackPanel>
             <GroupBox  st:StackPanel.Fill="Fill">
                 <GroupBox.Header>
                     Control-based

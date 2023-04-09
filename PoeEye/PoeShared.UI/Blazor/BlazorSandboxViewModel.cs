@@ -19,7 +19,8 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
 
     static BlazorSandboxViewModel()
     {
-        Binder.Bind(x => !x.MainCounterAlt ? typeof(MainCounterViewAlt) : typeof(MainCounterView)).To(x => x.MainCounterViewType);
+        Binder.Bind(x => x.ViewType == ViewTypeEnum.Main ? typeof(MainCounterView) : x.ViewType == ViewTypeEnum.Alt ? typeof(MainCounterViewAlt) : x.ViewType == ViewTypeEnum.Slow ? typeof(SlowView) : typeof(BrokenView))
+            .To(x => x.MainCounterViewType);
     }
 
 
@@ -40,5 +41,6 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
 
     public Type MainCounterViewType { get; private set; }
 
-    public bool MainCounterAlt { get; set; }
+    public ViewTypeEnum ViewType { get; set; }
+
 }

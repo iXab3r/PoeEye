@@ -1,0 +1,16 @@
+﻿@using System.Threading
+<h3>SlowView</h3>
+<h2>@Status</h2>
+
+@code {
+
+    public string Status { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        Status = ".onInitialized: entering";
+        Thread.Sleep(3000);
+        base.OnInitialized();
+        Status = ".onInitialized: exiting";
+    }
+}

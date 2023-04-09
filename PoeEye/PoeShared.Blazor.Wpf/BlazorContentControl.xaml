@@ -13,6 +13,7 @@
                               mc:Ignorable="d">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="BlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
@@ -21,7 +22,9 @@
                 <KeyBinding Gesture="F12" Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}"/>
             </Grid.InputBindings>
 
-            <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}"/>
+            <ContentPresenter 
+                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}"/>
         </Grid>
     </ControlTemplate>
 
@@ -31,6 +34,7 @@
 
     <Style x:Key="DefaultBlazorContentControlStyle" TargetType="{x:Type wpf:BlazorContentControl}">
         <Setter Property="Focusable" Value="False" />
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"></Setter>
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True">
                 <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}" />

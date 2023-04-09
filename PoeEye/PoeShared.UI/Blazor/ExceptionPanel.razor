@@ -1,0 +1,21 @@
+﻿<button @onclick="ThrowException">Throw Exception</button>
+<button @onclick="ThrowExceptionAsync">Awaited task throws</button>
+<button @onclick="ThrowExceptionUnawaited">Un-awaited task throws</button>
+
+@code {
+    void ThrowExceptionUnawaited()
+    {
+        _ = ThrowExceptionAsync();
+    }
+    
+    async Task ThrowExceptionAsync()
+    {
+        await Task.Delay(10);
+        throw new Exception("This is some ***async*** exception.");
+    }
+    
+    void ThrowException()
+    {
+        throw new Exception("This is some unhandled exception.");
+    }
+}

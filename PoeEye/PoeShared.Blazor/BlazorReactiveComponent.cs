@@ -30,6 +30,7 @@ public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReacti
         GC.SuppressFinalize(this);
     }
     
+    [Parameter]
     public object DataContext { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;

@@ -33,12 +33,12 @@
      </ItemGroup>
 
      <ItemGroup>
-       <Content Update="wwwroot\blazor.utils.js">
-         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-       </Content>
        <Content Update="index">
          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+       </Content>
+       <Content Update="wwwroot\css\blazor.utils.js">
+         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
        </Content>
      </ItemGroup>
 </Project>
