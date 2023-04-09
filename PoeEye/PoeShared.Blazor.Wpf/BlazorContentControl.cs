@@ -48,6 +48,17 @@ public class BlazorContentControl : ReactiveControl
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
 
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddBlazorWebView();
+        serviceCollection.AddWpfBlazorWebView();
+        //FIXME Singleton seems to be the simplest way to link WPF world to ASPNETCORE
+        foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
+        {
+            serviceCollection.Add(serviceDescriptor);
+        }
+
+        serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
+
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.WebView),
                 this.Observe(BackgroundProperty, x => x.Background),
@@ -80,16 +91,7 @@ public class BlazorContentControl : ReactiveControl
                     return;
                 }
 
-                var serviceCollection = new ServiceCollection();
-                serviceCollection.AddBlazorWebView();
-                serviceCollection.AddWpfBlazorWebView();
-                foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
-                {
-                    serviceCollection.Add(serviceDescriptor);
-                }
-
-                serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
-
+                // views have to be transient to allow to re-create them if needed (e.g. on error)
                 serviceCollection.AddTransient(typeof(BlazorContent), x =>
                 {
                     var wrapper = new BlazorContent()
