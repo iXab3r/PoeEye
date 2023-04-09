@@ -4,7 +4,7 @@ namespace PoeShared.Native;
 
 internal sealed class PassthroughWindowTrackerTitleMatcher : IWindowTrackerMatcher
 {
-    public bool IsMatch(string title, IntPtr hwnd, int processId)
+    public bool IsMatch(IWindowHandle windowHandle)
     {
         return true;
     }

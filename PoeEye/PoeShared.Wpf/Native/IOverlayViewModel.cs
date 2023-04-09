@@ -15,6 +15,8 @@ public interface IOverlayViewModel : IWindowViewModel
 
     OverlayMode OverlayMode { get; set; }
     
+    bool IsFocusable { get; set; }
+    
     bool GrowUpwards { get; }
 
     ICommand LockWindowCommand { [NotNull] get; }

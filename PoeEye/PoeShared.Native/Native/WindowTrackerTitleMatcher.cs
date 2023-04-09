@@ -11,8 +11,8 @@ internal sealed class WindowTrackerTitleMatcher : IWindowTrackerMatcher
         this.titleMatcher = titleMatcher;
     }
 
-    public bool IsMatch(string title, IntPtr hwnd, int processId)
+    public bool IsMatch(IWindowHandle window)
     {
-        return titleMatcher.IsMatch(title);
+        return titleMatcher.IsMatch(window.Title);
     }
 }

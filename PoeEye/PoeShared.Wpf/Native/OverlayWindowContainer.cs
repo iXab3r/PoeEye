@@ -27,6 +27,10 @@ internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewM
                 x.Log.Debug(() => $"Setting {nameof(x.ResizeBorderThickness)} to {v}");
                 x.ResizeBorderThickness = v;
             });
+        
+        Binder.BindIf(x => x.Content != null, x => !x.Content.IsLocked || x.Content.IsFocusable)
+            .Else(x => false)
+            .To(x => x.IsFocusable);
     }
 
     public OverlayWindowContainer(IFluentLog logger) : base(logger)

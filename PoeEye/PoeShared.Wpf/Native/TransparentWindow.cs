@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace PoeShared.Native;
 
@@ -9,11 +10,15 @@ public class TransparentWindow : ConstantAspectRatioWindow
         Loaded += OnLoaded;
         Log.Debug(() => "Created window");
     }
+    
+    private bool AllowsTransparencyAfterLoad { get; set; }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         Log.Debug(() => "Window is loaded - hiding system menu");
         UnsafeNative.HideSystemMenu(WindowHandle);
+        Log.Debug(() => $"Setting WindowExNoActivate");
+        AllowsTransparencyAfterLoad = AllowsTransparency;
     }
 
     protected void MakeTransparent()
@@ -26,5 +31,35 @@ public class TransparentWindow : ConstantAspectRatioWindow
     {
         Log.Debug(() => "Making window layered");
         UnsafeNative.SetWindowExLayered(WindowHandle);
+    }
+
+    public void SetActivation(bool isFocusable)
+    {
+        if (isFocusable)
+        {
+            UnsafeNative.SetWindowExActivate(WindowHandle);
+        }
+        else
+        {
+            UnsafeNative.SetWindowExNoActivate(WindowHandle);
+        }
+    }
+    
+    public void SetOverlayMode(OverlayMode mode)
+    {
+        if (AllowsTransparencyAfterLoad == false && mode == OverlayMode.Transparent)
+        {
+            throw new InvalidOperationException($"Transparent mode requires AllowsTransparency to be set to True");
+        }
+
+        switch (mode)
+        {
+            case OverlayMode.Layered:
+                MakeLayered();
+                break;
+            case OverlayMode.Transparent:
+                MakeTransparent();
+                break;
+        }
     }
 }

@@ -28,6 +28,8 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     int ProcessId { get; }
         
     int ThreadId { get; }
+    
+    int ParentProcessId { get; }
         
     DateTime CreatedAt { get; }
         

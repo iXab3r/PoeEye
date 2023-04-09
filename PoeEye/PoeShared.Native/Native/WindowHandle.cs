@@ -27,6 +27,7 @@ internal sealed class WindowHandle : IWindowHandle
     private readonly Lazy<User32.WindowStyles> windowStyle;
     private readonly Lazy<User32.WindowStylesEx> windowStyleEx;
     private readonly Lazy<(int processId, int threadId)> processIdSupplier;
+    private readonly Lazy<int> parentProcessIdSupplier;
     private readonly Lazy<(string processName, string processPath, string commandLine, string processArgs, DateTime createdAt)> processDataSupplier;
         
     public WindowHandle(IntPtr handle)
@@ -186,6 +187,19 @@ internal sealed class WindowHandle : IWindowHandle
             }
             return default;
         });
+
+        parentProcessIdSupplier = new Lazy<int>(() =>
+        {
+            try
+            {
+                return UnsafeNative.GetParentProcessId(ProcessId);
+            }
+            catch (Exception ex)
+            {
+                Log.Debug($"Failed to get parent process Id of process {ProcessId} - {ex.Message} ({ex.GetType().Name})");
+                return default;
+            }
+        });
     }
         
     private IFluentLog Log { get; }
@@ -193,6 +207,8 @@ internal sealed class WindowHandle : IWindowHandle
     public IntPtr Handle { get; }
 
     public string Title { get; }
+
+    public int ParentProcessId => parentProcessIdSupplier.Value;
 
     public int ProcessId => processIdSupplier.Value.processId;
 

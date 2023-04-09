@@ -168,6 +168,17 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
                 window.SetOverlayMode(x);
             }, logger.HandleUiException)
             .AddTo(childAnchors);
+        
+        window.WhenLoaded()
+            .Select(_ => viewModel.WhenAnyValue(x => x.IsFocusable))
+            .Switch()
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(x =>
+            {
+                logger.Debug(() => $"Changing isFocusable to {x}");
+                window.SetActivation(x);
+            }, logger.HandleUiException)
+            .AddTo(childAnchors);
 
         window
             .WhenRendered

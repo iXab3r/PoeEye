@@ -193,6 +193,21 @@ public partial class UnsafeNative
 
         return true;
     }
+    
+    public static bool SetWindowExActivate(IntPtr hwnd)
+    {
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+        Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to Activate");
+        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var newStyle = existingStyle.RemoveFlag(User32.SetWindowLongFlags.WS_EX_NOACTIVATE);
+        if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
+        {
+            Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
+            return false;
+        }
+
+        return true;
+    }
 
     public static void ShowInactiveTopmost(IntPtr handle)
     {

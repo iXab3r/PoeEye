@@ -51,6 +51,8 @@ internal abstract class WindowContainerBase<T> : DisposableReactiveObject where 
     
     public DataTemplate ContentTemplate { get; set; }
     
+    public bool IsFocusable { get; protected set; }
+    
     public double MinWidth { get; [UsedImplicitly] private set; }
     public double MaxWidth { get; [UsedImplicitly] private set; }
     public double MinHeight { get; [UsedImplicitly] private set; }

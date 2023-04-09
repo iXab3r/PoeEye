@@ -81,6 +81,19 @@ public partial class UnsafeNative
         MaxProcessInfoClass
     }
 
+    public static int GetParentProcessId(int processId)
+    {
+        using var openedProcess = OpenProcess(processId, Kernel32.ProcessAccess.PROCESS_VM_READ | Kernel32.ProcessAccess.PROCESS_QUERY_INFORMATION);
+        ProcessBasicInformation processInfo = default;
+        var argReturnLength = 0U;
+        var result = NtQueryInformationProcess(openedProcess.DangerousGetHandle(), ProcessInfoClass.ProcessBasicInformation, ref processInfo, Marshal.SizeOf(processInfo), ref argReturnLength);
+        if (result != 0)
+        {
+            throw new System.ComponentModel.Win32Exception(RtlNtStatusToDosError(result));
+        }
+        return (int)processInfo.Reserved3;
+    }
+
     /// <summary>
     ///   Reads command line of a target process
     ///   This is refactored version of code from https://github.com/VbScrub/ProcessCommandLineDemo

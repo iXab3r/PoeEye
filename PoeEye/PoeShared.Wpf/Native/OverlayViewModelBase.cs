@@ -103,6 +103,8 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
     }
 
+    public bool IsFocusable { get; set; }
+    
     public bool GrowUpwards { get; set; }
 
     public float Opacity { get; set; }

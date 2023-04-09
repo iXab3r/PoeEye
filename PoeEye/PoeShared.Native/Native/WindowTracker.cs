@@ -28,7 +28,7 @@ public class WindowTracker : DisposableReactiveObject, IWindowTracker
         var timerObservable = Observables
             .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
             .ToUnit();
-            
+
         var objectFocusHook = hookFactory.Create(new WinEventHookArguments
         {
             Flags = User32.WindowsEventHookFlags.WINEVENT_OUTOFCONTEXT,
@@ -36,12 +36,24 @@ public class WindowTracker : DisposableReactiveObject, IWindowTracker
             EventMax = User32.WindowsEventHookType.EVENT_OBJECT_FOCUS,
         });
 
-        timerObservable
-            .Select(_ => new { Reason = "Timer", ForegroundWindow = UnsafeNative.GetForegroundWindow() })
-            .Merge(objectFocusHook.WhenWindowEventTriggered.Select(x => new { Reason =  nameof( User32.WindowsEventHookType.EVENT_OBJECT_FOCUS), ForegroundWindow = x.WindowHandle }))
-            .Select(x => new { ActiveWindow = x.ForegroundWindow, Title = UnsafeNative.GetWindowTitle(x.ForegroundWindow), ProcessId = UnsafeNative.GetProcessIdByWindowHandle(x.ForegroundWindow), Reason = x.Reason })
-            .DistinctUntilChanged()
-            .SubscribeSafe(x => WindowActivated(x.ActiveWindow, x.Title, x.ProcessId), Log.HandleUiException)
+        Observable.Merge(timerObservable
+                    .Select(_ => new
+                    {
+                        Reason = "Timer",
+                        ForegroundWindow = UnsafeNative.GetForegroundWindow()
+                    }),
+                objectFocusHook.WhenWindowEventTriggered.Select(x => new
+                {
+                    Reason = nameof(User32.WindowsEventHookType.EVENT_OBJECT_FOCUS),
+                    ForegroundWindow = x.WindowHandle
+                }))
+            .Select(x => new
+            {
+                WindowHandle = windowHandleProvider.GetByWindowHandle(x.ForegroundWindow),
+                x.Reason
+            })
+            .DistinctUntilChanged(x => x.WindowHandle)
+            .SubscribeSafe(x => WindowActivated(x.WindowHandle), Log.HandleUiException)
             .AddTo(Anchors);
     }
 
@@ -56,9 +68,9 @@ public class WindowTracker : DisposableReactiveObject, IWindowTracker
     public string ActiveWindowTitle => ActiveWindow?.Title;
 
     public IntPtr ActiveWindowHandle => ActiveWindow?.Handle ?? IntPtr.Zero;
-        
+
     public IWindowHandle ActiveWindow { get; private set; }
-        
+
     public IWindowHandle MatchingWindow { get; private set; }
 
     public int ActiveProcessId => ActiveWindow?.ProcessId ?? default;
@@ -69,16 +81,16 @@ public class WindowTracker : DisposableReactiveObject, IWindowTracker
         builder.AppendParameter(nameof(Name), Name);
     }
 
-    private void WindowActivated(IntPtr hwnd, string title, int processId)
+    private void WindowActivated(IWindowHandle window)
     {
         var previousState = new {IsActive, MatchingWindowHandle, ActiveWindowTitle, ActiveWindowHandle, ActiveProcessId};
-        ActiveWindow = windowHandleProvider.GetByWindowHandle(hwnd);
-        IsActive = windowMatcher.IsMatch(title, hwnd, processId);
+        ActiveWindow = window;
+        IsActive = windowMatcher.IsMatch(window);
         MatchingWindow = IsActive ? ActiveWindow : default;
 
         if (previousState.ActiveWindowHandle != ActiveWindowHandle)
         {
-            Log.Debug(() => $"[#{Name}] Target window is {(IsActive ? string.Empty : "NOT ")}ACTIVE ({hwnd.ToHexadecimal()}, title '{ActiveWindowTitle}')");
+            Log.Debug(() => $"[#{Name}] Target window is {(IsActive ? string.Empty : "NOT ")}ACTIVE ({window.Handle.ToHexadecimal()}, title '{ActiveWindowTitle}')");
         }
 
         this.RaiseIfChanged(nameof(IsActive), previousState.IsActive, IsActive);
