@@ -131,7 +131,7 @@ public class BlazorContentControl : ReactiveControl
                     ComponentType = typeof(BlazorContent)
                 }.AddTo(webView.RootComponents);
                 
-                webView.HostPage = "index.html";
+                webView.HostPage = "wwwroot/index.html";
                 WebView = webView;
             })
             .AddTo(Anchors);
