@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
@@ -120,9 +121,16 @@ public class BlazorContentControl : ReactiveControl
                 
                 new RootComponent
                 {
+                    Selector = $"headOutlet",
+                    ComponentType = typeof(HeadOutlet)
+                }.AddTo(webView.RootComponents);
+                
+                new RootComponent
+                {
                     Selector = $"#app",
                     ComponentType = typeof(BlazorContent)
                 }.AddTo(webView.RootComponents);
+                
                 webView.HostPage = "index.html";
                 WebView = webView;
             })

@@ -6,6 +6,14 @@
 <p>The current count is: @DataContext.Count</p>
 <button @onclick="IncrementCount">Count</button>
 
+<HeadContent>
+    <meta name="description-counter" content="@DataContext.Count">
+     @if (DataContext.Count > 2)
+     {
+         <link href="/css/test.css" rel="stylesheet" />
+     }
+</HeadContent>
+
 @code {
     void IncrementCount()
     {
