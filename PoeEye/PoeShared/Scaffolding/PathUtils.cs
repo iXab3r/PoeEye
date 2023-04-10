@@ -159,25 +159,30 @@ public static class PathUtils
         var path2 = FullPath.FromPath(PathConverter(parentDir));
         return path2.IsChildOf(path1);
     }
-    
-    public static string GenerateValidName(string candidate, Predicate<string> pathValidator)
+
+    public static string GenerateValidName(
+        string baseName, 
+        Func<string, int, string> mutation,
+        Predicate<string> pathValidator)
     {
-        if (string.IsNullOrEmpty(candidate))
+        if (string.IsNullOrEmpty(baseName))
         {
             throw new ArgumentException($"New folder path must be specified");
         }
 
-        var folderName = Path.GetFileNameWithoutExtension(candidate);
-        if (string.IsNullOrEmpty(folderName))
+        var extension = Path.GetExtension(baseName);
+        var candidateName = Path.GetFileNameWithoutExtension(baseName);
+        if (string.IsNullOrEmpty(candidateName))
         {
-            throw new ArgumentException($"Invalid new folder path: {candidate}");
+            throw new ArgumentException($"Invalid new folder path: {baseName}");
         }
 
-        var folderPath = Path.GetDirectoryName(candidate) ?? string.Empty;
+        var folderPath = Path.GetDirectoryName(baseName) ?? string.Empty;
         var idx = 1;
         while (true)
         {
-            var fullPath = Path.Combine(folderPath, idx == 1 ? folderName : $"{folderName} ({idx})");
+            var tempName = idx == 1 ? candidateName : mutation(candidateName, idx);
+            var fullPath = Path.Combine(folderPath, tempName + extension);
             if (!pathValidator(fullPath))
             {
                 idx++;
@@ -187,6 +192,11 @@ public static class PathUtils
                 return fullPath;
             }
         }
+    }
+    
+    public static string GenerateValidName(string baseName, Predicate<string> pathValidator)
+    {
+        return GenerateValidName(baseName, (candidateName, idx) => $"{candidateName} ({idx})", pathValidator);
     }
 
     public static string ExpandPath([NotNull] string rootPath, [NotNull] string path)
