@@ -25,7 +25,7 @@ public class BlazorWebViewEx : BlazorWebView
             .Select(x => x is SolidColorBrush solidColorBrush ? solidColorBrush.Color : default)
             .Subscribe(x =>
             {
-                WebView.DefaultBackgroundColor = Color.FromArgb(x.R, x.G, x.B);
+                WebView.DefaultBackgroundColor = Color.FromArgb(x.A, x.R, x.G, x.B);
             })
             .AddTo(Anchors);
     }

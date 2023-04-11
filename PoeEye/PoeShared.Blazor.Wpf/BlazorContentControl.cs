@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -60,14 +61,6 @@ public class BlazorContentControl : ReactiveControl
         }
 
         serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
-
-        Observable.CombineLatest(
-                this.WhenAnyValue(x => x.WebView),
-                this.Observe(BackgroundProperty, x => x.Background),
-                (webView, background) => new {webView, background})
-            .Where(x => x.webView != null)
-            .Subscribe(x => x.webView.Background = x.background)
-            .AddTo(Anchors);
         
         this.WhenAnyValue(x => x.ViewType)
             .ObserveOnDispatcher()
