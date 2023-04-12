@@ -22,6 +22,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.groupbox.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.slider.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.datagrid.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.tabcontrol.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type ContentControl}">

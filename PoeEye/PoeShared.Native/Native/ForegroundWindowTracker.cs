@@ -14,8 +14,8 @@ internal sealed class ForegroundWindowTracker : DisposableReactiveObjectWithLogg
         IWindowHandleProvider windowHandleProvider,
         IFactory<IWinEventHookWrapper, WinEventHookArguments> hookFactory)
     {
-        var timerObservable = Observables
-            .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
+        var timerObservable = Observable
+            .Timer(RecheckPeriod)
             .Select(_ => new
             {
                 Reason = "Timer",
@@ -43,7 +43,7 @@ internal sealed class ForegroundWindowTracker : DisposableReactiveObjectWithLogg
             .Select(x => x);
 
         // the idea is to start by tracking events, but do periodic checks afterwards until the next event arrives
-        var updateObservable = objectFocusHook.Select(x => Observable.Return(x)).Switch();
+        var updateObservable = objectFocusHook.Select(x => Observable.Return(x).Concat(timerObservable)).Switch();
 
         updateObservable
             .StartWith(new { Reason = "Initial tick" })

@@ -110,9 +110,9 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
                         }).Merge()
                         .SubscribeSafe(async x =>
                         {
-                            Log.Debug(() => $"Component collection has changed: {x.Name}, requesting redraw");
+                            //Log.Debug(() => $"Component collection has changed: {x.Name}, requesting redraw");
                             await InvokeAsync(StateHasChanged);
-                            Log.Debug(() => $"Redraw completed after property change: {x.Name}");
+                            //Log.Debug(() => $"Redraw completed after property change: {x.Name}");
                         }, Log.HandleException)
                         .AddTo(Anchors);
                 }

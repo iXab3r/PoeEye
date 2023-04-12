@@ -12,6 +12,24 @@ namespace PoeShared.Scaffolding;
 
 public static class DependencyObjectExtensions
 {
+    /// <summary>
+    /// Returns full visual ancestry, starting at the leaf.
+    /// <para>If element is not of <see cref="Visual"/> or <see cref="Visual3D"/> the
+    /// logical ancestry is used.</para>
+    /// </summary>
+    /// <param name="leaf"></param>
+    /// <returns></returns>
+    public static IEnumerable<DependencyObject> GetVisualAncestry(this DependencyObject? leaf)
+    {
+        while (leaf is not null)
+        {
+            yield return leaf;
+            leaf = leaf is Visual || leaf is Visual3D
+                ? VisualTreeHelper.GetParent(leaf)
+                : LogicalTreeHelper.GetParent(leaf);
+        }
+    }
+    
     public static IEnumerable<DependencyObject> VisualDescendants(this DependencyObject d)
     {
         var tree = new Queue<DependencyObject>();
