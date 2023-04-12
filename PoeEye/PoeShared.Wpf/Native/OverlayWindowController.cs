@@ -13,6 +13,7 @@ using JetBrains.Annotations;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.UI;
 using ReactiveUI;
 
 namespace PoeShared.Native;
@@ -150,6 +151,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
                 viewModel.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Overlay IsVisible change, {x.prev} => {x.curr}"), 
                 windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
                 window.WhenLoaded().Select(_ => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
+            .Sample(UiConstants.UiThrottlingDelay)
             .ObserveOn(uiScheduler)
             .SubscribeSafe(reason =>
             {

@@ -30,7 +30,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
     private readonly IKeyboardEventsSource keyboardEventsSource;
     private readonly IWindowHandleProvider windowHandleProvider;
     private readonly IScheduler uiScheduler;
-    private readonly IWindowTracker mainWindowTracker;
+    private readonly IForegroundWindowTracker mainWindowTracker;
     private readonly INotificationsService notificationsService;
     private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
     private readonly CommandWrapper startRecording;
@@ -54,7 +54,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
     }
 
     public HotkeySequenceEditorController(
-        [Dependency(WellKnownWindows.AllWindows)] IWindowTracker mainWindowTracker,
+        IForegroundWindowTracker mainWindowTracker,
         IAppArguments appArguments,
         IClock clock,
         IHotkeySequenceEditorViewModel owner,
@@ -205,7 +205,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
         }).AddTo(recordingAnchors);
 
         Observable.Merge(
-                windowToRecord == null ? Observable.Empty<string>() : mainWindowTracker.WhenAnyValue(x => x.ActiveWindow)
+                windowToRecord == null ? Observable.Empty<string>() : mainWindowTracker.WhenAnyValue(x => x.ForegroundWindow)
                     .Where(x => x.Handle != windowToRecord.Handle && x.ProcessId != windowToRecord.ProcessId)
                     .Select(x => $"Active window changed ! Expected {windowToRecord}, got: {x})"),
                 tracker.WhenAnyValue(x => x.IsActive).Where(x => x).Select(x => $"Hotkey {tracker} detected"),

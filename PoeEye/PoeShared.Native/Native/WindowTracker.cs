@@ -1,59 +1,31 @@
 using System;
 using System.Reactive.Linq;
+using System.Threading;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Native;
 
-public class WindowTracker : DisposableReactiveObject, IWindowTracker
+public class WindowTracker : DisposableReactiveObjectWithLogger, IWindowTracker
 {
-    private static readonly IFluentLog Log = typeof(WindowTracker).PrepareLogger();
-    private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
-    private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
+    private static long GlobalIdx = 0;
     private readonly IWindowTrackerMatcher windowMatcher;
-    private readonly IWindowHandleProvider windowHandleProvider;
+    private readonly string instanceId = $"Tracker#{Interlocked.Increment(ref GlobalIdx)}";
 
     public WindowTracker(
-        IFactory<IWinEventHookWrapper, WinEventHookArguments> hookFactory,
-        IWindowTrackerMatcher windowMatcher,
-        IWindowHandleProvider windowHandleProvider)
+        IForegroundWindowTracker foregroundWindowTracker,
+        IWindowTrackerMatcher windowMatcher)
     {
         Guard.ArgumentNotNull(windowMatcher, nameof(windowMatcher));
+        Log.AddSuffix(instanceId);
 
         this.windowMatcher = windowMatcher;
-        this.windowHandleProvider = windowHandleProvider;
 
-        var timerObservable = Observables
-            .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
-            .ToUnit();
-
-        var objectFocusHook = hookFactory.Create(new WinEventHookArguments
-        {
-            Flags = User32.WindowsEventHookFlags.WINEVENT_OUTOFCONTEXT,
-            EventMin = User32.WindowsEventHookType.EVENT_OBJECT_FOCUS,
-            EventMax = User32.WindowsEventHookType.EVENT_OBJECT_FOCUS,
-        });
-
-        Observable.Merge(timerObservable
-                    .Select(_ => new
-                    {
-                        Reason = "Timer",
-                        ForegroundWindow = UnsafeNative.GetForegroundWindow()
-                    }),
-                objectFocusHook.WhenWindowEventTriggered.Select(x => new
-                {
-                    Reason = nameof(User32.WindowsEventHookType.EVENT_OBJECT_FOCUS),
-                    ForegroundWindow = x.WindowHandle
-                }))
-            .Select(x => new
-            {
-                WindowHandle = windowHandleProvider.GetByWindowHandle(x.ForegroundWindow),
-                x.Reason
-            })
-            .DistinctUntilChanged(x => x.WindowHandle)
-            .SubscribeSafe(x => WindowActivated(x.WindowHandle), Log.HandleUiException)
+        foregroundWindowTracker.WhenAnyValue(x => x.ForegroundWindow)
+            .Subscribe(WindowActivated)
             .AddTo(Anchors);
     }
 

@@ -217,6 +217,14 @@ public partial class UnsafeNative
         {
             Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
         }
+        
+        if (!User32.SetWindowPos(handle,
+                User32.SpecialWindowHandles.HWND_TOPMOST,
+                0, 0, 0, 0,
+                User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        {
+            Log.Warn($"Failed to SetWindowPos({handle.ToHexadecimal()}), error: {error}");
+        }
     }
 
     public static void ShowInactiveTopmost(IntPtr handle, Rectangle windowBounds)
