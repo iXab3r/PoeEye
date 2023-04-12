@@ -41,3 +41,7 @@ function loadCss(sourceUrl) {
 
     document.head.appendChild(tag);
 }
+
+function scrollToBottom(){
+    document.body.scroll(0, document.body.scrollHeight)
+}
