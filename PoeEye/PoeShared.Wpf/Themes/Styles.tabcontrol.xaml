@@ -45,6 +45,8 @@
                                                             eye:TabAssist.BindableIsItemsHost="{Binding Visibility, RelativeSource={RelativeSource Self}}"
                                                             KeyboardNavigation.TabIndex="1"
                                                             Orientation="Horizontal" />
+                                    <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(eye:TabAssist.HeaderSuffixContent)}"
+                                                      Visibility="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}"/>
                                 </StackPanel>
                             </ScrollViewer>
                         </wpf:ColorZone>
