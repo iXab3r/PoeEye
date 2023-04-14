@@ -15,7 +15,27 @@ public static class ObservableExtensions
     {
         return observable.Synchronize(gate.Gate);
     }
-
+    
+    
+    public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, CancellationToken, Task<T1>> supplier)
+    {
+        return observable.Select(x => Observable.FromAsync(token => supplier(x, token))).Switch();
+    }
+    
+    public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, CancellationToken, Task> supplier)
+    {
+        return observable.Select(x => Observable.FromAsync(async token =>
+        {
+            await supplier(x, token);
+            return Unit.Default;
+        })).Switch().Subscribe();
+    }
+    
+    public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier)
+    {
+        return observable.Select(x => Observable.FromAsync(_ => supplier(x))).Switch();
+    }
+    
     public static IObservable<T> RetryWithBackOff<T>(
         this IObservable<T> observable,
         Func<Exception, int, TimeSpan?> strategy)
