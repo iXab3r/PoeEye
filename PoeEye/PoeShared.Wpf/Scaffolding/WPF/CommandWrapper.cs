@@ -36,7 +36,8 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     private readonly Subject<bool> isExecuting = new();
     private readonly Subject<Exception> thrownExceptions = new();
     private readonly Subject<Unit> raiseCanExecuteChangedRequests = new();
-    
+    private readonly ISubject<object> whenExecuted = new Subject<object>();
+
     private CommandWrapper(ICommand command)
     {
         InnerCommand = command;
@@ -87,6 +88,8 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 
     private ICommand InnerCommand { get; }
 
+    public IObservable<object> WhenExecuted => whenExecuted;
+
     public bool CanExecute(object parameter)
     {
         try
@@ -110,6 +113,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         {
             isExecuting.OnNext(true);
             InnerCommand.Execute(parameter);
+            whenExecuted.OnNext(parameter);
         }
         catch (Exception ex)
         {
@@ -147,6 +151,11 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         return Create(new DelegateCommand(execute));
     }
         
+    public static CommandWrapper Create()
+    {
+        return Create(() => { });
+    }
+    
     public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
     {
         return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));

@@ -31,6 +31,15 @@ public static class ObservableExtensions
         })).Switch().Subscribe();
     }
     
+    public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> supplier)
+    {
+        return observable.Select(x => Observable.FromAsync(async _ =>
+        {
+            await supplier(x);
+            return Unit.Default;
+        })).Switch().Subscribe();
+    }
+    
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier)
     {
         return observable.Select(x => Observable.FromAsync(_ => supplier(x))).Switch();

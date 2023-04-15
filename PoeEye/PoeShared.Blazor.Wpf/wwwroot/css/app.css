@@ -121,6 +121,10 @@ body, html, .app {
     overflow-x: hidden;
 }
 
+.panel {
+    background-color: var(--eye-MaterialDesignPaperDark);
+}
+
 .scroller {
 }
 
@@ -170,4 +174,9 @@ body, html, .app {
 
 ::-webkit-scrollbar-thumb:window-inactive {
     background: rgba(255, 255, 255, 0.3);
+}
+
+.sticky {
+    position: sticky;
+    top: 0;
 }

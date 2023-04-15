@@ -45,3 +45,7 @@ function loadCss(sourceUrl) {
 function scrollToBottom(){
     document.body.scroll(0, document.body.scrollHeight)
 }
+
+function scrollToTop(){
+    document.body.scroll(0, 0)
+}
