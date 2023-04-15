@@ -11,6 +11,7 @@ namespace PoeShared.UI;
 internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
 {
     public static readonly HotkeyConverter Instance = new();
+    public static readonly CultureInfo DefaultCulture = new("en");
     private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None);
     private static readonly string NoneHotkeyName = NoneHotkey.ToString();
 
@@ -24,7 +25,7 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
     private readonly IDictionary<string, MouseWheelAction> mouseWheelEventsByName = new Dictionary<string, MouseWheelAction>(StringComparer.InvariantCultureIgnoreCase);
 
     private readonly IDictionary<Key, string> knownKeys = new Dictionary<Key, string>();
-    private readonly IDictionary<string, Key> knownKeysByName = new Dictionary<string, Key>(StringComparer.InvariantCultureIgnoreCase);
+    private readonly IDictionary<string, Key> knownKeysByLocalizedName = new Dictionary<string, Key>(StringComparer.InvariantCultureIgnoreCase);
 
     private readonly IDictionary<ModifierKeys, string> knownModifiers = new Dictionary<ModifierKeys, string>();
     private readonly IDictionary<string, ModifierKeys> knownModifiersByName = new Dictionary<string, ModifierKeys>(StringComparer.InvariantCultureIgnoreCase);
@@ -38,19 +39,19 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
             {
                 var keyName = x.ToString();
                 knownKeys[x] = keyName;
-                    
-                knownKeysByName[keyName] = x;
+
+                knownKeysByLocalizedName[keyName] = x;
 
                 var hotkey = new HotkeyGesture(x);
-                knownKeysByName[hotkey.ToString()] = x;
+                knownKeysByLocalizedName[hotkey.ToString()] = x;
             });
 
         var allModifiers = Enum
             .GetValues(typeof(ModifierKeys))
             .OfType<ModifierKeys>()
             .Select(x => new {ModifierKey = x, Name = x.ToString()})
-            .Concat(new[] { new { ModifierKey = ModifierKeys.Control, Name = "CTRL" } })
-            .Concat(new[] { new { ModifierKey = ModifierKeys.Windows, Name = "WIN" } })
+            .Concat(new[] {new {ModifierKey = ModifierKeys.Control, Name = "CTRL"}})
+            .Concat(new[] {new {ModifierKey = ModifierKeys.Windows, Name = "WIN"}})
             .ToArray();
 
         allModifiers
@@ -61,12 +62,14 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
                 {
                     return;
                 }
+
                 var modifier = x.Aggregate(ModifierKeys.None, (x, newKey) => x | newKey.ModifierKey);
                 var modifiersName = x.Where(y => y.ModifierKey != ModifierKeys.None).Select(x => x.Name.ToUpper()).JoinStrings(HotkeyGesture.ModifiersDelimiter);
                 if (!knownModifiers.ContainsKey(modifier))
                 {
                     knownModifiers[modifier] = modifiersName;
                 }
+
                 knownModifiersByName[modifiersName] = modifier;
             });
 
@@ -89,7 +92,7 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
                 mouseWheelEventsByName[wheelName] = x;
                 mouseWheelEvents[x] = wheelName;
             });
-            
+
         knownSpecialKeysByName["*"] = Key.Multiply;
         knownSpecialKeysByName["+"] = Key.OemPlus;
         knownSpecialKeysByName["="] = Key.OemPlus;
@@ -124,7 +127,7 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
             {
                 knownSpecialKeys[hotkeyGesture.Key].AddTo(keys);
             }
-            else 
+            else
             {
                 knownKeys[hotkeyGesture.Key].AddTo(keys);
             }
@@ -149,7 +152,20 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
 
     public new HotkeyGesture ConvertFromString(string source)
     {
-        return (HotkeyGesture) ConvertFrom(source ?? string.Empty) ?? NoneHotkey;
+        if (string.IsNullOrEmpty(source))
+        {
+            return NoneHotkey;
+        }
+
+        try
+        {
+            return (HotkeyGesture) ConvertFrom(context: default!, culture: DefaultCulture, source) ?? NoneHotkey;
+        }
+        catch (ArgumentException)
+        {
+            // this is thrown specified key sequence is not known in us/uk culture
+            return (HotkeyGesture) ConvertFrom(source) ?? NoneHotkey;
+        }
     }
 
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
@@ -223,17 +239,22 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
         {
             return new HotkeyGesture(mouseWheel, modifiers);
         }
-            
+
         if (knownSpecialKeysByName.TryGetValue(hotkeyPartRaw, out var specialKey))
         {
             return new HotkeyGesture(specialKey, modifiers);
         }
 
-        if (knownKeysByName.TryGetValue(hotkeyPartRaw, out var key))
+        if (HotkeyMapping.InvariantNameToKey.TryGetValue(hotkeyPartRaw, out var key))
         {
             return new HotkeyGesture(key, modifiers);
         }
-            
+        
+        if (knownKeysByLocalizedName.TryGetValue(hotkeyPartRaw, out var localizedKey))
+        {
+            return new HotkeyGesture(localizedKey, modifiers);
+        }
+
         throw new ArgumentException($"Unknown key: {hotkeyPartRaw}, modifiers: {modifiers}, source string: {source}");
     }
 

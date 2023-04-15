@@ -183,9 +183,9 @@ public sealed record HotkeyGesture
             "Windows".AddTo(keys);
         }
 
-        if (KnownSpecialKeys.ContainsKey(Key))
+        if (KnownSpecialKeys.TryGetValue(Key, out var specialKey))
         {
-            KnownSpecialKeys[Key].AddTo(keys);
+            specialKey.AddTo(keys);
         } else  if (Key != Key.None)
         {
             GetLocalizedKeyString(Key).AddTo(keys);

@@ -1,4 +1,7 @@
+using System;
+using System.Linq;
 using System.Windows.Input;
+using Microsoft.VisualBasic.Logging;
 using NUnit.Framework;
 using PoeShared.UI;
 using Shouldly;
@@ -6,7 +9,7 @@ using Shouldly;
 namespace PoeShared.Tests.WPF.Hotkeys;
 
 [TestFixture]
-public class HotkeyConverterTests
+public class HotkeyConverterTests : FixtureBase
 {
     [Test]
     public void ShouldSerializeAllKeyboardToString([Values] Key key)
@@ -23,6 +26,19 @@ public class HotkeyConverterTests
         {
             result.ShouldNotBe(empty);
         }
+    }
+
+    [Test]
+    public void ShouldConvertAllKeys([Values] Key key)
+    {
+        //Given
+        //When
+        var invariant = HotkeyMapping.KeysToInvariantName[key];
+        var invariantKey = HotkeyMapping.InvariantNameToKey[invariant];
+
+        //Then
+        invariant.ShouldNotBeEmpty();
+        invariantKey.ShouldBe(key);
     }
         
     [Test]
@@ -69,10 +85,12 @@ public class HotkeyConverterTests
     [TestCase(Key.Decimal, ModifierKeys.None, "Decimal")]
     [TestCase(Key.Enter, ModifierKeys.None, "ENTER")]
     [TestCase(Key.Return, ModifierKeys.None, "ENTER")]
+    [TestCase(Key.End, ModifierKeys.None, "End")]
     [TestCase(Key.D0, ModifierKeys.None, "0")]
     [TestCase(Key.D9, ModifierKeys.None, "9")]
     [TestCase(Key.A, ModifierKeys.None, "A")]
     [TestCase(Key.Z, ModifierKeys.None, "Z")]
+    [TestCase(Key.Clear, ModifierKeys.None, "Clear")]
     [TestCase(Key.A, ModifierKeys.Control, "CONTROL+A")]
     [TestCase(Key.A, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows, "ALT+CONTROL+SHIFT+WINDOWS+A")]
     public void ShouldSerializeKeyboard(Key key, ModifierKeys modifierKeys, string expected)
