@@ -63,7 +63,7 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger, IWe
             var result = await Task.Run(() => ProcessHelper.RunCmd(new ProcessStartInfo()
             {
                 UseShellExecute = true,
-                Arguments = "",
+                Arguments = "/silent /install",
                 FileName = installerPath.FullName
             }));
             if (result.ExitCode != 0)
