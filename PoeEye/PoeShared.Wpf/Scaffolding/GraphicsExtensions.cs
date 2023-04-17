@@ -17,6 +17,11 @@ public static class GraphicsExtensions
         {WinPixelFormat.Format32bppPArgb, PixelFormats.Pbgra32},
     });
 
+    public static WpfColor ToWpfColor(this WinColor color)
+    {
+        return WpfColor.FromArgb(color.A, color.R, color.G, color.B);
+    }
+
     public static WinPixelFormat ToWinPixelFormat(this WpfPixelFormat sourceFormat)
     {
         return KnownPixelFormats.Reverse[sourceFormat];
