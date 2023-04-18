@@ -13,6 +13,7 @@
      </PropertyGroup>
 
      <ItemGroup>
+         <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" />
          <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
          <ProjectReference Include="..\PoeShared.Squirrel\PoeShared.Squirrel.csproj" />
          <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
@@ -22,8 +23,6 @@
      <ItemGroup>
          <PackageReference Include="FluentValidation" Version="9.5.1" />
          <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
-         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="7.0.3" />
-         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="7.0.59" />
      </ItemGroup>
 
      <ItemGroup>
@@ -41,4 +40,6 @@
          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
        </Content>
      </ItemGroup>
+
+     <Import Project="..\maui\src\BlazorWebView\src\Wpf\build\Microsoft.AspNetCore.Components.WebView.Wpf.targets" />
 </Project>

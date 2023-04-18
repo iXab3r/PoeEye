@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Web.WebView2.Wpf;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
@@ -29,10 +31,12 @@ namespace PoeShared.Blazor.Wpf;
 
 public class BlazorContentControl : ReactiveControl
 {
+    private static readonly IFluentLog Log = typeof(BlazorContentControl).PrepareLogger();
+
     private static readonly Binder<BlazorContentControl> Binder = new();
 
     private readonly ISharedResourceLatch isBusyLatch;
-    
+
     public static readonly DependencyProperty ViewTypeProperty = DependencyProperty.Register(
         nameof(ViewType), typeof(Type), typeof(BlazorContentControl), new PropertyMetadata(default(Type)));
 
@@ -43,13 +47,22 @@ public class BlazorContentControl : ReactiveControl
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(BlazorContentControl), new FrameworkPropertyMetadata(typeof(BlazorContentControl)));
         Binder.Bind(x => x.isBusyLatch.IsBusy).To(x => x.IsBusy);
-        
     }
 
     public BlazorContentControl()
     {
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
+
+        ReloadCommand = CommandWrapper.Create(() =>
+        {
+            if (UnhandledException != null)
+            {
+                Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
+                UnhandledException = null;
+            }
+            WebView?.WebView.Reload();
+        });
 
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddBlazorWebView();
@@ -61,15 +74,22 @@ public class BlazorContentControl : ReactiveControl
         }
 
         serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
-        
+
         this.WhenAnyValue(x => x.ViewType)
             .ObserveOnDispatcher()
             .Subscribe(async viewType =>
             {
                 using var @rent = isBusyLatch.Rent();
-                
+
+                if (UnhandledException != null)
+                {
+                    Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
+                    UnhandledException = null;
+                }
+
                 if (WebView != null)
                 {
+                    Log.Debug($"Disposing previous instance of WebView");
                     await WebView.DisposeAsync();
                     WebView = null;
 
@@ -106,32 +126,34 @@ public class BlazorContentControl : ReactiveControl
 #pragma warning restore BL0005
                             .AddTo(reactiveComponent.Anchors);
                     }
+
                     return view;
                 });
-                
+
                 var webView = new BlazorWebViewEx();
+                webView.UnhandledException += OnUnhandledException;
                 webView.Services = serviceCollection.BuildServiceProvider();
-                
+
                 new RootComponent
                 {
                     Selector = $"headOutlet",
                     ComponentType = typeof(HeadOutlet)
                 }.AddTo(webView.RootComponents);
-                
+
                 new RootComponent
                 {
                     Selector = $"#app",
                     ComponentType = typeof(BlazorContent)
                 }.AddTo(webView.RootComponents);
-                
+
                 webView.HostPage = "wwwroot/index.html";
                 WebView = webView;
             })
             .AddTo(Anchors);
-        
+
         Binder.Attach(this).AddTo(Anchors);
     }
-    
+
     public ICommand OpenDevTools { get; }
 
     public Type ViewType
@@ -145,24 +167,35 @@ public class BlazorContentControl : ReactiveControl
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
     }
-    
+
     public bool IsBusy { get; private set; }
-    
+
     /// <summary>
     /// We have to dynamically recreate WebView when needed as it is EXTREMELY unfriendly for any changes of associated properties
     /// </summary>
     public BlazorWebViewEx WebView { get; private set; }
 
-    public override void OnApplyTemplate()
-    {
-        base.OnApplyTemplate();
-    }
-    
+    public Exception UnhandledException { get; private set; }
+
     public object View { get; private set; }
+
+    public ICommand ReloadCommand { get; }
+
+    private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
+    {
+        if (sender is BlazorWebView webView)
+        {
+            webView.UnhandledException -= OnUnhandledException;
+        }
+
+        Log.Error($"WebView has crashed: {sender}", e.Exception);
+        e.Handled = true; // JS context is already dead at this point
+        UnhandledException = e.Exception;
+    }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if(e.OriginalSource is not WebView2)
+        if (e.OriginalSource is not WebView2)
         {
             base.OnKeyDown(e);
         }
@@ -170,9 +203,9 @@ public class BlazorContentControl : ReactiveControl
 
     protected override void OnKeyUp(KeyEventArgs e)
     {
-        if(e.OriginalSource is not WebView2)
+        if (e.OriginalSource is not WebView2)
         {
-            base.OnKeyUp(e); 
+            base.OnKeyUp(e);
         }
     }
 }

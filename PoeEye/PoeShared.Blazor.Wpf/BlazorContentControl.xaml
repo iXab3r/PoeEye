@@ -22,9 +22,20 @@
                 <KeyBinding Gesture="F12" Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}"/>
             </Grid.InputBindings>
 
-            <ContentPresenter 
-                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
-                Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}"/>
+            <Grid Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
+                <ContentPresenter 
+                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NotNullToCollapsedConverter}}"
+                    Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}"/>
+                <Border
+                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NullToCollapsedConverter}}">
+                    <st:StackPanel Orientation="Vertical">
+                        <TextBlock Text="Component has crashed with exception:"/>
+                        <TextBlock Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException.Message}"/>
+                        <eye:ButtonEx Command="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}" Content="Try to recover"/>
+                    </st:StackPanel>
+                </Border>
+            </Grid>
+          
         </Grid>
     </ControlTemplate>
 

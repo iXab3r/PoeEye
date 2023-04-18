@@ -1,8 +1,19 @@
 ﻿<button @onclick="ThrowException">Throw Exception</button>
 <button @onclick="ThrowExceptionAsync">Awaited task throws</button>
 <button @onclick="ThrowExceptionUnawaited">Un-awaited task throws</button>
+<button @onclick="ThrowRenderTreeException">Throw RenderTree Exception</button>
+
+
+@if (RenderInvalidTree)
+{
+    <div><button @onclick="ThrowException" @qq="test">qwe</button></div>
+}
+
+<MainCounterView/>
 
 @code {
+    bool RenderInvalidTree { get; set; }
+    
     void ThrowExceptionUnawaited()
     {
         _ = ThrowExceptionAsync();
@@ -17,5 +28,10 @@
     void ThrowException()
     {
         throw new Exception("This is some unhandled exception.");
+    }
+    
+    void ThrowRenderTreeException()
+    {
+        RenderInvalidTree = true;
     }
 }
