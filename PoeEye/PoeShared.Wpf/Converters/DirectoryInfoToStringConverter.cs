@@ -5,11 +5,11 @@ using System.Windows.Data;
 
 namespace PoeShared.Converters;
 
-public class FileInfoToStringConverter : IValueConverter
+public class DirectoryInfoToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is FileInfo valueFileInfo)
+        if (value is DirectoryInfo valueFileInfo)
         {
             return valueFileInfo.FullName;
         }
@@ -24,6 +24,6 @@ public class FileInfoToStringConverter : IValueConverter
             return null;
         }
 
-        return new FileInfo(valueString);
+        return new DirectoryInfo(valueString);
     }
 }
