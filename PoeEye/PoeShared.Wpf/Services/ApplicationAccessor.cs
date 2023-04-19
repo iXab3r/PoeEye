@@ -57,6 +57,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         {
             Log.Info(() => $"Application is loaded - cleaning up lock file {loadingFileLock}");
             loadingFileLock.Dispose();
+            Log.Info(() => $"Performing GC after app is loaded");
+            GC.Collect();
         }, Log.HandleException).AddTo(Anchors);
         WhenExit.SubscribeSafe(exitCode =>
         {
