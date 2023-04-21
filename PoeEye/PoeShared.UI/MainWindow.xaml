@@ -14,7 +14,8 @@
                          UseLayoutRounding="True"
                          ShowIconOnTitleBar="True"
                          RenderOptions.EdgeMode="Aliased"
-                         Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+                         Title="PoeShared Demo" Height="750" Width="800"
+                         d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
             <TabItem Header="AutoComplete">
@@ -22,6 +23,36 @@
             </TabItem>
             <TabItem Header="Audio">
                 <eye:CachedContentControl Content="{Binding AudioSandbox}" />
+            </TabItem>
+            <TabItem Header="Listbox">
+                <st:StackPanel Orientation="Vertical">
+                    <eye:ButtonEx Command="{Binding RegenerateLargeListCommand}" Content="Regenerate"></eye:ButtonEx>
+                    <TabControl>
+                        <TabItem Header="Recycling">
+                           
+                        </TabItem>
+                        <TabItem Header="Virtualized">
+                            <ListBox ItemsSource="{Binding VirtualizedList}"
+                                     st:StackPanel.Fill="Fill"
+                                     VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <st:StackPanel Orientation="Horizontal"
+                                                       Visibility="{Binding HasValue, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                                            <eye:TextBlockWithCounter />
+                                            <TextBlock Text="{Binding Value}"></TextBlock>
+                                        </st:StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel IsVirtualizing="false" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                            </ListBox>
+                        </TabItem>
+                    </TabControl>
+                </st:StackPanel>
             </TabItem>
             <TabItem Header="Blazor">
                 <eye:CachedContentControl Content="{Binding BlazorSandbox}" />
@@ -34,32 +65,48 @@
             </TabItem>
             <TabItem Header="Misc">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    
+
                     <st:StackPanel Orientation="Vertical">
-                        <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowInTaskbar}">Show in taskbar</CheckBox>    
-                        <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowTitleBar}">Show title bar</CheckBox>    
-                        
+                        <CheckBox
+                            IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowInTaskbar}">
+                            Show in taskbar
+                        </CheckBox>
+                        <CheckBox
+                            IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=ShowTitleBar}">
+                            Show title bar
+                        </CheckBox>
+
                         <Expander Header="Color picker">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:HotKeyBox
                                     x:Name="HotkeyEditor" />
-                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsModifiers, Mode=TwoWay}">AcceptsModifiers</CheckBox>    
-                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsTab, Mode=TwoWay}">AcceptsTab</CheckBox>    
-                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseKeys, Mode=TwoWay}">AcceptsMouseKeys</CheckBox>    
-                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseWheel, Mode=TwoWay}">AcceptsMouseWheel</CheckBox>    
+                                <CheckBox
+                                    IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsModifiers, Mode=TwoWay}">
+                                    AcceptsModifiers
+                                </CheckBox>
+                                <CheckBox IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsTab, Mode=TwoWay}">AcceptsTab</CheckBox>
+                                <CheckBox
+                                    IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseKeys, Mode=TwoWay}">
+                                    AcceptsMouseKeys
+                                </CheckBox>
+                                <CheckBox
+                                    IsChecked="{Binding ElementName=HotkeyEditor, Path=AcceptsMouseWheel, Mode=TwoWay}">
+                                    AcceptsMouseWheel
+                                </CheckBox>
                             </st:StackPanel>
                         </Expander>
-                        
+
                         <Expander Header="Range slider">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
-                                <Slider Value="{Binding ElementName=RangeSlider, Path=LowerValue}"  
+                                <Slider Value="{Binding ElementName=RangeSlider, Path=LowerValue}"
                                         TickFrequency="{Binding ElementName=RangeSlider, Path=TickFrequency}"
-                                        Minimum="{Binding ElementName=RangeSlider, Path=Minimum}" 
+                                        Minimum="{Binding ElementName=RangeSlider, Path=Minimum}"
                                         Maximum="{Binding ElementName=RangeSlider, Path=Maximum}" />
-                                <eye:RangeSlider st:StackPanel.Fill="Fill" x:Name="RangeSlider" Minimum="0" Maximum="100" TickFrequency="0.01"/>
-                                <Slider Value="{Binding ElementName=RangeSlider, Path=UpperValue}" 
+                                <eye:RangeSlider st:StackPanel.Fill="Fill" x:Name="RangeSlider" Minimum="0"
+                                                 Maximum="100" TickFrequency="0.01" />
+                                <Slider Value="{Binding ElementName=RangeSlider, Path=UpperValue}"
                                         TickFrequency="{Binding ElementName=RangeSlider, Path=TickFrequency}"
-                                        Minimum="{Binding ElementName=RangeSlider, Path=Minimum}" 
+                                        Minimum="{Binding ElementName=RangeSlider, Path=Minimum}"
                                         Maximum="{Binding ElementName=RangeSlider, Path=Maximum}" />
                             </st:StackPanel>
                         </Expander>
@@ -68,19 +115,22 @@
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:ColorPickerEx x:Name="ColorPickerEx" Color="{Binding Color}" PickerDock="Right" />
                                 <eye:ColorPickerEx Color="{Binding Color}" PickerDock="Left" />
-                                <CheckBox IsChecked="{Binding ElementName=ColorPickerEx, Path=AllowAlpha}" Content="Allow alpha" />
-                                <TextBlock Text="{Binding ElementName=ColorPickerEx, Path=ColorWithoutAlpha, Converter={StaticResource ColorToStringConverter}, StringFormat='Color w/Alpha: {0}'}" />
-                                <TextBlock Text="{Binding ElementName=ColorPickerEx, Path=Alpha, StringFormat='Alpha: {0}'}" />
+                                <CheckBox IsChecked="{Binding ElementName=ColorPickerEx, Path=AllowAlpha}"
+                                          Content="Allow alpha" />
+                                <TextBlock
+                                    Text="{Binding ElementName=ColorPickerEx, Path=ColorWithoutAlpha, Converter={StaticResource ColorToStringConverter}, StringFormat='Color w/Alpha: {0}'}" />
+                                <TextBlock
+                                    Text="{Binding ElementName=ColorPickerEx, Path=Alpha, StringFormat='Alpha: {0}'}" />
                             </st:StackPanel>
                         </Expander>
-                        
+
                         <Expander Header="Numeric up/down">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:NumericUpDownEx Value="100" Width="100" IsMouseDragEnabled="True" />
                                 <eye:NumericUpDownEx Value="1000" Width="100" />
                             </st:StackPanel>
                         </Expander>
-                        
+
                         <Expander Header="Random period selector">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                                 <eye:CachedContentControl Content="{Binding RandomPeriodSelector}" />
@@ -90,8 +140,10 @@
                         </Expander>
                         <Expander Header="Fallback">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                                <TextBox MinWidth="120" Text="{Binding FallbackValue.Value}" materialDesign:TextFieldAssist.SuffixText="value" />
-                                <TextBox MinWidth="120" Text="{Binding FallbackValue.DefaultValue}" materialDesign:TextFieldAssist.SuffixText="default" />
+                                <TextBox MinWidth="120" Text="{Binding FallbackValue.Value}"
+                                         materialDesign:TextFieldAssist.SuffixText="value" />
+                                <TextBox MinWidth="120" Text="{Binding FallbackValue.DefaultValue}"
+                                         materialDesign:TextFieldAssist.SuffixText="default" />
                                 <TextBlock Text="{Binding FallbackValue.Value, StringFormat='Value: {0}'}" />
                                 <TextBlock Text="{Binding FallbackValue.ActualValue, StringFormat='Actual: {0}'}" />
                                 <TextBlock Text="{Binding FallbackValue.HasActualValue, StringFormat='HasValue: {0}'}" />
@@ -107,12 +159,12 @@
                             </st:StackPanel>
                         </Expander>
                         <Expander Header="Audio notification selector">
-                            <st:StackPanel Orientation="Horizontal" >
+                            <st:StackPanel Orientation="Horizontal">
                                 <eye:CachedContentControl Content="{Binding AudioNotificationSelector}"
                                                           Height="32" Width="32"
                                                           ContentTemplate="{StaticResource AudioNotificationSelectorButtonTemplate}" />
                                 <eye:CachedContentControl Content="{Binding AudioNotificationSelector}"
-                                                          Width="200"/>
+                                                          Width="200" />
                             </st:StackPanel>
                         </Expander>
                         <Expander Header="Outlined Textblock">
@@ -128,28 +180,37 @@
                                                        Color="Red"
                                                        PickerDock="Left" />
                                     <eye:NumericUpDownEx x:Name="OutlinedTextBlockStrokeThickness"
-                                                         Value="1"/>
+                                                         Value="1" />
                                     <eye:NumericUpDownEx x:Name="OutlinedTextBlockFontSize"
-                                                         Value="32"/>
+                                                         Value="32" />
                                 </st:StackPanel>
 
                                 <Border Background="Black">
-                                    <eye:OutlinedTextBlock Text="{Binding ElementName=OutlinedTextBlockText, Path=Text}"
-                                                           FontSize="{Binding ElementName=OutlinedTextBlockFontSize, Path=Value}"
-                                                           Stroke="{Binding ElementName=OutlinedTextBlockStrokeColor, Path=Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
-                                                           Foreground="{Binding ElementName=OutlinedTextBlockColor, Path=Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
-                                                           StrokeThickness="{Binding ElementName=OutlinedTextBlockStrokeThickness, Path=Value}" />
+                                    <eye:OutlinedTextBlock
+                                        Text="{Binding ElementName=OutlinedTextBlockText, Path=Text}"
+                                        FontSize="{Binding ElementName=OutlinedTextBlockFontSize, Path=Value}"
+                                        Stroke="{Binding ElementName=OutlinedTextBlockStrokeColor, Path=Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
+                                        Foreground="{Binding ElementName=OutlinedTextBlockColor, Path=Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
+                                        StrokeThickness="{Binding ElementName=OutlinedTextBlockStrokeThickness, Path=Value}" />
                                 </Border>
                             </st:StackPanel>
                         </Expander>
                         <Expander Header="Cached content control">
                             <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                                <eye:CachedContentControl Content="{Binding FakeDelay}" BorderBrush="Red" BorderThickness="1" Width="100" />
-                                <TextBlock Text="LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NullToCollapsedConverter}}" Width="120" />
-                                <TextBlock Text="NOT LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NotNullToCollapsedConverter}}" Width="120" />
-                                <Button Content="NULL" Command="{Binding SetCachedControlContentCommand}" CommandParameter="{x:Null}" Width="80" />
-                                <Button Content="Alpha" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Alpha" Width="80" />
-                                <Button Content="Beta" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Beta" Width="80" />
+                                <eye:CachedContentControl Content="{Binding FakeDelay}" BorderBrush="Red"
+                                                          BorderThickness="1" Width="100" />
+                                <TextBlock Text="LOADED"
+                                           Visibility="{Binding FakeDelay, Converter={StaticResource NullToCollapsedConverter}}"
+                                           Width="120" />
+                                <TextBlock Text="NOT LOADED"
+                                           Visibility="{Binding FakeDelay, Converter={StaticResource NotNullToCollapsedConverter}}"
+                                           Width="120" />
+                                <Button Content="NULL" Command="{Binding SetCachedControlContentCommand}"
+                                        CommandParameter="{x:Null}" Width="80" />
+                                <Button Content="Alpha" Command="{Binding SetCachedControlContentCommand}"
+                                        CommandParameter="Alpha" Width="80" />
+                                <Button Content="Beta" Command="{Binding SetCachedControlContentCommand}"
+                                        CommandParameter="Beta" Width="80" />
                                 <Button Content="#1" Command="{Binding SetCachedControlContentCommand}">
                                     <Button.CommandParameter>
                                         <system:Int32>
@@ -191,18 +252,18 @@
                     </st:StackPanel>
                 </ScrollViewer>
             </TabItem>
-            
+
             <TabItem Header="SelectionAdorner">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
                     <st:StackPanel Orientation="Horizontal">
-                        <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}" Content="Box"/>
-                        <eye:ButtonEx Command="{Binding StartSelectionPointCommand}" Content="Point"/>
-                        <eye:ButtonEx Command="{Binding StartSelectionPointStreamCommand}" Content="Point Stream"/>
-                        
-                        <TextBlock Text="Bounds"/>
-                        <eye:RectangleEditor Value="{Binding ProjectionBounds}"/>
-                        <TextBlock Text="Selection"/>
-                        <eye:RectangleEditor Value="{Binding SelectionProjected}"/>
+                        <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}" Content="Box" />
+                        <eye:ButtonEx Command="{Binding StartSelectionPointCommand}" Content="Point" />
+                        <eye:ButtonEx Command="{Binding StartSelectionPointStreamCommand}" Content="Point Stream" />
+
+                        <TextBlock Text="Bounds" />
+                        <eye:RectangleEditor Value="{Binding ProjectionBounds}" />
+                        <TextBlock Text="Selection" />
+                        <eye:RectangleEditor Value="{Binding SelectionProjected}" />
                     </st:StackPanel>
                     <st:StackPanel Orientation="Horizontal">
                         <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=IsInEditMode}">Is EditMode</CheckBox>
@@ -212,46 +273,59 @@
                         <CheckBox IsChecked="{Binding ElementName=SelectionAdornerEditor, Path=ShowProjected}">Show projected</CheckBox>
                     </st:StackPanel>
                     <st:StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsKeyboardFocused, StringFormat='IsKeyboardFocused: {0}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsKeyboardFocusWithin, StringFormat='IsKeyboardFocusWithin: {0}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseCaptured, StringFormat='IsMouseCaptured: {0}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseCaptureWithin, StringFormat='IsMouseCaptureWithin: {0}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseOver, StringFormat='IsMouseOver: {0}'}"/>
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=IsKeyboardFocused, StringFormat='IsKeyboardFocused: {0}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=IsKeyboardFocusWithin, StringFormat='IsKeyboardFocusWithin: {0}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseCaptured, StringFormat='IsMouseCaptured: {0}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseCaptureWithin, StringFormat='IsMouseCaptureWithin: {0}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=IsMouseOver, StringFormat='IsMouseOver: {0}'}" />
                     </st:StackPanel>
                     <st:StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=ActualWidth, StringFormat='ActualWidth: {0:F1}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=ActualHeight, StringFormat='ActualHeight: {0:F1}'}"/>
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=ActualWidth, StringFormat='ActualWidth: {0:F1}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=ActualHeight, StringFormat='ActualHeight: {0:F1}'}" />
                     </st:StackPanel>
                     <st:StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=AnchorPoint, StringFormat='AnchorPoint: {0:F1}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=MousePosition, StringFormat='MousePosition: {0:F1}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=Selection, StringFormat='Selection: {0:F1}'}"/>
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=AnchorPoint, StringFormat='AnchorPoint: {0:F1}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=MousePosition, StringFormat='MousePosition: {0:F1}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=Selection, StringFormat='Selection: {0:F1}'}" />
                     </st:StackPanel>
                     <st:StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=ProjectionBounds, StringFormat='ProjectionBounds: {0:F1}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=MousePositionProjected, StringFormat='MousePositionProjected: {0:F1}'}"/>
-                        <TextBlock Text="{Binding ElementName=SelectionAdornerEditor, Path=.SelectionProjected, StringFormat='SelectionProjected: {0:F1}'}"/>
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=ProjectionBounds, StringFormat='ProjectionBounds: {0:F1}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=MousePositionProjected, StringFormat='MousePositionProjected: {0:F1}'}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SelectionAdornerEditor, Path=.SelectionProjected, StringFormat='SelectionProjected: {0:F1}'}" />
                     </st:StackPanel>
                     <st:StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding SelectionRectangle, StringFormat='SelectionRectangle: {0:F1}'}"/>
+                        <TextBlock Text="{Binding SelectionRectangle, StringFormat='SelectionRectangle: {0:F1}'}" />
                     </st:StackPanel>
                     <eye:ButtonEx Command="{Binding StartSelectionBoxCommand}">Start REGION selection</eye:ButtonEx>
                     <eye:AdornedControl MinWidth="300" MinHeight="300" MaxWidth="500" MaxHeight="500"
                                         IsAdornerVisible="True">
                         <eye:AdornedControl.AdornerContent>
                             <Grid>
-                                <regionSelector:SelectionAdornerEditor 
-                                    x:Name="SelectionAdornerEditor" 
+                                <regionSelector:SelectionAdornerEditor
+                                    x:Name="SelectionAdornerEditor"
                                     IsInEditMode="{Binding SelectionAdorner.IsInEditMode}"
                                     IsBoxSelectionEnabled="{Binding SelectionAdorner.IsBoxSelectionEnabled}"
                                     SelectionProjected="{Binding SelectionAdorner.SelectionProjected}"
                                     MousePositionProjected="{Binding SelectionAdorner.MousePositionProjected}"
-                                    ProjectionBounds="{Binding SelectionAdorner.ProjectionBounds}"
-                                    />
+                                    ProjectionBounds="{Binding SelectionAdorner.ProjectionBounds}" />
                             </Grid>
                         </eye:AdornedControl.AdornerContent>
                         <Grid>
-                            <Rectangle Fill="Gray" Stroke="Red"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                            <Rectangle Fill="Gray" Stroke="Red" HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
                         </Grid>
                     </eye:AdornedControl>
                 </st:StackPanel>
@@ -259,32 +333,54 @@
             <TabItem Header="Colors">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
                     <st:StackPanel Orientation="Vertical">
-                        <eye:RangeSlider Minimum="0" Maximum="360" TrackBackground="{StaticResource HueBrush}"/>
-                        <eye:RangeSlider Minimum="0" Maximum="100"/>
-                        <eye:RangeSlider Minimum="0" Maximum="100"/>
+                        <eye:RangeSlider Minimum="0" Maximum="360" TrackBackground="{StaticResource HueBrush}" />
+                        <eye:RangeSlider Minimum="0" Maximum="100" />
+                        <eye:RangeSlider Minimum="0" Maximum="100" />
                     </st:StackPanel>
-                    
+
                     <Label Background="{DynamicResource MaterialDesignBody}" Content="Body"></Label>
                     <Label Background="{DynamicResource MaterialDesignDivider}" Content="Divider"></Label>
-                    <Label Background="{DynamicResource PrimaryHueDarkForegroundBrush}" Content="PrimaryHueDarkForegroundBrush"></Label>
-                    <Label Background="{DynamicResource SecondaryAccentForegroundBrush}" Content="SecondaryAccentForegroundBrush"></Label>
-                    <Label Background="{DynamicResource PrimaryHueLightForegroundBrush}" Content="PrimaryHueLightForegroundBrush"></Label>
-                    <Label Background="{DynamicResource PrimaryHueMidForegroundBrush}" Content="PrimaryHueMidForegroundBrush"></Label>
-                    <Label Background="{DynamicResource PrimaryHueDarkForegroundBrush}" Content="PrimaryHueDarkForegroundBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                           Content="PrimaryHueDarkForegroundBrush">
+                    </Label>
+                    <Label Background="{DynamicResource SecondaryAccentForegroundBrush}"
+                           Content="SecondaryAccentForegroundBrush">
+                    </Label>
+                    <Label Background="{DynamicResource PrimaryHueLightForegroundBrush}"
+                           Content="PrimaryHueLightForegroundBrush">
+                    </Label>
+                    <Label Background="{DynamicResource PrimaryHueMidForegroundBrush}"
+                           Content="PrimaryHueMidForegroundBrush">
+                    </Label>
+                    <Label Background="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                           Content="PrimaryHueDarkForegroundBrush">
+                    </Label>
                     <Label Background="{DynamicResource PrimaryHueLightBrush}" Content="PrimaryHueLightBrush"></Label>
                     <Label Background="{DynamicResource PrimaryHueMidBrush}" Content="PrimaryHueMidBrush"></Label>
                     <Label Background="{DynamicResource PrimaryHueDarkBrush}" Content="PrimaryHueDarkBrush"></Label>
                     <Label Background="{DynamicResource MaterialDesignPaper}" Content="MaterialDesignPaper"></Label>
-                    <Label Background="{DynamicResource MaterialDesignTextBoxBorder}" Content="MaterialDesignTextBoxBorder"></Label>
+                    <Label Background="{DynamicResource MaterialDesignTextBoxBorder}"
+                           Content="MaterialDesignTextBoxBorder">
+                    </Label>
                     <Label Background="{DynamicResource MaterialDesignSelection}" Content="MaterialDesignSelection"></Label>
                     <Label Background="{DynamicResource MaterialDesignCheckBoxOff}" Content="MaterialDesignCheckBoxOff"></Label>
-                    <Label Background="{DynamicResource MaterialDesignFlatButtonClick}" Content="MaterialDesignFlatButtonClick"></Label>
-                    <Label Background="{DynamicResource MaterialDesignValidationErrorBrush}" Content="MaterialDesignValidationErrorBrush"></Label>
+                    <Label Background="{DynamicResource MaterialDesignFlatButtonClick}"
+                           Content="MaterialDesignFlatButtonClick">
+                    </Label>
+                    <Label Background="{DynamicResource MaterialDesignValidationErrorBrush}"
+                           Content="MaterialDesignValidationErrorBrush">
+                    </Label>
                     <Label Background="{DynamicResource MahApps.Brushes.Accent}" Content="MahApps.Brushes.Accent"></Label>
-                    <Label Background="{DynamicResource MahApps.Brushes.ThemeForeground}" Content="MahApps.Brushes.ThemeForeground"></Label>
-                    <Label Background="{DynamicResource MahApps.Brushes.ThemeBackground}" Content="MahApps.Brushes.ThemeBackground"></Label>
+                    <Label Background="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                           Content="MahApps.Brushes.ThemeForeground">
+                    </Label>
+                    <Label Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
+                           Content="MahApps.Brushes.ThemeBackground">
+                    </Label>
                     <Label Background="{DynamicResource MahApps.Brushes.Gray8}" Content="MahApps.Brushes.Gray8"></Label>
-                    <Label Background="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}" Content="InactiveSelectionHighlightBrushKey"></Label>
+                    <Label Background="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"
+                           Content="InactiveSelectionHighlightBrushKey">
+                    </Label>
                 </st:StackPanel>
             </TabItem>
             <TabItem Header="BusyIndicator">
