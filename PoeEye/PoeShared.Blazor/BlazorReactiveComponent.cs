@@ -21,28 +21,29 @@ public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReacti
 {
     protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> CollectionProperties = new();
 
-    [Inject]
-    public IJSRuntime JsRuntime { get; init; }
+    [Inject] public IJSRuntime JsRuntime { get; init; }
+
+    protected BlazorReactiveComponent()
+    {
+    }
     
     public void Dispose()
     {
         Anchors.Dispose();
         GC.SuppressFinalize(this);
     }
-    
-    [Parameter]
-    public object DataContext { get; set; }
+
+    [Parameter] public object DataContext { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
-    
+
     public CompositeDisposable Anchors { get; } = new();
-    
+
     public void RaisePropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
-    
+
     protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
         TRet newValue,
         [CallerMemberName] string propertyName = null)
@@ -54,7 +55,7 @@ public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReacti
 
         return RaiseAndSet(ref backingField, newValue, propertyName);
     }
-    
+
     protected TRet RaiseAndSet<TRet>(
         ref TRet backingField,
         TRet newValue,
@@ -72,7 +73,6 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
 
     protected BlazorReactiveComponent()
     {
-        
     }
 
     public new T DataContext
@@ -84,47 +84,64 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        
-        this.WhenAnyValue(x => x.DataContext)
-            .Where(dataContext => dataContext != null)
-            .Subscribe(dataContext =>
-            {
-                Log.Debug(() => $"Initializing instance of {this} ({GetType()})");
-                
-                var properties = CollectionProperties.GetOrAdd(dataContext.GetType(), type => type
-                    .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
-                    .Where(x => typeof(INotifyCollectionChanged).IsAssignableFrom(x.PropertyType))
-                    .Where(x => x.CanRead)
-                    .ToArray());
-                if (properties.Any())
-                {
-                    properties.Select(property =>
-                        {
-                            return dataContext
-                                .WhenAnyProperty(property.Name)
-                                .StartWithDefault()
-                                .Select(_ => property.GetValue(dataContext) as INotifyCollectionChanged)
-                                .Select(x => x.ObserveCollectionChanges())
-                                .Switch()
-                                .Select(x => new {property.Name, x.EventArgs.Action, x.EventArgs});
-                        }).Merge()
-                        .SubscribeSafe(async x =>
-                        {
-                            //Log.Debug(() => $"Component collection has changed: {x.Name}, requesting redraw");
-                            await InvokeAsync(StateHasChanged);
-                            //Log.Debug(() => $"Redraw completed after property change: {x.Name}");
-                        }, Log.HandleException)
-                        .AddTo(Anchors);
-                }
-        
-                dataContext.PropertyChanged += async (sender, args) =>
-                {
-                    Log.Debug(() => $"Component property has changed: {args.PropertyName}, requesting redraw");
-                    await InvokeAsync(StateHasChanged);
-                    Log.Debug(() => $"Redraw completed after property change: {args.PropertyName}");
-                };
-                Log.Debug(() => $"Initialized instance of {this} ({GetType()})");
-            })
+
+        Observable.Merge(
+                this.WhenAnyValue(x => x.DataContext)
+                    .Select(x => x != null ? RaiseOnPropertyChanges(x) : Observable.Empty<PropertyChangedEventArgs>())
+                    .Switch(),
+                RaiseOnPropertyChanges(this)
+            )
+            .Sample(TimeSpan.FromMilliseconds(250))//FIXME UI throttling
+            .Subscribe(() => InvokeAsync(StateHasChanged))
             .AddTo(Anchors);
+    }
+
+    private static IObservable<PropertyChangedEventArgs> RaiseOnPropertyChanges(INotifyPropertyChanged source)
+    {
+        Log.Debug(() => $"Initializing reactive properties of {source}");
+
+        return Observable.Create<PropertyChangedEventArgs>(observer =>
+        {
+            var anchors = new CompositeDisposable();
+
+            var properties = CollectionProperties.GetOrAdd(source.GetType(), GetReactiveProperties);
+            if (properties.Any())
+            {
+                properties.Select(property =>
+                    {
+                        return source
+                            .WhenAnyProperty(property.Name)
+                            .StartWithDefault()
+                            .Select(_ => property.GetValue(source) as INotifyCollectionChanged)
+                            .Select(x => x.ObserveCollectionChanges())
+                            .Switch()
+                            .Select(x => new {property.Name, x.EventArgs.Action, x.EventArgs});
+                    }).Merge()
+                    .SubscribeSafe(x =>
+                    {
+                        //Log.Debug(() => $"Component collection has changed: {x.Name}, requesting redraw");
+                        observer.OnNext(new PropertyChangedEventArgs(x.Name));
+                        //Log.Debug(() => $"Redraw completed after property change: {x.Name}");
+                    }, Log.HandleException)
+                    .AddTo(anchors);
+            }
+
+            source.PropertyChanged += (sender, args) =>
+            {
+                //Log.Debug(() => $"Component property has changed: {args.PropertyName}, requesting redraw");
+                observer.OnNext(args);
+                //Log.Debug(() => $"Redraw completed after property change: {args.PropertyName}");
+            };
+            return anchors;
+        });
+    }
+
+    private static PropertyInfo[] GetReactiveProperties(Type type)
+    {
+        return type
+            .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(x => typeof(INotifyCollectionChanged).IsAssignableFrom(x.PropertyType))
+            .Where(x => x.CanRead)
+            .ToArray();
     }
 }
