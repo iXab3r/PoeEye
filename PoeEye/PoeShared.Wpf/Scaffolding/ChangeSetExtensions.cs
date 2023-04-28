@@ -13,19 +13,26 @@ public static class ChangeSetExtensions
         this IObservable<IChangeSet<T>> source, 
         out IReadOnlyObservableCollection<IVirtualizedListContainer<T>> collection) where T : class
     {
-        var resultCollection = new ObservableCollectionEx<VirtualizedListContainer<T>>();
+        return BindToCollectionVirtualized(source, () => new VirtualizedListContainer<T>(), out collection);
+    }
+
+    public static IObservable<IChangeSet<T>> BindToCollectionVirtualized<T, TContainer>(
+        this IObservable<IChangeSet<T>> source,
+        Func<TContainer> containerFactory,
+        out IReadOnlyObservableCollection<TContainer> collection) where T : class where TContainer : IVirtualizedListContainer<T>
+    {
+        var resultCollection = new ObservableCollectionEx<TContainer>();
         collection = resultCollection;
         
         return Observable.Create<IChangeSet<T>>(observer =>
         {
             var anchors = new CompositeDisposable();
-            var list = new VirtualizedList<T, VirtualizedListContainer<T>>(
+            var list = new VirtualizedList<T, TContainer>(
                 source,
-                containerFactory: new LambdaFactory<VirtualizedListContainer<T>>(() => new VirtualizedListContainer<T>())).AddTo(anchors);
+                containerFactory: new LambdaFactory<TContainer>(containerFactory)).AddTo(anchors);
             list.Containers.Connect().Bind(resultCollection).Subscribe().AddTo(anchors);
             return anchors;
         });
     }
-    
-    
+
 }

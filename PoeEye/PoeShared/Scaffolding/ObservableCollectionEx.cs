@@ -7,7 +7,6 @@ using PropertyChanged;
 
 namespace PoeShared.Scaffolding;
 
-[DoNotNotify]
 public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObservableCollection<T>, IReadOnlyObservableCollection<T>
 {
     private readonly ObservableCollectionExtended<T> collection = new();
