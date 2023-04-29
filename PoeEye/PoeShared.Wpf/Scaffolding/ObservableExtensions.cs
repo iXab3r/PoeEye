@@ -18,6 +18,11 @@ public static class ObservableExtensions
             _ => throw new NotSupportedException($"Unsupported scheduler type: {scheduler}")
         };
     }
+
+    public static IObservable<T> ObserveOnCurrentDispatcherIfNeeded<T>(this IObservable<T> source)
+    {
+        return source.ObserveOnIfNeeded(DispatcherScheduler.Current.Dispatcher);
+    }
     
     public static IObservable<T> ObserveOnIfNeeded<T>(this IObservable<T> source, Dispatcher dispatcher)
     {
