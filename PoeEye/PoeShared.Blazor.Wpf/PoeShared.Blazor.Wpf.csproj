@@ -39,6 +39,9 @@
        <Content Update="wwwroot\js\blazor.utils.js">
          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
        </Content>
+       <EmbeddedResource Include="..\..\Submodules\PoeEye\PoeEye\PoeShared.Blazor.Wpf\wwwroot\index.html">
+         <Link>wwwroot\index.html</Link>
+       </EmbeddedResource>
      </ItemGroup>
 
      <Import Project="..\maui\src\BlazorWebView\src\Wpf\build\Microsoft.AspNetCore.Components.WebView.Wpf.targets" />

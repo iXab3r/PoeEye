@@ -28,8 +28,5 @@ public sealed class InMemoryFileProvider : DisposableReactiveObjectWithLogger, I
         return NullChangeToken.Singleton;
     }
 
-    public void AddFile(IFileInfo fileInfo)
-    {
-        filesByName.AddOrUpdate(fileInfo);
-    }
+    public ISourceCache<IFileInfo, string> FilesByName => filesByName;
 }

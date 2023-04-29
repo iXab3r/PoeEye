@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
+using DynamicData;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Logging;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
@@ -35,13 +31,16 @@ public class BlazorContentControl : ReactiveControl
 
     private static readonly Binder<BlazorContentControl> Binder = new();
 
-    private readonly ISharedResourceLatch isBusyLatch;
-
     public static readonly DependencyProperty ViewTypeProperty = DependencyProperty.Register(
         nameof(ViewType), typeof(Type), typeof(BlazorContentControl), new PropertyMetadata(default(Type)));
 
     public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
         nameof(Content), typeof(object), typeof(BlazorContentControl), new PropertyMetadata(default(object)));
+
+    public static readonly DependencyProperty AdditionalFilesProperty = DependencyProperty.Register(
+        nameof(AdditionalFiles), typeof(IEnumerable<IFileInfo>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<IFileInfo>)));
+
+    private readonly ISharedResourceLatch isBusyLatch;
 
     static BlazorContentControl()
     {
@@ -61,6 +60,7 @@ public class BlazorContentControl : ReactiveControl
                 Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
                 UnhandledException = null;
             }
+
             WebView?.WebView.Reload();
         });
 
@@ -75,11 +75,13 @@ public class BlazorContentControl : ReactiveControl
 
         serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
 
+        var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
+
         this.WhenAnyValue(x => x.ViewType)
             .ObserveOnDispatcher()
             .Subscribe(async viewType =>
             {
-                using var @rent = isBusyLatch.Rent();
+                using var rent = isBusyLatch.Rent();
 
                 if (UnhandledException != null)
                 {
@@ -89,7 +91,7 @@ public class BlazorContentControl : ReactiveControl
 
                 if (WebView != null)
                 {
-                    Log.Debug($"Disposing previous instance of WebView");
+                    Log.Debug("Disposing previous instance of WebView");
                     await WebView.DisposeAsync();
                     WebView = null;
 
@@ -109,7 +111,7 @@ public class BlazorContentControl : ReactiveControl
                 // views have to be transient to allow to re-create them if needed (e.g. on error)
                 serviceCollection.AddTransient(typeof(BlazorContent), x =>
                 {
-                    var wrapper = new BlazorContent()
+                    var wrapper = new BlazorContent
                     {
                         Type = viewType
                     };
@@ -136,17 +138,35 @@ public class BlazorContentControl : ReactiveControl
 
                 new RootComponent
                 {
-                    Selector = $"headOutlet",
+                    Selector = "headOutlet",
                     ComponentType = typeof(HeadOutlet)
                 }.AddTo(webView.RootComponents);
 
                 new RootComponent
                 {
-                    Selector = $"#app",
+                    Selector = "#app",
                     ComponentType = typeof(BlazorContent)
                 }.AddTo(webView.RootComponents);
 
-                webView.HostPage = "wwwroot/index.html";
+                var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
+                webView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
+
+                var cssLinksText = additionalFiles
+                    .Where(x => x.Name.EndsWith(".css"))
+                    .Select(x => $"""<link href="{x.Name}" rel="stylesheet" />""")
+                    .JoinStrings(Environment.NewLine);
+                
+                var scriptsText = additionalFiles
+                    .Where(x => x.Name.EndsWith(".js"))
+                    .Select(x => $"""<script src="{x.Name}"></script>""")
+                    .JoinStrings(Environment.NewLine);
+
+                var indexFileContent = indexFileContentTemplate
+                    .Replace("<!--% AdditionalStylesheetsBlock %-->", cssLinksText)
+                    .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
+                
+                webView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo("index.g.html", Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
+                webView.HostPage = "index.g.html";
                 WebView = webView;
             })
             .AddTo(Anchors);
@@ -168,10 +188,17 @@ public class BlazorContentControl : ReactiveControl
         set => SetValue(ContentProperty, value);
     }
 
-    public bool IsBusy { get; private set; }
+    public IEnumerable<IFileInfo> AdditionalFiles
+    {
+        get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
+        set => SetValue(AdditionalFilesProperty, value);
+    }
+
+    public bool IsBusy { get; [UsedImplicitly] private set; }
 
     /// <summary>
-    /// We have to dynamically recreate WebView when needed as it is EXTREMELY unfriendly for any changes of associated properties
+    ///     We have to dynamically recreate WebView when needed as it is EXTREMELY unfriendly for any changes of associated
+    ///     properties
     /// </summary>
     public BlazorWebViewEx WebView { get; private set; }
 

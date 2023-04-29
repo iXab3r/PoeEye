@@ -4,7 +4,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal sealed class InMemoryFileInfo : IFileInfo
+public sealed class InMemoryFileInfo : IFileInfo
 {
     private readonly byte[] fileBytes;
 
