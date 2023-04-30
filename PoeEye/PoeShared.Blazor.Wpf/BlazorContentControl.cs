@@ -166,7 +166,7 @@ public class BlazorContentControl : ReactiveControl
                     .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
                 
                 webView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo("index.g.html", Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
-                webView.HostPage = "index.g.html";
+                webView.HostPage = "wwwroot/index.g.html"; // wwwroot must be included as a part of path to become ContentRoot
                 WebView = webView;
             })
             .AddTo(Anchors);

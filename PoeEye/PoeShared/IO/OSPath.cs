@@ -15,8 +15,8 @@ public record OSPath
     public OSPath(string fullPath) : this (fullPath, PathUtils.IsWindows)
     {
     }
-    
-    internal OSPath(string fullPath, bool isWindows)
+
+    private OSPath(string fullPath, bool isWindows)
     {
         FullPath = ToPlatformSpecificPath(fullPath, isWindows);
     }
@@ -47,18 +47,39 @@ public record OSPath
     {
         return new OSPath(Path.Combine(FullPath, other.FullPath));
     }
-    
-    internal static string ToWindowsPath(string path)
+
+    public virtual bool Equals(OSPath other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(FullPath, other.FullPath, PathUtils.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+    }
+
+    public override int GetHashCode()
+    {
+        return (FullPath != null ? FullPath.GetHashCode() : 0);
+    }
+
+    private static string ToWindowsPath(string path)
     {
         return path.Replace(UnixDirectorySeparator, WindowsDirectorySeparator).TrimEnd(AllSeparators);
     }
 
-    internal static string ToUnixPath(string path)
+    private static string ToUnixPath(string path)
     {
+        //FIXME Most corner-cases are not covered by this simple replacement, e.g. drive path, device path
         return path.Replace(WindowsDirectorySeparator, UnixDirectorySeparator).TrimEnd(AllSeparators);
     }
-    
-    internal static string ToPlatformSpecificPath(string path, bool isWindows)
+
+    private static string ToPlatformSpecificPath(string path, bool isWindows)
     {
         if (path == null)
         {
