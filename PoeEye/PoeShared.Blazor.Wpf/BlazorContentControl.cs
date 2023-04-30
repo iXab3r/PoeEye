@@ -152,12 +152,12 @@ public class BlazorContentControl : ReactiveControl
                 webView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
 
                 var cssLinksText = additionalFiles
-                    .Where(x => x.Name.EndsWith(".css"))
-                    .Select(x => $"""<link href="{x.Name}" rel="stylesheet" />""")
+                    .Where(x => x.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.css", StringComparison.OrdinalIgnoreCase))
+                    .Select(x => $"""<link href="{x.Name}" rel="stylesheet"></link>""")
                     .JoinStrings(Environment.NewLine);
                 
                 var scriptsText = additionalFiles
-                    .Where(x => x.Name.EndsWith(".js"))
+                    .Where(x => x.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.js", StringComparison.OrdinalIgnoreCase))
                     .Select(x => $"""<script src="{x.Name}"></script>""")
                     .JoinStrings(Environment.NewLine);
 

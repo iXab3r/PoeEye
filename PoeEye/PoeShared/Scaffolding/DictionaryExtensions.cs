@@ -32,16 +32,25 @@ public static class DictionaryExtensions
     {
         dictionary.Add(item.Key, item.Value);
     }
-    
+
+
     public static TValue AddOrUpdate<TKey, TValue>(
         this IDictionary<TKey, TValue> dictionary,
         TKey key,
-        TValue newValue,
+        Func<TValue> newValueFactory)
+    {
+        return AddOrUpdate(dictionary, key, newValueFactory, (_, _) => newValueFactory());
+    }
+
+    public static TValue AddOrUpdate<TKey, TValue>(
+        this IDictionary<TKey, TValue> dictionary,
+        TKey key,
+        Func<TValue> newValueFactory,
         Func<TKey, TValue, TValue> updateValueFactory)
     {
         Guard.ArgumentNotNull(dictionary, nameof(dictionary));
         Guard.ArgumentNotNull(key, nameof(key));
-        Guard.ArgumentNotNull(newValue, nameof(newValue));
+        Guard.ArgumentNotNull(newValueFactory, nameof(newValueFactory));
         Guard.ArgumentNotNull(updateValueFactory, nameof(updateValueFactory));
 
         if (dictionary.TryGetValue(key, out var existing))
@@ -49,7 +58,7 @@ public static class DictionaryExtensions
             return dictionary[key] = updateValueFactory(key, existing);
         }
 
-        return dictionary[key] = newValue;
+        return dictionary[key] = newValueFactory();
     }
 
     public static bool TryRemove<TKey, TValue>(
