@@ -27,31 +27,35 @@
                                        Background="{TemplateBinding wpf:ColorZoneAssist.Background}"
                                        DockPanel.Dock="Top"
                                        Focusable="False">
-                            <ScrollViewer eye:ScrollViewerAssist.SupportHorizontalScroll="True"
-                                          eye:ScrollViewerAssist.BubbleVerticalScroll="True"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden">
-                                <st:StackPanel Orientation="Horizontal">
-                                    <UniformGrid x:Name="CenteredHeaderPanel"
-                                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                 Focusable="False"
-                                                 eye:TabAssist.BindableIsItemsHost="{Binding Visibility, RelativeSource={RelativeSource Self}}"
-                                                 st:StackPanel.Fill="Fill"
-                                                 KeyboardNavigation.TabIndex="1"
-                                                 Rows="1" />
-                                    <VirtualizingStackPanel x:Name="HeaderPanel"
-                                                            st:StackPanel.Fill="Fill"
-                                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                            Focusable="False"
-                                                            eye:TabAssist.BindableIsItemsHost="{Binding Visibility, RelativeSource={RelativeSource Self}}"
-                                                            KeyboardNavigation.TabIndex="1"
-                                                            Orientation="Horizontal" />                          
-                                    <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(eye:TabAssist.HeaderSuffixContent)}"
-                                                      Visibility="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}"/>
-                                </st:StackPanel>
-                            </ScrollViewer>
+                            <st:StackPanel Orientation="Horizontal">
+                                <ScrollViewer eye:ScrollViewerAssist.SupportHorizontalScroll="True"
+                                              st:StackPanel.Fill="Fill"
+                                              eye:ScrollViewerAssist.BubbleVerticalScroll="True"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Hidden">
+                                    <st:StackPanel Orientation="Horizontal">
+                                        <UniformGrid x:Name="CenteredHeaderPanel"
+                                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                     Focusable="False"
+                                                     eye:TabAssist.BindableIsItemsHost="{Binding Visibility, RelativeSource={RelativeSource Self}}"
+                                                     st:StackPanel.Fill="Fill"
+                                                     KeyboardNavigation.TabIndex="1"
+                                                     Rows="1" />
+                                        <VirtualizingStackPanel x:Name="HeaderPanel"
+                                                                st:StackPanel.Fill="Fill"
+                                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                Focusable="False"
+                                                                eye:TabAssist.BindableIsItemsHost="{Binding Visibility, RelativeSource={RelativeSource Self}}"
+                                                                KeyboardNavigation.TabIndex="1"
+                                                                Orientation="Horizontal" />
+                                    </st:StackPanel>
+                                </ScrollViewer>
+                                <ContentPresenter
+                                    Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(eye:TabAssist.HeaderSuffixContent)}"
+                                    Visibility="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}" />
+                            </st:StackPanel>
                         </wpf:ColorZone>
                         <Border x:Name="PART_BorderSelectedContent"
                                 Padding="{TemplateBinding Padding}"

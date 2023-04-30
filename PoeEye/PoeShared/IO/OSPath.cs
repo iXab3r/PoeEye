@@ -68,12 +68,12 @@ public record OSPath
         return (FullPath != null ? FullPath.GetHashCode() : 0);
     }
 
-    private static string ToWindowsPath(string path)
+    internal static string ToWindowsPath(string path)
     {
         return path.Replace(UnixDirectorySeparator, WindowsDirectorySeparator).TrimEnd(AllSeparators);
     }
 
-    private static string ToUnixPath(string path)
+    internal static string ToUnixPath(string path)
     {
         //FIXME Most corner-cases are not covered by this simple replacement, e.g. drive path, device path
         return path.Replace(WindowsDirectorySeparator, UnixDirectorySeparator).TrimEnd(AllSeparators);

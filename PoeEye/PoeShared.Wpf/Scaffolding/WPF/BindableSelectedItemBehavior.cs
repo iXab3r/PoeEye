@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
+using PoeShared.Common;
 using PoeShared.Logging;
 using PoeShared.UI;
 
@@ -56,12 +57,12 @@ public class BindableSelectedItemBehavior : Behavior<TreeView>
         
     private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (e.NewValue is ITreeViewItemViewModel newItem)
+        if (e.NewValue is ICanBeSelected newItem)
         {
             newItem.IsSelected = true;
         }
 
-        if (e.OldValue is ITreeViewItemViewModel oldItem)
+        if (e.OldValue is ICanBeSelected oldItem)
         {
             oldItem.IsSelected = false;
         }
