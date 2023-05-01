@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using DynamicData;
+using Microsoft.JSInterop;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Prism;
@@ -134,25 +135,34 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
 
     private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
     {
-        if (!e.Observed &&
-            e.Exception.InnerException?.GetType().Name is "RpcException" or 
-                "Http2ConnectionException" or 
-                nameof(TaskCanceledException) or 
+        if (!e.Observed)
+        {
+            if (e.Exception.InnerException?.GetType().Name is "RpcException" or
+                "Http2ConnectionException" or
+                nameof(TaskCanceledException) or
                 nameof(TimeoutException) or
                 nameof(IOException))
-        {
-            //FIXME There should be a smarter way of solving that problem with unobserved GRPC RpcException/Http exceptions
-            /*
-             * There is a problem with Grpc.Net.Client.Internal.GrpcCall, specifically with how its method RunCall is called:
-             * private async Task RunCall(HttpRequestMessage request, TimeSpan? timeout)
-             * this is how current code uses it in multiple places: 
-             * _ = RunCall(message, timeout);
-             * This means that IF something happens inside RunCall the entire app will blow up as this exception will be gathered when Task is finalized
-             * most usual errors in RunCall are HTTP and Rpc exceptions
-             */
-            Log.Warn("Suppressing known unobserved exception", e.Exception.InnerException);
-            e.SetObserved();
-            return;
+            {
+                //FIXME There should be a smarter way of solving that problem with unobserved GRPC RpcException/Http exceptions
+                /*
+                 * There is a problem with Grpc.Net.Client.Internal.GrpcCall, specifically with how its method RunCall is called:
+                 * private async Task RunCall(HttpRequestMessage request, TimeSpan? timeout)
+                 * this is how current code uses it in multiple places: 
+                 * _ = RunCall(message, timeout);
+                 * This means that IF something happens inside RunCall the entire app will blow up as this exception will be gathered when Task is finalized
+                 * most usual errors in RunCall are HTTP and Rpc exceptions
+                 */
+                Log.Warn("Suppressing known unobserved exception", e.Exception.InnerException);
+                e.SetObserved();
+                return;
+            } else if (e.Exception.InnerException is JSException jsException)
+            {
+                Log.Warn("Suppressing JS exception", jsException);
+                e.SetObserved();
+                return;
+            }
+            
+            
         }
 
         ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");

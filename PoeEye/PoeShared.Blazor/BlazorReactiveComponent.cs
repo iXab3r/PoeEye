@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
 using DynamicData.Binding;
-using Microsoft.AspNetCore.Components;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -19,12 +18,6 @@ public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
 
 public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where T : IDisposableReactiveObject
 {
-    private static readonly IFluentLog Log = typeof(BlazorReactiveComponent<T>).PrepareLogger();
-
-    protected BlazorReactiveComponent()
-    {
-    }
-
     public new T DataContext
     {
         get => (T) base.DataContext;
@@ -37,18 +30,18 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
 
         Observable.Merge(
                 this.WhenAnyValue(x => x.DataContext)
-                    .Select(x => x != null ? RaiseOnPropertyChanges(x) : Observable.Empty<PropertyChangedEventArgs>())
+                    .Select(x => x != null ? RaiseOnPropertyChanges(Log, x) : Observable.Empty<PropertyChangedEventArgs>())
                     .Switch(),
-                RaiseOnPropertyChanges(this)
+                RaiseOnPropertyChanges(Log, this)
             )
             .Sample(TimeSpan.FromMilliseconds(250)) //FIXME UI throttling
             .Subscribe(() => InvokeAsync(StateHasChanged))
             .AddTo(Anchors);
     }
 
-    private static IObservable<PropertyChangedEventArgs> RaiseOnPropertyChanges(INotifyPropertyChanged source)
+    private static IObservable<PropertyChangedEventArgs> RaiseOnPropertyChanges(IFluentLog log, INotifyPropertyChanged source)
     {
-        Log.Debug(() => $"Initializing reactive properties of {source}");
+        log.Debug(() => $"Initializing reactive properties of {source}");
 
         return Observable.Create<PropertyChangedEventArgs>(observer =>
         {
@@ -72,11 +65,11 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
                         //Log.Debug(() => $"Component collection has changed: {x.Name}, requesting redraw");
                         observer.OnNext(new PropertyChangedEventArgs(x.Name));
                         //Log.Debug(() => $"Redraw completed after property change: {x.Name}");
-                    }, Log.HandleException)
+                    }, log.HandleException)
                     .AddTo(anchors);
             }
 
-            source.PropertyChanged += (sender, args) =>
+            source.PropertyChanged += (_, args) =>
             {
                 //Log.Debug(() => $"Component property has changed: {args.PropertyName}, requesting redraw");
                 observer.OnNext(args);

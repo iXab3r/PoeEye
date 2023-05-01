@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Reactive.Disposables;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +11,11 @@ using PropertyBinder;
 
 namespace PoeShared.Blazor;
 
-public abstract class BlazorReactiveComponentBase : ReactiveComponent
+public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 {
     private static readonly Binder<BlazorReactiveComponentBase> Binder = new();
 
     protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> CollectionProperties = new();
-
 
     static BlazorReactiveComponentBase()
     {
@@ -44,30 +44,29 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponent
 
         public BlazorReactiveComponentBase Owner { get; }
 
-        public async ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args)
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args)
         {
-            try
-            {
-                return await JsRuntime.InvokeAsync<TValue>(identifier, args);
-            }
-            catch (Exception e)
-            {
-                await Owner.InvokeAsync(() => throw new AggregateException(
-                    new InvalidOperationException("Do not forget to await JS invocations!"),
-                    e));
-                return default;
-            }
+            return InvokeAsync<TValue>(identifier, CancellationToken.None, args);
         }
 
         public async ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object[] args)
         {
+            if (Owner.Anchors.IsDisposed)
+            {
+                return default;
+            }
             try
             {
                 return await JsRuntime.InvokeAsync<TValue>(identifier, cancellationToken, args);
             }
             catch (Exception e)
             {
-                await Owner.InvokeAsync(() => throw e);
+                Owner.Log.Warn($"Component has encountered JS invocation error, identifier: {identifier}", e);
+                Owner.Dispose();
+
+                await Owner.InvokeAsync(() => throw new AggregateException(
+                    new InvalidOperationException("Do not forget to await JS invocations!"),
+                    e));
                 return default;
             }
         }
