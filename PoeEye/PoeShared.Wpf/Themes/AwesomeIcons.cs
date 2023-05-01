@@ -64,12 +64,16 @@ public static class AwesomeIcons
     public const string Pause = "\uf04c";
     public const string PowerOff = "\uf011";
     public const string Repeat = "\uf01e";
+    public const string Reply = "\uf112";
+    public const string ReplyAll = "\uf122";
     public const string QuestionCircle = "\uf29c";
     public const string Refresh = "\uf021";
     public const string RotateLeft = Undo;
     public const string RotateRight = Repeat;
     public const string Save = "\uf0c7";
     public const string Search = "\uf002";
+    public const string SearchMinus = "\uf010";
+    public const string SearchPlus = "\uf00e";
     public const string SignIn = "\uf090";
     public const string SignOut = "\uf08b";
     public const string Space = " ";

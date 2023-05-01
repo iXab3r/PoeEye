@@ -91,6 +91,11 @@ public static class ChangeSetExtensions
     {
         return source.ToObservableChangeSet<IReadOnlyObservableCollection<T>, T>();
     }
+    
+    public static IObservable<IChangeSet<T>> Connect<T>(this IReadOnlyObservableCollection<T> source)
+    {
+        return source.ToObservableChangeSet<IReadOnlyObservableCollection<T>, T>();
+    }
 
     public static IObservable<IChangeSet<TValue>> BindToCollection<TKey, TValue>(this IObservable<IChangeSet<TValue, TKey>> source, out IReadOnlyObservableCollection<TValue> collection)
     {
