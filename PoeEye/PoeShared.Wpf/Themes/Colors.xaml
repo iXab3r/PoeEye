@@ -6,6 +6,7 @@
                               xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
     <FontFamily x:Key="FontAwesome">pack://application:,,,/PoeShared.Wpf;component/Resources/#FontAwesome</FontFamily>
+    <FontFamily x:Key="JetBrainsMono">pack://application:,,,/PoeShared.Wpf;component/Resources/#JetBrains Mono</FontFamily>
     <SolidColorBrush x:Key="MaxTransparencyBrush" ice:Freeze="True">#01000000</SolidColorBrush>
     <Color x:Key="TransparentColorKey">#00000000</Color>
     <Color x:Key="OverlayBorderColorKey">#1A6A73</Color>

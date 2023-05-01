@@ -90,6 +90,8 @@
     <Resource Include="Resources\exception.png" />
     <None Remove="Resources\FontAwesome.otf" />
     <Resource Include="Resources\FontAwesome.otf" />
+    <None Remove="Resources\JetBrainsMono-Regular.ttf" />
+    <Resource Include="Resources\JetBrainsMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="UI\Hotkeys\HotkeyBox.cs">

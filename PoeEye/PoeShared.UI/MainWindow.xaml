@@ -333,6 +333,12 @@
             <TabItem Header="Colors">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
                     <st:StackPanel Orientation="Vertical">
+                        <TextBlock Text="Default {} => 0123456790 &#xf11c;"  FontSize="20"/>
+                        <TextBlock Text="FontAwesome {} => 0123456790 &#xf11c;" FontFamily="{StaticResource FontAwesome}" FontSize="20"/>
+                        <TextBlock Text="Mono Regular {} => 0123456790 &#xf11c;" FontFamily="{StaticResource JetBrainsMono}"  FontSize="20"/>
+                    </st:StackPanel>
+                    
+                    <st:StackPanel Orientation="Vertical">
                         <eye:RangeSlider Minimum="0" Maximum="360" TrackBackground="{StaticResource HueBrush}" />
                         <eye:RangeSlider Minimum="0" Maximum="100" />
                         <eye:RangeSlider Minimum="0" Maximum="100" />
