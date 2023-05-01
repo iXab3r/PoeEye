@@ -2,5 +2,7 @@
 
 public partial class BrokenView
 {
-    
+    public BrokenView()
+    {
+    }
 }

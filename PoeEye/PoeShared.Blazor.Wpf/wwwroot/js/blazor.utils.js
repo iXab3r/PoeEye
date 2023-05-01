@@ -49,3 +49,8 @@ function scrollToBottom(){
 function scrollToTop(){
     document.body.scroll(0, 0)
 }
+
+function throwException(message) {
+    console.warn(`Throwing exception: ${message}`)
+    throw new Error(message);
+}

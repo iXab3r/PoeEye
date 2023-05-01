@@ -14,28 +14,47 @@
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="BlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
         <Grid Background="Transparent">
             <Grid.InputBindings>
-                <KeyBinding Gesture="F12" Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}"/>
+                <KeyBinding Gesture="F12"
+                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}" />
+                <KeyBinding Gesture="F5"
+                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}" />
             </Grid.InputBindings>
-
-            <Grid Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
-                <ContentPresenter 
-                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NotNullToCollapsedConverter}}"
-                    Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}"/>
-                <Border
-                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NullToCollapsedConverter}}">
-                    <st:StackPanel Orientation="Vertical">
-                        <TextBlock Text="Component has crashed with exception:"/>
-                        <TextBlock Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException.Message}"/>
-                        <eye:ButtonEx Command="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}" Content="Try to recover"/>
-                    </st:StackPanel>
-                </Border>
-            </Grid>
-          
+             <st:StackPanel Orientation="Vertical" MarginBetweenChildren="0">
+                 <Grid st:StackPanel.Fill="Fill">
+                     <ContentPresenter
+                         x:Name="WebView"
+                         Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NotNullToCollapsedConverter}}"
+                         Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}" />
+                     <Border
+                         Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NullToCollapsedConverter}}">
+                         <st:StackPanel Orientation="Vertical">
+                             <Border BorderBrush="{StaticResource NegativeBrush}" BorderThickness="0 0 0 1">
+                                 <TextBlock Foreground="{StaticResource NegativeBrush}" Text="Render exception" />
+                             </Border>
+                             <Button
+                                 Command="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}"
+                                 Content="Try to recover" HorizontalAlignment="Left" />
+                             <Border Padding="5">
+                                 <TextBlock
+                                     Foreground="{StaticResource WarningBrush}"
+                                     Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException.Message}" />
+                             </Border>
+                         </st:StackPanel>
+                     </Border>
+                 </Grid>
+                 <Grid 
+                     x:Name="WebViewIsBusyAdorner"
+                     Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                     <ProgressBar IsIndeterminate="True"
+                                  Height="4" />
+                 </Grid>
+             </st:StackPanel>
         </Grid>
     </ControlTemplate>
 
@@ -47,10 +66,12 @@
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"></Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}"
+                         Value="True">
                 <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}"
+                         Value="False">
                 <Setter Property="Template" Value="{StaticResource TemporaryBlazorContentControlTemplate}" />
             </DataTrigger>
         </Style.Triggers>

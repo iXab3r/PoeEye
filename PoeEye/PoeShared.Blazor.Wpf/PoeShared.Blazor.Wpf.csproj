@@ -44,5 +44,14 @@
        </EmbeddedResource>
      </ItemGroup>
 
+     <ItemGroup>
+       <Compile Update="BlazorContent.cs">
+         <DependentUpon>BlazorContent.razor</DependentUpon>
+       </Compile>
+       <Compile Update="BlazorContentControl.cs">
+         <DependentUpon>BlazorContentControl.xaml</DependentUpon>
+       </Compile>
+     </ItemGroup>
+
      <Import Project="..\maui\src\BlazorWebView\src\Wpf\build\Microsoft.AspNetCore.Components.WebView.Wpf.targets" />
 </Project>

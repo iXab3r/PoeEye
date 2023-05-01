@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using DynamicData;
+using GongSolutions.Wpf.DragDrop.Utilities;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -13,6 +19,7 @@ using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Logging;
 using PoeShared.Native;
@@ -41,6 +48,8 @@ public class BlazorContentControl : ReactiveControl
         nameof(AdditionalFiles), typeof(IEnumerable<IFileInfo>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<IFileInfo>)));
 
     private readonly ISharedResourceLatch isBusyLatch;
+    private readonly SerialDisposable activeViewAnchors;
+    private readonly ProxyServiceProvider proxyServiceProvider;
 
     static BlazorContentControl()
     {
@@ -51,7 +60,11 @@ public class BlazorContentControl : ReactiveControl
     public BlazorContentControl()
     {
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
-        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
+        activeViewAnchors = new SerialDisposable().AddTo(Anchors);
+        proxyServiceProvider = new ProxyServiceProvider().AddTo(Anchors);
+
+        WebView = new BlazorWebViewEx();
+        WebView.UnhandledException += OnUnhandledException;
 
         ReloadCommand = CommandWrapper.Create(() =>
         {
@@ -63,6 +76,7 @@ public class BlazorContentControl : ReactiveControl
 
             WebView?.WebView.Reload();
         });
+        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
 
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddBlazorWebView();
@@ -72,16 +86,43 @@ public class BlazorContentControl : ReactiveControl
         {
             serviceCollection.Add(serviceDescriptor);
         }
+        serviceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(proxyServiceProvider));
+        //Root component is NEVER instantiated again
+        
+        proxyServiceProvider.ServiceProvider = serviceCollection.BuildServiceProvider();
+        
+        WebView.Services = proxyServiceProvider;
+        
+        new RootComponent
+        {
+            Selector = "headOutlet",
+            ComponentType = typeof(HeadOutlet)
+        }.AddTo(WebView.RootComponents);
 
-        serviceCollection.AddSingleton<IComponentActivator, BlazorComponentActivator>();
+        new RootComponent
+        {
+            Selector = "#app",
+            ComponentType = typeof(BlazorContent)
+        }.AddTo(WebView.RootComponents);
 
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
+        var generatedIndexFileName = "index.g.html";
+        var contentRoot = "wwwroot";
+        var hostPage = Path.Combine(contentRoot, generatedIndexFileName); // wwwroot must be included as a part of path to become ContentRoot;
 
         this.WhenAnyValue(x => x.ViewType)
             .ObserveOnDispatcher()
-            .Subscribe(async viewType =>
+            .SubscribeAsync(async viewType =>
             {
+                if (WebView.WebView is {CoreWebView2: not null})
+                {
+                    ViewScreenshot = await WebView.TakeScreenshotAsBitmapSource();
+                }
+
                 using var rent = isBusyLatch.Rent();
+
+                var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
+                WebView.FileProvider.FilesByName.Clear();
 
                 if (UnhandledException != null)
                 {
@@ -89,92 +130,64 @@ public class BlazorContentControl : ReactiveControl
                     UnhandledException = null;
                 }
 
-                if (WebView != null)
-                {
-                    Log.Debug("Disposing previous instance of WebView");
-                    await WebView.DisposeAsync();
-                    WebView = null;
-
-                    if (View is IDisposable disposable)
-                    {
-                        disposable.Dispose();
-                    }
-
-                    View = null;
-                }
-
                 if (viewType == null)
                 {
                     return;
                 }
 
-                // views have to be transient to allow to re-create them if needed (e.g. on error)
-                serviceCollection.AddTransient(typeof(BlazorContent), x =>
+                var childContainer = new ServiceCollection
                 {
-                    var wrapper = new BlazorContent
-                    {
-                        Type = viewType
-                    };
-                    return wrapper;
+                    serviceCollection
+                };
+                
+                // views have to be transient to allow to re-create them if needed (e.g. on error)
+                childContainer.AddTransient(typeof(BlazorContent), _ =>
+                {
+                    var viewWrapper = new BlazorContent(viewType).AddTo(viewAnchors);
+                    return viewWrapper;
                 });
-                serviceCollection.AddTransient(viewType, x =>
+                
+                childContainer.AddTransient(viewType, _ =>
                 {
                     var view = Activator.CreateInstance(viewType);
                     if (view is BlazorReactiveComponent reactiveComponent)
                     {
-                        this.WhenAnyValue(x => x.Content)
+                        this.WhenAnyValue(content => content.Content)
 #pragma warning disable BL0005 // this is a special case
-                            .Subscribe(x => reactiveComponent.DataContext = x)
+                            .Subscribe(content => reactiveComponent.DataContext = content)
 #pragma warning restore BL0005
-                            .AddTo(reactiveComponent.Anchors);
+                            .AddTo(viewAnchors);
+                    }
+
+                    if (view is IDisposable disposable)
+                    {
+                        viewAnchors.Add(disposable);
                     }
 
                     return view;
                 });
-
-                var webView = new BlazorWebViewEx();
-                webView.UnhandledException += OnUnhandledException;
-                webView.Services = serviceCollection.BuildServiceProvider();
-
-                new RootComponent
-                {
-                    Selector = "headOutlet",
-                    ComponentType = typeof(HeadOutlet)
-                }.AddTo(webView.RootComponents);
-
-                new RootComponent
-                {
-                    Selector = "#app",
-                    ComponentType = typeof(BlazorContent)
-                }.AddTo(webView.RootComponents);
+                proxyServiceProvider.ServiceProvider = childContainer.BuildServiceProvider();
 
                 var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
-                webView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
+                WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
 
-                var cssLinksText = additionalFiles
-                    .Where(x => x.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.css", StringComparison.OrdinalIgnoreCase))
-                    .Select(x => $"""<link href="{x.Name}" rel="stylesheet"></link>""")
-                    .JoinStrings(Environment.NewLine);
-                
-                var scriptsText = additionalFiles
-                    .Where(x => x.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.js", StringComparison.OrdinalIgnoreCase))
-                    .Select(x => $"""<script src="{x.Name}"></script>""")
-                    .JoinStrings(Environment.NewLine);
-
-                var indexFileContent = indexFileContentTemplate
-                    .Replace("<!--% AdditionalStylesheetsBlock %-->", cssLinksText)
-                    .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
-                
-                webView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo("index.g.html", Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
-                webView.HostPage = "wwwroot/index.g.html"; // wwwroot must be included as a part of path to become ContentRoot
-                WebView = webView;
+                var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
+                WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
+                if (WebView.HostPage == hostPage)
+                {
+                    Log.Debug($"Reloading existing page, view type: {viewType}");
+                    WebView.WebView.Reload();
+                }
+                else
+                {
+                    Log.Debug($"Navigating to index page, view type: {viewType}");
+                    WebView.HostPage = hostPage;
+                }
             })
             .AddTo(Anchors);
 
         Binder.Attach(this).AddTo(Anchors);
     }
-
-    public ICommand OpenDevTools { get; }
 
     public Type ViewType
     {
@@ -200,13 +213,15 @@ public class BlazorContentControl : ReactiveControl
     ///     We have to dynamically recreate WebView when needed as it is EXTREMELY unfriendly for any changes of associated
     ///     properties
     /// </summary>
-    public BlazorWebViewEx WebView { get; private set; }
+    public BlazorWebViewEx WebView { get; }
 
     public Exception UnhandledException { get; private set; }
-
-    public object View { get; private set; }
-
+    
     public ICommand ReloadCommand { get; }
+
+    public ICommand OpenDevTools { get; }
+    
+    public BitmapSource ViewScreenshot { get; private set; }
 
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
     {
@@ -234,5 +249,23 @@ public class BlazorContentControl : ReactiveControl
         {
             base.OnKeyUp(e);
         }
+    }
+
+    private static string PrepareIndexFileContext(string template, IReadOnlyList<IFileInfo> additionalFiles)
+    {
+        var cssLinksText = additionalFiles
+            .Where(x => x.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.css", StringComparison.OrdinalIgnoreCase))
+            .Select(x => $"""<link href="{x.Name}" rel="stylesheet"></link>""")
+            .JoinStrings(Environment.NewLine);
+                
+        var scriptsText = additionalFiles
+            .Where(x => x.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.js", StringComparison.OrdinalIgnoreCase))
+            .Select(x => $"""<script src="{x.Name}"></script>""")
+            .JoinStrings(Environment.NewLine);
+
+        var indexFileContent = template
+            .Replace("<!--% AdditionalStylesheetsBlock %-->", cssLinksText)
+            .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
+        return indexFileContent;
     }
 }

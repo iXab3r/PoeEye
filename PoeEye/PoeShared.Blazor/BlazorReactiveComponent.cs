@@ -1,70 +1,20 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using DynamicData.Binding;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
 namespace PoeShared.Blazor;
 
-public abstract class BlazorReactiveComponent : ComponentBase, IDisposableReactiveObject
+public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
 {
-    protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> CollectionProperties = new();
-
-    [Inject] public IJSRuntime JsRuntime { get; init; }
-
-    protected BlazorReactiveComponent()
-    {
-    }
-    
-    public void Dispose()
-    {
-        Anchors.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    [Parameter] public object DataContext { get; set; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public CompositeDisposable Anchors { get; } = new();
-
-    public void RaisePropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
-        TRet newValue,
-        [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<TRet>.Default.Equals(backingField, newValue))
-        {
-            return newValue;
-        }
-
-        return RaiseAndSet(ref backingField, newValue, propertyName);
-    }
-
-    protected TRet RaiseAndSet<TRet>(
-        ref TRet backingField,
-        TRet newValue,
-        [CallerMemberName] string propertyName = null)
-    {
-        backingField = newValue;
-        RaisePropertyChanged(propertyName);
-        return newValue;
-    }
 }
 
 public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where T : IDisposableReactiveObject
@@ -91,7 +41,7 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
                     .Switch(),
                 RaiseOnPropertyChanges(this)
             )
-            .Sample(TimeSpan.FromMilliseconds(250))//FIXME UI throttling
+            .Sample(TimeSpan.FromMilliseconds(250)) //FIXME UI throttling
             .Subscribe(() => InvokeAsync(StateHasChanged))
             .AddTo(Anchors);
     }

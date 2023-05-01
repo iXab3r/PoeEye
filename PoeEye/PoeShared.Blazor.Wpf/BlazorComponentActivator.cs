@@ -6,17 +6,13 @@ namespace PoeShared.Blazor.Wpf;
 
 internal sealed class BlazorComponentActivator : IComponentActivator
 {
-    private readonly Func<IServiceProvider> serviceProviderSupplier;
+    private readonly IServiceProvider serviceProvider;
 
-    public BlazorComponentActivator(IServiceProvider serviceProvider) : this(() => serviceProvider)
+    public BlazorComponentActivator(IServiceProvider serviceProvider)
     {
+        this.serviceProvider = serviceProvider;
     }
     
-    public BlazorComponentActivator(Func<IServiceProvider> serviceProviderSupplier)
-    {
-        this.serviceProviderSupplier = serviceProviderSupplier;
-    }
-
     /// <inheritdoc />
     public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type componentType)
     {
@@ -30,15 +26,12 @@ internal sealed class BlazorComponentActivator : IComponentActivator
             throw new ArgumentException($"The type {componentType.FullName} does not implement {nameof(IComponent)}.", nameof(componentType));
         }
 
-        if (typeof(BlazorReactiveComponent).IsAssignableFrom(componentType))
+        var result = (IComponent)serviceProvider.GetService(componentType);
+        if (result != null)
         {
-            var serviceProvider = serviceProviderSupplier();
-            var result = (IComponent)serviceProvider.GetService(componentType);
-            if (result != null)
-            {
-                return result;
-            } 
-        }
+            return result;
+        } 
+        
         return (IComponent) Activator.CreateInstance(componentType);
     }
 }

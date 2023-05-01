@@ -63,6 +63,9 @@
       <Compile Update="Blazor\SlowView.cs">
         <DependentUpon>SlowView.razor</DependentUpon>
       </Compile>
+      <Compile Update="Blazor\BrokenView.cs">
+        <DependentUpon>BrokenView.razor</DependentUpon>
+      </Compile>
     </ItemGroup>
     
     <ItemGroup>

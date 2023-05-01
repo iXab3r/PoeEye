@@ -2,5 +2,7 @@
 
 public partial class MainCounterViewAlt
 {
-    
+    public MainCounterViewAlt()
+    {
+    }
 }

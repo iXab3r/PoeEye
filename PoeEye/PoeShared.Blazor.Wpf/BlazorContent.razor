@@ -3,9 +3,9 @@
 
 <BlazorErrorBoundary @ref="errorBoundary">
     <ChildContent>
-        @if (Type != null)
+        @if (ViewType != null)
         {
-            <DynamicComponent Type="@Type" Parameters="@Parameters"/>
+            <DynamicComponent Type="@ViewType"/>
         }
         else
         {
@@ -13,9 +13,9 @@
         }
     </ChildContent>
     <ErrorContent>
-        <h3 class="text-danger border-bottom border-danger">Component has crashed</h3>
-        <button @onclick="Recover">Try to recover</button>
-        <div class="border p-2 text-warning">
+        <div class="text-danger border-bottom border-danger">Component exception</div>
+        <button class="m-1" @onclick="Recover">Try to recover</button>
+        <div class="p-2 text-warning">
             @if (errorBoundary.CurrentException != null)
             {
                 @errorBoundary.CurrentException
@@ -31,12 +31,6 @@
 
 @code {
 
-    [Parameter]
-    public Type Type { get; set; }
-
-    [Parameter]
-    public Dictionary<string, object> Parameters { get; set; }
-    
     private BlazorErrorBoundary errorBoundary;
 
     protected override void OnParametersSet()
