@@ -39,5 +39,7 @@ public interface IWindowViewModel : IDisposableReactiveObject
     
     bool IsLoaded { get; }
     
+    bool IsActive { get; }
+    
     double? TargetAspectRatio { get; set; }
 }

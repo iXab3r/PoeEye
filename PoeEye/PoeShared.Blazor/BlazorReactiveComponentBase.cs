@@ -44,11 +44,13 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 
         public BlazorReactiveComponentBase Owner { get; }
 
+        /// <inheritdoc />
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args)
         {
             return InvokeAsync<TValue>(identifier, CancellationToken.None, args);
         }
 
+        /// <inheritdoc />
         public async ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object[] args)
         {
             if (Owner.Anchors.IsDisposed)

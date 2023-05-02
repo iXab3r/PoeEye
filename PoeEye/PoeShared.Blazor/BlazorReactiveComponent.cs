@@ -24,6 +24,7 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
         set => base.DataContext = value;
     }
 
+    /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();

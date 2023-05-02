@@ -4,13 +4,14 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor;
 
-public abstract class ReactiveComponentBase : ComponentBase, IDisposableReactiveObject
+public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
 {
     private static long GlobalIdx;
 
@@ -46,6 +47,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IDisposableReactive
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    [UsedImplicitly]
     protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
         TRet newValue,
         [CallerMemberName] string propertyName = null)

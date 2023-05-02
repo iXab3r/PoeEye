@@ -92,6 +92,12 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
                 Log.Debug(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
             })
             .AddTo(Anchors);
+        
+        this.WhenAnyValue(y => y.OverlayWindow)
+            .Select(x => x != null ? x.Observe(Window.IsActiveProperty, y => y.IsActive) : Observable.Return(false))
+            .Switch()
+            .Subscribe(x => IsActive = x)
+            .AddTo(Anchors);
     }
 
     protected IFluentLog Log { get; }
@@ -113,6 +119,8 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     public Size MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
     
     public bool IsLoaded { get; private set; }
+    
+    public bool IsActive { get; private set; }
 
     public SizeToContent SizeToContent { get; protected set; } = SizeToContent.Manual;
 

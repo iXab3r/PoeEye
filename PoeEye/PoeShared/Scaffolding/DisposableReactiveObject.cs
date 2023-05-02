@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding;
 
@@ -32,6 +33,7 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         GC.SuppressFinalize(this);
     }
 
+    [UsedImplicitly]
     protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
         TRet newValue,
         [CallerMemberName] string propertyName = null)
