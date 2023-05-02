@@ -25,6 +25,9 @@ public class AppOptions : DisposableReactiveObject
         
     [Option('u', "update", Default = false, HelpText = "Show updater before app start")]
     public bool ShowUpdater { get; set; }
+    
+    [Option('s', "safeMode", Default = null, HelpText = "Safe-Mode - some functions are disabled at startup")]
+    public bool? IsSafeMode { get; set; }
         
     [Option('m', "modules", HelpText = "Prism modules - Space-separated list of modules that will be loaded")]
     public IEnumerable<string> PrismModules { get; set; }

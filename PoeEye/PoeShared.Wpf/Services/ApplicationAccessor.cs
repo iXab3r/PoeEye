@@ -55,10 +55,11 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
         this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
         {
-            Log.Info(() => $"Application is loaded - cleaning up lock file {loadingFileLock}");
-            loadingFileLock.Dispose();
             Log.Info(() => $"Performing GC after app is loaded");
             GC.Collect();
+            
+            Log.Info(() => $"Application is loaded - cleaning up lock file {loadingFileLock}");
+            loadingFileLock.Dispose();
         }, Log.HandleException).AddTo(Anchors);
         WhenExit.SubscribeSafe(exitCode =>
         {

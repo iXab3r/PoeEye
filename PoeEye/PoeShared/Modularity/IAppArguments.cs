@@ -38,6 +38,8 @@ public interface IAppArguments : IAppConfig
     bool IsLazyMode { get; }
         
     bool ShowUpdater { get; }
+    
+    bool? IsSafeMode { get; }
         
     IEnumerable<string> PrismModules { get; }
         
