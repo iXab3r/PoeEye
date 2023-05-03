@@ -30,7 +30,7 @@
     <PackageReference Include="Kent.Boogaart.Converters" Version="1.3.1">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net" Version="2.0.10" />
     <PackageReference Include="MahApps.Metro" Version="2.4.4">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
