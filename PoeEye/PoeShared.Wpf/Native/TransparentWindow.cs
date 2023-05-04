@@ -8,9 +8,21 @@ public class TransparentWindow : ConstantAspectRatioWindow
     public TransparentWindow()
     {
         Loaded += OnLoaded;
+        Activated += OnActivated;
+        Deactivated += OnDeactivated;
         Log.Debug(() => "Created window");
     }
-    
+
+    private void OnDeactivated(object sender, EventArgs e)
+    {
+        Log.Debug(() => "Window is deactivated");
+    }
+
+    private void OnActivated(object sender, EventArgs e)
+    {
+        Log.Debug(() => "Window is activated");
+    }
+
     private bool AllowsTransparencyAfterLoad { get; set; }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

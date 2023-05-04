@@ -12,14 +12,9 @@ public interface IBlazorContentControl
     IEnumerable<IFileInfo> AdditionalFiles { get; set; }
     bool IsBusy { get; }
 
-    /// <summary>
-    ///     We have to dynamically recreate WebView when needed as it is EXTREMELY unfriendly for any changes of associated
-    ///     properties
-    /// </summary>
     BlazorWebViewEx WebView { get; }
 
     Exception UnhandledException { get; }
     ICommand ReloadCommand { get; }
     ICommand OpenDevTools { get; }
-    bool Focus();
 }

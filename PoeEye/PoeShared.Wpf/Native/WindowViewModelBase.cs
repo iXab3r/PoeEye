@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -12,6 +14,7 @@ using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
+using Unity;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
@@ -104,10 +107,18 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             })
             .AddTo(Anchors);
         
+        
         this.WhenAnyValue(y => y.OverlayWindow)
-            .Select(x => x != null ? x.Observe(Window.IsActiveProperty, y => y.IsActive) : Observable.Return(false))
+            .CombineLatest(this.WhenAnyValue(x => x.ForegroundWindowTracker), (window, tracker) => new { window, tracker })
+            .Select(x => SubscribeToActivations(x.window, x.tracker))
             .Switch()
-            .Subscribe(x => IsActive = x)
+            .DistinctUntilChanged()
+            .Subscribe(x =>
+            {
+                Log.Debug($"Updating IsActive to {x}");
+                IsActive = x;
+                Log.Debug($"Updated IsActive to {x}");
+            })
             .AddTo(Anchors);
     }
 
@@ -116,11 +127,17 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     protected IObservable<Unit> WhenLoaded => whenLoaded;
     
     public TransparentWindow OverlayWindow { get; private set; }
+    
     public IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
 
     public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
+    
     public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyDown { get; }
+    
     public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
+    
+    [Dependency]
+    public IForegroundWindowTracker ForegroundWindowTracker { get; init; }
 
     public bool IsVisible { get; set; } = true;
 
@@ -191,6 +208,38 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             {
                 Log.Warn($"Failed to execute operation on dispatcher", e);
             }
+        });
+    }
+
+    private static IObservable<bool> SubscribeToActivations(TransparentWindow window, IForegroundWindowTracker foregroundWindowTracker)
+    {
+        if (window == null || foregroundWindowTracker == null)
+        {
+            return Observable.Return(false);
+        }
+
+        return Observable.Create<bool>(observer =>
+        {
+            var anchors = new CompositeDisposable();
+
+            foregroundWindowTracker
+                .WhenAnyValue(x => x.ForegroundWindow)
+                .Select(x => window.WindowHandle == x.Handle)
+                .Subscribe(observer)
+                .AddTo(anchors);
+
+            /* This is extremely unreliable under load
+            var initialValue = window.IsActive;
+            observer.OnNext(initialValue);
+            Observable.FromEventPattern<EventHandler, EventArgs>(h => window.Activated += h, h => window.Activated -= h)
+                .Subscribe(() => observer.OnNext(true))
+                .AddTo(anchors);
+            
+            Observable.FromEventPattern<EventHandler, EventArgs>(h => window.Deactivated += h, h => window.Deactivated -= h)
+                .Subscribe(() => observer.OnNext(false))
+                .AddTo(anchors);*/
+            
+            return anchors;
         });
     }
 }

@@ -436,6 +436,17 @@ public partial class UnsafeNative
         return true;
     }
 
+    public static bool SetFocus(IFluentLog log, IntPtr windowHandle)
+    {
+        var focused = SetFocus(windowHandle);
+        if (focused != windowHandle)
+        {
+            log.Warn($"Failed to SetFocus, error: {Kernel32.GetLastError()}, focused: {new WindowHandle(focused)}");
+            return false;
+        }
+        return true;
+    }
+
     private static bool AttemptSetForegroundWindow(IFluentLog log, IWindowHandle window)
     {
         log.Debug(() => "Calling SetForegroundWindow");
@@ -450,10 +461,10 @@ public partial class UnsafeNative
             {
                 if (result && foregroundWindow == IntPtr.Zero)
                 {
-                    log.Warn($"SetForegroundWindow result is OK, but failed to wait for GetForegroundWindow to become {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is null");
+                    log.Debug($"SetForegroundWindow result is OK, but failed to wait for GetForegroundWindow to become {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is null");
                     break;
                 }
-                log.Warn($"Failed to SetForegroundWindow {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
+                log.Debug($"Failed to SetForegroundWindow {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
                 return false;
             }
 
@@ -462,7 +473,7 @@ public partial class UnsafeNative
 
         if (result == false)
         {
-            log.Warn(() => "Successfully SetForegroundWindow, albeit result of call being false");
+            log.Debug(() => "Successfully SetForegroundWindow, albeit result of call being false");
         }
         else
         {

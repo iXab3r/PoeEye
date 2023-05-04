@@ -74,6 +74,9 @@ public partial class UnsafeNative
 
     [DllImport("user32.dll", SetLastError=true)]
     static extern bool BringWindowToTop(HandleRef hWnd);
+    
+    [DllImport("user32.dll", SetLastError=true)]
+    static extern IntPtr SetFocus(IntPtr hWnd);
 
     [DllImport("gdi32.dll")]
     static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2,int cx, int cy);
