@@ -29,7 +29,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     }
 
     [Inject] public IJSRuntime JsRuntime { get; private set; }
-
+    
     [Parameter] public object DataContext { get; set; }
 
     private sealed class SafeJsRuntime : IJSRuntime

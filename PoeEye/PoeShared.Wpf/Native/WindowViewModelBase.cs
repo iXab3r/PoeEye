@@ -62,10 +62,21 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             .ToProperty(this, x => x.Dpi)
             .AddTo(Anchors);
         
-        
 
         WhenKeyDown = this.WhenAnyValue(x => x.OverlayWindow)
             .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyDown += h, h => window.KeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
+            .Switch();
+        
+        WhenKeyUp = this.WhenAnyValue(x => x.OverlayWindow)
+            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyUp += h, h => window.KeyUp -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
+            .Switch();
+        
+        WhenPreviewKeyDown = this.WhenAnyValue(x => x.OverlayWindow)
+            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.PreviewKeyDown += h, h => window.PreviewKeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
+            .Switch();
+        
+        WhenPreviewKeyUp = this.WhenAnyValue(x => x.OverlayWindow)
+            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.PreviewKeyUp += h, h => window.PreviewKeyUp -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
             .Switch();
         
         this.WhenAnyValue(x => x.OverlayWindow)
@@ -105,8 +116,11 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     protected IObservable<Unit> WhenLoaded => whenLoaded;
     
     public TransparentWindow OverlayWindow { get; private set; }
-    
+    public IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
+
     public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
+    public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyDown { get; }
+    public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
 
     public bool IsVisible { get; set; } = true;
 

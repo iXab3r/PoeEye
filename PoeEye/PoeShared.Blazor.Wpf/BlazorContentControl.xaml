@@ -10,6 +10,7 @@
                               xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                               xmlns:wpf="clr-namespace:PoeShared.Blazor.Wpf"
                               xmlns:wpf1="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
+                              xmlns:controls="clr-namespace:EyeAuras.Controls.Controls;assembly=EyeAuras.Controls"
                               mc:Ignorable="d">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
@@ -40,10 +41,15 @@
                              <Button
                                  Command="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}"
                                  Content="Try to recover" HorizontalAlignment="Left" />
-                             <Border Padding="5">
-                                 <TextBlock
+                             <Border Padding="5" st:StackPanel.Fill="Fill">
+                                 <controls:ExtendedTextEditor
+                                     IsReadOnly="True"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     VerticalScrollBarVisibility="Auto"
+                                     VerticalContentAlignment="Stretch"
                                      Foreground="{StaticResource WarningBrush}"
-                                     Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException.Message}" />
+                                     TextContent="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledExceptionMessage, Mode=OneWay}" />
                              </Border>
                          </st:StackPanel>
                      </Border>

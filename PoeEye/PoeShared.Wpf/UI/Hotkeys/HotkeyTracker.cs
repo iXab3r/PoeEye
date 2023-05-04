@@ -279,7 +279,13 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
     public void Reset()
     {
-        Log.Debug("Resetting state");
+        Log.Debug("Resetting hotkey state");
+        IsActive = false;
+    }
+    
+    public void Activate()
+    {
+        Log.Debug("Activating hotkey");
         IsActive = false;
     }
 

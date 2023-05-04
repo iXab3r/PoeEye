@@ -27,7 +27,10 @@ public interface IWindowViewModel : IDisposableReactiveObject
 
     TransparentWindow OverlayWindow { [CanBeNull] get; }
 
+    IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
     IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
+    IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyDown { get; }
+    IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
 
     void SetOverlayWindow([NotNull] TransparentWindow owner);
 

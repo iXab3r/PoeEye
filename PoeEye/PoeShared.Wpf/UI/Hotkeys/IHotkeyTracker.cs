@@ -36,4 +36,6 @@ public interface IHotkeyTracker : IDisposableReactiveObject
     void Clear();
 
     void Reset();
+    
+    void Activate();
 }

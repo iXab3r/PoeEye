@@ -32,7 +32,7 @@ using ReactiveUI;
 
 namespace PoeShared.Blazor.Wpf;
 
-public class BlazorContentControl : ReactiveControl
+public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 {
     private static readonly IFluentLog Log = typeof(BlazorContentControl).PrepareLogger();
 
@@ -55,6 +55,7 @@ public class BlazorContentControl : ReactiveControl
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(BlazorContentControl), new FrameworkPropertyMetadata(typeof(BlazorContentControl)));
         Binder.Bind(x => x.isBusyLatch.IsBusy).To(x => x.IsBusy);
+        Binder.Bind(x => x.UnhandledException == null ? null : FormatExceptionMessage(x.UnhandledException)).To(x => x.UnhandledExceptionMessage);
     }
 
     public BlazorContentControl()
@@ -161,7 +162,7 @@ public class BlazorContentControl : ReactiveControl
 
                     if (view is IDisposable disposable)
                     {
-                        viewAnchors.Add(disposable);
+                        disposable.AddTo(viewAnchors);
                     }
 
                     return view;
@@ -217,12 +218,23 @@ public class BlazorContentControl : ReactiveControl
 
     public Exception UnhandledException { get; private set; }
     
+    public string UnhandledExceptionMessage { get; private set; }
+    
     public ICommand ReloadCommand { get; }
 
     public ICommand OpenDevTools { get; }
-    
+    public void Activate()
+    {
+        throw new NotImplementedException();
+    }
+
     public BitmapSource ViewScreenshot { get; private set; }
 
+    private static string FormatExceptionMessage(Exception exception)
+    {
+        return exception.ToString();
+    }
+    
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
     {
         if (sender is BlazorWebView webView)

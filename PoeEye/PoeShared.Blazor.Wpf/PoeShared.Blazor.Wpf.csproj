@@ -13,6 +13,7 @@
      </PropertyGroup>
 
      <ItemGroup>
+         <ProjectReference Include="..\EyeAuras.Controls\EyeAuras.Controls.csproj" />
          <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" />
          <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
          <ProjectReference Include="..\PoeShared.Squirrel\PoeShared.Squirrel.csproj" />
@@ -49,6 +50,9 @@
          <DependentUpon>BlazorContent.razor</DependentUpon>
        </Compile>
        <Compile Update="BlazorContentControl.cs">
+         <DependentUpon>BlazorContentControl.xaml</DependentUpon>
+       </Compile>
+       <Compile Update="IBlazorContentControl.cs">
          <DependentUpon>BlazorContentControl.xaml</DependentUpon>
        </Compile>
      </ItemGroup>
