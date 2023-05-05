@@ -12,7 +12,7 @@ public interface IOverlayWindowController : IDisposableReactiveObject
         
     bool ShowWireframes { get; set; }
         
-    IDisposable RegisterChild([NotNull] IOverlayViewModel viewModel);
+    IDisposable RegisterChild(IOverlayViewModel viewModel);
 
     void ActivateLastActiveWindow();
 

@@ -17,7 +17,7 @@ using PoeShared.Modularity;
 
 namespace PoeShared.Native;
 
-public class ConstantAspectRatioWindow : MetroWindow
+public class ConstantAspectRatioWindow : Window
 {
     private const float DefaultPixelsPerInch = 96.0F;
 

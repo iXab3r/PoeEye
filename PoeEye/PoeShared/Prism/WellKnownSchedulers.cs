@@ -9,4 +9,5 @@ public static class WellKnownSchedulers
     public const string SendInput = "SendInput";
     public const string SharedThread = "SharedThread";
     public const string RedirectToUI = "UISchedulerIfNotOnUIThread";
+    public const string UIOverlay = WellKnownDispatchers.UIOverlay;
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,6 +77,18 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         return Add(name, newScheduler);
     }
 
+    public Dispatcher AddDispatcher(string name, ThreadPriority threadPriority)
+    {
+        if (schedulers.TryGetValue(name, out var existing))
+        {
+            throw new InvalidOperationException($"Scheduler with the same name {name} is already created: {existing}");
+        }
+
+        var newScheduler = CreateDispatcherScheduler(name, threadPriority);
+        Add(name, newScheduler);
+        return newScheduler.Dispatcher;
+    }
+
     public IScheduler Add(string name, IScheduler scheduler)
     {
         if (!schedulers.TryAdd(name, scheduler))
@@ -86,7 +99,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         return scheduler;
     }
 
-    private IScheduler CreateEnforcedThreadScheduler(string name, ThreadPriority priority)
+    private static IScheduler CreateEnforcedThreadScheduler(string name, ThreadPriority priority)
     {
         Guard.ArgumentNotNull(name, nameof(name));
 
@@ -94,15 +107,16 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         return new EnforcedThreadScheduler(name, priority);
     }
 
-    private IScheduler CreateDispatcherScheduler(string name)
+    private static DispatcherScheduler CreateDispatcherScheduler(string name, ThreadPriority priority)
     {
         Guard.ArgumentNotNull(name, nameof(name));
 
         Log.WithSuffix(name).Debug(() => $"Creating new dispatcher");
-        var consumer = new TaskCompletionSource<IScheduler>();
+        var consumer = new TaskCompletionSource<DispatcherScheduler>();
         var dispatcherThread = new Thread(InitializeDispatcherThread)
         {
             Name = $"SC-{name}",
+            Priority = priority,
             IsBackground = true
         };
         dispatcherThread.SetApartmentState(ApartmentState.STA);
@@ -112,17 +126,17 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         return consumer.Task.Result;
     }
 
-    private void InitializeDispatcherThread(object arg)
+    private static void InitializeDispatcherThread(object arg)
     {
-        if (arg is not TaskCompletionSource<IScheduler> consumer)
+        if (arg is not TaskCompletionSource<DispatcherScheduler> consumer)
         {
             throw new InvalidOperationException($"Wrong args: {arg}");
         }
 
-        InitializeDispatcherThread(consumer);
+        RunDispatcherThread(consumer);
     }
 
-    private void InitializeDispatcherThread(TaskCompletionSource<IScheduler> consumer)
+    private static void RunDispatcherThread(TaskCompletionSource<DispatcherScheduler> consumer)
     {
         try
         {
@@ -130,36 +144,37 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
             var dispatcher = Dispatcher.CurrentDispatcher;
             Log.Debug(() => $"Dispatcher: {dispatcher}");
             var scheduler = new DispatcherScheduler(dispatcher);
+            using var anchors = new CompositeDisposable();
             Observable
                 .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                     h => scheduler.Dispatcher.Hooks.OperationStarted += h,
                     h => scheduler.Dispatcher.Hooks.OperationStarted -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationStarted", eventArgs.EventArgs), Log.HandleUiException)
-                .AddTo(Anchors);
+                .AddTo(anchors);
             Observable
                 .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                     h => scheduler.Dispatcher.Hooks.OperationPriorityChanged += h,
                     h => scheduler.Dispatcher.Hooks.OperationPriorityChanged -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs), Log.HandleUiException)
-                .AddTo(Anchors);
+                .AddTo(anchors);
             Observable
                 .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                     h => scheduler.Dispatcher.Hooks.OperationAborted += h,
                     h => scheduler.Dispatcher.Hooks.OperationAborted -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationAborted", eventArgs.EventArgs), Log.HandleUiException)
-                .AddTo(Anchors);
+                .AddTo(anchors);
             Observable
                 .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                     h => scheduler.Dispatcher.Hooks.OperationPriorityChanged += h,
                     h => scheduler.Dispatcher.Hooks.OperationPriorityChanged -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs), Log.HandleUiException)
-                .AddTo(Anchors);
+                .AddTo(anchors);
             Observable
                 .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                     h => scheduler.Dispatcher.Hooks.OperationPosted += h,
                     h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs), Log.HandleUiException)
-                .AddTo(Anchors);
+                .AddTo(anchors);
             Log.Debug(() => $"Scheduler: {dispatcher}");
             consumer.TrySetResult(scheduler);
 

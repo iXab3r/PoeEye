@@ -30,8 +30,7 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
     private readonly MMDeviceEnumerator deviceEnumerator;
 
     public WaveOutDeviceSelectorViewModel(
-        IAudioPlayer audioPlayer,
-        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        IAudioPlayer audioPlayer)
     {
         this.audioPlayer = audioPlayer;
         devicesSource
@@ -39,7 +38,7 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
             .OnItemAdded(x => Log.Debug(() => $"Added WaveOut device: {x}"))
             .OnItemRemoved(x => Log.Debug(() => $"Removed WaveOut device: {x}"))
             .OnItemUpdated((prev, curr) => Log.Debug(() => $"Updated WaveOut device, previous: {prev}, current: {curr}"))
-            .ObserveOn(uiScheduler)
+            .ObserveOnCurrentDispatcher()
             .BindToCollection(out var devices)
             .SubscribeToErrors(Log.HandleException)
             .AddTo(Anchors);

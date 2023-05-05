@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -40,6 +41,19 @@ public static class BitmapSourceExtensions
 
     [DllImport("gdi32")]
     private static extern int DeleteObject(IntPtr o);
+    
+    public static BitmapSource ToBitmapSource(this byte[] data)
+    {
+        if (data == null || data.Length == 0)
+        {
+            return null;
+        }
+        var result = new BitmapImage();
+        result.BeginInit();
+        result.StreamSource = new MemoryStream(data);
+        result.EndInit();
+        return result;
+    }
         
     public static BitmapSource ToBitmapSource(this Bitmap bitmap)
     {

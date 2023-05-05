@@ -6,8 +6,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 using PoeShared.Logging;
-using PoeShared.Modularity;
 using Prism.Commands;
 using ReactiveUI;
 
@@ -158,17 +158,17 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     
     public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));
+        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(Dispatcher.CurrentDispatcher)));
     }
 
     public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(Dispatcher.CurrentDispatcher)));
     }
     
     public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(SchedulerProvider.RedirectToUiScheduler)));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(Dispatcher.CurrentDispatcher)));
     }
 
     public static CommandWrapper Create(Func<Task> execute)

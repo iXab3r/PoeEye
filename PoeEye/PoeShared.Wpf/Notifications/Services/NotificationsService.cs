@@ -23,7 +23,7 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
 
     public NotificationsService(
         [Dependency(WellKnownWindows.AllWindows)] IOverlayWindowController overlayWindowController,
-        [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler,
+        [Dependency(WellKnownSchedulers.UIOverlay)] IScheduler uiOverlayScheduler,
         IFactory<INotificationContainerViewModel, INotificationViewModel> notificationContainerFactory,
         IFactory<OverlayNotificationsContainerViewModel> overlayNotificationsContainerFactory)
     {
@@ -36,14 +36,14 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
         itemsSource
             .Connect()
             .DisposeMany()
-            .ObserveOn(uiScheduler)
+            .ObserveOn(uiOverlayScheduler)
             .Bind(out var items)
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
         Items = items;
 
         Log.Debug(() => "Sending notification containers creation to UI thread");
-        uiScheduler.Schedule(() =>
+        uiOverlayScheduler.Schedule(() =>
         {
             Log.Debug(() => "Preparing notification containers");
             var layeredContainer = overlayNotificationsContainerFactory.Create().AddTo(Anchors);
@@ -52,7 +52,7 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
             itemsSource
                 .Connect()
                 .Filter(x => x.Notification.Interactive)
-                .ObserveOn(uiScheduler)
+                .ObserveOn(uiOverlayScheduler)
                 .Bind(out var interactiveItems)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
@@ -64,14 +64,14 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
             itemsSource
                 .Connect()
                 .Filter(x => !x.Notification.Interactive)
-                .ObserveOn(uiScheduler)
+                .ObserveOn(uiOverlayScheduler)
                 .Bind(out var nonInteractiveItems)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             transparentContainer.Items = nonInteractiveItems;
 
             layeredContainer.WhenAnyValue(x => x.NativeBounds)
-                .ObserveOn(uiScheduler)
+                .ObserveOn(uiOverlayScheduler)
                 .SubscribeSafe(containerOffset =>
                 {
                     Log.Debug(() => $"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");

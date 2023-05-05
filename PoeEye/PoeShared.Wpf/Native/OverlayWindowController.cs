@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using DynamicData;
 
 using JetBrains.Annotations;
@@ -24,14 +25,14 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
     private readonly string overlayControllerId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
 
-    private readonly IScheduler uiScheduler;
+    private readonly Dispatcher uiScheduler;
 
     private readonly ISourceList<OverlayWindowView> windows = new SourceListEx<OverlayWindowView>();
     private readonly IWindowTracker windowTracker;
 
     public OverlayWindowController(
         [NotNull] IWindowTracker windowTracker,
-        [NotNull] [Unity.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        [NotNull] [Unity.Dependency(WellKnownDispatchers.UIOverlay)] Dispatcher uiScheduler)
     {
         Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
         Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -98,7 +99,13 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
 
     public IDisposable RegisterChild(IOverlayViewModel viewModel)
     {
-        Guard.ArgumentNotNull(viewModel, nameof(viewModel));
+        if (!uiScheduler.CheckAccess())
+        {
+            Log.Debug($"Invoking registration on {uiScheduler}");
+            return uiScheduler.Invoke(() => RegisterChild(viewModel));
+        }
+
+        Log.Debug("Registering new child");
         OverlayWindowView window = default;
         var logger = Log.WithSuffix(viewModel).WithSuffix(() => window);
 

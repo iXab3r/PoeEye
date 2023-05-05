@@ -90,11 +90,15 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
         var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         Log.Info(() => $"Task scheduler: {taskScheduler}");
         Log.Info(() => $"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
+
+        var overlayDispatcher = SchedulerProvider.Instance.AddDispatcher(WellKnownDispatchers.UIOverlay, ThreadPriority.Normal);
         
         var uiThread = Thread.CurrentThread;
         Container
             .RegisterSingleton<ISchedulerProvider>(x => SchedulerProvider.Instance)
             .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UI, x => defaultDispatcher)
+            .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UIOverlay, x => overlayDispatcher)
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.UIOverlay, x => SchedulerProvider.Instance.GetOrAdd(WellKnownSchedulers.UIOverlay))
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.UI, x =>
             {
                 var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);

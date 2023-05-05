@@ -15,6 +15,7 @@
     <DataTemplate DataType="{x:Type audio:AudioSandbox}">
         <st:StackPanel Orientation="Vertical">
             <st:StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding IsEnabled}">Is Enabled</CheckBox>
                 <ComboBox ItemsSource="{Binding Devices}"
                           DisplayMemberPath="Name"
                           SelectedItem="{Binding DeviceId}" 

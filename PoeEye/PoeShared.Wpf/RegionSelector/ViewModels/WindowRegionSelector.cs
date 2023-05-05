@@ -12,6 +12,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using JetBrains.Annotations;
 using PoeShared.Prism;
 using PoeShared.UI;
@@ -28,8 +29,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
 
     public WindowRegionSelector(
         IFactory<TaskWindowSeeker> taskWindowSeekerFactory,
-        [NotNull] ISelectionAdornerLegacy selectionAdorner,
-        [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        [NotNull] ISelectionAdornerLegacy selectionAdorner)
     {
         Title = "Region Selector";
         OverlayMode = OverlayMode.Layered;
@@ -41,6 +41,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
         windowSeeker = taskWindowSeekerFactory.Create();
         windowSeeker.SkipNotVisibleWindows = true;
 
+        var uiDispatcher = Dispatcher.CurrentDispatcher;
         var refreshRequest = new Subject<Unit>();
 
         SelectionAdorner.WhenAnyValue(x => x.MousePosition, x => x.Owner).ToUnit()
@@ -49,7 +50,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
             .Where(x => x.Owner != null)
             .Select(x => x.MousePosition.ToScreen(x.Owner))
             .Sample(UiConstants.UiThrottlingDelay)
-            .ObserveOn(uiScheduler)
+            .ObserveOn(uiDispatcher)
             .Select(x => new Rectangle(x.X, x.Y, 1, 1))
             .Select(ToRegionResult)
             .Do(x => Log.Debug(() => $"Selection candidate: {x}"))
@@ -61,14 +62,14 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
             .AddTo(Anchors);
             
         this.WhenAnyValue(x => x.IsBusy)
-            .Select(x => x ? Observables.BlockingTimer( TimeSpan.FromSeconds(1)).ObserveOn(uiScheduler).ToUnit() : Observable.Empty<Unit>())
+            .Select(x => x ? Observables.BlockingTimer( TimeSpan.FromSeconds(1)).ObserveOn(uiDispatcher).ToUnit() : Observable.Empty<Unit>())
             .Switch()
             .SubscribeSafe(refreshRequest)
             .AddTo(Anchors);
 
         this.WhenAnyValue(x => x.IsBusy)
             .CombineLatest(selectionAdorner.WhenAnyValue(x => x.Owner), (busy, owner) => new { busy, owner })
-            .ObserveOn(uiScheduler)
+            .ObserveOn(uiDispatcher)
             .Select(x => x.busy && x.owner != null ? x.owner.FindVisualAncestor<Window>() : null)
             .Select(x => x != null ? 
                 Observable.Merge( 

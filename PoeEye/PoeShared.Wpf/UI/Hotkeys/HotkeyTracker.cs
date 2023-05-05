@@ -28,7 +28,6 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
     private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
     private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
-    private readonly IScheduler uiScheduler;
 
     static HotkeyTracker()
     {
@@ -37,19 +36,17 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
         Binder.BindIf(x => x.HasModifiers, x => false).To(x => x.IgnoreModifiers);
         Binder
             .BindIf(x => x.CanSuppressHotkey == false, x => false)
-            .To((x,v) => x.SuppressKey = v, x => x.uiScheduler);
+            .To((x,v) => x.SuppressKey = v);
     }
 
     public HotkeyTracker(
         IClock clock,
         IKeyboardEventsSource eventSource,
         [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
-        [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler,
-        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler)
     {
         Log = typeof(HotkeyTracker).PrepareLogger().WithSuffix(this);
         this.clock = clock;
-        this.uiScheduler = uiScheduler;
 
         Disposable
             .Create(() => Log.Debug(() => $"Disposing HotkeyTracker"))

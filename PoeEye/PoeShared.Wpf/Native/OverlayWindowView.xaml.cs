@@ -11,12 +11,6 @@ public partial class OverlayWindowView
     {
         InitializeComponent();
         BorderThickness = new Thickness(0);
-        ShowTitleBar = false;
-        ShowSystemMenu = false;
-        ShowCloseButton = false;
-        ShowMinButton = false;
-        ShowMaxRestoreButton = false;
-        ShowSystemMenuOnRightClick = false;
         SizeChanged += OnSizeChanged;
     }
     

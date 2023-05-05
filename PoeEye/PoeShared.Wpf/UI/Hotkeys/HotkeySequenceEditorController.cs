@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 using PoeShared.Hotkeys;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -29,7 +30,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
     private readonly IFactory<IHotkeyTracker> hotkeyFactory;
     private readonly IKeyboardEventsSource keyboardEventsSource;
     private readonly IWindowHandleProvider windowHandleProvider;
-    private readonly IScheduler uiScheduler;
+    private readonly Dispatcher uiDispatcher;
     private readonly IForegroundWindowTracker mainWindowTracker;
     private readonly INotificationsService notificationsService;
     private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
@@ -61,8 +62,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
         INotificationsService notificationsService,
         IFactory<IHotkeyTracker> hotkeyFactory,
         IKeyboardEventsSource keyboardEventsSource,
-        IWindowHandleProvider windowHandleProvider,
-        [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        IWindowHandleProvider windowHandleProvider)
     {
         this.mainWindowTracker = mainWindowTracker;
         this.appArguments = appArguments;
@@ -72,7 +72,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
         this.hotkeyFactory = hotkeyFactory;
         this.keyboardEventsSource = keyboardEventsSource;
         this.windowHandleProvider = windowHandleProvider;
-        this.uiScheduler = uiScheduler;
+        this.uiDispatcher = Dispatcher.CurrentDispatcher;
 
         this.WhenAnyValue(x => x.RecordStartTime)
             .DistinctUntilChanged()
@@ -82,7 +82,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
             .ToProperty(out recordDuration, this, x => x.RecordingDuration)
             .AddTo(Anchors);
 
-        startRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOn(uiScheduler));
+        startRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOn(uiDispatcher));
         stopRecording = CommandWrapper.Create(StopRecordingExecuted);
 
         Binder.Attach(this).AddTo(Anchors);
@@ -168,7 +168,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
         {
             mouseLocationSource
                 .Sample(UiConstants.UiThrottlingDelay)
-                .ObserveOn(uiScheduler)
+                .ObserveOn(uiDispatcher)
                 .Finally(() => MouseLocation = default)
                 .SubscribeSafe(x => MouseLocation = x, Log.HandleUiException)
                 .AddTo(recordingAnchors);
@@ -238,7 +238,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
                 mouseLocationSource
                     .Sample(MousePositionRecordingResolution)
                     .DistinctUntilChanged()
-                    .ObserveOn(uiScheduler)
+                    .ObserveOn(uiDispatcher)
                     .TakeUntil(cancel)
                     .SubscribeSafe(x =>
                     {
@@ -258,7 +258,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
                         .Select(x => (Point?)x)
                         .Sample(MousePositionRecordingResolution)
                         .DistinctUntilChanged()
-                        .ObserveOn(uiScheduler)
+                        .ObserveOn(uiDispatcher)
                         .TakeUntil(cancel)
                         .WithPrevious()
                         .SubscribeSafe(x =>
@@ -314,7 +314,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
                         })
                         .DistinctUntilChanged()
                         .Where(x => x != default && !x.Value.IsEmpty)
-                        .ObserveOn(uiScheduler)
+                        .ObserveOn(uiDispatcher)
                         .TakeUntil(cancel)
                         .SubscribeSafe(x =>
                         {
@@ -340,7 +340,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
                 )
                 .DistinctUntilChanged()
                 .Where(x => !hotkey.Contains(x.KeyCode))
-                .ObserveOn(uiScheduler)
+                .ObserveOn(uiDispatcher)
                 .TakeUntil(cancel)
                 .SubscribeSafe(x =>
                 {
@@ -362,7 +362,7 @@ internal sealed class HotkeySequenceEditorController : DisposableReactiveObject,
                     keyboardEventsSource.WhenMouseUp.Select(x => new { x.Button, x.X, x.Y, IsDown = false })
                 )
                 .DistinctUntilChanged()
-                .ObserveOn(uiScheduler)
+                .ObserveOn(uiDispatcher)
                 .TakeUntil(cancel)
                 .SubscribeSafe(x =>
                 {

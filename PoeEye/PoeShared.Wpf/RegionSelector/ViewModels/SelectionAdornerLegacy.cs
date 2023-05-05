@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using JetBrains.Annotations;
 using PoeShared.Native;
 using PoeShared.Prism;
@@ -33,7 +34,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
 
     private readonly ObservableAsPropertyHelper<bool> ownerIsVisibleSource;
     private readonly ObservableAsPropertyHelper<bool> selectionIsNotEmptySource;
-    private readonly IScheduler uiScheduler;
+    private readonly Dispatcher uiDispatcher;
 
     static SelectionAdornerLegacy()
     {
@@ -56,12 +57,11 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
         
     public SelectionAdornerLegacy(
         [NotNull] IKeyboardEventsSource keyboardEventsSource,
-        [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
-        [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
     {
         this.keyboardEventsSource = keyboardEventsSource;
         this.mainWindowTracker = mainWindowTracker;
-        this.uiScheduler = uiScheduler;
+        this.uiDispatcher = Dispatcher.CurrentDispatcher;
 
         ownerIsVisibleSource = this.WhenAnyValue(x => x.Owner)
             .Select(x => x == null ? Observable.Return(false) : x.Observe(UIElement.IsVisibleProperty, x => x.IsVisible))
@@ -141,7 +141,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                         keyboardEventsSource.WhenKeyDown.Where(x => x.KeyData == Keys.Escape).Do(x => x.Handled = true).Select(x => $"{x.KeyData} pressed"),
                         keyboardEventsSource.WhenMouseDown.Where(x => x.Button != MouseButtons.Left).Do(x => x.Handled = true).Select(x => $"mouse {x.Button} pressed"))
                     .Do(reason => Log.Info(() => $"Closing SelectionAdorner, reason: {reason}, activeWindow: {mainWindowTracker.ActiveWindowTitle}, activeProcess: {mainWindowTracker.ActiveProcessId}, currentProcess: {CurrentProcessId}"))
-                    .ObserveOn(uiScheduler)
+                    .ObserveOn(uiDispatcher)
                     .SubscribeSafe(subscriber.OnCompleted, Log.HandleUiException)
                     .AddTo(selectionAnchors);
                     
@@ -152,7 +152,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                             .StartWith(new MouseEventExtArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
                         : Observable.Empty<MouseEventExtArgs>())
                     .Switch()
-                    .ObserveOn(uiScheduler)
+                    .ObserveOn(uiDispatcher)
                     .Where(x => Owner is { IsVisible: true })
                     .SubscribeSafe(HandleMouseMove, Log.HandleUiException)
                     .AddTo(selectionAnchors);
@@ -176,7 +176,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                         return supportBoxSelection ? keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ToUnit() : Observable.Return(Unit.Default);
                     })
                     .Switch()
-                    .ObserveOn(uiScheduler)
+                    .ObserveOn(uiDispatcher)
                     .Select(_ => Selection)
                     .SubscribeSafe(subscriber)
                     .AddTo(selectionAnchors);

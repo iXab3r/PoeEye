@@ -46,6 +46,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
         };
 
         this.WhenAnyValue(x => x.DeviceId)
+            .EnableIf(this.WhenAnyValue(x => x.IsEnabled))
             .Subscribe(x =>
             {
                 if (DeviceListener != null)
@@ -171,6 +172,8 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
 
     public WpfPlot Plot { get; set; }
 
+    public bool IsEnabled { get; set; }
+    
     public CircularBuffer<double> AudioBuffer { get; }
     
     public Coordinates[] ScatterBuffer { get; }

@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -18,12 +19,12 @@ internal sealed class NotificationContainerViewModel : DisposableReactiveObject,
     private static readonly IFluentLog Log = typeof(NotificationContainerViewModel).PrepareLogger();
     private static readonly Binder<NotificationContainerViewModel> Binder = new();
     private readonly IClock clock;
-    private readonly IScheduler uiScheduler;
+    private readonly Dispatcher uiDispatcher;
 
     static NotificationContainerViewModel()
     {
-        Binder.Bind(x => x.Notification.Icon).To((x, v) => x.Icon = v, x => x.uiScheduler);
-        Binder.Bind(x => x.Notification.Title).To((x, v) => x.Title = v, x => x.uiScheduler);
+        Binder.Bind(x => x.Notification.Icon).To((x, v) => x.Icon = v, x => x.uiDispatcher);
+        Binder.Bind(x => x.Notification.Title).To((x, v) => x.Title = v, x => x.uiDispatcher);
         Binder.Bind(x => x.clock.UtcNow)
             .WithDependency(x => x.Notification.TimeToLive)
             .To((x, v) => x.TimeToLiveChangeTimestamp = v);
@@ -31,20 +32,18 @@ internal sealed class NotificationContainerViewModel : DisposableReactiveObject,
 
     public NotificationContainerViewModel(
         IClock clock,
-        INotificationViewModel notification,
-        [Unity.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-        [Unity.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        INotificationViewModel notification)
     {
+        uiDispatcher = Dispatcher.CurrentDispatcher;
         CreatedAt = clock.UtcNow;
         this.clock = clock;
-        this.uiScheduler = uiScheduler;
         Notification = notification;
         CloseCommand = CommandWrapper.Create(() => notification.CloseController.Close(), notification.WhenAnyValue(x => x.CloseController).Select(x => x != null));
 
         notification.WhenAnyValue(x => x.TimeToLive)
             .Select(x => x > TimeSpan.Zero ? Observables.BlockingTimer(UiConstants.UiThrottlingDelay) : Observable.Empty<long>())
             .Switch()
-            .ObserveOn(uiScheduler)
+            .ObserveOnCurrentDispatcherIfNeeded()
             .Subscribe(() =>
             {
                 var elapsed = clock.UtcNow - TimeToLiveChangeTimestamp;
@@ -75,7 +74,7 @@ internal sealed class NotificationContainerViewModel : DisposableReactiveObject,
 
                 return progress * 2;
             })
-            .ObserveOn(uiScheduler)
+            .ObserveOnCurrentDispatcherIfNeeded()
             .SubscribeSafe(x => Opacity = x, Log.HandleUiException)
             .AddTo(Anchors);
             

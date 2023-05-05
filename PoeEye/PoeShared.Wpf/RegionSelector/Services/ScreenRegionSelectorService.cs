@@ -31,11 +31,8 @@ internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IS
         this.overlayController = overlayController;
         windowRegionSelector = regionSelectorWindowFactory.Create();
         windowRegionSelector.IsVisible = false;
-        uiScheduler.Schedule(() =>
-        {
-            Log.Debug(() => $"Registering region selector overlay");
-            overlayController.RegisterChild(windowRegionSelector).AddTo(Anchors);
-        });
+        Log.Debug(() => $"Registering region selector overlay");
+        overlayController.RegisterChild(windowRegionSelector).AddTo(Anchors);
     }
 
     public async Task<RegionSelectorResult> SelectRegion(Size minSelection)

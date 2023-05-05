@@ -1,5 +1,6 @@
 ﻿using System.Reactive.Concurrency;
 using System.Threading;
+using System.Windows.Threading;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity;
@@ -13,6 +14,9 @@ public interface ISchedulerProvider
     
     [NotNull]
     IScheduler Add([NotNull] string name, ThreadPriority threadPriority);
+    
+    [NotNull]
+    Dispatcher AddDispatcher([NotNull] string name, ThreadPriority threadPriority);
     
     [NotNull]
     IScheduler Add([NotNull] string name, IScheduler scheduler);
