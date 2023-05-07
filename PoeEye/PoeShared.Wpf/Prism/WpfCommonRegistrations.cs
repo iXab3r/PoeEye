@@ -82,41 +82,42 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
 
     private void InitializeSchedulers()
     {
-        var defaultDispatcher = Dispatcher.CurrentDispatcher;
-        Log.Info(() => $"Dispatcher set to: {defaultDispatcher}");
-        var syncContext = new DispatcherSynchronizationContext(defaultDispatcher);
+        var uiDispatcher = Dispatcher.CurrentDispatcher;
+        Log.Info(() => $"Dispatcher set to: {uiDispatcher}");
+        Log.Info(() => $"Capturing {uiDispatcher} as {WellKnownDispatchers.UI}");
+        
+        var syncContext = new DispatcherSynchronizationContext(uiDispatcher);
         Log.Info(() => $"Synchronization context: {syncContext}");
         SynchronizationContext.SetSynchronizationContext(syncContext);
         var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        
         Log.Info(() => $"Task scheduler: {taskScheduler}");
-        Log.Info(() => $"Capturing {defaultDispatcher} as {WellKnownDispatchers.UI}");
 
-        var overlayDispatcher = SchedulerProvider.Instance.AddDispatcher(WellKnownDispatchers.UIOverlay, ThreadPriority.Normal);
+        //FIXME For stability reasons this is disabled for now - should test other changes related to multiple dispatchers first
+        //var overlayDispatcher = SchedulerProvider.Instance.AddDispatcher(WellKnownDispatchers.UIOverlay, ThreadPriority.Normal);
         
         var uiThread = Thread.CurrentThread;
         Container
             .RegisterSingleton<ISchedulerProvider>(x => SchedulerProvider.Instance)
-            .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UI, x => defaultDispatcher)
-            .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UIOverlay, x => overlayDispatcher)
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.UIOverlay, x => SchedulerProvider.Instance.GetOrAdd(WellKnownSchedulers.UIOverlay))
+            .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UI, x => uiDispatcher)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.UI, x =>
             {
-                var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
                 Log.Debug(() => $"Initializing {WellKnownSchedulers.UI} scheduler on {uiDispatcher}");
                 return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Normal);
             })
+            .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.UIIdle, x =>
             {
-                var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
                 Log.Debug(() => $"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
                 return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Background);
             })
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => ThreadPoolScheduler.Instance.DisableOptimizations())
-            .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.RedirectToUI, x => new EnforcedThreadScheduler(uiThread, x.Resolve<IScheduler>(WellKnownSchedulers.UI)))
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.InputHook, ThreadPriority.Highest))
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.SharedThread, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SharedThread, ThreadPriority.Normal))
-            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SendInput, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SendInput, ThreadPriority.Highest));
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.SendInput, x => x.Resolve<ISchedulerProvider>().Add(WellKnownSchedulers.SendInput, ThreadPriority.Highest))
+            .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UIOverlay, x => x.Resolve<Dispatcher>(WellKnownDispatchers.UI))
+            .RegisterSingleton<IScheduler>(WellKnownSchedulers.UIOverlay, x => x.Resolve<IScheduler>(WellKnownSchedulers.UI));
 
         var schedulerProvider = Container.Resolve<ISchedulerProvider>();
         if (schedulerProvider is SchedulerProvider provider)

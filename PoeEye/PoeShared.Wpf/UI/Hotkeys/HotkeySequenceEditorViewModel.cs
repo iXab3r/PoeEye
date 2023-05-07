@@ -150,8 +150,14 @@ internal sealed class HotkeySequenceEditorViewModel : DisposableReactiveObject, 
             Key key => new HotkeySequenceItem[]
             {
                 new HotkeySequenceHotkey() {Hotkey = new HotkeyGesture(key), IsDown = true},
-                new HotkeySequenceDelay() {Delay = this.DefaultKeyPressDuration},
+                new HotkeySequenceDelay() {Delay = this.DefaultKeyPressDuration, IsKeypress = true},
                 new HotkeySequenceHotkey() {Hotkey = new HotkeyGesture(key), IsDown = false}
+            },
+            MouseButton mouseButton => new HotkeySequenceItem[]
+            {
+                new HotkeySequenceHotkey() {Hotkey = new HotkeyGesture(mouseButton), IsDown = true},
+                new HotkeySequenceDelay() {Delay = this.DefaultKeyPressDuration, IsKeypress = true},
+                new HotkeySequenceHotkey() {Hotkey = new HotkeyGesture(mouseButton), IsDown = false}
             },
                 
             _ => throw new ArgumentOutOfRangeException(nameof(arg), arg, "Unknown item type")

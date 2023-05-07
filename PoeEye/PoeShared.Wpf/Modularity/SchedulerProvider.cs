@@ -185,6 +185,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         {
             Log.HandleException(e);
             consumer.TrySetException(e);
+            throw; 
         }
         finally
         {

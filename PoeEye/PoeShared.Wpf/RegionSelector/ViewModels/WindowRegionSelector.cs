@@ -29,6 +29,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
 
     public WindowRegionSelector(
         IFactory<TaskWindowSeeker> taskWindowSeekerFactory,
+        [Dependency(WellKnownSchedulers.UIOverlay)] IScheduler overlayScheduler,
         [NotNull] ISelectionAdornerLegacy selectionAdorner)
     {
         Title = "Region Selector";
@@ -41,7 +42,6 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
         windowSeeker = taskWindowSeekerFactory.Create();
         windowSeeker.SkipNotVisibleWindows = true;
 
-        var uiDispatcher = Dispatcher.CurrentDispatcher;
         var refreshRequest = new Subject<Unit>();
 
         SelectionAdorner.WhenAnyValue(x => x.MousePosition, x => x.Owner).ToUnit()
@@ -50,7 +50,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
             .Where(x => x.Owner != null)
             .Select(x => x.MousePosition.ToScreen(x.Owner))
             .Sample(UiConstants.UiThrottlingDelay)
-            .ObserveOn(uiDispatcher)
+            .ObserveOn(overlayScheduler)
             .Select(x => new Rectangle(x.X, x.Y, 1, 1))
             .Select(ToRegionResult)
             .Do(x => Log.Debug(() => $"Selection candidate: {x}"))
@@ -62,15 +62,15 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
             .AddTo(Anchors);
             
         this.WhenAnyValue(x => x.IsBusy)
-            .Select(x => x ? Observables.BlockingTimer( TimeSpan.FromSeconds(1)).ObserveOn(uiDispatcher).ToUnit() : Observable.Empty<Unit>())
+            .Select(x => x ? Observables.BlockingTimer( TimeSpan.FromSeconds(1)).ObserveOn(overlayScheduler).ToUnit() : Observable.Empty<Unit>())
             .Switch()
             .SubscribeSafe(refreshRequest)
             .AddTo(Anchors);
 
         this.WhenAnyValue(x => x.IsBusy)
             .CombineLatest(selectionAdorner.WhenAnyValue(x => x.Owner), (busy, owner) => new { busy, owner })
-            .ObserveOn(uiDispatcher)
-            .Select(x => x.busy && x.owner != null ? x.owner.FindVisualAncestor<Window>() : null)
+            .ObserveOn(overlayScheduler)
+            .Select(x => x.busy && x.owner != null ? x.owner.Dispatcher.Invoke(x.owner.FindVisualAncestor<Window>) : null)
             .Select(x => x != null ? 
                 Observable.Merge( 
                     Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => x.LostFocus += h, h => x.LostFocus -= h).Select(x => "window LostFocus"),
@@ -85,6 +85,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
             .AddTo(Anchors);
             
         this.WhenAnyValue(x => x.SelectionCandidate)
+            .ObserveOn(overlayScheduler)
             .SubscribeSafe(
                 regionResult =>
                 {

@@ -34,7 +34,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
 
     private readonly ObservableAsPropertyHelper<bool> ownerIsVisibleSource;
     private readonly ObservableAsPropertyHelper<bool> selectionIsNotEmptySource;
-    private readonly Dispatcher uiDispatcher;
+    private readonly IScheduler uiDispatcher;
 
     static SelectionAdornerLegacy()
     {
@@ -57,11 +57,12 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
         
     public SelectionAdornerLegacy(
         [NotNull] IKeyboardEventsSource keyboardEventsSource,
+        [Dependency(WellKnownSchedulers.UIOverlay)] IScheduler uiScheduler,
         [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
     {
         this.keyboardEventsSource = keyboardEventsSource;
         this.mainWindowTracker = mainWindowTracker;
-        this.uiDispatcher = Dispatcher.CurrentDispatcher;
+        this.uiDispatcher = uiScheduler;
 
         ownerIsVisibleSource = this.WhenAnyValue(x => x.Owner)
             .Select(x => x == null ? Observable.Return(false) : x.Observe(UIElement.IsVisibleProperty, x => x.IsVisible))
@@ -135,6 +136,8 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                 Disposable.Create(() => Log.Debug(() => $"Disposing SelectionAnchors")).AddTo(selectionAnchors);
                 Disposable.Create(() => IsVisible = false).AddTo(selectionAnchors);
                 Selection = Rect.Empty;
+                
+                
 
                 Observable.Merge(
                         mainWindowTracker.WhenAnyValue(x => x.ActiveProcessId).Where(x => StopWhenAppFocusLost).Where(x => x != CurrentProcessId).Select(x => $"main window lost focus - processId changed"),

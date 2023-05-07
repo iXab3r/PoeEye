@@ -25,27 +25,27 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
     private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
     private readonly string overlayControllerId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
 
-    private readonly Dispatcher uiScheduler;
+    private readonly Dispatcher overlayScheduler;
 
     private readonly ISourceList<OverlayWindowView> windows = new SourceListEx<OverlayWindowView>();
     private readonly IWindowTracker windowTracker;
 
     public OverlayWindowController(
         [NotNull] IWindowTracker windowTracker,
-        [NotNull] [Unity.Dependency(WellKnownDispatchers.UIOverlay)] Dispatcher uiScheduler)
+        [NotNull] [Unity.Dependency(WellKnownDispatchers.UIOverlay)] Dispatcher overlayScheduler)
     {
         Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
-        Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+        Guard.ArgumentNotNull(overlayScheduler, nameof(overlayScheduler));
 
         Log = GetType().PrepareLogger().WithSuffix(overlayControllerId);
         Log.Info(() => $"Creating overlay window controller using {windowTracker}");
 
         this.windowTracker = windowTracker;
-        this.uiScheduler = uiScheduler;
+        this.overlayScheduler = overlayScheduler;
 
         windows
             .Connect()
-            .ObserveOn(uiScheduler)
+            .ObserveOn(overlayScheduler)
             .Transform(x => new WindowInteropHelper(x).EnsureHandle())
             .Bind(out childWindows)
             .SubscribeToErrors(Log.HandleUiException)
@@ -65,7 +65,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
             .Select(x => (x.WindowIsActive || x.OverlayIsActive) && IsEnabled)
             .DistinctUntilChanged()
             .Do(x => Log.Debug(() => $"Sending SetVisibility({x}) to window scheduler"))
-            .ObserveOn(uiScheduler)
+            .ObserveOn(overlayScheduler)
             .SubscribeSafe(SetVisibility, Log.HandleUiException)
             .AddTo(Anchors);
 
@@ -99,10 +99,10 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
 
     public IDisposable RegisterChild(IOverlayViewModel viewModel)
     {
-        if (!uiScheduler.CheckAccess())
+        if (!overlayScheduler.CheckAccess())
         {
-            Log.Debug($"Invoking registration on {uiScheduler}");
-            return uiScheduler.Invoke(() => RegisterChild(viewModel));
+            Log.Debug($"Invoking registration on {overlayScheduler}");
+            return overlayScheduler.Invoke(() => RegisterChild(viewModel));
         }
 
         Log.Debug("Registering new child");
@@ -140,7 +140,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         viewModel.SetActivationController(activationController);
 
         this.WhenAnyValue(x => x.ShowWireframes)
-            .ObserveOn(uiScheduler)
+            .ObserveOn(overlayScheduler)
             .SubscribeSafe(() => windowContainer.ShowWireframes = ShowWireframes, Log.HandleUiException)
             .AddTo(childAnchors);
 
@@ -159,7 +159,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
                 windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
                 window.WhenLoaded().Select(_ => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
             .Sample(UiConstants.UiThrottlingDelay)
-            .ObserveOn(uiScheduler)
+            .ObserveOn(overlayScheduler)
             .SubscribeSafe(reason =>
             {
                 logger.Debug(() => $"Processing visibility change, reason: {reason}");
@@ -170,7 +170,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         window.WhenLoaded()
             .Select(_ => viewModel.WhenAnyValue(x => x.OverlayMode))
             .Switch()
-            .ObserveOn(uiScheduler)
+            .ObserveOn(overlayScheduler)
             .SubscribeSafe(x =>
             {
                 logger.Debug(() => $"Changing overlay mode to {x}");
@@ -181,7 +181,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         window.WhenLoaded()
             .Select(_ => viewModel.WhenAnyValue(x => x.IsFocusable))
             .Switch()
-            .ObserveOn(uiScheduler)
+            .ObserveOn(overlayScheduler)
             .SubscribeSafe(x =>
             {
                 logger.Debug(() => $"Changing isFocusable to {x}");

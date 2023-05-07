@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Binding;
 using PoeShared.Prism;
 using PoeShared.UI;
 
@@ -34,5 +39,50 @@ public static class ChangeSetExtensions
             return anchors;
         });
     }
+    
+    public static IObservable<Unit> SynchronizeToSourceList<TCollection, T>(
+        this TCollection source,
+        ISourceList<T> destination)  where TCollection : INotifyCollectionChanged, IEnumerable<T>, ICollection<T>
+    {
+        //FIXME This will NOT sync if changes are done on destination list
+        return Observable.Create<Unit>(observer =>
+        {
+            var anchors = new CompositeDisposable();
 
+            source.Clear();
+            destination.Items.ForEach(source.Add);
+
+            source
+                .ToObservableChangeSet<TCollection, T>()
+                .SkipInitial()
+                .ForEachItemChange(change =>
+                {
+                    switch (change.Reason)
+                    {
+                        case ListChangeReason.Add:
+                            destination.Insert(change.CurrentIndex, change.Current);
+                            break;
+                        case ListChangeReason.Remove:
+                            destination.Remove(change.Current);
+                            break;
+                        case ListChangeReason.Replace:
+                            destination.Replace(change.Previous.Value, change.Current);
+                            break;
+                        case ListChangeReason.Clear:
+                            destination.Clear();
+                            break;
+                        case ListChangeReason.Moved:
+                            destination.Move(change.PreviousIndex, change.CurrentIndex);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(change), change.Reason, $"Change of type {change.Reason} is not supported, full change: {change}");
+                    }
+                })
+                .Subscribe()
+                .AddTo(anchors);
+
+
+            return anchors;
+        });
+    }
 }
