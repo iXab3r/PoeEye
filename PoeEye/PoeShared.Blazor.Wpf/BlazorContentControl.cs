@@ -30,6 +30,7 @@ using PoeShared.Services;
 using PoeShared.UI;
 using PropertyBinder;
 using ReactiveUI;
+using Unity;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -50,6 +51,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public static readonly DependencyProperty EnableHotkeysProperty = DependencyProperty.Register(
         nameof(EnableHotkeys), typeof(bool), typeof(BlazorContentControl), new PropertyMetadata(true));
+    
+    public static readonly DependencyProperty ContainerProperty = DependencyProperty.Register(
+        nameof(Container), typeof(IUnityContainer), typeof(BlazorContentControl), new PropertyMetadata(default(IUnityContainer)));
     
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeViewAnchors;
@@ -119,8 +123,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         var hostPage = Path.Combine(contentRoot, generatedIndexFileName); // wwwroot must be included as a part of path to become ContentRoot;
 
         this.WhenAnyValue(x => x.ViewType)
+            .CombineLatest(this.WhenAnyValue(x => x.Container), (viewType, container) => new { viewType, container })
             .ObserveOnDispatcher()
-            .SubscribeAsync(async viewType =>
+            .SubscribeAsync(async state =>
             {
                 if (WebView.WebView is {CoreWebView2: not null})
                 {
@@ -138,26 +143,26 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     UnhandledException = null;
                 }
 
-                if (viewType == null)
+                if (state?.viewType == null)
                 {
                     return;
                 }
 
-                var childContainer = new ServiceCollection
+                var childServiceCollection = new ServiceCollection
                 {
                     serviceCollection
                 };
                 
                 // views have to be transient to allow to re-create them if needed (e.g. on error)
-                childContainer.AddTransient(typeof(BlazorContent), _ =>
+                childServiceCollection.AddTransient(typeof(BlazorContent), _ =>
                 {
-                    var viewWrapper = new BlazorContent(viewType).AddTo(viewAnchors);
+                    var viewWrapper = new BlazorContent(state.viewType).AddTo(viewAnchors);
                     return viewWrapper;
                 });
                 
-                childContainer.AddTransient(viewType, _ =>
+                childServiceCollection.AddTransient(state.viewType, _ =>
                 {
-                    var view = Activator.CreateInstance(viewType);
+                    var view = state.container == null ? Activator.CreateInstance(state.viewType) : state.container.Resolve(state.viewType);
                     if (view is BlazorReactiveComponent reactiveComponent)
                     {
                         this.WhenAnyValue(content => content.Content)
@@ -174,21 +179,21 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
                     return view;
                 });
-                proxyServiceProvider.ServiceProvider = childContainer.BuildServiceProvider();
+                proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
 
                 var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
                 WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
 
                 var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                 WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
-                if (WebView.HostPage == hostPage)
+                if (WebView.HostPage == hostPage && WebView.WebView.CoreWebView2 != null)
                 {
-                    Log.Debug($"Reloading existing page, view type: {viewType}");
+                    Log.Debug($"Reloading existing page, view type: {state}");
                     WebView.WebView.Reload();
                 }
                 else
                 {
-                    Log.Debug($"Navigating to index page, view type: {viewType}");
+                    Log.Debug($"Navigating to index page, view type: {state}");
                     WebView.HostPage = hostPage;
                 }
             })
@@ -207,6 +212,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     {
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
+    }
+    
+    public IUnityContainer Container
+    {
+        get => (IUnityContainer) GetValue(ContainerProperty);
+        set => SetValue(ContainerProperty, value);
     }
 
     public IEnumerable<IFileInfo> AdditionalFiles
