@@ -15,7 +15,7 @@ public static class UnityContainerExtensions
         instance
             .RegisterFactory<IOverlayWindowController>(
                 dependencyName,
-                unity => unity.Resolve<OverlayWindowController>(
+                unity => unity.Resolve<TrackedOverlayWindowController>(
                     new DependencyOverride<IWindowTracker>(
                         unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
                 new ContainerControlledLifetimeManager());
@@ -29,7 +29,7 @@ public static class UnityContainerExtensions
     {
         instance
             .RegisterFactory<IOverlayWindowController>(
-                unity => unity.Resolve<OverlayWindowController>(
+                unity => unity.Resolve<TrackedOverlayWindowController>(
                     new DependencyOverride<IWindowTracker>(
                         unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
                 new ContainerControlledLifetimeManager());

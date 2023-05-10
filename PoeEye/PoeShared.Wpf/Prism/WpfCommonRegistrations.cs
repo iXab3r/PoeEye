@@ -10,6 +10,7 @@ using PoeShared.Modularity;
 using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Native;
 using PoeShared.Notifications.Services;
 using PoeShared.Notifications.ViewModels;
 using PoeShared.Profiler;
@@ -72,6 +73,8 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<ISelectionAdorner, SelectionAdorner>()
             .RegisterType<IOpenFileDialog, NativeFileDialog>()
             .RegisterType<ISaveFileDialog, NativeFileDialog>()
+            .RegisterType<IOverlayWindowController, OverlayWindowController>()
+            .RegisterType<ITrackedOverlayWindowController, TrackedOverlayWindowController>()
             .RegisterType<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
             .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
             .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()

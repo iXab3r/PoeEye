@@ -37,6 +37,21 @@ public static class SchedulerExtensions
             throw new ArgumentException($"Unsupported type of Scheduler: {scheduler}");
         }
     }
+
+    public static bool CheckAccess(this IScheduler scheduler)
+    {
+        return IsOnScheduler(scheduler);
+    }
+    
+    public static void VerifyAccess(this IScheduler scheduler)
+    {
+        if (IsOnScheduler(scheduler))
+        {
+            return;
+        }
+
+        throw new InvalidOperationException($"Must be on scheduler {scheduler}, but it is not");
+    }
     
     public static bool IsOnScheduler(this IScheduler scheduler)
     {

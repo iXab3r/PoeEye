@@ -1,4 +1,5 @@
 using System;
+using DynamicData;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
@@ -8,14 +9,9 @@ public interface IOverlayWindowController : IDisposableReactiveObject
 {
     bool IsVisible { get; }
         
-    bool IsEnabled { get; set; }
-        
     bool ShowWireframes { get; set; }
         
     IDisposable RegisterChild(IOverlayViewModel viewModel);
 
-    void ActivateLastActiveWindow();
-
-    [NotNull]
-    IOverlayViewModel[] GetChildren();
+    IObservableList<IOverlayViewModel> Children { get; }
 }

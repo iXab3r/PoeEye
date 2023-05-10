@@ -20,9 +20,10 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
 
     private readonly ISourceList<INotificationContainerViewModel> itemsSource;
     private readonly IFactory<INotificationContainerViewModel, INotificationViewModel> notificationContainerFactory;
+    private readonly IOverlayWindowController overlayWindowController;
 
     public NotificationsService(
-        [Dependency(WellKnownWindows.AllWindows)] IOverlayWindowController overlayWindowController,
+        IFactory<IOverlayWindowController, IScheduler> overlayWindowControllerFactory,
         [Dependency(WellKnownSchedulers.UIOverlay)] IScheduler uiOverlayScheduler,
         IFactory<INotificationContainerViewModel, INotificationViewModel> notificationContainerFactory,
         IFactory<OverlayNotificationsContainerViewModel> overlayNotificationsContainerFactory)
@@ -30,7 +31,7 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
         Log.Debug(() => "Initializing notification service");
 
         this.notificationContainerFactory = notificationContainerFactory;
-        overlayWindowController.IsEnabled = true;
+        overlayWindowController = overlayWindowControllerFactory.Create(uiOverlayScheduler);
 
         itemsSource = new SourceListEx<INotificationContainerViewModel>().AddTo(Anchors);
         itemsSource

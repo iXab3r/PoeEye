@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -7,11 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
-using System.Windows.Threading;
 using DynamicData;
-
-using JetBrains.Annotations;
-using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.UI;
@@ -19,95 +14,47 @@ using ReactiveUI;
 
 namespace PoeShared.Native;
 
-internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
+public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
 {
-    private static long GlobalIdx;
-    private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
-    private readonly string overlayControllerId = $"OC#{Interlocked.Increment(ref GlobalIdx)}";
+    private static long globalIdx;
+    private readonly string overlayControllerId = $"OC#{Interlocked.Increment(ref globalIdx)}";
 
-    private readonly Dispatcher overlayScheduler;
+    private readonly IScheduler overlayScheduler;
 
     private readonly ISourceList<OverlayWindowView> windows = new SourceListEx<OverlayWindowView>();
-    private readonly IWindowTracker windowTracker;
 
-    public OverlayWindowController(
-        [NotNull] IWindowTracker windowTracker,
-        [NotNull] [Unity.Dependency(WellKnownDispatchers.UIOverlay)] Dispatcher overlayScheduler)
+    public OverlayWindowController(IScheduler overlayScheduler)
     {
-        Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
         Guard.ArgumentNotNull(overlayScheduler, nameof(overlayScheduler));
 
         Log = GetType().PrepareLogger().WithSuffix(overlayControllerId);
-        Log.Info(() => $"Creating overlay window controller using {windowTracker}");
 
-        this.windowTracker = windowTracker;
         this.overlayScheduler = overlayScheduler;
 
-        windows
+        Children = windows
             .Connect()
-            .ObserveOn(overlayScheduler)
-            .Transform(x => new WindowInteropHelper(x).EnsureHandle())
-            .Bind(out childWindows)
-            .SubscribeToErrors(Log.HandleUiException)
-            .AddTo(Anchors);
-
-        Observable.Merge(windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit(), this.WhenAnyValue(x => x.IsEnabled).ToUnit())
-            .Select(
-                x => new
-                {
-                    ActiveWindowHandle = windowTracker.ActiveWindowHandle,
-                    ActiveTitle = windowTracker.ActiveWindowTitle,
-                    WindowIsActive = windowTracker.IsActive,
-                    OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowHandle),
-                    IsEnabled
-                })
-            .Do(x => Log.Debug(() => $"Active window has changed: {x}"))
-            .Select(x => (x.WindowIsActive || x.OverlayIsActive) && IsEnabled)
-            .DistinctUntilChanged()
-            .Do(x => Log.Debug(() => $"Sending SetVisibility({x}) to window scheduler"))
-            .ObserveOn(overlayScheduler)
-            .SubscribeSafe(SetVisibility, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        windowTracker
-            .WhenAnyValue(x => x.MatchingWindow)
-            .Where(x => x != null && !IsPairedOverlay(windowTracker.ActiveWindowHandle))
-            .SubscribeSafe(x => LastActiveWindow = x, Log.HandleUiException)
-            .AddTo(Anchors);
+            .Transform(x => ((OverlayWindowContainer)x.DataContext).Content)
+            .AsObservableList();
 
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
     }
 
-    private IFluentLog Log { get; }
+    protected IFluentLog Log { get; }
 
     public bool ShowWireframes { get; set; }
 
-    public bool IsVisible { get; private set; }
-
-    public bool IsEnabled { get; set; } = true;
-        
-    public IWindowHandle LastActiveWindow { get; private set; }
-
-    public IOverlayViewModel[] GetChildren()
-    {
-        return windows.Items
-            .Select(x => x.DataContext)
-            .OfType<OverlayWindowContainer>()
-            .Select(x => x.Content)
-            .ToArray();
-    }
+    public bool IsVisible { get; private set; } = true;
 
     public IDisposable RegisterChild(IOverlayViewModel viewModel)
     {
-        if (!overlayScheduler.CheckAccess())
+        if (!overlayScheduler.IsOnScheduler())
         {
             Log.Debug($"Invoking registration on {overlayScheduler}");
             return overlayScheduler.Invoke(() => RegisterChild(viewModel));
         }
 
         Log.Debug("Registering new child");
-        OverlayWindowView window = default;
-        var logger = Log.WithSuffix(viewModel).WithSuffix(() => window);
+        var logger = Log.WithSuffix(viewModel);
 
         var childAnchors = new CompositeDisposable();
         Disposable.Create(() =>
@@ -121,17 +68,19 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         var windowContainer = new OverlayWindowContainer(logger)
         {
             Content = viewModel
-        };
-        windowContainer.AddTo(childAnchors);
+        }.AddTo(childAnchors);
+        
         logger.Debug(() => $"Initialized window container: {windowContainer}");
-        window = new OverlayWindowView
+        var window = new OverlayWindowView
         {
-            Title = $"{viewModel.Id} {overlayControllerId} {windowTracker}",
+            Title = $"{viewModel.Id} {overlayControllerId}",
             Visibility = Visibility.Collapsed,
             ShowInTaskbar = false,
             ShowActivated = false,
             Topmost = true,
         };
+        logger.AddSuffix(() => window);
+        
         logger.Info(() => $"Created overlay window");
         window.DataContext = windowContainer;
         logger.Debug(() => $"Assigned data context");
@@ -145,7 +94,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
             .AddTo(childAnchors);
 
         window.WhenLoaded()
-            .Do(args => logger.Debug(() => $"Overlay is loaded"))
+            .Do(_ => logger.Debug(() => $"Overlay is loaded"))
             .SubscribeSafe(() =>
             {
                 logger.Debug(() => $"Assigning overlay view {window} to view-model {viewModel}");
@@ -156,7 +105,6 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         Observable.Merge(
                 this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Controller IsVisible change, {x.prev} => {x.curr}"), 
                 viewModel.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Overlay IsVisible change, {x.prev} => {x.curr}"), 
-                windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
                 window.WhenLoaded().Select(_ => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
             .Sample(UiConstants.UiThrottlingDelay)
             .ObserveOn(overlayScheduler)
@@ -197,19 +145,20 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
             .AddTo(childAnchors);
 
         windows.Add(window);
-
-        Disposable.Create(() =>
-        {
-            logger.Info($"Closing overlay");
-            window.Close();
-        }).AddTo(childAnchors);
             
         Disposable.Create(() =>
         {
             logger.Debug(() => $"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
             windows.Remove(window);
         }).AddTo(childAnchors);
+        
+        Disposable.Create(() =>
+        {
+            logger.Info($"Closing overlay");
+            window.Close();
+        }).AddTo(childAnchors);
 
+        childAnchors.AddTo(viewModel.Anchors);
         childAnchors.AddTo(Anchors);
 
         Log.Info(() => $"Overlay view initialized: {window}");
@@ -218,16 +167,7 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         return childAnchors;
     }
 
-    public void ActivateLastActiveWindow()
-    {
-        var windowHandle = LastActiveWindow;
-        if (windowHandle == default)
-        {
-            return;
-        }
-
-        UnsafeNative.SetForegroundWindow(windowHandle);
-    }
+    public IObservableList<IOverlayViewModel> Children { get; } 
 
     private void HandleVisibilityChange(IFluentLog logger, OverlayWindowView overlayWindow, IOverlayViewModel viewModel)
     {
@@ -248,26 +188,20 @@ internal sealed class OverlayWindowController : DisposableReactiveObject, IOverl
         }
         else
         {
-            logger.Debug(() => $"Hiding overlay (tracker {windowTracker})");
+            logger.Debug(() => $"Hiding overlay");
 
             UnsafeNative.HideWindow(overlayWindow.WindowHandle);
         }
     }
 
-    private bool IsPairedOverlay(IntPtr hwnd)
-    {
-        return childWindows.Contains(hwnd);
-
-    }
-
-    private void SetVisibility(bool isVisible)
+    protected void SetVisibility(bool isVisible)
     {
         if (isVisible == IsVisible)
         {
             return;
         }
 
-        Log.Debug(() => $"Overlay controller IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
+        Log.Debug(() => $"Overlay controller IsVisible = {IsVisible} => {isVisible}");
         IsVisible = isVisible;
     }
 

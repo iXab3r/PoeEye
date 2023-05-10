@@ -48,7 +48,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     public IScheduler GetOrAdd(string name)
     {
         Log.Debug(() => $"Retrieving scheduler {name}");
-        return schedulers.GetOrAdd(name, x => CreateEnforcedThreadScheduler(name, ThreadPriority.Normal));
+        return schedulers.GetOrAdd(name, x => CreateDispatcherScheduler(name, ThreadPriority.Normal));
     }
 
     public bool TryGet(string name, out IScheduler scheduler)
@@ -73,7 +73,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
             throw new InvalidOperationException($"Scheduler with the same name {name} is already created: {existing}");
         }
 
-        var newScheduler = CreateEnforcedThreadScheduler(name, priority: threadPriority);
+        var newScheduler = CreateDispatcherScheduler(name, priority: threadPriority);
         return Add(name, newScheduler);
     }
 

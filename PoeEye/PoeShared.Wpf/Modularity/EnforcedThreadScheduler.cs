@@ -25,7 +25,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Log = GetType().PrepareLogger().WithSuffix($"SchedulerName: {name}");
         Log.Info(() => $"Initializing new scheduler {name}");
-        threadScheduler = new EventLoopScheduler(start =>
+        var eventLoopScheduler = new EventLoopScheduler(start =>
         {
             Log.Info(() => $"Initializing thread for scheduler {name} with priority {priority}");
             if (schedulerThread != null)
@@ -43,6 +43,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
             Log.Info(() => $"Scheduler {name} with thread {schedulerThread.Name} initialized");
             return schedulerThread;
         });
+        threadScheduler = eventLoopScheduler;
     }
     
     private IFluentLog Log { get; }
