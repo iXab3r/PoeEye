@@ -3,15 +3,11 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Native;
 
-public interface IOverlayViewModel : IWindowViewModel
+public interface IOverlayViewModel : IWindowViewModel, IOverlayCanBeLocked
 {
     float Opacity { get; set; }
 
     bool ShowResizeThumbs { get; set; }
-
-    bool IsLocked { get; set; }
-
-    bool IsUnlockable { get; }
 
     OverlayMode OverlayMode { get; set; }
     

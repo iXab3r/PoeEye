@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public static readonly DependencyProperty AdditionalFilesProperty = DependencyProperty.Register(
         nameof(AdditionalFiles), typeof(IEnumerable<IFileInfo>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<IFileInfo>)));
 
+    public static readonly DependencyProperty EnableHotkeysProperty = DependencyProperty.Register(
+        nameof(EnableHotkeys), typeof(bool), typeof(BlazorContentControl), new PropertyMetadata(true));
+    
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeViewAnchors;
     private readonly ProxyServiceProvider proxyServiceProvider;
@@ -67,6 +71,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         WebView = new BlazorWebViewEx();
         WebView.UnhandledException += OnUnhandledException;
 
+        var canExecuteHotkeys = this.Observe(EnableHotkeysProperty, x => x.EnableHotkeys)
+            .Select(x => x);
+
         ReloadCommand = CommandWrapper.Create(() =>
         {
             if (UnhandledException != null)
@@ -76,8 +83,8 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             }
 
             WebView?.WebView.Reload();
-        });
-        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
+        }, canExecuteHotkeys);
+        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow(), canExecuteHotkeys);
 
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddBlazorWebView();
@@ -207,6 +214,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
         set => SetValue(AdditionalFilesProperty, value);
     }
+    
+    public bool EnableHotkeys
+    {
+        get => (bool) GetValue(EnableHotkeysProperty);
+        set => SetValue(EnableHotkeysProperty, value);
+    }
 
     public bool IsBusy { get; [UsedImplicitly] private set; }
 
@@ -218,15 +231,11 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public Exception UnhandledException { get; private set; }
     
-    public string UnhandledExceptionMessage { get; private set; }
+    public string UnhandledExceptionMessage { get; [UsedImplicitly] private set; }
     
     public ICommand ReloadCommand { get; }
 
     public ICommand OpenDevTools { get; }
-    public void Activate()
-    {
-        throw new NotImplementedException();
-    }
 
     public BitmapSource ViewScreenshot { get; private set; }
 

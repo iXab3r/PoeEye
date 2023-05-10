@@ -1,12 +1,11 @@
-﻿using PoeShared.Scaffolding;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using PoeShared.Bindings;
 using PoeShared.Services;
 using PropertyChanged;
 
-namespace EyeAuras.OnTopReplica;
+namespace PoeShared.Scaffolding;
 
 [DebuggerDisplay("Bounds={Bounds}")]
 public sealed class ReactiveRectangle : BindableReactiveObject
