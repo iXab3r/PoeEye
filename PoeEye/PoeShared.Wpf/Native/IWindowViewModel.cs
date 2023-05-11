@@ -9,7 +9,7 @@ using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
 
-public interface IWindowViewModel : IDisposableReactiveObject
+public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive
 {
     System.Drawing.Rectangle NativeBounds { get; set; }
 
