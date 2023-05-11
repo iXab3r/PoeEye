@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Native;
 
-public interface IOverlayViewModel : IWindowViewModel, IOverlayCanBeLocked
+public interface IOverlayViewModel : IWindowViewModel, ICanBeLocked
 {
     float Opacity { get; set; }
 

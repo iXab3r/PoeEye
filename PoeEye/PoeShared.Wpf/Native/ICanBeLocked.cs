@@ -2,7 +2,7 @@
 
 namespace PoeShared.Native;
 
-public interface IOverlayCanBeLocked : INotifyPropertyChanged
+public interface ICanBeLocked : INotifyPropertyChanged
 {
     bool IsLocked { get; set; }
 
