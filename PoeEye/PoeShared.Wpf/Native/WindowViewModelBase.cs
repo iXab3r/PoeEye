@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -10,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using DynamicData.Binding;
+using JetBrains.Annotations;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PropertyBinder;
@@ -59,7 +59,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         }, Log.HandleUiException).AddTo(Anchors);
         
         
-        dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => OverlayWindow.Dpi))
+        dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.WhenAnyValue(y => y.Dpi))
             .Switch()
             .Do(x => Log.Debug(() => $"DPI updated to {x}"))
             .ToProperty(this, x => x.Dpi)
@@ -83,7 +83,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             .Switch();
         
         this.WhenAnyValue(x => x.OverlayWindow)
-            .SwitchIfNotDefault(x => x.Observe(ConstantAspectRatioWindow.NativeBoundsProperty, y => y.NativeBounds).Select(y => new { Window = x, ActualBounds = y }))
+            .SwitchIfNotDefault(x => x.WhenAnyValue(y => y.NativeBounds).Select(y => new { Window = x, ActualBounds = y }))
             .Subscribe(x =>
             {
                 // always on UI thread
@@ -137,7 +137,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
     
     [Dependency]
-    public IForegroundWindowTracker ForegroundWindowTracker { get; init; }
+    public IForegroundWindowTracker ForegroundWindowTracker { get; [UsedImplicitly] init; }
 
     public bool IsVisible { get; set; } = true;
 

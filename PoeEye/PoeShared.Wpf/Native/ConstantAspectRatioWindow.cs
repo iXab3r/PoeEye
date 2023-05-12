@@ -8,40 +8,20 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using MahApps.Metro.Controls;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.UI;
 using PoeShared.Modularity;
+using ReactiveUI;
 
 namespace PoeShared.Native;
 
-public class ConstantAspectRatioWindow : Window
+public class ConstantAspectRatioWindow : ReactiveWindow
 {
-    private const float DefaultPixelsPerInch = 96.0F;
-
-    public static readonly DependencyProperty TargetAspectRatioProperty = DependencyProperty.Register(
-        "TargetAspectRatio",
-        typeof(double?),
-        typeof(ConstantAspectRatioWindow),
-        new PropertyMetadata(default(double?)));
-
-    public static readonly DependencyProperty DpiProperty = DependencyProperty.Register(
-        "Dpi", typeof(PointF), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(PointF)));
-
-    public static readonly DependencyProperty DpiAwareProperty = DependencyProperty.Register(
-        "DpiAware", typeof(bool), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(bool)));
-
-    public static readonly DependencyProperty NativeBoundsProperty = DependencyProperty.Register(
-        "NativeBounds", typeof(Rectangle), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(Rectangle)));
-
     private static long GlobalWindowId;
 
-    public static readonly DependencyProperty ActualBoundsProperty = DependencyProperty.Register(
-        "ActualBounds", typeof(Rectangle), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(Rectangle)));
-
-    protected readonly CompositeDisposable Anchors = new();
+    private const float DefaultPixelsPerInch = 96.0F;
 
     private readonly AspectRatioSizeCalculator aspectRatioSizeCalculator = new();
     private DragParams? dragParams;
@@ -60,8 +40,7 @@ public class ConstantAspectRatioWindow : Window
         SourceInitialized += OnSourceInitialized;
         Closed += OnClosed;
 
-        this.Observe(TargetAspectRatioProperty)
-            .Select(_ => TargetAspectRatio)
+        this.WhenAnyValue(x => x.TargetAspectRatio)
             .DistinctUntilChanged()
             .SubscribeSafe(
                 targetAspectRatio =>
@@ -89,17 +68,9 @@ public class ConstantAspectRatioWindow : Window
         Dpi = new PointF(1, 1);
     }
 
-    public Rectangle NativeBounds
-    {
-        get { return (Rectangle)GetValue(NativeBoundsProperty); }
-        set { SetValue(NativeBoundsProperty, value); }
-    }
+    public Rectangle NativeBounds { get; set; }
 
-    public Rectangle ActualBounds
-    {
-        get { return (Rectangle)GetValue(ActualBoundsProperty); }
-        set { SetValue(ActualBoundsProperty, value); }
-    }
+    public Rectangle ActualBounds { get; private set; }
 
     public IntPtr WindowHandle { get; private set; }
 
@@ -110,23 +81,11 @@ public class ConstantAspectRatioWindow : Window
 
     public string WindowId { get; } = $"Wnd#{Interlocked.Increment(ref GlobalWindowId)}";
 
-    public double? TargetAspectRatio
-    {
-        get => (double?)GetValue(TargetAspectRatioProperty);
-        set => SetValue(TargetAspectRatioProperty, value);
-    }
+    public double? TargetAspectRatio { get; set; }
 
-    public PointF Dpi
-    {
-        get { return (PointF)GetValue(DpiProperty); }
-        set { SetValue(DpiProperty, value); }
-    }
+    public PointF Dpi { get; private set; }
 
-    public bool DpiAware
-    {
-        get { return (bool)GetValue(DpiAwareProperty); }
-        set { SetValue(DpiAwareProperty, value); }
-    }
+    public bool DpiAware { get; set; } = true;
 
     protected IFluentLog Log { get; }
 
@@ -181,7 +140,7 @@ public class ConstantAspectRatioWindow : Window
         // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
         // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
         var isUpdatingActualBounds = false;
-        this.Observe(NativeBoundsProperty, x => x.NativeBounds)
+        this.WhenAnyValue(x => x.NativeBounds)
             .WithPrevious()
             .Where(x => x.Current != x.Previous)
             .SubscribeSafe(x =>
@@ -208,7 +167,7 @@ public class ConstantAspectRatioWindow : Window
             }, Log.HandleUiException)
             .AddTo(Anchors);
 
-        this.Observe(ActualBoundsProperty, x => x.ActualBounds)
+        this.WhenAnyValue(x => x.ActualBounds)
             .WithPrevious()
             .Where(x => x.Current != x.Previous)
             .SubscribeSafe(x =>
@@ -222,7 +181,7 @@ public class ConstantAspectRatioWindow : Window
                 try
                 {
                     isUpdatingActualBounds = true;
-                    SetCurrentValue(NativeBoundsProperty, x.Current);
+                    NativeBounds = x.Current;
                 }
                 finally
                 {
@@ -284,7 +243,7 @@ public class ConstantAspectRatioWindow : Window
                 if (newBounds != currentBounds)
                 {
                     Log.WithSuffix(msg).Debug(() => $"Updating actual bounds: {currentBounds} => {newBounds}");
-                    SetCurrentValue(ActualBoundsProperty, newBounds);
+                    ActualBounds = newBounds;
                     Log.WithSuffix(msg).Debug(() => $"Updated actual bounds: {currentBounds} => {newBounds}");
                 }
 

@@ -16,7 +16,6 @@
     IsTabStop="False"
     ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
-    DpiAware="True"
     UseLayoutRounding="True">
 
     <WindowChrome.WindowChrome>
@@ -58,7 +57,6 @@
             <Setter Property="MaxHeight" Value="{Binding MaxHeight, Mode=OneWay}" />
 
             <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
-            <Setter Property="TargetAspectRatio" Value="{Binding Content.TargetAspectRatio, Mode=OneWay}" />
 
             <Setter Property="ResizeMode" Value="NoResize" />
             <Setter Property="WindowStyle" Value="None" />
