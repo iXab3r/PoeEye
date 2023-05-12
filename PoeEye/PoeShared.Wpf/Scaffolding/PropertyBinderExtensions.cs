@@ -46,7 +46,15 @@ public static class PropertyBinderExtensions
             {
                 throw new ArgumentException($"Failed to get {typeof(IScheduler)} from context {x}, builder: {builderClosure}");
             }
-            scheduler.Schedule(() => action(x, v));
+
+            if (scheduler.IsOnScheduler())
+            {
+                action(x, v);
+            }
+            else
+            {
+                scheduler.Schedule(() => action(x, v));
+            }
         });
     }
 }

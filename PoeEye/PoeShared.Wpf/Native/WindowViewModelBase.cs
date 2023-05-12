@@ -31,6 +31,9 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     static WindowViewModelBase()
     {
         Binder.BindAction(x => x.Log.Info(() => $"Title updated to {x.Title}"));
+        
+        Binder.BindIf(x => x.OverlayWindow != null, x => x.TargetAspectRatio).To((x, v) => x.OverlayWindow.TargetAspectRatio = v);
+        Binder.BindIf(x => x.OverlayWindow != null, x => x.SizeToContent).To((x, v) => x.OverlayWindow.SizeToContent = v);
     }
 
     protected WindowViewModelBase()

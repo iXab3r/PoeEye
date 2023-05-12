@@ -19,6 +19,9 @@ namespace PoeShared.Native;
 
 public class ConstantAspectRatioWindow : ReactiveWindow
 {
+    public static readonly DependencyProperty TargetAspectRatioProperty = DependencyProperty.Register(
+        nameof(TargetAspectRatio), typeof(double?), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(double?)));
+
     private static long GlobalWindowId;
 
     private const float DefaultPixelsPerInch = 96.0F;
@@ -40,7 +43,7 @@ public class ConstantAspectRatioWindow : ReactiveWindow
         SourceInitialized += OnSourceInitialized;
         Closed += OnClosed;
 
-        this.WhenAnyValue(x => x.TargetAspectRatio)
+        this.Observe(TargetAspectRatioProperty, x => x.TargetAspectRatio)
             .DistinctUntilChanged()
             .SubscribeSafe(
                 targetAspectRatio =>
@@ -81,7 +84,11 @@ public class ConstantAspectRatioWindow : ReactiveWindow
 
     public string WindowId { get; } = $"Wnd#{Interlocked.Increment(ref GlobalWindowId)}";
 
-    public double? TargetAspectRatio { get; set; }
+    public double? TargetAspectRatio
+    {
+        get => (double?) GetValue(TargetAspectRatioProperty);
+        set => SetValue(TargetAspectRatioProperty, value);
+    }
 
     public PointF Dpi { get; private set; }
 

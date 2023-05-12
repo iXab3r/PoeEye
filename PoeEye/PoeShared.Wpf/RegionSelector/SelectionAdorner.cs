@@ -10,10 +10,8 @@ using ReactiveUI;
 
 namespace PoeShared.RegionSelector;
 
-public interface ISelectionAdorner : IDisposableReactiveObject
-{
-    bool IsVisible { get; set; }
-    
+public interface ISelectionAdorner : IDisposableReactiveObject, ICanBeVisible
+{    
     bool IsInEditMode { get; set; }
     
     bool ShowBackground { get; set; }
@@ -117,10 +115,13 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
                 SelectionProjected = WinRect.Empty;
             }).AddTo(anchors);
 
-            var selectionSource = isVirtual ? this.WhenAnyValue(x => x.SelectionProjected) : this.WhenAnyValue(x => x.Selection);
+            var selectionSource = isVirtual 
+                ? this.WhenAnyValue(x => x.SelectionProjected) 
+                : this.WhenAnyValue(x => x.Selection);
             selectionSource
                 .Skip(1)
                 .TakeUntil(this.WhenAnyValue(x => x.IsInEditMode).Where(x => x == false))
+                .Select(x => x)
                 .Subscribe(observer)
                 .AddTo(anchors);
 

@@ -5,10 +5,8 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
 
-public interface IOverlayWindowController : IDisposableReactiveObject
+public interface IOverlayWindowController : IDisposableReactiveObject, IHasVisible
 {
-    bool IsVisible { get; }
-        
     bool ShowWireframes { get; set; }
         
     IDisposable RegisterChild(IOverlayViewModel viewModel);

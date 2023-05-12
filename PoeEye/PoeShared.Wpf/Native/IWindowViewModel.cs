@@ -9,7 +9,7 @@ using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
 
-public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive
+public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICanBeVisible
 {
     System.Drawing.Rectangle NativeBounds { get; set; }
 
@@ -34,15 +34,11 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive
 
     void SetOverlayWindow([NotNull] TransparentWindow owner);
 
-    bool IsVisible { get; set; }
-
     bool ShowInTaskbar { get; set; }
 
     bool EnableHeader { get; set; }
     
     bool IsLoaded { get; }
-    
-    bool IsActive { get; }
     
     double? TargetAspectRatio { get; set; }
 }

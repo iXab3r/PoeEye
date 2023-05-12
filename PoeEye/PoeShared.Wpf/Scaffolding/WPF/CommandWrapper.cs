@@ -164,33 +164,17 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     
     public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.Create(execute, PrepareCanExecute(canExecute)));
+        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute, DispatcherScheduler.Current));
     }
 
     public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, PrepareCanExecute(canExecute)));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute, DispatcherScheduler.Current));
     }
     
     public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, PrepareCanExecute(canExecute)));
-    }
-
-    private static IObservable<bool> PrepareCanExecute(IObservable<bool> canExecute)
-    {
-        var dispatcher = Dispatcher.CurrentDispatcher;
-        return canExecute.Select(x =>
-            {
-                var source = Observable.Return(x);
-                if (dispatcher.CheckAccess())
-                {
-                    return source;
-                }
-
-                return source.ObserveOn(dispatcher);
-            })
-            .Switch();
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute, DispatcherScheduler.Current));
     }
 
     public static CommandWrapper Create(Func<Task> execute)
