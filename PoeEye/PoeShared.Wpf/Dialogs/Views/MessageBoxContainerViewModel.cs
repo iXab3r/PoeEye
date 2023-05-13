@@ -5,7 +5,7 @@ using PropertyBinder;
 
 namespace PoeShared.Dialogs.Views;
 
-internal sealed class MessageBoxContainerViewModel : WindowContainerBase<IWindowViewModel>
+public sealed class MessageBoxContainerViewModel : WindowContainerBase<IWindowViewModel>
 {
     private static readonly Binder<MessageBoxContainerViewModel> Binder = new();
 

@@ -137,6 +137,20 @@ public partial class UnsafeNative
             Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
         }
     }
+    
+    public static void ShowSystemMenu(IntPtr hwnd)
+    {
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
+        Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Showing SystemMenu");
+
+        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var newStyle = existingStyle | User32.SetWindowLongFlags.WS_SYSMENU;
+        if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
+        {
+            Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
+        }
+    }
 
     public static bool SetWindowExTransparent(IntPtr hwnd)
     {

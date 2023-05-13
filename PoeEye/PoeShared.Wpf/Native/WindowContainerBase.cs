@@ -8,7 +8,7 @@ using PropertyBinder;
 
 namespace PoeShared.Native;
 
-internal abstract class WindowContainerBase<T> : DisposableReactiveObject where T : IWindowViewModel
+public abstract class WindowContainerBase<T> : DisposableReactiveObject where T : IWindowViewModel
 {
     private static readonly Binder<WindowContainerBase<T>> Binder = new();
     private const int MIN_THUMB_SIZE = 8;

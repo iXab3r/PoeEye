@@ -23,7 +23,8 @@
                               UseLayoutRounding="True"
                               Background="{StaticResource PopupWindowBackgroundBrushKey}"
                               BorderBrush="{StaticResource OverlayBorderBrushKey}"
-                              BorderThickness="1">
+                              BorderThickness="1"
+                              >
     <Window.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
