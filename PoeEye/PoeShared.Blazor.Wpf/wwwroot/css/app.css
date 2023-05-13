@@ -112,7 +112,7 @@
 }
 
 body, html, .app {
-    background-color: var(--eye-MaterialDesignPaper);
+    background-color: transparent;
     color: var(--eye-MaterialDesignBody);
     font-family: var(--eye-font-family);
     font-size: 12px;
