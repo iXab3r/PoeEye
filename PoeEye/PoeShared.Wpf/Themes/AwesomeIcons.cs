@@ -29,6 +29,10 @@ public static class AwesomeIcons
     public const string Certificate = "\uf0a3";
     public const string Check = "\uf00c";
     public const string CheckCircle = "\uf058";
+    public const string ChevronLeft = "\uf053";
+    public const string ChevronRight = "\uf054";
+    public const string ChevronUp = "\uf077";
+    public const string ChevronDown = "\uf078";
     public const string CloseIcon = "\uf00d";
     public const string CloudDownload = "\uf0ed";
     public const string CloudUpload = "\uf0ee";
