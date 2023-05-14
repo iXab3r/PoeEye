@@ -189,12 +189,15 @@
     </Style>
 
     <Style x:Key="FastContextMenuStyle" TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource MaterialDesignContextMenu}">
+        <Style.Resources>
+            <Style TargetType="MenuItem" BasedOn="{StaticResource FastMenuItem}" />
+        </Style.Resources>
+        
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="ItemContainerStyle" Value="{StaticResource FastMenuItem}"></Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type MenuBase}">

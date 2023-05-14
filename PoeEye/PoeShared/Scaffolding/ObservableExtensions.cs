@@ -155,12 +155,12 @@ public static class ObservableExtensions
         return SwitchIfNotDefault(observable, trueSelector: selector, falseSelector: Observable.Empty<TOut>);
     }
     
-    public static IObservable<T> SwitchIfNot<T>(this IObservable<T> source, IObservable<bool> condition)
+    public static IObservable<T> EnableIf<T>(this IObservable<T> source, IObservable<bool> condition)
     {
-        return SwitchIfNot(source, condition, Observable.Empty<T>());
+        return EnableIf(source, condition, Observable.Empty<T>());
     }
     
-    public static IObservable<T> SwitchIfNot<T>(
+    public static IObservable<T> EnableIf<T>(
         this IObservable<T> source, 
         IObservable<bool> condition, 
         IObservable<T> alternateSource)
