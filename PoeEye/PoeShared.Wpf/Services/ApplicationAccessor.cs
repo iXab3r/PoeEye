@@ -54,8 +54,9 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             IsExiting = true;
         }, Log.HandleException).AddTo(Anchors);
 
-        runningFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".running"))).AddTo(Anchors);
-        loadingFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".loading"))).AddTo(Anchors);
+        var lockFileAcquireTimeout = TimeSpan.FromSeconds(10);
+        runningFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".running")), lockFileAcquireTimeout).AddTo(Anchors);
+        loadingFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".loading")), lockFileAcquireTimeout).AddTo(Anchors);
         Log.Info(() => $"Application load state: { new { runningFileLock, loadingFileLock } }");
         LastExitWasGraceful = !runningFileLock.ExistedInitially;
         LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
