@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Polly;
 
 namespace PoeShared.Services;
 
@@ -14,7 +15,7 @@ public sealed class FileLock : DisposableReactiveObject
         LockFile = lockFile;
         ExistedInitially = Exists;
         Log.Debug(() => $"Preparing lock file, existed since start: {ExistedInitially}");
-        fileStream = PrepareLockFile(Log, LockFile.FullName).AddTo(Anchors);
+        fileStream = PrepareLockFileSafe(Log, LockFile.FullName).AddTo(Anchors);
         Disposable.Create(() => CleanupLockFile(Log, LockFile.FullName)).AddTo(Anchors);
         Log.Debug(() => $"File lock created successfully");
     }
@@ -32,6 +33,8 @@ public sealed class FileLock : DisposableReactiveObject
         base.FormatToString(builder);
         builder.Append(nameof(FileLock));
         builder.AppendParameter(nameof(LockFile), LockFile.FullName);
+        builder.AppendParameter(nameof(ExistedInitially), ExistedInitially);
+        builder.AppendParameter(nameof(Exists), Exists);
     }
 
     private static void CleanupLockFile(IFluentLog log, string lockFilePath)
@@ -58,6 +61,24 @@ public sealed class FileLock : DisposableReactiveObject
         }
     }
 
+    private static Stream PrepareLockFileSafe(IFluentLog log, string lockFilePath)
+    {
+        var retryCount = 10;
+        var result = Policy
+            .Handle<Exception>()
+            .WaitAndRetry(
+                retryCount,
+                retryAttempt => TimeSpan.FromMilliseconds(1000),
+                (exception, timeSpan, context) => { log.WithPrefix($"#{context.Count}/{retryCount}").Debug($"Failed to open file - {exception.Message}"); }
+            ).ExecuteAndCapture(context => PrepareLockFile(log, lockFilePath), new Context());
+        if (result.Outcome == OutcomeType.Failure)
+        {
+            throw new InvalidStateException($"Failed to open lock file {lockFilePath}");
+        }
+
+        return result.Result;
+    }
+    
     private static Stream PrepareLockFile(IFluentLog log, string lockFilePath)
     {
         log.Debug(() => $"Creating lock file: {lockFilePath}");

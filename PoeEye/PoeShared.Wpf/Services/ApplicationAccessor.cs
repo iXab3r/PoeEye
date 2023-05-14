@@ -56,6 +56,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
         runningFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".running"))).AddTo(Anchors);
         loadingFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".loading"))).AddTo(Anchors);
+        Log.Info(() => $"Application load state: { new { runningFileLock, loadingFileLock } }");
         LastExitWasGraceful = !runningFileLock.ExistedInitially;
         LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
         this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>

@@ -167,6 +167,7 @@ public class AppArguments : AppOptions, IAppArguments
             LocalAppDataDirectory,
             ShowUpdater,
             StartupArgs,
+            IsSafeMode,
             ApplicationPath = ApplicationExecutablePath,
             ApplicationName = ApplicationExecutableName
         }.Dump());

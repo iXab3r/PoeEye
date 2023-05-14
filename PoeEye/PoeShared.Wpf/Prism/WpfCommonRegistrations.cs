@@ -52,10 +52,6 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
             .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);
             
-        Log.Debug(() => $"Initializing application: {Application.Current}");
-        var accessor = Container.Resolve<IApplicationAccessor>();
-        Log.Debug(() => $"Application accessor: {accessor}");
-
         Container.RegisterOverlayController(WellKnownWindows.AllWindows, WellKnownWindows.AllWindows);
 
         Container

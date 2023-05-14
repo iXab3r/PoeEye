@@ -57,7 +57,6 @@ public abstract class ApplicationBase : Application
             Container.AddNewExtensionIfNotExists<HttpClientRegistrations>();
             Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
 
-
             appArguments = Container.Resolve<IAppArguments>();
             if (appArguments.IsDebugMode)
             {
