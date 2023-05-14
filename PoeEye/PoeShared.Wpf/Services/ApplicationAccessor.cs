@@ -7,10 +7,12 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using ReactiveUI;
 
 namespace PoeShared.Services;
@@ -22,15 +24,18 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
     private readonly IAppArguments appArguments;
     private readonly Application application;
+    private readonly IWindowHandleProvider windowHandleProvider;
     private readonly FileLock loadingFileLock;
     private readonly FileLock runningFileLock;
     private readonly ISubject<int> whenTerminated = new Subject<int>();
 
     public ApplicationAccessor(
         Application application,
+        IWindowHandleProvider windowHandleProvider,
         IAppArguments appArguments)
     {
         this.application = application;
+        this.windowHandleProvider = windowHandleProvider;
         this.appArguments = appArguments;
         Log.Info(() => $"Initializing Application accessor for {application}");
         if (application == null)
@@ -82,7 +87,17 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         
     public bool LastLoadWasSuccessful { get; }
     
-    public Window MainWindow => application.MainWindow;
+    public Window MainWindow
+    {
+        get
+        {
+            if (application.Dispatcher.CheckAccess())
+            {
+                return application.MainWindow;
+            }
+            return application.Dispatcher.Invoke(() => application.MainWindow);
+        }
+    }
 
     public void ReportIsLoaded()
     {

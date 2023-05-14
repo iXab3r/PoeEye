@@ -7,27 +7,27 @@ using PoeShared.Native;
 
 namespace PoeShared.UI;
 
-public class DpiAwareMetroWindow : MetroWindow
+public class DpiAwareMetroWindow : MetroWindowEx
 {
     public static readonly DependencyProperty DpiProperty = DependencyProperty.Register(
-        "Dpi", typeof(DpiScale), typeof(MetroWindow), new PropertyMetadata(default(DpiScale)));
-        
+        nameof(Dpi), typeof(DpiScale), typeof(MetroWindow), new PropertyMetadata(default(DpiScale)));
+
     public DpiAwareMetroWindow()
     {
-        this.LocationChanged += OnLocationChanged;
+        LocationChanged += OnLocationChanged;
     }
 
     public DpiScale Dpi
     {
-        get { return (DpiScale) GetValue(DpiProperty); }
-        set { SetValue(DpiProperty, value); }
+        get => (DpiScale) GetValue(DpiProperty);
+        set => SetValue(DpiProperty, value);
     }
 
     private void OnLocationChanged(object sender, EventArgs e)
     {
         Dpi = VisualTreeHelper.GetDpi(this);
     }
-        
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);

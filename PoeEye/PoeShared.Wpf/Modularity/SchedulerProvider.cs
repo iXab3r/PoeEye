@@ -99,6 +99,11 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         return scheduler;
     }
 
+    public DispatcherScheduler CreateDispatcherScheduler(string name, ThreadPriority priority)
+    {
+        return CreateDispatcherSchedulerInternal(name, priority);
+    }
+
     private static IScheduler CreateEnforcedThreadScheduler(string name, ThreadPriority priority)
     {
         Guard.ArgumentNotNull(name, nameof(name));
@@ -107,7 +112,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         return new EnforcedThreadScheduler(name, priority);
     }
 
-    private static DispatcherScheduler CreateDispatcherScheduler(string name, ThreadPriority priority)
+    private static DispatcherScheduler CreateDispatcherSchedulerInternal(string name, ThreadPriority priority)
     {
         Guard.ArgumentNotNull(name, nameof(name));
 

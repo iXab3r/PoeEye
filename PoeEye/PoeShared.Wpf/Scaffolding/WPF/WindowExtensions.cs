@@ -37,4 +37,15 @@ public static class WindowExtensions {
                 return IntPtr.Zero;
             });
     }
+
+    public static IntPtr GetWindowHandle(this Window instance)
+    {
+        if (!instance.CheckAccess())
+        {
+            return instance.Dispatcher.Invoke(() => GetWindowHandle(instance));
+        }
+
+        var interopHandler = new WindowInteropHelper(instance);
+        return interopHandler.EnsureHandle();
+    }
 }

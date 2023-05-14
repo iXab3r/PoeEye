@@ -20,4 +20,7 @@ public interface ISchedulerProvider
     
     [NotNull]
     IScheduler Add([NotNull] string name, IScheduler scheduler);
+
+    [NotNull]
+    DispatcherScheduler CreateDispatcherScheduler(string name, ThreadPriority priority);
 }

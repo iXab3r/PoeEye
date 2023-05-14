@@ -72,13 +72,6 @@ public static class ObservableExtensions
     {
         return SubscribeSafe(source, onNext, onError, NoOperation);
     }
-    
-    public static IObservable<T> EnableIf<T>(this IObservable<T> source, IObservable<bool> condition)
-    {
-        return condition
-            .Select(x => x ? source : Observable.Empty<T>())
-            .Switch();
-    }
         
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted)
     {
@@ -160,6 +153,21 @@ public static class ObservableExtensions
         [NotNull] Func<TIn, IObservable<TOut>> selector)
     {
         return SwitchIfNotDefault(observable, trueSelector: selector, falseSelector: Observable.Empty<TOut>);
+    }
+    
+    public static IObservable<T> SwitchIfNot<T>(this IObservable<T> source, IObservable<bool> condition)
+    {
+        return SwitchIfNot(source, condition, Observable.Empty<T>());
+    }
+    
+    public static IObservable<T> SwitchIfNot<T>(
+        this IObservable<T> source, 
+        IObservable<bool> condition, 
+        IObservable<T> alternateSource)
+    {
+        return condition
+            .Select(x => x ? source : alternateSource)
+            .Switch();
     }
     
     public static IObservable<TOut> SwitchIf<TIn, TOut>(

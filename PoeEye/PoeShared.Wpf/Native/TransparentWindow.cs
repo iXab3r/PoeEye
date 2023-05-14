@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Native;
 
@@ -25,10 +27,28 @@ public class TransparentWindow : ConstantAspectRatioWindow
 
     private bool AllowsTransparencyAfterLoad { get; set; }
 
+    public bool ShowSystemMenu { get; set; } = false;
+
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        Log.Debug(() => "Window is loaded - hiding system menu");
-        UnsafeNative.HideSystemMenu(WindowHandle);
+        Log.Debug(() => "Window is loaded");
+        this.WhenAnyValue(x => x.ShowSystemMenu)
+            .ObserveOnCurrentDispatcherIfNeeded()
+            .Subscribe(x =>
+            {
+                if (x)
+                {
+                    Log.Debug(() => "Showing system menu");
+                    UnsafeNative.ShowSystemMenu(WindowHandle);
+                }
+                else
+                {
+                    Log.Debug(() => "Hiding system menu");
+                    UnsafeNative.HideSystemMenu(WindowHandle);
+                }
+            })
+            .AddTo(Anchors);
+        
         Log.Debug(() => $"Setting WindowExNoActivate");
         AllowsTransparencyAfterLoad = AllowsTransparency;
     }

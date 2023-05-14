@@ -46,7 +46,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
         };
 
         this.WhenAnyValue(x => x.DeviceId)
-            .EnableIf(this.WhenAnyValue(x => x.IsEnabled))
+            .SwitchIfNot(this.WhenAnyValue(x => x.IsEnabled))
             .Subscribe(x =>
             {
                 if (DeviceListener != null)

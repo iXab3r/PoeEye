@@ -31,10 +31,6 @@
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.4">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
-    <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.1.6" />
     <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.3" />
     <PackageReference Include="PInvoke.SHCore" Version="0.6.49" />
     <PackageReference Include="Polly" Version="7.2.3" />
@@ -60,6 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\gong-wpf-dragdrop\src\GongSolutions.WPF.DragDrop\GongSolutions.WPF.DragDrop.csproj" />
+    <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
+    <ProjectReference Include="..\MaterialDesignInXamlToolkit\MaterialDesignThemes.Wpf\MaterialDesignThemes.Wpf.csproj" />
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
   </ItemGroup>

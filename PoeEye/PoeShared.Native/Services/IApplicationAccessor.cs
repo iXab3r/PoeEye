@@ -33,6 +33,6 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     bool LastLoadWasSuccessful { get; }
     
     Window MainWindow { get; }
-
+    
     void ReportIsLoaded();
 }

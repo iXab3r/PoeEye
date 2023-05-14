@@ -9,8 +9,8 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
-
-    <Style TargetType="{x:Type MenuItem}" x:Key="FastMenuItem" BasedOn="{x:Null}">
+    
+    <Style TargetType="{x:Type MenuItem}" x:Key="SlowMenuItem" BasedOn="{x:Null}">
         <Setter Property="Padding" Value="8,3" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="MinHeight" Value="27" />
@@ -126,12 +126,75 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type MenuItem}" x:Key="FastMenuItem" BasedOn="{x:Null}">
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="MinHeight" Value="27" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Command">
+            <Setter.Value>
+                <Binding RelativeSource="{RelativeSource Self}" Path="(ui1:CommandWrapperHelper.Command)" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=(ui1:CommandWrapperHelper.CommandParameter)}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type MenuItem}">
+                    <Border x:Name="Container"
+                            Background="{TemplateBinding Background}"
+                            Height="{TemplateBinding Height}">
+                        <Grid
+                            Margin="{TemplateBinding Padding}"
+                            VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="IconGroup" />
+                                <ColumnDefinition Width="*" SharedSizeGroup="TextGroup" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="GestureGroup" />
+                            </Grid.ColumnDefinitions>
+
+                            <ContentPresenter Grid.Column="0" x:Name="IconPresenter"
+                                              VerticalAlignment="Center"
+                                              Visibility="{TemplateBinding Icon, Converter={StaticResource NullToCollapsedConverter}}"
+                                              Content="{TemplateBinding Icon}" />
+
+                            <ContentPresenter Grid.Column="1" x:Name="HeaderPresenter"
+                                              Margin="{TemplateBinding Padding}"
+                                              ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                              Content="{TemplateBinding Header}"
+                                              ContentStringFormat="{TemplateBinding HeaderStringFormat}"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+
+                            <ContentPresenter Grid.Column="2" x:Name="InputGesturePresenter"
+                                              VerticalAlignment="Center"
+                                              Visibility="{TemplateBinding InputGestureText, Converter={StaticResource NullToCollapsedConverter}}"
+                                              Content="{TemplateBinding InputGestureText}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ui1:ContextMenuServiceExtensions.BindDataContextToMenuItemCommandParameter" Value="True">
+                            <Setter Property="ui1:CommandWrapperHelper.CommandParameter" Value="{Binding DataContext, RelativeSource={RelativeSource Self}}" />
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource PrimaryHueDarkBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value=".56" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="FastContextMenuStyle" TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource MaterialDesignContextMenu}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource FastMenuItem}"></Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type MenuBase}">

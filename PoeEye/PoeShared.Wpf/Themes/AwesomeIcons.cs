@@ -88,6 +88,8 @@ public static class AwesomeIcons
     public const string Unlink = "\uf127";
     public const string Warning = "\uf071";
     public const string Wiki = "\uf266";
+    public const string WindowMaximize = "\uf2d0";
+    public const string WindowRestore = "\uf2d2";
     public const string Youtube = "\uf167";
     public const string User = "\uf007";
     public const string UserCircle = "\uf2bd";
