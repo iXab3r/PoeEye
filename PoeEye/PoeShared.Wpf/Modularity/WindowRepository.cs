@@ -36,7 +36,7 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
 
         var controller = await Show(contentFactory);
         Log.Debug($"Awaiting for window to close: {controller}");
-        await controller.WhenClosed;
+        await controller.WhenClosed.Take(1).Do(x => { });
         Log.Debug($"Window has closed: {controller}");
     }
 

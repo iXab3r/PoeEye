@@ -32,6 +32,11 @@ public sealed class DispatcherScheduler : LocalScheduler, ISchedulerPeriodic
         }
     }
 
+    public static void EnsureExists()
+    {
+        var currentDispatcher = Current;//will throw if not exists
+    }
+
     /// <summary>
     /// Constructs a <see cref="DispatcherScheduler"/> that schedules units of work on the given <see cref="System.Windows.Threading.Dispatcher"/>.
     /// </summary>

@@ -6,7 +6,7 @@
                               xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
     <FontFamily x:Key="FontAwesome">pack://application:,,,/PoeShared.Wpf;component/Resources/#FontAwesome</FontFamily>
-    <FontFamily x:Key="JetBrainsMono">pack://application:,,,/PoeShared.Wpf;component/Resources/#JetBrains Mono</FontFamily>
+    <FontFamily x:Key="JetBrainsMono" >pack://application:,,,/PoeShared.Wpf;component/Resources/#JetBrains Mono</FontFamily>
     <SolidColorBrush x:Key="MaxTransparencyBrush" ice:Freeze="True">#01000000</SolidColorBrush>
     <Color x:Key="TransparentColorKey">#00000000</Color>
     <Color x:Key="OverlayBorderColorKey">#1A6A73</Color>
@@ -23,21 +23,21 @@
     <SolidColorBrush x:Key="OverlayBackgroundBrushKey" Color="{StaticResource OverlayBackgroundColorKey}" ice:Freeze="True" />
     <SolidColorBrush x:Key="OverlayForegroundBrushKey" Color="{StaticResource OverlayForegroundColorKey}" ice:Freeze="True" />
     
-    <DataTemplate x:Key="EmptyTemplate"/>
+    <DataTemplate x:Key="EmptyTemplate" />
 
-    <DrawingBrush x:Key="CheckerboardBrushKey" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+    <DrawingBrush x:Key="CheckerboardBrushKey" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ice:Freeze="True" >
         <DrawingBrush.Drawing>
             <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="LightGray" />
         </DrawingBrush.Drawing>
     </DrawingBrush>
 
-    <LinearGradientBrush x:Key="PrimaryHueMidGradientBrush" StartPoint="0,0" EndPoint="1,1">
+    <LinearGradientBrush x:Key="PrimaryHueMidGradientBrush" StartPoint="0,0" EndPoint="1,1" ice:Freeze="True" >
         <GradientStop Color="{StaticResource OverlayTitleBackgroundColorKey}" Offset="0.0" />
         <GradientStop Color="{StaticResource OverlayTitleBackgroundColorKey}" Offset="0.3" />
         <GradientStop Color="Transparent" Offset="0.7" />
     </LinearGradientBrush>
 
-    <DrawingBrush x:Key="ColoredCheckerboardBrushKey" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+    <DrawingBrush x:Key="ColoredCheckerboardBrushKey" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ice:Freeze="True" >
         <DrawingBrush.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Green">
@@ -123,7 +123,7 @@
     <SolidColorBrush x:Key="PoeItemRarityRelicBrush" Color="{StaticResource PoeItemRarityRelicColor}" ice:Freeze="True" />
 
     <!-- Change this to any pure hue i.e. no more than 2 rgb components set and at least 1 set to FF -->
-    <LinearGradientBrush x:Key="HueBrush" StartPoint="0,0" EndPoint="1,0">
+    <LinearGradientBrush x:Key="HueBrush" StartPoint="0,0" EndPoint="1,0" ice:Freeze="True" >
         <LinearGradientBrush.GradientStops>
             <GradientStop Color="#FF0000" Offset="0" />
             <GradientStop Color="#FFFF00" Offset="0.167" />
@@ -135,24 +135,24 @@
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="MahAccentDoubleGradientBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
+    <LinearGradientBrush x:Key="MahAccentDoubleGradientBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3" ice:Freeze="True" >
         <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
         <GradientStop Color="Transparent" Offset="1" />
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="MahGroupBoxHeaderBrush" StartPoint="0,0" EndPoint="1,1">
+    <LinearGradientBrush x:Key="MahGroupBoxHeaderBrush" StartPoint="0,0" EndPoint="1,1" ice:Freeze="True" >
         <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
         <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.2" />
         <GradientStop Color="Transparent" Offset="0.8" />
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="MahGroupBoxLightHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
+    <LinearGradientBrush x:Key="MahGroupBoxLightHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3" ice:Freeze="True" >
         <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.0" />
         <GradientStop Color="{StaticResource MahApps.Colors.Accent}" Offset="0.1" />
         <GradientStop Color="Transparent" Offset="0.8" />
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="MahGroupBoxNeutralHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3">
+    <LinearGradientBrush x:Key="MahGroupBoxNeutralHeaderBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.3" ice:Freeze="True" >
         <GradientStop Color="{StaticResource NeutralColor}" Offset="0.0" />
         <GradientStop Color="{StaticResource NeutralColor}" Offset="0.1" />
         <GradientStop Color="Transparent" Offset="0.8" />
@@ -250,14 +250,14 @@
         </DrawingBrush.Drawing>
     </DrawingBrush>
 
-    <BitmapImage x:Key="MouseDeviceLeftImage" UriSource="../Resources/mouse-device-left-click-control.png" />
-    <BitmapImage x:Key="MouseDeviceRightImage" UriSource="../Resources/mouse-device-right-click-control.png" />
-    <BitmapImage x:Key="MouseDeviceMiddleImage" UriSource="../Resources/mouse-device-middle-click-control.png" />
-    <BitmapImage x:Key="MouseDeviceXButton1Image" UriSource="../Resources/mouse-device-xbutton1-click-control.png" />
-    <BitmapImage x:Key="MouseDeviceXButton2Image" UriSource="../Resources/mouse-device-xbutton2-click-control.png" />
-    <BitmapImage x:Key="CursorAbsoluteImage" UriSource="../Resources/CursorAbsolute.png" />
-    <BitmapImage x:Key="CursorRelativeImage" UriSource="../Resources/CursorRelative.png" />
-    <BitmapImage x:Key="DragDropImage" UriSource="../Resources/DragDrop.png" />
-    <BitmapImage x:Key="DragDropWhiteImage" UriSource="../Resources/DragDropWhite.png" />
-    <BitmapImage x:Key="ExceptionImage" UriSource="../Resources/exception.png" />
+    <BitmapImage x:Key="MouseDeviceLeftImage" UriSource="../Resources/mouse-device-left-click-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="MouseDeviceRightImage" UriSource="../Resources/mouse-device-right-click-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="MouseDeviceMiddleImage" UriSource="../Resources/mouse-device-middle-click-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="MouseDeviceXButton1Image" UriSource="../Resources/mouse-device-xbutton1-click-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="MouseDeviceXButton2Image" UriSource="../Resources/mouse-device-xbutton2-click-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="CursorAbsoluteImage" UriSource="../Resources/CursorAbsolute.png" ice:Freeze="True" />
+    <BitmapImage x:Key="CursorRelativeImage" UriSource="../Resources/CursorRelative.png" ice:Freeze="True" />
+    <BitmapImage x:Key="DragDropImage" UriSource="../Resources/DragDrop.png" ice:Freeze="True" />
+    <BitmapImage x:Key="DragDropWhiteImage" UriSource="../Resources/DragDropWhite.png" ice:Freeze="True" />
+    <BitmapImage x:Key="ExceptionImage" UriSource="../Resources/exception.png" ice:Freeze="True" />
 </eye:SharedResourceDictionary>

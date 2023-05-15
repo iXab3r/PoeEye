@@ -3,6 +3,7 @@
                               xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                               xmlns:mdix="http://materialdesigninxaml.net/winfx/xaml/themes"
                               xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                              xmlns:ice="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                               xmlns:eye="clr-namespace:PoeShared.UI"
                               xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
                               xmlns:st="http://schemas.spicytaco.io/">
@@ -12,8 +13,8 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.slider.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
 
-    <Geometry x:Key="DownArrowGeometry">M 0 0 L 3.5 4 L 7 0 Z</Geometry>
-    <Geometry x:Key="UpArrowGeometry">M 0 4 L 3.5 0 L 7 4 Z</Geometry>
+    <Geometry x:Key="DownArrowGeometry" ice:Freeze="True">M 0 0 L 3.5 4 L 7 0 Z</Geometry>
+    <Geometry x:Key="UpArrowGeometry" ice:Freeze="True">M 0 4 L 3.5 0 L 7 4 Z</Geometry>
 
     <ControlTemplate x:Key="FastNumericUpDownTemplate" TargetType="{x:Type mah:NumericUpDown}">
         <Grid Background="Transparent" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
@@ -129,7 +130,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="ContextMenu" Value="{StaticResource MaterialDesignDefaultContextMenu}" />
+        <Setter Property="ContextMenu" Value="{DynamicResource MaterialDesignDefaultContextMenu}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />

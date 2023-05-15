@@ -30,12 +30,12 @@ public class NumericUpDownEx : NumericUpDown
     private const string PART_DecrementButton = "PART_NumericDown";
 
     public static readonly DependencyProperty IsMouseDragEnabledProperty = DependencyProperty.Register(
-        "IsMouseDragEnabled", typeof(bool), typeof(NumericUpDownEx), new PropertyMetadata(default(bool)));
+        nameof(IsMouseDragEnabled), typeof(bool), typeof(NumericUpDownEx), new PropertyMetadata(default(bool)));
 
     public bool IsMouseDragEnabled
     {
-        get { return (bool) GetValue(IsMouseDragEnabledProperty); }
-        set { SetValue(IsMouseDragEnabledProperty, value); }
+        get => (bool) GetValue(IsMouseDragEnabledProperty);
+        set => SetValue(IsMouseDragEnabledProperty, value);
     }
     
     static NumericUpDownEx()
