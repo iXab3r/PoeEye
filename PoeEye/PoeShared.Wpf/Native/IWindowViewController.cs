@@ -2,10 +2,11 @@ using System;
 using System.ComponentModel;
 using System.Reactive;
 using System.Windows;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
 
-public interface IWindowViewController : INotifyPropertyChanged, IViewController
+public interface IWindowViewController : IDisposableReactiveObject, IViewController
 {
     IObservable<Unit> WhenLoaded { get; }
         

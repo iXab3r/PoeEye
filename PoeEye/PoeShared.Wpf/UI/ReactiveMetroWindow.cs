@@ -9,15 +9,17 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
 
-public class MetroWindowEx : MetroWindow, IDisposableReactiveObject
+public class ReactiveMetroWindow : MetroWindow
 {
-    public MetroWindowEx()
+    public CompositeDisposable Anchors { get; } = new();
+
+    public ReactiveMetroWindow()
     {
         AllowsTransparency = true;
         WindowStyle = WindowStyle.None;
         SourceInitialized += OnSourceInitialized;
         Closed += OnClosed;
-        Controller = new WindowViewController(this);
+        Controller = new WindowViewController(this).AddTo(Anchors);
     }
 
     private void OnSourceInitialized(object sender, EventArgs e)
@@ -28,8 +30,6 @@ public class MetroWindowEx : MetroWindow, IDisposableReactiveObject
             throw new InvalidStateException("Window handle must be initialized at this point");
         }
     }
-
-    public CompositeDisposable Anchors { get; } = new();
 
     public IntPtr WindowHandle { get; private set; }
     
@@ -53,7 +53,6 @@ public class MetroWindowEx : MetroWindow, IDisposableReactiveObject
         base.OnPropertyChanged(e);
         RaisePropertyChanged(e.Property.Name);
     }
-
 
     private void OnClosed(object sender, EventArgs e)
     {

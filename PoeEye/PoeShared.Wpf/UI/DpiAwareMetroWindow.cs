@@ -7,7 +7,7 @@ using PoeShared.Native;
 
 namespace PoeShared.UI;
 
-public class DpiAwareMetroWindow : MetroWindowEx
+public class DpiAwareMetroWindow : ReactiveMetroWindow
 {
     public static readonly DependencyProperty DpiProperty = DependencyProperty.Register(
         nameof(Dpi), typeof(DpiScale), typeof(MetroWindow), new PropertyMetadata(default(DpiScale)));

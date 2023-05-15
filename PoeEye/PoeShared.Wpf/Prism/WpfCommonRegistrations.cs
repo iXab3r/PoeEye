@@ -49,6 +49,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IErrorMonitorViewModel, ErrorMonitorViewModel>()
             .RegisterSingleton<IProfilerViewModel, PerformanceProfilerViewModel>()
             .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
+            .RegisterSingleton<IWindowRepository, WindowRepository>()
             .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
             .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);
             

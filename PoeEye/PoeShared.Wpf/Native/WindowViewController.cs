@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Interop;
@@ -9,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Modularity;
 using ReactiveUI;
 
 namespace PoeShared.Native;
@@ -52,6 +54,12 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
                 owner.Topmost = true;
             }, Log.HandleUiException)
             .AddTo(Anchors);
+
+        new ScheduledDisposable(DispatcherScheduler.Current, Disposable.Create(() =>
+        {
+            Log.Debug("Controlled is being disposed, closing the window");
+            Close();
+        })).AddTo(Anchors);
     }
         
     private IFluentLog Log { get; }

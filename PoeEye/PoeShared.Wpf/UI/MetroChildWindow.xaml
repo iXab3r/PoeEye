@@ -1,0 +1,72 @@
+﻿<ui:ReactiveMetroWindow x:Class="PoeShared.UI.MetroChildWindow"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:views="clr-namespace:PoeShared.Dialogs.Views;assembly=PoeShared.Wpf"
+                     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                     xmlns:converters="http://schemas.kent.boogaart.com/converters"
+                     xmlns:ui="clr-namespace:PoeShared.UI"
+                     xmlns:native="clr-namespace:PoeShared.Native"
+                     mc:Ignorable="d"
+                     Height="450" Width="800"
+                     IsTabStop="False"
+                     d:DataContext="{d:DesignInstance native:IWindowViewModel}"
+                     ShowInTaskbar="{Binding ShowInTaskbar, Mode=TwoWay}"
+                     ShowActivated="True"
+                     Focusable="True"
+                     WindowStartupLocation="CenterOwner"
+                     Title="{Binding Title}"
+                     Foreground="{StaticResource OverlayForegroundBrushKey}"
+                     UseLayoutRounding="True"
+                     ShowSystemMenu="True"
+                     BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
+                     Background="{DynamicResource MaterialDesignPaper}"
+                     BorderThickness="1">
+    <mah:MetroWindow.LeftWindowCommands>
+        <mah:WindowCommands ShowSeparators="True" Margin="3,0,0,0">
+            <ToggleButton Margin="4,2,7,2"
+                          Style="{StaticResource FlatToggleButton}"
+                          Width="20"
+                          Height="20"
+                          ToolTip="Always on Top">
+                <ToggleButton.IsChecked>
+                    <Binding Path="Controller.Topmost"
+                             RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ui:MetroChildWindow}}" />
+                </ToggleButton.IsChecked>
+                <ToggleButton.Content>
+                    <materialDesign:PackIcon>
+                        <materialDesign:PackIcon.Foreground>
+                            <Binding Path="Controller.Topmost" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ui:MetroChildWindow}}">
+                                <Binding.Converter>
+                                    <converters:MapConverter>
+                                        <converters:MapConverter.Mappings>
+                                            <converters:Mapping From="{StaticResource TrueValue}" To="{StaticResource PositiveBrush}" />
+                                            <converters:Mapping From="{StaticResource FalseValue}" To="{StaticResource WarningBrush}" />
+                                        </converters:MapConverter.Mappings>
+                                    </converters:MapConverter>
+                                </Binding.Converter>
+                            </Binding>
+                        </materialDesign:PackIcon.Foreground>
+                        <materialDesign:PackIcon.Kind>
+                            <Binding Path="Controller.Topmost" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ui:MetroChildWindow}}">
+                                <Binding.Converter>
+                                    <converters:MapConverter>
+                                        <converters:MapConverter.Mappings>
+                                            <converters:Mapping From="{StaticResource TrueValue}" To="{x:Static materialDesign:PackIconKind.Pin}" />
+                                            <converters:Mapping From="{StaticResource FalseValue}" To="{x:Static materialDesign:PackIconKind.PinOutline}" />
+                                        </converters:MapConverter.Mappings>
+                                    </converters:MapConverter>
+                                </Binding.Converter>
+                            </Binding>
+                        </materialDesign:PackIcon.Kind>
+                    </materialDesign:PackIcon>
+                </ToggleButton.Content>
+            </ToggleButton>
+        </mah:WindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>
+    <Grid>
+        <ui:CachedContentControl Content="{Binding }"/>
+    </Grid>
+</ui:ReactiveMetroWindow>
