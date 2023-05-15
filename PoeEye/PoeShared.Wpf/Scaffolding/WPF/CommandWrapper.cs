@@ -164,17 +164,17 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     
     public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute, DispatcherScheduler.Current));
+        return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(DispatcherScheduler.Current), DispatcherScheduler.Current));
     }
 
     public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute, DispatcherScheduler.Current));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(DispatcherScheduler.Current), DispatcherScheduler.Current));
     }
     
     public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
     {
-        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute, DispatcherScheduler.Current));
+        return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(DispatcherScheduler.Current), DispatcherScheduler.Current));
     }
 
     public static CommandWrapper Create(Func<Task> execute)
