@@ -94,8 +94,10 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
             window.Loaded += (sender, args) =>
             {
                 Log.Debug($"Window has loaded: {window}");
+                content.SetOverlayWindow(window);
                 windowCompletionSource.SetResult(window.Controller);
             };
+            
             
             try
             {

@@ -26,7 +26,7 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
 
     string Title { [CanBeNull] get; }
 
-    ReactiveMetroWindow Parent { [CanBeNull] get; }
+    ReactiveMetroWindow ParentWindow { [CanBeNull] get; }
 
     IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
     IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }

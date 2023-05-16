@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using MahApps.Metro.Controls;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -31,6 +32,7 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         Log.Debug(() => "Created window");
         AllowsTransparency = true;
         WindowStyle = WindowStyle.None;
+        NonActiveBorderBrush = Brushes.Transparent;
         Initialized += OnInitialized;
         SourceInitialized += OnSourceInitialized;
         Closed += OnClosed;
