@@ -77,7 +77,16 @@ public partial class UnsafeNative
     
     [DllImport("user32.dll", SetLastError=true)]
     static extern IntPtr SetFocus(IntPtr hWnd);
-
+    
+    /// <summary>
+    /// Enables or disables mouse and keyboard input to the specified window or control. When input is disabled, the window does not receive input such as mouse clicks and key presses. When input is enabled, the window receives all input.
+    /// </summary>
+    /// <param name="hWnd">A handle to the window to be enabled or disabled.</param>
+    /// <param name="isEnabled">If the window was previously disabled, the return value is nonzero. If the window was not previously disabled, the return value is zero.</param>
+    /// <returns>If the window was previously disabled, returns true. If the window was not previously disabled, returns false</returns>
+    [DllImport("user32.dll", SetLastError=true)]
+    public static extern bool EnableWindow(IntPtr hWnd, bool isEnabled);
+    
     [DllImport("gdi32.dll")]
     static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2,int cx, int cy);
 
@@ -311,6 +320,6 @@ public partial class UnsafeNative
         public int y;
         public int cx;
         public int cy;
-        public readonly int flags;
+        public readonly User32.SetWindowPosFlags flags;
     }
 }

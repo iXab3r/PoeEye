@@ -1,8 +1,6 @@
-﻿using PoeShared.Scaffolding;
+﻿namespace PoeShared.UI;
 
-namespace PoeShared.UI;
-
-public partial class MetroChildWindow : IDisposableReactiveObject
+public partial class MetroChildWindow
 {
     public MetroChildWindow()
     {

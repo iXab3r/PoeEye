@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -8,6 +9,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using EnumsNET;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
@@ -17,31 +19,20 @@ using ReactiveUI;
 
 namespace PoeShared.Native;
 
-public class ConstantAspectRatioWindow : ReactiveWindow
+public class ReactiveMetroWindow : ReactiveMetroWindowBase
 {
     public static readonly DependencyProperty TargetAspectRatioProperty = DependencyProperty.Register(
-        nameof(TargetAspectRatio), typeof(double?), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(double?)));
-
-    private static long GlobalWindowId;
+        nameof(TargetAspectRatio), typeof(double?), typeof(ReactiveMetroWindow), new PropertyMetadata(default(double?)));
 
     private const float DefaultPixelsPerInch = 96.0F;
 
     private readonly AspectRatioSizeCalculator aspectRatioSizeCalculator = new();
     private DragParams? dragParams;
 
-    protected ConstantAspectRatioWindow()
+    public ReactiveMetroWindow()
     {
-        Scheduler = new DispatcherScheduler(Dispatcher.CurrentDispatcher);
-        Title = WindowId;
         Tag = $"Tag of {WindowId}";
-        Log = typeof(ConstantAspectRatioWindow).PrepareLogger()
-            .WithSuffix(WindowId)
-            .WithSuffix(() => NativeWindowId)
-            .WithSuffix(() => DataContext == default ? "Data context is not set" : DataContext.ToString());
         Loaded += OnLoaded;
-        Initialized += OnInitialized;
-        SourceInitialized += OnSourceInitialized;
-        Closed += OnClosed;
 
         this.Observe(TargetAspectRatioProperty, x => x.TargetAspectRatio)
             .DistinctUntilChanged()
@@ -75,15 +66,6 @@ public class ConstantAspectRatioWindow : ReactiveWindow
 
     public Rectangle ActualBounds { get; private set; }
 
-    public IntPtr WindowHandle { get; private set; }
-
-    public IScheduler Scheduler { get; }
-
-    public string NativeWindowId =>
-        WindowHandle == IntPtr.Zero ? $"Native window not created yet" : WindowHandle.ToHexadecimal();
-
-    public string WindowId { get; } = $"Wnd#{Interlocked.Increment(ref GlobalWindowId)}";
-
     public double? TargetAspectRatio
     {
         get => (double?) GetValue(TargetAspectRatioProperty);
@@ -93,34 +75,9 @@ public class ConstantAspectRatioWindow : ReactiveWindow
     public PointF Dpi { get; private set; }
 
     public bool DpiAware { get; set; } = true;
-
-    protected IFluentLog Log { get; }
-
-    private void OnInitialized(object sender, EventArgs e)
-    {
-        Log.Debug(() => $"Window initialized");
-        Log.Debug("Initializing native window handle");
-        new WindowInteropHelper(this).EnsureHandle(); //EnsureHandle leads to SourceInitialized
-        Log.Debug(() => "Native window initialized");
-    }
-
-    private void OnClosed(object sender, EventArgs e)
-    {
-        Log.Info(() => $"Window is closed, source: {this}");
-
-        Anchors.Dispose();
-    }
-
-    private void OnSourceInitialized(object sender, EventArgs e)
-    {
-        Log.Debug(() => "Native window initialized");
-        WindowHandle = new WindowInteropHelper(this).Handle; // should be already available here
-        Log.Debug(() => $"Initialized native window handle");
-        if (WindowHandle == IntPtr.Zero)
-        {
-            throw new InvalidStateException("Window handle must be initialized at this point");
-        }
-    }
+    
+    public IObservable<EventPattern<EventArgs>> WhenRendered => Observable
+        .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h);
 
     private void OnLoaded(object sender, EventArgs ea)
     {
@@ -137,9 +94,25 @@ public class ConstantAspectRatioWindow : ReactiveWindow
             Log.Debug(() => $"Releasing {nameof(HwndSource)}");
             hwndSource.Dispose();
         }).AddTo(Anchors);
+        
+        this.WhenAnyValue(ShowSystemMenuProperty, x => x.ShowSystemMenu)
+            .Subscribe(x =>
+            {
+                if (x)
+                {
+                    Log.Debug(() => "Showing system menu");
+                    UnsafeNative.ShowSystemMenu(WindowHandle);
+                }
+                else
+                {
+                    Log.Debug(() => "Hiding system menu");
+                    UnsafeNative.HideSystemMenu(WindowHandle);
+                }
+            })
+            .AddTo(Anchors);
 
         Dpi = GetDpiFromHwndSource(hwndSource);
-        hwndSource.AddHook(WindowDragHook);
+        hwndSource.AddHook(WindowDragHook); 
         //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
         Log.Debug(() => $"Resolved {nameof(HwndSource)} for {WindowHandle}: {hwndSource}");
         hwndSource.AddHook(WindowPositionHook);
@@ -223,8 +196,14 @@ public class ConstantAspectRatioWindow : ReactiveWindow
             case User32.WindowMessage.WM_WINDOWPOSCHANGING
                 when Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS)) is UnsafeNative.WINDOWPOS wp:
             {
+                if (wp.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE))
+                {
+                    // window reordering
+                    Log.WithSuffix(msg).Debug(() => $"Window position is being updated w/o move/resize, flags: {wp.flags}");
+                    break;
+                }
                 var desiredBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
-                Log.WithSuffix(msg).Debug(() => $"Window position is being changed to {desiredBounds}");
+                Log.WithSuffix(msg).Debug(() => $"Window position is being changed to {desiredBounds}, flags: {wp.flags}");
                 break;
             }
             case User32.WindowMessage.WM_SIZING
@@ -244,8 +223,14 @@ public class ConstantAspectRatioWindow : ReactiveWindow
             case User32.WindowMessage.WM_WINDOWPOSCHANGED
                 when Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS)) is UnsafeNative.WINDOWPOS wp:
             {
+                if (wp.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE))
+                {
+                    // window reordering
+                    Log.WithSuffix(msg).Debug(() => $"Window position has being updated w/o move/resize, flags: {wp.flags}");
+                    break;
+                }
                 var newBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
-                Log.WithSuffix(msg).Debug(() => $"Window position has been changed to {newBounds}");
+                Log.WithSuffix(msg).Debug(() => $"Window position has been changed to {newBounds}, flags: {wp.flags}");
                 var currentBounds = ActualBounds;
                 if (newBounds != currentBounds)
                 {
@@ -306,7 +291,7 @@ public class ConstantAspectRatioWindow : ReactiveWindow
                 }
 
                 var pos = (UnsafeNative.WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
-                if ((pos.flags & (int)SWP.NOMOVE) != 0)
+                if (pos.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE))
                 {
                     break;
                 }
@@ -362,11 +347,6 @@ public class ConstantAspectRatioWindow : ReactiveWindow
         return IntPtr.Zero;
     }
 
-    public override string ToString()
-    {
-        return $"{WindowId} ({NativeWindowId})";
-    }
-
     private static PointF GetDpiFromHwndSource(HwndSource targetSource)
     {
         if (targetSource == null)
@@ -402,11 +382,6 @@ public class ConstantAspectRatioWindow : ReactiveWindow
         }
 
         return new PointF(dpiX / DefaultPixelsPerInch, dpiY / DefaultPixelsPerInch);
-    }
-
-    private enum SWP
-    {
-        NOMOVE = 0x0002
     }
 
     private struct DragParams

@@ -1,4 +1,4 @@
-﻿<native:WindowBase
+﻿<native:ReactiveMetroWindow
     x:Class="PoeShared.Native.OverlayWindowView"
     x:Name="WindowRoot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -16,7 +16,13 @@
     IsTabStop="False"
     ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
-    UseLayoutRounding="True">
+    ShowSystemMenu="False"
+    ShowTitleBar="False"
+    ShowCloseButton="False"
+    UseLayoutRounding="True"
+    BorderThickness="0"
+    NonActiveBorderBrush="{x:Null}"
+    BorderBrush="{x:Null}">
 
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}"
@@ -46,8 +52,8 @@
         </eye:SharedResourceDictionary>
     </Window.Resources>
 
-    <native:TransparentWindow.Style>
-        <Style TargetType="{x:Type native:TransparentWindow}">
+    <native:ReactiveMetroWindow.Style>
+        <Style TargetType="{x:Type native:ReactiveMetroWindow}">
             <Setter Property="Background" Value="{x:Null}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="DataContext" Value="{Binding}" />
@@ -62,7 +68,7 @@
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="AllowsTransparency" Value="True" />
         </Style>
-    </native:TransparentWindow.Style>
+    </native:ReactiveMetroWindow.Style>
 
     <Grid>
         <Border>
@@ -243,4 +249,4 @@
         </scaffolding:DataPiping.DataPipes>
     </Grid>
 
-</native:WindowBase>
+</native:ReactiveMetroWindow>

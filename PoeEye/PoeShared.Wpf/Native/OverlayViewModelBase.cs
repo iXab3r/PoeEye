@@ -142,15 +142,15 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
 
     public virtual void ResetToDefault()
     {
-        if (OverlayWindow == null)
+        if (Parent == null)
         {
             throw new InvalidOperationException("Overlay window is not loaded yet");
         }
 
-        var activeMonitor = UnsafeNative.GetMonitorInfo(OverlayWindow);
+        var activeMonitor = UnsafeNative.GetMonitorInfo(Parent);
 
         Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {NativeBounds})");
-        var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
+        var center = UnsafeNative.GetPositionAtTheCenter(Parent).ScaleToScreen(Dpi);
         var size = DefaultSize.IsNotEmpty() ? DefaultSize : MinSize;
         NativeBounds = new Rectangle(center, size);
         Log.Info(() => $"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");

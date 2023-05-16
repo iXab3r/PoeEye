@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
+using PoeShared.UI;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.Native;
@@ -25,14 +26,12 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
 
     string Title { [CanBeNull] get; }
 
-    TransparentWindow OverlayWindow { [CanBeNull] get; }
+    ReactiveMetroWindow Parent { [CanBeNull] get; }
 
     IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
     IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
     IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyDown { get; }
     IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
-
-    void SetOverlayWindow([NotNull] TransparentWindow owner);
 
     bool ShowInTaskbar { get; set; }
 
@@ -41,4 +40,6 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     bool IsLoaded { get; }
     
     double? TargetAspectRatio { get; set; }
+    
+    internal void SetOverlayWindow([NotNull] ReactiveMetroWindow owner);
 }

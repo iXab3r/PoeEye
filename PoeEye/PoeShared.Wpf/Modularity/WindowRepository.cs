@@ -34,6 +34,21 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
     {
         Log.Debug($"Showing new modal dialog window with content of type {typeof(T)}");
 
+        using var windowAnchors = new CompositeDisposable();
+        /* This simulates "modal" behavior of child window, but looks kinda bad (looks like window is non-responsive rather than inactive) 
+        if (applicationAccessor.MainWindow != null)
+        {
+            var mainWindowHandle = applicationAccessor.MainWindow.GetWindowHandle();
+            Log.Debug($"Disabling main window {mainWindowHandle.ToHexadecimal()}");
+            if (UnsafeNative.EnableWindow(mainWindowHandle, false) == false)
+            {
+                Log.Debug($"Disabled main window {mainWindowHandle.ToHexadecimal()}");
+                Disposable.Create(() =>
+                {
+                    Log.Debug($"Enabling main window {mainWindowHandle.ToHexadecimal()}");
+                }).AddTo(windowAnchors);
+            };
+        }*/
         var controller = await Show(contentFactory);
         Log.Debug($"Awaiting for window to close: {controller}");
         await controller.WhenClosed.Take(1).Do(x => { });

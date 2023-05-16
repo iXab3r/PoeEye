@@ -57,8 +57,11 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
 
         new ScheduledDisposable(DispatcherScheduler.Current, Disposable.Create(() =>
         {
-            Log.Debug("Controlled is being disposed, closing the window");
-            Close();
+            if (Window.IsVisible)
+            {
+                Log.Debug("Controlled is being disposed, closing the window");
+                Close();   
+            }
         })).AddTo(Anchors);
     }
         
