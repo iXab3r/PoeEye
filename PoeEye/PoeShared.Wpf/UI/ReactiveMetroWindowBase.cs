@@ -1,12 +1,16 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using ControlzEx.Behaviors;
+using DynamicData;
 using MahApps.Metro.Controls;
+using Microsoft.Xaml.Behaviors;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -30,11 +34,13 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
             .WithSuffix(() => DataContext == default ? "Data context is not set" : DataContext.ToString());
         
         Log.Debug(() => "Created window");
+        PreferDWMBorderColor = false;
         AllowsTransparency = true;
         WindowStyle = WindowStyle.None;
         NonActiveBorderBrush = Brushes.Transparent;
+        
+
         Initialized += OnInitialized;
-        SourceInitialized += OnSourceInitialized;
         Closed += OnClosed;
         Loaded += OnLoaded;
         Activated += OnActivated;
@@ -72,13 +78,23 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         AllowsTransparencyAfterLoad = AllowsTransparency;
     }
 
-    private void OnSourceInitialized(object sender, EventArgs e)
+    protected override void OnSourceInitialized(EventArgs e)
     {
+        base.OnSourceInitialized(e);
+        
         WindowHandle = new WindowInteropHelper(this).Handle; // should be already available here
         if (WindowHandle == IntPtr.Zero)
         {
             throw new InvalidStateException("Window handle must be initialized at this point");
         }
+        
+        var behaviors = Interaction.GetBehaviors(this);
+        Log.Debug(() => $"Default behaviors: {behaviors.DumpToString()}");
+
+        var behaviorTypeToRemove = new[] { typeof(GlowWindowBehavior) };
+        var behaviorToRemove = behaviors.Where(x => behaviorTypeToRemove.Contains(x.GetType())).ToArray();
+        behaviors.RemoveMany(behaviorToRemove);
+        Log.Debug(() => $"Removing the following behaviors: {behaviorToRemove.DumpToString()}");
     }
 
     public IntPtr WindowHandle { get; private set; }
