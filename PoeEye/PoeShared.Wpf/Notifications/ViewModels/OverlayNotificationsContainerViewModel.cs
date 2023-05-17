@@ -5,12 +5,20 @@ using System.Windows;
 using System.Windows.Forms;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
+using PropertyBinder;
 using ReactiveUI;
 
 namespace PoeShared.Notifications.ViewModels;
 
 internal sealed class OverlayNotificationsContainerViewModel : OverlayViewModelBase
 {
+    private static readonly Binder<OverlayNotificationsContainerViewModel> Binder = new();
+
+    static OverlayNotificationsContainerViewModel()
+    {
+        Binder.Bind(x => x.Items != null && x.Items.Count > 0).To(x => x.IsVisible);
+    }
+    
     public OverlayNotificationsContainerViewModel()
     {
         Title = "NotificationsContainer";
@@ -29,6 +37,8 @@ internal sealed class OverlayNotificationsContainerViewModel : OverlayViewModelB
                 NativeBounds = x.DesiredBounds;
             }, Log.HandleUiException)
             .AddTo(Anchors);
+        
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     public ReadOnlyObservableCollection<INotificationContainerViewModel> Items { get; set; }
