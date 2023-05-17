@@ -27,6 +27,21 @@ public static class GeometryExtensions
             Y = y
         };
     }
+    
+    public static WinRect CenterInsideBounds(this WinRect childBounds, WinRect parentBounds)
+    {
+        // Calculate the center of the parent rectangle
+        var parentCenterX = parentBounds.X + parentBounds.Width / 2;
+        var parentCenterY = parentBounds.Y + parentBounds.Height / 2;
+
+        // Calculate the top left coordinates of the child rectangle
+        var childTopLeftX = parentCenterX - childBounds.Width / 2;
+        var childTopLeftY = parentCenterY - childBounds.Height / 2;
+
+        // Create a new rectangle for the child, centered within the parent
+        var centeredChildBounds = childBounds with {X = childTopLeftX, Y = childTopLeftY};
+        return centeredChildBounds;
+    }
 
     public static WinRect EnsureInBounds(this WinRect value, WinSize min, WinSize max)
     {

@@ -154,10 +154,13 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
         var window = new MessageBoxWindow
         {
             Owner = windowStack.Count <= 0 ? mainWindow : windowStack.Peek(),
-            DataContext = windowContainer
+            DataContext = windowContainer,
+            WindowStartupLocation = WindowStartupLocation.Manual
         };
         windowStack.Push(window);
         Disposable.Create(() => windowStack.Pop()).AddTo(windowAnchors);
+
+        var ownerWindowRect = UnsafeNative.GetWindowRect(window.Owner.GetWindowHandle());
 
         window.WhenLoaded()
             .Do(args => log.Debug(() => $"Message box is loaded"))
@@ -165,6 +168,11 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
             {
                 log.Debug(() => $"Assigning overlay view {this} to view-model {messageBox}");
                 messageBox.SetOverlayWindow(window);
+
+                var childRect = messageBox.NativeBounds;
+                var updatedBounds = childRect.CenterInsideBounds(ownerWindowRect);
+                log.Debug($"Centering rect {childRect} inside parent {ownerWindowRect}, result: {updatedBounds}");
+                messageBox.NativeBounds = updatedBounds;
             }, log.HandleUiException)
             .AddTo(windowAnchors);
         

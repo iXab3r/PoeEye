@@ -91,10 +91,17 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
                 };
             }
 
+            var ownerWindowRect = UnsafeNative.GetWindowRect(mainWindowHandle);
             window.Loaded += (sender, args) =>
             {
                 Log.Debug($"Window has loaded: {window}");
                 content.SetOverlayWindow(window);
+                
+                var childRect = window.NativeBounds;
+                var updatedBounds = childRect.CenterInsideBounds(ownerWindowRect);
+                Log.Debug($"Centering rect {childRect} inside parent {ownerWindowRect}, result: {updatedBounds}");
+                window.NativeBounds = updatedBounds;
+                
                 windowCompletionSource.SetResult(window.Controller);
             };
             

@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
+using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.UI;
 
@@ -14,6 +15,8 @@ namespace PoeShared.Scaffolding;
 
 public static class ChangeSetExtensions
 {
+    private static readonly IFluentLog Log = typeof(ChangeSetExtensions).PrepareLogger();
+
     public static IObservable<IChangeSet<T>> BindToCollectionVirtualized<T>(
         this IObservable<IChangeSet<T>> source, 
         out IReadOnlyObservableCollection<IVirtualizedListContainer<T>> collection) where T : class
@@ -35,7 +38,7 @@ public static class ChangeSetExtensions
             var list = new VirtualizedList<T, TContainer>(
                 source,
                 containerFactory: new LambdaFactory<TContainer>(containerFactory)).AddTo(anchors);
-            list.Containers.Connect().Bind(resultCollection).Subscribe().AddTo(anchors);
+            list.Containers.Connect().Bind(resultCollection).SubscribeToErrors(Log.HandleUiException).AddTo(anchors);
             return anchors;
         });
     }
@@ -60,7 +63,7 @@ public static class ChangeSetExtensions
                     switch (change.Reason)
                     {
                         case ListChangeReason.Add:
-                            destination.Insert(change.CurrentIndex, change.Current);
+                            destination.Add(change.Current);
                             break;
                         case ListChangeReason.Remove:
                             destination.Remove(change.Current);
@@ -78,7 +81,7 @@ public static class ChangeSetExtensions
                             throw new ArgumentOutOfRangeException(nameof(change), change.Reason, $"Change of type {change.Reason} is not supported, full change: {change}");
                     }
                 })
-                .Subscribe()
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(anchors);
 
 

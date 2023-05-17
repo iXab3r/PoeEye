@@ -12,7 +12,6 @@
                               xmlns:views="clr-namespace:PoeShared.Dialogs.Views"
                               mc:Ignorable="d"
                               d:DataContext="{d:DesignInstance views:MessageBoxContainerViewModel}"
-                              WindowStartupLocation="CenterOwner"
                               IsTabStop="False"
                               ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
                               ShowActivated="True"
