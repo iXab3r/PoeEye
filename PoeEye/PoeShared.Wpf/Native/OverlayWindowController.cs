@@ -73,7 +73,6 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
         logger.Debug(() => $"Initialized window container: {windowContainer}");
         var window = new OverlayWindowView
         {
-            Title = $"{viewModel.Id} {overlayControllerId}",
             Visibility = Visibility.Collapsed,
             ShowInTaskbar = false,
             ShowActivated = false,
