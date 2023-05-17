@@ -47,7 +47,7 @@ internal sealed class TrackedOverlayWindowController : OverlayWindowController, 
     
     private bool IsPairedOverlay(IntPtr hwnd)
     {
-        return Children.Items.Any(x => x.ParentWindow != null && x.ParentWindow.WindowHandle == hwnd);
+        return Children.Items.Any(x => x.WindowController != null && x.WindowController.Handle == hwnd);
     }
 
     public IWindowTracker WindowTracker { get; }

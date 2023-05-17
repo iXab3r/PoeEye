@@ -167,7 +167,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
             .SubscribeSafe(() =>
             {
                 log.Debug(() => $"Assigning overlay view {this} to view-model {messageBox}");
-                messageBox.SetOverlayWindow(window);
+                messageBox.SetOverlayWindow(window.Controller);
 
                 var childRect = messageBox.NativeBounds;
                 var updatedBounds = childRect.CenterInsideBounds(ownerWindowRect);

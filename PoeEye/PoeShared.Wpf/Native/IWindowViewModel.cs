@@ -26,12 +26,12 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
 
     string Title { [CanBeNull] get; }
 
-    ReactiveMetroWindow ParentWindow { [CanBeNull] get; }
+    IWindowViewController WindowController { [CanBeNull] get; }
 
-    IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
-    IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
-    IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyDown { get; }
-    IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
+    IObservable<KeyEventArgs> WhenKeyUp { get; }
+    IObservable<KeyEventArgs> WhenKeyDown { get; }
+    IObservable<KeyEventArgs> WhenPreviewKeyDown { get; }
+    IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
 
     bool ShowInTaskbar { get; set; }
 
@@ -41,5 +41,5 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     
     double? TargetAspectRatio { get; set; }
     
-    internal void SetOverlayWindow([NotNull] ReactiveMetroWindow owner);
+    internal void SetOverlayWindow([NotNull] IWindowViewController owner);
 }

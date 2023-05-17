@@ -4,10 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
 using PInvoke;
-using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -30,7 +27,7 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         this.schedulerProvider = schedulerProvider;
     }
     
-    public async Task ShowDialog<T>(Func<T> contentFactory) where T : IWindowViewModel
+    public async Task<T> ShowDialog<T>(Func<T> contentFactory) where T : IWindowViewModel
     {
         Log.Debug($"Showing new modal dialog window with content of type {typeof(T)}");
 
@@ -49,30 +46,30 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
                 }).AddTo(windowAnchors);
             };
         }*/
-        var controller = await Show(contentFactory);
-        Log.Debug($"Awaiting for window to close: {controller}");
-        await controller.WhenClosed.Take(1).Do(x => { });
-        Log.Debug($"Window has closed: {controller}");
+        var content = await Show(contentFactory);
+        Log.Debug($"Awaiting for window to close: {content}");
+        await content.WindowController.WhenClosed.Take(1).Do(x => { });
+        Log.Debug($"Window has closed: {content}");
+        return content;
     }
 
-    public async Task<IWindowViewController> Show<T>(Func<T> contentFactory) where T : IWindowViewModel
+    public async Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel
     {
         Log.Debug($"Showing new window with content of type {typeof(T)}");
 
         var dispatcherId = $"UI-{Interlocked.Increment(ref globalIdx)}";
         var dispatcher = schedulerProvider.CreateDispatcherScheduler(dispatcherId, ThreadPriority.Normal);
         
-        var windowCompletionSource = new TaskCompletionSource<IWindowViewController>();
+        var windowCompletionSource = new TaskCompletionSource<T>();
+        
         dispatcher.Schedule(() =>
         {
             Log.Debug($"Creating new window for data of type {typeof(T)}");
-
             var window = new MetroChildWindow().AddTo(Anchors); // minor memory leak
             Log.Debug($"Created new window: {window}");
 
             Log.Debug($"Creating new data context for window of type {typeof(T)}");
             var content = contentFactory().AddTo(window.Anchors);
-            //content.SetOverlayWindow(window); refactor this to allow for child window to be controlled by data context
             window.DataContext = content;
             
             Disposable.Create(() =>
@@ -95,14 +92,14 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
             window.Loaded += (sender, args) =>
             {
                 Log.Debug($"Window has loaded: {window}");
-                content.SetOverlayWindow(window);
+                content.SetOverlayWindow(window.Controller);
                 
                 var childRect = window.NativeBounds;
                 var updatedBounds = childRect.CenterInsideBounds(ownerWindowRect);
                 Log.Debug($"Centering rect {childRect} inside parent {ownerWindowRect}, result: {updatedBounds}");
                 window.NativeBounds = updatedBounds;
                 
-                windowCompletionSource.SetResult(window.Controller);
+                windowCompletionSource.SetResult(content);
             };
             
             
@@ -120,7 +117,7 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         
         Log.Debug($"Awaiting for window to be loaded");
         var result = await windowCompletionSource.Task;
-        Log.Debug($"Window has loaded, controller: {result}");
+        Log.Debug($"Window has loaded: {result}");
         return result;
     }
 }

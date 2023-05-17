@@ -32,9 +32,9 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     static WindowViewModelBase()
     {
         Binder.BindAction(x => x.Log.Info(() => $"Title updated to {x.Title}"));
-        
-        Binder.BindIf(x => x.ParentWindow != null, x => x.TargetAspectRatio).To((x, v) => x.ParentWindow.TargetAspectRatio = v);
-        Binder.BindIf(x => x.ParentWindow != null, x => x.SizeToContent).To((x, v) => x.ParentWindow.SizeToContent = v);
+
+        Binder.BindIf(x => x.WindowController != null, x => x.TargetAspectRatio).To((x, v) => x.WindowController.Window.TargetAspectRatio = v);
+        Binder.BindIf(x => x.WindowController != null, x => x.SizeToContent).To((x, v) => x.WindowController.Window.SizeToContent = v);
     }
 
     protected WindowViewModelBase()
@@ -43,10 +43,10 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         Title = GetType().ToString();
         Binder.Attach(this).AddTo(Anchors);
         uiDispatcher = Dispatcher.CurrentDispatcher;
-        
-        this.WhenValueChanged(x => x.ParentWindow, false)
+
+        this.WhenValueChanged(x => x.WindowController, false)
             .Take(1)
-            .Select(x => x.WhenLoaded())
+            .Select(x => x.WhenLoaded)
             .Switch()
             .SubscribeSafe(whenLoaded)
             .AddTo(Anchors);
@@ -61,33 +61,21 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             Log.Debug("Window has been loaded, changing status");
             IsLoaded = true;
         }, Log.HandleUiException).AddTo(Anchors);
-        
-        
-        dpi = this.WhenAnyValue(x => x.ParentWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.WhenAnyValue(y => y.Dpi))
+
+
+        dpi = this.WhenAnyValue(x => x.WindowController).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.WhenAnyValue(y => y.Window.Dpi))
             .Switch()
             .Do(x => Log.Debug(() => $"DPI updated to {x}"))
             .ToProperty(this, x => x.Dpi)
             .AddTo(Anchors);
-        
 
-        WhenKeyDown = this.WhenAnyValue(x => x.ParentWindow)
-            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyDown += h, h => window.KeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
-            .Switch();
-        
-        WhenKeyUp = this.WhenAnyValue(x => x.ParentWindow)
-            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.KeyUp += h, h => window.KeyUp -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
-            .Switch();
-        
-        WhenPreviewKeyDown = this.WhenAnyValue(x => x.ParentWindow)
-            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.PreviewKeyDown += h, h => window.PreviewKeyDown -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
-            .Switch();
-        
-        WhenPreviewKeyUp = this.WhenAnyValue(x => x.ParentWindow)
-            .Select(window => window != null ? Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.PreviewKeyUp += h, h => window.PreviewKeyUp -= h).Select(x => x) : Observable.Empty<EventPattern<KeyEventArgs>>())
-            .Switch();
-        
-        this.WhenAnyValue(x => x.ParentWindow)
-            .SwitchIfNotDefault(x => x.WhenAnyValue(y => y.NativeBounds).Select(y => new { Window = x, ActualBounds = y }))
+        WhenKeyDown = this.WhenAnyValue(x => x.WindowController).SwitchIfNotDefault(x => x.WhenKeyDown);
+        WhenKeyUp = this.WhenAnyValue(x => x.WindowController).SwitchIfNotDefault(x => x.WhenKeyUp);
+        WhenPreviewKeyDown = this.WhenAnyValue(x => x.WindowController).SwitchIfNotDefault(x => x.WhenPreviewKeyDown);
+        WhenPreviewKeyUp = this.WhenAnyValue(x => x.WindowController).SwitchIfNotDefault(x => x.WhenPreviewKeyUp);
+
+        this.WhenAnyValue(x => x.WindowController)
+            .SwitchIfNotDefault(x => x.WhenAnyValue(y => y.Window.NativeBounds).Select(y => new {Window = x, ActualBounds = y}))
             .Subscribe(x =>
             {
                 // always on UI thread
@@ -95,12 +83,12 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
                 NativeBounds = x.ActualBounds;
                 Log.Debug(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
             })
-            .AddTo(Anchors); 
+            .AddTo(Anchors);
 
-        this.WhenAnyValue(x => x.ParentWindow)
+        this.WhenAnyValue(x => x.WindowController)
             .SwitchIfNotDefault(x => this.WhenAnyValue(y => y.NativeBounds)
-                .Select(y => new { Window = x, DesiredBounds = y })
-                .ObserveOnIfNeeded(x.Dispatcher))
+                .Select(y => new {x.Window, DesiredBounds = y})
+                .ObserveOnIfNeeded(x.Window.Dispatcher))
             .Subscribe(x =>
             {
                 // always on UI thread, possible recursive assignment
@@ -110,11 +98,11 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
                 Log.Debug(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
             })
             .AddTo(Anchors);
-        
-        
-        this.WhenAnyValue(y => y.ParentWindow)
-            .CombineLatest(this.WhenAnyValue(x => x.ForegroundWindowTracker), (window, tracker) => new { window, tracker })
-            .Select(x => SubscribeToActivations(x.window, x.tracker))
+
+
+        this.WhenAnyValue(y => y.WindowController)
+            .CombineLatest(this.WhenAnyValue(x => x.ForegroundWindowTracker), (winController, tracker) => new {window = winController, tracker})
+            .Select(x => SubscribeToActivations(x.window?.Window, x.tracker))
             .Switch()
             .DistinctUntilChanged()
             .Subscribe(x =>
@@ -129,19 +117,18 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     protected IFluentLog Log { get; }
 
     protected IObservable<Unit> WhenLoaded => whenLoaded;
-    
-    public ReactiveMetroWindow ParentWindow { get; private set; }
-    
-    public IObservable<EventPattern<KeyEventArgs>> WhenKeyUp { get; }
 
-    public IObservable<EventPattern<KeyEventArgs>> WhenKeyDown { get; }
-    
-    public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyDown { get; }
-    
-    public IObservable<EventPattern<KeyEventArgs>> WhenPreviewKeyUp { get; }
-    
-    [Dependency]
-    public IForegroundWindowTracker ForegroundWindowTracker { get; [UsedImplicitly] init; }
+    public IWindowViewController WindowController { get; private set; }
+
+    public IObservable<KeyEventArgs> WhenKeyUp { get; }
+
+    public IObservable<KeyEventArgs> WhenKeyDown { get; }
+
+    public IObservable<KeyEventArgs> WhenPreviewKeyDown { get; }
+
+    public IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
+
+    [Dependency] public IForegroundWindowTracker ForegroundWindowTracker { get; [UsedImplicitly] init; }
 
     public bool IsVisible { get; set; } = true;
 
@@ -152,9 +139,9 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     public Size MinSize { get; set; } = new Size(0, 0);
 
     public Size MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
-    
+
     public bool IsLoaded { get; private set; }
-    
+
     public bool IsActive { get; private set; }
 
     public SizeToContent SizeToContent { get; protected set; } = SizeToContent.Manual;
@@ -162,13 +149,13 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     public string Id { get; } = $"Overlay#{Interlocked.Increment(ref GlobalWindowId)}";
 
     public string Title { get; protected set; }
-    
+
     public Size DefaultSize { get; set; }
 
-    public string OverlayDescription => $"{(ParentWindow == null ? "NOWINDOW" : ParentWindow.Name)}";
-    
+    public string OverlayDescription => $"{(WindowController == null ? "NOWINDOW" : WindowController)}";
+
     public bool EnableHeader { get; set; } = true;
-    
+
     public bool ShowInTaskbar { get; set; }
 
     public double? TargetAspectRatio { get; set; }
@@ -181,13 +168,13 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         builder.AppendParameter(nameof(NativeBounds), NativeBounds);
     }
 
-    public void SetOverlayWindow(ReactiveMetroWindow owner)
+    public void SetOverlayWindow(IWindowViewController owner)
     {
         Guard.ArgumentNotNull(owner, nameof(owner));
 
-        if (ParentWindow != null)
+        if (WindowController != null)
         {
-            Log.Info(() => $"Re-assigning overlay window: {ParentWindow} => {owner}");
+            Log.Info(() => $"Re-assigning overlay window: {WindowController} => {owner}");
         }
         else
         {
@@ -195,11 +182,11 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         }
 
         Log.Info(() => $"Syncing window parameters with view model");
-        owner.NativeBounds = NativeBounds;
-        ParentWindow = owner;
-        Log.Info(() => $"Overlay window is assigned: {ParentWindow}");
+        owner.Window.NativeBounds = NativeBounds;
+        WindowController = owner;
+        Log.Info(() => $"Overlay window is assigned: {WindowController}");
     }
-    
+
     public DispatcherOperation BeginInvoke(Action dispatcherAction)
     {
         return uiDispatcher.BeginInvoke(() =>
@@ -242,7 +229,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             Observable.FromEventPattern<EventHandler, EventArgs>(h => window.Deactivated += h, h => window.Deactivated -= h)
                 .Subscribe(() => observer.OnNext(false))
                 .AddTo(anchors);*/
-            
+
             return anchors;
         });
     }

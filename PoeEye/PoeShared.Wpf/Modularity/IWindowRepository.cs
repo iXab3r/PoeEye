@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using PoeShared.Dialogs.ViewModels;
 using PoeShared.Native;
 
 namespace PoeShared.Modularity;
@@ -12,7 +13,7 @@ public interface IWindowRepository
     /// <param name="contentFactory"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    Task<IWindowViewController> Show<T>(Func<T> contentFactory) where T : IWindowViewModel;
+    Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel;
     
     /// <summary>
     /// Shows content in modal dialog window that is handled by a separate dispatcher
@@ -20,5 +21,5 @@ public interface IWindowRepository
     /// <param name="contentFactory"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    Task ShowDialog<T>(Func<T> contentFactory) where T : IWindowViewModel;
+    Task<T> ShowDialog<T>(Func<T> contentFactory) where T : IWindowViewModel;
 }

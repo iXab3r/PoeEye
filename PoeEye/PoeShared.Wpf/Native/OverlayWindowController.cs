@@ -98,7 +98,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             .SubscribeSafe(() =>
             {
                 logger.Debug(() => $"Assigning overlay view {window} to view-model {viewModel}");
-                viewModel.SetOverlayWindow(window);
+                viewModel.SetOverlayWindow(window.Controller);
             }, logger.HandleUiException)
             .AddTo(childAnchors);
             

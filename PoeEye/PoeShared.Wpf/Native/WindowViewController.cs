@@ -5,19 +5,21 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.UI;
 using ReactiveUI;
 
 namespace PoeShared.Native;
 
 public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
 {
-    public WindowViewController(Window owner)
+    public WindowViewController(ReactiveMetroWindow owner)
     {
         Window = owner;
         Handle = new WindowInteropHelper(owner).EnsureHandle();
@@ -34,7 +36,11 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
                 Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
                 Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
             .Take(1);
-            
+
+        WhenKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.KeyUp += h, h => Window.KeyUp -= h).Select(x => x.EventArgs);
+        WhenKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.KeyDown += h, h => Window.KeyDown -= h).Select(x => x.EventArgs);
+        WhenPreviewKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.PreviewKeyDown += h, h => Window.PreviewKeyDown -= h).Select(x => x.EventArgs);
+        WhenPreviewKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.PreviewKeyUp += h, h => Window.PreviewKeyUp -= h).Select(x => x.EventArgs);
         WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
         WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
         WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
@@ -78,10 +84,18 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
     public IObservable<CancelEventArgs> WhenClosing { get; }
 
     public IObservable<Unit> WhenRendered { get; }
-        
+    
+    public IObservable<KeyEventArgs> WhenKeyUp { get; }
+    
+    public IObservable<KeyEventArgs> WhenKeyDown { get; }
+    
+    public IObservable<KeyEventArgs> WhenPreviewKeyDown { get; }
+    
+    public IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
+
     public IntPtr Handle { get; }
         
-    public Window Window { get; }
+    public ReactiveMetroWindow Window { get; }
 
     public void Activate()
     {

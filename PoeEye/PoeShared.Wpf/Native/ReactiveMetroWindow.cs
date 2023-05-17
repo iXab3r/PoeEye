@@ -1,20 +1,15 @@
 using System;
 using System.Drawing;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
-using System.Windows.Threading;
-using EnumsNET;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.UI;
-using PoeShared.Modularity;
 using ReactiveUI;
 
 namespace PoeShared.Native;
@@ -31,6 +26,7 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
 
     public ReactiveMetroWindow()
     {
+        Log.Debug(() => "Created window");
         Tag = $"Tag of {WindowId}";
         Loaded += OnLoaded;
 
@@ -60,8 +56,11 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 }, Log.HandleUiException)
             .AddTo(Anchors);
         Dpi = new PointF(1, 1);
+        Controller = new WindowViewController(this).AddTo(Anchors);
     }
-
+    
+    public IWindowViewController Controller { get; }
+    
     public Rectangle NativeBounds { get; set; }
 
     public Rectangle ActualBounds { get; private set; }

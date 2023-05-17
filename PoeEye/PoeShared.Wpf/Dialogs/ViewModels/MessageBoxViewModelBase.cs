@@ -18,10 +18,10 @@ public abstract class MessageBoxViewModelBase<T> : WindowViewModelBase, IMessage
         EnableHeader = false;
         
         WhenKeyDown
-            .Where(x => x.EventArgs.Key == Key.Escape)
+            .Where(x => x.Key == Key.Escape)
             .Subscribe(x =>
             {
-                x.EventArgs.Handled = true;
+                x.Handled = true;
                 Close();
             })
             .AddTo(Anchors);

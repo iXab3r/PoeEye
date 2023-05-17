@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow x:Class="PoeShared.Blazor.Wpf.WebViewInstallWindow"
+﻿<native:ReactiveMetroWindow x:Class="PoeShared.Blazor.Wpf.WebViewInstallWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,6 +6,7 @@
                  xmlns:eye="http://coderush.net/poeeye/"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:installer="clr-namespace:PoeShared.Blazor.Wpf.Installer"
+                 xmlns:native="clr-namespace:PoeShared.Native;assembly=PoeShared.Wpf"
                  mc:Ignorable="d"
                  TextElement.Foreground="{DynamicResource MaterialDesignBody}"
                  TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
@@ -31,4 +32,4 @@
                  d:DataContext="{d:DesignInstance installer:WebViewInstallerWindow}"
                  x:ClassModifier="internal">
     <eye:CachedContentControl Content="{Binding}"/>
-</mah:MetroWindow>
+</native:ReactiveMetroWindow>

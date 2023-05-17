@@ -61,38 +61,38 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
             .AddTo(Anchors);
        
         this.WhenAnyValue(x => x.IsLocked)
-            .Select(isLocked => isLocked == false ? WhenKeyDown : Observable.Empty<EventPattern<KeyEventArgs>>())
+            .Select(isLocked => isLocked == false ? WhenKeyDown : Observable.Empty<KeyEventArgs>())
             .Switch()
             .SubscribeSafe(x =>
             {
-                if (x.EventArgs.Key is Key.Down or Key.S)
+                if (x.Key is Key.Down or Key.S)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = bounds with {Y = bounds.Y + 1};
-                    x.EventArgs.Handled = true;
+                    x.Handled = true;
                 }
-                else if (x.EventArgs.Key is Key.Up or Key.W)
+                else if (x.Key is Key.Up or Key.W)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = bounds with {Y = bounds.Y - 1};
-                    x.EventArgs.Handled = true;
+                    x.Handled = true;
                 }
-                else if (x.EventArgs.Key is Key.Left or Key.A)
+                else if (x.Key is Key.Left or Key.A)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = bounds with {X = bounds.X - 1};
-                    x.EventArgs.Handled = true;
+                    x.Handled = true;
                 }
-                else if (x.EventArgs.Key is Key.Right or Key.D)
+                else if (x.Key is Key.Right or Key.D)
                 {
                     var bounds = NativeBounds;
                     NativeBounds = bounds with {X = bounds.X + 1};
-                    x.EventArgs.Handled = true;
+                    x.Handled = true;
                 }
-                else if (x.EventArgs.Key is Key.R)
+                else if (x.Key is Key.R)
                 {
                     ResetToDefault();
-                    x.EventArgs.Handled = true;
+                    x.Handled = true;
                 }
             }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -142,15 +142,15 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
 
     public virtual void ResetToDefault()
     {
-        if (ParentWindow == null)
+        if (WindowController == null)
         {
             throw new InvalidOperationException("Overlay window is not loaded yet");
         }
 
-        var activeMonitor = UnsafeNative.GetMonitorInfo(ParentWindow);
+        var activeMonitor = UnsafeNative.GetMonitorInfo(WindowController.Window);
 
         Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {NativeBounds})");
-        var center = UnsafeNative.GetPositionAtTheCenter(ParentWindow).ScaleToScreen(Dpi);
+        var center = UnsafeNative.GetPositionAtTheCenter(WindowController.Window).ScaleToScreen(Dpi);
         var size = DefaultSize.IsNotEmpty() ? DefaultSize : MinSize;
         NativeBounds = new Rectangle(center, size);
         Log.Info(() => $"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");

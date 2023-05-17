@@ -10,4 +10,5 @@ public interface IMessageBoxViewModel : IWindowViewModel
 
 public interface IMessageBoxViewModel<T> : IMessageBoxViewModel, ICloseable<T>
 {
+    T Result { get; }
 }
