@@ -332,7 +332,7 @@
                                     <Setter Property="Height" Value="64" />
                                     <Setter Property="MinWidth" Value="36" />
                                     <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Margin" Value="0,0, 10, 0" />
+                                    <Setter Property="Margin" Value="0" /> <!-- there must be no empty spaces between elements, otherwise drag'n'drop goes crazy -->
                                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
                                     <Setter Property="Visibility">
                                         <Setter.Value>
@@ -346,15 +346,17 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <ContentPresenter>
-                                                    <scaffolding:DataPiping.DataPipes>
-                                                        <scaffolding:DataPipeCollection>
-                                                            <scaffolding:DataPipe
-                                                                Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsKeyboardFocusWithin}"
-                                                                Target="{Binding IsFocused, Mode=OneWayToSource}" />
-                                                        </scaffolding:DataPipeCollection>
-                                                    </scaffolding:DataPiping.DataPipes>
-                                                </ContentPresenter>
+                                                <Border Padding="0,0,10,0" Background="Transparent">
+                                                    <ContentPresenter>
+                                                        <scaffolding:DataPiping.DataPipes>
+                                                            <scaffolding:DataPipeCollection>
+                                                                <scaffolding:DataPipe
+                                                                    Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsKeyboardFocusWithin}"
+                                                                    Target="{Binding IsFocused, Mode=OneWayToSource}" />
+                                                            </scaffolding:DataPipeCollection>
+                                                        </scaffolding:DataPiping.DataPipes>
+                                                    </ContentPresenter>
+                                                </Border>
                                             </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
