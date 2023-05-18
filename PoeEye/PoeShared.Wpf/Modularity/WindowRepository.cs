@@ -4,6 +4,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
 using PInvoke;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -26,7 +28,7 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         this.applicationAccessor = applicationAccessor;
         this.schedulerProvider = schedulerProvider;
     }
-    
+
     public async Task<T> ShowDialog<T>(Func<T> contentFactory) where T : IWindowViewModel
     {
         Log.Debug($"Showing new modal dialog window with content of type {typeof(T)}");
@@ -51,6 +53,43 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         await content.WindowController.WhenClosed.Take(1).Do(x => { });
         Log.Debug($"Window has closed: {content}");
         return content;
+    }
+    
+    public void ShowWindow<T>(Func<T> windowFactory) where T : Window
+    {
+        Log.Debug($"Showing new window with content of type {typeof(T)}");
+
+        var dispatcherId = $"UI-{Interlocked.Increment(ref globalIdx)}";
+        var dispatcher = schedulerProvider.CreateDispatcherScheduler(dispatcherId, ThreadPriority.Normal);
+
+        var isLoaded = new ManualResetEventSlim(false);
+        dispatcher.Schedule(() =>
+        {
+            Log.Debug($"Creating new window for data of type {typeof(T)}");
+            var window = windowFactory(); 
+            Log.Debug($"Created new window: {window}");
+
+            window.Loaded += (sender, args) =>
+            {
+                Log.Debug($"Window has loaded: {window}");
+                isLoaded.Set();
+            };
+            
+            try
+            {
+                Log.Debug($"Showing the window: {window}");
+                window.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                Log.Error("Window has closed with an error", e);
+                throw;
+            }
+        }).AddTo(Anchors);
+        
+        Log.Debug($"Awaiting for window to be loaded");
+        isLoaded.Wait();
+        Log.Debug($"Window has loaded");
     }
 
     public async Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel

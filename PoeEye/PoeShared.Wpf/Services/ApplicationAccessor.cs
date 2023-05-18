@@ -197,38 +197,21 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             application.Shutdown(0);
         }
     }
-    
+
     public void RestartAs(string processPath, string arguments)
     {
         Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
-        using var ts = new TaskService(null);
-        var taskDefinition = ts.NewTask();
-        taskDefinition.Settings.StartWhenAvailable = true;
-        taskDefinition.Principal.RunLevel = TaskRunLevel.Highest;
-        taskDefinition.Settings.DeleteExpiredTaskAfter = new TimeSpan(0, 0, 10);
-        taskDefinition.Settings.StopIfGoingOnBatteries = false;
-        taskDefinition.Settings.DisallowStartIfOnBatteries = false;
-        taskDefinition.Settings.AllowDemandStart = false;
-        taskDefinition.Settings.ExecutionTimeLimit = TimeSpan.Zero;
-        
-        var trigger = new RegistrationTrigger
-        {
-            StartBoundary = DateTime.Now,
-            Delay = TimeSpan.FromSeconds(1), 
-            EndBoundary = DateTime.Now.Add(TimeSpan.FromSeconds(10)),
-            Enabled = true,
-        };
-        taskDefinition.Triggers.Add(trigger);
 
-        var action = new ExecAction()
+        var startInfo = new ProcessStartInfo()
         {
-            Path = "powershell.exe",
+            UseShellExecute = true,
             Arguments = $"Wait-Process -Id {Environment.ProcessId}; Start-Process -FilePath '{processPath}' -ArgumentList '{arguments}'",
+            FileName = "powershell.exe",
+            WindowStyle = ProcessWindowStyle.Hidden
         };
-            
-        taskDefinition.Actions.Add(action);
-        var task = ts.RootFolder.RegisterTaskDefinition($"E_Restart_{idGenerator.Next()}", taskDefinition);
-        Log.DebugIfDebug(() => $"Registered a task: {task}, terminating current instance");
+        var newProcess = Process.Start(startInfo);
+        Log.Info($"Spawned new process: {newProcess}");
+        
         Exit();
         throw new InvalidOperationException("Should never hit this line");
     }

@@ -24,6 +24,15 @@
                      BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
                      Background="{DynamicResource MaterialDesignPaper}"
                      BorderThickness="1">
+    
+    <Window.Resources>
+        <ui:SharedResourceDictionary>
+            <ui:SharedResourceDictionary.MergedDictionaries>
+                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+            </ui:SharedResourceDictionary.MergedDictionaries>
+        </ui:SharedResourceDictionary>
+    </Window.Resources>
+    
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands ShowSeparators="True" Margin="3,0,0,0">
             <ToggleButton Margin="4,2,7,2"
