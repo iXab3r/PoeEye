@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Color = System.Drawing.Color;
 
@@ -17,7 +18,10 @@ namespace PoeShared.Blazor.Wpf;
 
 public class BlazorWebViewEx : BlazorWebView
 {
-    protected CompositeDisposable Anchors { get; } = new CompositeDisposable();
+    private static readonly IFluentLog Log = typeof(BlazorWebViewEx).PrepareLogger();
+    private static readonly ConcurrentDictionary<string, IFileProvider> StaticFilesProvidersByPath = new();
+
+    protected CompositeDisposable Anchors { get; } = new();
     
     public BlazorWebViewEx()
     {
@@ -39,9 +43,10 @@ public class BlazorWebViewEx : BlazorWebView
 
     public override IFileProvider CreateFileProvider(string contentRootDir)
     {
-        var basicProvider = base.CreateFileProvider(contentRootDir);
-
-        return new CompositeFileProvider(FileProvider, basicProvider);
+        var contentRoot = new DirectoryInfo(contentRootDir);
+        Log.Info($"Initializing content provider @ {contentRoot}");
+        var staticFilesProvider = StaticFilesProvidersByPath.GetOrAdd(contentRoot.FullName, _ => new CachingFileProvider(contentRoot));
+        return new CompositeFileProvider(FileProvider, staticFilesProvider);
     }
 
     public async Task<BitmapSource> TakeScreenshotAsBitmapSource()
