@@ -69,8 +69,6 @@ public static class WindowHandleExtensions
         return true;
     }
     
-    
-
     public static bool IsOwnWindow(this IWindowHandle window)
     {
         if (window.Handle == CurrentProcess.MainWindowHandle)

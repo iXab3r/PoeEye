@@ -120,7 +120,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         var consumer = new TaskCompletionSource<DispatcherScheduler>();
         var dispatcherThread = new Thread(InitializeDispatcherThread)
         {
-            Name = $"SC-{name}",
+            Name = $"S#{name}",
             Priority = priority,
             IsBackground = true
         };
