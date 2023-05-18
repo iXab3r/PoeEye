@@ -35,4 +35,6 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     Window MainWindow { get; }
     
     void ReportIsLoaded();
+
+    void RestartAs(string processPath, string arguments);
 }

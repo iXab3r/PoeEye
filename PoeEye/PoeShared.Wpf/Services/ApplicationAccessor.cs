@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using Microsoft.Win32.TaskScheduler;
 using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -25,6 +26,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private readonly IAppArguments appArguments;
     private readonly Application application;
     private readonly IWindowHandleProvider windowHandleProvider;
+    private readonly IUniqueIdGenerator idGenerator;
     private readonly FileLock loadingFileLock;
     private readonly FileLock runningFileLock;
     private readonly ISubject<int> whenTerminated = new Subject<int>();
@@ -32,10 +34,12 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     public ApplicationAccessor(
         Application application,
         IWindowHandleProvider windowHandleProvider,
+        IUniqueIdGenerator idGenerator,
         IAppArguments appArguments)
     {
         this.application = application;
         this.windowHandleProvider = windowHandleProvider;
+        this.idGenerator = idGenerator;
         this.appArguments = appArguments;
         Log.Info(() => $"Initializing Application accessor for {application}");
         if (application == null)
@@ -192,5 +196,40 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             Log.Info(() => $"Closing app via Shutdown");
             application.Shutdown(0);
         }
+    }
+    
+    public void RestartAs(string processPath, string arguments)
+    {
+        Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
+        using var ts = new TaskService(null);
+        var taskDefinition = ts.NewTask();
+        taskDefinition.Settings.StartWhenAvailable = true;
+        taskDefinition.Principal.RunLevel = TaskRunLevel.Highest;
+        taskDefinition.Settings.DeleteExpiredTaskAfter = new TimeSpan(0, 0, 10);
+        taskDefinition.Settings.StopIfGoingOnBatteries = false;
+        taskDefinition.Settings.DisallowStartIfOnBatteries = false;
+        taskDefinition.Settings.AllowDemandStart = false;
+        taskDefinition.Settings.ExecutionTimeLimit = TimeSpan.Zero;
+        
+        var trigger = new RegistrationTrigger
+        {
+            StartBoundary = DateTime.Now,
+            Delay = TimeSpan.FromSeconds(1), 
+            EndBoundary = DateTime.Now.Add(TimeSpan.FromSeconds(10)),
+            Enabled = true,
+        };
+        taskDefinition.Triggers.Add(trigger);
+
+        var action = new ExecAction()
+        {
+            Path = "powershell.exe",
+            Arguments = $"Wait-Process -Id {Environment.ProcessId}; Start-Process -FilePath '{processPath}' -ArgumentList '{arguments}'",
+        };
+            
+        taskDefinition.Actions.Add(action);
+        var task = ts.RootFolder.RegisterTaskDefinition($"E_Restart_{idGenerator.Next()}", taskDefinition);
+        Log.DebugIfDebug(() => $"Registered a task: {task}, terminating current instance");
+        Exit();
+        throw new InvalidOperationException("Should never hit this line");
     }
 }

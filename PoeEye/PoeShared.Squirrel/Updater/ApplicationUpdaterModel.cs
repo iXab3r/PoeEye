@@ -195,18 +195,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     private async Task Restart(FileInfo executable)
     {
         using var unused = CreateIsBusyAnchor();
-            
-        Log.Debug(
-            $"Restarting app, {executable}...");
-
         Log.Debug(() => $"Starting application @ '{executable.FullName}', args: {appArguments.StartupArgs} ...");
-        var updaterProcess = Process.Start(executable.FullName, appArguments.StartupArgs);
-        if (updaterProcess == null)
-        {
-            throw new FileNotFoundException($"Failed to start application @ '{executable.FullName}'");
-        }
-        Log.Debug(() => $"Process spawned, PID: {updaterProcess.Id}");
-        applicationAccessor.Exit();
+        applicationAccessor.RestartAs(executable.FullName, appArguments.StartupArgs);
     }
 
     private async Task<IPoeUpdateManager> CreateManager()
