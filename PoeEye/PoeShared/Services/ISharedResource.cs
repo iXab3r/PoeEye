@@ -1,6 +1,6 @@
 ﻿namespace PoeShared.Services;
 
-public interface ISharedResource : IDisposable
+public interface ISharedResource : IDisposableReactiveObject
 {
     long RefCount { get; }
         

@@ -45,7 +45,7 @@ public class BenchmarkBase : FixtureBase
             .WithOption(ConfigOptions.JoinSummary, false)
             .WithSummaryStyle(summaryStyle)
             .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.Method));
-            
+        
         return result;
     }
 
