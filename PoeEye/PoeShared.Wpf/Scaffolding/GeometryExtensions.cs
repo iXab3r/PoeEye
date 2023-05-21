@@ -85,7 +85,7 @@ public static class GeometryExtensions
         result.Intersect(otherRectangle);
         return result;
     }
-
+    
     public static Rectangle OffsetBy(this Rectangle rect, WinPoint offset)
     {
         var result = rect;
@@ -196,6 +196,11 @@ public static class GeometryExtensions
     public static double Area(this WinSize sourceSize)
     {
         return sourceSize.Height * sourceSize.Width;
+    }
+    
+    public static float Area(this RectangleF source)
+    {
+        return source.Width * source.Height;
     }
         
     public static bool IsNotEmpty(this System.Drawing.Size size)
@@ -333,6 +338,17 @@ public static class GeometryExtensions
     }
 
     public static Rectangle ToWinRectangle(this Rect sourceSize)
+    {
+        return new Rectangle
+        {
+            X = (int) sourceSize.X,
+            Y = (int) sourceSize.Y,
+            Width = (int) sourceSize.Width,
+            Height = (int) sourceSize.Height
+        };
+    }
+    
+    public static Rectangle ToWinRectangle(this RectangleF sourceSize)
     {
         return new Rectangle
         {
