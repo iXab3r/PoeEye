@@ -19,7 +19,7 @@ public class BenchmarkBase : FixtureBase
                     new NetCoreAppSettings(
                         targetFrameworkMoniker: targetFrameworkMoniker,
                         runtimeFrameworkVersion: null,
-                        name: "6.0")))
+                        name: "6.0").WithTimeout(TimeSpan.FromMinutes(10))))
             .WithArguments(new Argument[]{ new MsBuildArgument("/p:ValidateExecutableReferencesMatchSelfContained=false") })
             .AsDefault();
         return job;
