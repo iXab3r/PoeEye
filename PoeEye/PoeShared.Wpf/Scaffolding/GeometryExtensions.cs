@@ -198,9 +198,19 @@ public static class GeometryExtensions
         return sourceSize.Height * sourceSize.Width;
     }
     
+    public static double Area(this SizeF sourceSize)
+    {
+        return sourceSize.Height * sourceSize.Width;
+    }
+    
     public static float Area(this RectangleF source)
     {
         return source.Width * source.Height;
+    }
+    
+    public static RectangleF Scale(this RectangleF source, SizeF scaleFactor)
+    {
+        return new RectangleF(source.X * scaleFactor.Width, source.Y * scaleFactor.Height, source.Width * scaleFactor.Width, source.Height * scaleFactor.Height);
     }
         
     public static bool IsNotEmpty(this System.Drawing.Size size)

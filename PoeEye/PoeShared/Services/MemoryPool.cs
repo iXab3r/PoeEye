@@ -23,13 +23,17 @@ public sealed class MemoryPool : IMemoryPool
     private MemoryPool()
     {
     }
-        
+
+    public PinnedMemoryBuffer RentPinnedBuffer(int minimumLength)
+    {
+        return new PinnedMemoryBuffer(this, minimumLength);
+    }
+
     public byte[] Rent(int minimumLength)
     {
         return arrayPool.Rent(minimumLength);
     }
 
-       
     public void Return(byte[] array)
     {
         // clearArray is extremely expensive, Return jumps from 1,408ns to 1,914,345ns on 4K RGBA image (~30mb)

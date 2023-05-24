@@ -2,6 +2,8 @@
 
 public interface IMemoryPool
 {
+    PinnedMemoryBuffer RentPinnedBuffer(int minimumLength);
+    
     byte[] Rent(int minimumLength);
 
     /// <summary>
