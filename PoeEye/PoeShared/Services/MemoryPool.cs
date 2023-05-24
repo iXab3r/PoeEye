@@ -20,6 +20,8 @@ public sealed class MemoryPool : IMemoryPool
 
     private readonly ArrayPool<byte> arrayPool = ArrayPool<byte>.Create(MaxArraySize, MaxArrayPerBucket);
 
+    private long rentedArrays;
+    
     private MemoryPool()
     {
     }
@@ -31,11 +33,13 @@ public sealed class MemoryPool : IMemoryPool
 
     public byte[] Rent(int minimumLength)
     {
+        Interlocked.Increment(ref rentedArrays);
         return arrayPool.Rent(minimumLength);
     }
 
     public void Return(byte[] array)
     {
+        Interlocked.Decrement(ref rentedArrays);
         // clearArray is extremely expensive, Return jumps from 1,408ns to 1,914,345ns on 4K RGBA image (~30mb)
         arrayPool.Return(array, clearArray: false);
     }
