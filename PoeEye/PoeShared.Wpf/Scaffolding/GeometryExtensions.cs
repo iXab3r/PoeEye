@@ -93,6 +93,32 @@ public static class GeometryExtensions
         return result;
     }
 
+    public static WinRect? OffsetBy(this WinRect? rect, WinPoint? offset)
+    {
+        if (rect == null || offset == null)
+        {
+            return default;
+        }
+        return rect.Value with
+        {
+            X = rect.Value.X + offset.Value.X,
+            Y = rect.Value.Y + offset.Value.Y
+        };
+    }
+    
+    public static RectangleF? OffsetBy(this RectangleF? rect, PointF? offset)
+    {
+        if (rect == null || offset == null)
+        {
+            return default;
+        }
+        return rect.Value with
+        {
+            X = rect.Value.X + offset.Value.X,
+            Y = rect.Value.Y + offset.Value.Y
+        };
+    }
+
     public static Rectangle Normalize(this Rectangle rect)
     {
         var x = rect.Width >= 0
@@ -402,4 +428,5 @@ public static class GeometryExtensions
     {
         return !double.IsInfinity(value);
     }
+    
 }

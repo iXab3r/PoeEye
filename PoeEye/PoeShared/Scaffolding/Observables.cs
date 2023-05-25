@@ -59,4 +59,19 @@ public static class Observables
             return anchors;
         });
     }
+
+    public static IObservable<T> Using<T>(Func<T> resourceFactory) where T : IDisposable
+    {
+        return Observable.Using(resourceFactory, arg => Observable.Never<T>());
+    }
+    
+    public static IObservable<T> Using<T>(Action<CompositeDisposable> resourceFactory) where T : IDisposable
+    {
+        return Observable.Using(() =>
+        {
+            var anchors = new CompositeDisposable();
+            resourceFactory(anchors);
+            return anchors;
+        }, arg => Observable.Never<T>());
+    }
 }

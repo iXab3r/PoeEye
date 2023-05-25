@@ -8,12 +8,12 @@ namespace PoeShared.Converters;
 
 public class ColorToSolidColorBrushConverter : IValueConverter
 {
-    private static readonly ConcurrentDictionary<Color, SolidColorBrush> BrushesByColor = new();
+    private static readonly ConcurrentDictionary<WpfColor, SolidColorBrush> BrushesByColor = new();
     private static readonly Lazy<ColorToSolidColorBrushConverter> InstanceSupplier = new();
 
     public static ColorToSolidColorBrushConverter Instance => InstanceSupplier.Value;
 
-    public static SolidColorBrush Convert(Color color)
+    public static SolidColorBrush Convert(WpfColor color)
     {
         return BrushesByColor.GetOrAdd(color, x =>
         {
@@ -25,7 +25,12 @@ public class ColorToSolidColorBrushConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is not Color color)
+        if (value is WinColor winColor)
+        {
+            return Convert(winColor.ToWpfColor(), targetType, parameter, culture);
+        }
+        
+        if (value is not WpfColor color)
         {
             return Binding.DoNothing;
         }
@@ -39,6 +44,10 @@ public class ColorToSolidColorBrushConverter : IValueConverter
         object parameter,
         CultureInfo culture)
     {
-        return ((SolidColorBrush) value)?.Color;
+        if (value is SolidColorBrush solidColorBrush)
+        {
+            return solidColorBrush.Color;
+        }
+        return null;
     }
 }

@@ -28,7 +28,7 @@ internal sealed class WindowBoundsTrackerFactory : IWindowBoundsTrackerFactory
 
         return locationChangeHook.WhenWindowEventTriggered.Where(y => y.WindowHandle == windowToTrack.Handle)
             .StartWithDefault()
-            .Select(x => (Rectangle?)windowToTrack.WindowBounds)
+            .Select(x => (Rectangle?)windowToTrack.DwmWindowBounds) // Dwm is more precise
             .DistinctUntilChanged();
     }
 
