@@ -14,9 +14,13 @@ public sealed class ReactiveRectangle : BindableReactiveObject
     
     private Rectangle bounds;
 
-    public ReactiveRectangle()
+    public ReactiveRectangle(NamedLock updateLock)
     {
-        updateLock = new NamedLock(nameof(ReactiveRectangle));
+        this.updateLock = updateLock;
+    }
+
+    public ReactiveRectangle() : this(new NamedLock(nameof(ReactiveRectangle)))
+    {
     }
 
     public ReactiveRectangle(Rectangle rectangle) : this()
@@ -49,28 +53,28 @@ public sealed class ReactiveRectangle : BindableReactiveObject
     public int RegionX
     {
         get => bounds.X;
-        set => SetValue(new Rectangle(value, bounds.Y, bounds.Width, bounds.Height));
+        set => SetValue(bounds with {X = value});
     }
 
     [DoNotNotify]
     public int RegionY
     {
         get => bounds.Y;
-        set => SetValue(new Rectangle(bounds.X, value, bounds.Width, bounds.Height));
+        set => SetValue(bounds with {Y = value});
     }
 
     [DoNotNotify]
     public int RegionWidth
     {
         get => bounds.Width;
-        set => SetValue(new Rectangle(bounds.X, bounds.Y, Math.Max(0, value), bounds.Height));
+        set => SetValue(bounds with {Width = Math.Max(0, value)});
     }
 
     [DoNotNotify]
     public int RegionHeight
     {
         get => bounds.Height;
-        set => SetValue(new Rectangle(bounds.X, bounds.Y, bounds.Width, Math.Max(0, value)));
+        set => SetValue(bounds with {Height = Math.Max(0, value)});
     }
 
     public void Reset()
