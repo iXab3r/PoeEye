@@ -15,4 +15,32 @@ public static class DisposableExtensions
         anchor.Disposable = instance;
         return instance;
     }
+
+    public static T Add<T>(this T instance, Action action) where T: ICollection<IDisposable>
+    {
+        instance.Add(Disposable.Create(action));
+        return instance;
+    }
+    
+    public static T Add<T, TItem>(this T instance, Func<TItem> accessor) where T: ICollection<IDisposable> where TItem : IDisposable
+    {
+        Disposable.Create(() =>
+        {
+            var item = accessor();
+            item?.Dispose();
+        }).AddTo(instance);
+        return instance;
+    }
+    
+    public static T Add<T, TItem>(this T instance, Func<IEnumerable<TItem>> itemsAccessor) where T: ICollection<IDisposable> where TItem : IDisposable
+    {
+        Disposable.Create(() =>
+        {
+            foreach (var evaluator in itemsAccessor())
+            {
+                evaluator?.Dispose();
+            }
+        }).AddTo(instance);
+        return instance;
+    }
 }

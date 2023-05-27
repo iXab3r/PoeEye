@@ -58,27 +58,12 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
 
     protected void AddDisposableResources<T>(Func<IEnumerable<T>> itemsSupplier) where T : IDisposable
     {
-        Disposable.Create(() =>
-        {
-            foreach (var evaluator in itemsSupplier())
-            {
-                evaluator?.Dispose();
-            }
-        }).AddTo(Anchors);
-    }
-    
-    protected void AddDisposeAction(Action action) 
-    {
-        Disposable.Create(action).AddTo(Anchors);
+        Anchors.Add(itemsSupplier);
     }
     
     protected void AddDisposableResource<T>(Func<T> accessor) where T : IDisposable
     {
-        Disposable.Create(() =>
-        {
-            var item = accessor();
-            item?.Dispose();
-        }).AddTo(Anchors);
+        Anchors.Add(accessor);
     }
     
     protected void EnsureNotDisposed()

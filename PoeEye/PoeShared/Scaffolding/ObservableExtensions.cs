@@ -289,6 +289,14 @@ public static class ObservableExtensions
             (default(TSource), default(TSource)),
             (previous, current) => (previous.Item2, current));
     }
+    
+    public static IObservable<TSource> SkipUntil<TSource>(
+        this IObservable<TSource> source,
+        Func<TSource, bool> condition)
+    {
+        var sharedObservable = source.Publish().RefCount();
+        return sharedObservable.SkipWhile(condition).Take(1).Concat(sharedObservable);
+    }
         
     public static IObservable<TSource> DisposePrevious<TSource>(
         this IObservable<TSource> source) where TSource : IDisposable
