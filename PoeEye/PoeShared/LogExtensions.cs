@@ -34,6 +34,10 @@ public static class LogExtensions
     {
         Guard.ArgumentNotNull(exception, nameof(exception));
         logger.Error($"UI Exception occurred", exception);
+        if (Debugger.IsAttached)
+        {
+            Debugger.Break();
+        }
         SharedLog.Instance.Errors.OnNext(exception);
     }
         

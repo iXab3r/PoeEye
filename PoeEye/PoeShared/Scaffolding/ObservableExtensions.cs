@@ -52,27 +52,32 @@ public static class ObservableExtensions
         return observable
             .RetryWithBackOff<T, Exception>(strategy);
     }
- 
+
+    [DebuggerStepThrough]
     public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext)
     {
         return observable.Subscribe(_ => onNext());
     }
         
+    [DebuggerStepThrough]
     public static IDisposable SubscribeToErrors<T>(this IObservable<T> source, Action<Exception> onError)
     {
         return SubscribeSafe(source, x => { }, onError);
     }
 
+    [DebuggerStepThrough]
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action onNext, Action<Exception> onError)
     {
         return SubscribeSafe(source, x => onNext(), onError);
     }
         
+    [DebuggerStepThrough]
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError)
     {
         return SubscribeSafe(source, onNext, onError, NoOperation);
     }
         
+    [DebuggerStepThrough]
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
@@ -80,7 +85,7 @@ public static class ObservableExtensions
         if (onError == null) throw new ArgumentNullException(nameof(onError));
         if (onCompleted == null) throw new ArgumentNullException(nameof(onCompleted));
 
-        return source.Subscribe(x =>
+        return source.Subscribe([DebuggerStepThrough](x) =>
         {
             try
             {

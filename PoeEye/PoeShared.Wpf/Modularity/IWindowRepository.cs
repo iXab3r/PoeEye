@@ -16,7 +16,7 @@ public interface IWindowRepository
     /// <returns></returns>
     Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel;
     
-    void ShowWindow<T>(Func<T> windowFactory) where T : Window;
+    Task<T> ShowWindow<T>(Func<T> windowFactory) where T : Window;
     
     /// <summary>
     /// Shows content in modal dialog window that is handled by a separate dispatcher

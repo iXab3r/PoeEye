@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using MahApps.Metro.ValueBoxes;
 
 namespace PoeShared.UI;
 
@@ -31,5 +33,32 @@ public class StretchingTreeViewItem : TreeViewItem
     protected override bool IsItemItsOwnContainerOverride(object item)
     {
         return item is StretchingTreeViewItem;
+    }
+
+    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+    {
+        if (e.Handled || !IsEnabled)
+        {
+            return;
+        }
+
+        if (e.ClickCount % 2 == 0)
+        {
+            SetCurrentValue(IsExpandedProperty, BooleanBoxes.Box(!IsExpanded));
+            e.Handled = true;
+        }
+    }
+
+    protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+    {
+        if (e.Handled || !IsEnabled)
+        {
+            return;
+        }
+
+        if (Focus())
+        {
+            e.Handled = true;
+        }
     }
 }

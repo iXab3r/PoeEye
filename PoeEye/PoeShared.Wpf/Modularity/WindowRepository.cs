@@ -55,13 +55,14 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         return content;
     }
     
-    public void ShowWindow<T>(Func<T> windowFactory) where T : Window
+    public Task<T> ShowWindow<T>(Func<T> windowFactory) where T : Window
     {
         Log.Debug($"Showing new window with content of type {typeof(T)}");
 
         var dispatcherId = $"UI-{Interlocked.Increment(ref globalIdx)}";
         var dispatcher = schedulerProvider.CreateDispatcherScheduler(dispatcherId, ThreadPriority.Normal);
 
+        var windowCompletionSource = new TaskCompletionSource<T>();
         var isLoaded = new ManualResetEventSlim(false);
         dispatcher.Schedule(() =>
         {
@@ -74,6 +75,8 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
                 Log.Debug($"Window has loaded: {window}");
                 isLoaded.Set();
             };
+            
+            windowCompletionSource.SetResult(window);
             
             try
             {
@@ -90,6 +93,7 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         Log.Debug($"Awaiting for window to be loaded");
         isLoaded.Wait();
         Log.Debug($"Window has loaded");
+        return windowCompletionSource.Task;
     }
 
     public async Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel

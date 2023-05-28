@@ -115,6 +115,17 @@ public sealed class ObservableCollectionEx<T> : DisposableReactiveObject, IObser
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        CollectionChanged?.Invoke(this, e);
+        try
+        {
+            CollectionChanged?.Invoke(this, e);
+        }
+        catch (NotSupportedException)
+        {
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+            throw;
+        }
     }
 }

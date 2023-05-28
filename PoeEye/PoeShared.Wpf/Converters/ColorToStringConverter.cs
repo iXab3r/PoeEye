@@ -6,18 +6,11 @@ using System.Windows.Media;
 
 namespace PoeShared.Converters;
 
-public class ColorToStringConverter : DependencyObject, IValueConverter
+public class ColorToStringConverter : IValueConverter
 {
     private readonly ColorConverter colorConverter = new ColorConverter();
 
-    public static readonly DependencyProperty AllowAlphaProperty = DependencyProperty.Register(
-        "AllowAlpha", typeof(bool), typeof(ColorToStringConverter), new PropertyMetadata(true));
-
-    public bool AllowAlpha
-    {
-        get { return (bool) GetValue(AllowAlphaProperty); }
-        set { SetValue(AllowAlphaProperty, value); }
-    }
+    public bool AllowAlpha { get; set; }
         
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

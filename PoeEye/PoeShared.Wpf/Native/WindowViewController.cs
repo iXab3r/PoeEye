@@ -19,11 +19,13 @@ namespace PoeShared.Native;
 
 public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
 {
+    private readonly Lazy<IntPtr> windowHandle;
+    
     public WindowViewController(ReactiveMetroWindow owner)
     {
         Window = owner;
-        Handle = new WindowInteropHelper(owner).EnsureHandle();
-        Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC for {Handle.ToHexadecimal()}");
+        windowHandle = new Lazy<IntPtr>(() => new WindowInteropHelper(owner).EnsureHandle());
+        Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC");
         Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
         WhenRendered = Observable
@@ -93,7 +95,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
     
     public IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
 
-    public IntPtr Handle { get; }
+    public IntPtr Handle => windowHandle.Value;
         
     public ReactiveMetroWindow Window { get; }
 

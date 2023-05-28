@@ -111,6 +111,14 @@ public partial class UnsafeNative
         return new Rectangle(frame.left, frame.top, frame.right - frame.left, frame.bottom - frame.top);
     }
 
+    public static bool SetWindowLong(IntPtr hwnd, Func<User32.SetWindowLongFlags, User32.SetWindowLongFlags> flagsChanger)
+    {
+        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var newStyle = flagsChanger(existingStyle);
+        var newStyleResult = User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle);
+        return true;
+    }
+
     public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)
     {
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Setting window bounds: {rect}");
@@ -123,7 +131,7 @@ public partial class UnsafeNative
 
         return true;
     }
-
+    
     public static void HideSystemMenu(IntPtr hwnd)
     {
         Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");

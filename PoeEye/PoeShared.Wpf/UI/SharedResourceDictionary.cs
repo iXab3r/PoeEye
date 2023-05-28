@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 
@@ -16,10 +18,18 @@ public class SharedResourceDictionary : ResourceDictionary
 {
     private static readonly IFluentLog Log = typeof(SharedResourceDictionary).PrepareLogger();
 
+    [ThreadStatic] private static Dictionary<Uri, ResourceDictionary> sharedDictionaries;
+    [ThreadStatic] private static Thread owningThread;
+    [ThreadStatic] private static Stack<object> resourceResolutionQueue;
+
     /// <summary>
     /// Internal cache of loaded dictionaries 
     /// </summary>
-    public static Dictionary<Uri, ResourceDictionary> SharedDictionaries { get; } = new();
+    public static Dictionary<Uri, ResourceDictionary> SharedDictionaries => sharedDictionaries ??= new Dictionary<Uri, ResourceDictionary>();
+
+    public static Thread OwningThread => owningThread ??= Thread.CurrentThread;
+
+    private Stack<object> ResourceResolutionQueue => resourceResolutionQueue ??= new();
 
     /// <summary>
     /// Local member of the source uri
@@ -60,5 +70,37 @@ public class SharedResourceDictionary : ResourceDictionary
                 MergedDictionaries.Add(SharedDictionaries[value]);
             }
         }
+    }
+
+    protected override void OnGettingValue(object key, ref object value, out bool canCache)
+    {
+        try
+        {
+            ResourceResolutionQueue.Push(key);
+            
+            //using var sw = new BenchmarkTimer($"Resolving resource", Log.WithSuffix(() => resourceResolutionQueue.DumpToTable(" -> ")));
+            base.OnGettingValue(key, ref value, out canCache);
+            //sw.Step($"Resolved resource, canCache: {canCache}");
+            if (value is not DispatcherObject dispatcherObject)
+            {
+                return;
+            }
+
+            if (!dispatcherObject.CheckAccess())
+            {
+                var message = $"Resolved object by key {key} is owned by another dispatcher, current: {dispatcherObject.Dispatcher.Thread.Name}, expected: {Dispatcher.CurrentDispatcher.Thread.Name}";
+                //sw.Step(message);
+                throw new InvalidOperationException(message);
+            }
+        }
+        finally
+        {
+            var dequeue = ResourceResolutionQueue.Pop();
+            if (dequeue != key)
+            {
+                throw new InvalidOperationException($"Expected {key}, got {dequeue}, queue: {resourceResolutionQueue.DumpToTable(" -> ")}");
+            }
+        }
+
     }
 }

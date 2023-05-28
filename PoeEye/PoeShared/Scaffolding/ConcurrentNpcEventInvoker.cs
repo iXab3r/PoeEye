@@ -16,6 +16,7 @@ internal sealed class ConcurrentNpcEventInvoker : INpcEventInvoker
 
     public bool IsEmpty => delegatesList.Count <= 0;
 
+    [DebuggerStepThrough]
     public void Add(PropertyChangedEventHandler value)
     {
         var holder = new DelegateHolder(value);
@@ -35,6 +36,7 @@ internal sealed class ConcurrentNpcEventInvoker : INpcEventInvoker
         }
     }
 
+    [DebuggerStepThrough]
     public void Remove(PropertyChangedEventHandler value)
     {
         if (!delegates.TryRemove(value, out var holder))
@@ -47,6 +49,7 @@ internal sealed class ConcurrentNpcEventInvoker : INpcEventInvoker
         }
     }
 
+    [DebuggerStepThrough]
     public void Raise(string propertyName)
     {
         if (IsEmpty)

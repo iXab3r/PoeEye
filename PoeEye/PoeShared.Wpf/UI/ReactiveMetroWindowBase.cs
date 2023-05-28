@@ -29,7 +29,6 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
             .WithSuffix(WindowId)
             .WithSuffix(() => NativeWindowId)
             .WithSuffix(() => DataContext == default ? "Data context is not set" : DataContext.ToString());
-
         NonActiveBorderBrush = Brushes.Transparent;
         PreferDWMBorderColor = false;
         AllowsTransparency = true;
