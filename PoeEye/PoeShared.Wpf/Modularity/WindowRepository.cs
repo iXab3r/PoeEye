@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using PInvoke;
+using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -109,10 +110,22 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         {
             Log.Debug($"Creating new window for data of type {typeof(T)}");
             var window = new MetroChildWindow().AddTo(Anchors); // minor memory leak
+            window.Anchors.Add(() => Log.WithSuffix(window).Debug($"Window is being disposed"));
+            
             Log.Debug($"Created new window: {window}");
 
             Log.Debug($"Creating new data context for window of type {typeof(T)}");
             var content = contentFactory().AddTo(window.Anchors);
+            content.Anchors.Add(() =>
+            {
+                Log.WithSuffix(content).Debug($"Window content is being disposed");
+                if (!window.Anchors.IsDisposed)
+                {
+                    Log.WithSuffix(content).Debug($"Window content is disposed - disposing the window itself");
+                    window.Dispose();
+                }
+
+            });
             window.DataContext = content;
             
             Disposable.Create(() =>
@@ -149,6 +162,11 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
             try
             {
                 Log.Debug($"Showing the window: {window}");
+                var closeController = new CloseController(() => window.Close());
+                if (content is ICloseable closeable)
+                {
+                    closeable.CloseController = closeController;
+                }
                 window.ShowDialog();
             }
             catch (Exception e)
