@@ -30,7 +30,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private readonly FileLock loadingFileLock;
     private readonly FileLock runningFileLock;
     private readonly ISubject<int> whenTerminated = new Subject<int>();
-
+    
     public ApplicationAccessor(
         Application application,
         IWindowHandleProvider windowHandleProvider,
@@ -48,14 +48,18 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         }
             
         Log.Info(() => $"Binding to application {application}");
-        WhenExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
+
+        var whenAppHasExited = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
             .Select(x => x.EventArgs.ApplicationExitCode)
             .Replay(1)
             .AutoConnect();
+        
+        WhenExit = Observable.Amb(whenTerminated, whenAppHasExited).Take(1);
         WhenExit.SubscribeSafe(x =>
         {
             Log.Info(() => $"Application exit requested, exit code: {x}");
             IsExiting = true;
+            
         }, Log.HandleException).AddTo(Anchors);
 
         var lockFileAcquireTimeout = TimeSpan.FromSeconds(10);
@@ -64,6 +68,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Log.Info(() => $"Application load state: { new { runningFileLock, loadingFileLock } }");
         LastExitWasGraceful = !runningFileLock.ExistedInitially;
         LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
+        
         this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
         {
             Log.Info(() => $"Performing GC after app is loaded");
@@ -78,6 +83,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             {
                 Log.Info(() => $"Graceful exit - cleaning up lock file {runningFileLock}");
                 runningFileLock.Dispose();
+                Log.Info(() => $"Graceful exit - cleaning up lock file {loadingFileLock}");
+                loadingFileLock.Dispose(); // this may happen if we're restarting before the app is loaded
             }
             else
             {
@@ -87,6 +94,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
     }
 
+    public bool IsElevated => appArguments.IsElevated;
+    
     public bool IsLoaded { get; private set; }
         
     public bool LastExitWasGraceful { get; }
@@ -184,35 +193,62 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         }
             
         Log.Info(() => $"Terminating application (shutdownMode: {application.ShutdownMode}, window: {new { application.MainWindow }})...");
-        if (application.MainWindow != null && 
+        var mainWindow = application.MainWindow;
+        if (mainWindow != null && 
             application.ShutdownMode == ShutdownMode.OnMainWindowClose && 
-            application.MainWindow.IsLoaded)
+            mainWindow.IsLoaded)
         {
-            Log.Info(() => $"Closing main window {application.MainWindow}...");
-            application.MainWindow.Close();
+            Log.Info(() => $"Closing main window {mainWindow}...");
+            mainWindow.Close();
+            if (mainWindow is IDisposable disposable)
+            {
+                Log.Info(() => $"Disposing main window {disposable}...");
+                disposable.Dispose();
+                Log.Info(() => $"Disposed main window");
+            }
+            Log.Info(() => $"Closed main window");
         }
-        else
-        {
-            Log.Info(() => $"Closing app via Shutdown");
-            application.Shutdown(0);
-        }
+        
+        Log.Info(() => $"Terminating app environment");
+        Terminate(0); // using this instead of App.Shutdown() to avoid async issues
     }
 
-    public void RestartAs(string processPath, string arguments)
+    public void RestartAs(string processPath, string arguments = default, string verb = default)
     {
         Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
 
+        if (arguments != null && arguments.Contains('-'))
+        {
+            Log.Info($"Supplied arguments contain '-', compressing args: {arguments}");
+            RestartAs(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb);
+            return;
+        }
+
+        ReportTermination(0); // report termination to release locks, resources, etc
+
+        var waitCmd = "Wait-Process -Id {Environment.ProcessId}";
+        var newProcessArgs = string.IsNullOrEmpty(arguments) ? "" : $" -ArgumentList \"{arguments}\"";
+        var startProcessCmd = $"Start-Process -FilePath '{processPath}'{newProcessArgs}";
         var startInfo = new ProcessStartInfo()
         {
             UseShellExecute = true,
-            Arguments = $"Wait-Process -Id {Environment.ProcessId}; Start-Process -FilePath '{processPath}' -ArgumentList '{arguments}'",
+            Arguments = new[]{ waitCmd,  startProcessCmd }.JoinStrings("; "),
             FileName = "powershell.exe",
-            WindowStyle = ProcessWindowStyle.Hidden
+            WindowStyle = ProcessWindowStyle.Hidden,
+            Verb = verb ?? string.Empty
         };
-        var newProcess = Process.Start(startInfo);
-        Log.Info($"Spawned new process: {newProcess}");
-        
+        var startInfoString = new { startInfo.FileName, startInfo.Arguments, startInfo.Verb, startInfo.UseShellExecute };
+        var newProcess = Process.Start(startInfo) ?? throw new InvalidStateException($"Failed to start new process using args: {startInfoString}");
+        Log.Info($"Spawned new process: {newProcess.Id}, args: {startInfoString}");
+        Log.Info($"New process state: {new { newProcess.Id, newProcess.HasExited }}");
+
         Exit();
         throw new InvalidOperationException("Should never hit this line");
+    }
+
+    public void RestartAsAdmin()
+    {
+        Log.Info("Restarting current process with admin privileges");
+        RestartAs(Environment.ProcessPath, $"{appArguments.StartupArgs} --adminMode true", verb: "runas");
     }
 }

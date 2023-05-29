@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using PoeShared.Logging;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using Splat;
@@ -12,10 +13,12 @@ internal sealed class SquirrelEventsHandler : ISquirrelEventsHandler
 {
     private static readonly IFluentLog Log = typeof(SquirrelEventsHandler).PrepareLogger();
     private readonly IApplicationAccessor applicationAccessor;
+    private readonly IAppArguments appArguments;
 
-    public SquirrelEventsHandler(IApplicationAccessor applicationAccessor)
+    public SquirrelEventsHandler(IApplicationAccessor applicationAccessor, IAppArguments appArguments)
     {
         this.applicationAccessor = applicationAccessor;
+        this.appArguments = appArguments;
         HandleSquirrelEvents();
     }
 
@@ -49,7 +52,8 @@ internal sealed class SquirrelEventsHandler : ISquirrelEventsHandler
             OnInitialInstall,
             OnAppUpdate,
             onAppUninstall: OnAppUninstall,
-            onFirstRun: OnFirstRun);
+            onFirstRun: OnFirstRun,
+            arguments: appArguments.CommandLineArguments);
         Log.Debug("Squirrel events were handled successfully");
     }
 
@@ -97,7 +101,7 @@ internal sealed class SquirrelEventsHandler : ISquirrelEventsHandler
         string[] arguments = null)
     {
         Action<Version> defaultBlock = v => { };
-        var args = arguments ?? Environment.GetCommandLineArgs().Skip(1).ToArray();
+        var args = arguments ?? Array.Empty<string>();
         if (args.Length == 0)
         {
             return;

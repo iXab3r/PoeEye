@@ -22,6 +22,8 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     void Terminate(int exitCode);
         
     bool IsExiting { get; }
+    
+    bool IsElevated { get; }
         
     /// <summary>
     ///  IsLoaded is set to true after main window is loaded
@@ -36,5 +38,7 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     
     void ReportIsLoaded();
 
-    void RestartAs(string processPath, string arguments);
+    void RestartAs(string processPath, string arguments = default, string verb = default);
+
+    void RestartAsAdmin();
 }

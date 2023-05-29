@@ -40,6 +40,8 @@ public interface IAppArguments : IAppConfig
     bool ShowUpdater { get; }
     
     bool? IsSafeMode { get; }
+    
+    bool? IsAdminMode { get; }
         
     IEnumerable<string> PrismModules { get; }
         
@@ -48,6 +50,8 @@ public interface IAppArguments : IAppConfig
     string AutostartFlag { [CanBeNull] get; }
         
     string StartupArgs { [CanBeNull] get; }
+    
+    string[] CommandLineArguments { [CanBeNull] get; }
 
     bool Parse(string[] args);
 }

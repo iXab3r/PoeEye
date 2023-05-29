@@ -9,6 +9,7 @@ namespace PoeShared.Scaffolding;
 public static class StringUtils
 {
     public static readonly string GzipPrefix = "GZip ";
+    public static readonly string HexGzipPrefix = "GH";
     
     /// <summary>
     ///     Разделитель, который используется при формировании списков
@@ -23,6 +24,32 @@ public static class StringUtils
     public static string ToMD5(string value)
     {
         return ToHex(System.Security.Cryptography.MD5.Create().ComputeHash(Encoding.Unicode.GetBytes(value)), _separator: null);
+    }
+
+    public static bool IsHexGzip(string value)
+    {
+        return value != null && value.StartsWith(HexGzipPrefix);
+    }
+
+    public static string ToHexGzip(string value)
+    {
+        var gzip = CompressStringToGZip(value);
+        var bytes = Encoding.Default.GetBytes(gzip);
+        var hex = ToHex(bytes, null);
+        var hexGzip = HexGzipPrefix+hex;
+        return hexGzip;
+    }
+
+    public static string FromHexGzip(string hexGzip)
+    {
+        if (!IsHexGzip(hexGzip))
+        {
+            throw new ArgumentException($"Provided value is not of valid format, expected to start with {HexGzipPrefix}: {hexGzip}");
+        }
+        var bytes = FromHex(hexGzip.Substring(HexGzipPrefix.Length));
+        var gzip = Encoding.Default.GetString(bytes);
+        var value = DecompressStringFromGZip(gzip);
+        return value;
     }
     
     /// <summary>

@@ -1,8 +1,11 @@
+using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using CommandLine;
+using Microsoft.CodeAnalysis;
 using PoeShared.Modularity;
+using Parser = CommandLine.Parser;
 
 namespace PoeShared;
 
@@ -28,6 +31,9 @@ public class AppOptions : DisposableReactiveObject
     
     [Option('s', "safeMode", Default = null, HelpText = "Safe-Mode - some functions are disabled at startup")]
     public bool? IsSafeMode { get; set; }
+    
+    [Option('a', "adminMode", Default = null, HelpText = "Admin-Mode - require admin mode to function")]
+    public bool? IsAdminMode { get; set; }
         
     [Option('m', "modules", HelpText = "Prism modules - Space-separated list of modules that will be loaded")]
     public IEnumerable<string> PrismModules { get; set; }
@@ -75,16 +81,28 @@ public class AppArguments : AppOptions, IAppArguments
         ProcessId = Process.GetCurrentProcess().Id;
         IsElevated = true;
         AppDomainDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var args = Environment.GetCommandLineArgs();
-        StartupArgs = args.Skip(1)
+        var arguments = CommandLineStringSplitter.Instance.Split(Environment.CommandLine).ToArray();
+        CommandLineArguments = arguments.Skip(1).ToArray();
+        if (CommandLineArguments.Length == 1)
+        {
+            if (CommandLineArguments.Length == 1 && StringUtils.IsHexGzip(CommandLineArguments[0]))
+            {
+                Log.Info($"Decompressing arguments: {CommandLineArguments[0]}");
+                //compressed arg list
+                var decompressed = StringUtils.FromHexGzip(CommandLineArguments[0]);
+                Log.Info($"Decompressed arguments: {decompressed}");
+                CommandLineArguments = CommandLineStringSplitter.Instance.Split(decompressed).ToArray();
+            }
+        }
+        
+        StartupArgs = CommandLineArguments
             .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
             .Where(x => !string.Equals(AutostartFlag, x, StringComparison.OrdinalIgnoreCase))
             .JoinStrings(" ");
-        ApplicationExecutablePath = args.First();
+        ApplicationExecutablePath = arguments.First();
         ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
 
-        var arguments = Environment.GetCommandLineArgs();
-        var parsed = Parse(arguments);
+        var parsed = Parse(CommandLineArguments);
         if (string.IsNullOrEmpty(Profile))
         {
             Profile = IsDebugMode ? "debug" : DefaultProfileName;
@@ -98,7 +116,7 @@ public class AppArguments : AppOptions, IAppArguments
         if (!parsed)
         {
             SharedLog.Instance.InitializeLogging(this);
-            throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
+            throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", CommandLineArguments)}");
         }
     }
 
@@ -107,6 +125,8 @@ public class AppArguments : AppOptions, IAppArguments
     public bool IsLinux { get; }
 
     public string StartupArgs { get; }
+    
+    public string[] CommandLineArguments { get; }
 
     public int ProcessId { get; }
 
@@ -168,6 +188,7 @@ public class AppArguments : AppOptions, IAppArguments
             ShowUpdater,
             StartupArgs,
             IsSafeMode,
+            IsAdminMode,
             ApplicationPath = ApplicationExecutablePath,
             ApplicationName = ApplicationExecutableName
         }.Dump());

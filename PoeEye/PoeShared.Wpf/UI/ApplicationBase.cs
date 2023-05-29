@@ -10,6 +10,7 @@ using System.Runtime.Loader;
 using System.Threading;
 using System.Windows;
 using App.Metrics;
+using CommandLine;
 using PInvoke;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -127,6 +128,10 @@ public abstract class ApplicationBase : Application
 
             Log.Debug(() => $"Configuring AllowSetForegroundWindow permissions");
             UnsafeNative.AllowSetForegroundWindow();
+            
+            var applicationAccessor = Container.Resolve<IApplicationAccessor>();
+            Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
+            applicationAccessor.WhenExit.Subscribe(OnExit).AddTo(Anchors);
         }
         catch (Exception ex)
         {
@@ -152,10 +157,9 @@ public abstract class ApplicationBase : Application
         Container.Resolve<IExceptionReportingService>();
     }
 
-    protected override void OnExit(ExitEventArgs e)
+    private void OnExit(int exitCode)
     {
-        Log.Debug(() => $"Processing application OnExit, exit code: {e.ApplicationExitCode}");
-        base.OnExit(e);
+        Log.Debug(() => $"Processing application OnExit, exit code: {exitCode}");
         Log.Debug("Disposing application resources");
         Anchors.Dispose();
         Log.Debug("Disposed application resources");
