@@ -6,11 +6,10 @@ using log4net;
 
 namespace PoeShared.Scaffolding;
 
-public sealed class BenchmarkTimer : IDisposable
+public sealed class BenchmarkTimer : DisposableReactiveObject
 {
     private static readonly IFluentLog DefaultLogger = LogManager.GetLogger(typeof(BenchmarkTimer)).ToFluent();
 
-    private readonly string benchmarkName;
     private readonly IFluentLog logger;
     private readonly string propertyName;
     private readonly ConcurrentQueue<string> operations = new ConcurrentQueue<string>();
@@ -24,15 +23,30 @@ public sealed class BenchmarkTimer : IDisposable
     public BenchmarkTimer(string benchmarkName, ILog logger, [CallerMemberName] string propertyName = null) : this(benchmarkName, logger?.ToFluent(), propertyName)
     {
     }
-    public BenchmarkTimer(string benchmarkName, IFluentLog logger = null, [CallerMemberName] string propertyName = null)
+    
+    public BenchmarkTimer(string benchmarkName, IFluentLog logger = null, [CallerMemberName] string propertyName = null) : this(logger, propertyName)
     {
-        this.benchmarkName = benchmarkName;
         this.logger = logger ?? DefaultLogger;
         this.propertyName = propertyName ?? "unknown";
         sw = Stopwatch.StartNew();
-        Step($"=> {benchmarkName}");
+        AddStep(() => $" => {benchmarkName}");
+        Anchors.Add(() =>
+        {
+            if (logOnDisposal && this.logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
+            {
+                this.logger.Debug(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
+            }
+        });
     }
-        
+    
+    public BenchmarkTimer(IFluentLog logger = null, [CallerMemberName] string propertyName = null)
+    {
+        this.logger = logger ?? DefaultLogger;
+        this.propertyName = propertyName ?? "unknown";
+        sw = Stopwatch.StartNew();
+        Anchors.Add(() => sw.Stop());
+    }
+    
     public TimeSpan Elapsed => sw.Elapsed;
 
     public BenchmarkTimer ResetStep()
@@ -87,14 +101,18 @@ public sealed class BenchmarkTimer : IDisposable
     {
         return Step(() => message);
     }
-        
+
     private void AddStep(Func<string> messageFactory)
+    {
+        AddStep(messageFactory, sw.Elapsed);
+    }
+    
+    private void AddStep(Func<string> messageFactory, TimeSpan elapsed)
     {
         if (predicate != null && !predicate())
         {
             return;
         }
-        var timestamp = sw.Elapsed;
 
         var logMessage = $"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {messageFactory()}";
         operations.Enqueue(logMessage);
@@ -102,15 +120,6 @@ public sealed class BenchmarkTimer : IDisposable
         {
             logger.Debug(() => logMessage);
         }
-        previousOperationTimestamp = timestamp;
-    }
-        
-    public void Dispose()
-    {
-        sw.Stop();
-        if (logOnDisposal && logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
-        {
-            logger.Debug(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
-        }
+        previousOperationTimestamp = elapsed;
     }
 }

@@ -105,8 +105,38 @@ public static class NotifyPropertyChangedExtensions
     {
         WaitForValueAsync(instance, ex1, condition, timeout).Wait();
     }
+    
+    public static Task<T1> WaitForAsync<TObject, T1>(
+        this TObject instance, 
+        Func<TObject, T1> extractor,
+        Predicate<T1> condition,
+        TimeSpan timeout)
+        where TObject : INotifyPropertyChanged
+    {
+        var source = Observable.Timer(DateTimeOffset.Now, timeout / 5).Select(_ => extractor.Invoke(instance));
+        if (timeout <= TimeSpan.Zero)
+        {
+            return source
+                .Select(x => condition(x) == false ? throw new TimeoutException($"Value {x} does not satisfy condition") : x)
+                .Take(1)
+                .ToTask();
+        }
+
+        var reactiveResult = source.Where(x => condition(x)).Take(1);
+        if (timeout < TimeSpan.MaxValue)
+        {
+            var timeoutSource = Observable
+                .Return(default(T1))
+                .Delay(timeout)
+                .Select(_ => Observable.Throw<T1>(new TimeoutException($"Value did not satisfy condition in {timeout}")))
+                .Switch();
+            reactiveResult = reactiveResult.Amb(timeoutSource);
+        }
+
+        return reactiveResult.ToTask();
+    }
         
-    public static Task WaitForValueAsync<TObject, T1>(
+    public static Task<T1> WaitForValueAsync<TObject, T1>(
         this TObject instance, 
         Expression<Func<TObject, T1>> ex1,
         Predicate<T1> condition,
