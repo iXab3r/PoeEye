@@ -19,16 +19,12 @@
     ShowSystemMenu="False"
     ShowTitleBar="False"
     ShowCloseButton="False"
+    ShowMaxRestoreButton="False"
+    ShowMinButton="False"
     UseLayoutRounding="True"
     BorderThickness="0"
     NonActiveBorderBrush="{x:Null}"
     BorderBrush="{x:Null}">
-
-    <WindowChrome.WindowChrome>
-        <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}"
-                      CornerRadius="0" CaptionHeight="0"
-                      ResizeBorderThickness="{Binding ResizeBorderThickness, Mode=OneWay}" />
-    </WindowChrome.WindowChrome>
     <Window.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
@@ -64,9 +60,15 @@
 
             <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
 
-            <Setter Property="ResizeMode" Value="NoResize" />
-            <Setter Property="WindowStyle" Value="None" />
             <Setter Property="AllowsTransparency" Value="True" />
+            
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Content.IsLocked}" Value="True">
+                    <Setter Property="ResizeMode" Value="NoResize" />
+                    <Setter Property="WindowStyle" Value="None" />
+                </DataTrigger>
+
+            </Style.Triggers>
         </Style>
     </native:ReactiveMetroWindow.Style>
 

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using ControlzEx.Behaviors;
+using Microsoft.Xaml.Behaviors;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Native;
@@ -12,8 +15,23 @@ public partial class OverlayWindowView
         InitializeComponent();
         BorderThickness = new Thickness(0);
         SizeChanged += OnSizeChanged;
+        Loaded += OnLoaded;
     }
-    
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        var window = sender as Window;
+        var windowViewModel = window?.DataContext as WindowContainerBase<IOverlayViewModel>;
+        var overlayViewModel = windowViewModel?.Content;
+        
+        var behaviors = Interaction.GetBehaviors(this);
+        var chromeBehavior = behaviors.OfType<WindowChromeBehavior>().FirstOrDefault();
+        if (chromeBehavior == null)
+        {
+            return;
+        }
+    }
+
     private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
     {
         Log.Debug(() => $"Window size changed");
