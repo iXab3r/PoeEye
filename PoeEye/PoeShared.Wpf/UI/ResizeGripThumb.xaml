@@ -1,0 +1,17 @@
+<Grid x:Class="PoeShared.UI.ResizeGripThumb"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PoeShared.UI"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+             mc:Ignorable="d"
+             d:DesignHeight="20" d:DesignWidth="20">
+    <ResizeGrip />
+    <Thumb Cursor="SizeNWSE" Background="Transparent">
+        <i:Interaction.Behaviors>
+            <wpf:ResizeThumbBehavior/>
+        </i:Interaction.Behaviors>
+    </Thumb>
+</Grid>
