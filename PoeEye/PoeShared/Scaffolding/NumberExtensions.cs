@@ -37,8 +37,8 @@ public static class NumberExtensions
     {
         return Math.Max(Math.Min(value, max), min);
     }
-    
-    public static int RoundToOdd(this int value)
+
+    public static int EnsureOdd(this int value)
     {
         if (value % 2 != 0)
         {
@@ -47,7 +47,7 @@ public static class NumberExtensions
 
         return value - 1;
     }
-        
+     
     public static double EnsureInRange(this double value, double min, double max)
     {
         return Math.Max(Math.Min(value, max), min);
