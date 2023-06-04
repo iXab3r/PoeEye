@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using DynamicData;
 using DynamicData.Binding;
+using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
@@ -35,6 +36,8 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     static ApplicationUpdaterViewModel()
     {
         Binder.Bind(x => x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
+        Binder.Bind(x => !x.IsBusy && x.LatestUpdate != null).To(x => x.CanApplyUpdate);
+        Binder.Bind(x => !x.IsBusy && x.LatestAppliedVersion != null).To(x => x.CanRestartApplication);
     }
 
     public ApplicationUpdaterViewModel(
@@ -106,9 +109,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         this.RaiseWhenSourceValue(x => x.LauncherExecutable, updaterModel, x => x.LauncherExecutable, uiScheduler).AddTo(Anchors);
         this.RaiseWhenSourceValue(x => x.UpdateSource, updaterModel, x => x.UpdateSource, uiScheduler).AddTo(Anchors);
 
-        RestartCommand = CommandWrapper
-            .Create(RestartCommandExecuted);
-
+        RestartCommand = CommandWrapper.Create(RestartCommandExecuted, this.WhenAnyValue(x => x.CanRestartApplication));
         RestartCommand
             .ThrownExceptions
             .SubscribeSafe(ex => SetError($"Restart error: {ex.Message}"), Log.HandleUiException)
@@ -141,9 +142,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             .AddTo(Anchors);
 
         ShowUpdaterCommand = CommandWrapper.Create<object>(ShowUpdaterCommandExecuted);
-        ApplyUpdateCommand = CommandWrapper.Create(
-            ApplyUpdateCommandExecuted,
-            this.WhenAnyValue(x => x.LatestUpdate).ObserveOn(uiScheduler).Select(x => x != null));
+        ApplyUpdateCommand = CommandWrapper.Create(ApplyUpdateCommandExecuted, this.WhenAnyValue(x => x.CanApplyUpdate));
 
         OpenUri = CommandWrapper.Create<string>(OpenUriCommandExecuted);
         Binder.Attach(this).AddTo(Anchors);
@@ -186,6 +185,9 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     public int ProgressPercent => updaterModel.ProgressPercent;
 
     public bool IsBusy { get; private set; }
+    
+    public bool CanApplyUpdate { get; [UsedImplicitly] private set; }
+    public bool CanRestartApplication { get; [UsedImplicitly] private set; }
 
     public CommandWrapper OpenUri { get; }
 
@@ -278,7 +280,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             }
             else
             {
-                SetStatus("No updates found");
+                SetStatus("No updates found, you're using the latest version");
             }
         }
         catch (Exception ex)

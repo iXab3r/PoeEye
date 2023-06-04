@@ -27,25 +27,19 @@
                     <eye:ButtonEx
                         MinHeight="30"
                         Command="{Binding RestartCommand}"
-                        Icon="&#xf2d0;">
+                        Icon="&#xf2d0;"
+                        HideIfDisabled="True">
                         <eye:ButtonEx.Content>
                             <TextBlock Text="Restart application" />
                         </eye:ButtonEx.Content>
-                        <eye:ButtonEx.Visibility>
-                            <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
-                                <MultiBinding.Bindings>
-                                    <Binding Path="LatestAppliedVersion" Converter="{StaticResource NullToFalseConverter}" />
-                                    <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
-                                </MultiBinding.Bindings>
-                            </MultiBinding>
-                        </eye:ButtonEx.Visibility>
                     </eye:ButtonEx>
 
                     <eye:ButtonEx
                         MinHeight="30"
                         Command="{Binding ApplyUpdateCommand}"
                         Icon="&#xF0ED;"
-                        ToolTip="{Binding UpdateInfo}">
+                        ToolTip="{Binding UpdateInfo}"
+                        HideIfDisabled="True">
                         <eye:ButtonEx.Content>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Install" />
@@ -66,14 +60,6 @@
                                            Text="{x:Static themes:AwesomeIcons.Certificate}"/>
                             </StackPanel>
                         </eye:ButtonEx.Content>
-                        <eye:ButtonEx.Visibility>
-                            <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
-                                <MultiBinding.Bindings>
-                                    <Binding Path="LatestUpdate" Converter="{StaticResource NullToFalseConverter}" />
-                                    <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
-                                </MultiBinding.Bindings>
-                            </MultiBinding>
-                        </eye:ButtonEx.Visibility>
                     </eye:ButtonEx>
 
                     <ProgressBar Margin="5, 10"
