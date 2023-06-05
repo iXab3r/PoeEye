@@ -14,13 +14,16 @@ internal static class SquirrelAwareExecutableDetector
 {
     public static List<string> GetAllSquirrelAwareApps(string directory, int minimumVersion = 1)
     {
-        var di = new DirectoryInfo(directory);
-
-        return di.EnumerateFiles()
-            .Where(x => x.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-            .Select(x => x.FullName)
-            .Where(x => (GetPeSquirrelAwareVersion(x) ?? -1) >= minimumVersion)
-            .ToList();
+        var executables = new DirectoryInfo(directory).EnumerateFiles("*.exe").ToArray();
+        var result = (from x in executables
+            select x.FullName into x
+            where (GetPeSquirrelAwareVersion(x) ?? -1) >= minimumVersion
+            select x).ToList();
+        if (result.Any())
+        {
+            return result;
+        }
+        return executables.Length == 1 ? executables.Select(x => x.FullName).ToList() : new List<string>();
     }
 
     public static int? GetPeSquirrelAwareVersion(string executable)
