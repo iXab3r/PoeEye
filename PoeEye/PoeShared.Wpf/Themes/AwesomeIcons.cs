@@ -37,6 +37,7 @@ public static class AwesomeIcons
     public const string CloudDownload = "\uf0ed";
     public const string CloudUpload = "\uf0ee";
     public const string CogIcon = "\uf013";
+    public const string Copy = "\uF0C5";
     public const string CollapsedDirectory = "\uf114";
     public const string CheckboxSquareChecked = "\uf046";
     public const string CheckboxSquareEmpty = "\uf096";
@@ -66,6 +67,7 @@ public static class AwesomeIcons
     public const string Padlock = "\uf023";
     public const string PlayOutlined = "\uf01d";
     public const string PlusCircle = "\uf055";
+    public const string Paste = "\uF0EA";
     public const string Pause = "\uf04c";
     public const string PowerOff = "\uf011";
     public const string Repeat = "\uf01e";

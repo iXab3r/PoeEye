@@ -253,9 +253,9 @@ public static class GeometryExtensions
                IsFinite(size.Height);
     }
 
-    public static WinSize ToWpfSize(this System.Drawing.Size sourceSize)
+    public static WpfSize ToWpfSize(this System.Drawing.Size sourceSize)
     {
-        return new WinSize(sourceSize.Width, sourceSize.Height);
+        return new WpfSize(sourceSize.Width, sourceSize.Height);
     }
 
     public static WinSize ToWinSize(this WpfSize sourceSize)

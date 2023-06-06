@@ -68,6 +68,14 @@ public static class ScreenRegionUtils
         return !result.IntersectsWith(destinationRegion) ? new WpfRect() : result;
     }
 
+    public static WinPoint CalculateProjection(
+        WinPoint point,
+        WinSize selectorSize,
+        WinSize projectionAreaSize)
+    {
+        return CalculateProjection(new WpfRect(new WpfPoint(point.X, point.Y), new WpfSize(1, 1)), selectorSize.ToWpfSize(), projectionAreaSize).Location;
+    }
+
     public static Rectangle CalculateProjection(
         WpfRect selection,
         WpfSize selectorSize,
