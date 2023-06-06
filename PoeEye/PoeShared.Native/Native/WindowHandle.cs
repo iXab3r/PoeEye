@@ -221,6 +221,8 @@ internal sealed class WindowHandle : IWindowHandle
     public Rectangle ClientBounds => UnsafeNative.GetClientRect(Handle);
 
     public Rectangle DwmWindowBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
+
+    public Rectangle DwmWindowBoundsWithinMonitor => UnsafeNative.DwmGetWindowFrameBoundsWithinMonitor(Handle);
         
     public Rectangle MonitorBounds => System.Windows.Forms.Screen.FromHandle(Handle).Bounds;
 

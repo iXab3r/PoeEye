@@ -26,14 +26,4 @@ public static class WindowHandleExtensions
 
         return new Point(screenPoint.X + windowBounds.Left, screenPoint.Y + windowBounds.Top);
     }
-
-    public static WinRect GetDwmWindowBoundsWithinMonitor(this IWindowHandle windowHandle)
-    {
-        return UnsafeNative.DwmGetWindowFrameBoundsWithinMonitor(windowHandle.Handle);
-    }
-    
-    public static WinRect GetMonitorBounds(this IWindowHandle windowHandle)
-    {
-        return System.Windows.Forms.Screen.FromHandle(windowHandle.Handle).Bounds;
-    }
 }
