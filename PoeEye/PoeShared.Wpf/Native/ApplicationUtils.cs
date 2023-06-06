@@ -22,14 +22,17 @@ public class ApplicationUtils
         {
             AppIcon = Icon.ExtractAssociatedIcon(appPath);
             AppIconSource = GetAppIcon(new FileInfo(appPath));
+            AppIconBitmap = AppIconSource.ToBitmap();
         }
     }
         
-    public static ImageSource AppIconSource { get; }
+    public static BitmapSource AppIconSource { get; }
+    
+    public static Bitmap AppIconBitmap { get; }
         
     public static Icon AppIcon { get; }
 
-    public static ImageSource GetAppIcon(FileInfo path)
+    public static BitmapSource GetAppIcon(FileInfo path)
     {
         try
         {

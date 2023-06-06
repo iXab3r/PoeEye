@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Media;
 using PoeShared.Scaffolding;
 
@@ -17,7 +18,7 @@ public abstract class NotificationViewModelBase : DisposableReactiveObject, INot
 
     public string Title { get; set; }
 
-    public ImageSource Icon { get; set; }
+    public Bitmap Icon { get; set; }
 
     public TimeSpan TimeToLive { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Media;
 using PoeShared.Scaffolding;
 
@@ -8,7 +9,7 @@ public interface INotificationViewModel : IDisposableReactiveObject, ICloseable
 {
     string Title { get; set; }
         
-    ImageSource Icon { get; set; }
+    Bitmap Icon { get; set; }
         
     TimeSpan TimeToLive { get; set; }
         

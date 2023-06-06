@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using PoeShared.Logging;
@@ -18,7 +19,9 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
 {
     private static readonly IFluentLog Log = typeof(NotificationsService).PrepareLogger();
 
-    private readonly ISourceList<INotificationContainerViewModel> itemsSource;
+    private readonly ISourceList<INotificationViewModel> notificationsSource = new SourceList<INotificationViewModel>();
+    private readonly IObservableList<INotificationContainerViewModel> itemsSource;
+    
     private readonly IFactory<INotificationContainerViewModel, INotificationViewModel> notificationContainerFactory;
     private readonly IOverlayWindowController overlayWindowController;
 
@@ -33,7 +36,13 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
         this.notificationContainerFactory = notificationContainerFactory;
         overlayWindowController = overlayWindowControllerFactory.Create(uiOverlayScheduler);
 
-        itemsSource = new SourceListEx<INotificationContainerViewModel>().AddTo(Anchors);
+        itemsSource = notificationsSource
+            .Connect()
+            .DisposeMany()
+            .ObserveOn(uiOverlayScheduler)
+            .Transform(ToContainer)
+            .AsObservableList();
+        
         itemsSource
             .Connect()
             .DisposeMany()
@@ -86,21 +95,26 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
 
     public void CloseAll()
     {
-        itemsSource.Clear();
+        notificationsSource.Clear();
     }
 
-    public IDisposable AddNotification(INotificationViewModel notification)
+    private INotificationContainerViewModel ToContainer(INotificationViewModel notification)
     {
         var container = notificationContainerFactory.Create(notification);
         var closeController = new ItemCloseController<INotificationViewModel>(notification, () =>
         {
             Log.Debug(() => $"Removing notification: {notification} in container: {container}");
-            itemsSource.Remove(container);
+            notificationsSource.Remove(notification);
         });
         notification.CloseController = closeController;
 
-        Log.Debug(() => $"Showing notification: {notification} in container: {container}");
-        itemsSource.Add(container);
+        Log.Debug(() => $"Embedded notification: {notification} in container: {container}");
         return container;
+    }
+
+    public IDisposable AddNotification(INotificationViewModel notification)
+    {
+        notificationsSource.Add(notification);
+        return Disposable.Create(() => notificationsSource.Remove(notification));
     }
 }

@@ -23,7 +23,7 @@ internal sealed class NotificationContainerViewModel : DisposableReactiveObject,
 
     static NotificationContainerViewModel()
     {
-        Binder.Bind(x => x.Notification.Icon).To((x, v) => x.Icon = v, x => x.uiDispatcher);
+        Binder.Bind(x => x.Notification.Icon).To((x, v) => x.Icon = v?.ToBitmapSource(), x => x.uiDispatcher);
         Binder.Bind(x => x.Notification.Title).To((x, v) => x.Title = v, x => x.uiDispatcher);
         Binder.Bind(x => x.clock.UtcNow)
             .WithDependency(x => x.Notification.TimeToLive)

@@ -14,22 +14,6 @@ using ReactiveUI;
 
 namespace PoeShared.Scaffolding.WPF;
 
-public static class Commands
-{
-    public static ICommand OpenUri { get; } = CommandWrapper.Create<object>(OpenUriExecuted);
-
-    private static async Task OpenUriExecuted(object arg)
-    {
-        var uri = arg switch
-        {
-            string stringArg => stringArg,
-            Uri uriArg => uriArg.ToString(),
-            _ => throw new ArgumentOutOfRangeException(nameof(arg), arg, $"Unsupported argument type: {arg}")
-        };
-        await ProcessUtils.OpenUri(uri);
-    }
-}
-
 public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 {
     private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
@@ -38,10 +22,28 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     private readonly Subject<Exception> thrownExceptions = new();
     private readonly Subject<Unit> raiseCanExecuteChangedRequests = new();
     private readonly ISubject<object> whenExecuted = new Subject<object>();
+    private readonly DispatcherScheduler scheduler;
 
     private CommandWrapper(ICommand command)
     {
+        scheduler = DispatcherScheduler.Current;
         InnerCommand = command;
+        InnerCommand.CanExecuteChanged += InnerCommandOnCanExecuteChanged;
+    }
+
+    private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)
+    {
+        var actualScheduler = DispatcherScheduler.Current;
+        if (actualScheduler != null && actualScheduler.Dispatcher.Thread == scheduler.Dispatcher.Thread)
+        {
+            return;
+        }
+
+        Log.Error($"CanExecute is executed on an invalid thread, expected: {scheduler}, actual: {actualScheduler}");
+        if (Debugger.IsAttached)
+        {
+            Debugger.Break();
+        }
     }
 
     public static CommandWrapper FromDelegateCommand(DelegateCommandBase command)
@@ -199,7 +201,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 
     public static CommandWrapper Create<T>(Action<T> execute)
     {
-        return FromDelegateCommand(new DelegateCommand<T>(execute));
+        return FromReactiveCommand(ReactiveCommand.Create(execute));
     }
     
     public static CommandWrapper Create<T>(Action<T> execute, IObservable<bool> raiseCanExecuteWhen)
