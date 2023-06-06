@@ -24,6 +24,11 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     private readonly ISubject<object> whenExecuted = new Subject<object>();
     private readonly DispatcherScheduler scheduler;
 
+#if DEBUG
+    // ReSharper disable once UnusedMember.Local Needed for debugging
+    private readonly StackTrace createdFrom = new();
+#endif
+
     private CommandWrapper(ICommand command)
     {
         scheduler = DispatcherScheduler.Current;
@@ -179,6 +184,11 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(DispatcherScheduler.Current), DispatcherScheduler.Current));
     }
 
+    public static CommandWrapper Create<T>(Action<T> execute)
+    {
+        return FromReactiveCommand(ReactiveCommand.Create(execute, outputScheduler: DispatcherScheduler.Current));
+    }
+
     public static CommandWrapper Create(Func<Task> execute)
     {
         return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
@@ -199,11 +209,6 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         return FromDelegateCommand(new DelegateCommand<T>(execute, canExecute));
     }
 
-    public static CommandWrapper Create<T>(Action<T> execute)
-    {
-        return FromReactiveCommand(ReactiveCommand.Create(execute));
-    }
-    
     public static CommandWrapper Create<T>(Action<T> execute, IObservable<bool> raiseCanExecuteWhen)
     {
         return Create<T>(async x => execute(x), raiseCanExecuteWhen);
