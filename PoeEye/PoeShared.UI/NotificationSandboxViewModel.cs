@@ -58,7 +58,7 @@ internal sealed class NotificationSandboxViewModel : DisposableReactiveObject
             Text = string.IsNullOrEmpty(NotificationText) ? Enumerable.Repeat("a", (int)rng.Next(10, 60)).JoinStrings(" ") : NotificationText,
             TimeToLive = NotificationTimeout,
             Title = NotificationTitle,
-            Icon = WithIcon ? NotificationImage : default,
+            Icon = WithIcon ? NotificationImage.ToBitmap() : default,
             Interactive = Interactive,
             Closeable = Closeable
         };
