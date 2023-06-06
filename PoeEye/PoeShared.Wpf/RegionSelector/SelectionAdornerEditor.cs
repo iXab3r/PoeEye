@@ -61,10 +61,11 @@ public class SelectionAdornerEditor : ReactiveControl
             .Bind(x => ScreenRegionUtils.CalculateProjection(
                 new WpfRect(x.MousePosition, new WpfSize(1, 1)),
                 x.ActualSize,
-                x.ProjectionBounds).Location)
+                x.ProjectionBounds, 
+                true).Location)
             .To((x, v) => x.SetCurrentValue(MousePositionProjectedProperty, v));
 
-        Binder.Bind(x => ScreenRegionUtils.CalculateProjection(
+        Binder.Bind(x => ScreenRegionUtils.ReverseProjection(
                 x.SelectionProjected,
                 x.ActualSize,
                 x.ProjectionBounds
@@ -358,6 +359,6 @@ public class SelectionAdornerEditor : ReactiveControl
     {
         var projectedSelection = ScreenRegionUtils.CalculateProjection(selection, ActualSize, ProjectionBounds);
         SetCurrentValue(SelectionProjectedProperty, projectedSelection);
-        ApplySelection(ScreenRegionUtils.CalculateProjection(projectedSelection, ActualSize, ProjectionBounds));
+        ApplySelection(ScreenRegionUtils.ReverseProjection(projectedSelection, ActualSize, ProjectionBounds));
     }
 }

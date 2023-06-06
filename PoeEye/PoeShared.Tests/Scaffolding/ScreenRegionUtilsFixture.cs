@@ -254,7 +254,7 @@ public class ScreenRegionUtilsFixture : FixtureBase
         Log.Debug($"{new {projected, selector, clientSize, expected}}");
 
         //When
-        var result = ScreenRegionUtils.CalculateProjection(projected, selector, clientSize);
+        var result = ScreenRegionUtils.ReverseProjection(projected, selector, clientSize);
 
         //Then
         result.X.ShouldBe(expected.X, 1e-1);
@@ -309,21 +309,6 @@ public class ScreenRegionUtilsFixture : FixtureBase
             new Rectangle(1, 1, 1, 1)
         ) { TestName = "Selection outside by size client and selector bounds" }; 
         */
-    }
-
-    [Test]
-    [TestCaseSource(nameof(ShouldCalculateBoundsCases))]
-    public void ShouldCalculateBounds(Rectangle selection, Size selector, Rectangle clientBounds, Rectangle expected)
-    {
-        //Given
-
-        //When
-#pragma warning disable CS0618 // for test purposes
-        var result = ScreenRegionUtils.CalculateBounds(selection, selector, clientBounds);
-#pragma warning restore CS0618
-
-        //Then
-        result.ShouldBe(expected);
     }
 
     [Test]

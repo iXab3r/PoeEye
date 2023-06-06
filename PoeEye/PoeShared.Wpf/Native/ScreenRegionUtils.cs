@@ -8,64 +8,23 @@ namespace PoeShared.Native;
 
 public static class ScreenRegionUtils
 {
-    [Obsolete("Replaced by CalculateProjection")]
-    public static Rectangle CalculateBounds(
-        Rectangle selection,
-        WinSize selectorSize,
-        Rectangle clientBounds)
+    public static WinRect CalculateProjection(
+        WpfRect selection,
+        WpfSize selectorSize,
+        WinRect projectionAreaBounds,
+        bool allowProjectionOutsideArea)
     {
-        return CalculateBounds(selection, selectorSize, clientBounds, Rectangle.Empty);
+        var result = CalculateProjection(selection, selectorSize, projectionAreaBounds.Size, allowProjectionOutsideArea);
+        result.Offset(projectionAreaBounds.Location);
+        return result;
     }
-
-    public static Rectangle CalculateProjection(
+    
+    public static WinRect CalculateProjection(
         WpfRect selection,
         WpfSize selectorSize,
         WinRect projectionAreaBounds)
     {
-        var result = CalculateProjection(selection, selectorSize, projectionAreaBounds.Size);
-        result.Offset(projectionAreaBounds.Location);
-        return result;
-    }
-
-    public static WpfRect CalculateProjection(
-        WinRect projectedSelection,
-        WpfSize selectorSize,
-        WinRect projectionAreaBounds)
-    {
-        var offset = new WinPoint(-projectionAreaBounds.Location.X, -projectionAreaBounds.Location.Y);
-        var result = CalculateProjection(projectedSelection.OffsetBy(offset), selectorSize, projectionAreaBounds.Size);
-        return result;
-    }
-
-    public static WpfRect CalculateProjection(
-        WinRect projectedSelection,
-        WpfSize selectorSize,
-        WinSize projectionAreaSize)
-    {
-        if (projectedSelection.IsEmptyArea() || selectorSize.IsEmptyArea() || projectionAreaSize.IsEmptyArea())
-        {
-            return new WpfRect();
-        }
-            
-        var selectionPercent = new WpfRect
-        {
-            X = (float)projectedSelection.X / projectionAreaSize.Width,
-            Y = (float)projectedSelection.Y / projectionAreaSize.Height,
-            Height = (float)projectedSelection.Height / projectionAreaSize.Height,
-            Width = (float)projectedSelection.Width / projectionAreaSize.Width
-        };
-            
-        var destinationRegion = new WpfRect
-        {
-            X = selectionPercent.X * selectorSize.Width,
-            Y = selectionPercent.Y * selectorSize.Height,
-            Width = selectionPercent.Width * selectorSize.Width,
-            Height = selectionPercent.Height * selectorSize.Height
-        };
-
-        var result = new WpfRect(default, selectorSize);
-        result.Intersect(destinationRegion);
-        return !result.IntersectsWith(destinationRegion) ? new WpfRect() : result;
+        return CalculateProjection(selection, selectorSize, projectionAreaBounds, allowProjectionOutsideArea: false);
     }
 
     public static WinPoint CalculateProjection(
@@ -80,6 +39,15 @@ public static class ScreenRegionUtils
         WpfRect selection,
         WpfSize selectorSize,
         WinSize projectionAreaSize)
+    {
+        return CalculateProjection(selection, selectorSize, projectionAreaSize, allowProjectionOutsideArea: false);
+    }
+
+    public static Rectangle CalculateProjection(
+        WpfRect selection,
+        WpfSize selectorSize,
+        WinSize projectionAreaSize,
+        bool allowProjectionOutsideArea)
     {
         if (selection.IsEmptyArea() || selectorSize.IsEmptyArea() || projectionAreaSize.IsEmptyArea())
         {
@@ -111,71 +79,53 @@ public static class ScreenRegionUtils
 
         var projectionBounds = new Rectangle(WinPoint.Empty, projectionAreaSize);
         result.Intersect(projectionBounds);
-        return !result.IntersectsWith(projectionBounds) ? Rectangle.Empty : result;
+        if (allowProjectionOutsideArea || result.IntersectsWith(projectionBounds))
+        {
+            return result;
+        }
+
+        return Rectangle.Empty;
+    }
+    
+    public static WpfRect ReverseProjection(
+        WinRect projectedSelection,
+        WpfSize selectorSize,
+        WinRect projectionAreaBounds)
+    {
+        var offset = new WinPoint(-projectionAreaBounds.Location.X, -projectionAreaBounds.Location.Y);
+        var result = ReverseProjection(projectedSelection.OffsetBy(offset), selectorSize, projectionAreaBounds.Size);
+        return result;
     }
 
-    [Obsolete("Replaced by CalculateProjection")]
-    public static Rectangle CalculateBounds(Rectangle selection,
-        WinSize selectorSize,
-        Rectangle clientBounds,
-        Rectangle clientRegionBounds)
+    public static WpfRect ReverseProjection(
+        WinRect projectedSelection,
+        WpfSize selectorSize,
+        WinSize projectionAreaSize)
     {
-        if (selection.IsEmpty || selectorSize.IsEmpty || clientBounds.IsEmpty)
+        if (projectedSelection.IsEmptyArea() || selectorSize.IsEmptyArea() || projectionAreaSize.IsEmptyArea())
         {
-            return Rectangle.Empty;
+            return new WpfRect();
         }
-
-        var currentTargetRegion = clientBounds;
-        if (!clientRegionBounds.IsEmpty)
-        {
-            currentTargetRegion.Intersect(clientRegionBounds);
-        }
-
+            
         var selectionPercent = new WpfRect
         {
-            X = (double)selection.X / selectorSize.Width,
-            Y = (double)selection.Y / selectorSize.Height,
-            Height = (double)selection.Height / selectorSize.Height,
-            Width = (double)selection.Width / selectorSize.Width
+            X = (float)projectedSelection.X / projectionAreaSize.Width,
+            Y = (float)projectedSelection.Y / projectionAreaSize.Height,
+            Height = (float)projectedSelection.Height / projectionAreaSize.Height,
+            Width = (float)projectedSelection.Width / projectionAreaSize.Width
         };
-
-        WpfRect currentRegionPercent;
-        if (currentTargetRegion.IsNotEmptyArea())
-        {
-            currentRegionPercent = new WpfRect
-            {
-                X = (double)currentTargetRegion.X / clientBounds.Width,
-                Y = (double)currentTargetRegion.Y / clientBounds.Height,
-                Height = (double)currentTargetRegion.Height / clientBounds.Height,
-                Width = (double)currentTargetRegion.Width / clientBounds.Width
-            };
-        }
-        else
-        {
-            currentRegionPercent = new WpfRect
-            {
-                Width = 1,
-                Height = 1
-            };
-        }
-
+            
         var destinationRegion = new WpfRect
         {
-            X = (currentRegionPercent.X + selectionPercent.X * currentRegionPercent.Width) * clientBounds.Width,
-            Y = (currentRegionPercent.Y + selectionPercent.Y * currentRegionPercent.Height) * clientBounds.Height,
-            Width = Math.Max(1, currentRegionPercent.Width * selectionPercent.Width * clientBounds.Width),
-            Height = Math.Max(1, currentRegionPercent.Height * selectionPercent.Height * clientBounds.Height)
-        };
-        destinationRegion = new WpfRect
-        {
-            X = Math.Round(destinationRegion.X),
-            Y = Math.Round(destinationRegion.Y),
-            Width = Math.Round(destinationRegion.Width),
-            Height = Math.Round(destinationRegion.Height)
+            X = selectionPercent.X * selectorSize.Width,
+            Y = selectionPercent.Y * selectorSize.Height,
+            Width = selectionPercent.Width * selectorSize.Width,
+            Height = selectionPercent.Height * selectorSize.Height
         };
 
-        var destinationRect = destinationRegion.ToWinRectangle();
-        return destinationRect;
+        var result = new WpfRect(default, selectorSize);
+        result.Intersect(destinationRegion);
+        return !result.IntersectsWith(destinationRegion) ? new WpfRect() : result;
     }
 
     public static WinPoint ToScreenCoordinates(double absoluteX, double absoluteY)
