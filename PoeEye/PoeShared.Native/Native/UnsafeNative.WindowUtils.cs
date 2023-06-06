@@ -57,18 +57,11 @@ public partial class UnsafeNative
         return z;
     }
 
-    public static Rectangle GetWindowBoundsWithFrame(IntPtr hwnd)
+    public static Rectangle DwmGetWindowFrameBoundsWithinMonitor(IntPtr hwnd)
     {
-        //FIXME On Win10 GetWindowRect works not as expected - it includes invisible borders around the frame
-        var windowRect = GetWindowRect(hwnd);
-        return windowRect;
-    }
-
-    public static Rectangle GetClientRectWithinMonitor(IntPtr hwnd)
-    {
-        var windowRect = GetWindowBoundsWithFrame(hwnd);
+        var windowRect = DwmGetWindowFrameBounds(hwnd);
         var monitorRect = System.Windows.Forms.Screen.FromHandle(hwnd).Bounds;
-        return new Rectangle(windowRect.X - monitorRect.X, windowRect.Y - monitorRect.Y, windowRect.Width, windowRect.Height);
+        return windowRect with { X = windowRect.X - monitorRect.X, Y = windowRect.Y - monitorRect.Y};
     }
 
     public static Rectangle GetWindowRect(IntPtr hwnd)

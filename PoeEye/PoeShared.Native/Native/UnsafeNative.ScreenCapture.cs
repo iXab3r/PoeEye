@@ -39,7 +39,7 @@ public partial class UnsafeNative
         
     public static Bitmap GetWindowImageViaCopyFromScreen(IntPtr hwnd, Rectangle region)
     {
-        var sourceRegion = GetWindowBoundsWithFrame(hwnd);
+        var sourceRegion = DwmGetWindowFrameBounds(hwnd);
         if (sourceRegion.Width <= 0 || sourceRegion.Height <= 0)
         {
             return null;
@@ -63,7 +63,7 @@ public partial class UnsafeNative
 
         try
         {
-            var sourceRegion = GetWindowBoundsWithFrame(hwnd);
+            var sourceRegion = DwmGetWindowFrameBounds(hwnd);
             if (sourceRegion.Width <= 0 || sourceRegion.Height <= 0)
             {
                 return null;

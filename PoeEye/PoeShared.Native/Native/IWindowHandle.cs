@@ -17,8 +17,6 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
         
     Rectangle DwmWindowBounds { get; }
         
-    Rectangle ClientRectWithinMonitor { get; }
-        
     Icon Icon { get; }
         
     BitmapSource IconBitmap { get; }

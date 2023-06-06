@@ -222,7 +222,7 @@ internal sealed class WindowHandle : IWindowHandle
 
     public Rectangle DwmWindowBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
         
-    public Rectangle ClientRectWithinMonitor => UnsafeNative.GetClientRectWithinMonitor(Handle);
+    public Rectangle MonitorBounds => System.Windows.Forms.Screen.FromHandle(Handle).Bounds;
 
     [JsonIgnore] public Icon Icon => iconSupplier.Value;
 
