@@ -9,7 +9,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TargetFramework>net7-windows</TargetFramework>
-    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
+    <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;CS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <SupportedPlatform Include="windows" />

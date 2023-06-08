@@ -6,7 +6,7 @@
         <Platforms>AnyCPU</Platforms>
         <WarningsAsErrors />
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998</NoWarn>
+        <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;CS1591</NoWarn>
         <RootNamespace>PoeShared.Squirrel</RootNamespace>
     </PropertyGroup>
 
