@@ -9,27 +9,33 @@ internal sealed class NativeFolderBrowserDialog : DisposableReactiveObjectWithLo
 {
     public DirectoryInfo ShowDialog()
     {
-        Log.Info(() => $"Showing Open folder dialog, parameters: {new { Title, InitialDirectory, LastDirectory }}");
+        Log.Info(() => $"Showing Open folder dialog, parameters: {new { Title, InitialDirectory, LastDirectory = SelectedPath }}");
         var dialog = new FolderBrowserDialog()
         {
             Description = Title,
             InitialDirectory = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory) 
                 ? InitialDirectory
                 : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            SelectedPath = SelectedPath ?? string.Empty
         };
         
-        if (dialog.ShowDialog() != DialogResult.OK)
+        if (dialog.ShowDialog() != DialogResult.OK )
         {
             Log.Info("User cancelled Open file dialog");
             return default;
         }
 
-        LastDirectory = new DirectoryInfo(dialog.SelectedPath);
-        Log.Info(() => $"User has selected folder {LastDirectory} (exists: {LastDirectory.Exists})");
-        return LastDirectory;
+        SelectedPath = dialog.SelectedPath;
+        if (SelectedPath != null)
+        {
+            Log.Info(() => $"User has selected folder {SelectedPath}");
+            InitialDirectory = Path.GetDirectoryName(SelectedPath);
+        }
+
+        return string.IsNullOrEmpty(SelectedPath) ? null : new DirectoryInfo(SelectedPath);
     }
 
-    public DirectoryInfo LastDirectory { get; private set; }
+    public string SelectedPath { get; set; }
     
     public string Title { get; set; }
     

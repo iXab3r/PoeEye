@@ -7,7 +7,7 @@ public interface IFolderBrowserDialog : IDisposableReactiveObject
 {
     DirectoryInfo ShowDialog();
    
-    DirectoryInfo LastDirectory { get; }
+    string SelectedPath { get; set; }
     
     string Title { get; set; }
    
