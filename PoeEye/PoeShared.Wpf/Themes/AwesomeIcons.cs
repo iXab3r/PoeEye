@@ -52,6 +52,7 @@ public static class AwesomeIcons
     public const string FileText = "\uf0f6";
     public const string FileImage = "\uf1c5";
     public const string Font = "\uf031";
+    public const string FolderOpen = "\uf115";
     public const string Keyboard = "\uf11c";
     public const string Hourglass = "\uf252";
     public const string Incognito = "\uf2a7";

@@ -29,6 +29,7 @@ public static class ProcessUtils
             () =>
             {
                 Log.Debug(() => $"Selecting: {fileSystemInfo}");
+                fileSystemInfo.Refresh();
                 if (!fileSystemInfo.Exists)
                 {
                     throw new InvalidOperationException($"{fileSystemInfo} does not exist");
