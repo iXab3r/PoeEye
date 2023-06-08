@@ -70,6 +70,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<ISelectionAdorner, SelectionAdorner>()
             .RegisterType<IOpenFileDialog, NativeFileDialog>()
             .RegisterType<ISaveFileDialog, NativeFileDialog>()
+            .RegisterType<IFolderBrowserDialog, NativeFolderBrowserDialog>()
             .RegisterType<IOverlayWindowController, OverlayWindowController>()
             .RegisterType<ITrackedOverlayWindowController, TrackedOverlayWindowController>()
             .RegisterType<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()

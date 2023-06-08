@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Win32;
 using PoeShared.Scaffolding;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace PoeShared.Dialogs.Services;
 
