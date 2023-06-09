@@ -46,8 +46,8 @@ public class HotkeyTests
         var hotkey = new HotkeyGesture(key, modifierKeys);
 
         // Then
-        hotkey.Key.ShouldBe(expectedKey, () => hotkey.ToString());
-        hotkey.ModifierKeys.ShouldBe(expectedModifierKeys, () => hotkey.ToString());
+        hotkey.Key.ShouldBe(expectedKey, hotkey.ToString());
+        hotkey.ModifierKeys.ShouldBe(expectedModifierKeys, hotkey.ToString());
     }
 
     [TestCase(MouseButton.Left, ModifierKeys.None, "MouseLeft")]

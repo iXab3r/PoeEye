@@ -22,7 +22,7 @@ public class AspectRatioSizeCalculatorTests
         var result = instance.Calculate(aspectRatio, bounds, initialBounds, prioritizeHeight);
 
         //Then
-        result.ShouldBe(expected, () => $"{new { prioritizeHeight, aspectRatio, bounds, expected }}");
+        result.ShouldBe(expected, $"{new { prioritizeHeight, aspectRatio, bounds, expected }}");
     }
 
     private static IEnumerable<TestCaseData> ShouldCalculateCases()

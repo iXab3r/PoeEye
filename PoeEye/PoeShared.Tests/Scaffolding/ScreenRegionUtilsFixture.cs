@@ -327,7 +327,7 @@ public class ScreenRegionUtilsFixture : FixtureBase
                 var converted = ScreenRegionUtils.ToWinInputCoordinates(srcPoint, bounds);
                 var dstPoint = ScreenRegionUtils.ToScreenCoordinates(converted.X, converted.Y, bounds);
                     
-                srcPoint.ShouldBe(dstPoint, () => $"Source: {srcPoint}, Converted: {converted}, Result: {dstPoint}");
+                srcPoint.ShouldBe(dstPoint, $"Source: {srcPoint}, Converted: {converted}, Result: {dstPoint}");
             }
         }
     }

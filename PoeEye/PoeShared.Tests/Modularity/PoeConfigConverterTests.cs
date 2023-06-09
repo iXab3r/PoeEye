@@ -229,7 +229,7 @@ public class PoeConfigConverterTests : FixtureBase
         var result = instance.Deserialize<SampleCombinedConfig>(serializedValue);
 
         //Then
-        result.Configs.Length.ShouldBe(1, () => $"Serialized value:\n{serializedValue}");
+        result.Configs.Length.ShouldBe(1, $"Serialized value:\n{serializedValue}");
         result.Configs[0].ShouldBeOfType<SampleConfig>();
         ((SampleConfig) result.Configs[0]).Value.ShouldBe("value");
     }

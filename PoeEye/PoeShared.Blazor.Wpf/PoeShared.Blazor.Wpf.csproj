@@ -22,7 +22,7 @@
      </ItemGroup>
 
      <ItemGroup>
-         <PackageReference Include="FluentValidation" Version="9.5.1" />
+         <PackageReference Include="FluentValidation" Version="11.4.0" />
          <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
      </ItemGroup>
 

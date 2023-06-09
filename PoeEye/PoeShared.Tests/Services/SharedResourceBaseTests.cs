@@ -227,12 +227,12 @@ public class SharedResourceBaseTests : FixtureBase
             if (instance.RefCount > 0)
             {
                 logger.Debug("Expecting rent to succeed");
-                rented.ShouldBe(true, () => $"Run {runId}");
+                rented.ShouldBe(true, $"Run {runId}");
             }
             else
             {
                 logger.Debug("Expecting rent to fail");
-                rented.ShouldBe(false, () => $"Run {runId}");
+                rented.ShouldBe(false, $"Run {runId}");
             }
         });
 
