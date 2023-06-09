@@ -1,7 +1,7 @@
  <Project Sdk="Microsoft.NET.Sdk.Razor">
 
      <PropertyGroup>
-         <TargetFramework>net7-windows7</TargetFramework>
+         <TargetFramework>net7-windows</TargetFramework>
          <AssemblyTitle>PoeShared.Blazor</AssemblyTitle>
          <Product>PoeShared.Blazor</Product>
          <Copyright>Copyright © Xab3r 2023</Copyright>
@@ -9,7 +9,7 @@
          <Platforms>AnyCPU</Platforms>
          <UseWpf>true</UseWpf>
          <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-         <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;CS1591</NoWarn>
+         
      </PropertyGroup>
 
      <ItemGroup>
