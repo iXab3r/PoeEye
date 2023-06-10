@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using ByteSizeLib;
 using Microsoft.Extensions.FileProviders;
 
 namespace PoeShared.Blazor.Wpf;
@@ -28,4 +29,9 @@ public sealed class InMemoryFileInfo : IFileInfo
     public long Length => fileBytes.Length;
     public string Name { get; }
     public string PhysicalPath => null;
+
+    public override string ToString()
+    {
+        return $"InMemoryFile: {Name} ({ByteSize.FromBytes(Length)})";
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using NUnit.Framework;
 using DynamicData;
@@ -149,5 +150,87 @@ public class ChangeSetExtensionsFixture : FixtureBase
         first.NewStartingIndex.ShouldBe(expected.NewStartingIndex);
         first.NewItems.CollectionSequenceShouldBe(expected.NewItems);
         first.OldItems.CollectionSequenceShouldBe(expected.OldItems);
+    }
+
+    [Test]
+    public void ShouldFilterAndSortSourceCache()
+    {
+        //Given
+        var sourceCache = new SourceCache<string, string>(x => x);
+
+        using var anchor = sourceCache
+            .Connect()
+            .RemoveKey()
+            .Filter(x => x.Contains(" "))
+            .Sort(new SortExpressionComparer<string>().ThenByDescending(x => x), resetThreshold: int.MaxValue)
+            .Transform(x => $"{x} t")
+            .BindToCollection(out var additionalFiles)
+            .SubscribeToErrors(Log.HandleUiException);
+
+        //When
+        sourceCache.AddOrUpdate("1");
+        sourceCache.AddOrUpdate("1 a");
+        sourceCache.AddOrUpdate("3");
+        sourceCache.AddOrUpdate("3 a");
+        sourceCache.AddOrUpdate("2");
+        sourceCache.AddOrUpdate("2 a");
+
+        //Then
+        additionalFiles.CollectionSequenceShouldBe("3 a t", "2 a t", "1 a t");
+    }
+    
+    [Test]
+    public void ShouldFilterAndSortSourceCacheAndNotCrash()
+    {
+        //Given
+        var sourceCache = new SourceCache<string, string>(x => x);
+
+        using var anchor = sourceCache
+            .Connect()
+            .RemoveKey()
+            .Filter(x => x.Contains(" "))
+            .Sort(new SortExpressionComparer<string>().ThenByDescending(x => x), resetThreshold: int.MaxValue)
+            .Transform(x => $"{x} t")
+            .BindToCollection(out var additionalFiles)
+            .SubscribeToErrors(Log.HandleUiException);
+
+        //When
+        sourceCache.AddOrUpdate("1");
+        sourceCache.AddOrUpdate("1 a");
+        sourceCache.AddOrUpdate("3");
+        sourceCache.AddOrUpdate("3 a");
+        sourceCache.AddOrUpdate("2");
+        sourceCache.AddOrUpdate("2 a");
+        sourceCache.Clear();
+        sourceCache.AddOrUpdate("1");
+        sourceCache.AddOrUpdate("1 a");
+        sourceCache.AddOrUpdate("2");
+
+        //Then
+        additionalFiles.CollectionSequenceShouldBe("1 a t");
+    }
+
+    [Test]
+    [TestCase(1)]
+    [TestCase(2)]
+    public void ShouldNotCrash(int threads)
+    {
+        //Given
+        var sourceCache = new SourceCache<string, string>(x => x);
+
+        using var anchor = sourceCache
+            .Connect()
+            .RemoveKey()
+            .Filter(x => x.Contains(" "))
+            .Sort(new SortExpressionComparer<string>().ThenByDescending(x => x), resetThreshold: int.MaxValue)
+            .Transform(x => $"{x} t")
+            .BindToCollection(out var additionalFiles)
+            .SubscribeToErrors(Log.HandleUiException);
+
+        //When
+        
+
+        //Then
+
     }
 }
