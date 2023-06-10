@@ -17,6 +17,7 @@ namespace PoeShared.Scaffolding.WPF;
 public sealed class CommandWrapper : DisposableReactiveObject, ICommand
 {
     private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
+    private static readonly ISubject<Exception> ErrorsSink = new Subject<Exception>();
 
     private readonly Subject<bool> isExecuting = new();
     private readonly Subject<Exception> thrownExceptions = new();
@@ -102,6 +103,8 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     private ICommand InnerCommand { get; }
 
     public IObservable<object> WhenExecuted => whenExecuted;
+
+    public static IObservable<Exception> Errors => ErrorsSink;
 
     public bool CanExecute(object parameter)
     {
@@ -218,6 +221,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
         Log.HandleException(exception);
         Error = exception.Message;
+        ErrorsSink.OnNext(exception);
     }
 
     public void RaiseCanExecuteChanged()
