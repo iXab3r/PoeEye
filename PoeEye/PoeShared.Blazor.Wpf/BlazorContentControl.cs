@@ -127,11 +127,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             .ObserveOnDispatcher()
             .SubscribeAsync(async state =>
             {
-                if (WebView.WebView is {CoreWebView2: not null})
-                {
-                    ViewScreenshot = await WebView.TakeScreenshotAsBitmapSource();
-                }
-
                 using var rent = isBusyLatch.Rent();
 
                 var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
@@ -247,8 +242,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public ICommand ReloadCommand { get; }
 
     public ICommand OpenDevTools { get; }
-
-    public BitmapSource ViewScreenshot { get; private set; }
 
     private static string FormatExceptionMessage(Exception exception)
     {
