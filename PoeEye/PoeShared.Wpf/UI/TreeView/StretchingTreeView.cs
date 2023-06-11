@@ -4,6 +4,11 @@ namespace PoeShared.UI;
 
 public class StretchingTreeView : System.Windows.Controls.TreeView
 {
+    public StretchingTreeView()
+    {
+        RequestBringIntoView += OnRequestBringIntoView;
+    }
+
     protected override DependencyObject GetContainerForItemOverride()
     {
         return new StretchingTreeViewItem();
@@ -13,4 +18,9 @@ public class StretchingTreeView : System.Windows.Controls.TreeView
     {
         return item is StretchingTreeViewItem;
     }        
+    
+    private static void OnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+    {
+        e.Handled = true;
+    }
 }
