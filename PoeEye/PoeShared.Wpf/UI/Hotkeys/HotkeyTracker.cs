@@ -276,14 +276,24 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
     public void Reset()
     {
+        if (IsActive == false)
+        {
+            Log.Debug("Hotkey is not active, ignoring reset request");
+            return;
+        }
         Log.Debug("Resetting hotkey state");
         IsActive = false;
     }
     
     public void Activate()
     {
+        if (IsActive == true)
+        {
+            Log.Debug("Hotkey is active, ignoring activation request");
+            return;
+        }
         Log.Debug("Activating hotkey");
-        IsActive = false;
+        IsActive = true;
     }
 
     private static bool CanBeSuppressed(HotkeyGesture hotkey)

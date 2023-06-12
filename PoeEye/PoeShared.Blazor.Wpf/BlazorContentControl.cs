@@ -129,6 +129,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             {
                 using var rent = isBusyLatch.Rent();
 
+                Log.Debug(() => $"Reloading control, new content type: {state.viewType}");
                 var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
                 WebView.FileProvider.FilesByName.Clear();
 
@@ -140,6 +141,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
                 if (state?.viewType == null)
                 {
+                    Log.Debug(() => $"Content type is not specified, nothing to load");
                     return;
                 }
 
@@ -177,7 +179,11 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
 
                 var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
-                WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
+                if (additionalFiles.Any())
+                {
+                    Log.Debug(() => $"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
+                    WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
+                }
 
                 var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                 WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
