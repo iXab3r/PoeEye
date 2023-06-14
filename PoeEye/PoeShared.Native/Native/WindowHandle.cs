@@ -54,13 +54,30 @@ internal sealed class WindowHandle : IWindowHandle
 
         ownerSupplier = new Lazy<IWindowHandle>(() =>
         {
-            var ownerHandle = User32.GetWindow(Handle, User32.GetWindowCommands.GW_OWNER);
-            return ownerHandle == IntPtr.Zero ? default : new WindowHandle(ownerHandle);
+            try
+            {
+                var ownerHandle = User32.GetWindow(Handle, User32.GetWindowCommands.GW_OWNER);
+                return ownerHandle == IntPtr.Zero ? default : new WindowHandle(ownerHandle);
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"Failed to get owner via {nameof(User32.GetWindow)}, last error: {Kernel32.GetLastError()}", ex);
+            }
+            return default;
         }, LazyThreadSafetyMode.ExecutionAndPublication);
         parentSupplier = new Lazy<IWindowHandle>(() =>
         {
-            var parentHandle = UnsafeNative.GetParent(Handle);
-            return parentHandle == IntPtr.Zero ? default : new WindowHandle(parentHandle);
+            try
+            {
+                var parentHandle = UnsafeNative.GetParent(Handle);
+                return parentHandle == IntPtr.Zero ? default : new WindowHandle(parentHandle);
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"Failed to get parent via {nameof(UnsafeNative.GetParent)}, last error: {Kernel32.GetLastError()}", ex);
+            }
+
+            return default;
         }, LazyThreadSafetyMode.ExecutionAndPublication);
         classSupplier = new Lazy<string>(() => UnsafeNative.GetWindowClass(handle), LazyThreadSafetyMode.ExecutionAndPublication);
         iconSupplier = new Lazy<Icon>(() => GetWindowIcon(handle), LazyThreadSafetyMode.ExecutionAndPublication);

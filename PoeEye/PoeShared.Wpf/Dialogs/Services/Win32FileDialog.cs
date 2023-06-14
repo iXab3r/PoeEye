@@ -6,9 +6,9 @@ using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace PoeShared.Dialogs.Services;
 
-internal sealed class NativeFileDialog : DisposableReactiveObjectWithLogger, ISaveFileDialog, IOpenFileDialog
+public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveFileDialog, IOpenFileDialog
 {
-    public NativeFileDialog()
+    public Win32FileDialog()
     {
     }
     

@@ -5,7 +5,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Dialogs.Services;
 
-internal sealed class NativeFolderBrowserDialog : DisposableReactiveObjectWithLogger, IFolderBrowserDialog
+internal sealed class Win32FolderBrowserDialog : DisposableReactiveObjectWithLogger, IFolderBrowserDialog
 {
     public DirectoryInfo ShowDialog()
     {

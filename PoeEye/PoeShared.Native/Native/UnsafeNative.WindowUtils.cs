@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Interop;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
@@ -304,6 +305,38 @@ public partial class UnsafeNative
             // Or fallback to GDI solutions above
             return 1;
         }
+    }
+    
+    /// <summary>
+    /// Resolves the best parent window for Open/Save File, BrowseFolder and other dialogs
+    /// Takes into consideration which thread/dispatcher is currently active
+    /// </summary>
+    /// <returns></returns>
+    public static IntPtr ResolveParentForDialogWindow()
+    {
+        IntPtr result;
+        if (System.Windows.Application.Current != null && 
+            System.Windows.Application.Current.Dispatcher.CheckAccess())
+        {
+            if (System.Windows.Application.Current.MainWindow != null)
+            {
+                // we're on main app dispatcher, try to get main window handle
+                var windowHandle = new WindowInteropHelper(System.Windows.Application.Current.MainWindow);
+                if (windowHandle.Handle != IntPtr.Zero)
+                {
+                    return windowHandle.Handle;
+                }
+            }
+        }
+
+        var foregroundWindow = User32.GetForegroundWindow();
+        if (foregroundWindow != IntPtr.Zero)
+        {
+            return foregroundWindow;
+        }
+
+        var activeWindow = User32.GetActiveWindow();
+        return activeWindow;
     }
 
     public static IntPtr GetForegroundWindow()
