@@ -28,7 +28,7 @@ public static class GeometryExtensions
         };
     }
     
-    public static WinRect CenterInsideBounds(this WinRect childBounds, WinRect parentBounds)
+    public static WinRect CenterInsideBounds(this WinSize childBounds, WinRect parentBounds)
     {
         // Calculate the center of the parent rectangle
         var parentCenterX = parentBounds.X + parentBounds.Width / 2;
@@ -39,8 +39,7 @@ public static class GeometryExtensions
         var childTopLeftY = parentCenterY - childBounds.Height / 2;
 
         // Create a new rectangle for the child, centered within the parent
-        var centeredChildBounds = childBounds with {X = childTopLeftX, Y = childTopLeftY};
-        return centeredChildBounds;
+        return new Rectangle(childTopLeftX, childTopLeftY, childBounds.Width, childBounds.Height);
     }
 
     public static WinRect EnsureInBounds(this WinRect value, WinSize min, WinSize max)

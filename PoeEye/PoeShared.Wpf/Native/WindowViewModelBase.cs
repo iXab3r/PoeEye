@@ -182,7 +182,16 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         }
 
         Log.Info(() => $"Syncing window parameters with view model");
-        owner.Window.NativeBounds = NativeBounds;
+        WinRect initialBounds;
+        if (NativeBounds.IsNotEmptyArea())
+        {
+            initialBounds = NativeBounds;
+        }
+        else
+        {
+            initialBounds = new Rectangle(WinPoint.Empty, DefaultSize.IsNotEmptyArea() ? DefaultSize : MinSize);
+        }
+        owner.Window.NativeBounds = initialBounds;
         WindowController = owner;
         Log.Info(() => $"Overlay window is assigned: {WindowController}");
     }

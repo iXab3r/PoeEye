@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -143,21 +144,19 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
                     User32.SetWindowLong(window.WindowHandle, User32.WindowLongIndexFlags.GWLP_HWNDPARENT, (User32.SetWindowLongFlags) mainWindowHandle);
                 };
             }
-
+            
             var ownerWindowRect = UnsafeNative.GetWindowRect(mainWindowHandle);
+            var childSize = content.DefaultSize.IsNotEmptyArea() ? content.DefaultSize : content.MinSize;
+            var updatedBounds = childSize.CenterInsideBounds(ownerWindowRect);
+            Log.Debug($"Centering rect {childSize} inside parent {ownerWindowRect}, result: {updatedBounds}");
+            content.NativeBounds = updatedBounds;
+
             window.Loaded += (sender, args) =>
             {
                 Log.Debug($"Window has loaded: {window}");
                 content.SetOverlayWindow(window.Controller);
-                
-                var childRect = window.NativeBounds;
-                var updatedBounds = childRect.CenterInsideBounds(ownerWindowRect);
-                Log.Debug($"Centering rect {childRect} inside parent {ownerWindowRect}, result: {updatedBounds}");
-                window.NativeBounds = updatedBounds;
-                
                 windowCompletionSource.SetResult(content);
             };
-            
             
             try
             {

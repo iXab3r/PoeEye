@@ -15,6 +15,8 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     System.Drawing.Rectangle NativeBounds { get; set; }
 
     Size MinSize { get; set; }
+    
+    Size DefaultSize { get; set; }
 
     Size MaxSize { get; set; }
 
