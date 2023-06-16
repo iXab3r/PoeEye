@@ -10,7 +10,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
     
-    <Style TargetType="{x:Type MenuItem}" x:Key="SlowMenuItem" BasedOn="{x:Null}">
+    <Style TargetType="{x:Type MenuItem}" x:Key="SlowHierarchicalMenuItem" BasedOn="{x:Null}">
         <Setter Property="Padding" Value="8,3" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="MinHeight" Value="27" />
