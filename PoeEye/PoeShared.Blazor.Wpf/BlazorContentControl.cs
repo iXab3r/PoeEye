@@ -51,10 +51,10 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public static readonly DependencyProperty EnableHotkeysProperty = DependencyProperty.Register(
         nameof(EnableHotkeys), typeof(bool), typeof(BlazorContentControl), new PropertyMetadata(true));
-    
+
     public static readonly DependencyProperty ContainerProperty = DependencyProperty.Register(
         nameof(Container), typeof(IUnityContainer), typeof(BlazorContentControl), new PropertyMetadata(default(IUnityContainer)));
-    
+
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeViewAnchors;
     private readonly ProxyServiceProvider proxyServiceProvider;
@@ -98,13 +98,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         {
             serviceCollection.Add(serviceDescriptor);
         }
+
         serviceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(proxyServiceProvider));
         //Root component is NEVER instantiated again
-        
+
         proxyServiceProvider.ServiceProvider = serviceCollection.BuildServiceProvider();
-        
+
         WebView.Services = proxyServiceProvider;
-        
+
         new RootComponent
         {
             Selector = "headOutlet",
@@ -123,13 +124,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         var hostPage = Path.Combine(contentRoot, generatedIndexFileName); // wwwroot must be included as a part of path to become ContentRoot;
 
         this.WhenAnyValue(x => x.ViewType)
-            .CombineLatest(this.WhenAnyValue(x => x.Container), (viewType, container) => new { viewType, container })
+            .CombineLatest(this.WhenAnyValue(x => x.Container), (viewType, container) => new {viewType, container})
             .ObserveOnDispatcher()
             .SubscribeAsync(async state =>
             {
                 using var rent = isBusyLatch.Rent();
 
                 Log.Debug(() => $"Reloading control, new content type: {state.viewType}");
+
                 var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
                 WebView.FileProvider.FilesByName.Clear();
 
@@ -145,57 +147,67 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     return;
                 }
 
-                var childServiceCollection = new ServiceCollection
+                try
                 {
-                    serviceCollection
-                };
-                
-                // views have to be transient to allow to re-create them if needed (e.g. on error)
-                childServiceCollection.AddTransient(typeof(BlazorContent), _ =>
-                {
-                    var viewWrapper = new BlazorContent(state.viewType).AddTo(viewAnchors);
-                    return viewWrapper;
-                });
-                
-                childServiceCollection.AddTransient(state.viewType, _ =>
-                {
-                    var view = state.container == null ? Activator.CreateInstance(state.viewType) : state.container.Resolve(state.viewType);
-                    if (view is BlazorReactiveComponent reactiveComponent)
+                    var childServiceCollection = new ServiceCollection
                     {
-                        this.WhenAnyValue(content => content.Content)
+                        serviceCollection
+                    };
+
+                    // views have to be transient to allow to re-create them if needed (e.g. on error)
+                    childServiceCollection.AddTransient(typeof(BlazorContent), _ =>
+                    {
+                        var viewWrapper = new BlazorContent(state.viewType).AddTo(viewAnchors);
+                        return viewWrapper;
+                    });
+
+                    childServiceCollection.AddTransient(state.viewType, _ =>
+                    {
+                        var view = state.container == null ? Activator.CreateInstance(state.viewType) : state.container.Resolve(state.viewType);
+                        if (view is BlazorReactiveComponent reactiveComponent)
+                        {
+                            this.WhenAnyValue(content => content.Content)
 #pragma warning disable BL0005 // this is a special case
-                            .Subscribe(content => reactiveComponent.DataContext = content)
+                                .Subscribe(content => reactiveComponent.DataContext = content)
 #pragma warning restore BL0005
-                            .AddTo(viewAnchors);
-                    }
+                                .AddTo(viewAnchors);
+                        }
 
-                    if (view is IDisposable disposable)
+                        if (view is IDisposable disposable)
+                        {
+                            disposable.AddTo(viewAnchors);
+                        }
+
+                        return view;
+                    });
+                    proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
+
+                    var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
+                    if (additionalFiles.Any())
                     {
-                        disposable.AddTo(viewAnchors);
+                        Log.Debug(() => $"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
+                        WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
                     }
 
-                    return view;
-                });
-                proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
+                    var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
+                    WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
-                var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
-                if (additionalFiles.Any())
-                {
-                    Log.Debug(() => $"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
-                    WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
-                }
 
-                var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
-                WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
-                if (WebView.HostPage == hostPage && WebView.WebView.CoreWebView2 != null)
-                {
-                    Log.Debug($"Reloading existing page, view type: {state}");
-                    WebView.WebView.Reload();
+                    if (WebView.HostPage == hostPage && WebView.WebView.CoreWebView2 != null)
+                    {
+                        Log.Debug($"Reloading existing page, view type: {state}");
+                        WebView.WebView.Reload();
+                    }
+                    else
+                    {
+                        Log.Debug($"Navigating to index page, view type: {state}");
+                        WebView.HostPage = hostPage;
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    Log.Debug($"Navigating to index page, view type: {state}");
-                    WebView.HostPage = hostPage;
+                    Log.Error($"Failed to initialize view using {state}");
+                    UnhandledException = e;
                 }
             })
             .AddTo(Anchors);
@@ -214,7 +226,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
     }
-    
+
     public IUnityContainer Container
     {
         get => (IUnityContainer) GetValue(ContainerProperty);
@@ -226,7 +238,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
         set => SetValue(AdditionalFilesProperty, value);
     }
-    
+
     public bool EnableHotkeys
     {
         get => (bool) GetValue(EnableHotkeysProperty);
@@ -242,9 +254,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public BlazorWebViewEx WebView { get; }
 
     public Exception UnhandledException { get; private set; }
-    
+
     public string UnhandledExceptionMessage { get; [UsedImplicitly] private set; }
-    
+
     public ICommand ReloadCommand { get; }
 
     public ICommand OpenDevTools { get; }
@@ -253,7 +265,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     {
         return exception.ToString();
     }
-    
+
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
     {
         if (sender is BlazorWebView webView)
@@ -288,7 +300,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             .Where(x => x.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.css", StringComparison.OrdinalIgnoreCase))
             .Select(x => $"""<link href="{x.Name}" rel="stylesheet"></link>""")
             .JoinStrings(Environment.NewLine);
-                
+
         var scriptsText = additionalFiles
             .Where(x => x.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.js", StringComparison.OrdinalIgnoreCase))
             .Select(x => $"""<script src="{x.Name}"></script>""")
