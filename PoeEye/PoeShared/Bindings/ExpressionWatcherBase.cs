@@ -14,6 +14,10 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
     protected static readonly Binder<ExpressionWatcherBase> Binder = new();
 
+    /// <summary>
+    /// Name of input parameter in lambda expressions, e.g. x => x.ToString(), InputParameterName here is "x"
+    /// </summary>
+    public const string InputParameterName = "x";
 
     static ExpressionWatcherBase()
     {
@@ -113,8 +117,8 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
     private static ExpressionWatcher<TSource, TProperty> PrepareWatcher<TSource, TProperty>(string sourceExprText, string conditionExprText) where TSource : class
     {
-        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, TProperty>($"x => {sourceExprText}");
-        var conditionBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, bool>($"x => {conditionExprText}");
+        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, TProperty>($"{InputParameterName} => {sourceExprText}");
+        var conditionBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, bool>($"{InputParameterName} => {conditionExprText}");
 
         return new ExpressionWatcher<TSource, TProperty>(sourceBinderExpr, conditionBinderExpr);
     }
