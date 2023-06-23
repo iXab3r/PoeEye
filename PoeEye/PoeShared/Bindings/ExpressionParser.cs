@@ -24,29 +24,7 @@ internal sealed class ExpressionParser : LazyReactiveObject<ExpressionParser>, I
     /// <inheritdoc/>
     public Expression<Func<TSource, TResult>> ParseFunction<TSource, TResult>(string expression)
     {
-        var parameterName = ExtractParameterName(expression);
-        return ParseFunction<TSource, TResult>(expression, parameterName);
-    }
-
-    private LambdaExpression ParseLambda<TSource, TResult>(string expression, string parameterName)
-    {
-        try
-        {
-            var sourceParameter = Expression.Parameter(typeof(TSource), parameterName);
-            var lambdaExpression = DynamicExpressionParser.ParseLambda<TSource, TResult>(parsingConfig, createParameterCtor: false, expression: expression, sourceParameter);
-            return lambdaExpression;
-        }
-        catch (Exception e)
-        {
-            Log.Warn($"Failed to parse lambda expression: {expression}", e);
-            throw;
-        }
-    }
-
-    private Expression<Func<TSource, TResult>> ParseFunction<TSource, TResult>(string expression, string parameterName)
-    {
-        var lambdaExpression = ParseLambda<TSource, TResult>(expression, parameterName);
-
+        var lambdaExpression = ParseLambda<TSource, TResult>(expression);
         try
         {
             var result = (Expression<Func<TSource, TResult>>) lambdaExpression;
@@ -59,18 +37,18 @@ internal sealed class ExpressionParser : LazyReactiveObject<ExpressionParser>, I
         }
     }
 
-    private static string ExtractParameterName(string expression)
+    private LambdaExpression ParseLambda<TSource, TResult>(string expression)
     {
-        var parametersPartIdx = expression.IndexOf("=>", StringComparison.Ordinal);
-        if (parametersPartIdx < 0)
+        try
         {
-            throw new ArgumentException($"Failed to extract parameter name from expression {expression}");
+            var lambdaExpression = DynamicExpressionParser.ParseLambda<TSource, TResult>(parsingConfig, createParameterCtor: false, expression: expression);
+            return lambdaExpression;
         }
-
-        var parametersPart = expression.Substring(0, parametersPartIdx);
-
-        var result = parametersPart.Trim('(', ' ', ')');
-        return result;
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to parse lambda expression: {expression}", e);
+            throw;
+        }
     }
     
     private sealed class PassthroughLinkCustomTypeProvider : IDynamicLinkCustomTypeProvider

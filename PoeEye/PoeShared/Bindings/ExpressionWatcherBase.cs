@@ -113,8 +113,8 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
     private static ExpressionWatcher<TSource, TProperty> PrepareWatcher<TSource, TProperty>(string sourceExprText, string conditionExprText) where TSource : class
     {
-        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, TProperty>(sourceExprText);
-        var conditionBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, bool>(conditionExprText);
+        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, TProperty>($"x => {sourceExprText}");
+        var conditionBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, bool>($"x => {conditionExprText}");
 
         return new ExpressionWatcher<TSource, TProperty>(sourceBinderExpr, conditionBinderExpr);
     }
