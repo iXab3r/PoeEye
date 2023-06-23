@@ -14,7 +14,6 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
     protected static readonly Binder<ExpressionWatcherBase> Binder = new();
 
-    private static readonly PassthroughLinkCustomTypeProvider CustomTypeProvider = new();
 
     static ExpressionWatcherBase()
     {
@@ -114,15 +113,8 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
     private static ExpressionWatcher<TSource, TProperty> PrepareWatcher<TSource, TProperty>(string sourceExprText, string conditionExprText) where TSource : class
     {
-        var sourceParameter = Expression.Parameter(typeof(TSource), "x");
-        var config = new ParsingConfig
-        {
-            ResolveTypesBySimpleName = true,
-            CustomTypeProvider = CustomTypeProvider
-        };
-
-        var sourceBinderExpr = (Expression<Func<TSource, TProperty>>) DynamicExpressionParser.ParseLambda(config, false, new[] { sourceParameter }, typeof (TProperty), sourceExprText);
-        var conditionBinderExpr = (Expression<Func<TSource, bool>>) DynamicExpressionParser.ParseLambda(config, false, new[] { sourceParameter }, typeof (bool), conditionExprText);
+        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, TProperty>(sourceExprText);
+        var conditionBinderExpr = ExpressionParser.Instance.ParseFunction<TSource, bool>(conditionExprText);
 
         return new ExpressionWatcher<TSource, TProperty>(sourceBinderExpr, conditionBinderExpr);
     }
@@ -137,35 +129,5 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
         var lambda = Expression.Lambda<Func<string ,string, IValueWatcher>>(methodExpr, sourceExprParameter, conditionExprParameter);
         return PropertyBinder.Binder.ExpressionCompiler.Compile(lambda);
-    }
-
-    private sealed class PassthroughLinkCustomTypeProvider : IDynamicLinkCustomTypeProvider
-    {
-        private readonly IDynamicLinkCustomTypeProvider fallback;
-
-        public PassthroughLinkCustomTypeProvider()
-        {
-            fallback = new DynamicLinqCustomTypeProvider();
-        }
-
-        public HashSet<Type> GetCustomTypes()
-        {
-            return fallback.GetCustomTypes();
-        }
-
-        public Dictionary<Type, List<MethodInfo>> GetExtensionMethods()
-        {
-            return fallback.GetExtensionMethods();
-        }
-
-        public Type ResolveType(string typeName)
-        {
-            return fallback.ResolveType(typeName);
-        }
-
-        public Type ResolveTypeBySimpleName(string simpleTypeName)
-        {
-            return fallback.ResolveTypeBySimpleName(simpleTypeName);
-        }
     }
 }

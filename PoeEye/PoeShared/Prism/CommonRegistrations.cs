@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using App.Metrics;
 using Microsoft.Extensions.Logging;
+using PoeShared.Bindings;
 using PoeShared.Caching;
 using PoeShared.Evaluators;
 using PoeShared.Modularity;
@@ -31,7 +32,8 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
             .RegisterSingleton<IFileSystem, FileSystem>()
-            .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
+            .RegisterSingleton<IExpressionParser>(x => ExpressionParser.Instance)
+            .RegisterSingleton<IMemoryPool>(x => MemoryPool.Shared);
             
         Container
             .RegisterSingleton<IMetricsRoot>(x =>

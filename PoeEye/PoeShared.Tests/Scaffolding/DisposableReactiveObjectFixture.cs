@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using PoeShared.Bindings;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
@@ -111,7 +112,6 @@ public class DisposableReactiveObjectFixture
     {
         //Given
         var object1 = new TestStub();
-        var object2 = new TestStub();
 
         var sourceExprText = @"x => x.IntProperty";
         var sourceParameter = Expression.Parameter(typeof(TestStub), "x");
@@ -120,6 +120,29 @@ public class DisposableReactiveObjectFixture
         var targetExprText = @"x => x.OtherIntProperty";
         var targetParameter = Expression.Parameter(typeof(TestStub), "x");
         var targetBinderExpr = System.Linq.Dynamic.Core.DynamicExpressionParser.ParseLambda<TestStub, int>(ParsingConfig.Default, false, targetExprText, targetParameter);
+            
+        var binder = new Binder<TestStub>();
+        binder.Bind(sourceBinderExpr).To(targetBinderExpr);
+            
+        //When
+        using var binderAnchor = binder.Attach(object1);
+        object1.IntProperty = 1;
+
+        //Then
+        object1.OtherIntProperty.ShouldBe(1);
+    }
+    
+    [Test]
+    public void ShouldCreateCustomBinderUsingExpressionParser()
+    {
+        //Given
+        var object1 = new TestStub();
+
+        var sourceExprText = @"x => x.IntProperty";
+        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TestStub, int>(sourceExprText);
+            
+        var targetExprText = @"x => x.OtherIntProperty";
+        var targetBinderExpr = ExpressionParser.Instance.ParseFunction<TestStub, int>(targetExprText);
             
         var binder = new Binder<TestStub>();
         binder.Bind(sourceBinderExpr).To(targetBinderExpr);

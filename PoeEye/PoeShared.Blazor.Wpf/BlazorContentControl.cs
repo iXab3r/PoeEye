@@ -68,6 +68,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public BlazorContentControl()
     {
+        Disposable.Create(() => Log.Debug("Blazor content control is being disposed")).AddTo(Anchors);
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
         proxyServiceProvider = new ProxyServiceProvider().AddTo(Anchors);
@@ -171,11 +172,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                                 .Subscribe(content => reactiveComponent.DataContext = content)
 #pragma warning restore BL0005
                                 .AddTo(viewAnchors);
-                        }
-
+                        } 
+                        
                         if (view is IDisposable disposable)
                         {
-                            disposable.AddTo(viewAnchors);
+                            Disposable.Create(() =>
+                            {
+                                Log.Debug($"Disposing {view}");
+                                disposable.Dispose();
+                            }).AddTo(viewAnchors);
                         }
 
                         return view;
