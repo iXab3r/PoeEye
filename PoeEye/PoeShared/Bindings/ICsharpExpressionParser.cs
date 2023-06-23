@@ -6,6 +6,11 @@ namespace PoeShared.Bindings;
 public interface ICsharpExpressionParser
 {
     /// <summary>
+    /// Name of input parameter in lambda expressions, e.g. x => x.ToString(), InputParameterName here is "x"
+    /// </summary>
+    public const string InputParameterName = "x";
+    
+    /// <summary>
     /// Parses a function expression.
     /// </summary>
     /// <typeparam name="TSource">The type of the source parameter.</typeparam>

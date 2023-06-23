@@ -37,11 +37,16 @@ public sealed class CsharpExpressionParser : LazyReactiveObject<CsharpExpression
         }
     }
 
-    private LambdaExpression ParseLambda<TSource, TResult>(string expression)
+    private LambdaExpression ParseLambda<TSource, TResult>(string expression, string parameterName = "x")
     {
         try
         {
-            var lambdaExpression = DynamicExpressionParser.ParseLambda<TSource, TResult>(parsingConfig, createParameterCtor: false, expression: expression);
+            var lambdaExpression = DynamicExpressionParser.ParseLambda(
+                parsingConfig, 
+                createParameterCtor: false, 
+                parameters: new[] { Expression.Parameter(typeof(TSource), parameterName) },
+                resultType: typeof(TResult),
+                expression: expression);
             return lambdaExpression;
         }
         catch (Exception e)

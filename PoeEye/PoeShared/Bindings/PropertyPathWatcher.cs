@@ -13,7 +13,7 @@ public sealed class PropertyPathWatcher : ExpressionWatcherBase
         Binder.Bind( x => x.SourceType.GetPropertyTypeOrDefault(x.PropertyPath))
             .To(x => x.PropertyType);
             
-        Binder.Bind(x => !string.IsNullOrEmpty(x.PropertyPath) ? $@"{InputParameterName}.{x.PropertyPath}" : default ).To(x => x.SourceExpression);
+        Binder.Bind(x => !string.IsNullOrEmpty(x.PropertyPath) ? $@"{ICsharpExpressionParser.InputParameterName}.{x.PropertyPath}" : default ).To(x => x.SourceExpression);
         Binder.Bind(x => BuildCondition(x.PropertyPath)).To(x => x.ConditionExpression);
     }
 
@@ -87,7 +87,7 @@ public sealed class PropertyPathWatcher : ExpressionWatcherBase
 
             combinedPropertyName.Append(propertyPart);
 
-            result.Append($"{InputParameterName}{(combinedPropertyName.Length > 0 ? "." : null)}{combinedPropertyName} != null");
+            result.Append($"{ICsharpExpressionParser.InputParameterName}{(combinedPropertyName.Length > 0 ? "." : null)}{combinedPropertyName} != null");
         }
             
         return result.ToString();
