@@ -139,10 +139,10 @@ public class DisposableReactiveObjectFixture
         var object1 = new TestStub();
 
         var sourceExprText = @"x => x.IntProperty";
-        var sourceBinderExpr = ExpressionParser.Instance.ParseFunction<TestStub, int>(sourceExprText);
+        var sourceBinderExpr = CsharpExpressionParser.Instance.ParseFunction<TestStub, int>(sourceExprText);
             
         var targetExprText = @"x => x.OtherIntProperty";
-        var targetBinderExpr = ExpressionParser.Instance.ParseFunction<TestStub, int>(targetExprText);
+        var targetBinderExpr = CsharpExpressionParser.Instance.ParseFunction<TestStub, int>(targetExprText);
             
         var binder = new Binder<TestStub>();
         binder.Bind(sourceBinderExpr).To(targetBinderExpr);

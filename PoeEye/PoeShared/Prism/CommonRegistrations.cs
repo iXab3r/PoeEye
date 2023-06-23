@@ -32,7 +32,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
             .RegisterSingleton<IFileSystem, FileSystem>()
-            .RegisterSingleton<IExpressionParser>(x => ExpressionParser.Instance)
+            .RegisterSingleton<ICsharpExpressionParser>(x => CsharpExpressionParser.Instance)
             .RegisterSingleton<IMemoryPool>(x => MemoryPool.Shared);
             
         Container

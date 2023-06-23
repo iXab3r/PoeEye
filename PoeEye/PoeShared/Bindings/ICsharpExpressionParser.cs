@@ -3,7 +3,7 @@ namespace PoeShared.Bindings;
 /// <summary>
 /// Defines methods to parse C# expressions.
 /// </summary>
-public interface IExpressionParser
+public interface ICsharpExpressionParser
 {
     /// <summary>
     /// Parses a function expression.

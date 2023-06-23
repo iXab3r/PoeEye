@@ -4,15 +4,15 @@ using System.Reflection;
 
 namespace PoeShared.Bindings;
 
-internal sealed class ExpressionParser : LazyReactiveObject<ExpressionParser>, IExpressionParser
+public sealed class CsharpExpressionParser : LazyReactiveObject<CsharpExpressionParser>, ICsharpExpressionParser
 {
-    private static readonly IFluentLog Log = typeof(ExpressionParser).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(CsharpExpressionParser).PrepareLogger();
 
     private static readonly PassthroughLinkCustomTypeProvider CustomTypeProvider = new();
 
     private readonly ParsingConfig parsingConfig;
 
-    public ExpressionParser()
+    public CsharpExpressionParser()
     {
         parsingConfig = new ParsingConfig
         {
