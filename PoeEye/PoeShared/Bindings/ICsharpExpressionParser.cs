@@ -1,14 +1,21 @@
+using System.Linq.Dynamic.Core.CustomTypeProviders;
+
 namespace PoeShared.Bindings;
 
 /// <summary>
 /// Defines methods to parse C# expressions.
 /// </summary>
-public interface ICsharpExpressionParser
+public interface ICsharpExpressionParser 
 {
     /// <summary>
     /// Name of input parameter in lambda expressions, e.g. x => x.ToString(), InputParameterName here is "x"
     /// </summary>
     public const string InputParameterName = "x";
+    
+    /// <summary>
+    /// Interface for providing functionality to find custom types for or resolve any type by full or simple name.
+    /// </summary>
+    IDynamicLinqCustomTypeProvider CustomTypeProvider { get; }
     
     /// <summary>
     /// Parses a function expression.

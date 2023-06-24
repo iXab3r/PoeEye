@@ -8,7 +8,7 @@ public sealed class CsharpExpressionParser : LazyReactiveObject<CsharpExpression
 {
     private static readonly IFluentLog Log = typeof(CsharpExpressionParser).PrepareLogger();
 
-    private static readonly PassthroughLinkCustomTypeProvider CustomTypeProvider = new();
+    private static readonly PassthroughLinkCustomTypeProvider DefaultCustomTypeProvider = new();
 
     private readonly ParsingConfig parsingConfig;
 
@@ -17,9 +17,12 @@ public sealed class CsharpExpressionParser : LazyReactiveObject<CsharpExpression
         parsingConfig = new ParsingConfig
         {
             ResolveTypesBySimpleName = true,
-            CustomTypeProvider = CustomTypeProvider
+            CustomTypeProvider = DefaultCustomTypeProvider,
         };
     }
+
+    /// <inheritdoc/>
+    public IDynamicLinqCustomTypeProvider CustomTypeProvider => DefaultCustomTypeProvider;
 
     /// <inheritdoc/>
     public Expression<Func<TSource, TResult>> ParseFunction<TSource, TResult>(string expression)
