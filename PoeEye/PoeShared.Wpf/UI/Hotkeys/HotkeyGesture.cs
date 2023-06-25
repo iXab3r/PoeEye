@@ -25,11 +25,20 @@ public sealed record HotkeyGesture
         KnownSpecialKeys[Key.Multiply] = "Num *";
         KnownSpecialKeys[Key.Subtract] = "Num -";
     }
-        
+
     public HotkeyGesture()
     {
     }
 
+    /// <summary>
+    /// Creates a new HotkeyGesture with the given keyboard key and optional modifier keys.
+    /// </summary>
+    /// <param name="key">The keyboard key of the hotkey gesture.</param>
+    /// <param name="modifierKeys">The optional modifier keys of the hotkey gesture.</param>
+    /// <remarks>
+    /// If the key is None and modifier keys are specified, the key is set to the appropriate default key
+    /// depending on the modifier key (Control, Alt, Shift, or Windows).
+    /// </remarks>
     public HotkeyGesture(Key key, ModifierKeys modifierKeys = ModifierKeys.None) : this()
     {
         if (key == Key.None && modifierKeys != ModifierKeys.None)
@@ -43,7 +52,7 @@ public sealed record HotkeyGesture
                 _ => Key.None
             };
         }
-            
+
         switch (key)
         {
             case Key.LeftCtrl:
@@ -68,19 +77,34 @@ public sealed record HotkeyGesture
         ModifierKeys = modifierKeys;
     }
 
+    /// <summary>
+    /// Creates a new HotkeyGesture with the given mouse button and optional modifier keys.
+    /// </summary>
+    /// <param name="mouseButton">The mouse button of the hotkey gesture.</param>
+    /// <param name="modifierKeys">The optional modifier keys of the hotkey gesture.</param>
     public HotkeyGesture(MouseButton mouseButton, ModifierKeys modifierKeys = ModifierKeys.None) : this()
     {
         MouseButton = mouseButton;
         ModifierKeys = modifierKeys;
     }
 
+    /// <summary>
+    /// Creates a new HotkeyGesture based on an existing one, with optional modifier keys.
+    /// </summary>
+    /// <param name="keys">The existing hotkey gesture to base the new one on.</param>
+    /// <param name="modifierKeys">The optional modifier keys of the hotkey gesture.</param>
     public HotkeyGesture(HotkeyGesture keys, ModifierKeys modifierKeys = ModifierKeys.None) : this()
     {
         MouseButton = keys.MouseButton;
         Key = keys.Key;
         ModifierKeys = modifierKeys;
     }
-        
+
+    /// <summary>
+    /// Creates a new HotkeyGesture with the given mouse button and optional modifier keys.
+    /// </summary>
+    /// <param name="mouseButton">The mouse button of the hotkey gesture.</param>
+    /// <param name="modifierKeys">The optional modifier keys of the hotkey gesture.</param>
     public HotkeyGesture(MouseButtons mouseButton, ModifierKeys modifierKeys = ModifierKeys.None) : this()
     {
         var button = default(MouseButton?);
@@ -102,34 +126,74 @@ public sealed record HotkeyGesture
                 button = System.Windows.Input.MouseButton.XButton2;
                 break;
         }
+
         MouseButton = button;
         ModifierKeys = modifierKeys;
     }
-        
+    
+    /// <summary>
+    /// Creates a new HotkeyGesture with the given mouse wheel action and optional modifier keys.
+    /// </summary>
+    /// <param name="mouseWheel">The mouse wheel action of the hotkey gesture.</param>
+    /// <param name="modifierKeys">The optional modifier keys of the hotkey gesture.</param>
     public HotkeyGesture(MouseWheelAction mouseWheel, ModifierKeys modifierKeys = ModifierKeys.None) : this()
     {
         ModifierKeys = modifierKeys;
         MouseWheel = mouseWheel;
     }
 
+    /// <summary>
+    /// Represents the mouse button used in the gesture.
+    /// </summary>
     public MouseButton? MouseButton { get; init; }
 
-    public Key Key { get; init;}
+    /// <summary>
+    /// Represents the keyboard key used in the gesture.
+    /// </summary>
+    public Key Key { get; init; }
 
-    public ModifierKeys ModifierKeys { get; init;}
-        
-    public MouseWheelAction MouseWheel { get; init;}
-        
+    /// <summary>
+    /// Represents the modifier keys used in the gesture.
+    /// </summary>
+    public ModifierKeys ModifierKeys { get; init; }
+
+    /// <summary>
+    /// Represents the mouse wheel action in the gesture.
+    /// </summary>
+    public MouseWheelAction MouseWheel { get; init; }
+
+    /// <summary>
+    /// Indicates if the gesture is a keyboard gesture.
+    /// </summary>
     public bool IsKeyboard => Key != Key.None;
-        
+
+    /// <summary>
+    /// Indicates if the gesture includes a mouse button.
+    /// </summary>
     public bool IsMouseButton => MouseButton != null;
-        
+
+    /// <summary>
+    /// Indicates if the gesture includes a mouse wheel action.
+    /// </summary>
     public bool IsMouseWheel => MouseWheel != MouseWheelAction.None;
 
+    /// <summary>
+    /// Indicates if the gesture is a mouse gesture.
+    /// </summary>
     public bool IsMouse => IsMouseButton || IsMouseWheel;
-        
+
+    /// <summary>
+    /// Indicates if the gesture is empty.
+    /// </summary>
     public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None && MouseWheel == MouseWheelAction.None;
 
+
+    /// <summary>
+    /// Compares this gesture with another for equality, optionally ignoring modifiers.
+    /// </summary>
+    /// <param name="other">The other HotkeyGesture to compare with.</param>
+    /// <param name="ignoreModifiers">Whether to ignore modifier keys in the comparison.</param>
+    /// <returns>True if the gestures are equal; false otherwise.</returns>
     public bool Equals(HotkeyGesture other, bool ignoreModifiers)
     {
         if (!ignoreModifiers)
@@ -150,13 +214,16 @@ public sealed record HotkeyGesture
         if (key.MouseButton != null)
         {
             return key.MouseButton.ToString();
-        } else if (key.Key != Key.None)
+        }
+        else if (key.Key != Key.None)
         {
             return key.Key.ToString();
-        } else if (key.MouseWheel != MouseWheelAction.None)
+        }
+        else if (key.MouseWheel != MouseWheelAction.None)
         {
             return key.MouseWheel.ToString();
         }
+
         return string.Empty;
     }
 
@@ -186,7 +253,8 @@ public sealed record HotkeyGesture
         if (KnownSpecialKeys.TryGetValue(Key, out var specialKey))
         {
             specialKey.AddTo(keys);
-        } else  if (Key != Key.None)
+        }
+        else if (Key != Key.None)
         {
             GetLocalizedKeyString(Key).AddTo(keys);
         }
@@ -215,15 +283,15 @@ public sealed record HotkeyGesture
         {
             return key.ToString();
         }
-            
-        var virtualKey = (User32.VirtualKey)KeyInterop.VirtualKeyFromKey(key);
+
+        var virtualKey = (User32.VirtualKey) KeyInterop.VirtualKeyFromKey(key);
         return GetLocalizedKeyStringUnsafe(virtualKey) ?? key.ToString();
     }
 
     private static string GetLocalizedKeyStringUnsafe(User32.VirtualKey key)
     {
         // strip any modifier keys
-        var keyCode = (int)key & 0xffff;
+        var keyCode = (int) key & 0xffff;
 
         var sb = new StringBuilder(256);
         var scanCode = User32.MapVirtualKey(keyCode, User32.MapVirtualKeyTranslation.MAPVK_VK_TO_VSC);
