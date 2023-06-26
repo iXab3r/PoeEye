@@ -19,6 +19,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     private Func<bool> predicate = () => true;
     private bool logEachStep = true;
     private bool logOnDisposal = false;
+    private FluentLogLevel logLevel = FluentLogLevel.Debug;
 
     public BenchmarkTimer(string benchmarkName, ILog logger, [CallerMemberName] string propertyName = null) : this(benchmarkName, logger?.ToFluent(), propertyName)
     {
@@ -32,9 +33,9 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
         AddStep(() => $" => {benchmarkName}");
         Anchors.Add(() =>
         {
-            if (logOnDisposal && this.logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
+            if (logOnDisposal && sw.Elapsed > loggingElapsedThreshold)
             {
-                this.logger.Debug(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
+                LogMessage(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }
         });
     }
@@ -64,6 +65,12 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     public BenchmarkTimer WithLoggingEachStep()
     {
         logEachStep = true;
+        return this;
+    }
+    
+    public BenchmarkTimer WithLogLevel(FluentLogLevel newLogLevel)
+    {
+        this.logLevel = newLogLevel;
         return this;
     }
         
@@ -118,8 +125,30 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
         operations.Enqueue(logMessage);
         if (logEachStep && logger.IsDebugEnabled)
         {
-            logger.Debug(() => logMessage);
+            LogMessage(() => logMessage);
         }
         previousOperationTimestamp = elapsed;
+    }
+
+    private void LogMessage(Func<string> messageSupplier)
+    {
+        switch (logLevel)
+        {
+            case FluentLogLevel.Trace:
+            case FluentLogLevel.Debug:
+                logger.Debug(messageSupplier);
+                break;
+            case FluentLogLevel.Info:
+                logger.Info(messageSupplier);
+                break;
+            case FluentLogLevel.Warn:
+                logger.Warn(messageSupplier);
+                break;
+            case FluentLogLevel.Error:
+                logger.Error(messageSupplier);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }
