@@ -11,6 +11,41 @@ public static class ObservableExtensions
 {
     private static readonly Action NoOperation = () => { };
 
+    public static IObservable<TResult> SwitchLatestAsync<TSource, TResult>(this IObservable<TSource> source, Func<TSource, CancellationToken, Task<TResult>> asyncMethod)
+    {
+        return Observable.Create<TResult>(async observer =>
+        {
+            var cts = new CancellationTokenSource();
+            try
+            {
+                // ReSharper disable once MethodSupportsCancellation reason: By design - cts should cancel only inner loop
+                await source.ForEachAsync(async item =>
+                {
+                    cts.Cancel(); // cancel old request
+                    cts = new CancellationTokenSource();
+                    try
+                    {
+                        var result = await asyncMethod(item, cts.Token);
+                        observer.OnNext(result);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        // Expected when the operation is cancelled, we don't have to do anything special here.
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Expected when the operation is cancelled, we don't have to do anything special here.
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                observer.OnError(ex); // Propagate the error to the observer
+            }
+            observer.OnCompleted();
+        });
+    }
+    
     public static IObservable<T> Synchronize<T>(this IObservable<T> observable, NamedLock gate)
     {
         return observable.Synchronize(gate.Gate);

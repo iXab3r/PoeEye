@@ -5,6 +5,7 @@ namespace PoeShared.Scaffolding;
 
 public static class TaskExtensions
 {
+    private const int warningThresholdMs = 20;
     private static readonly IFluentLog Log = typeof(TaskExtensions).PrepareLogger();
     private static readonly int MinWaitHandleTimeoutInMs = 20;
 
@@ -42,7 +43,8 @@ public static class TaskExtensions
         }
         else
         {
-            if (sw.ElapsedMilliseconds > millisecondsTimeout * 2)
+            var elapsedMilliseconds = sw.ElapsedMilliseconds;
+            if (elapsedMilliseconds > warningThresholdMs && elapsedMilliseconds > millisecondsTimeout * 2)
             {
                 log.Warn(() => $"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms which is much longer than expected");
             }
