@@ -278,9 +278,16 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             webView.UnhandledException -= OnUnhandledException;
         }
 
-        Log.Error($"WebView has crashed: {sender}", e.Exception);
+        if (ReferenceEquals(sender, WebView.WebView))
+        {
+            Log.Error( $"WebView has crashed: {sender}", e.Exception);
+            UnhandledException = e.Exception;
+        }
+        else
+        {
+            Log.Error( $"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
+        }
         e.Handled = true; // JS context is already dead at this point
-        UnhandledException = e.Exception;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

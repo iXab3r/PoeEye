@@ -18,7 +18,7 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             .Select(x => x.EventArgs.LoadedAssembly)
             .Subscribe(assembly =>
             {
-                if (assembly.FullName == null || assembly.FullName.StartsWith("ℛ*"))
+                if (assembly.FullName.StartsWith("ℛ*"))
                 {
                     // these are dynamically emitted assemblies by CSS
                     return;
