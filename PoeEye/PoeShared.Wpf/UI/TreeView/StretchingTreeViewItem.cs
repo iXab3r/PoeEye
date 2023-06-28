@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using MahApps.Metro.ValueBoxes;
 
 namespace PoeShared.UI;
@@ -9,14 +10,20 @@ public class StretchingTreeViewItem : TreeViewItem
 {
     public StretchingTreeViewItem()
     {
-        this.Loaded += StretchingTreeViewItem_Loaded;
+        Loaded += StretchingTreeViewItem_Loaded;
+        RequestBringIntoView += OnRequestBringIntoView;
+    }
+
+    private void OnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+    {
+        e.Handled = true;
     }
 
     private void StretchingTreeViewItem_Loaded(object sender, RoutedEventArgs e)
     {
-        if (this.VisualChildrenCount > 0)
+        if (VisualChildrenCount > 0)
         {
-            Grid grid = this.GetVisualChild(0) as Grid;
+            var grid = GetVisualChild(0) as Grid;
             if (grid != null && grid.ColumnDefinitions.Count == 3)
             {
                 grid.ColumnDefinitions.RemoveAt(2);
