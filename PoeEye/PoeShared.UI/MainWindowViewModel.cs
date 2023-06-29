@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using EyeAuras.OnTopReplica;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Blazor;
 using PoeShared.Prism;
