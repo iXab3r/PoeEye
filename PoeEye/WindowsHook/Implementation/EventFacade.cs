@@ -98,21 +98,8 @@ internal abstract class EventFacade : DisposableReactiveObject, IKeyboardMouseEv
         remove => mouseListener.Value.MouseWheelExt -= value;
     }
 
-    public event EventHandler<MouseEventExtArgs> MouseDragStartedExt
-    {
-        add => mouseListener.Value.MouseDragStartedExt += value;
-        remove => mouseListener.Value.MouseDragStartedExt -= value;
-    }
-
-    public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt
-    {
-        add => mouseListener.Value.MouseDragFinishedExt += value;
-        remove => mouseListener.Value.MouseDragFinishedExt -= value;
-    }
-
     protected abstract MouseListener CreateMouseListener();
     protected abstract KeyListener CreateKeyListener();
-    
     
     
     protected override void FormatToString(ToStringBuilder builder)

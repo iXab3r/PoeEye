@@ -52,22 +52,4 @@ public interface IMouseEvents
     ///     suppress further processing of mouse wheel moves in other applications.
     /// </remarks>
     event EventHandler<MouseEventExtArgs> MouseWheelExt;
-
-    /// <summary>
-    ///     Occurs when a drag event has started (left button held down whilst moving more than the system drag threshold).
-    /// </summary>
-    /// <remarks>
-    ///     This event provides extended arguments of type <see cref="MouseEventArgs" /> enabling you to
-    ///     suppress further processing of mouse movement in other applications.
-    /// </remarks>
-    event EventHandler<MouseEventExtArgs> MouseDragStartedExt;
-
-    /// <summary>
-    ///     Occurs when a drag event has completed.
-    /// </summary>
-    /// <remarks>
-    ///     This event provides extended arguments of type <see cref="MouseEventArgs" /> enabling you to
-    ///     suppress further processing of mouse movement in other applications.
-    /// </remarks>
-    event EventHandler<MouseEventExtArgs> MouseDragFinishedExt;
 }

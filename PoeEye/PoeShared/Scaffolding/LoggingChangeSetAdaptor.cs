@@ -1,4 +1,4 @@
-#if DEBUG
+#if DEBUG && false
 #define OBSERVABLECOLLECTIONEX_ENABLE_STACKTRACE_LOG
 #endif
 

@@ -22,13 +22,13 @@ internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IS
 
     public ScreenRegionSelectorService(
         [Dependency(WellKnownWindows.MainWindow)] IWindowViewController viewController,
-        [Dependency(WellKnownWindows.AllWindows)] IOverlayWindowController overlayController,
+        IFactory<IOverlayWindowController, IScheduler> overlayControllerFactory,
         [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler,
         IFactory<IWindowRegionSelector> regionSelectorWindowFactory)
     {
         Log.Debug(() => $"Initializing region selector service");
         this.viewController = viewController;
-        this.overlayController = overlayController;
+        this.overlayController = overlayControllerFactory.Create(uiScheduler).AddTo(Anchors);
         windowRegionSelector = regionSelectorWindowFactory.Create();
         windowRegionSelector.IsVisible = false;
         Log.Debug(() => $"Registering region selector overlay");

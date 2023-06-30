@@ -14,7 +14,7 @@ namespace WindowsHook.WinApi;
 ///     See full documentation at http://globalmousekeyhook.codeplex.com/wikipage?title=MouseStruct
 /// </remarks>
 [StructLayout(LayoutKind.Explicit)]
-internal struct MouseStruct
+internal record struct MouseStruct
 {
     /// <summary>
     ///     Specifies a Point structure that contains the X- and Y-coordinates of the cursor, in screen coordinates.

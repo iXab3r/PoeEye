@@ -5,35 +5,16 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using PInvoke;
 using WindowsHook.WinApi;
 
 namespace WindowsHook.Implementation;
 
 internal abstract class MouseListener : BaseListener, IMouseEvents
 {
-    private readonly ButtonSet m_DoubleDown;
-    private readonly ButtonSet m_SingleDown;
-    private readonly Point m_UninitialisedPoint = new(-1, -1);
-    private readonly int m_xDragThreshold;
-    private readonly int m_yDragThreshold;
-    private Point m_DragStartPosition;
-
-    private bool m_IsDragging;
-
-    private Point m_PreviousPosition;
-
     protected MouseListener(Subscribe subscribe)
         : base(subscribe)
     {
-        m_xDragThreshold = NativeMethods.GetXDragThreshold();
-        m_yDragThreshold = NativeMethods.GetYDragThreshold();
-        m_IsDragging = false;
-
-        m_PreviousPosition = m_UninitialisedPoint;
-        m_DragStartPosition = m_UninitialisedPoint;
-
-        m_DoubleDown = new ButtonSet();
-        m_SingleDown = new ButtonSet();
         IsReady = true;
     }
 
@@ -42,9 +23,12 @@ internal abstract class MouseListener : BaseListener, IMouseEvents
     public event EventHandler<MouseEventExtArgs> MouseDownExt;
     public event EventHandler<MouseEventExtArgs> MouseUpExt;
     public event EventHandler<MouseEventExtArgs> MouseWheelExt;
-    public event EventHandler<MouseEventExtArgs> MouseDragStartedExt;
-    public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     protected override bool Callback(WinHookCallbackData data)
     {
         var e = GetEventArgs(data);
@@ -54,42 +38,52 @@ internal abstract class MouseListener : BaseListener, IMouseEvents
         }
 
         MouseRaw?.Invoke(this, e);
+        
 
-        if (e.IsMouseButtonDown)
+        /*
+        According to the Microsoft documentation, these are the messages that the WH_MOUSE_LL hook procedure can receive:
+
+        WM_LBUTTONDOWN
+        WM_LBUTTONUP
+        WM_MOUSEMOVE
+        WM_MOUSEWHEEL
+        WM_MOUSEHWHEEL
+        WM_RBUTTONDOWN
+        WM_RBUTTONUP
+        WM_MBUTTONDOWN
+        WM_MBUTTONUP
+        WM_XBUTTONDOWN
+        WM_XBUTTONUP
+         */
+        switch (e.Message)
         {
-            ProcessDown(ref e);
+            case User32.WindowMessage.WM_LBUTTONDOWN:
+            case User32.WindowMessage.WM_RBUTTONDOWN:
+            case User32.WindowMessage.WM_MBUTTONDOWN:
+            case User32.WindowMessage.WM_XBUTTONDOWN:
+                ProcessDown(ref e);
+                break;
+            case User32.WindowMessage.WM_LBUTTONUP:
+            case User32.WindowMessage.WM_RBUTTONUP:
+            case User32.WindowMessage.WM_MBUTTONUP:
+            case User32.WindowMessage.WM_XBUTTONUP:
+                ProcessUp(ref e);
+                break;
+            case User32.WindowMessage.WM_MOUSEWHEEL:
+            case User32.WindowMessage.WM_MOUSEHWHEEL:
+                ProcessWheel(ref e);
+                break;
+            case User32.WindowMessage.WM_MOUSEMOVE:
+                ProcessMove(ref e);
+                break;
         }
-
-        if (e.IsMouseButtonUp)
-        {
-            ProcessUp(ref e);
-        }
-
-        if (e.WheelScrolled)
-        {
-            ProcessWheel(ref e);
-        }
-
-        var hasMoved = HasMoved(e.Point);
-        if (hasMoved)
-        {
-            ProcessMove(ref e);
-        }
-
-        ProcessDrag(ref e);
-
+        
         return !e.Handled;
-    }
-
-    private MouseEventExtArgs EnrichWithButtons(MouseEventExtArgs args)
-    {
-        var buttons = args.Button | m_SingleDown.Values;
-        return new MouseEventExtArgs(args, buttons);
     }
 
     protected abstract MouseEventExtArgs GetEventArgs(WinHookCallbackData data);
 
-    protected virtual void ProcessWheel(ref MouseEventExtArgs e)
+    protected void ProcessWheel(ref MouseEventExtArgs e)
     {
         OnWheelExt(e);
     }
@@ -97,161 +91,39 @@ internal abstract class MouseListener : BaseListener, IMouseEvents
     protected virtual void ProcessDown(ref MouseEventExtArgs e)
     {
         OnDownExt(e);
-        if (e.Handled)
-        {
-            return;
-        }
-
-        switch (e.Clicks)
-        {
-            case 2:
-                m_DoubleDown.Add(e.Button);
-                break;
-            case 1:
-                m_SingleDown.Add(e.Button);
-                break;
-        }
     }
 
     protected virtual void ProcessUp(ref MouseEventExtArgs e)
     {
         OnUpExt(e);
-        if (e.Handled)
-        {
-            return;
-        }
-
-        if (m_SingleDown.Contains(e.Button))
-        {
-            m_SingleDown.Remove(e.Button);
-        }
-
-        if (m_DoubleDown.Contains(e.Button))
-        {
-            e = e.ToDoubleClickEventArgs();
-            m_DoubleDown.Remove(e.Button);
-        }
     }
 
     private void ProcessMove(ref MouseEventExtArgs e)
     {
-        e = EnrichWithButtons(e);
-        m_PreviousPosition = e.Point;
         OnMoveExt(e);
     }
 
-    private void ProcessDrag(ref MouseEventExtArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-        if (m_SingleDown.Contains(MouseButtons.Left))
-        {
-            if (m_DragStartPosition.Equals(m_UninitialisedPoint))
-            {
-                m_DragStartPosition = e.Point;
-            }
-
-            ProcessDragStarted(ref e);
-        }
-        else
-        {
-            m_DragStartPosition = m_UninitialisedPoint;
-            ProcessDragFinished(ref e);
-        }
-    }
-
-    private void ProcessDragStarted(ref MouseEventExtArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-        if (m_IsDragging)
-        {
-            return;
-        }
-
-        var isXDragging = Math.Abs(e.Point.X - m_DragStartPosition.X) > m_xDragThreshold;
-        var isYDragging = Math.Abs(e.Point.Y - m_DragStartPosition.Y) > m_yDragThreshold;
-        m_IsDragging = isXDragging || isYDragging;
-
-        if (m_IsDragging)
-        {
-            OnDragStartedExt(e);
-        }
-    }
-
-    private void ProcessDragFinished(ref MouseEventExtArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-        if (m_IsDragging)
-        {
-            OnDragFinishedExt(e);
-            m_IsDragging = false;
-        }
-    }
-
-    private bool HasMoved(Point actualPoint)
-    {
-        return m_PreviousPosition != actualPoint;
-    }
-
-    protected virtual void OnMoveExt(MouseEventExtArgs e)
+    protected void OnMoveExt(MouseEventExtArgs e)
     {
         var handler = MouseMoveExt;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
+        handler?.Invoke(this, e);
     }
 
-    protected virtual void OnDownExt(MouseEventExtArgs e)
+    protected void OnDownExt(MouseEventExtArgs e)
     {
         var handler = MouseDownExt;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
+        handler?.Invoke(this, e);
     }
 
-    protected virtual void OnUpExt(MouseEventExtArgs e)
+    protected void OnUpExt(MouseEventExtArgs e)
     {
         var handler = MouseUpExt;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
+        handler?.Invoke(this, e);
     }
 
-    protected virtual void OnWheelExt(MouseEventExtArgs e)
+    protected void OnWheelExt(MouseEventExtArgs e)
     {
         var handler = MouseWheelExt;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
-    }
-
-    protected virtual void OnDragStartedExt(MouseEventExtArgs e)
-    {
-        var handler = MouseDragStartedExt;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
-    }
-
-    protected virtual void OnDragFinishedExt(MouseEventExtArgs e)
-    {
-        var handler = MouseDragFinishedExt;
-        if (handler != null)
-        {
-            handler(this, e);
-        }
+        handler?.Invoke(this, e);
     }
 }

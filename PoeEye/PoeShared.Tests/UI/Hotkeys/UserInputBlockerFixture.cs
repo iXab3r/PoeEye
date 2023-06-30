@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Moq;
+using PInvoke;
 using PoeShared.Native;
 using PoeShared.Services;
 using PoeShared.Tests.Helpers;
@@ -88,8 +89,8 @@ public class UserInputBlockerFixture : FixtureBase
         //Given
         var instance = CreateInstance();
         using var block = instance.Block(UserInputBlockType.All);
-        MouseEventExtArgs down = sendDown ? new MouseEventExtArgs(MouseButtons.Left, 1, new Point(), 0, 0, isMouseButtonDown: true, isMouseButtonUp: false, modifiers, isInjected) : default;
-        MouseEventExtArgs up = sendUp ? new MouseEventExtArgs(MouseButtons.Left, 1, new Point(), 0, 0, isMouseButtonDown: false, isMouseButtonUp: true, modifiers, isInjected) : default;
+        MouseEventExtArgs down = sendDown ? new MouseEventExtArgs(User32.WindowMessage.WM_LBUTTONDOWN, new Point(), 0, 0, modifiers, isInjected) : default;
+        MouseEventExtArgs up = sendUp ? new MouseEventExtArgs(User32.WindowMessage.WM_LBUTTONUP, new Point(), 0, 0, modifiers, isInjected) : default;
 
         //When
         if (down != null)
