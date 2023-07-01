@@ -16,7 +16,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     private TimeSpan previousOperationTimestamp;
     private readonly Stopwatch sw;
     private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
-    private Func<bool> predicate = () => true;
+    private Func<bool> logCondition = () => true;
     private bool logEachStep = true;
     private bool logOnDisposal = false;
     private FluentLogLevel logLevel = FluentLogLevel.Debug;
@@ -27,25 +27,29 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     
     public BenchmarkTimer(string benchmarkName, IFluentLog logger = null, [CallerMemberName] string propertyName = null) : this(logger, propertyName)
     {
-        this.logger = logger ?? DefaultLogger;
-        this.propertyName = propertyName ?? "unknown";
-        sw = Stopwatch.StartNew();
         AddStep(() => $" => {benchmarkName}");
-        Anchors.Add(() =>
-        {
-            if (logOnDisposal && sw.Elapsed > loggingElapsedThreshold)
-            {
-                LogMessage(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
-            }
-        });
+        Anchors.Add(() => AddStep(() => $" <= {benchmarkName}"));
     }
-    
-    public BenchmarkTimer(IFluentLog logger = null, [CallerMemberName] string propertyName = null)
+
+    public BenchmarkTimer(IFluentLog logger = null, [CallerMemberName] string propertyName = null) 
     {
         this.logger = logger ?? DefaultLogger;
         this.propertyName = propertyName ?? "unknown";
         sw = Stopwatch.StartNew();
         Anchors.Add(() => sw.Stop());
+        Anchors.Add(() =>
+        {
+            if (!logOnDisposal || sw.Elapsed <= loggingElapsedThreshold)
+            {
+                return;
+            }
+
+            if (logCondition != null && !logCondition())
+            {
+                return;
+            }
+            LogMessage(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {operations.Count} steps completed\n\t{string.Join("\n\t", operations)}");
+        });
     }
     
     public TimeSpan Elapsed => sw.Elapsed;
@@ -88,7 +92,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
         
     public BenchmarkTimer WithCondition([NotNull] Func<bool> predicate)
     {
-        this.predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+        this.logCondition = predicate ?? throw new ArgumentNullException(nameof(predicate));
         return this;
     }
 
@@ -116,14 +120,14 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     
     private void AddStep(Func<string> messageFactory, TimeSpan elapsed)
     {
-        if (predicate != null && !predicate())
+        if (logCondition != null && !logCondition())
         {
             return;
         }
 
         var logMessage = $"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {messageFactory()}";
         operations.Enqueue(logMessage);
-        if (logEachStep && logger.IsDebugEnabled)
+        if (logEachStep)
         {
             LogMessage(() => logMessage);
         }
@@ -132,6 +136,10 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
 
     private void LogMessage(Func<string> messageSupplier)
     {
+        if (!logger.IsEnabled(logLevel))
+        {
+            return;
+        }
         switch (logLevel)
         {
             case FluentLogLevel.Trace:

@@ -197,7 +197,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                     WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
-
                     if (WebView.HostPage == hostPage && WebView.WebView.CoreWebView2 != null)
                     {
                         Log.Debug($"Reloading existing page, view type: {state}");
@@ -286,6 +285,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         else
         {
             Log.Error( $"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
+            UnhandledException = e.Exception;
         }
         e.Handled = true; // JS context is already dead at this point
     }

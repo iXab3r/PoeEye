@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 using Microsoft.Extensions.FileProviders;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf;
 
-public interface IBlazorContentControl
+public interface IBlazorContentControl : IDisposableReactiveObject
 {
     Type ViewType { get; set; }
     object Content { get; set; }

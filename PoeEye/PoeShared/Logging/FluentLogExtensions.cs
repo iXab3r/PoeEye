@@ -7,6 +7,19 @@ namespace PoeShared.Logging;
 
 public static class FluentLogExtensions
 {
+    public static bool IsEnabled(this IFluentLog log, FluentLogLevel logLevel)
+    {
+        return logLevel switch
+        {
+            FluentLogLevel.Trace => log.IsDebugEnabled,
+            FluentLogLevel.Debug => log.IsDebugEnabled,
+            FluentLogLevel.Info => log.IsInfoEnabled,
+            FluentLogLevel.Warn => log.IsWarnEnabled,
+            FluentLogLevel.Error => log.IsErrorEnabled,
+            _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, $"Unknown log level: {logLevel}")
+        };
+    }
+    
     public static void DebugIfDebug(this IFluentLog log, Func<string> message)
     {
 #if DEBUG
