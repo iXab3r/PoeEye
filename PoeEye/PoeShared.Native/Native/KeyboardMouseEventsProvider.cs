@@ -3,18 +3,30 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using WindowsHook;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PropertyBinder;
 using Unity;
 
 namespace PoeShared.Native;
 
-internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
+internal sealed class KeyboardMouseEventsProvider : DisposableReactiveObject, IKeyboardMouseEventsProvider
 {
+    private static readonly Binder<KeyboardMouseEventsProvider> Binder = new();
     private static readonly IFluentLog Log = typeof(KeyboardMouseEventsProvider).PrepareLogger();
+
+    private readonly HookHandlerContainer systemHookContainer;
+    private readonly HookHandlerContainer appHookContainer;
+
+    static KeyboardMouseEventsProvider()
+    {
+        Binder.Bind(x => x.systemHookContainer.IsActive).To(x => x.SystemHookIsActive);
+        Binder.Bind(x => x.appHookContainer.IsActive).To(x => x.AppHookIsActive);
+    }
 
     [InjectionConstructor]
     public KeyboardMouseEventsProvider([Dependency(WellKnownSchedulers.InputHook)]
@@ -30,18 +42,22 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
         IFactory<IKeyboardMouseEvents> appEventsFactory,
         IScheduler inputScheduler)
     {
-        System = new HookHandlerContainer(() => new HookHandler("global", globalEventsFactory))
-            .Source
-            .SubscribeOn(inputScheduler);
+        systemHookContainer = new HookHandlerContainer(() => new HookHandler("global", globalEventsFactory)).AddTo(Anchors);
+        System = systemHookContainer.Source.SubscribeOn(inputScheduler);
 
-        Application = new HookHandlerContainer(() => new HookHandler("app", appEventsFactory))
-            .Source
-            .SubscribeOn(inputScheduler);
+        appHookContainer = new HookHandlerContainer(() => new HookHandler("app", appEventsFactory)).AddTo(Anchors);
+        Application = appHookContainer.Source.SubscribeOn(inputScheduler);
+        
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     public IObservable<IKeyboardMouseEvents> System { get; }
 
     public IObservable<IKeyboardMouseEvents> Application { get; }
+    
+    public bool SystemHookIsActive { get; [UsedImplicitly] private set; }
+    
+    public bool AppHookIsActive { get; [UsedImplicitly] private set; }
 
     /// <summary>
     /// Basically it is Using + Replay(1) + RefCount
@@ -85,6 +101,7 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
                         Log.Info(() => $"Disposing value as we don't have subs left: {activeValue}");
                         activeValue.Dispose();
                         activeValue = null;
+                        IsActive = false;
                     }
                 }).AddTo(activeAnchors);
 
@@ -104,6 +121,7 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
                         throw new InvalidOperationException("Failed to get non-null value from factory function");
                     }
                     observer.OnNext(activeValue.Source);
+                    IsActive = true;
                 }
 
                 return activeAnchors;
@@ -113,6 +131,8 @@ internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
         public int RefCount => refCount;
 
         public IObservable<IKeyboardMouseEvents> Source { get; }
+        
+        public bool IsActive { get; private set; }
     }
 
     private sealed class HookHandler : DisposableReactiveObject

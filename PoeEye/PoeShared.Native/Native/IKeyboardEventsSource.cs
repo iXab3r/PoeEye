@@ -8,6 +8,10 @@ namespace PoeShared.Native;
 public interface IKeyboardEventsSource : ISupportsKeyboardFilter, ISupportsMouseFilter
 {
     bool RealtimeMode { get; }
+    
+    bool SystemHookIsActive { get; }
+    
+    bool AppHookIsActive { get; }
 
     IObservable<KeyEventArgsExt> WhenKeyRaw { [NotNull] get; }
         

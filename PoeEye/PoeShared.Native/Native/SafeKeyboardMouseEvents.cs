@@ -7,12 +7,14 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
 using DynamicData;
+using JetBrains.Annotations;
 using WindowsHook;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PropertyBinder;
 using Unity;
 using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
@@ -20,6 +22,7 @@ namespace PoeShared.Native;
 
 internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
 {
+    private static readonly Binder<KeyboardEventsSource> Binder = new();
     private static readonly IFluentLog Log = typeof(KeyboardEventsSource).PrepareLogger();
     private readonly IClock clock;
     private readonly IScheduler inputScheduler;
@@ -27,6 +30,12 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
 
     private readonly IKeyboardMouseEventsProvider keyboardMouseEventsProvider;
     private readonly SourceListEx<IMouseEventFilter> mouseEventFilters = new();
+
+    static KeyboardEventsSource()
+    {
+        Binder.Bind(x => x.keyboardMouseEventsProvider.SystemHookIsActive).To(x => x.SystemHookIsActive);
+        Binder.Bind(x => x.keyboardMouseEventsProvider.AppHookIsActive).To(x => x.AppHookIsActive);
+    }
 
     public KeyboardEventsSource(
         IKeyboardMouseEventsProvider keyboardMouseEventsProvider,
@@ -89,6 +98,8 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
         WhenKeyPress = keyboardHook
             .Where(x => x.EventType == InputEventType.KeyPress && x.EventArgs is KeyPressEventArgs)
             .Select(x => x.EventArgs as KeyPressEventArgs);
+        
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     public IObservable<MouseEventExtArgs> WhenMouseRaw { get; }
@@ -108,7 +119,11 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
     public IObservable<MouseEventExtArgs> WhenMouseWheel { get; }
 
     public bool RealtimeMode { get; } = true;
-        
+    
+    public bool SystemHookIsActive { get; [UsedImplicitly] private set; }
+    
+    public bool AppHookIsActive { get; [UsedImplicitly] private set;}
+
     public IObservable<KeyEventArgsExt> WhenKeyRaw { get; }
 
     public IDisposable AddKeyboardFilter(IKeyboardEventFilter filter)
