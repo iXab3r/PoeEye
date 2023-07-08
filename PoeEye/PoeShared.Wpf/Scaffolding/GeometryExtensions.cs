@@ -11,6 +11,26 @@ namespace PoeShared.Scaffolding;
 /// </summary>
 public static class GeometryExtensions
 {
+    public static PointF? Offset(this PointF? point, float x, float y)
+    {
+        if (point == null)
+        {
+            return null;
+        }
+
+        return new PointF(point.Value.X + x, point.Value.Y + y);
+    }
+    
+    public static PointF? Divide(this PointF? point, float dividerX, float dividerY)
+    {
+        if (point == null)
+        {
+            return null;
+        }
+
+        return new PointF(point.Value.X / dividerX, point.Value.Y / dividerY);
+    }
+    
     public static Rect Normalize(this Rect rect)
     {
         var x = rect.Width >= 0
