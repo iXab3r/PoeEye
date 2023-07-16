@@ -88,7 +88,9 @@
                 <Setter TargetName="PART_NumericUp" Property="Visibility" Value="Hidden" />
                 <Setter TargetName="PART_NumericDown" Property="Visibility" Value="Hidden" />
             </Trigger>
-
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
             <Trigger Property="IsReadOnly" Value="True">
                 <Setter Property="InterceptArrowKeys" Value="False" />
                 <Setter Property="InterceptManualEnter" Value="False" />
@@ -238,7 +240,6 @@
                             <Setter TargetName="PART_NumericUp" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="PART_NumericDown" Property="Visibility" Value="Hidden" />
                         </Trigger>
-
                         <Trigger Property="IsReadOnly" Value="True">
                             <Setter Property="InterceptArrowKeys" Value="False" />
                             <Setter Property="InterceptManualEnter" Value="False" />
