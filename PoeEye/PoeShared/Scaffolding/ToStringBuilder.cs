@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Primitives;
 
 namespace PoeShared.Scaffolding;
 
@@ -10,10 +11,20 @@ public sealed class ToStringBuilder
     private readonly StringBuilder primaryPartBuilder = new();
     private readonly StringBuilder paramsPartBuilder = new();
     private readonly object owner;
-
+    private string paramsSeparator = ", ";
+    
     public ToStringBuilder([NotNull] object owner)
     {
         this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+    }
+
+    public ToStringBuilder WithParamsSeparator(string paramsSeparator)
+    {
+        var result = new ToStringBuilder(owner)
+        {
+            paramsSeparator = paramsSeparator
+        };
+        return result;
     }
 
     public void Append(string value)
@@ -44,7 +55,7 @@ public sealed class ToStringBuilder
         {
             if (paramsPartBuilder.Length > 0)
             {
-                paramsPartBuilder.Append(", ");
+                paramsPartBuilder.Append(paramsSeparator);
             }
 
             paramsPartBuilder.Append($"{parameterName}: {value}");
@@ -56,6 +67,11 @@ public sealed class ToStringBuilder
         }
     }
 
+    public string ParametersToString()
+    {
+        return paramsPartBuilder.ToString();
+    }
+    
     public override string ToString()
     {
         try
@@ -69,10 +85,8 @@ public sealed class ToStringBuilder
             {
                 result.Append(owner.GetType().Name);
             }
-            if (paramsPartBuilder.Length > 0)
-            {
-                result.Append($"{{ {paramsPartBuilder} }}");
-            }
+            
+            result.Append($"{{ {paramsPartBuilder} }}");
 
             return result.ToString();
         }
