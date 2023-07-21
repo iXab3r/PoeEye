@@ -83,4 +83,12 @@
             <x:TypeExtension TypeName="eye:UserInputBlockType" />
         </ObjectDataProvider.MethodParameters>
     </ObjectDataProvider>
+    
+    <ObjectDataProvider x:Key="ModifierKeysTypeDataProvider"
+                        MethodName="GetValuesAndDescriptions"
+                        ObjectType="wpf:EnumHelper">
+        <ObjectDataProvider.MethodParameters>
+            <x:TypeExtension TypeName="ModifierKeys" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
 </eye:SharedResourceDictionary>

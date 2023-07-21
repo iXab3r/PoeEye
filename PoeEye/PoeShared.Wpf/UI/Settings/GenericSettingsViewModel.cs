@@ -8,6 +8,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using DynamicData;
@@ -16,6 +17,7 @@ using PoeShared.Dialogs.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Native;
 using PoeShared.Prism;
 using Prism.Commands;
 using Prism.Modularity;
@@ -24,7 +26,7 @@ using Unity;
 
 namespace PoeShared.UI;
 
-internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLogger, IGenericSettingsViewModel
+internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSettingsViewModel
 {
     private static readonly MethodInfo ReloadConfigMethod = typeof(GenericSettingsViewModel)
         .GetMethod(nameof(ReloadTypedConfig), BindingFlags.Instance | BindingFlags.NonPublic);
@@ -37,7 +39,7 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLog
     private readonly ConcurrentDictionary<Type, MethodInfo> reloadConfigByType = new();
     private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new();
 
-    private readonly ISourceList<ISettingsViewModel> moduleSettings = new SourceListEx<ISettingsViewModel>();
+    private readonly ISourceCache<ISettingsViewModel, Type> moduleSettings = new SourceCache<ISettingsViewModel, Type>(x => x.GetType());
         
     public GenericSettingsViewModel(
         [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
@@ -48,6 +50,11 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLog
         Guard.ArgumentNotNull(container, nameof(container));
         this.modulesEnumerator = modulesEnumerator;
         this.container = container;
+        DefaultSize = new WinSize(600, 600);
+        MinSize = new WinSize(600, 200);
+        Title = "SETTINGS";
+        CloseCommand = CommandWrapper.Create(Close);
+        SaveCommand = CommandWrapper.Create(SaveExecuted);
 
         moduleSettings
             .Connect()
@@ -60,6 +67,12 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLog
     }
 
     public IReadOnlyObservableCollection<ISettingsViewModel> ModulesSettings { get; }
+    
+    public ICloseController CloseController { get; set; }
+    
+    public ICommand CloseCommand { get; }
+    
+    public ICommand SaveCommand { get; }
 
     public void ReloadConfigs()
     {
@@ -73,9 +86,16 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLog
         moduleSettings.Items.ForEach(SaveConfig);
     }
 
-    private void ReloadModulesList(IEnumerable<ISettingsViewModel> viewModels)
+    private void ReloadModulesList(IEnumerable<Type> types)
     {
-        moduleSettings.EditDiff(viewModels);
+        var toRemove = moduleSettings.Items.Select(x => x.GetType()).Except(types).ToArray();
+        var toAdd = types.Except( moduleSettings.Items.Select(x => x.GetType())).ToArray();
+        moduleSettings.RemoveKeys(toRemove);
+        foreach (var type in toAdd)
+        {
+            var viewModel = (ISettingsViewModel)container.Resolve(type);
+            moduleSettings.AddOrUpdate(viewModel);
+        }
     }
 
     private Type GetConfigType(ISettingsViewModel viewModel)
@@ -120,9 +140,19 @@ internal sealed class GenericSettingsViewModel : DisposableReactiveObjectWithLog
     private void SaveTypedConfig<TConfig>(ISettingsViewModel<TConfig> viewModel)
         where TConfig : class, IPoeEyeConfig, new()
     {
-
         var configProvider = container.Resolve<IConfigProvider<TConfig>>();
         var config = viewModel.Save();
         configProvider.Save(config);
+    }
+
+    public void Close()
+    {
+        this.CloseController?.Close();
+    }
+    
+    public async Task SaveExecuted()
+    {
+        await Task.Run(SaveConfigs);
+        Close();
     }
 }

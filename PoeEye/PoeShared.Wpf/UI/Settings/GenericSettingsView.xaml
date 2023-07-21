@@ -1,7 +1,8 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:modularity="clr-namespace:PoeShared.Modularity"
-                    xmlns:eye="clr-namespace:PoeShared.UI">
+                    xmlns:eye="clr-namespace:PoeShared.UI"
+                    xmlns:st="http://schemas.spicytaco.io/">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -9,8 +10,8 @@
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type eye:GenericSettingsViewModel}">
-        <DockPanel LastChildFill="True">
-            <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto">
+        <st:StackPanel>
+            <ScrollViewer st:StackPanel.Fill="Fill" VerticalScrollBarVisibility="Auto">
                 <Grid IsSharedSizeScope="True">
                     <ItemsControl ItemsSource="{Binding ModulesSettings}">
                         <ItemsControl.ItemTemplate>
@@ -21,6 +22,19 @@
                     </ItemsControl>
                 </Grid>
             </ScrollViewer>
-        </DockPanel>
+            <Separator Margin="10,0"/>
+            <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="10">
+                <Separator st:StackPanel.Fill="Fill" Visibility="Hidden"/>
+                <eye:ButtonEx
+                    MinWidth="80"
+                    HideIfDisabled="True"
+                    Command="{Binding SaveCommand}"
+                    Icon="&#xf0c7;"
+                    Content="Save" />
+                <eye:ButtonEx Command="{Binding CloseCommand}"
+                              MinWidth="120"
+                              Content="Cancel" />
+            </st:StackPanel>
+        </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>

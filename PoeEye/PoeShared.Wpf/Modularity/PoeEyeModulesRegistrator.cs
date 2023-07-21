@@ -1,4 +1,5 @@
-﻿using DynamicData;
+﻿using System;
+using DynamicData;
 using PoeShared.Scaffolding;
 using Unity;
 
@@ -8,7 +9,7 @@ internal sealed class PoeEyeModulesRegistrator : IPoeEyeModulesRegistrator, IPoe
 {
     private readonly IUnityContainer container;
 
-    private readonly SourceListEx<ISettingsViewModel> settings = new();
+    private readonly SourceListEx<Type> settings = new();
 
     public PoeEyeModulesRegistrator(IUnityContainer container)
     {
@@ -18,15 +19,13 @@ internal sealed class PoeEyeModulesRegistrator : IPoeEyeModulesRegistrator, IPoe
         Settings = settings;
     }
 
-    public IObservableList<ISettingsViewModel> Settings { get; }
+    public IObservableList<Type> Settings { get; }
 
     public IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>()
         where TConfig : class, IPoeEyeConfig, new()
         where TSettingsViewModel : ISettingsViewModel<TConfig>
     {
-        var viewModel = (ISettingsViewModel) container.Resolve(typeof(TSettingsViewModel));
-        settings.Add(viewModel);
-
+        settings.Add(typeof(TSettingsViewModel));
         return this;
     }
 }
