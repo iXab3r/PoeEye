@@ -21,6 +21,18 @@ public static class EnumerableExtensions
 
         return snapshottedEnumerable.ElementAt(Rng.Next(0, snapshottedEnumerable.Count()));
     }
+    
+    public static IEnumerable<T> Randomize<T>(this IEnumerable<T> source)
+    {
+        T[] elements = source.ToArray();
+        for (int i = elements.Length - 1; i >= 0; i--)
+        {
+            // Swap element "i" with a random earlier element including itself
+            int swapIndex = Rng.Next(i + 1);
+            yield return elements[swapIndex];
+            elements[swapIndex] = elements[i];
+        }
+    }
 
     public static IEnumerable<T> Subrange<T>(this IReadOnlyList<T> enumerable, int startIdx, int count)
     {
