@@ -10,6 +10,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using ControlzEx.Behaviors;
 using DynamicData;
+using MahApps.Metro.Behaviors;
 using MahApps.Metro.Controls;
 using Microsoft.Xaml.Behaviors;
 using PoeShared.Logging;
@@ -106,7 +107,11 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         var behaviors = Interaction.GetBehaviors(this);
         Log.Debug(() => $"Default behaviors: {behaviors.DumpToString()}");
 
-        var behaviorTypeToRemove = new[] {typeof(GlowWindowBehavior)};
+        var behaviorTypeToRemove = new[]
+        {
+            typeof(GlowWindowBehavior), 
+            typeof(WindowsSettingBehavior), //WindowsSettingBehavior has an issue with multiple dispatchers - SaveWindowState crashes the app on shutdown
+        };
         var behaviorToRemove = behaviors.Where(x => behaviorTypeToRemove.Contains(x.GetType())).ToArray();
         behaviors.RemoveMany(behaviorToRemove);
         Log.Debug(() => $"Removing the following behaviors: {behaviorToRemove.DumpToString()}");
