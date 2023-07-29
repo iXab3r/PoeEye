@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
@@ -23,7 +24,7 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
         get => (T) base.DataContext;
         set => base.DataContext = value;
     }
-
+    
     /// <inheritdoc />
     protected override void OnInitialized()
     {
@@ -33,17 +34,18 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent where
                 this.WhenAnyValue(x => x.DataContext)
                     .Select(x => x != null ? RaiseOnPropertyChanges(Log, x) : Observable.Empty<PropertyChangedEventArgs>())
                     .Switch(),
-                RaiseOnPropertyChanges(Log, this)
+                RaiseOnPropertyChanges(Log, this),
+                this.WhenAnyValue(x => x.DataContext)
+                    .Select(x => x is IRefreshableComponent refreshableComponent ? refreshableComponent.WhenRefresh : Observable.Empty<object>())
+                    .Switch()
             )
-            .Sample(TimeSpan.FromMilliseconds(250)) //FIXME UI throttling
-            .Subscribe(() => InvokeAsync(StateHasChanged))
+            .Subscribe(x => WhenRefresh.OnNext(x))
             .AddTo(Anchors);
     }
 
     private static IObservable<PropertyChangedEventArgs> RaiseOnPropertyChanges(IFluentLog log, INotifyPropertyChanged source)
     {
         log.Debug(() => $"Initializing reactive properties of {source}");
-
         return Observable.Create<PropertyChangedEventArgs>(observer =>
         {
             var anchors = new CompositeDisposable();

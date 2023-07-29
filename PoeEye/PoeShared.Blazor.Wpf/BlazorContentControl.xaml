@@ -19,8 +19,7 @@
     <ControlTemplate x:Key="BlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
         <Grid Background="Transparent">
             <Grid.InputBindings>
-                <KeyBinding Gesture="F12"
-                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenDevTools}" />
+        
                 <KeyBinding Gesture="F5"
                             Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}" />
             </Grid.InputBindings>
@@ -44,8 +43,11 @@
                                      IsReadOnly="True"
                                      Background="Transparent"
                                      BorderThickness="0"
+                                     Height="NaN"
+                                     Width="NaN"
                                      VerticalScrollBarVisibility="Auto"
                                      VerticalContentAlignment="Stretch"
+                                     TextWrapping="Wrap"
                                      Foreground="{StaticResource WarningBrush}"
                                      Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledExceptionMessage, Mode=OneWay}" />
                              </Border>

@@ -12,6 +12,11 @@ namespace PoeShared.Scaffolding;
 
 public static class ChangeSetExtensions
 {
+    public static IObservableList<T> AsObservableList<T, TKey>(this IObservableCache<T, TKey> cache)
+    {
+        return cache.Connect().RemoveKey().AsObservableList();
+    }
+    
     /// <summary>
     /// Automatically refresh downstream operator. The refresh is triggered when the observable receives a notification.
     /// </summary>

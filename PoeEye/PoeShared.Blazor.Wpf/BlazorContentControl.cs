@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
+using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Logging;
@@ -56,6 +58,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         nameof(Container), typeof(IUnityContainer), typeof(BlazorContentControl), new PropertyMetadata(default(IUnityContainer)));
 
     private readonly ISharedResourceLatch isBusyLatch;
+    private readonly SerialDisposable activeContentAnchors;
     private readonly SerialDisposable activeViewAnchors;
     private readonly ProxyServiceProvider proxyServiceProvider;
 
@@ -70,6 +73,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     {
         Disposable.Create(() => Log.Debug("Blazor content control is being disposed")).AddTo(Anchors);
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
+        activeContentAnchors = new SerialDisposable().AddTo(Anchors);
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
         proxyServiceProvider = new ProxyServiceProvider().AddTo(Anchors);
 
@@ -94,6 +98,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddBlazorWebView();
         serviceCollection.AddWpfBlazorWebView();
+        serviceCollection.AddBlazorWebViewDeveloperTools();
+        serviceCollection.AddLogging(builder =>
+        {
+            builder.SetMinimumLevel(LogLevel.Information);
+            builder.ClearProviders();
+            builder.AddProvider(new Log4NetLoggerProvider());
+
+            builder.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Trace);
+        });
         //FIXME Singleton seems to be the simplest way to link WPF world to ASPNETCORE
         foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
         {
@@ -133,7 +146,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
                 Log.Debug(() => $"Reloading control, new content type: {state.viewType}");
 
-                var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
+                var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 WebView.FileProvider.FilesByName.Clear();
 
                 if (UnhandledException != null)
@@ -158,12 +171,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     // views have to be transient to allow to re-create them if needed (e.g. on error)
                     childServiceCollection.AddTransient(typeof(BlazorContent), _ =>
                     {
-                        var viewWrapper = new BlazorContent(state.viewType).AddTo(viewAnchors);
+                        var viewWrapper = new BlazorContent(state.viewType).AddTo(contentAnchors);
                         return viewWrapper;
                     });
 
                     childServiceCollection.AddTransient(state.viewType, _ =>
                     {
+                        var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
+                        contentAnchors.Add(viewAnchors);
+                        
                         var view = state.container == null ? Activator.CreateInstance(state.viewType) : state.container.Resolve(state.viewType);
                         if (view is BlazorReactiveComponent reactiveComponent)
                         {
@@ -191,7 +207,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     if (additionalFiles.Any())
                     {
                         Log.Debug(() => $"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
-                        WebView.FileProvider.FilesByName.AddOrUpdate(additionalFiles);
+                        foreach (var file in additionalFiles)
+                        {
+                            if (file is RefFileInfo)
+                            {
+                                continue;
+                            }
+                            WebView.FileProvider.FilesByName.AddOrUpdate(file);
+                        }
                     }
 
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
@@ -310,12 +333,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     {
         var cssLinksText = additionalFiles
             .Where(x => x.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.css", StringComparison.OrdinalIgnoreCase))
-            .Select(x => $"""<link href="{x.Name}" rel="stylesheet"></link>""")
+            .Select(file => $"""<link href="{file.Name}" rel="stylesheet"></link>""")
             .JoinStrings(Environment.NewLine);
 
         var scriptsText = additionalFiles
             .Where(x => x.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.js", StringComparison.OrdinalIgnoreCase))
-            .Select(x => $"""<script src="{x.Name}"></script>""")
+            .Select(file => $"""<script src="{file.Name}"></script>""")
             .JoinStrings(Environment.NewLine);
 
         var indexFileContent = template

@@ -2,6 +2,6 @@
 
 namespace PoeShared.Blazor;
 
-public interface IReactiveComponent : IDisposableReactiveObject
+public interface IReactiveComponent : IDisposableReactiveObject, IRefreshableComponent
 {
 }

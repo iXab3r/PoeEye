@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using JetBrains.Annotations;
@@ -22,9 +24,18 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         ObjectId = $"Cmp#{Interlocked.Increment(ref GlobalIdx)}";
 
         logSupplier = new Lazy<IFluentLog>(PrepareLogger);
+        
+        WhenRefresh
+            .Sample(RefreshPeriod) //FIXME UI throttling
+            .SubscribeAsync(async x => await InvokeAsync(StateHasChanged)).AddTo(Anchors);
     }
 
+    public TimeSpan RefreshPeriod { get; set; } = TimeSpan.FromMilliseconds(100);
+
+    public ISubject<object> WhenRefresh { get; } = new Subject<object>();
+
     protected IFluentLog Log => logSupplier.Value;
+    
     protected string ObjectId { get; }
 
     protected virtual IFluentLog PrepareLogger()
@@ -41,7 +52,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     public event PropertyChangedEventHandler PropertyChanged;
 
     public CompositeDisposable Anchors { get; } = new();
-
+    
     public void RaisePropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
