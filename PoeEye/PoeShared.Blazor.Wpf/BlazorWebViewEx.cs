@@ -25,7 +25,16 @@ public class BlazorWebViewEx : BlazorWebView
     
     public BlazorWebViewEx()
     {
+        this.BlazorWebViewInitializing += OnBlazorWebViewInitializing;
         this.BlazorWebViewInitialized += OnBlazorWebViewInitialized;
+    }
+
+    private void OnBlazorWebViewInitializing(object sender, BlazorWebViewInitializingEventArgs e)
+    {
+        e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
+        {
+            AdditionalBrowserArguments = "--disable-web-security --allow-file-access-from-files --allow-file-access --enable-local-file-accesses"
+        };
     }
 
     private void OnBlazorWebViewInitialized(object sender, BlazorWebViewInitializedEventArgs e)

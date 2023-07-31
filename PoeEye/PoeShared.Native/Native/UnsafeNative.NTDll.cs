@@ -80,6 +80,21 @@ public partial class UnsafeNative
         ProcessRevokeFileHandles, // s: PROCESS_REVOKE_FILE_HANDLES_INFORMATION
         MaxProcessInfoClass
     }
+    
+    [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
+    static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
+
+    public static void CreateHardLink(string lpFileName, string lpExistingFileName)
+    {
+        if (CreateHardLink(lpFileName, lpExistingFileName, IntPtr.Zero))
+        {
+            return;
+        }
+
+        var lastError = Kernel32.GetLastError();
+        Exception winException = lastError != Win32ErrorCode.NERR_Success ? new System.ComponentModel.Win32Exception(error: (int) lastError) : null;
+        throw new InvalidStateException($"Failed to create hardlink {lpFileName} => {lpExistingFileName}", winException);
+    }
 
     public static int GetParentProcessId(int processId)
     {

@@ -19,6 +19,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     private static readonly Binder<BlazorReactiveComponentBase> Binder = new();
 
     protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> CollectionProperties = new();
+    protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> DynamicDataProperties = new();
 
     static BlazorReactiveComponentBase()
     {
@@ -30,7 +31,6 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     {
         Binder.Attach(this).AddTo(Anchors);
     }
-
     
     [Inject] public IJSRuntime JsRuntime { get; private set; }
     

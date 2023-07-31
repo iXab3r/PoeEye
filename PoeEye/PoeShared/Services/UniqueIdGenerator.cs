@@ -24,7 +24,12 @@ internal sealed class UniqueIdGenerator : IUniqueIdGenerator
 
     public string Next()
     {
-        return $"{clock.UtcNow:yyyyMMddHHmmss}{GenerateId()}";
+        return Next(true);
+    }
+    
+    public string Next(bool includeTimestamp)
+    {
+        return $"{(includeTimestamp ? $"{clock.UtcNow:yyyyMMddHHmmss}" : "")}{GenerateId()}";
     }
 
     public string Next(string prefix)

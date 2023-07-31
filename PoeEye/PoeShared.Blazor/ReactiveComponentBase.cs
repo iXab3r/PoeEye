@@ -6,8 +6,10 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
@@ -27,7 +29,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         
         WhenRefresh
             .Sample(RefreshPeriod) //FIXME UI throttling
-            .SubscribeAsync(async x => await InvokeAsync(StateHasChanged)).AddTo(Anchors);
+            .SubscribeAsync(async x => await Refresh()).AddTo(Anchors);
     }
 
     public TimeSpan RefreshPeriod { get; set; } = TimeSpan.FromMilliseconds(100);
@@ -52,7 +54,57 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     public event PropertyChangedEventHandler PropertyChanged;
 
     public CompositeDisposable Anchors { get; } = new();
-    
+
+    protected async Task Refresh()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override bool ShouldRender()
+    {
+        return base.ShouldRender();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override void BuildRenderTree(RenderTreeBuilder builder)
+    {
+        base.BuildRenderTree(builder);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        return base.SetParametersAsync(parameters);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
     public void RaisePropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

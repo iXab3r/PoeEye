@@ -3,6 +3,25 @@
 public static class FileUtils
 {
     private static readonly IFluentLog Log = typeof(FileUtils).PrepareLogger();
+    
+    public static void RemoveFilesInDirectory(this DirectoryInfo directory)
+    {
+        if (!directory.Exists) {
+            return;
+        }
+        var filesToRemove = directory.GetFiles("*", SearchOption.AllDirectories);
+        RemoveFiles(filesToRemove);
+    }
+
+    public static void RemoveDirectoryIfEmpty(this DirectoryInfo directory)
+    {
+        var hasFiles = directory.EnumerateFiles().Any();
+        var hasDirectories = directory.EnumerateDirectories().Any();
+        if (directory.Exists && !hasFiles && !hasDirectories)
+        {
+            directory.Delete(recursive: true);
+        }
+    }
 
     public static void CopyDirectory(DirectoryInfo sourcePath, DirectoryInfo targetPath)
     {
@@ -87,6 +106,26 @@ public static class FileUtils
             size = bufferSize - offset;
             Array.Copy(buffer, buffer.Length - offset, buffer, 0, offset);
             position += bufferSize - offset;
+        }
+    }
+
+    private static void RemoveFiles(params FileInfo[] filesToRemove)
+    {
+        var directoriesToCleanup = new HashSet<DirectoryInfo>();
+        foreach (var file in filesToRemove)
+        {
+            file.Delete();
+            if (file.Exists)
+            {
+                throw new ApplicationException($"Failed to remove file {file}");
+            }
+            var parentFolder = file.Directory;
+            directoriesToCleanup.Add(parentFolder);
+        }
+	
+        foreach (var dir in directoriesToCleanup)
+        {
+            RemoveDirectoryIfEmpty(dir);
         }
     }
 }
