@@ -6,7 +6,7 @@ namespace PoeShared.Scaffolding;
 /// Not thread safe ! There is a bug in ChangeAwareList(?) that leads to ArgumentOutOfRange in some cases
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservableList<T>
+public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservableList<T>, ICollection<T>
 {
     private readonly int capacity;
     private readonly ISourceListEx<T> innerList = new SourceListEx<T>();
@@ -35,9 +35,19 @@ public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservabl
         innerList.Clear();
     }
 
-    public void Remove(T item)
+    public bool Contains(T item)
     {
-        innerList.Remove(item);
+        return innerList.Contains(item);
+    }
+
+    public void CopyTo(T[] array, int arrayIndex)
+    {
+        innerList.Items.ToArray().CopyTo(array, arrayIndex);
+    }
+
+    public bool Remove(T item)
+    {
+        return innerList.Remove(item);
     }
 
     public IObservable<IChangeSet<T>> Connect(Func<T, bool> predicate = null)
@@ -51,6 +61,20 @@ public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservabl
     }
 
     public int Count => innerList.Count;
+    
+    public bool IsReadOnly => false;
+    
     public IObservable<int> CountChanged => innerList.CountChanged;
+    
     public IEnumerable<T> Items => innerList.Items;
+    
+    public IEnumerator<T> GetEnumerator()
+    {
+        return innerList.Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }

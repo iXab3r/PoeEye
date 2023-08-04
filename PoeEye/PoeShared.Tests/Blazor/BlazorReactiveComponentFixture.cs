@@ -53,17 +53,25 @@ internal class BlazorReactiveComponentFixtureTests : FixtureBase
     public static IEnumerable<NamedTestCaseData> ShouldRefreshTestCases()
     {
         yield return AsCase("Struct property", x => x.DataContext.IntValue = 1, expectedChanges: 1);
-        yield return AsCase("ObservableCollection Add", x => x.DataContext.ObservableCollection.Add(1), expectedChanges: 1);
-        yield return AsCase("SourceList Add", x => x.DataContext.SourceList.Add(1), expectedChanges: 1);
         yield return AsCase("ObservableList Add", x => x.DataContext.AddToObservableList(1), expectedChanges: 1);
         yield return AsCase("ObservableCache Add", x => x.DataContext.AddToObservableCache(1), expectedChanges: 1);
         yield return AsCase("SourceCache Add", x => x.DataContext.SourceCache.AddOrUpdate(1), expectedChanges: 1);
-        yield return AsCase("UntypedObservableCollection Add", x => x.DataContext.AddToUntypedObservableCollection(1), expectedChanges: 1);
         yield return AsCase("UntypedObservableList Add", x => x.DataContext.AddToUntypedObservableList(1), expectedChanges: 1);
         yield return AsCase("UntypedObservableCache Add", x => x.DataContext.AddToUntypedObservableCache(1), expectedChanges: 1);
+        yield return AsCase("SourceList Add", x => x.DataContext.SourceList.Add(1), expectedChanges: 2);
+        yield return AsCase("ObservableCollection Add", x => x.DataContext.ObservableCollection.Add(1), expectedChanges: 2);
+        yield return AsCase("UntypedObservableCollection Add", x => x.DataContext.AddToUntypedObservableCollection(1), expectedChanges: 2);
 
         //FIXME Not supported yet, but should be!
-        yield return AsCase("Nested Struct property", x => x.DataContext.Nested.IntValue = 1, expectedChanges: 0);
+        yield return AsCase("Nested Struct property", x => x.DataContext.Nested.IntValue = 1, expectedChanges: 1);
+        yield return AsCase("Nested ObservableList Add", x => x.DataContext.Nested.AddToObservableList(1), expectedChanges: 1);
+        yield return AsCase("Nested ObservableCache Add", x => x.DataContext.Nested.AddToObservableCache(1), expectedChanges: 1);
+        yield return AsCase("Nested SourceCache Add", x => x.DataContext.Nested.SourceCache.AddOrUpdate(1), expectedChanges: 1);
+        yield return AsCase("Nested UntypedObservableList Add", x => x.DataContext.Nested.AddToUntypedObservableList(1), expectedChanges: 1);
+        yield return AsCase("Nested UntypedObservableCache Add", x => x.DataContext.Nested.AddToUntypedObservableCache(1), expectedChanges: 1);
+        yield return AsCase("Nested SourceList Add", x => x.DataContext.Nested.SourceList.Add(1), expectedChanges: 2);
+        yield return AsCase("Nested ObservableCollection Add", x => x.DataContext.Nested.ObservableCollection.Add(1), expectedChanges: 2);
+        yield return AsCase("Nested UntypedObservableCollection Add", x => x.DataContext.Nested.AddToUntypedObservableCollection(1), expectedChanges: 2);
     }
 
     private static NamedTestCaseData AsCase(string testName, Action<TestComponent> setter, int expectedChanges)
@@ -81,8 +89,6 @@ internal class BlazorReactiveComponentFixtureTests : FixtureBase
         private readonly ObservableCollectionEx<int> untypedObservableCollection = new();
         private readonly SourceList<int> untypedObservableList = new();
         private readonly SourceCache<int, int> untypedObservableCache = new(x => x);
-        
-        
         
         public int IntValue { get; set; }
 

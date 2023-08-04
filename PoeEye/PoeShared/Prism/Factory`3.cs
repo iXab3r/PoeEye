@@ -4,7 +4,7 @@ using Unity.Resolution;
 
 namespace PoeShared.Prism;
 
-internal sealed class Factory<T1, T2, T3> : IFactory<T1, T2, T3>, INamedFactory<T1, T2, T3>
+internal sealed class Factory<TOut, TIn1, TIn2> : IFactory<TOut, TIn1, TIn2>, INamedFactory<TOut, TIn1, TIn2>
 {
     private readonly IUnityContainer container;
 
@@ -15,13 +15,13 @@ internal sealed class Factory<T1, T2, T3> : IFactory<T1, T2, T3>, INamedFactory<
         this.container = container;
     }
 
-    public T1 Create(T2 parameter1, T3 parameter2)
+    public TOut Create(TIn1 parameter1, TIn2 parameter2)
     {
-        return container.Resolve<T1>(new DependencyOverride<T2>(parameter1), new DependencyOverride<T3>(parameter2));
+        return container.Resolve<TOut>(new DependencyOverride<TIn1>(parameter1), new DependencyOverride<TIn2>(parameter2));
     }
 
-    public T1 Create(string name, T2 param1, T3 param2)
+    public TOut Create(string name, TIn1 param1, TIn2 param2)
     {
-        return container.Resolve<T1>(name, new DependencyOverride<T2>(param1), new DependencyOverride<T3>(param2));
+        return container.Resolve<TOut>(name, new DependencyOverride<TIn1>(param1), new DependencyOverride<TIn2>(param2));
     }
 }

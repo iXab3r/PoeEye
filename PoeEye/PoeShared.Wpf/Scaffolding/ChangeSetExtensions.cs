@@ -17,6 +17,12 @@ namespace PoeShared.Scaffolding;
 public static class ChangeSetExtensions
 {
     private static readonly IFluentLog Log = typeof(ChangeSetExtensions).PrepareLogger();
+    
+    public static T AddTo<T, TKey>(this T element, ISourceCache<T, TKey> parent)
+    {
+        parent.AddOrUpdate(element);
+        return element;
+    }
 
     public static IObservable<IChangeSet<T>> BindToCollectionVirtualized<T>(
         this IObservable<IChangeSet<T>> source,

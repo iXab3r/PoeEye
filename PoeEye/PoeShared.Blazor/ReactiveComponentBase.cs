@@ -20,6 +20,8 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     private static long GlobalIdx;
 
     private readonly Lazy<IFluentLog> logSupplier;
+    private long rawRefreshCount;
+    private long refreshCount;
 
     protected ReactiveComponentBase()
     {
@@ -28,17 +30,23 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         logSupplier = new Lazy<IFluentLog>(PrepareLogger);
         
         WhenRefresh
+            .Do(x => Interlocked.Increment(ref rawRefreshCount))
             .Sample(RefreshPeriod) //FIXME UI throttling
+            .Do(x => Interlocked.Increment(ref refreshCount))
             .SubscribeAsync(async x => await Refresh()).AddTo(Anchors);
     }
 
-    public TimeSpan RefreshPeriod { get; set; } = TimeSpan.FromMilliseconds(100);
+    public TimeSpan RefreshPeriod { get; set; } = TimeSpan.FromMilliseconds(50);
 
     public ISubject<object> WhenRefresh { get; } = new Subject<object>();
 
     protected IFluentLog Log => logSupplier.Value;
     
     protected string ObjectId { get; }
+    
+    public long RefreshCount => refreshCount;
+    
+    public long RawRefreshCount => refreshCount;
 
     protected virtual IFluentLog PrepareLogger()
     {

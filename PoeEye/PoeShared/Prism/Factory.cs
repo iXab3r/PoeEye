@@ -4,7 +4,7 @@ using Unity;
 
 namespace PoeShared.Prism;
 
-internal sealed class Factory<T> : INamedFactory<T>, ICachingProxyFactory<T>
+internal sealed class Factory<TOut> : INamedFactory<TOut>, ICachingProxyFactory<TOut>
 {
     private readonly IUnityContainer container;
 
@@ -15,13 +15,13 @@ internal sealed class Factory<T> : INamedFactory<T>, ICachingProxyFactory<T>
         this.container = container;
     }
 
-    public T Create()
+    public TOut Create()
     {
-        return container.Resolve<T>();
+        return container.Resolve<TOut>();
     }
 
-    public T Create(string name)
+    public TOut Create(string name)
     {
-        return container.Resolve<T>(name);
+        return container.Resolve<TOut>(name);
     }
 }
