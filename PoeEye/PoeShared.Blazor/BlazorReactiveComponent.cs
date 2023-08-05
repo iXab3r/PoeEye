@@ -162,7 +162,7 @@ public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
 
     protected static IObservable<EventPattern<PropertyChangedEventArgs>> RaiseOnPropertyChanges(IFluentLog log, INotifyPropertyChanged source)
     {
-        log.Debug(() => $"Initializing reactive properties of {source}");
+        //log.Debug(() => $"Initializing reactive properties of {source}");
         return Observable.Create<EventPattern<PropertyChangedEventArgs>>(observer =>
         {
             var anchors = new CompositeDisposable();

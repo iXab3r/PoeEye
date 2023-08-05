@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Reactive.Linq;
 using System.Text;
@@ -24,36 +25,38 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
 
     public async Task DownloadFile(string url, string targetFile, Action<int> progress)
     {
-        using (var wc = CreateClient())
+        using var wc = CreateClient();
+        using var progressAnchors = Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
+                h => wc.DownloadProgressChanged += h,
+                h => wc.DownloadProgressChanged -= h)
+            .Where(x => progress != null)
+            .Sample(UiConstants.UiThrottlingDelay)
+            .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
+        var outputDirectory = Path.GetDirectoryName(targetFile) ?? throw new ArgumentException($"Invalid target - directory could not be resolved: {targetFile}");
+        if (!Directory.Exists(outputDirectory))
         {
-            using var progressAnchors = Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
-                    h => wc.DownloadProgressChanged += h,
-                    h => wc.DownloadProgressChanged -= h)
-                .Where(x => progress != null)
-                .Sample(UiConstants.UiThrottlingDelay)
-                .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
-            try
-            {
-                Log.Debug(() => $"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
-                await wc.DownloadFileTaskAsync(url, targetFile);
-                progress(100);
-            }
-            catch (Exception e)
-            {
-                Log.Warn($"Failed to download {url} to {targetFile}", e);
-                progress(0);
-            }
+            Directory.CreateDirectory(outputDirectory);
+        }
+        try
+        {
+            Log.Debug(() => $"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
+            await wc.DownloadFileTaskAsync(url, targetFile);
+            progress(100);
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to download {url} to {targetFile}", e);
+            progress(0);
+            throw;
         }
     }
 
     public async Task<byte[]> DownloadUrl(string url)
     {
-        using (var wc = CreateClient())
-        {
-            Log.Debug(() => $"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
+        using var wc = CreateClient();
+        Log.Debug(() => $"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
 
-            return await wc.DownloadDataTaskAsync(url);
-        }
+        return await wc.DownloadDataTaskAsync(url);
     }
 
     public Task<long> GetSize(string url)

@@ -91,7 +91,7 @@ internal class DownloadReleasesImpl : IEnableLogger
         return downloadedFiles;
     }
 
-    private static Task DownloadRelease(
+    private static async Task DownloadRelease(
         string updateBaseUrl,
         IReleaseEntry releaseEntry,
         IFileDownloader urlDownloader, string targetFile,
@@ -108,7 +108,15 @@ internal class DownloadReleasesImpl : IEnableLogger
         var sourceFileUrl = new Uri(baseUri, releaseEntryUrl).AbsoluteUri;
         File.Delete(targetFile);
 
-        return urlDownloader.DownloadFile(sourceFileUrl, targetFile, progressConsumer);
+        try
+        {
+            await urlDownloader.DownloadFile(sourceFileUrl, targetFile, progressConsumer);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to download from {updateBaseUrl}", e);
+            progressConsumer(0);
+        }
     }
 
     private void ChecksumPackage(IReleaseEntry downloadedRelease)
