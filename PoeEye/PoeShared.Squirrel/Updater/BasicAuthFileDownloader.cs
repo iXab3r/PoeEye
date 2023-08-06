@@ -32,8 +32,6 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
             .Where(x => progress != null)
             .Sample(UiConstants.UiThrottlingDelay)
             .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
-        var outputDirectory = Path.GetDirectoryName(targetFile) ?? throw new ArgumentException($"Invalid target - directory could not be resolved: {targetFile}");
-      
         var outputDirectory = Path.GetDirectoryName(targetFile);
         if (!string.IsNullOrEmpty(outputDirectory) && !Directory.Exists(outputDirectory))
         {
