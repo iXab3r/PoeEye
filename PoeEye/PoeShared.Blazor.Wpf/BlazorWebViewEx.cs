@@ -33,7 +33,7 @@ public class BlazorWebViewEx : BlazorWebView
     {
         e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
         {
-            AdditionalBrowserArguments = "--disable-web-security --allow-file-access-from-files --allow-file-access --enable-local-file-accesses"
+            AdditionalBrowserArguments = ""
         };
     }
 
