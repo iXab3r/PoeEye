@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -128,7 +129,7 @@ public abstract class ApplicationBase : Application
 
             Log.Debug(() => $"Configuring AllowSetForegroundWindow permissions");
             UnsafeNative.AllowSetForegroundWindow();
-            
+
             var applicationAccessor = Container.Resolve<IApplicationAccessor>();
             Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
             applicationAccessor.WhenExit.Subscribe(OnExit).AddTo(Anchors);
@@ -151,8 +152,19 @@ public abstract class ApplicationBase : Application
         RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
         SharedLog.Instance.InitializeLogging(appArguments);
 
-        var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
-        SharedLog.Instance.LoadLogConfiguration(appArguments, new FileInfo(logFileConfigPath));
+        var candidates = new[]
+            {
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"log4net.{appArguments.AppName}.config"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config")
+            }.Select(x => new FileInfo(x))
+            .Select(x => new {LogFile = x, x.Exists})
+            .ToArray();
+        Log.Debug($"Log file: {candidates.DumpToString()}");
+        var logFileConfigPath = candidates.FirstOrDefault(x => x.Exists);
+        if (logFileConfigPath?.LogFile != null)
+        {
+            SharedLog.Instance.LoadLogConfiguration(appArguments, logFileConfigPath.LogFile);
+        }
         SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
         Container.Resolve<IExceptionReportingService>();
     }
