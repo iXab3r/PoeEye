@@ -1,7 +1,14 @@
-﻿namespace PoeShared.Scaffolding;
+﻿using System.Reactive;
+
+namespace PoeShared.Scaffolding;
 
 public static class DisposableExtensions
 {
+    public static IObservable<Unit> ToObservable(this IDisposable disposable)
+    {
+        return Observable.Create<Unit>(_ => disposable);
+    }
+    
     public static CompositeDisposable ToCompositeDisposable(this IEnumerable<IDisposable> disposables)
     {
         var result = new CompositeDisposable();
