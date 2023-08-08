@@ -16,6 +16,11 @@ public sealed class LambdaEqualityComparer<T> : IEqualityComparer<T>
         this.hash = hash;
     }
 
+    public static LambdaEqualityComparer<T> FromKey<TKey>(Func<T, TKey> keyExtractor)
+    {
+        return new LambdaEqualityComparer<T>((x, y) => keyExtractor(x).Equals(keyExtractor(y)));
+    }
+
     public bool Equals(T x, T y)
     {
         if (ReferenceEquals(x, y))
