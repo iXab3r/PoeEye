@@ -1,7 +1,6 @@
 namespace PoeShared.UI;
 
-public sealed class HotkeySequenceText : HotkeySequenceItem
+public sealed record HotkeySequenceText : HotkeySequenceItem
 {
-
     public string Text { get; set; }
 }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Windows.Input;
-using Force.DeepCloner;
-using PoeShared.Scaffolding;
+﻿using PoeShared.Scaffolding;
 using PropertyBinder;
-using ReactiveUI;
 
 namespace PoeShared.UI;
 
-public abstract class HotkeySequenceItem : DisposableReactiveObject, ICloneable
+public abstract record HotkeySequenceItem : DisposableReactiveRecord
 {
     private static readonly Binder<HotkeySequenceItem> Binder = new();
 
@@ -27,9 +23,4 @@ public abstract class HotkeySequenceItem : DisposableReactiveObject, ICloneable
     public bool IsFocused { get; set; }
     
     public bool IsInEditMode { get; set; } = false;
-    
-    public object Clone()
-    {
-        return this.DeepClone();
-    }
 }
