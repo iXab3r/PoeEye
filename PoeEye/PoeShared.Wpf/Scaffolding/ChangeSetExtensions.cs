@@ -50,49 +50,47 @@ public static class ChangeSetExtensions
         });
     }
 
-    public static IObservable<Unit> BindToSourceList<TCollection, T>(
+    public static IDisposable BindToSourceList<TCollection, T>(
         this TCollection source,
         ISourceList<T> destination) where TCollection : INotifyCollectionChanged, IEnumerable<T>, ICollection<T>
     {
         //FIXME This will NOT sync if changes are done on destination list
-        return Observable.Create<Unit>(observer =>
-        {
-            var anchors = new CompositeDisposable();
+        source.Clear();
+        destination.Items.ForEach(source.Add);
 
-            source.Clear();
-            destination.Items.ForEach(source.Add);
-                
-            source
-                .ToObservableChangeSet<TCollection, T>(skipInitial: true)
-                .ForEachItemChange(change =>
+        return source
+            .ToObservableChangeSet<TCollection, T>(skipInitial: true)
+            .ForEachItemChange(change =>
+            {
+                switch (change.Reason)
                 {
-                    switch (change.Reason)
-                    {
-                        case ListChangeReason.Add:
+                    case ListChangeReason.Add:
+                        if (change.CurrentIndex >= 0)
+                        {
+                            destination.Insert(change.CurrentIndex, change.Current);
+                        }
+                        else
+                        {
                             destination.Add(change.Current);
-                            break;
-                        case ListChangeReason.Remove:
-                            destination.Remove(change.Current);
-                            break;
-                        case ListChangeReason.Replace:
-                            destination.Replace(change.Previous.Value, change.Current);
-                            break;
-                        case ListChangeReason.Clear:
-                            destination.Clear();
-                            break;
-                        case ListChangeReason.Moved:
-                            destination.Move(change.PreviousIndex, change.CurrentIndex);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(change), change.Reason, $"Change of type {change.Reason} is not supported, full change: {change}");
-                    }
-                })
-                .SubscribeToErrors(Log.HandleUiException)
-                .AddTo(anchors);
-
-
-            return anchors;
-        });
+                        }
+                        break;
+                    case ListChangeReason.Remove:
+                        destination.Remove(change.Current); //using value here to avoid problem with Clear()
+                        break;
+                    case ListChangeReason.Replace:
+                        destination.ReplaceAt(change.CurrentIndex, change.Current);
+                        break;
+                    case ListChangeReason.Clear:
+                        destination.Clear();
+                        break;
+                    case ListChangeReason.Moved:
+                        destination.Move(change.PreviousIndex, change.CurrentIndex);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(change), change.Reason, $"Change of type {change.Reason} is not supported, full change: {change}");
+                }
+            })
+            .SubscribeToErrors(Log.HandleUiException);
     }
 
     public static IObservable<IChangeSet<T>> ToObservableChangeSet<TCollection, T>(

@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using NUnit.Framework;
 using DynamicData;
 using DynamicData.Binding;
-using PoeShared.Scaffolding;
 using PoeShared.Tests.Helpers;
-using Shouldly;
 
 namespace PoeShared.Tests.Scaffolding;
 
 [TestFixture]
 public class ChangeSetExtensionsFixture : FixtureBase
 {
-
     [Test]
     public void ShouldPopulateFromListWhenAdded()
     {
@@ -33,7 +27,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
         target.Count.ShouldBe(1);
         target.Lookup("test").Value.ShouldBe(("test", 1));
     }
-        
+
     [Test]
     public void ShouldPopulateFromListWhenRemoved()
     {
@@ -50,7 +44,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
         //Then
         target.Count.ShouldBe(0);
     }
-        
+
     [Test]
     public void ShouldPopulateFromListWhenReplaced()
     {
@@ -80,7 +74,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
         //Then
         ShouldBeEqual(received.ToArray(), expected.ToArray());
     }
-    
+
     [Test]
     public void ShouldReplicateNotificationChangesForRemove()
     {
@@ -94,7 +88,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
         //Then
         ShouldBeEqual(received.ToArray(), expected.ToArray());
     }
-    
+
     [Test]
     public void ShouldReplicateNotificationChangesForReplace()
     {
@@ -108,7 +102,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
         //Then
         ShouldBeEqual(received.ToArray(), expected.ToArray());
     }
-    
+
     [Test]
     public void ShouldReplicateNotificationChangesForClear()
     {
@@ -142,7 +136,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
             ShouldBeEqual(received[idx], expected[idx]);
         }
     }
-    
+
     private void ShouldBeEqual(NotifyCollectionChangedEventArgs first, NotifyCollectionChangedEventArgs expected)
     {
         first.Action.ShouldBe(expected.Action);
@@ -178,7 +172,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
         //Then
         additionalFiles.CollectionSequenceShouldBe("3 a t", "2 a t", "1 a t");
     }
-    
+
     [Test]
     public void ShouldFilterAndSortSourceCacheAndNotCrash()
     {
@@ -228,9 +222,269 @@ public class ChangeSetExtensionsFixture : FixtureBase
             .SubscribeToErrors(Log.HandleUiException);
 
         //When
-        
+
 
         //Then
+    }
 
+    [Test]
+    public void ShouldBindToSourceList_Synchronize()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>() { 2 };
+        var sourceList = new SourceList<int>();
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Add(1);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1);
+    }
+
+    /// <summary>
+    /// Tests that when an item is added to the output collection, it gets synchronized to the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_Addition()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Add(1);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1);
+    }
+
+    /// <summary>
+    /// Tests that when an item is removed from the output collection, it gets removed from the source list as well.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_Removal()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 2, 3});
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Remove(2);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 3);
+    }
+
+    /// <summary>
+    /// Tests that when the output collection is cleared, the source list gets cleared as well.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_Clear()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 2, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Clear();
+
+        //Then
+        Assert.IsEmpty(sourceList.Items);
+    }
+
+    /// <summary>
+    /// Tests that when an item in the output collection is replaced, the corresponding item in the source list gets replaced as well.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_Replace()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 2, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection[1] = 4;
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 4, 3);
+    }
+
+    /// <summary>
+    /// Tests that when an item is moved within the output collection, the item's position is updated in the source list as well.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_MoveItem()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 2, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Move(0, 2); // Move first item to last position
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(2, 3, 1);
+    }
+
+    /// <summary>
+    /// Tests that when multiple items are added to the output collection, they are synchronized to the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_MultipleAdditions()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Add(1);
+        outputCollection.Add(2);
+        outputCollection.Add(3);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 2, 3);
+    }
+
+    /// <summary>
+    /// Tests that when multiple items are removed from the output collection, they are removed from the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_MultipleRemovals()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 2, 3, 4, 5});
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Remove(1);
+        outputCollection.Remove(3);
+        outputCollection.Remove(5);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(2, 4);
+    }
+
+    /// <summary>
+    /// Tests that complex operations on the output collection are reflected in the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_ComplexOperations()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 2, 3, 4});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Add(5); // Add 5 -> 1,2,3,4,5
+        outputCollection.Move(4, 0); // Move 5 to first position -> 5,1,2,3,4
+        outputCollection.Remove(2); // Remove 2 -> 5,1,3,4
+        outputCollection[1] = 6; // Replace 1 with 6 -> 5,6,3,4
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(5, 6, 3, 4);
+    }
+
+    /// <summary>
+    /// Tests that when an item is inserted into the output collection at a specific index, 
+    /// the same item gets inserted at the same index in the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_SingleInsertion()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Insert(1, 2); // Insert 2 at index 1
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 2, 3);
+    }
+
+    /// <summary>
+    /// Tests that inserting multiple items at specific indices in the output collection 
+    /// results in the items being added at the correct positions in the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_MultipleInsertions()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Insert(1, 2);
+        outputCollection.Insert(3, 4);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 2, 3, 4);
+    }
+
+    /// <summary>
+    /// Tests that inserting an item and then removing it results in correct synchronization with the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_InsertAndRemove()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Insert(1, 2);
+        outputCollection.Remove(2);
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 3);
+    }
+
+    /// <summary>
+    /// Tests that inserting an item and then replacing it results in correct synchronization with the source list.
+    /// </summary>
+    [Test]
+    public void ShouldBindToSourceList_InsertAndReplace()
+    {
+        //Given
+        var outputCollection = new ObservableCollection<int>();
+        var sourceList = new SourceList<int>();
+        sourceList.AddRange(new[] {1, 3});
+
+        using var subscription = outputCollection.BindToSourceList(sourceList);
+
+        //When
+        outputCollection.Insert(1, 2);
+        outputCollection[1] = 4; // Replace the previously inserted item
+
+        //Then
+        sourceList.Items.CollectionSequenceShouldBe(1, 4, 3);
     }
 }
