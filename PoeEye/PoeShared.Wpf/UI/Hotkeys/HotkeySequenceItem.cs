@@ -3,7 +3,7 @@ using PropertyBinder;
 
 namespace PoeShared.UI;
 
-public abstract record HotkeySequenceItem : DisposableReactiveRecord
+public abstract class HotkeySequenceItem : DisposableReactiveObject
 {
     private static readonly Binder<HotkeySequenceItem> Binder = new();
 

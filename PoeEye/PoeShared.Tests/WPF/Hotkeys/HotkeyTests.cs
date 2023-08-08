@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using NUnit.Framework;
+using PoeShared.Tests.Helpers;
 using PoeShared.UI;
 using Shouldly;
 
@@ -63,5 +64,31 @@ public class HotkeyTests
 
         // Then
         toString.ShouldBe(expected);
+    }
+
+    [Test]
+    [TestCase(Key.None, ModifierKeys.None)]
+    [TestCase(Key.A, ModifierKeys.None)]
+    [TestCase(Key.None, ModifierKeys.Control)]
+    [TestCase(Key.None, ModifierKeys.Control | ModifierKeys.Alt)]
+    [TestCase(Key.LeftCtrl, ModifierKeys.None)]
+    [TestCase(Key.RightCtrl, ModifierKeys.None)]
+    [TestCase(Key.RightCtrl, ModifierKeys.Control)]
+    [TestCase(Key.A, ModifierKeys.Control)]
+    [TestCase(Key.A, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows)]
+    public void ShouldEqual(Key key, ModifierKeys modifierKeys)
+    {
+        //Given
+        var key1 = new HotkeyGesture(key, modifierKeys);
+        var key2 = new HotkeyGesture(key, modifierKeys);
+
+        //When
+        var resultViaEquals = key1.Equals(key2);
+        var resultViaComparison = key1 == key2;
+
+        //Then
+        resultViaEquals.ShouldBe(true);
+        resultViaComparison.ShouldBe(true);
+        key1.GetHashCode().ShouldBe(key2.GetHashCode());
     }
 }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Force.DeepCloner;
 using GongSolutions.Wpf.DragDrop;
 using PoeShared.Scaffolding;
 
@@ -60,7 +61,7 @@ internal sealed class HotkeyDropHandler : DefaultDropHandler
                     break;
                 case HotkeySequenceItem item:
                 {
-                    var clone = item with {};
+                    var clone = item.DeepClone();
                     clone.InsertTo(itemsSource.Items, dropIndex);
                     break;
                 }

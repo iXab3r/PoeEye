@@ -4,7 +4,7 @@ using PropertyBinder;
 
 namespace PoeShared.UI;
 
-public sealed record HotkeySequenceHotkey : HotkeySequenceItem
+public sealed class HotkeySequenceHotkey : HotkeySequenceItem
 {
     private static readonly Binder<HotkeySequenceHotkey> Binder = new();
 
