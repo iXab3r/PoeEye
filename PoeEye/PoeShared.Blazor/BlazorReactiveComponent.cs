@@ -93,7 +93,8 @@ public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
     
     protected static IObservable<EventPattern<PropertyChangedEventArgs>> ListenToObject(
         IFluentLog log, 
-        INotifyPropertyChanged source)
+        INotifyPropertyChanged source,
+        bool trackChildObjects)
     {
         return Observable.Create<EventPattern<PropertyChangedEventArgs>>(observer =>
         {
@@ -140,17 +141,20 @@ public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
                         observer.OnNext(args);
                     }, log.HandleException)
                     .AddTo(anchors);
-                
-                propertyValueListener
-                    .Select(x => x as INotifyPropertyChanged)
-                    .Select(x => x != null ? ListenToObject(log, x) : Observable.Empty<EventPattern<PropertyChangedEventArgs>>())
-                    .Switch()
-                    .Subscribe(args =>
-                    {
-                        //log.Debug(() => $"Nested component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
-                        observer.OnNext(args);
-                    })
-                    .AddTo(anchors);
+
+                if (trackChildObjects)
+                {
+                    propertyValueListener
+                        .Select(x => x as INotifyPropertyChanged)
+                        .Select(x => x != null ? ListenToObject(log, x, true) : Observable.Empty<EventPattern<PropertyChangedEventArgs>>())
+                        .Switch()
+                        .Subscribe(args =>
+                        {
+                            //log.Debug(() => $"Nested component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
+                            observer.OnNext(args);
+                        })
+                        .AddTo(anchors);
+                }
 
                 propertyListener.Connect().AddTo(anchors);
                 propertyValueListener.Connect().AddTo(anchors);
@@ -192,17 +196,27 @@ public abstract class BlazorReactiveComponent<T> : BlazorReactiveComponent
 
     public IObservable<object> WhenChanged => whenChanged;
 
+    /// <summary>
+    /// Tracks changes in objects referenced by this component
+    /// FIXME Disabled by default - it is extremely inefficient and has some issues like stack overflow in some cases
+    /// </summary>
+    public bool TrackReferencedObjects { get; set; } = false;
+
     protected BlazorReactiveComponent()
     {
+        var forceRefresh = this.WhenAnyValue(x => x.DataContext)
+            .Select(x => x is IRefreshableComponent refreshableComponent ? refreshableComponent.WhenRefresh : Observable.Empty<object>())
+            .Switch();
+
+        var propertyUpdate = 
+            Observable.CombineLatest(this.WhenAnyValue(x => x.DataContext), this.WhenAnyValue(x => x.TrackReferencedObjects), (dataContext, trackNestedObjects) => (dataContext, trackNestedObjects))
+            .Select(x => x.dataContext is INotifyPropertyChanged reactiveComponent ? ListenToObject(Log, reactiveComponent, x.trackNestedObjects) : Observable.Empty<EventPattern<PropertyChangedEventArgs>>())
+            .Switch();
+        
         Observable.Merge(
                 RaiseOnPropertyChanges(Log, this),
-                this.WhenAnyValue(x => x.DataContext)
-                    .Select(x => x is INotifyPropertyChanged reactiveComponent ? ListenToObject(Log, reactiveComponent) : Observable.Empty<EventPattern<PropertyChangedEventArgs>>())
-                    .Switch(),
-                this.WhenAnyValue(x => x.DataContext)
-                    .Select(x => x is IRefreshableComponent refreshableComponent ? refreshableComponent.WhenRefresh : Observable.Empty<object>())
-                    .Switch()
-            )
+                forceRefresh,
+                propertyUpdate)
             .Subscribe(x => { whenChanged.OnNext(x); })
             .AddTo(Anchors);
     }
