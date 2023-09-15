@@ -31,6 +31,7 @@ internal class BlazorReactiveComponentFixtureTests : FixtureBase
         {
             Nested = new TestViewModel()
         };
+        instance.TrackReferencedObjects = true;
         instance.DataContext = context;
         var changes = instance.WhenChanged.Listen();
 
