@@ -13,6 +13,11 @@ namespace PoeShared.Native;
 public partial class UnsafeNative
 {
     /// <summary>
+    /// Specifies the method which will be used when calling ActivateWindow
+    /// </summary>
+    public static UnsafeWindowActivationMethod WindowActivationMethod { get; set; } = UnsafeWindowActivationMethod.Auto;
+
+    /// <summary>
     /// In some cases GetForegroundWindow returns NULL, that means that "future" foreground window is still activating
     /// If system returns NULL we want to give a chance for window to activate. This is max timeout we'll wait for to GetForegroundWindow to return non-null value
     /// </summary>
@@ -62,7 +67,7 @@ public partial class UnsafeNative
     {
         var windowRect = DwmGetWindowFrameBounds(hwnd);
         var monitorRect = System.Windows.Forms.Screen.FromHandle(hwnd).Bounds;
-        return windowRect with { X = windowRect.X - monitorRect.X, Y = windowRect.Y - monitorRect.Y};
+        return windowRect with {X = windowRect.X - monitorRect.X, Y = windowRect.Y - monitorRect.Y};
     }
 
     public static Rectangle GetWindowRect(IntPtr hwnd)
@@ -107,7 +112,7 @@ public partial class UnsafeNative
 
     public static bool SetWindowLong(IntPtr hwnd, Func<User32.SetWindowLongFlags, User32.SetWindowLongFlags> flagsChanger)
     {
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
         var newStyle = flagsChanger(existingStyle);
         var newStyleResult = User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle);
         return true;
@@ -125,28 +130,28 @@ public partial class UnsafeNative
 
         return true;
     }
-    
+
     public static void HideSystemMenu(IntPtr hwnd)
     {
         Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
 
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Hiding SystemMenu");
 
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
         var newStyle = existingStyle & ~User32.SetWindowLongFlags.WS_SYSMENU;
         if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
         {
             Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
         }
     }
-    
+
     public static void ShowSystemMenu(IntPtr hwnd)
     {
         Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
 
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Showing SystemMenu");
 
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
         var newStyle = existingStyle | User32.SetWindowLongFlags.WS_SYSMENU;
         if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
         {
@@ -160,7 +165,7 @@ public partial class UnsafeNative
 
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to Transparent");
 
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
         var newStyle = existingStyle;
         newStyle &= ~User32.SetWindowLongFlags.WS_EX_LAYERED;
         newStyle |= User32.SetWindowLongFlags.WS_EX_TOOLWINDOW;
@@ -180,7 +185,7 @@ public partial class UnsafeNative
 
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to Layered");
 
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
         var newStyle = existingStyle;
         newStyle &= ~User32.SetWindowLongFlags.WS_EX_TRANSPARENT;
         newStyle |= User32.SetWindowLongFlags.WS_EX_TOOLWINDOW;
@@ -198,7 +203,7 @@ public partial class UnsafeNative
     {
         Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to NoActivate");
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
         var newStyle = existingStyle;
         newStyle |= User32.SetWindowLongFlags.WS_EX_NOACTIVATE;
         if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
@@ -209,12 +214,12 @@ public partial class UnsafeNative
 
         return true;
     }
-    
+
     public static bool SetWindowExActivate(IntPtr hwnd)
     {
         Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
         Log.Debug(() => $"[{hwnd.ToHexadecimal()}] Reconfiguring window to Activate");
-        var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
         var newStyle = existingStyle.RemoveFlag(User32.SetWindowLongFlags.WS_EX_NOACTIVATE);
         if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
         {
@@ -233,7 +238,7 @@ public partial class UnsafeNative
         {
             Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
         }
-        
+
         if (!User32.SetWindowPos(handle,
                 User32.SpecialWindowHandles.HWND_TOPMOST,
                 0, 0, 0, 0,
@@ -306,7 +311,7 @@ public partial class UnsafeNative
             return 1;
         }
     }
-    
+
     /// <summary>
     /// Resolves the best parent window for Open/Save File, BrowseFolder and other dialogs
     /// Takes into consideration which thread/dispatcher is currently active
@@ -315,7 +320,7 @@ public partial class UnsafeNative
     public static IntPtr ResolveParentForDialogWindow()
     {
         IntPtr result;
-        if (System.Windows.Application.Current != null && 
+        if (System.Windows.Application.Current != null &&
             System.Windows.Application.Current.Dispatcher.CheckAccess())
         {
             if (System.Windows.Application.Current.MainWindow != null)
@@ -348,7 +353,7 @@ public partial class UnsafeNative
     {
         ActivateWindow(new WindowHandle(window));
     }
-    
+
     public static void ActivateWindow(IWindowHandle window)
     {
         ActivateWindow(window, TimeSpan.FromMilliseconds(500));
@@ -371,7 +376,7 @@ public partial class UnsafeNative
 
         log.Debug(() => $"Requesting window placement");
         var placement = User32.GetWindowPlacement(window.Handle);
-        log.Debug(() => $"Window placement: {new { placement.flags, placement.showCmd, placement.ptMaxPosition, placement.ptMinPosition }}");
+        log.Debug(() => $"Window placement: {new {placement.flags, placement.showCmd, placement.ptMaxPosition, placement.ptMinPosition}}");
         if (placement.showCmd == User32.WindowShowStyle.SW_SHOWMINIMIZED)
         {
             log.Debug(() => $"Restoring minimized window {window} to normal");
@@ -380,7 +385,7 @@ public partial class UnsafeNative
         }
 
         log.Debug(() => $"Bringing window to foreground");
-        var activationResult = SetForegroundWindow(log, window);
+        var activationResult = SetForegroundWindow(log, window, WindowActivationMethod);
         log.Debug(() => $"SetForegroundWindow returned {activationResult}");
 
         var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
@@ -408,7 +413,7 @@ public partial class UnsafeNative
             Thread.Sleep(10);
         }
     }
-    
+
     public static void ActivateWindow(IWindowHandle window, TimeSpan timeout)
     {
         ActivateWindow(window, timeout, Log.WithSuffix(window));
@@ -421,12 +426,94 @@ public partial class UnsafeNative
 
     public static bool SetForegroundWindow(IWindowHandle hwnd)
     {
-        return SetForegroundWindow(Log.WithSuffix(hwnd), hwnd);
+        return SetForegroundWindow(Log.WithSuffix(hwnd), hwnd, WindowActivationMethod);
     }
-    
-    public static bool SetForegroundWindow(IFluentLog log, IWindowHandle hwnd)
+
+    public static bool SetForegroundWindow(IFluentLog log, IWindowHandle hwnd, UnsafeWindowActivationMethod activationMethod)
     {
-        log.Debug(() => $"Initiating SetForegroundWindow");
+        return activationMethod switch
+        {
+            UnsafeWindowActivationMethod.AttachThreadInput => SetForegroundWindowWithAttachInput(log, hwnd),
+            UnsafeWindowActivationMethod.SendInput => SetForegroundWindowWithSendInputHack(log, hwnd),
+            var _ => SetForegroundWindowWithSendInputHack(log, hwnd)
+        };
+    }
+
+    public static bool SetForegroundWindowWithSendInputHack(IFluentLog log, IWindowHandle hwnd)
+    {
+        log.Debug(() => $"Initiating SetForegroundWindow({hwnd}) via SendInput hack");
+        var initialForegroundWindow = GetForegroundWindow();
+
+        if (User32.IsIconic(hwnd.Handle))
+        {
+            log.Debug(() => "Window is minimized, restoring its state");
+            User32.ShowWindow(hwnd.Handle, User32.WindowShowStyle.SW_RESTORE);
+        }
+
+        if (hwnd.Handle == initialForegroundWindow)
+        {
+            log.Debug(() => $"Window is already foreground");
+            return true;
+        }
+
+        var inputs = new User32.INPUT[]
+        {
+            new()
+            {
+                type = User32.InputType.INPUT_MOUSE,
+                Inputs = new User32.INPUT.InputUnion
+                {
+                    mi = new User32.MOUSEINPUT
+                    {
+                        dx = 0,
+                        dy = 0,
+                        mouseData = 0,
+                        dwFlags = User32.MOUSEEVENTF.MOUSEEVENTF_MOVE,
+                        time = 0,
+                        dwExtraInfo_IntPtr = IntPtr.Zero
+                    }
+                }
+            }
+        };
+        var eventsSent = User32.SendInput(inputs.Length, inputs, Marshal.SizeOf<User32.INPUT>());
+        if (eventsSent != inputs.Length)
+        {
+            log.Warn($"Failed to SendInput events, expected {inputs.Length}, got {eventsSent}");
+        }
+
+        var maxAttempts = 5;
+        var attemptIdx = 0;
+        while (!AttemptSetForegroundWindow(log, hwnd))
+        {
+            if (attemptIdx >= maxAttempts)
+            {
+                log.Debug(() => $"Failed to SetForegroundWindow miserably after {maxAttempts} attempts");
+                return false;
+            }
+            else
+            {
+                log.Debug(() => $"Failed to SetForegroundWindow, attempt {attemptIdx + 1}/{maxAttempts}");
+            }
+
+            attemptIdx++;
+        }
+
+        log.Debug(() => $"SetForegroundWindow succeeded on attempt {attemptIdx + 1}/{maxAttempts}");
+
+        log.Debug(() => "SetForegroundWindow succeeded, bringing window to top...");
+        Win32ErrorCode error;
+        
+        if (!BringWindowToTop(hwnd.Handle) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        {
+            log.Warn($"Could not SetForegroundWindow.BringWindowToTop, error: {error}");
+        }
+
+        return true;
+    }
+
+    public static bool SetForegroundWindowWithAttachInput(IFluentLog log, IWindowHandle hwnd)
+    {
+        log.Debug(() => $"Initiating SetForegroundWindow({hwnd}) with AttachInput");
         var initialForegroundWindow = GetForegroundWindow();
 
         if (User32.IsIconic(hwnd.Handle))
@@ -492,6 +579,7 @@ public partial class UnsafeNative
             log.Warn($"Failed to SetFocus, error: {Kernel32.GetLastError()}, focused: {new WindowHandle(focused)}");
             return false;
         }
+
         return true;
     }
 
@@ -502,7 +590,7 @@ public partial class UnsafeNative
         log.Debug(() => $"Call result for SetForegroundWindow is {result}, double-checking...");
         var sw = Stopwatch.StartNew();
         IntPtr foregroundWindow;
-        while ((foregroundWindow = GetForegroundWindow()) != window.Handle && 
+        while ((foregroundWindow = GetForegroundWindow()) != window.Handle &&
                User32.GetWindow(foregroundWindow, User32.GetWindowCommands.GW_OWNER) != window.Handle)
         {
             if (sw.Elapsed > MinWindowActivationTimeout)
@@ -512,6 +600,7 @@ public partial class UnsafeNative
                     log.Debug($"SetForegroundWindow result is OK, but failed to wait for GetForegroundWindow to become {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window is null");
                     break;
                 }
+
                 log.Debug($"Failed to SetForegroundWindow {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
                 return false;
             }
@@ -533,7 +622,7 @@ public partial class UnsafeNative
 
     private sealed class MainWindowThreadResolver
     {
-        private static readonly Lazy<MainWindowThreadResolver> InstanceSupplier = new Lazy<MainWindowThreadResolver>();
+        private static readonly Lazy<MainWindowThreadResolver> InstanceSupplier = new();
         private int mainWindowThreadId;
 
         public static MainWindowThreadResolver Instance => InstanceSupplier.Value;
