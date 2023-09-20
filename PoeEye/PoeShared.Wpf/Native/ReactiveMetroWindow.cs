@@ -225,7 +225,17 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 if (wp.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE))
                 {
                     // window reordering
-                    Log.WithSuffix(msg).Debug(() => $"Window position has being updated w/o move/resize, flags: {wp.flags}");
+                    Log.WithSuffix(msg).Debug(() => $"Window position is being updated w/o move/resize, flags: {wp.flags}");
+                    break;
+                }
+
+                /* When a window is minimized, Windows doesn't actually move the window off-screen in the sense of simply placing it somewhere far away from the visible display area.
+                 * Instead, Windows gives it a specific off-screen position, which is at the coordinates (-32000, -32000). 
+                 * This is a special coordinate used internally by the windowing system to denote minimized windows.
+                 * If you were to enumerate all windows on the system and check their positions, any window that is minimized would report this position. */
+                if (wp is {x: -32000, y: -32000})
+                {
+                    Log.WithSuffix(msg).Debug(() => $"Window position is being updated w/o move/resize due to minimize/maximize operation");
                     break;
                 }
                 var newBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);

@@ -13,6 +13,10 @@ public interface IWindowViewController : IDisposableReactiveObject, IViewControl
     IObservable<Unit> WhenLoaded { get; }
         
     IObservable<Unit> WhenUnloaded { get; }
+    
+    IObservable<Unit> WhenDeactivated { get; }
+    
+    IObservable<Unit> WhenActivated { get; }
 
     IObservable<Unit> WhenClosed { get; }
         

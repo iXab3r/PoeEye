@@ -39,12 +39,13 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
                 Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
             .Take(1);
 
-        WhenKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.KeyUp += h, h => Window.KeyUp -= h).Select(x => x.EventArgs);
-        WhenKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.KeyDown += h, h => Window.KeyDown -= h).Select(x => x.EventArgs);
-        WhenPreviewKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.PreviewKeyDown += h, h => Window.PreviewKeyDown -= h).Select(x => x.EventArgs);
-        WhenPreviewKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => Window.PreviewKeyUp += h, h => Window.PreviewKeyUp -= h).Select(x => x.EventArgs);
+        WhenKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.KeyUp += h, h => owner.KeyUp -= h).Select(x => x.EventArgs);
+        WhenKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.KeyDown += h, h => owner.KeyDown -= h).Select(x => x.EventArgs);
+        WhenPreviewKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.PreviewKeyDown += h, h => owner.PreviewKeyDown -= h).Select(x => x.EventArgs);
+        WhenPreviewKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.PreviewKeyUp += h, h => owner.PreviewKeyUp -= h).Select(x => x.EventArgs);
         WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
         WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
+        WhenActivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Activated += h, h => owner.Activated -= h).ToUnit();
         WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
 
         this.WhenAnyValue(x => x.Topmost)
@@ -81,6 +82,8 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
         
     public IObservable<Unit> WhenClosed { get; }
  
+    public IObservable<Unit> WhenActivated { get; }
+    
     public IObservable<Unit> WhenDeactivated { get; }
         
     public IObservable<CancelEventArgs> WhenClosing { get; }
