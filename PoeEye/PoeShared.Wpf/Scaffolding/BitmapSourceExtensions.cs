@@ -6,12 +6,29 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using ByteSizeLib;
+using PoeShared.Logging;
 using Point = System.Drawing.Point;
 
 namespace PoeShared.Scaffolding;
 
 public static class BitmapSourceExtensions
 {
+    private static readonly IFluentLog Log = typeof(BitmapSourceExtensions).PrepareLogger();
+
+    public static Bitmap ToBitmapSafe(this BitmapSource source)
+    {
+        try
+        {
+            return source.ToBitmap();
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to convert BitmapSource to bitmap", e);
+            return null;
+        }
+    }
+    
     public static Bitmap ToBitmap(this BitmapSource source)
     {
         var bmp = new Bitmap(
@@ -41,6 +58,19 @@ public static class BitmapSourceExtensions
 
     [DllImport("gdi32")]
     private static extern int DeleteObject(IntPtr o);
+
+    public static BitmapSource ToBitmapSourceSafe(this byte[] data)
+    {
+        try
+        {
+            return data.ToBitmapSource();
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to convert data({ByteSize.FromBytes(data.Length)}) to BitmapSource", e);
+            return null;
+        }
+    }
     
     public static BitmapSource ToBitmapSource(this byte[] data)
     {
