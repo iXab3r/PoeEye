@@ -50,8 +50,8 @@ internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSe
         Guard.ArgumentNotNull(container, nameof(container));
         this.modulesEnumerator = modulesEnumerator;
         this.container = container;
-        DefaultSize = new WinSize(600, 600);
-        MinSize = new WinSize(600, 200);
+        DefaultSize = new WinSize(650, 500);
+        MinSize = new WinSize(400, 200);
         Title = "SETTINGS";
         CloseCommand = CommandWrapper.Create(Close);
         SaveCommand = CommandWrapper.Create(SaveExecuted);
