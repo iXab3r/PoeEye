@@ -114,6 +114,7 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         };
         var behaviorToRemove = behaviors.Where(x => behaviorTypeToRemove.Contains(x.GetType())).ToArray();
         behaviors.RemoveMany(behaviorToRemove);
+        behaviors.Add(new RestoreWindowWhenActivatedXamlBehavior());
         Log.Debug(() => $"Removing the following behaviors: {behaviorToRemove.DumpToString()}");
     }
 
