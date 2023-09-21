@@ -44,6 +44,7 @@ public static class FileUtils
             throw new IOException($"Destination file '{destinationFile.FullName}' already exists.");
         }
 
+        var sw = Stopwatch.StartNew();
         Log.Debug($"Copying file {sourceFile.FullName} (exists: {sourceFile.Exists}{(sourceFile.Exists ? $" {ByteSize.FromBytes(sourceFile.Length)}" : "")}) => {destinationFile.FullName} (exists: {destinationFile.Exists}{(destinationFile.Exists ? $" {ByteSize.FromBytes(destinationFile.Length)}" : "")})");
         using var sourceStream = new FileStream(sourceFile.FullName, FileMode.Open, FileAccess.Read);
         using var destStream = new FileStream(destinationFile.FullName, FileMode.Create, FileAccess.Write);
@@ -54,11 +55,13 @@ public static class FileUtils
             destStream.Write(buffer, 0, bytesRead);
         }
         destinationFile.Refresh();
+        sw.Stop();
+        
         if (!destinationFile.Exists)
         {
             throw new FileNotFoundException($"Failed to copy file {sourceFile.FullName} to {destinationFile.FullName}");
         }
-        Log.Debug($"Copied file to {destinationFile.FullName}({ByteSize.FromBytes(destinationFile.Length)})");
+        Log.Debug($"Copied file to {destinationFile.FullName}({ByteSize.FromBytes(destinationFile.Length)} in {sw.ElapsedMilliseconds:F0}ms)");
     }
 
     public static void CopyDirectory(DirectoryInfo sourcePath, DirectoryInfo targetPath)
@@ -75,7 +78,10 @@ public static class FileUtils
             Directory.CreateDirectory(targetDir.FullName);
         }
 
-        foreach (var file in sourceDir.GetFiles())
+        var filesToCopy = sourceDir.GetFiles();
+        Log.Debug(() => $"Files to copy: {filesToCopy.Length}");
+
+        foreach (var file in filesToCopy)
         {
             if (!fileFilter(file))
             {
@@ -95,12 +101,13 @@ public static class FileUtils
             Log.Debug(() => @$"Copied to {targetFilePath} ({ByteSize.FromBytes(targetFile.Length)})");
         }
 
-        foreach (var diSourceSubDir in sourceDir.GetDirectories())
+        var foldersToCopy = sourceDir.GetDirectories();
+        Log.Debug(() => $"Folders to copy: {foldersToCopy.Length}");
+        foreach (var folderToCopy in foldersToCopy)
         {
-            var nextTargetSubDir = targetDir.CreateSubdirectory(diSourceSubDir.Name);
-            CopyDirectory(diSourceSubDir, nextTargetSubDir, fileFilter);
+            var targetDirectory = new DirectoryInfo(Path.Combine(targetDir.FullName, folderToCopy.Name));
+            CopyDirectory(folderToCopy, targetDirectory, fileFilter);
         }
-
         Log.Debug(() => $"Copied folder with all content {sourceDir} to {targetDir}");
     }
 
