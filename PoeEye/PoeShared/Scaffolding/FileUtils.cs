@@ -80,7 +80,7 @@ public static class FileUtils
         }
 
         var filesToCopy = sourceDir.GetFiles();
-        Log.Debug(() => $"Files to copy: {filesToCopy.Length}\n\t{filesToCopy.Select(x => x.FullName).DumpToTable()}");
+        Log.Debug(() => $"Files to copy: {filesToCopy.Length}\n\t{filesToCopy.Select(x => $"{x.FullName} (exists: {x.Exists})").DumpToTable()}");
 
         foreach (var fileToCopy in filesToCopy)
         {
@@ -109,7 +109,7 @@ public static class FileUtils
         }
 
         var foldersToCopy = sourceDir.GetDirectories();
-        Log.Debug(() => $"Folders to copy: {foldersToCopy.Length}\n\t{foldersToCopy.Select(x => x.FullName).DumpToTable()}");
+        Log.Debug(() => $"Folders to copy: {foldersToCopy.Length}\n\t{foldersToCopy.Select(x => $"{x.FullName} (exists: {x.Exists})").DumpToTable()}");
         foreach (var folderToCopy in foldersToCopy)
         {
             if (!folderToCopy.Exists)
@@ -118,7 +118,14 @@ public static class FileUtils
                 continue;
             }
             var targetDirectory = new DirectoryInfo(Path.Combine(targetDir.FullName, folderToCopy.Name));
-            CopyDirectory(folderToCopy, targetDirectory, fileFilter);
+            try
+            {
+                CopyDirectory(folderToCopy, targetDirectory, fileFilter);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Log.Warn($"Virtualization error - folder seems to exist, but in fact it does not: {folderToCopy.FullName}");
+            }
         }
         Log.Debug(() => $"Copied folder with all content {sourceDir} to {targetDir}");
     }
