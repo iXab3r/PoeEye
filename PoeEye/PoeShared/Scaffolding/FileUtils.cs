@@ -31,7 +31,11 @@ public static class FileUtils
     public static void CopyDirectory(DirectoryInfo sourceDir, DirectoryInfo targetDir, Predicate<FileInfo> fileFilter)
     {
         Log.Debug(() => $"Copying folder with all content {sourceDir} to {targetDir}");
-        Directory.CreateDirectory(targetDir.FullName);
+        if (!Directory.Exists(targetDir.FullName))
+        {
+            Log.Debug(() => $"Creating target directory {targetDir}");
+            Directory.CreateDirectory(targetDir.FullName);
+        }
 
         foreach (var file in sourceDir.GetFiles())
         {
