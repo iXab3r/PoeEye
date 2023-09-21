@@ -1,4 +1,6 @@
-﻿namespace PoeShared.Scaffolding;
+﻿using ByteSizeLib;
+
+namespace PoeShared.Scaffolding;
 
 public static class FileUtils
 {
@@ -45,8 +47,16 @@ public static class FileUtils
                 continue;
             }
 
-            Log.Debug(() => @$"Copying {targetDir.FullName}\{file.Name}");
-            file.CopyTo(Path.Combine(targetDir.FullName, file.Name), true);
+            var targetFilePath = Path.Combine(targetDir.FullName, file.Name);
+            Log.Debug(() => @$"Copying {file.FullName} ({ByteSize.FromBytes(file.Length)}) => {targetFilePath}");
+            file.CopyTo(targetFilePath, true);
+            var targetFile = new FileInfo(targetFilePath);
+            if (!targetFile.Exists)
+            {
+                throw new InvalidStateException($"Failed to copy file {file.FullName} to {targetFilePath}");
+            }
+
+            Log.Debug(() => @$"Copied to {targetFilePath} ({ByteSize.FromBytes(targetFile.Length)})");
         }
 
         foreach (var diSourceSubDir in sourceDir.GetDirectories())
