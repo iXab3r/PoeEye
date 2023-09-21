@@ -71,6 +71,7 @@ public static class FileUtils
 
     public static void CopyDirectory(DirectoryInfo sourceDir, DirectoryInfo targetDir, Predicate<FileInfo> fileFilter)
     {
+        //FIXME This method contains a bunch of virtualization hacks, in some cases files returned by enumeration even though there are no such files/folders
         Log.Debug(() => $"Copying folder with all content {sourceDir} to {targetDir}");
         if (!Directory.Exists(targetDir.FullName))
         {
@@ -79,32 +80,43 @@ public static class FileUtils
         }
 
         var filesToCopy = sourceDir.GetFiles();
-        Log.Debug(() => $"Files to copy: {filesToCopy.Length}");
+        Log.Debug(() => $"Files to copy: {filesToCopy.Length}\n\t{filesToCopy.Select(x => x.FullName).DumpToTable()}");
 
-        foreach (var file in filesToCopy)
+        foreach (var fileToCopy in filesToCopy)
         {
-            if (!fileFilter(file))
+            if (!fileFilter(fileToCopy))
             {
-                Log.Debug(() => $"Skipping file {file.FullName}");
+                Log.Debug(() => $"Skipping file {fileToCopy.FullName}");
+                continue;
+            }
+            
+            if (!fileToCopy.Exists)
+            {
+                Log.Warn($"Virtualization error - file seems to exist, but in fact it does not: {fileToCopy.FullName}");
                 continue;
             }
 
-            var targetFilePath = Path.Combine(targetDir.FullName, file.Name);
-            Log.Debug(() => @$"Copying {file.FullName} ({ByteSize.FromBytes(file.Length)}) => {targetFilePath}");
-            CopyFile(file.FullName, targetFilePath, overwrite: true);
+            var targetFilePath = Path.Combine(targetDir.FullName, fileToCopy.Name);
+            Log.Debug(() => @$"Copying {fileToCopy.FullName} ({ByteSize.FromBytes(fileToCopy.Length)}) => {targetFilePath}");
+            CopyFile(fileToCopy.FullName, targetFilePath, overwrite: true);
             var targetFile = new FileInfo(targetFilePath);
             if (!targetFile.Exists)
             {
-                throw new InvalidStateException($"Failed to copy file {file.FullName} to {targetFilePath}");
+                throw new InvalidStateException($"Failed to copy file {fileToCopy.FullName} to {targetFilePath}");
             }
 
             Log.Debug(() => @$"Copied to {targetFilePath} ({ByteSize.FromBytes(targetFile.Length)})");
         }
 
         var foldersToCopy = sourceDir.GetDirectories();
-        Log.Debug(() => $"Folders to copy: {foldersToCopy.Length}");
+        Log.Debug(() => $"Folders to copy: {foldersToCopy.Length}\n\t{foldersToCopy.Select(x => x.FullName).DumpToTable()}");
         foreach (var folderToCopy in foldersToCopy)
         {
+            if (!folderToCopy.Exists)
+            {
+                Log.Warn($"Virtualization error - folder seems to exist, but in fact it does not: {folderToCopy.FullName}");
+                continue;
+            }
             var targetDirectory = new DirectoryInfo(Path.Combine(targetDir.FullName, folderToCopy.Name));
             CopyDirectory(folderToCopy, targetDirectory, fileFilter);
         }
