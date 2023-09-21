@@ -39,6 +39,10 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
         this.WhenAnyValue(x => x.Parent.ResortWhen)
             .SubscribeSafe(x => ResortWhen = x, Log.HandleUiException)
             .AddTo(Anchors);
+        
+        this.WhenAnyValue(x => x.Parent.RefreshWhen)
+            .SubscribeSafe(x => RefreshWhen = x, Log.HandleUiException)
+            .AddTo(Anchors);
             
         this.WhenAnyValue(x => x.Parent.SortComparer)
             .SubscribeSafe(x => SortComparer = x, Log.HandleUiException)
@@ -47,8 +51,13 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
         var resort = this.WhenAnyValue(x => x.ResortWhen)
             .Select(x => x != null ? x(this) : Observable.Return(Unit.Default))
             .Switch();
+        var refresh = this.WhenAnyValue(x => x.RefreshWhen)
+            .Select(x => x != null ? x(this) : Observable.Never(Unit.Default))
+            .Select(x => x)
+            .Switch();
         children
             .Connect()
+            .AutoRefreshOnObservableSynchronized(model => refresh)
             .Sort(this.WhenAnyValue(x => x.SortComparer).Select(x => x ?? DefaultComparer), SortOptions.None, resort) // DynamicData 7+ REQUIRES to have Comparer set to non-null
             .BindToCollection(out var chld)
             .SubscribeToErrors(Log.HandleUiException)
@@ -96,6 +105,8 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
 
     public bool MatchesFilter { get; } = true;
 
+    public Func<ITreeViewItemViewModel, IObservable<Unit>> RefreshWhen { get; set; }
+    
     public IReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
     public IObservableList<ITreeViewItemViewModel> ChildrenList { get; }
     public Func<ITreeViewItemViewModel, IObservable<bool>> Filter { get; set; }
