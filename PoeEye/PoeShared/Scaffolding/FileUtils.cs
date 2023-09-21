@@ -25,6 +25,42 @@ public static class FileUtils
         }
     }
 
+    /// <summary>
+    /// Copies a file from a source path to a destination path.
+    /// This method uses low-level file streams instead of File.Copy (which uses Kernel32.CopyFileEx internally) to make it more compatible with file system virtualization methods
+    /// which often(at least 2 of them) forget to hook them
+    /// </summary>
+    /// <param name="sourcePath">The path of the source file to be copied.</param>
+    /// <param name="destinationPath">The path to where the file should be copied.</param>
+    /// <param name="overwrite">A boolean value indicating whether an existing file at the destination path should be overwritten. If set to false and a file exists, an exception will be thrown.</param>
+    /// <param name="bufferSize">Buffer size, most SSDs prefer larger buffer(512KB+)</param>
+    /// <exception cref="IOException">Thrown when the destination file already exists and overwrite parameter is set to false, or any other IO error occurs.</exception>
+    public static void CopyFile(string sourcePath, string destinationPath, bool overwrite, int bufferSize = 512 * 1024)
+    {
+        var sourceFile = new FileInfo(sourcePath);
+        var destinationFile = new FileInfo(destinationPath);
+        if (!overwrite && destinationFile.Exists)
+        {
+            throw new IOException($"Destination file '{destinationFile.FullName}' already exists.");
+        }
+
+        Log.Debug($"Copying file {sourceFile.FullName} (exists: {sourceFile.Exists}{(sourceFile.Exists ? $" {ByteSize.FromBytes(sourceFile.Length)}" : "")}) => {destinationFile.FullName} (exists: {destinationFile.Exists}{(destinationFile.Exists ? $" {ByteSize.FromBytes(destinationFile.Length)}" : "")})");
+        using var sourceStream = new FileStream(sourceFile.FullName, FileMode.Open, FileAccess.Read);
+        using var destStream = new FileStream(destinationFile.FullName, FileMode.Create, FileAccess.Write);
+        var buffer = new byte[bufferSize]; 
+        int bytesRead;
+        while ((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            destStream.Write(buffer, 0, bytesRead);
+        }
+        destinationFile.Refresh();
+        if (!destinationFile.Exists)
+        {
+            throw new FileNotFoundException($"Failed to copy file {sourceFile.FullName} to {destinationFile.FullName}");
+        }
+        Log.Debug($"Copied file to {destinationFile.FullName}({ByteSize.FromBytes(destinationFile.Length)})");
+    }
+
     public static void CopyDirectory(DirectoryInfo sourcePath, DirectoryInfo targetPath)
     {
         CopyDirectory(sourcePath, targetPath, x => true);
@@ -49,7 +85,7 @@ public static class FileUtils
 
             var targetFilePath = Path.Combine(targetDir.FullName, file.Name);
             Log.Debug(() => @$"Copying {file.FullName} ({ByteSize.FromBytes(file.Length)}) => {targetFilePath}");
-            file.CopyTo(targetFilePath, true);
+            CopyFile(file.FullName, targetFilePath, overwrite: true);
             var targetFile = new FileInfo(targetFilePath);
             if (!targetFile.Exists)
             {
