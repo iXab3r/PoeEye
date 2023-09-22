@@ -90,8 +90,16 @@ public static class DirectoryInfoExtensions
                     {
                         continue;
                     }
-                    var subdirFiles = dirInfo.GetFilesSafe(searchPattern, searchOption);
-                    result.AddRange(subdirFiles);
+
+                    try
+                    {
+                        var subdirFiles = dirInfo.GetFilesSafe(searchPattern, searchOption);
+                        result.AddRange(subdirFiles);
+                    }
+                    catch (DirectoryNotFoundException e)
+                    {
+                        Log.Warn($"Virtualization error - folder seems to exist, but in fact it does not: {dirInfo.FullName}", e);
+                    }
                 }
             }
             catch (UnauthorizedAccessException ex)
