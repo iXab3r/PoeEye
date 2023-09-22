@@ -90,7 +90,7 @@ public static class DirectoryInfoExtensions
                     {
                         continue;
                     }
-                    var subdirFiles = dirInfo.GetFilesSafe(searchPattern);
+                    var subdirFiles = dirInfo.GetFilesSafe(searchPattern, searchOption);
                     result.AddRange(subdirFiles);
                 }
             }
