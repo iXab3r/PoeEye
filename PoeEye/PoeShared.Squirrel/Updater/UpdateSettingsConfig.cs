@@ -12,6 +12,8 @@ public sealed record UpdateSettingsConfig : IPoeEyeConfigVersioned
     public string UpdateSourceId { get; set; }
 
     public bool IgnoreDeltaUpdates { get; set; } = true;
+    
+    public bool AutomaticallyDownloadUpdates { get; set; } = false;
 
     public int Version { get; set; } = 11;
 }

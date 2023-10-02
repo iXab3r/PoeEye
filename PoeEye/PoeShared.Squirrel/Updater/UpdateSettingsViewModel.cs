@@ -50,6 +50,8 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
     
     public bool IgnoreDeltaUpdates { get; set; }
     
+    public bool AutomaticallyDownloadUpdates { get; set; }
+    
     public IReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         
     public Task Load(UpdateSettingsConfig config)
@@ -57,6 +59,7 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
         CheckForUpdates = config.AutoUpdateTimeout > TimeSpan.Zero;
         UpdateSource = KnownSources.FirstOrDefault(x => x.Id == config.UpdateSourceId);
         IgnoreDeltaUpdates = config.IgnoreDeltaUpdates;
+        AutomaticallyDownloadUpdates = config.AutomaticallyDownloadUpdates;
         return Task.CompletedTask;
     }
 
@@ -66,7 +69,8 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
         {
             AutoUpdateTimeout = CheckForUpdates ? UpdateSettingsConfig.DefaultAutoUpdateTimeout : TimeSpan.Zero,
             UpdateSourceId = UpdateSource?.Id,
-            IgnoreDeltaUpdates = IgnoreDeltaUpdates
+            IgnoreDeltaUpdates = IgnoreDeltaUpdates,
+            AutomaticallyDownloadUpdates = AutomaticallyDownloadUpdates
         };
         return updatedConfig;
     }

@@ -12,6 +12,7 @@ using System.Windows;
 using ByteSizeLib;
 using DynamicData;
 using DynamicData.Binding;
+using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
@@ -126,6 +127,11 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             .ListenTo(x => x.IgnoreDeltaUpdates)
             .SubscribeSafe(x => updaterModel.IgnoreDeltaUpdates = x, Log.HandleUiException)
             .AddTo(Anchors);
+            
+        configProvider
+            .ListenTo(x => x.AutomaticallyDownloadUpdates)
+            .SubscribeSafe(x => AutomaticallyDownloadUpdates = x, Log.HandleUiException)
+            .AddTo(Anchors);
 
         Observable.Merge(
                 configProvider
@@ -144,6 +150,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                     .Do(source => Log.Debug(() => $"Update source changed: {source}"))
                     .Select(x => new { open = false, silent = false, reason =  $"update source change" }),
                 Observable.Return(new { open = false, silent = false, reason = $"initial tick" }),
+                this.WhenAnyValue(x => x.AutomaticallyDownloadUpdates).Where(x => x).Skip(1).Select(x => new { open = true, silent = false, reason = $"settings changed, {nameof(AutomaticallyDownloadUpdates)} enabled" }),
                 checkForUpdatesCommandSink.Select(_ => new { open = true, silent = false, reason = $"user requested update" }))
             .ObserveOn(uiScheduler)
             .Do(x => Log.Debug(() => $"Checking for updates: {x}"))
@@ -182,7 +189,9 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public bool IsInErrorStatus { get; private set; }
     
-    public bool CanUpdateToLatest { get; private set; }
+    public bool CanUpdateToLatest { get; [UsedImplicitly] private set; }
+    
+    public bool AutomaticallyDownloadUpdates { get; private set; }
 
     public string StatusText { get; private set; }
 
@@ -296,7 +305,10 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             if (newVersion.ReleasesToApply.Any())
             {
                 SetStatus($"New version v{LatestVersion} is available");
-                await ApplyUpdateCommandExecuted(applyRelease: false);
+                if (AutomaticallyDownloadUpdates)
+                {
+                    await ApplyUpdateCommandExecuted(applyRelease: false);
+                }
             }
             else
             {

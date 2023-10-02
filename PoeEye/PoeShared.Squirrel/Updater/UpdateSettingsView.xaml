@@ -42,6 +42,10 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <TextBlock Text="Automatically download updates: " HorizontalAlignment="Right" IsEnabled="{Binding CheckForUpdates}"/>
+            <CheckBox IsChecked="{Binding AutomaticallyDownloadUpdates}"
+                      IsEnabled="{Binding CheckForUpdates}"
+                      ToolTip="The program will download updates as soon as they become available. You still can decide whether to apply an update or not." />
             <!-- Temporarily disabled - should be re-enabled only after supporting portable builds 
             <TextBlock Text="Download full updates: " HorizontalAlignment="Right" IsEnabled="{Binding CheckForUpdates}"/>
             <CheckBox IsChecked="{Binding IgnoreDeltaUpdates}"
