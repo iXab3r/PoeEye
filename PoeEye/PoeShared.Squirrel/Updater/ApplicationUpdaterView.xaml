@@ -27,7 +27,10 @@
                 <Grid Margin="10,0" DockPanel.Dock="Bottom">
                     <eye:ButtonEx
                         MinHeight="30"
+                        Width="250"
                         Command="{Binding RestartCommand}"
+                        Background="{StaticResource WarningBrush}"
+                        CornerRadius="2"
                         Icon="&#xf2d0;">
                         <eye:ButtonEx.Content>
                             <TextBlock Text="Restart application" />
@@ -44,6 +47,9 @@
 
                     <eye:ButtonEx
                         MinHeight="30"
+                        Width="250"
+                        Background="{StaticResource PositiveBrush}"
+                        CornerRadius="2"
                         Command="{Binding ApplyUpdateCommand}"
                         Icon="&#xF0ED;"
                         ToolTip="{Binding UpdateInfo}">

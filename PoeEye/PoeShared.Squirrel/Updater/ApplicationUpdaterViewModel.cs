@@ -40,6 +40,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     {
         Binder.Bind(x => x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
         Binder.Bind(x => x.LatestUpdate != null).OnScheduler(x => x.uiScheduler).To(x => x.CanUpdateToLatest);
+        Binder.Bind(x => x.LatestUpdate != null && x.LatestUpdate.ReleasesToApply.EmptyIfNull().Any()).OnScheduler(x => x.uiScheduler).To(x => x.HasUpdatesToInstall);
     }
 
     public ApplicationUpdaterViewModel(
@@ -190,6 +191,8 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     public bool IsInErrorStatus { get; private set; }
     
     public bool CanUpdateToLatest { get; [UsedImplicitly] private set; }
+    
+    public bool HasUpdatesToInstall { get; [UsedImplicitly] private set; }
     
     public bool AutomaticallyDownloadUpdates { get; private set; }
 

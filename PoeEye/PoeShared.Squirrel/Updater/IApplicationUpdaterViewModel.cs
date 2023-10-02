@@ -23,6 +23,8 @@ public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     bool IsInErrorStatus { get; }
     
     bool CanUpdateToLatest { get; }
+    
+    bool HasUpdatesToInstall { get; }
 
     string StatusText { get; }
         
