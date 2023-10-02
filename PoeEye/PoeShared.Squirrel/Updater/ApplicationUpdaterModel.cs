@@ -83,7 +83,36 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     public int ProgressPercent { get; private set; }
 
     public bool IsBusy { get; private set; }
+    
+    public async Task<bool> VerifyRelease(IPoeUpdateInfo updateInfo)
+    {
+        Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
+        
+        using var unused = CreateIsBusyAnchor();
+        using var mgr = await CreateManager();
+        using var progressTracker = new ComplexProgressTracker();
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
 
+        Log.Debug(() => $"Verifying update files {updateInfo}");
+        var verificationResult = await mgr.VerifyReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "VerifyRelease"));
+        Log.Debug(() => $"Verification result: {verificationResult}, update: {updateInfo}");
+        return verificationResult;
+    }
+
+    public async Task DownloadRelease(IPoeUpdateInfo updateInfo)
+    {
+        Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
+        
+        using var unused = CreateIsBusyAnchor();
+        using var mgr = await CreateManager();
+        using var progressTracker = new ComplexProgressTracker();
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
+
+        Log.Debug(() => $"Downloading release, update {updateInfo}");
+        var downloadedReleases = await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "DownloadRelease"));
+        Log.Warn($"Downloaded following releases:\n\t{downloadedReleases.DumpToTable()}");
+    }
+    
     public async Task ApplyRelease(IPoeUpdateInfo updateInfo)
     {
         Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
@@ -92,42 +121,28 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
         using var unused = CreateIsBusyAnchor();
         using var mgr = await CreateManager();
-            
+        using var progressTracker = new ComplexProgressTracker();
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
+        
         Log.Debug("Downloading releases...");
 
-        const string downloadReleaseTaskName = "DownloadRelease";
         const string applyReleaseTaskName = "ApplyRelease";
-        var progressByTask = new Dictionary<string, int>{ { downloadReleaseTaskName, 0 }, { applyReleaseTaskName, 0 } };
-        void CombinedProgressReporter(int progressPercent, string taskName)
-        {
-            progressByTask[taskName] = progressPercent;
-            var totalProgress = (int)progressByTask.Values.Average();
-            UpdateProgress(totalProgress, $"{taskName} {progressPercent}%");
-        }
-
-        var downloadedReleases = await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => CombinedProgressReporter(x, downloadReleaseTaskName));
-        Log.Warn($"Downloaded following releases:\n\t{downloadedReleases.DumpToTable()}");
 
         string newVersionFolder;
         if (appArguments.IsDebugMode)
         {
             Log.Warn("Debug mode detected, simulating update process without touching files");
             newVersionFolder = appArguments.AppDomainDirectory;
-            for (var i = 0; i < 20; i++)
-            {
-                CombinedProgressReporter(i*5, downloadReleaseTaskName);
-                await Task.Delay(500);
-            }
             for (var i = 0; i < 10; i++)
             {
-                CombinedProgressReporter(i*10, applyReleaseTaskName);
+                progressTracker.Update(i*10, applyReleaseTaskName);
                 await Task.Delay(500);
             }
         }
         else
         {
             Log.Debug(() => $"Applying releases: {updateInfo}");
-            newVersionFolder = await mgr.ApplyReleases(updateInfo, x => CombinedProgressReporter(x, applyReleaseTaskName));
+            newVersionFolder = await mgr.ApplyReleases(updateInfo, x => progressTracker.Update(x, applyReleaseTaskName));
         }
 
         var lastAppliedRelease = updateInfo.ReleasesToApply.Last();
@@ -244,12 +259,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
     }
 
-    private void UpdateProgress(int progressPercent, string taskName)
-    {
-        Log.Debug(() => $"{taskName} is in progress: {progressPercent}%");
-        ProgressPercent = progressPercent;
-    }
-
     private void CheckUpdateProgress(int progressPercent)
     {
         Log.Debug(() => $"Check update is in progress: {progressPercent}%");
@@ -267,4 +276,6 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
                 ProgressPercent = 0;
             });
     }
+
+   
 }

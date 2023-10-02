@@ -10,6 +10,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
+    
 
     <DataTemplate DataType="{x:Type updater1:ApplicationUpdaterViewModel}">
         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;
+using ReactiveUI;
 using Splat;
 using Squirrel;
 
@@ -21,6 +23,31 @@ internal class DownloadReleasesImpl : IEnableLogger
     {
         this.urlDownloader = urlDownloader;
         this.rootAppDirectory = rootAppDirectory;
+    }
+
+    public async Task<bool> VerifyReleases(
+        IReadOnlyCollection<IReleaseEntry> releasesToDownload,
+        Action<int> progress = null)
+    {
+        progress ??= _ => { };
+        using var progressTracker = new ComplexProgressTracker();
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => progress(x));
+
+        return await releasesToDownload.ToAsyncEnumerable()
+            .AllAsync(x =>
+            {
+                try
+                {
+                    return ValidateChecksum(x);
+                }
+                finally
+                {
+                    lock (progressTracker)
+                    {
+                        progressTracker.Update(100, x.Filename);
+                    }
+                }
+            });;
     }
 
     public async Task<IReadOnlyCollection<FileInfo>> DownloadReleases(
@@ -43,24 +70,35 @@ internal class DownloadReleasesImpl : IEnableLogger
                 async x =>
                 {
                     var targetFile = new FileInfo(Path.Combine(packagesDirectory, x.Filename));
-
-                    double component = 0;
-                    await DownloadRelease(
-                        updateUrlOrPath,
-                        x,
-                        urlDownloader,
-                        targetFile.FullName,
-                        p =>
-                        {
-                            lock (progress)
+                    
+                    if (!ValidateChecksum(x))
+                    {
+                        Log.Debug($"Downloading from {updateUrlOrPath} to {targetFile.FullName}");
+                        double component = 0;
+                        await DownloadRelease(
+                            updateUrlOrPath,
+                            x,
+                            urlDownloader,
+                            targetFile.FullName,
+                            p =>
                             {
-                                current -= component;
-                                component = toIncrement / 100.0 * p;
-                                progress((int) Math.Round(current += component));
-                            }
-                        });
-                    ChecksumPackage(x);
+                                lock (progress)
+                                {
+                                    current -= component;
+                                    component = toIncrement / 100.0 * p;
+                                    progress((int) Math.Round(current += component));
+                                }
+                            });
+                    }
+                    else
+                    {
+                        lock (progress)
+                        {
+                            progress((int) Math.Round(current += toIncrement));
+                        }
+                    }
 
+                    ChecksumPackage(x);
                     targetFile.AddTo(downloadedFiles);
                 });
         }
@@ -72,10 +110,13 @@ internal class DownloadReleasesImpl : IEnableLogger
                 {
                     var targetFile = new FileInfo(Path.Combine(packagesDirectory, x.Filename));
 
-                    File.Copy(
-                        Path.Combine(updateUrlOrPath, x.Filename),
-                        targetFile.FullName,
-                        true);
+                    if (!ValidateChecksum(x))
+                    {
+                        File.Copy(
+                            Path.Combine(updateUrlOrPath, x.Filename),
+                            targetFile.FullName,
+                            true);
+                    } 
 
                     lock (progress)
                     {
@@ -83,7 +124,6 @@ internal class DownloadReleasesImpl : IEnableLogger
                     }
 
                     ChecksumPackage(x);
-
                     targetFile.AddTo(downloadedFiles);
                 });
         }
@@ -119,34 +159,52 @@ internal class DownloadReleasesImpl : IEnableLogger
         }
     }
 
+    private string CalculateChecksum(FileInfo targetPackage)
+    {
+        using var file = targetPackage.OpenRead();
+        var hash = Utility.CalculateStreamSha1(file);
+        return hash;
+    }
+
+    private bool ValidateChecksum(IReleaseEntry downloadedRelease)
+    {
+        try
+        {
+            ChecksumPackage(downloadedRelease);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+    
     private void ChecksumPackage(IReleaseEntry downloadedRelease)
     {
-        var targetPackage = new FileInfo(
-            Path.Combine(rootAppDirectory, "packages", downloadedRelease.Filename));
+        var targetPackage = new FileInfo(Path.Combine(rootAppDirectory, "packages", downloadedRelease.Filename));
 
         if (!targetPackage.Exists)
         {
-            Log.Error($"File {targetPackage.FullName} should exist but doesn't");
+            Log.Debug($"File {targetPackage.FullName} should exist but doesn't");
 
             throw new Exception("Checksum file doesn't exist: " + targetPackage.FullName);
         }
 
         if (targetPackage.Length != downloadedRelease.Filesize)
         {
-            Log.Error($"File Length should be {downloadedRelease.Filesize}, is {targetPackage.Length}");
+            Log.Debug($"File Length should be {downloadedRelease.Filesize}, is {targetPackage.Length}");
             targetPackage.Delete();
 
             throw new Exception("Checksum file size doesn't match: " + targetPackage.FullName);
         }
 
-        using var file = targetPackage.OpenRead();
-        var hash = Utility.CalculateStreamSha1(file);
+        var hash = CalculateChecksum(targetPackage);
         if (hash.Equals(downloadedRelease.SHA1, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
 
-        Log.Error($"File SHA1 should be {downloadedRelease.SHA1}, is {hash}");
+        Log.Debug($"File SHA1 should be {downloadedRelease.SHA1}, is {hash}");
         targetPackage.Delete();
         throw new Exception("Checksum doesn't match: " + targetPackage.FullName);
     }

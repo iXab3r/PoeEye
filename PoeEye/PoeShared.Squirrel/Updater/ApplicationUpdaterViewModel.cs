@@ -3,10 +3,13 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows;
+using ByteSizeLib;
 using DynamicData;
 using DynamicData.Binding;
 using PoeShared.Modularity;
@@ -35,6 +38,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     static ApplicationUpdaterViewModel()
     {
         Binder.Bind(x => x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
+        Binder.Bind(x => x.LatestUpdate != null).OnScheduler(x => x.uiScheduler).To(x => x.CanUpdateToLatest);
     }
 
     public ApplicationUpdaterViewModel(
@@ -54,8 +58,12 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         this.updaterModel = updaterModel;
         this.uiScheduler = uiScheduler;
 
+        var checkForUpdatesCommandSink = new Subject<Unit>();
         CheckForUpdatesCommand = CommandWrapper
-            .Create(CheckForUpdatesCommandExecuted, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid));
+            .Create<object>(async x =>
+            {
+                checkForUpdatesCommandSink.OnNext(Unit.Default);
+            }, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid));
 
         CheckForUpdatesCommand
             .ThrownExceptions
@@ -127,23 +135,30 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                     .Select(
                         timeout => timeout.curr <= TimeSpan.Zero
                             ? Observable.Never<long>()
-                            : Observables.BlockingTimer(timeout.curr))
+                            : Observables.BlockingTimer(TimeSpan.FromSeconds(30)))
                     .Switch()
-                    .Select(_ => $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})"),
+                    .Select(_ => new { open = false, silent = true, reason = $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})" })
+                    .Skip(1),
                 updaterModel
                     .ObservableForProperty(x => x.UpdateSource, skipInitial: true)
                     .Do(source => Log.Debug(() => $"Update source changed: {source}"))
-                    .Select(x => $"update source change"))
+                    .Select(x => new { open = false, silent = false, reason =  $"update source change" }),
+                Observable.Return(new { open = false, silent = false, reason = $"initial tick" }),
+                checkForUpdatesCommandSink.Select(_ => new { open = true, silent = false, reason = $"user requested update" }))
             .ObserveOn(uiScheduler)
-            .Do(reason => Log.Debug(() => $"Checking for updates, reason: {reason}"))
-            .Where(x => CheckForUpdatesCommand.CanExecute(null))
-            .SubscribeSafe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
+            .Do(x => Log.Debug(() => $"Checking for updates: {x}"))
+            .Where(x => !IsBusy)
+            .SubscribeAsync(async x =>
+            {
+                
+                await CheckForUpdatesCommandExecuted(open: x.open, silent: x.silent);
+            })
             .AddTo(Anchors);
 
         ShowUpdaterCommand = CommandWrapper.Create<object>(ShowUpdaterCommandExecuted);
-        ApplyUpdateCommand = CommandWrapper.Create(
-            ApplyUpdateCommandExecuted,
-            this.WhenAnyValue(x => x.LatestUpdate).ObserveOn(uiScheduler).Select(x => x != null));
+        ApplyUpdateCommand = CommandWrapper.Create<object>(
+            x => ApplyUpdateCommandExecuted(applyRelease: x is bool b ? b : true),
+            this.WhenAnyValue(x => x.CanUpdateToLatest).ObserveOn(uiScheduler));
 
         OpenUri = CommandWrapper.Create<string>(OpenUriCommandExecuted);
         Binder.Attach(this).AddTo(Anchors);
@@ -166,6 +181,8 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     public CommandWrapper ShowUpdaterCommand { get; }
 
     public bool IsInErrorStatus { get; private set; }
+    
+    public bool CanUpdateToLatest { get; private set; }
 
     public string StatusText { get; private set; }
 
@@ -238,23 +255,28 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         });
     }
 
-    private async Task CheckForUpdatesCommandExecuted()
+    private async Task CheckForUpdatesCommandExecuted(bool open, bool silent)
     {
+        SetStatus("Checking for updates...");
         Log.Debug(() => $"Update check requested, source: {updaterModel.UpdateSource}");
-        if (CheckForUpdatesCommand.IsBusy || ApplyUpdateCommand.IsBusy)
+        
+        if (open)
+        {
+            await Task.Delay(UiConstants.ArtificialShortDelay); 
+            IsOpen = true;
+        }
+        
+        if (IsBusy)
         {
             Log.Debug("Update is already in progress");
-            IsOpen = true;
             return;
         }
 
-        SetStatus("Checking for updates...");
-        var sw = Stopwatch.StartNew();
-        LatestUpdate = default;
-        updaterModel.Reset();
-
         try
         {
+            var sw = Stopwatch.StartNew();
+            updaterModel.Reset();
+
             await updaterModel.CheckForUpdates();
 
             var timeToWait = sw.Elapsed - UiConstants.ArtificialShortDelay;
@@ -267,14 +289,14 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             var newVersion = updaterModel.LatestUpdate;
             if (newVersion == null)
             {
-                throw new ApplicationException($"Something went wrong - failed to get latest update info");
+                throw new ApplicationException($"Failed to get latest update info");
             }
             availableReleasesSource.EditDiff(newVersion.RemoteReleases);
             LatestUpdate = newVersion;
             if (newVersion.ReleasesToApply.Any())
             {
-                IsOpen = true;
                 SetStatus($"New version v{LatestVersion} is available");
+                await ApplyUpdateCommandExecuted(applyRelease: false);
             }
             else
             {
@@ -284,35 +306,55 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         catch (Exception ex)
         {
             Log.HandleException(ex);
-            IsOpen = true;
             SetError($"Failed to check for updates, UpdateSource: {UpdateSource} - {ex.Message}");
+            if (!silent)
+            {
+                IsOpen = true;
+            }
         }
     }
 
-    private async Task ApplyUpdateCommandExecuted()
+    private async Task ApplyUpdateCommandExecuted(bool applyRelease)
     {
         Log.Debug(() => $"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
-        if (CheckForUpdatesCommand.IsBusy || ApplyUpdateCommand.IsBusy)
+        if (ApplyUpdateCommand.IsBusy)
         {
             Log.Debug("Already in progress");
-            IsOpen = true;
             return;
         }
 
-        SetStatus($"Preparing update v{LatestVersion}...");
+        SetStatus($"Preparing to update to v{LatestVersion}...");
 
-        if (LatestUpdate == null)
+        var latestUpdate = LatestUpdate;
+        if (latestUpdate == null)
         {
-            throw new ApplicationException("Latest update must be specified");
+            throw new InvalidOperationException("Latest update must be specified");
         }
 
-        await Task.Delay(UiConstants.ArtificialLongDelay);
+        var sw = Stopwatch.StartNew();
 
         try
         {
-            await updaterModel.ApplyRelease(LatestUpdate);
+            SetStatus($"Verifying installation files v{LatestVersion} ({ByteSize.FromBytes(latestUpdate.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
+            var isVerified = await updaterModel.VerifyRelease(latestUpdate);
+            SetStatus($"Verified v{LatestVersion}");
+
+            if (!isVerified)
+            {
+                SetStatus($"Downloading v{LatestVersion} ({ByteSize.FromBytes(latestUpdate.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
+                await updaterModel.DownloadRelease(latestUpdate);
+                SetStatus($"Downloaded v{LatestVersion}");
+            }
+
+            if (!applyRelease)
+            {
+                return;
+            }
+
+            SetStatus($"Installing v{LatestVersion}...");
+            await updaterModel.ApplyRelease(latestUpdate);
             IsOpen = true;
-            SetStatus($"Successfully updated to v{LatestVersion}");
+            SetStatus($"Successfully updated to v{LatestVersion}, restarting...");
             LatestUpdate = default;
             await RestartCommandExecuted();
         }
@@ -321,6 +363,14 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             Log.HandleException(ex);
             IsOpen = true;
             SetError($"Failed to apply update to v{LatestVersion}, UpdateSource: {UpdateSource} - {ex.Message}");
+        }
+        finally
+        {
+            var timeToSleep = UiConstants.ArtificialShortDelay - sw.Elapsed;
+            if (timeToSleep > TimeSpan.Zero)
+            {
+                await Task.Delay(timeToSleep);
+            }
         }
     }
 

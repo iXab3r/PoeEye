@@ -41,6 +41,11 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
         return await SafeGet(x => x.DownloadReleases(releasesToDownload, progress));
     }
 
+    public async Task<bool> VerifyReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
+    {
+        return await SafeGet(x => x.VerifyReleases(releasesToDownload, progress));
+    }
+
     public async Task<string> ApplyReleases(
         IPoeUpdateInfo updateInfo,
         Action<int> progress = null)

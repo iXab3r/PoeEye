@@ -60,8 +60,9 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
             
         sw.Step("Update lock acquired");
         var checkForUpdate = new CheckForUpdateImpl(urlDownloader, RootAppDirectory);
+        var localReleasePath = Utility.LocalReleaseFileForAppDir(RootAppDirectory);
         var result = await checkForUpdate.CheckForUpdate(
-            Utility.LocalReleaseFileForAppDir(RootAppDirectory),
+            localReleasePath,
             UpdateUrlOrPath,
             ignoreDeltaUpdates,
             progress);
@@ -73,11 +74,25 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
     {
         using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToString()}", Log);
         using var updateLock = AcquireUpdateLock();
-            
         sw.Step("Update lock acquired");
+
+        sw.Step("Downloading releases");
         var downloadReleases = new DownloadReleasesImpl(urlDownloader, RootAppDirectory);
         var result = await downloadReleases.DownloadReleases(UpdateUrlOrPath, releasesToDownload, progress);
         sw.Step("Download completed");
+        return result;
+    }
+
+    public async Task<bool> VerifyReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
+    {
+        using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToString()}", Log);
+        using var updateLock = AcquireUpdateLock();
+        sw.Step("Update lock acquired");
+        
+        sw.Step("Verifying releases");
+        var downloadReleases = new DownloadReleasesImpl(urlDownloader, RootAppDirectory);
+        var result = await downloadReleases.VerifyReleases(releasesToDownload, progress);
+        sw.Step($"Verified releases, result: {result}");
         return result;
     }
 

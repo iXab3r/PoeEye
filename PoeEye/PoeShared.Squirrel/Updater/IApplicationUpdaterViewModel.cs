@@ -21,6 +21,8 @@ public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     CommandWrapper ShowUpdaterCommand { get; }
 
     bool IsInErrorStatus { get; }
+    
+    bool CanUpdateToLatest { get; }
 
     string StatusText { get; }
         

@@ -34,10 +34,14 @@ public interface IApplicationUpdaterModel : IDisposableReactiveObject
     /// </summary>
     Task CheckForUpdates();
 
+    Task<bool> VerifyRelease(IPoeUpdateInfo updateInfo);
+
     Task RestartApplication();
     
     Task RestartApplicationViaLauncher();
 
+    Task DownloadRelease([NotNull] IPoeUpdateInfo updateInfo);
+    
     Task ApplyRelease([NotNull] IPoeUpdateInfo updateInfo);
 
     void Reset();
