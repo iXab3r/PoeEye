@@ -18,6 +18,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.Services;
 using PoeShared.Squirrel.Core;
 using PoeShared.UI;
 using PropertyBinder;
@@ -35,10 +36,11 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     private readonly IScheduler uiScheduler;
     private readonly IFactory<IUpdaterWindowDisplayer> updateWindowDisplayer;
     private readonly IApplicationUpdaterModel updaterModel;
+    private readonly ISharedResourceLatch isBusyLatch;
 
     static ApplicationUpdaterViewModel()
     {
-        Binder.Bind(x => x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
+        Binder.Bind(x => x.isBusyLatch.IsBusy || x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
         Binder.Bind(x => x.LatestUpdate != null).OnScheduler(x => x.uiScheduler).To(x => x.CanUpdateToLatest);
         Binder.Bind(x => x.LatestUpdate != null && x.LatestUpdate.ReleasesToApply.EmptyIfNull().Any()).OnScheduler(x => x.uiScheduler).To(x => x.HasUpdatesToInstall);
     }
@@ -59,6 +61,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         this.updateWindowDisplayer = updateWindowDisplayer;
         this.updaterModel = updaterModel;
         this.uiScheduler = uiScheduler;
+        this.isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
 
         var checkForUpdatesCommandSink = new Subject<Unit>();
         CheckForUpdatesCommand = CommandWrapper
@@ -158,8 +161,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             .Where(x => !IsBusy)
             .SubscribeAsync(async x =>
             {
-                
-                await CheckForUpdatesCommandExecuted(open: x.open, silent: x.silent);
+                await CheckForUpdate(open: x.open, silent: x.silent);
             })
             .AddTo(Anchors);
 
@@ -267,23 +269,22 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         });
     }
 
-    private async Task CheckForUpdatesCommandExecuted(bool open, bool silent)
+    private async Task CheckForUpdate(bool open, bool silent)
     {
-        SetStatus("Checking for updates...");
-        Log.Debug(() => $"Update check requested, source: {updaterModel.UpdateSource}");
-        
-        if (open)
-        {
-            await Task.Delay(UiConstants.ArtificialShortDelay); 
-            IsOpen = true;
-        }
-        
         if (IsBusy)
         {
             Log.Debug("Update is already in progress");
             return;
         }
-
+        Log.Debug(() => $"Update check requested, source: {updaterModel.UpdateSource}");
+        SetStatus("Checking for updates...");
+        
+        using var isBusyRent = isBusyLatch.Rent();
+        if (open)
+        {
+            IsOpen = true;
+            await Task.Delay(UiConstants.ArtificialShortDelay); 
+        }
         try
         {
             var sw = Stopwatch.StartNew();
@@ -315,7 +316,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             }
             else
             {
-                SetStatus("No updates found");
+                SetStatus($"No updates in {updaterModel.UpdateSource.Name} channel, you're using the latest version");
             }
         }
         catch (Exception ex)
