@@ -22,7 +22,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
                 deviceProvider.Devices
                     .ToObservableChangeSet()
                     .Filter(x => !x.Equals(MMDeviceId.All)),
-                new[] {MMDeviceId.DefaultInput, MMDeviceId.DefaultOutput}.ToSourceListEx().ToObservableChangeSet()
+                new[] {MMDeviceId.DefaultInput, MMDeviceId.DefaultOutput}.AsSourceListEx().ToObservableChangeSet()
             }.Or()
             .ObserveOnDispatcher()
             .BindToCollection(out var devices)

@@ -76,7 +76,7 @@
                         <eye:ButtonEx.Visibility>
                             <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
                                 <MultiBinding.Bindings>
-                                    <Binding Path="LatestUpdate" Converter="{StaticResource NullToFalseConverter}" />
+                                    <Binding Path="CanUpdateToLatest" />
                                     <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
                                 </MultiBinding.Bindings>
                             </MultiBinding>

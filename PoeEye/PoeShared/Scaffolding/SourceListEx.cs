@@ -46,6 +46,8 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     public IObservable<int> CountChanged => sourceList.CountChanged;
 
     public IEnumerable<T> Items => sourceList.Items;
+    
+    public IReadOnlyObservableCollection<T> Collection => collection;
 
     public void Edit(Action<IExtendedList<T>> updateAction)
     {
@@ -78,4 +80,5 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
         add => collection.CollectionChanged += value;
         remove => collection.CollectionChanged -= value;
     }
+
 }

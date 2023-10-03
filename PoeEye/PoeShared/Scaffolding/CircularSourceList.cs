@@ -6,7 +6,7 @@ namespace PoeShared.Scaffolding;
 /// Not thread safe ! There is a bug in ChangeAwareList(?) that leads to ArgumentOutOfRange in some cases
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservableList<T>, ICollection<T>
+public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservableListEx<T>, ICollection<T>
 {
     private readonly int capacity;
     private readonly ISourceListEx<T> innerList = new SourceListEx<T>();
@@ -77,4 +77,6 @@ public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservabl
     {
         return GetEnumerator();
     }
+
+    public IReadOnlyObservableCollection<T> Collection => innerList.Collection;
 }

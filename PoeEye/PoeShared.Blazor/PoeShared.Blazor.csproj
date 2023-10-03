@@ -6,7 +6,7 @@
         <Copyright>Copyright © Xab3r 2023</Copyright>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <LangVersion>10</LangVersion>
+        <LangVersion>latest</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <OutputType>Library</OutputType>
         

@@ -175,6 +175,13 @@ public static class ChangeSetExtensions
         return source.ToSourceListEx();
     }
     
+    public static ISourceCacheEx<T, TKey> ToSourceCacheEx<T, TKey>(this ISourceCache<T, TKey> source)
+    {
+        Guard.ArgumentNotNull(source, nameof(source));
+
+        return new SourceCacheEx<T, TKey>(source);
+    }
+    
     public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
     {
         if (instance.TryGetValue(key, out var value))
@@ -294,8 +301,13 @@ public static class ChangeSetExtensions
         }
         return result.Value;
     }
+    
+    public static ISourceListEx<T> ToSourceListEx<T, TKey>(this IObservableCache<T, TKey> cache)
+    {
+        return cache.Connect().RemoveKey().ToSourceListEx();
+    }
 
-    public static ISourceListEx<T> ToSourceListEx<T>(this IEnumerable<T> items)
+    public static ISourceListEx<T> AsSourceListEx<T>(this IEnumerable<T> items)
     {
         return new SourceListEx<T>(items.ToSourceList());
     }
