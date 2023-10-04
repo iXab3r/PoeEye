@@ -61,11 +61,18 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
 
     public TOut Track<TOut>(Expression<Func<TContext, TOut>> selector)
     {
-        return changeDetector.Track(DataContext, selector);
+        return Track(DataContext, selector);
     }
     
-    public TOut Track<TContext, TOut>(TContext context, Expression<Func<TContext, TOut>> selector) where TContext : class
+    public TOut Track<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
     {
-        return changeDetector.Track(context, selector);
+        try
+        {
+            return changeDetector.Track(context, selector);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidStateException($"Failed to initialize change tracking in component {this} ({GetType()}) (data context: {DataContext}) for expression: {selector}{(ReferenceEquals(context, DataContext) ? "" : $", expression context: {context}")}", e);
+        }
     }
 }

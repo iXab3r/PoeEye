@@ -5,17 +5,23 @@ using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Reflection;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
 namespace PoeShared.Blazor.Internals;
 
-internal sealed record ChangeTracker<TContext, TOut> : IChangeTracker where TContext : class
+internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TContext : class
 {
+    private static readonly IFluentLog Log = typeof(ChangeTracker<TContext, TOut>).PrepareLogger();
+
     // ReSharper disable once StaticMemberInGenericType
-    private static readonly MethodInfo AsEnumerableMethod = typeof(Enumerable).GetMethod(nameof(Enumerable.AsEnumerable)) ?? throw new MissingMethodException($"Failed to find method {nameof(Enumerable.AsEnumerable)} in {typeof(Enumerable)}");
-    private static readonly MethodInfo AttachDependencyAsEnumerableMethod = typeof(ChangeTracker<TContext, TOut>).GetMethod(nameof(AttachDependencyAsEnumerable), BindingFlags.NonPublic | BindingFlags.Static) ?? throw new MissingMethodException($"Failed to find method {nameof(Enumerable.AsEnumerable)} in {typeof(Enumerable)}");
-    
+    private static readonly MethodInfo AsEnumerableMethod = typeof(Enumerable).GetMethod(nameof(Enumerable.AsEnumerable))
+                                                            ?? throw new MissingMethodException($"Failed to find method {nameof(Enumerable.AsEnumerable)} in {typeof(Enumerable)}");
+
+    private static readonly MethodInfo AttachDependencyAsEnumerableMethod = typeof(ChangeTracker<TContext, TOut>).GetMethod(nameof(AttachDependencyAsEnumerable), BindingFlags.NonPublic | BindingFlags.Static)
+                                                                            ?? throw new MissingMethodException($"Failed to find method {nameof(AttachDependencyAsEnumerableMethod)} in {typeof(ChangeTracker<TContext, TOut>)}");
+
     private readonly TContext context;
     private readonly Expression<Func<TContext, TOut>> selector;
     private readonly CompositeDisposable anchors = new();
@@ -25,6 +31,15 @@ internal sealed record ChangeTracker<TContext, TOut> : IChangeTracker where TCon
 
     public ChangeTracker(TContext context, Expression<Func<TContext, TOut>> selector)
     {
+        if (!IsParameterUsedAtLeastOnce(selector))
+        {
+            Log.Warn($"The parameter is not used in the expression body: {selector}, expecting that {selector.Body} will use it at least once");
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+        }
+
         this.context = context;
         this.selector = selector;
         StampExpression = selector.ToString();
@@ -57,12 +72,12 @@ internal sealed record ChangeTracker<TContext, TOut> : IChangeTracker where TCon
         {
             var revision = parent.revision++;
             parent.value = v;
-            parent.whenChanged.OnNext(new{ parent.context, value = v, revision, stamp });
+            parent.whenChanged.OnNext(new {parent.context, value = v, revision, stamp});
         });
         return binder;
     }
 
-    private static void AttachDependencyAsEnumerable<TItem>(PropertyRuleBuilder<TOut, TContext> propertyRuleBuilder, LambdaExpression selector) 
+    private static void AttachDependencyAsEnumerable<TItem>(PropertyRuleBuilder<TOut, TContext> propertyRuleBuilder, LambdaExpression selector)
     {
         var updatedSelector = AppendAsEnumerable<TItem>(selector);
         propertyRuleBuilder.WithDependency(updatedSelector);
@@ -131,5 +146,35 @@ internal sealed record ChangeTracker<TContext, TOut> : IChangeTracker where TCon
     public void Dispose()
     {
         anchors?.Dispose();
+    }
+
+    private static bool IsParameterUsedAtLeastOnce(Expression<Func<TContext, TOut>> expression)
+    {
+        var visitor = new ParameterUsageVisitor(expression.Parameters.Single());
+        visitor.Visit(expression.Body);
+
+        return visitor.ParameterUsed;
+    }
+
+    private class ParameterUsageVisitor : ExpressionVisitor
+    {
+        private readonly ParameterExpression parameter;
+
+        public bool ParameterUsed { get; private set; } = false;
+
+        public ParameterUsageVisitor(ParameterExpression parameter)
+        {
+            this.parameter = parameter ?? throw new ArgumentNullException(nameof(parameter));
+        }
+
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            if (node == parameter)
+            {
+                ParameterUsed = true;
+            }
+
+            return base.VisitParameter(node);
+        }
     }
 }
