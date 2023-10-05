@@ -26,6 +26,27 @@ public static class FileUtils
     }
 
     /// <summary>
+    /// Creates a temporary copy of the specified file and returns a <see cref="FileStream"/> for it. 
+    /// The temporary file will be deleted upon closing the returned <see cref="FileStream"/>.
+    /// </summary>
+    /// <param name="sourceFile">Source file to be copied.</param>
+    /// <returns>A <see cref="FileStream"/> that provides access to the temporary copy of the file. The file is opened in read-write mode with read-write sharing and is set to be deleted upon closing the stream.</returns>
+    /// <exception cref="System.IO.IOException">Thrown when the file copy operation fails.</exception>
+    /// <remarks>
+    /// The method ensures the temporary file has a unique name by appending the original file name to a system-generated temporary file name.
+    /// </remarks>
+    public static FileInfo CopyFileToTemp(FileInfo sourceFile)
+    {
+        var fileName = Path.GetFileName(sourceFile.FullName);
+        var tempFilePath = Path.GetTempFileName();
+        var tempFileName = Path.GetFileNameWithoutExtension(tempFilePath);
+        var tempDirectory = Path.GetDirectoryName(tempFilePath) ?? throw new ArgumentException($"Failed to get temp file directory from {tempFilePath}");
+        var destinationPath = Path.Combine(tempDirectory, $"{Path.GetFileNameWithoutExtension(fileName)}_{tempFileName}{Path.GetExtension(fileName)}");
+
+        return CopyFile(sourceFile.FullName, destinationPath, overwrite: true);
+    }
+
+    /// <summary>
     /// Copies a file from a source path to a destination path.
     /// This method uses low-level file streams instead of File.Copy (which uses Kernel32.CopyFileEx internally) to make it more compatible with file system virtualization methods
     /// which often(at least 2 of them) forget to hook them
@@ -35,7 +56,7 @@ public static class FileUtils
     /// <param name="overwrite">A boolean value indicating whether an existing file at the destination path should be overwritten. If set to false and a file exists, an exception will be thrown.</param>
     /// <param name="bufferSize">Buffer size, most SSDs prefer larger buffer(512KB+)</param>
     /// <exception cref="IOException">Thrown when the destination file already exists and overwrite parameter is set to false, or any other IO error occurs.</exception>
-    public static void CopyFile(string sourcePath, string destinationPath, bool overwrite, int bufferSize = 512 * 1024)
+    public static FileInfo CopyFile(string sourcePath, string destinationPath, bool overwrite, int bufferSize = 512 * 1024)
     {
         var sourceFile = new FileInfo(sourcePath);
         var destinationFile = new FileInfo(destinationPath);
@@ -62,6 +83,7 @@ public static class FileUtils
             throw new FileNotFoundException($"Failed to copy file {sourceFile.FullName} to {destinationFile.FullName}");
         }
         Log.Debug($"Copied file to {destinationFile.FullName}({ByteSize.FromBytes(destinationFile.Length)} in {sw.ElapsedMilliseconds:F0}ms)");
+        return destinationFile;
     }
 
     public static void CopyDirectory(DirectoryInfo sourcePath, DirectoryInfo targetPath)
