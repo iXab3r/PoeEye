@@ -54,6 +54,8 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     
     public TimeSpan Elapsed => sw.Elapsed;
 
+    public bool IsEnabled => logger.IsEnabled(logLevel);
+
     public BenchmarkTimer ResetStep()
     {
         previousOperationTimestamp = sw.Elapsed;
