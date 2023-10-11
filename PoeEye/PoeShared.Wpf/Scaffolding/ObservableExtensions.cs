@@ -29,6 +29,28 @@ public static class ObservableExtensions
         return source
             .Select(x => dispatcher.CheckAccess() ? Observable.Return(x) : Observable.Return(x).ObserveOn(dispatcher)).Switch();
     }
+    
+    public static IObservable<T> EnsureOn<T>(this IObservable<T> source, IScheduler scheduler)
+    {
+        return scheduler switch
+        {
+            DispatcherScheduler dispatcherScheduler => EnsureOn(source, dispatcherScheduler.Dispatcher),
+            EnforcedThreadScheduler enforcedThreadScheduler => EnsureOn(source, enforcedThreadScheduler),
+            _ => throw new NotSupportedException($"Unsupported scheduler type: {scheduler}")
+        };
+    }
+    
+    public static IObservable<T> EnsureOn<T>(this IObservable<T> source, Dispatcher dispatcher)
+    {
+        return source
+            .Select(x => dispatcher.CheckAccess() ? x : throw new InvalidOperationException($"Expected that the message will be on dispatcher {dispatcher}"));
+    }
+    
+    public static IObservable<T> EnsureOn<T>(this IObservable<T> source, EnforcedThreadScheduler scheduler)
+    {
+        return source
+            .Select(x => scheduler.IsOnSchedulerThread ? x : throw new InvalidOperationException($"Expected that the message will be on thread {scheduler}"));
+    }
 
     public static IObservable<T> Suspend<T>(
         this IObservable<T> source,

@@ -91,6 +91,24 @@ public class SharedLog : DisposableReactiveObject
         repository.RaiseConfigurationChanged(EventArgs.Empty);
         Log.Warn(() => $"Logging level switched to '{loggingLevel}'");
     }
+    
+    public void SwitchImmediateFlush(bool immediateFlush)
+    {
+        var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
+
+        var updatedAppenders = new List<FileAppender>();
+        foreach (var appender in repository.GetAppenders().OfType<FileAppender>())
+        {
+            if (appender.ImmediateFlush == immediateFlush)
+            {
+                continue;
+            }
+            appender.ImmediateFlush = immediateFlush;
+            updatedAppenders.Add(appender);
+        }
+        repository.RaiseConfigurationChanged(EventArgs.Empty);
+        Log.Warn(() => $"ImmediateFlush switched to {immediateFlush} for {updatedAppenders.Count} appender(s):\n\t{updatedAppenders.Select(x => new { x.Name, x.File, x.Threshold, x.LockingModel }).DumpToTable()}");
+    }
 
     public IDisposable AddTraceAppender()
     {
