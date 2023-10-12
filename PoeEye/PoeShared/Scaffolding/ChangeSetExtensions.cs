@@ -151,7 +151,7 @@ public static class ChangeSetExtensions
     {
         var result = new ObservableCollectionEx<T>();
         collection = result;
-        var adaptor = new LoggingChangeSetAdaptor<T>(result);
+        var adaptor = new ObservableCollectionAdaptorEx<T>(result);
         return source.Adapt(adaptor); // never reset to avoid breaking PropertyBinder
     }
     
@@ -159,7 +159,7 @@ public static class ChangeSetExtensions
     {
         var result = new SynchronizedObservableCollectionEx<T>();
         collection = result;
-        var adaptor = new LoggingChangeSetAdaptor<T>(result);
+        var adaptor = new ObservableCollectionAdaptorEx<T>(result);
         return source.Adapt(adaptor); // never reset to avoid breaking PropertyBinder
     }
 
@@ -658,5 +658,15 @@ public static class ChangeSetExtensions
 
             return cache;
         }).Select(cache => cache.CaptureChanges()); //invoke capture changes to return the changeset
+    }
+    
+    public static IObservable<IChangeSet<T>> WithLogging<T>(this IObservable<IChangeSet<T>> source, string name = default, IFluentLog logger = default, FluentLogLevel logLevel = default)
+    {
+        return source.Adapt(new LoggingListChangeSetAdaptor<T>(name: name, logger: logger, logLevel: logLevel));
+    }
+    
+    public static IObservable<IChangeSet<T, TKey>> WithLogging<T, TKey>(this IObservable<IChangeSet<T, TKey>> source, string name = default, IFluentLog logger = default, FluentLogLevel logLevel = default)
+    {
+        return source.Adapt(new LoggingChangeSetAdaptor<T, TKey>(name: name, logger: logger, logLevel: logLevel));
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using log4net;
 
@@ -48,7 +46,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
             {
                 return;
             }
-            LogMessage(() => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {operations.Count} steps completed\n\t{string.Join("\n\t", operations)}");
+            logger.Write(logLevel, () => $"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {operations.Count} steps completed\n\t{string.Join("\n\t", operations)}");
         });
     }
     
@@ -131,34 +129,9 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
         operations.Enqueue(logMessage);
         if (logEachStep)
         {
-            LogMessage(() => logMessage);
+            logger.Write(logLevel, () => logMessage);
         }
         previousOperationTimestamp = elapsed;
     }
 
-    private void LogMessage(Func<string> messageSupplier)
-    {
-        if (!logger.IsEnabled(logLevel))
-        {
-            return;
-        }
-        switch (logLevel)
-        {
-            case FluentLogLevel.Trace:
-            case FluentLogLevel.Debug:
-                logger.Debug(messageSupplier);
-                break;
-            case FluentLogLevel.Info:
-                logger.Info(messageSupplier);
-                break;
-            case FluentLogLevel.Warn:
-                logger.Warn(messageSupplier);
-                break;
-            case FluentLogLevel.Error:
-                logger.Error(messageSupplier);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
 }
