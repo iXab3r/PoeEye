@@ -22,6 +22,7 @@
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
     <PackageReference Include="DeepCloner" Version="0.10.2" />
+    <PackageReference Include="DynamicData" Version="8.0.2" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="Font.Awesome" Version="5.15.4" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.0.48" />

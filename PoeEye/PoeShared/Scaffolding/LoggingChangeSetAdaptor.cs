@@ -20,10 +20,10 @@ public class LoggingListChangeSetAdaptor<T> : LoggingChangeSetAdaptorBase, IChan
         {
             if (changeSet is ChangeSet<T> changes)
             {
-                var idx = 0;
-                foreach (var change in changes)
+                for (var i = 0; i < changes.Count; i++)
                 {
-                    WriteLog($"Adapting the change [{idx}/{changes.Count}] : {new {change.Reason, change.Type, change.Range}}");
+                    var change = changes[i];
+                    WriteLog($"Adapting the change [{i}/{changes.Count}] : {new {change.Reason, change.Type, change.Range}}");
                 }
             }
             else
@@ -64,10 +64,10 @@ public class LoggingChangeSetAdaptor<T, TKey> : LoggingChangeSetAdaptorBase, ICh
         {
             if (changeSet is ChangeSet<T, TKey> changes)
             {
-                var idx = 0;
-                foreach (var change in changes)
+                for (var i = 0; i < changes.Count; i++)
                 {
-                    WriteLog($"Adapting the change [{idx}/{changes.Count}] : {new {change.Reason, change.CurrentIndex, change.PreviousIndex}}");
+                    var change = changes[i];
+                    WriteLog($"Adapting the change [{i}/{changes.Count}] : {new {change.Reason, change.Key, change.CurrentIndex, change.PreviousIndex}}");
                 }
             }
             else
