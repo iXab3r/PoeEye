@@ -84,6 +84,10 @@ public static class AwesomeIcons
     public const string SearchPlus = "\uf00e";
     public const string SignIn = "\uf090";
     public const string SignOut = "\uf08b";
+    public const string SortAmountAsc = "\uf160";
+    public const string SortAmountDesc = "\uf161";
+    public const string SortNumericAsc = "\uf162";
+    public const string SortNumericDesc = "\uf163";
     public const string Space = " ";
     public const string StopOutlined = "\uf28e";
     public const string Stop = "\uf28d";
@@ -98,6 +102,7 @@ public static class AwesomeIcons
     public const string User = "\uf007";
     public const string UserCircle = "\uf2bd";
     public const string UserSecret = "\uf21b";
+    public const string Zoom = "\uf002";
 
     public static string ToHtml(string input)
     {
