@@ -4,6 +4,7 @@ using ReactiveUI;
 using PoeShared.Scaffolding;
 using System;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PropertyBinder;
 using Unity;
@@ -23,6 +24,8 @@ partial class BlazorContentPresenter
     [Inject] public IBlazorViewRepository ViewRepository { get; set; }
 
     public Type ResolvedViewType { get; [UsedImplicitly] private set; }
+    
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Instance of resolved object, populated using ReferenceCapture in default flow
@@ -53,6 +56,15 @@ partial class BlazorContentPresenter
             .To((x, v) =>
             {
                 x.ResolvedViewType = v;
+                var currentView = x.View;
+                if (currentView == null || currentView.GetType() == v)
+                {
+                    return;
+                }
+
+                // active View/ResolvedViewType mismatch - force re-render
+                x.View = null;
+                x.StateHasChanged();
             });
         
         Binder
@@ -80,8 +92,15 @@ partial class BlazorContentPresenter
             })
             .AddTo(Anchors);
         
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        IsInitialized = true;
         Binder.Attach(this).AddTo(Anchors);
     }
+    
 
     internal void SetView(object value)
     {

@@ -84,7 +84,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         var canExecuteHotkeys = this.Observe(EnableHotkeysProperty, x => x.EnableHotkeys)
             .Select(x => x);
 
-        ReloadCommand = CommandWrapper.Create(() =>
+        ReloadCommand = CommandWrapper.Create(async () =>
         {
             if (UnhandledException != null)
             {
@@ -92,7 +92,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 UnhandledException = null;
             }
 
-            WebView?.WebView.Reload();
+            var webView = WebView.WebView;
+            if (webView != null)
+            {
+                await webView.EnsureCoreWebView2Async();
+                webView.Reload();
+            }
         }, canExecuteHotkeys);
         OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow(), canExecuteHotkeys);
 
@@ -116,7 +121,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         new RootComponent
         {
             Selector = "#app",
-            ComponentType = typeof(BlazorContentPresenter)
+            ComponentType = typeof(BlazorContentPresenterWrapper)
         }.AddTo(WebView.RootComponents);
 
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
@@ -150,10 +155,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     childServiceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(proxyServiceProvider, state.container));
 
                     // views have to be transient to allow to re-create them if needed (e.g. on error)
-                    childServiceCollection.AddTransient(typeof(BlazorContentPresenter), _ =>
+                    childServiceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
                     {
-                        var contentPresenter = new BlazorContentPresenter().AddTo(contentAnchors);
-                        contentPresenter.ViewType = state.viewType;
+                        var contentPresenter = new BlazorContentPresenterWrapper()
+                        {
+                            ViewType = state.viewType,
+                        }.AddTo(contentAnchors);
                         this.WhenAnyValue(content => content.Content)
                             .Subscribe(content => contentPresenter.Content = content)
                             .AddTo(contentAnchors);

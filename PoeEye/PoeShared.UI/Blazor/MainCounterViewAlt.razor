@@ -4,6 +4,8 @@
 <p>The current count is: @DataContext.Count</p>
 <button @onclick="IncrementCount">Count</button>
 
+<BlazorContentPresenter Content="@("random string")" ViewTypeKey="@("non-existent")" />
+
 @code {
     void IncrementCount()
     {
