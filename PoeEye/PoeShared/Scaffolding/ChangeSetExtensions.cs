@@ -17,6 +17,21 @@ public static class ChangeSetExtensions
         return cache.Connect().RemoveKey().AsObservableList();
     }
     
+    [Obsolete("Contains some bug, do not use with further testing")]
+    public static IObservable<IChangeSet<TObject>> Flatten<TObject>(this IObservable<IChangeSet<TObject>> source, Func<TObject, IObservable<IChangeSet<TObject>>> childrenAccessor)
+    {
+        return source.TransformMany(node => 
+        {
+            // Flatten the children's hierarchy recursively
+            var children = childrenAccessor(node);
+            var flattenChildren = children.Flatten(childrenAccessor);
+
+            // Combine the node itself with its flattened children
+            var firstItem = new Change<TObject>(ListChangeReason.Add, node);
+            return flattenChildren.StartWith(new ChangeSet<TObject>(new[]{ firstItem })).AsObservableList();
+        });
+    }
+
     /// <summary>
     /// Automatically refresh downstream operator. The refresh is triggered when the observable receives a notification.
     /// </summary>

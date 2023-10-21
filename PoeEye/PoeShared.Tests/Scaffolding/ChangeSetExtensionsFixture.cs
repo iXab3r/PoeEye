@@ -231,7 +231,7 @@ public class ChangeSetExtensionsFixture : FixtureBase
     public void ShouldBindToSourceList_Synchronize()
     {
         //Given
-        var outputCollection = new ObservableCollection<int>() { 2 };
+        var outputCollection = new ObservableCollection<int>() {2};
         var sourceList = new SourceList<int>();
         using var subscription = outputCollection.BindToSourceList(sourceList);
 
@@ -486,5 +486,105 @@ public class ChangeSetExtensionsFixture : FixtureBase
 
         //Then
         sourceList.Items.CollectionSequenceShouldBe(1, 4, 3);
+    }
+
+    [Test]
+    public void ShouldFlattenDeepHierarchy()
+    {
+        // Given
+        var parent = new SourceList<TestNode>();
+        var parentNode = new TestNode {Id = "parent"};
+        var childNode1 = new TestNode {Id = "child1"};
+        var childNode2 = new TestNode {Id = "child2"};
+        var grandchildNode = new TestNode {Id = "grandchild"};
+
+        parent.Add(parentNode);
+        parentNode.Children.Add(childNode1);
+        childNode1.Children.Add(childNode2);
+        childNode2.Children.Add(grandchildNode);
+
+        // When
+        using var flattened = parent.Connect().Flatten(p => p.Children.Connect()).AsObservableList();
+
+        // Then
+        flattened.Count.ShouldBe(4);
+        flattened.Items.ShouldContain(parentNode);
+        flattened.Items.ShouldContain(childNode1);
+        flattened.Items.ShouldContain(childNode2);
+        flattened.Items.ShouldContain(grandchildNode);
+    }
+
+    [Test]
+    public void RemovingItemFromMiddleOfHierarchyUpdatesFlattenedList()
+    {
+        // Given
+        var parent = new SourceList<TestNode>();
+        var parentNode = new TestNode {Id = "parent"};
+        var childNode1 = new TestNode {Id = "child1"};
+        var childNode2 = new TestNode {Id = "child2"};
+        parent.Add(parentNode);
+        parentNode.Children.Add(childNode1);
+        childNode1.Children.Add(childNode2);
+        using var flattened = parent.Connect().Flatten(p => p.Children.Connect()).AsObservableList();
+
+        // When
+        parentNode.Children.Remove(childNode1);
+
+        // Then
+        flattened.Count.ShouldBe(1);
+        flattened.Items.ShouldContain(parentNode);
+        flattened.Items.ShouldNotContain(childNode1);
+    }
+
+    [Test]
+    public void ChangesInGrandchildrenReflectInFlattened()
+    {
+        // Given
+        var parent = new SourceList<TestNode>();
+
+        var parentNode = new TestNode {Id = "parent"};
+        var childNode = new TestNode {Id = "child"};
+        parent.Add(parentNode);
+        parentNode.Children.Add(childNode);
+        using var flattened = parent.Connect().Flatten(p => p.Children.Connect()).AsObservableList();
+
+        // When
+        childNode.Children.Add(new TestNode {Id = "grandchild1"});
+        childNode.Children.Add(new TestNode {Id = "grandchild2"});
+
+        // Then
+        flattened.Count.ShouldBe(4);
+        flattened.Items.ShouldContain(parentNode);
+        flattened.Items.ShouldContain(childNode);
+        flattened.Items.ShouldContain(childNode.Children.Items.ElementAt(0));
+        flattened.Items.ShouldContain(childNode.Children.Items.ElementAt(1));
+    }
+
+    [Test]
+    public void FlatteningEmptyHierarchyReturnsOnlyRootNodes()
+    {
+        // Given
+        var parent = new SourceList<TestNode>();
+
+        var parentNode1 = new TestNode {Id = "parent1"};
+        var parentNode2 = new TestNode {Id = "parent2"};
+
+        parent.Add(parentNode1);
+        parent.Add(parentNode2);
+
+        // When
+        using var flattened = parent.Connect().Flatten(p => p.Children.Connect()).AsObservableList();
+
+        // Then
+        flattened.Count.ShouldBe(2);
+        flattened.Items.ShouldContain(parentNode1);
+        flattened.Items.ShouldContain(parentNode2);
+    }
+
+
+    public class TestNode
+    {
+        public string Id { get; set; }
+        public SourceList<TestNode> Children { get; } = new SourceList<TestNode>();
     }
 }
