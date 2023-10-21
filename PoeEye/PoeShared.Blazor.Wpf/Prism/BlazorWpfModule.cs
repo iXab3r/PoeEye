@@ -1,4 +1,6 @@
-﻿using PoeShared.Modularity;
+﻿using System.ComponentModel;
+using PoeShared.Blazor.Prism;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using Prism.Ioc;
 using Prism.Unity;
@@ -11,5 +13,6 @@ public sealed class BlazorWpfModule : DynamicModule
     protected override void RegisterTypesInternal(IUnityContainer container)
     {
         container.AddNewExtensionIfNotExists<BlazorWpfExtensions>();
+        container.AddNewExtensionIfNotExists<BlazorWebExtensions>();
     }
 }

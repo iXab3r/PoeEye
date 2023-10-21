@@ -54,9 +54,6 @@
       <Compile Update="Blazor\MainCounter.Viewcs">
         <DependentUpon>Main.razor</DependentUpon>
       </Compile>
-      <Compile Update="Blazor\MainCounterViewModel.cs">
-        <DependentUpon>MainCounterViewAlt.razor</DependentUpon>
-      </Compile>
       <Compile Update="Blazor\MainCounterView.cs">
         <DependentUpon>MainCounterView.razor</DependentUpon>
       </Compile>
@@ -65,6 +62,9 @@
       </Compile>
       <Compile Update="Blazor\BrokenView.cs">
         <DependentUpon>BrokenView.razor</DependentUpon>
+      </Compile>
+      <Compile Update="Blazor\MainCounterViewAlt.cs">
+        <DependentUpon>MainCounterViewAlt.razor</DependentUpon>
       </Compile>
     </ItemGroup>
     

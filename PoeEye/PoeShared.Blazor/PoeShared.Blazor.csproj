@@ -9,7 +9,6 @@
         <LangVersion>latest</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <OutputType>Library</OutputType>
-        
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,6 +24,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Services\" />
+      <Compile Update="BlazorContentPresenter.cs">
+        <DependentUpon>BlazorContentPresenter.razor</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
+using Unity;
 
 namespace PoeShared.Blazor.Wpf;
 
 internal sealed class BlazorComponentActivator : IComponentActivator
 {
     private readonly IServiceProvider serviceProvider;
+    private readonly IUnityContainer unityContainer;
 
-    public BlazorComponentActivator(IServiceProvider serviceProvider)
+    public BlazorComponentActivator(IServiceProvider serviceProvider, IUnityContainer unityContainer)
     {
         this.serviceProvider = serviceProvider;
+        this.unityContainer = unityContainer;
     }
     
     /// <inheritdoc />
@@ -30,7 +33,12 @@ internal sealed class BlazorComponentActivator : IComponentActivator
         if (result != null)
         {
             return result;
-        } 
+        }
+
+        if (unityContainer != null)
+        {
+            return (IComponent) unityContainer.Resolve(componentType);
+        }
         
         return (IComponent) Activator.CreateInstance(componentType);
     }

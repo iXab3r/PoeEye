@@ -1,15 +1,22 @@
-﻿@using PoeShared.Blazor.Scaffolding
-@inherits BlazorReactiveComponent
+@using PoeShared.Blazor.Scaffolding
+@inherits ReactiveComponentBase
 
 <BlazorErrorBoundary @ref="errorBoundary">
     <ChildContent>
-        @if (ViewType != null)
+        @if (ResolvedViewType != null)
         {
-            <DynamicComponent Type="@ViewType"/>
+            @DynamicView
         }
         else
         {
-            <div>Type is not selected</div>
+            if (Content == null)
+            {
+                <div>Content is not set</div>
+            }
+            else
+            {
+                <div>View for @($"{Content.GetType()}") is not resolved</div>
+            }
         }
     </ChildContent>
     <ErrorContent>

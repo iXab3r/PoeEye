@@ -24,6 +24,7 @@ using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
+using PoeShared.Blazor.Prism;
 using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -95,29 +96,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         }, canExecuteHotkeys);
         OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow(), canExecuteHotkeys);
 
-        var serviceCollection = new ServiceCollection();
+        var serviceCollection = new ServiceCollection()
+        {
+            BlazorServiceCollection.Instance
+        };
         serviceCollection.AddBlazorWebView();
         serviceCollection.AddWpfBlazorWebView();
         serviceCollection.AddBlazorWebViewDeveloperTools();
-        serviceCollection.AddLogging(builder =>
-        {
-            builder.SetMinimumLevel(LogLevel.Information);
-            builder.ClearProviders();
-            builder.AddProvider(new Log4NetLoggerProvider());
-
-            builder.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Trace);
-        });
-        //FIXME Singleton seems to be the simplest way to link WPF world to ASPNETCORE
-        foreach (var serviceDescriptor in BlazorServiceCollection.Instance)
-        {
-            serviceCollection.Add(serviceDescriptor);
-        }
-
-        serviceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(proxyServiceProvider));
-        //Root component is NEVER instantiated again
-
-        proxyServiceProvider.ServiceProvider = serviceCollection.BuildServiceProvider();
-
+        
+        //proxy is needed to allow BlazorComponentActivator to have access to Unity/ServiceProvider
         WebView.Services = proxyServiceProvider;
 
         new RootComponent
@@ -129,7 +116,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         new RootComponent
         {
             Selector = "#app",
-            ComponentType = typeof(BlazorContent)
+            ComponentType = typeof(BlazorContentPresenter)
         }.AddTo(WebView.RootComponents);
 
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
@@ -155,51 +142,22 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     UnhandledException = null;
                 }
 
-                if (state?.viewType == null)
-                {
-                    Log.Debug(() => $"Content type is not specified, nothing to load");
-                    return;
-                }
-
                 try
                 {
-                    var childServiceCollection = new ServiceCollection
-                    {
-                        serviceCollection
-                    };
+                    var childServiceCollection = new ServiceCollection {serviceCollection};
+                    
+                    // this is needed mostly for compatibility-reasons with views that use UnityContainer
+                    childServiceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(proxyServiceProvider, state.container));
 
                     // views have to be transient to allow to re-create them if needed (e.g. on error)
-                    childServiceCollection.AddTransient(typeof(BlazorContent), _ =>
+                    childServiceCollection.AddTransient(typeof(BlazorContentPresenter), _ =>
                     {
-                        var viewWrapper = new BlazorContent(state.viewType).AddTo(contentAnchors);
-                        return viewWrapper;
-                    });
-
-                    childServiceCollection.AddTransient(state.viewType, _ =>
-                    {
-                        var viewAnchors = new CompositeDisposable().AssignTo(activeViewAnchors);
-                        contentAnchors.Add(viewAnchors);
-                        
-                        var view = state.container == null ? Activator.CreateInstance(state.viewType) : state.container.Resolve(state.viewType);
-                        if (view is BlazorReactiveComponent reactiveComponent)
-                        {
-                            this.WhenAnyValue(content => content.Content)
-#pragma warning disable BL0005 // this is a special case
-                                .Subscribe(content => reactiveComponent.DataContext = content)
-#pragma warning restore BL0005
-                                .AddTo(viewAnchors);
-                        } 
-                        
-                        if (view is IDisposable disposable)
-                        {
-                            Disposable.Create(() =>
-                            {
-                                Log.Debug($"Disposing {view}");
-                                disposable.Dispose();
-                            }).AddTo(viewAnchors);
-                        }
-
-                        return view;
+                        var contentPresenter = new BlazorContentPresenter().AddTo(contentAnchors);
+                        contentPresenter.ViewType = state.viewType;
+                        this.WhenAnyValue(content => content.Content)
+                            .Subscribe(content => contentPresenter.Content = content)
+                            .AddTo(contentAnchors);
+                        return contentPresenter;
                     });
                     proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
 
@@ -220,7 +178,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                     WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
-                    if (WebView.HostPage == hostPage && WebView.WebView.CoreWebView2 != null)
+                    if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
                     {
                         Log.Debug($"Reloading existing page, view type: {state}");
                         WebView.WebView.Reload();

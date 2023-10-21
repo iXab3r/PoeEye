@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Wpf.Prism;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -22,7 +23,8 @@ public partial class App : ApplicationBase
 
         Container.AddNewExtensionIfNotExists<BlazorWpfExtensions>();
         Container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
-        
+        Container.AddNewExtensionIfNotExists<BlazorWebExtensions>();
+
         Container
             .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();
             

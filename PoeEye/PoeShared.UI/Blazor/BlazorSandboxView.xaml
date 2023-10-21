@@ -30,9 +30,9 @@
             </GroupBox>
             <GroupBox  st:StackPanel.Fill="Fill">
                 <GroupBox.Header>
-                    Control-based
+                    Automatically resolved
                 </GroupBox.Header>
-                <wpf:BlazorContentControl ViewType="{x:Type blazor:MainCounterView}" Content="{Binding MainCounter}"/>
+                <wpf:BlazorContentControl Content="{Binding MainCounter}"/>
             </GroupBox>
         </st:StackPanel>
     </DataTemplate>
