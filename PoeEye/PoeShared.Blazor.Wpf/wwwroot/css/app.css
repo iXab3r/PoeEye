@@ -111,7 +111,7 @@
     --eye-OverlayForegroundColorKey: White;
 }
 
-body, html, .app {
+body, html {
     background-color: transparent;
     color: var(--eye-MaterialDesignBody);
     font-family: var(--eye-font-family);
@@ -119,6 +119,11 @@ body, html, .app {
     width: 100vw;
     height: 100vh;
     overflow-x: hidden;
+}
+
+#app {
+    height: 100%;
+    width: 100%;
 }
 
 .panel {
