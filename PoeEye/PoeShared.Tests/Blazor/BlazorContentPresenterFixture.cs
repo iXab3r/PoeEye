@@ -36,6 +36,7 @@ public class BlazorContentPresenterFixture : FixtureBase
         // Given
         var expectedType = typeof(DummyComponent);
         var presenter = CreateInstance();
+        presenter.Initialize();
         presenter.ViewType = expectedType;
 
         // When 
@@ -53,6 +54,7 @@ public class BlazorContentPresenterFixture : FixtureBase
         var expectedType = typeof(DummyComponent);
         viewRepositoryMock.Setup(repo => repo.ResolveViewType(content.GetType(), null)).Returns(expectedType);
         var presenter = CreateInstance();
+        presenter.Initialize();
         presenter.Content = content;
 
         // When 
@@ -68,6 +70,7 @@ public class BlazorContentPresenterFixture : FixtureBase
         // Given
         var initialComponent = new DisposableDummyComponent();
         var presenter = CreateInstance();
+        presenter.Initialize();
         presenter.SetView(initialComponent);
         presenter.ViewType = typeof(DisposableDummyComponent); // Trigger the view change
 
@@ -84,6 +87,7 @@ public class BlazorContentPresenterFixture : FixtureBase
         // Given
         var component = new DisposableDummyComponent();
         var presenter = CreateInstance();
+        presenter.Initialize();
         presenter.SetView(component);
 
         // When 

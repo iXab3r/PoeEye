@@ -91,19 +91,22 @@ partial class BlazorContentPresenter
                 }
             })
             .AddTo(Anchors);
-        
     }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        IsInitialized = true;
-        Binder.Attach(this).AddTo(Anchors);
+        Initialize();
     }
-    
 
     internal void SetView(object value)
     {
         View = value;
+    }
+
+    internal void Initialize()
+    {
+        IsInitialized = true;
+        Binder.Attach(this).AddTo(Anchors);
     }
 }
