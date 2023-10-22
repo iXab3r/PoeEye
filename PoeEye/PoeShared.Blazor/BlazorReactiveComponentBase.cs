@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -9,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PoeShared.Blazor.Internals;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
@@ -18,8 +20,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 {
     private static readonly Binder<BlazorReactiveComponentBase> Binder = new();
 
-    protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> CollectionProperties = new();
-    protected static readonly ConcurrentDictionary<Type, PropertyInfo[]> DynamicDataProperties = new();
+    private readonly Subject<object> whenChanged = new();
 
     static BlazorReactiveComponentBase()
     {
@@ -29,12 +30,35 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 
     protected BlazorReactiveComponentBase()
     {
+        this.WhenAnyProperty(x => x.DataContext)
+            .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
+            .AddTo(Anchors);
+        changeDetector.WhenChanged
+            .Subscribe(x => whenChanged.OnNext(x)).AddTo(Anchors);
+        WhenChanged.Subscribe(WhenRefresh).AddTo(Anchors);
+
         Binder.Attach(this).AddTo(Anchors);
     }
     
     [Inject] public IJSRuntime JsRuntime { get; private set; }
     
     [Parameter] public object DataContext { get; set; }
+    
+    public IObservable<object> WhenChanged => whenChanged;
+    
+    private readonly ReactiveChangeDetector changeDetector = new();
+
+    public TOut Track<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
+    {
+        try
+        {
+            return changeDetector.Track(context, selector);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidStateException($"Failed to initialize change tracking in component {this} ({GetType()}) (data context: {DataContext}) for expression: {selector}{(ReferenceEquals(context, DataContext) ? "" : $", expression context: {context}")}", e);
+        }
+    }
 
     private sealed class SafeJsRuntime : IJSRuntime
     {

@@ -101,7 +101,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     
     private void LoadViewsFromAssembly(Assembly assembly)
     {
-        var logger = Log.WithSuffix(assembly.GetName().Name);
+        var logger = Log.WithSuffix(assembly.ToString());
         logger.Debug(() => "Loading Blazor views from assembly");
 
         try

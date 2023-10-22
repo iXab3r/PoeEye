@@ -47,6 +47,9 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     public long RefreshCount => refreshCount;
     
     public long RawRefreshCount => refreshCount;
+    
+    [Parameter]
+    public string Name { get; set; }
 
     protected virtual IFluentLog PrepareLogger()
     {
