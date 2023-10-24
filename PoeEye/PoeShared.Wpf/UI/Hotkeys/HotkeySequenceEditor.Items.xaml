@@ -195,6 +195,12 @@
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.XButton2}">
                 <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceXButton2Image}" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding Hotkey.MouseWheel}" Value="{x:Static eye:MouseWheelAction.WheelDown}">
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceWheelDownImage}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Hotkey.MouseWheel}" Value="{x:Static eye:MouseWheelAction.WheelUp}">
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceWheelUpImage}" />
+            </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding HasMousePosition}" Value="True" />

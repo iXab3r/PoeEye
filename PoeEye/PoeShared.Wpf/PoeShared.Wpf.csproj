@@ -64,31 +64,19 @@
   <ItemGroup>
     <Resource Include="Resources\mouse-device-left-click-control.png" />
     <Resource Include="Resources\mouse-device-right-click-control.png" />
-    <None Remove="Resources\mouse-device-middle-click-control.png" />
     <Resource Include="Resources\mouse-device-middle-click-control.png" />
-    <None Remove="Resources\stop-1.1s-200px.svg" />
-    <Resource Include="Resources\stop-1.1s-200px.svg" />
-    <None Remove="Resources\record-1.1s-47px.svg" />
-    <Resource Include="Resources\record-1.1s-47px.svg" />
-    <None Remove="Resources\cursor-1.1s-200px.svg" />
-    <None Remove="Resources\cursor-1.1s-200px.png" />
-    <None Remove="Resources\DragDrop.png" />
-    <Resource Include="Resources\DragDrop.png" />
-    <None Remove="Resources\DragDropWhite.png" />
-    <Resource Include="Resources\DragDropWhite.png" />
-    <None Remove="Resources\mouse-device-xbutton1-click-control.png" />
+    <Resource Include="Resources\mouse-device-wheel-down-control.png" />
+    <Resource Include="Resources\mouse-device-wheel-up-control.png" />
     <Resource Include="Resources\mouse-device-xbutton1-click-control.png" />
-    <None Remove="Resources\mouse-device-xbutton2-click-control.png" />
     <Resource Include="Resources\mouse-device-xbutton2-click-control.png" />
-    <None Remove="Resources\CursorAbsolute.png" />
+    <Resource Include="Resources\stop-1.1s-200px.svg" />
+    <Resource Include="Resources\record-1.1s-47px.svg" />
+    <Resource Include="Resources\DragDrop.png" />
+    <Resource Include="Resources\DragDropWhite.png" />
     <Resource Include="Resources\CursorAbsolute.png" />
-    <None Remove="Resources\CursorRelative.png" />
     <Resource Include="Resources\CursorRelative.png" />
-    <None Remove="Resources\exception.png" />
     <Resource Include="Resources\exception.png" />
-    <None Remove="Resources\FontAwesome.otf" />
     <Resource Include="Resources\FontAwesome.otf" />
-    <None Remove="Resources\JetBrainsMono-Regular.ttf" />
     <Resource Include="Resources\JetBrainsMono-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>

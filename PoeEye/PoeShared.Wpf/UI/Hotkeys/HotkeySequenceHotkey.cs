@@ -1,4 +1,5 @@
 using System.Drawing;
+using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
@@ -11,7 +12,7 @@ public sealed class HotkeySequenceHotkey : HotkeySequenceItem
     static HotkeySequenceHotkey()
     {
         Binder.Bind(x => x.MousePosition != null).To(x => x.HasMousePosition);
-        Binder.Bind(x => x.HasMousePosition || x.Hotkey != null && x.Hotkey.MouseButton != null).To(x => x.IsMouse);
+        Binder.Bind(x => x.HasMousePosition || x.Hotkey != null && x.Hotkey.IsMouse).To(x => x.IsMouse);
     }
 
     public HotkeySequenceHotkey()
@@ -25,9 +26,9 @@ public sealed class HotkeySequenceHotkey : HotkeySequenceItem
 
     public Point? MousePosition { get; set; }
 
-    public bool HasMousePosition { get; private set; }
+    public bool HasMousePosition { get; [UsedImplicitly] private set; }
 
-    public bool IsMouse { get; private set; }
+    public bool IsMouse { get; [UsedImplicitly] private set; }
 
     public bool? IsDown { get; set; }
 }

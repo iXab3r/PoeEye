@@ -110,6 +110,8 @@
                     <eye:ButtonEx CommandParameter="{x:Static MouseButton.Middle}" />
                     <eye:ButtonEx CommandParameter="{x:Static MouseButton.XButton1}" />
                     <eye:ButtonEx CommandParameter="{x:Static MouseButton.XButton2}" />
+                    <eye:ButtonEx CommandParameter="{x:Static eye:MouseWheelAction.WheelDown}" />
+                    <eye:ButtonEx CommandParameter="{x:Static eye:MouseWheelAction.WheelUp}" />
                 </st:AutoGrid>
             </st:StackPanel>
         </Border>

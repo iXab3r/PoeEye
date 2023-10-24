@@ -255,6 +255,8 @@
     <BitmapImage x:Key="MouseDeviceMiddleImage" UriSource="../Resources/mouse-device-middle-click-control.png" ice:Freeze="True" />
     <BitmapImage x:Key="MouseDeviceXButton1Image" UriSource="../Resources/mouse-device-xbutton1-click-control.png" ice:Freeze="True" />
     <BitmapImage x:Key="MouseDeviceXButton2Image" UriSource="../Resources/mouse-device-xbutton2-click-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="MouseDeviceWheelUpImage" UriSource="../Resources/mouse-device-wheel-up-control.png" ice:Freeze="True" />
+    <BitmapImage x:Key="MouseDeviceWheelDownImage" UriSource="../Resources/mouse-device-wheel-down-control.png" ice:Freeze="True" />
     <BitmapImage x:Key="CursorAbsoluteImage" UriSource="../Resources/CursorAbsolute.png" ice:Freeze="True" />
     <BitmapImage x:Key="CursorRelativeImage" UriSource="../Resources/CursorRelative.png" ice:Freeze="True" />
     <BitmapImage x:Key="DragDropImage" UriSource="../Resources/DragDrop.png" ice:Freeze="True" />

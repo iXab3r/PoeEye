@@ -14,6 +14,7 @@ public sealed class KeyToStringConverter : IValueConverter
         {
             Key key => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(key)),
             MouseButton mouseButton => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(mouseButton)),
+            MouseWheelAction mouseWheel => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(mouseWheel)),
             _ => Binding.DoNothing
         };
     }
