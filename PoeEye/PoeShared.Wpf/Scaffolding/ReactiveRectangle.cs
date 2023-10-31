@@ -7,7 +7,7 @@ using PropertyChanged;
 
 namespace PoeShared.Scaffolding;
 
-[DebuggerDisplay("Bounds={Bounds}")]
+[DebuggerDisplay("Bounds={Bounds} Name={Name}")]
 public sealed class ReactiveRectangle : BindableReactiveObject
 {
     private readonly NamedLock updateLock;
@@ -27,6 +27,8 @@ public sealed class ReactiveRectangle : BindableReactiveObject
     {
         SetValue(rectangle);
     }
+    
+    public string Name { get; set; }
 
     [DoNotNotify]
     public Rectangle Bounds
@@ -81,15 +83,15 @@ public sealed class ReactiveRectangle : BindableReactiveObject
     {
         SetValue(Rectangle.Empty);
     }
-
-    public void SetValue(Rectangle newValue)
+    
+    public bool SetValue(Rectangle newValue)
     {
         using var @lock = updateLock.Enter();
         
         var previousValue = bounds;
         if (previousValue == newValue)
         {
-            return;
+            return false;
         }
 
         bounds = newValue;
@@ -100,12 +102,14 @@ public sealed class ReactiveRectangle : BindableReactiveObject
         this.RaiseIfChanged(nameof(RegionY), previousValue.Y, newValue.Y);
         this.RaiseIfChanged(nameof(RegionWidth), previousValue.Width, newValue.Width);
         this.RaiseIfChanged(nameof(RegionHeight), previousValue.Height, newValue.Height);
+        return true;
     }
 
     protected override void FormatToString(ToStringBuilder builder)
     {
         base.FormatToString(builder);
         builder.Append("Region");
+        builder.AppendParameterIfNotDefault(nameof(Name), Name);
         builder.AppendParameter(nameof(Bounds), bounds);
     }
 }
