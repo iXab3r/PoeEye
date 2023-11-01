@@ -84,6 +84,8 @@ public sealed class NamedLock
 #endif
         });
     }
+
+    public bool IsEntered => gate.IsEntered;
     
     public IDisposable Enter()
     {

@@ -69,14 +69,14 @@ public sealed class ReactiveRectangle : BindableReactiveObject
     public int RegionWidth
     {
         get => bounds.Width;
-        set => SetValue(bounds with {Width = Math.Max(0, value)});
+        set => SetValue(bounds with {Width = value});
     }
 
     [DoNotNotify]
     public int RegionHeight
     {
         get => bounds.Height;
-        set => SetValue(bounds with {Height = Math.Max(0, value)});
+        set => SetValue(bounds with {Height = value});
     }
 
     public void Reset()
