@@ -45,7 +45,6 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         IScreenRegionSelectorService regionSelectorService,
         NotificationSandboxViewModel notificationSandbox,
         ExceptionSandboxViewModel exceptionSandbox,
-        IHotkeySequenceEditorViewModel hotkeySequenceEditor,
         AutoCompleteSandboxViewModel autoCompleteSandbox,
         BindingsSandboxViewModel bindingsSandbox,
         AudioSandbox audioSandbox)
@@ -59,7 +58,6 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         ExceptionSandbox = exceptionSandbox.AddTo(Anchors);
         AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
         RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
-        HotkeySequenceEditor = hotkeySequenceEditor.AddTo(Anchors);
         LongCommand = CommandWrapper.Create(async () => { await Task.Delay(3000); });
 
         ErrorCommand = CommandWrapper.Create(async () =>
@@ -142,8 +140,6 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     public IRandomPeriodSelector RandomPeriodSelector { get; }
 
     public Fallback<string> FallbackValue { get; } = new Fallback<string>(string.IsNullOrWhiteSpace);
-
-    public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 
     public CommandWrapper LongCommand { get; }
 

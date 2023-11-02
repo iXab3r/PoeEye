@@ -83,50 +83,8 @@
     <Compile Update="UI\Hotkeys\HotkeyBox.cs">
       <DependentUpon>HotKeyBox.xaml</DependentUpon>
     </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceEditor.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceEditor.Part.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceItem.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceDelay.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceHotkey.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceText.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceEditorItemVisibilityConverter.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeyDropHandler.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\IHotkeySequenceEditorViewModel.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceEditorViewModel.cs">
-      <DependentUpon>IHotkeySequenceEditorViewModel.cs</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\RecordingNotificationViewModel.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
     <Compile Update="UI\RandomPeriodSelector.cs">
       <DependentUpon>RandomPeriodSelector.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeyDragHandler.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceEditorController.cs">
-      <DependentUpon>IHotkeySequenceEditorController.cs</DependentUpon>
-    </Compile>
-    <Compile Update="UI\Hotkeys\IHotkeySequenceEditorController.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
     <Compile Update="UI\CachedContentControl.cs">
       <DependentUpon>CachedContentControl.xaml</DependentUpon>
@@ -142,18 +100,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="UI\Hotkeys\HotkeySequenceEditor.Defaults.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Page>
-    <Page Update="UI\Hotkeys\HotkeySequenceEditor.Osd.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Page>
-    <Page Update="UI\Hotkeys\HotkeySequenceEditor.Items.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Page>
     <Page Update="Themes\Styles.tabcontrol.xaml">
       <Generator>MSBuild:Compile</Generator>
       <XamlRuntime>Wpf</XamlRuntime>

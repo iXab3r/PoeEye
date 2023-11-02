@@ -75,8 +75,6 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterType<ITrackedOverlayWindowController, TrackedOverlayWindowController>()
             .RegisterType<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
             .RegisterType<ISwitchableTextEvaluatorViewModel, SwitchableTextEvaluatorViewModel>()
-            .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
-            .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
             .RegisterType<INotificationContainerViewModel, NotificationContainerViewModel>()
             .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>();
     }
