@@ -140,9 +140,8 @@ public partial class UnsafeNative
             try
             {
                 var sourceBmpRegion = new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height);
-                sourceBmpRegion.Intersect(region);
-
-                var result = sourceBmp.Clone(sourceBmpRegion, sourceBmp.PixelFormat);
+                var captureRegion = sourceBmpRegion.PickRegion(region);
+                var result = sourceBmp.Clone(captureRegion, sourceBmp.PixelFormat);
                 return result;
             }
             finally

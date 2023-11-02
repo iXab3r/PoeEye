@@ -30,6 +30,9 @@ public partial class UnsafeNative
 
     [DllImport("dwmapi.dll")]
     private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out bool pvAttribute, int cbAttribute);
+    
+    [DllImport("dwmapi.dll", PreserveSig = false)]
+    public static extern bool DwmIsCompositionEnabled();
 
     public static IntPtr MakeLParam(int loWord, int hiWord)
     {
@@ -108,6 +111,23 @@ public partial class UnsafeNative
         }
 
         return new Rectangle(frame.left, frame.top, frame.right - frame.left, frame.bottom - frame.top);
+    }
+
+    public static Rectangle GetWindowBorders(IntPtr hwnd)
+    {
+        var isDwmEnabled = IsWindows10OrGreater() && DwmIsCompositionEnabled();
+        var dwmRect = DwmGetWindowFrameBounds(hwnd);
+        var apiRect = GetWindowRect(hwnd);
+        var windowRect = isDwmEnabled ? DwmGetWindowFrameBounds(hwnd) : GetWindowRect(hwnd);
+
+        var captionHeight = User32.GetSystemMetrics(User32.SystemMetric.SM_CYCAPTION);
+        
+        var leftBorder = 0;
+        var topBorder = captionHeight;
+        var rightBorder = 0;
+        var bottomBorder = 0;
+
+        return new Rectangle(leftBorder, topBorder, rightBorder, bottomBorder);
     }
 
     public static bool SetWindowLong(IntPtr hwnd, Func<User32.SetWindowLongFlags, User32.SetWindowLongFlags> flagsChanger)
