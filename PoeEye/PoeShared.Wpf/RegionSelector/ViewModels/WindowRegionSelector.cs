@@ -93,11 +93,19 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
                     {
                         SelectionCandidateBounds = Rect.Empty;
                         return;
-                    } 
-                        
-                    var bounds = regionResult.Window.WindowBounds.ScaleToWpf();
-                    var relative = SelectionAdorner.Owner.PointFromScreen(bounds.Location);
-                    SelectionCandidateBounds = new Rect(relative, bounds.Size);
+                    }
+
+                    var bounds = regionResult.Window.DwmWindowBounds.ToWpfRectangle();
+                    var topLeft = SelectionAdorner.Owner.PointFromScreen(bounds.Location);
+                    var bottomRight = SelectionAdorner.Owner.PointFromScreen(new WpfPoint(bounds.Location.X + bounds.Width, bounds.Location.Y + bounds.Height));
+                    var wpfBounds = new Rect
+                    {
+                        X = topLeft.X,
+                        Y = topLeft.Y,
+                        Width = bottomRight.X - topLeft.X,
+                        Height = bottomRight.Y - topLeft.Y
+                    };
+                    SelectionCandidateBounds = wpfBounds;
                 }, Log.HandleUiException)
             .AddTo(Anchors);
     }
