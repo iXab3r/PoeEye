@@ -220,6 +220,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         }
 
         TConfig result = default;
+        Exception thrownException = null;
         try
         {
             var fileData = File.ReadAllText(configFilePath);
@@ -231,11 +232,12 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         catch (Exception ex)
         {
             Log.Warn($"Could not deserialize config data", ex);
+            thrownException = ex;
         }
 
         if (result == null)
         {
-            throw new ApplicationException($"Could not load configuration from {configFilePath}");
+            throw new ApplicationException($"Could not load configuration from {configFilePath}", thrownException);
         }
 
         return result;

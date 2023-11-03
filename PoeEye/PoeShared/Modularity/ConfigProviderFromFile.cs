@@ -231,6 +231,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         }
 
         PoeEyeCombinedConfig result = null;
+        Exception thrownException = null;
         try
         {
             var fileData = File.ReadAllText(ConfigFilePath);
@@ -243,6 +244,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         catch (Exception ex)
         {
             Log.Warn($"Could not deserialize config data", ex);
+            thrownException = ex;
 
             foreach (var strategy in strategies.Items)
             {
@@ -263,7 +265,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (result == null)
         {
-            throw new ApplicationException($"Could not load configuration from {ConfigFilePath}");
+            throw new ApplicationException($"Could not load configuration from {ConfigFilePath}", thrownException);
         }
 
         return result;
