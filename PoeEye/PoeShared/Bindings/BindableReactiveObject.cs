@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 using DynamicData;
+using JetBrains.Annotations;
 
 namespace PoeShared.Bindings;
 
@@ -24,12 +25,21 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
             .AddTo(Anchors);
         BindingsList = bindingsList;
         Bindings = bindings;
+
+        bindings
+            .CountChanged
+            .Select(x => x > 0)
+            .DistinctUntilChanged()
+            .Subscribe(x => HasBindings = x)
+            .AddTo(Anchors);
     }
 
     protected IFluentLog Log { get; }
     
     protected string ObjectId { get; }
 
+    public bool HasBindings { get; [UsedImplicitly] private set; }
+    
     public IObservableCache<IReactiveBinding, string> Bindings { get; }
 
     public ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
