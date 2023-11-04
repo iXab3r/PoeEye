@@ -42,4 +42,34 @@ public class EnumerableExtensionsFixture
         //Then
         result.OrderBy(x => x).ShouldBe(expected.OrderBy(x => x));
     }
+
+    [Test]
+    [TestCase("", "ab", new[] {"a", "b"})] // Empty separator
+    [TestCase("-", "", new string[] {})] // Empty input array
+    [TestCase("", "", new string[] {})] // Empty separator and input array
+    [TestCase("-", "a", new[] {"a"})] // Single element, normal separator
+    [TestCase("", "a", new[] {"a"})] // Single element, empty separator
+    [TestCase("-", "a-", new[] {"a", ""})] // Empty string as second element
+    [TestCase("-", "-b", new[] {"", "b"})] // Empty string as first element
+    [TestCase("-", "-", new[] {"", ""})] // Only empty strings as elements
+    [TestCase("-", "a-b", "a", "b")]
+    [TestCase("-", "a-b", new[] {"a", "b"})]
+    [TestCase("-", "a-b-c", new[] {"a", "b", "c"})]
+    [TestCase("->", "1->2->3", new[] {"1", "2", "3"})]
+    [TestCase(", ", "apple, banana, cherry", new[] {"apple", "banana", "cherry"})]
+    [TestCase("", "123", new[] {"1", "2", "3"})] // No separator
+    [TestCase(" ", "x y z", new[] {"x", "y", "z"})]
+    [TestCase(" | ", "cat | dog | fish", new[] {"cat", "dog", "fish"})]
+    [TestCase("-", "", new string[] {})] // Empty input array
+    [TestCase("-", "single", new[] {"single"})] // Single element
+    [TestCase("--", "first--second", new[] {"first", "second"})] // Multi-char separator
+    public void ShouldIntersperse(string element, string expected, params string[] items)
+    {
+        //Given
+        //When
+        var result = items.Intersperse(element).ToArray().JoinStrings("");
+
+        //Then
+        result.ShouldBe(expected);
+    }
 }

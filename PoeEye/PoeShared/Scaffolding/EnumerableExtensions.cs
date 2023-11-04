@@ -13,6 +13,40 @@ public static class EnumerableExtensions
         return !enumerable.Any();
     }
 
+    /// <summary>
+    /// Inserts a specified separator between each element of a sequence, if the sequence has more than one item.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements of the input sequence.</typeparam>
+    /// <param name="items">The sequence into which the separator will be interspersed.</param>
+    /// <param name="separatorFactory">The element factory which will be used to intersperse in between the elements of the sequence.</param>
+    /// <returns>A sequence that contains the elements of the input sequence with the separator interspersed between each element.</returns>
+    /// <remarks>
+    /// If the sequence is empty or contains only one element, the returned sequence will be equivalent to the input sequence.
+    /// </remarks>
+    public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> items, Func<T, T> separatorFactory)
+    {
+        if (!items.Any() || items.Count() == 1)
+        {
+            return items;
+        }
+        return items.SelectMany((item, index) => index == items.Count() - 1 ? new[] { item } : new[] { item, separatorFactory(item) });
+    }
+    
+    /// <summary>
+    /// Inserts a specified separator between each element of a sequence, if the sequence has more than one item.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements of the input sequence.</typeparam>
+    /// <param name="items">The sequence into which the separator will be interspersed.</param>
+    /// <param name="separator">The element to intersperse in between the elements of the sequence.</param>
+    /// <returns>A sequence that contains the elements of the input sequence with the separator interspersed between each element.</returns>
+    /// <remarks>
+    /// If the sequence is empty or contains only one element, the returned sequence will be equivalent to the input sequence.
+    /// </remarks>
+    public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> items, T separator)
+    {
+        return Intersperse(items, _ => separator);
+    }
+
     public static T PickRandom<T>(this IEnumerable<T> enumerable)
     {
         Guard.ArgumentNotNull(enumerable, nameof(enumerable));
