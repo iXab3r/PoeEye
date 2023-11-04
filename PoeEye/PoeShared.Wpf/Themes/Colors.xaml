@@ -71,7 +71,6 @@
     <SolidColorBrush x:Key="MahAccentBrush" Color="{StaticResource MahApps.Colors.Accent}" ice:Freeze="True" />
     <SolidColorBrush x:Key="MahLightAccentBrush" Color="{StaticResource MahApps.Colors.Accent}" Opacity="0.6" ice:Freeze="True" />
     
-
     <Color x:Key="PositiveColor">LimeGreen</Color>
     <Color x:Key="WarningColor">Orange</Color>
     <Color x:Key="NegativeColor">IndianRed</Color>
@@ -239,6 +238,21 @@
         <DrawingBrush.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="{StaticResource NegativeBrush}">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="0,0,50,50" />
+                            <RectangleGeometry Rect="50,50,50,50" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    
+    <DrawingBrush x:Key="DashedNeutralBorderBrush" Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile" ice:Freeze="True">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource NeutralBrush}">
                     <GeometryDrawing.Geometry>
                         <GeometryGroup>
                             <RectangleGeometry Rect="0,0,50,50" />
