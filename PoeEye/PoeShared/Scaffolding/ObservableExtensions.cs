@@ -353,15 +353,21 @@ public static class ObservableExtensions
         var sharedObservable = source.Publish().RefCount();
         return sharedObservable.SkipWhile(condition).Take(1).Concat(sharedObservable);
     }
+    
+    public static IObservable<TSource> DoWithPrevious<TSource>(
+        this IObservable<TSource> source, Action<TSource> action)
+    {
+        return WithPrevious(source).Select(x =>
+        {
+            action(x.Item1);
+            return x.Item2;
+        });
+    }
         
     public static IObservable<TSource> DisposePrevious<TSource>(
         this IObservable<TSource> source) where TSource : IDisposable
     {
-        return WithPrevious(source).Select(x =>
-        {
-            x.Item1?.Dispose();
-            return x.Item2;
-        });
+        return source.DoWithPrevious(x => x?.Dispose());
     }
 
     public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan)

@@ -11,7 +11,7 @@ public static class DisposableReactiveObjectExtensions
 
         TTarget latest = default;
         source.WhenAnyValue(propertyAccessor)
-            .DisposePrevious()
+            .DoWithPrevious(x => x?.Dispose())
             .Subscribe(x => latest = x)
             .AddTo(anchors);
         Disposable.Create(() => latest?.Dispose()).AddTo(anchors);

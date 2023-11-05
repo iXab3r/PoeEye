@@ -13,7 +13,7 @@ public sealed class SharedResource<T> : DisposableReactiveObject where T : Share
         this.factory = factory;
         Disposable.Create(() => Instance = default).AddTo(Anchors);
         this.WhenAnyValue(x => x.Instance)
-            .DisposePrevious()
+            .DoWithPrevious(x => x?.Dispose())
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
     }

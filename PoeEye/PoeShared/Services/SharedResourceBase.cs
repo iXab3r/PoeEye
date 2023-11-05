@@ -1,4 +1,5 @@
-﻿//#define SHAREDRESOURCE_ENABLE_STACKTRACE_LOG
+﻿#define SHAREDRESOURCE_ENABLE_STACKTRACE_LOG
+//#define SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS
 
 using System.Threading;
 
@@ -61,21 +62,21 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     {
         Log.Debug(() => "Entering Read lock");
         EnsureIsAlive();
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
         WriteLog($"Entering Read lock: {resourceGate}");
 #endif
         resourceGate.EnterReadLock();
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
         WriteLog($"Entered Read lock: {resourceGate}");
 #endif
         return Disposable.Create(() =>
         {
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exiting Read lock: {resourceGate}");
 #endif
             Log.Debug(() => "Exiting Read lock");
             resourceGate.ExitReadLock();
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exited Read lock: {resourceGate}");
 #endif
         });
@@ -85,21 +86,21 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     {
         Log.Debug(() => "Entering Write lock");
         EnsureIsAlive();
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
         WriteLog($"Entering Write lock: {resourceGate}");
 #endif
         resourceGate.EnterWriteLock();
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
         WriteLog($"Entered Write lock: {resourceGate}");
 #endif
         return Disposable.Create(() =>
         {
             Log.Debug(() => "Exiting Write lock");
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exiting Write lock: {resourceGate}");
 #endif
             resourceGate.ExitWriteLock();
-#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
+#if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exited Write lock: {resourceGate}");
 #endif
         });
