@@ -51,7 +51,7 @@ public static class ProcessUtils
                     throw new InvalidOperationException($"Directory {appDirectory} does not exist");
                 }
 
-                Process.Start(ExplorerExecutablePath, appDirectory);
+                Process.Start(ExplorerExecutablePath, $"\"{appDirectory}\"");
             });
     }
 }
