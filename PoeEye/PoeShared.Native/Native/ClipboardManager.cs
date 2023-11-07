@@ -30,6 +30,7 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
     {
         Guard.ArgumentNotNull(() => text);
 
+        Clear();
         ClipboardApi.SetText(text);
     }
 
@@ -41,6 +42,11 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
     public string GetText()
     {
         return ClipboardApi.GetText();
+    }
+
+    public bool Clear()
+    {
+        return ClipboardApi.Clear();
     }
 
     public IDataObject GetDataObject()
@@ -136,6 +142,11 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
         }
 
         public static bool ContainsText() => ContainsFormat(ClipboardFormat.CF_UNICODETEXT);
+
+        public static bool Clear()
+        {
+            return EmptyClipboard();
+        }
 
         public static bool ContainsFormat(ClipboardFormat format)
         {

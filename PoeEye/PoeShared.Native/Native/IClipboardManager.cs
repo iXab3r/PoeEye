@@ -24,4 +24,6 @@ public interface IClipboardManager
     void SetDataObject(object dataObject);
 
     string GetText();
+
+    bool Clear();
 }
