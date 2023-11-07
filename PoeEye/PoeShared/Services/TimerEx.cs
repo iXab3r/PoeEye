@@ -32,7 +32,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                 return $"Tmr{name}, {dueTime.TotalMilliseconds:F0}ms, {period.TotalMilliseconds:F0}ms";
             }
         });
-        Log.Info(() => $"[{this}] Initializing timer");
+        Log.Debug(() => $"[{this}] Initializing timer");
         this.period = period;
         this.amendPeriod = amendPeriod;
         timer = new Timer(Callback, null, dueTime, TimeSpan.FromMilliseconds(-1));
