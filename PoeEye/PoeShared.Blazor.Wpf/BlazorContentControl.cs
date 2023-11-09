@@ -100,6 +100,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             }
         }, canExecuteHotkeys);
         OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow(), canExecuteHotkeys);
+        
 
         var serviceCollection = new ServiceCollection()
         {
@@ -168,7 +169,10 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     });
                     proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
 
-                    var additionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
+                    var repositoryAdditionalFiles =
+                        proxyServiceProvider.ServiceProvider.GetRequiredService<IBlazorContentRepository>().AdditionalFiles.Items.ToArray();
+                    var controlAdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
+                    var additionalFiles = repositoryAdditionalFiles.Concat(controlAdditionalFiles).ToArray();
                     if (additionalFiles.Any())
                     {
                         Log.Debug(() => $"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");

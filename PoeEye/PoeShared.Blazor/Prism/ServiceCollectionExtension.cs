@@ -13,4 +13,11 @@ public static class ServiceCollectionExtension
         services.AddSingleton<IBlazorViewRegistrator>(provider => unityContainer.Resolve<IBlazorViewRegistrator>());
         return services;
     }
+    
+    public static IServiceCollection AddBlazorContentRepository(this IServiceCollection services, IUnityContainer unityContainer)
+    {
+        services.AddSingleton<BlazorContentRepository>(provider => unityContainer.Resolve<BlazorContentRepository>());
+        services.AddSingleton<IBlazorContentRepository>(provider => unityContainer.Resolve<IBlazorContentRepository>());
+        return services;
+    }
 }
