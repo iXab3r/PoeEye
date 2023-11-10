@@ -185,3 +185,18 @@ body, html {
     position: sticky;
     top: 0;
 }
+
+/* MahAccentDoubleGradientBrush equivalent */
+.header-mah-accent-double-gradient {
+    background: linear-gradient(45deg, rgba(13, 110, 253, 0.3) 0%, transparent 100%);
+}
+
+/* MahGroupBoxHeaderBrush equivalent */
+.header-mah-groupbox-header {
+    background: linear-gradient(45deg, #0d6efd 0%, #0d6efd 20%, transparent 80%);
+}
+
+/* MahGroupBoxLightHeaderBrush equivalent */
+.header-mah-groupbox-light-header {
+    background: linear-gradient(45deg, rgba(13, 110, 253, 0.3) 0%, rgba(13, 110, 253, 0.3) 10%, transparent 80%);
+}

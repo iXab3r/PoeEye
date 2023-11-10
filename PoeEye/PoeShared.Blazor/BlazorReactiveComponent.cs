@@ -43,6 +43,11 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
         base.OnInitialized();
     }
 
+    public void TrackState<TOut>(Expression<Func<TContext, TOut>> selector)
+    {
+        Track(selector);
+    }
+
     public TOut Track<TOut>(Expression<Func<TContext, TOut>> selector)
     {
         return Track(DataContext, selector);

@@ -259,7 +259,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     private static string FormatExceptionMessage(Exception exception)
     {
-        return exception.ToString();
+        return $"{exception.GetType().Name}: {exception.Message} @ {exception.StackTrace}";
     }
 
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
