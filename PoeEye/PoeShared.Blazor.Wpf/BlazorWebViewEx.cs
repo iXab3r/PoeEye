@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -11,13 +12,14 @@ using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
+using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Color = System.Drawing.Color;
 
 namespace PoeShared.Blazor.Wpf;
 
-public class BlazorWebViewEx : BlazorWebView
+public class BlazorWebViewEx : BlazorWebView, IDisposable
 {
     private static readonly IFluentLog Log = typeof(BlazorWebViewEx).PrepareLogger();
     private static readonly ConcurrentDictionary<string, IFileProvider> StaticFilesProvidersByPath = new();
@@ -34,7 +36,7 @@ public class BlazorWebViewEx : BlazorWebView
     {
         e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
         {
-            AdditionalBrowserArguments = ""
+            AdditionalBrowserArguments = "--disable-web-security --allow-file-access-from-files --allow-file-access"
         };
     }
 
@@ -49,6 +51,17 @@ public class BlazorWebViewEx : BlazorWebView
             .AddTo(Anchors);
         e.WebView.GotFocus += WebViewOnGotFocus;
         e.WebView.LostFocus += WebViewOnLostFocus;
+
+        var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
+        foreach (var rootDirectory in drives)
+        {
+            var driveLetter = rootDirectory.GetDriveLetter();
+            if (string.IsNullOrEmpty(driveLetter))
+            {
+                continue;
+            }
+            e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
+        }
     }
 
     private void WebViewOnLostFocus(object sender, RoutedEventArgs e)
@@ -79,5 +92,19 @@ public class BlazorWebViewEx : BlazorWebView
         bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
         bitmapImage.EndInit();
         return bitmapImage;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Anchors?.Dispose();
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

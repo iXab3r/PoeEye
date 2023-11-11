@@ -78,7 +78,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
         proxyServiceProvider = new ProxyServiceProvider().AddTo(Anchors);
 
-        WebView = new BlazorWebViewEx();
+        WebView = new BlazorWebViewEx().AddTo(Anchors);
         WebView.UnhandledException += OnUnhandledException;
 
         var canExecuteHotkeys = this.Observe(EnableHotkeysProperty, x => x.EnableHotkeys)

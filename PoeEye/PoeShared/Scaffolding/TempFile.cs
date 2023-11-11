@@ -22,6 +22,18 @@ public sealed class TempFile : IDisposable
     }
     
     /// <summary>
+    /// Initializes a new instance of the <see cref="TempFile"/> class.
+    /// Creates a file in temporary location.
+    /// </summary>
+    public TempFile()
+    {
+        Log.Debug($"Creating temporary file");
+        var tempFilePath = Path.GetTempFileName();
+        File = new FileInfo(tempFilePath);
+        Log.Debug($"Temporary file is now at @ {File.FullName}");
+    }
+    
+    /// <summary>
     /// Gets the temporary file information.
     /// </summary>
     public FileInfo File { get; }
@@ -39,5 +51,12 @@ public sealed class TempFile : IDisposable
         {
             Log.Warn($"Failed to remove temp script file @ {File.FullName}", e);
         }
+    }
+
+    public override string ToString()
+    {
+        var builder = new ToStringBuilder(this);
+        builder.AppendParameter(nameof(FileInfo.FullName), File.FullName);
+        return builder.ToString();
     }
 }
