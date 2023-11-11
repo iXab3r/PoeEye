@@ -7,9 +7,11 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
              mc:Ignorable="d"
-             d:DesignHeight="20" d:DesignWidth="20">
+             d:DesignHeight="20" d:DesignWidth="20"
+             Cursor="SizeNWSE"
+             x:Name="ResizeGripThumbRoot">
     <ResizeGrip />
-    <Thumb Cursor="SizeNWSE" Background="Transparent">
+    <Thumb Cursor="{Binding ElementName=ResizeGripThumbRoot, Path=Cursor}" Background="Transparent">
         <i:Interaction.Behaviors>
             <wpf:ResizeThumbBehavior/>
         </i:Interaction.Behaviors>

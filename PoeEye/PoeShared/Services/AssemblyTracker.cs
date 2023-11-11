@@ -29,20 +29,16 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             .AddTo(Anchors);
         loadedCache.AddOrUpdate(domain.GetAssemblies());
 
-        loadedCache
+        LoadedAssemblies = loadedCache
             .Connect()
             .OnItemAdded(assembly =>
             {
                 Log.Debug(() => $"Assembly is now tracked: {assembly}");
                 loadedSink.OnNext(assembly);
-            })
-            .BindToCollection(out var loaded)
-            .Subscribe()
-            .AddTo(Anchors);
-        LoadedAssemblies = loaded;
+            }).RemoveKey().AsObservableList().AddTo(Anchors);
     }
 
-    public IReadOnlyObservableCollection<Assembly> LoadedAssemblies { get; }
-    
+    public IObservableList<Assembly> LoadedAssemblies { get; }
+
     public IObservable<Assembly> WhenLoaded => loadedSink.AsObservable();
 }

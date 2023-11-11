@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.AspNetCore.Components.WebView;
@@ -46,6 +47,16 @@ public class BlazorWebViewEx : BlazorWebView
                 WebView.DefaultBackgroundColor = Color.FromArgb(x.A, x.R, x.G, x.B);
             })
             .AddTo(Anchors);
+        e.WebView.GotFocus += WebViewOnGotFocus;
+        e.WebView.LostFocus += WebViewOnLostFocus;
+    }
+
+    private void WebViewOnLostFocus(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void WebViewOnGotFocus(object sender, RoutedEventArgs e)
+    {
     }
 
     public InMemoryFileProvider FileProvider { get; } = new();

@@ -10,17 +10,22 @@ namespace PoeShared.Scaffolding.WPF;
 public static class WindowExtensions {
     private static readonly IFluentLog Log = typeof(WindowExtensions).PrepareLogger();
 
+    public static IDisposable RegisterWndProc(this HwndSource hwndSource, HwndSourceHook hook)
+    {
+        Log.Info(() => $"Adding hook to {hwndSource}");
+        hwndSource.AddHook(hook);
+        return Disposable.Create(() =>
+        {
+            Log.Info(() => $"Removing hook from {hwndSource}");
+            hwndSource.RemoveHook(hook);
+        });
+    }
+    
     public static IDisposable RegisterWndProc(this Window instance, HwndSourceHook hook)
     {
         var hwnd = new WindowInteropHelper(instance).EnsureHandle();
         var hwndSource = HwndSource.FromHwnd(hwnd) ?? throw new ApplicationException($"Something went wrong - failed to create {nameof(HwndSource)} for handle {hwnd.ToHexadecimal()}");
-        Log.Info(() => $"Adding hook to {instance}");
-        hwndSource.AddHook(hook);
-        return Disposable.Create(() =>
-        {
-            Log.Info(() => $"Removing hook from {instance}");
-            hwndSource.RemoveHook(hook);
-        });
+        return hwndSource.RegisterWndProc(hook);
     }
 
     public static IDisposable LogWndProc(this Window instance, string prefix)

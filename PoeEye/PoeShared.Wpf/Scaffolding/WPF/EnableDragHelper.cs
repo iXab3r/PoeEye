@@ -1,10 +1,15 @@
 using System;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace PoeShared.Scaffolding.WPF;
+
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 public sealed class EnableDragHelper
 {
@@ -14,60 +19,78 @@ public sealed class EnableDragHelper
         typeof(EnableDragHelper),
         new PropertyMetadata(default(bool), OnLoaded));
 
-    private static void OnLoaded(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+
+    private static void OnLoaded(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
     {
-        var uiElement = dependencyObject as UIElement;
-        if (uiElement == null || dependencyPropertyChangedEventArgs.NewValue is bool == false)
+        if (dependencyObject is not UIElement uiElement)
         {
             return;
         }
 
-        if ((bool) dependencyPropertyChangedEventArgs.NewValue)
+        if ((bool)e.NewValue)
         {
-            uiElement.MouseMove += UIElementOnMouseMove;
+            uiElement.MouseDown += UIElementOnMouseDown;
         }
         else
         {
-            uiElement.MouseMove -= UIElementOnMouseMove;
+            uiElement.MouseDown -= UIElementOnMouseDown;
         }
     }
 
-    private static void UIElementOnMouseMove(object sender, MouseEventArgs mouseEventArgs)
+    private static void UIElementOnMouseDown(object sender, MouseButtonEventArgs e)
     {
-        var uiElement = sender as UIElement;
-        if (uiElement == null)
+        if (sender is not UIElement uiElement || e.LeftButton != MouseButtonState.Pressed)
         {
             return;
         }
 
-        if (mouseEventArgs.LeftButton != MouseButtonState.Pressed)
+        var window = uiElement.FindVisualAncestor<Window>();
+        if (window != null)
+        {
+            window.DragMove();
+            return;
+        }
+        
+        var popup = uiElement.FindLogicalAncestor<Popup>();
+        if (popup != null)
+        {
+            var mousePosition = e.MouseDevice.GetPosition(popup); // Get the mouse position relative to the screen
+            popup.Tag = mousePosition;
+            popup.Child.CaptureMouse();
+            popup.MouseMove += PopupOnMouseMove;
+            popup.MouseUp += PopupOnMouseUp;
+        }
+    }
+
+    private static void PopupOnMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not Popup popup)
         {
             return;
         }
 
+        popup.Child.ReleaseMouseCapture();
+        popup.Tag = null;
+        popup.MouseMove -= PopupOnMouseMove;
+        popup.MouseUp -= PopupOnMouseUp;
+    }
 
-        DependencyObject parent = uiElement;
-        var avoidInfiniteLoop = 0;
-        // Search up the visual tree to find the first parent window.
-        while (parent is Window == false)
+    private static void PopupOnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed || sender is not Popup {Tag: Point originalPoint} popup)
         {
-            parent = VisualTreeHelper.GetParent(parent);
-            avoidInfiniteLoop++;
-            if (avoidInfiniteLoop == 1000)
-            {
-                // Something is wrong - we could not find the parent window.
-                return;
-            }
+            return;
         }
 
-        var window = parent as Window;
-        Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
-        {
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
-            {
-                window.DragMove();
-            }
-        }));
+        var currentPoint = e.MouseDevice.GetPosition(popup); // Get the current mouse position relative to the screen
+        var offset = new Point(currentPoint.X - originalPoint.X, currentPoint.Y - originalPoint.Y);
+
+        // Adjust the popup's position
+        popup.HorizontalOffset += offset.X;
+        popup.VerticalOffset += offset.Y;
+
+        // Update the starting point for the next move
+        popup.Tag = currentPoint;
     }
 
     public static void SetEnableDrag(DependencyObject element, bool value)
@@ -77,6 +100,6 @@ public sealed class EnableDragHelper
 
     public static bool GetEnableDrag(DependencyObject element)
     {
-        return (bool) element.GetValue(EnableDragProperty);
+        return (bool)element.GetValue(EnableDragProperty);
     }
 }

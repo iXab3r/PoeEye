@@ -21,7 +21,7 @@ public sealed class FocusHelper
     {
         obj.SetValue(IsFocusedProperty, value);
     }
-
+    
     private static T FindFocusable<T>(DependencyObject element) where T : FrameworkElement
     {
         if (element is T)

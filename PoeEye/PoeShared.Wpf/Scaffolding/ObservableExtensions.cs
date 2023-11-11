@@ -14,7 +14,7 @@ public static class ObservableExtensions
         return scheduler switch
         {
             DispatcherScheduler dispatcherScheduler => ObserveOnIfNeeded(source, dispatcherScheduler.Dispatcher),
-            EnforcedThreadScheduler enforcedThreadScheduler => source.Select(x => enforcedThreadScheduler.IsOnSchedulerThread ? Observable.Return(x) : Observable.Return(x).ObserveOn(enforcedThreadScheduler)).Switch(),
+            EnforcedThreadScheduler enforcedThreadScheduler => source.SelectMany(x => enforcedThreadScheduler.IsOnSchedulerThread ? Observable.Return(x) : Observable.Return(x).ObserveOn(enforcedThreadScheduler)),
             _ => throw new NotSupportedException($"Unsupported scheduler type: {scheduler}")
         };
     }
@@ -23,13 +23,13 @@ public static class ObservableExtensions
     {
         return source.ObserveOnIfNeeded(DispatcherScheduler.Current.Dispatcher);
     }
-    
+
     public static IObservable<T> ObserveOnIfNeeded<T>(this IObservable<T> source, Dispatcher dispatcher)
     {
         return source
-            .Select(x => dispatcher.CheckAccess() ? Observable.Return(x) : Observable.Return(x).ObserveOn(dispatcher)).Switch();
+            .SelectMany(x => dispatcher.CheckAccess() ? Observable.Return(x) : Observable.Return(x).ObserveOn(dispatcher));
     }
-    
+
     public static IObservable<T> EnsureOn<T>(this IObservable<T> source, IScheduler scheduler)
     {
         return scheduler switch
@@ -39,17 +39,33 @@ public static class ObservableExtensions
             _ => throw new NotSupportedException($"Unsupported scheduler type: {scheduler}")
         };
     }
-    
+
     public static IObservable<T> EnsureOn<T>(this IObservable<T> source, Dispatcher dispatcher)
     {
         return source
-            .Select(x => dispatcher.CheckAccess() ? x : throw new InvalidOperationException($"Expected that the message will be on dispatcher {dispatcher}"));
+            .Select(x =>
+            {
+                if (dispatcher.CheckAccess())
+                {
+                    return x;
+                }
+
+                throw new InvalidOperationException($"Expected that the message will be on dispatcher {dispatcher}");
+            });
     }
-    
+
     public static IObservable<T> EnsureOn<T>(this IObservable<T> source, EnforcedThreadScheduler scheduler)
     {
         return source
-            .Select(x => scheduler.IsOnSchedulerThread ? x : throw new InvalidOperationException($"Expected that the message will be on thread {scheduler}"));
+            .Select(x =>
+            {
+                if (scheduler.IsOnSchedulerThread)
+                {
+                    return x;
+                }
+
+                throw new InvalidOperationException($"Expected that the message will be on thread {scheduler}");
+            });
     }
 
     public static IObservable<T> Suspend<T>(
