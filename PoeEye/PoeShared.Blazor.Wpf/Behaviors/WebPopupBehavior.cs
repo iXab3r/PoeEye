@@ -2,49 +2,77 @@ using System;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Interactivity;
 using System.Windows.Interop;
-using Microsoft.VisualBasic.Logging;
 using Microsoft.Web.WebView2.Wpf;
 using PInvoke;
-using PoeShared.Blazor.Wpf;
+using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 
-namespace PoeShared.Scaffolding.WPF;
+namespace PoeShared.Blazor.Wpf.Behaviors;
 
-public sealed class ClosePopupWhenDeactivatedBehavior : Behavior<Popup>
+public sealed class WebPopupBehavior : Behavior<Popup>
 {
+    public static readonly DependencyProperty CloseWhenDeactivatedProperty = DependencyProperty.Register(
+        nameof(CloseWhenDeactivated), typeof(bool), typeof(WebPopupBehavior), new PropertyMetadata(default(bool)));
+
     protected override void OnAttached()
     {
         base.OnAttached();
         AssociatedObject.Opened += AssociatedObjectOnOpened;
     }
 
+    public bool CloseWhenDeactivated
+    {
+        get => (bool) GetValue(CloseWhenDeactivatedProperty);
+        set => SetValue(CloseWhenDeactivatedProperty, value);
+    }
+
     private void AssociatedObjectOnOpened(object sender, EventArgs e)
     {
-        UIElement focusable = null;
+        if (!CloseWhenDeactivated)
+        {
+            return;
+        }
+        
+        /*
+         * There are quite a few issues with displaying WebView2 in popup:
+         * air-space - https://github.com/MicrosoftEdge/WebView2Feedback/issues/286
+         * hit-test - https://github.com/MicrosoftEdge/WebView2Feedback/issues/997
+         * focus - https://github.com/MicrosoftEdge/WebView2Feedback/issues/2531
+         *
+         * All-in-all, this behavior is an attempt to counter some of them by managing focus
+         * Note that for all this to have effect, usually StaysOpen must be set to True,
+         * otherwise popup will use its own mechanism(which will not work) to close the popup
+        */
+        
+        WebView2 focusableWebView = null;
+        UIElement focusableElement = null;
         foreach (var element in AssociatedObject.Child.VisualDescendants().OfType<UIElement>())
         {
+            if (focusableWebView != null && focusableElement != null)
+            {
+                break;
+            }
+            
             if (!element.Focusable)
             {
                 continue;
             }
 
-            if (element is WebView2 webView)
+            if (focusableWebView == null && element is WebView2 webView)
             {
-                focusable = webView;
-                break;
+                focusableWebView = webView;
+                continue;
             }
 
-            if (focusable == null)
+            if (focusableElement == null)
             {
-                focusable = element;
+                focusableElement = element;
             }
         }
-        focusable?.Focus();
 
         var anchors = new CompositeDisposable();
         Disposable.Create(() => { }).AddTo(anchors);
@@ -57,13 +85,20 @@ public sealed class ClosePopupWhenDeactivatedBehavior : Behavior<Popup>
             })
             .AddTo(anchors);
 
+        //var parentWindow = AssociatedObject.FindVisualAncestor<Window>();
         var popupRoot = AssociatedObject.Child.FindVisualTreeRoot();
         var popupRootSource = (HwndSource)PresentationSource.FromDependencyObject(popupRoot);
-        popupRootSource.RegisterWndProc(PopupWindowHook).AddTo(anchors);
+        if (popupRootSource == null)
+        {
+            return;
+        }
 
-        //detecting on popup window seems to be reliable enough
-        //var parentWindow = AssociatedObject.FindVisualAncestor<Window>();
-        //parentWindow?.RegisterWndProc(ParentWindowHook).AddTo(anchors);
+        // there were multiple attempts, seems that finding out WebView
+        var elementToFocus = focusableWebView ?? focusableElement;
+        elementToFocus?.Focus();
+        
+        // this part will track deactivation and close popup if needed
+        popupRootSource.RegisterWndProc(PopupWindowHook).AddTo(anchors);
     }
 
     private IntPtr PopupWindowHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)

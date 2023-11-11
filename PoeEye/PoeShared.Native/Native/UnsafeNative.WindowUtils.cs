@@ -250,9 +250,22 @@ public partial class UnsafeNative
         return true;
     }
 
-    public static void ShowInactiveTopmost(IntPtr handle)
+    public static void ShowTopmost(IntPtr handle)
     {
         Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window topmost");
+        Win32ErrorCode error;
+        if (!User32.SetWindowPos(handle,
+                User32.SpecialWindowHandles.HWND_TOPMOST,
+                0, 0, 0, 0,
+                User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        {
+            Log.Warn($"Failed to SetWindowPos({handle.ToHexadecimal()}), error: {error}");
+        }
+    }
+    
+    public static void ShowInactiveTopmost(IntPtr handle)
+    {
+        Log.Debug(() => $"[{handle.ToHexadecimal()}] Showing window inactive topmost");
         Win32ErrorCode error;
         if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
         {
