@@ -14,7 +14,7 @@ using ReactiveUI;
 
 namespace PoeShared.Scaffolding.WPF;
 
-public sealed class CommandWrapper : DisposableReactiveObject, ICommand
+public sealed class CommandWrapper : DisposableReactiveObject, ICommandWrapper
 {
     private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
     private static readonly ISubject<Exception> ErrorsSink = new Subject<Exception>();
@@ -122,6 +122,11 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommand
         }
     }
 
+    public async Task ExecuteAsync(object parameter)
+    {
+        Execute(parameter);
+    }
+    
     public void Execute(object parameter)
     {
         ResetError();

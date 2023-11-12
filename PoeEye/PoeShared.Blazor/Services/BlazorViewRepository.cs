@@ -29,9 +29,9 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             .Switch()
             .Subscribe(x =>
             {
-                Log.Info($"Adding assembly {x} to processing queue");
+                Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
-                Log.Info($"Added assembly {x} to processing queue");
+                Log.Debug($"Added assembly {x} to processing queue");
             }, Log.HandleUiException)
             .AddTo(Anchors);
     }
