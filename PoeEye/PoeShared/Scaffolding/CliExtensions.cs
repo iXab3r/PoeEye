@@ -11,11 +11,13 @@ public static class CliExtensions
 
     public static async IAsyncEnumerable<CommandEvent> ListenAndLogAsync(this Command command, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        using var anchors = new CompositeDisposable();
         var log = Log.WithSuffix(command.ToString());
         int? processId = null;
         try
         {
             log.Info($"Running command: {command}");
+            
 
             await foreach (var cmdEvent in ListenAsync(log, command, Encoding.Default, Encoding.Default, cancellationToken))
             {
@@ -25,6 +27,14 @@ public static class CliExtensions
                         processId = started.ProcessId;
                         log.AddPrefix($"PID {started.ProcessId}");
                         log.Info($"Process started; ID: {started.ProcessId}");
+                        
+                        cancellationToken.Register(() =>
+                        {
+                            log.Warn($"Forcefully cancelling command process(id {started.ProcessId}): {command}");
+                            TerminateProcessById(started.ProcessId, log);
+                            log.Warn($"Forcefully terminated process(id {started.ProcessId}): {command}");
+                        }).AddTo(anchors);
+                        
                         break;
                     case StandardOutputCommandEvent stdOut:
                         log.Debug($"Out> {stdOut.Text}");
