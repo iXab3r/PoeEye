@@ -1,3 +1,5 @@
+//#define WINDOW_ENABLE_STACKTRACE_LOG
+
 using System;
 using System.Drawing;
 using System.Reactive;
@@ -26,7 +28,7 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
 
     public ReactiveMetroWindow()
     {
-        Log.Debug(() => "Created window");
+        Log.Info(() => "Created window");
         Tag = $"Tag of {WindowId}";
         Loaded += OnLoaded;
 
@@ -49,18 +51,19 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                     {
                         return;
                     }
-
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.Debug(() =>
                         $"Setting initial window bounds, TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, desired bounds: {newBounds}");
+#endif
                     NativeBounds = newBounds;
                 }, Log.HandleUiException)
             .AddTo(Anchors);
         Dpi = new PointF(1, 1);
         Controller = new WindowViewController(this).AddTo(Anchors);
     }
-    
+
     public IWindowViewController Controller { get; }
-    
+
     public Rectangle NativeBounds { get; set; }
 
     public Rectangle ActualBounds { get; private set; }
@@ -74,15 +77,17 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
     public PointF Dpi { get; private set; }
 
     public bool DpiAware { get; set; } = true;
-    
+
     public IObservable<EventPattern<EventArgs>> WhenRendered => Observable
         .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h);
 
     private void OnLoaded(object sender, EventArgs ea)
     {
         Log.Info(() => $"Window is loaded");
+#if WINDOW_ENABLE_STACKTRACE_LOG
         Log.Debug(() => $"Resolving {nameof(HwndSource)} for {WindowHandle}");
-        var hwndSource = (HwndSource)PresentationSource.FromVisual(this);
+#endif
+        var hwndSource = (HwndSource) PresentationSource.FromVisual(this);
         if (hwndSource == null)
         {
             throw new InvalidStateException("HwndSource must be initialized at this point");
@@ -90,30 +95,38 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
 
         Disposable.Create(() =>
         {
+#if WINDOW_ENABLE_STACKTRACE_LOG
             Log.Debug(() => $"Releasing {nameof(HwndSource)}");
+#endif
             hwndSource.Dispose();
         }).AddTo(Anchors);
-        
+
         this.WhenAnyValue(ShowSystemMenuProperty, x => x.ShowSystemMenu)
             .Subscribe(x =>
             {
                 if (x)
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.Debug(() => "Showing system menu");
+#endif
                     UnsafeNative.ShowSystemMenu(WindowHandle);
                 }
                 else
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.Debug(() => "Hiding system menu");
+#endif
                     UnsafeNative.HideSystemMenu(WindowHandle);
                 }
             })
             .AddTo(Anchors);
 
         Dpi = GetDpiFromHwndSource(hwndSource);
-        hwndSource.AddHook(WindowDragHook); 
+        hwndSource.AddHook(WindowDragHook);
         //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
+#if WINDOW_ENABLE_STACKTRACE_LOG
         Log.Debug(() => $"Resolved {nameof(HwndSource)} for {WindowHandle}: {hwndSource}");
+#endif
         hwndSource.AddHook(WindowPositionHook);
 
         // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
@@ -127,21 +140,29 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
                 if (isUpdatingActualBounds)
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.Debug(() =>
                         $"Native bounds changed as a part of actual bounds update: {x.Previous} => {x.Current}");
+#endif
                     return;
                 }
 
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.Debug(() => $"Native bounds changed, setting windows rect: {x.Previous} => {x.Current}");
+#endif
                 UnsafeNative.SetWindowRect(WindowHandle, x.Current);
                 var actualBounds = UnsafeNative.GetWindowRect(WindowHandle);
                 if (actualBounds != x.Current)
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.Warn(() => $"Failed to resize: {x.Previous} => {x.Current}, resulting native bounds: {actualBounds}");
+#endif
                 }
                 else
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.Debug(() => $"Native bounds changed: {x.Previous} => {x.Current}");
+#endif
                 }
             }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -156,7 +177,9 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                     return;
                 }
 
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.Debug(() => $"Actual bounds have changed: {x.Previous} => {x.Current}");
+#endif
                 try
                 {
                     isUpdatingActualBounds = true;
@@ -167,7 +190,9 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                     isUpdatingActualBounds = false;
                 }
 
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.Debug(() => $"Propagated actual bounds: {x.Current}");
+#endif
             }, Log.HandleUiException)
             .AddTo(Anchors);
     }
@@ -180,16 +205,20 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
             return IntPtr.Zero;
         }
 
-        var msg = (User32.WindowMessage)msgRaw;
+        var msg = (User32.WindowMessage) msgRaw;
         switch (msg)
         {
             case User32.WindowMessage.WM_GETMINMAXINFO
                 when Marshal.PtrToStructure(lParam, typeof(User32.MINMAXINFO)) is User32.MINMAXINFO minmax:
             {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(msg).Debug(() => $"OS has requested window MinMaxInfo, structure value: {minmax.ToJson()}");
+#endif
                 minmax.ptMinTrackSize = new POINT(); // there is a problem with WPF Window which measures MinSize incorrectly 
                 Marshal.StructureToPtr(minmax, lParam, true);
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(msg).Debug(() => $"Overriding MinMaxInfo with new value: {minmax.ToJson()}");
+#endif
                 break;
             }
             case User32.WindowMessage.WM_WINDOWPOSCHANGING
@@ -198,17 +227,24 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 if (wp.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE))
                 {
                     // window reordering
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.WithSuffix(msg).Debug(() => $"Window position is being updated w/o move/resize, flags: {wp.flags}");
+#endif
                     break;
                 }
+
                 var desiredBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(msg).Debug(() => $"Window position is being changed to {desiredBounds}, flags: {wp.flags}");
+#endif
                 break;
             }
             case User32.WindowMessage.WM_SIZING
                 when Marshal.PtrToStructure(lParam, typeof(RECT)) is RECT bounds:
             {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(msg).Debug(() => $"Window size is being changed to {bounds}");
+#endif
                 break;
             }
             case User32.WindowMessage.WM_SIZE:
@@ -216,7 +252,9 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 // The low-order word of lParam specifies the new width of the client area.
                 // The high-order word of lParam specifies the new height of the client area.
                 var newSize = new WinSize(lParam.LoWord(), lParam.HiWord());
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(msg).Debug(() => $"Window size has been changed to {newSize}");
+#endif
                 break;
             }
             case User32.WindowMessage.WM_WINDOWPOSCHANGED
@@ -225,27 +263,39 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 if (wp.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE))
                 {
                     // window reordering
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.WithSuffix(msg).Debug(() => $"Window position is being updated w/o move/resize, flags: {wp.flags}");
+#endif
                     break;
                 }
 
                 /* When a window is minimized, Windows doesn't actually move the window off-screen in the sense of simply placing it somewhere far away from the visible display area.
-                 * Instead, Windows gives it a specific off-screen position, which is at the coordinates (-32000, -32000). 
+                 * Instead, Windows gives it a specific off-screen position, which is at the coordinates (-32000, -32000).
                  * This is a special coordinate used internally by the windowing system to denote minimized windows.
                  * If you were to enumerate all windows on the system and check their positions, any window that is minimized would report this position. */
                 if (wp is {x: -32000, y: -32000})
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.WithSuffix(msg).Debug(() => $"Window position is being updated w/o move/resize due to minimize/maximize operation");
+#endif
                     break;
                 }
+
                 var newBounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(msg).Debug(() => $"Window position has been changed to {newBounds}, flags: {wp.flags}");
+#endif
+
                 var currentBounds = ActualBounds;
                 if (newBounds != currentBounds)
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.WithSuffix(msg).Debug(() => $"Updating actual bounds: {currentBounds} => {newBounds}");
+#endif
                     ActualBounds = newBounds;
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.WithSuffix(msg).Debug(() => $"Updated actual bounds: {currentBounds} => {newBounds}");
+#endif
                 }
 
                 break;
@@ -267,7 +317,7 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
             return IntPtr.Zero;
         }
 
-        var msg = (User32.WindowMessage)msgRaw;
+        var msg = (User32.WindowMessage) msgRaw;
         switch (msg)
         {
             case User32.WindowMessage.WM_ENTERSIZEMOVE:
@@ -276,9 +326,12 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 dragParams = new DragParams
                 {
                     InitialBounds = bounds,
-                    InitialAspectRatio = (double)bounds.Width / bounds.Height,
+                    InitialAspectRatio = (double) bounds.Width / bounds.Height,
                 };
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.Debug(() => $"Entering Drag mode, initial bounds: {bounds}");
+#endif
+
                 break;
             }
             case User32.WindowMessage.WM_EXITSIZEMOVE:
@@ -288,7 +341,11 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                     break;
                 }
 
+#if WINDOW_ENABLE_STACKTRACE_LOG
+
                 Log.Debug(() => $"Drag mode completed, initialBounds: {dragParams?.InitialBounds} => {ActualBounds}");
+#endif
+
                 dragParams = null;
                 break;
             }
@@ -299,7 +356,7 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                     break;
                 }
 
-                var pos = (UnsafeNative.WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
+                var pos = (UnsafeNative.WINDOWPOS) Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
                 if (pos.flags.HasFlag(User32.SetWindowPosFlags.SWP_NOMOVE))
                 {
                     break;
@@ -310,18 +367,24 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 var minSize = new WpfSize(MinWidth, MinHeight).Scale(Dpi).ToWinSize();
                 var maxSize = new WpfSize(MaxWidth, MaxHeight).Scale(Dpi).ToWinSize();
                 var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 var logSuffix =
                     $"initial bounds: {initialBounds}, targetAspectRatio: {aspectRatio}, move bounds: {bounds}";
+#endif
 
                 if (bounds.Size == initialBounds.Size)
                 {
+#if WINDOW_ENABLE_STACKTRACE_LOG
                     Log.WithSuffix(logSuffix).Debug(() => $"Ignoring position change - actual size stayed the same");
+#endif
                     break;
                 }
 
                 var newBounds = aspectRatioSizeCalculator.Calculate(aspectRatio, bounds, initialBounds,
                     prioritizeHeight: aspectRatio >= 1);
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(logSuffix).Debug(() => $"Calculated updated bounds: {newBounds}");
+#endif
                 newBounds.Width = newBounds.Width.EnsureInRange(minSize.Width, maxSize.Width);
                 newBounds.Height = newBounds.Height.EnsureInRange(minSize.Height, maxSize.Height);
                 if (newBounds == bounds)
@@ -329,7 +392,9 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                     break;
                 }
 
+#if WINDOW_ENABLE_STACKTRACE_LOG
                 Log.WithSuffix(logSuffix).Debug(() => $"Propagating updated bounds: {newBounds}");
+#endif
 
                 pos.x = newBounds.X;
                 pos.y = newBounds.Y;

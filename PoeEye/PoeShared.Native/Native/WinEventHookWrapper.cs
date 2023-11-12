@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using PInvoke;
 using PoeShared.Prism;
@@ -25,6 +26,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
     private readonly WinEventHookArguments hookArgs;
 
     private readonly ISubject<WinEventHookData> whenWindowEventTriggered = new Subject<WinEventHookData>();
+    private readonly Thread hookThread;
 
     public WinEventHookWrapper(
         WinEventHookArguments hookArgs,
@@ -37,7 +39,12 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         Log.Debug(() => $"New WinEvent hook created, args: {hookArgs}");
 
         Disposable.Create(() => Log.Info(() => $"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
-        Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
+        hookThread = new Thread(Run)
+        {
+            Name = $"Hook {hookArgs.ToString()}",
+            IsBackground = true,
+        };
+        hookThread.Start(); // realistically, this thread is never stopped - hooks live for entire lifetime of an app
         Disposable.Create(() => Log.Info(() => $"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
     }
     private IFluentLog Log { get; }
@@ -120,8 +127,9 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             try
             {
                 log.Info(() => $"Event loop started");
+                long messagesProcessed = 0;
                 while(GetMessage(out var msg, IntPtr.Zero, 0, 0 ))
-                { 
+                {
                     try
                     {
                         if (msg.Message == WM_QUIT)
@@ -129,14 +137,18 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
                             log.Info(() => $"Received {nameof(WM_QUIT)}, breaking event loop");
                             break;
                         }
-                        TranslateMessage(ref msg); 
-                        DispatchMessage(ref msg); 
+
+                        TranslateMessage(ref msg);
+                        DispatchMessage(ref msg);
                     }
                     catch (Exception e)
                     {
                         log.Warn($"Exception in EventLoop", e);
                     }
-                        
+                    finally
+                    {
+                        messagesProcessed++;
+                    }
                 } 
             }
             catch (Exception e)
