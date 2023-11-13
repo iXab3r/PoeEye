@@ -181,6 +181,16 @@ internal sealed class PoeConfigConverter : JsonConverter
                 {
                     var result = converterKvp.Converter(convertedValue);
                     Log.Info(() => $"Successfully used converter {converterKvp.Key}");
+                    if (result is IPoeEyeConfigVersioned versioned)
+                    {
+                        // realistically, this should always be the case
+                        Log.Info(() => $"Bumping up version in metadata after converter {converterKvp.Key}: {metadata.Version} => {versioned.Version}");
+                        if (versioned.Version != converterKvp.Key.TargetVersion)
+                        {
+                            Log.Warn(() => $"Something is off - expected that converter {converterKvp.Key} will convert version {metadata.Version} to {converterKvp.Key.TargetVersion}, but got {versioned.Version}");
+                        }
+                        metadata.Version = versioned.Version;
+                    }
                     return result;
                 }
                 catch (Exception e)
@@ -267,9 +277,5 @@ internal sealed class PoeConfigConverter : JsonConverter
         where TConfig : IPoeEyeConfig
     {
         metadata.Value = value;
-        if (value is IPoeEyeConfigVersioned versioned)
-        {
-            metadata.Version = versioned.Version;
-        }
     }
 }
