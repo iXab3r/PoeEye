@@ -329,6 +329,30 @@ public static class StringUtils
         return text.StartsWith(GzipPrefix);
     }
 
+    public static byte[] DecompressFromGZip(byte[] compressedBuffer)
+    {
+        using var decompressed = new MemoryStream();
+        using var compressed = new MemoryStream(compressedBuffer);
+        
+        compressed.Position = 0;
+        using (var gZipStream = new GZipStream(compressed, CompressionMode.Decompress))
+        {
+            gZipStream.CopyTo(decompressed);
+        }
+
+        return decompressed.ToArray();
+    }
+    public static byte[] CompressToGZip(byte[] buffer)
+    {
+        using var memoryStream = new MemoryStream();
+        using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true))
+        {
+            gZipStream.Write(buffer, 0, buffer.Length);
+        }
+        var compressedBuffer = memoryStream.ToArray();
+        return compressedBuffer;
+    }
+    
     /// <summary>
     ///     Compresses the string.
     /// </summary>
@@ -340,12 +364,7 @@ public static class StringUtils
         Guard.ArgumentNotNull(() => text);
 
         var buffer = Encoding.UTF8.GetBytes(text);
-        using var memoryStream = new MemoryStream();
-        using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true))
-        {
-            gZipStream.Write(buffer, 0, buffer.Length);
-        }
-        var compressedBuffer = memoryStream.ToArray();
+        var compressedBuffer = CompressToGZip(buffer);
         if (includePrefix)
         {
             return $"{GzipPrefix}{Convert.ToBase64String(compressedBuffer)}";
@@ -380,17 +399,8 @@ public static class StringUtils
             }
 
             var compressedBuffer = Convert.FromBase64String(compressedText);
-            using (var decompressed = new MemoryStream())
-            using (var compressed = new MemoryStream(compressedBuffer))
-            {
-                compressed.Position = 0;
-                using (var gZipStream = new GZipStream(compressed, CompressionMode.Decompress))
-                {
-                    gZipStream.CopyTo(decompressed);
-                }
-
-                return Encoding.UTF8.GetString(decompressed.ToArray());
-            }
+            var decompressedBuffer = DecompressFromGZip(compressedBuffer);
+            return Encoding.UTF8.GetString(decompressedBuffer);
         }
         catch (InvalidDataException)
         {

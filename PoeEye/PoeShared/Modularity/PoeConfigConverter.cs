@@ -267,5 +267,9 @@ internal sealed class PoeConfigConverter : JsonConverter
         where TConfig : IPoeEyeConfig
     {
         metadata.Value = value;
+        if (value is IPoeEyeConfigVersioned versioned)
+        {
+            metadata.Version = versioned.Version;
+        }
     }
 }
