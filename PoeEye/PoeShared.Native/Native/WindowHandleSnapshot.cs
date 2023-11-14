@@ -25,6 +25,7 @@ internal readonly struct WindowHandleSnapshot : IWindowHandle
     public Rectangle ClientBounds { get; }
     public Rectangle DwmWindowBounds { get; }
     public Rectangle DwmWindowBoundsWithinMonitor { get; }
+    public Size BorderSize { get; }
     public Icon Icon { get; }
     public BitmapSource IconBitmap { get; }
     public string Class { get; }

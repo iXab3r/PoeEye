@@ -36,6 +36,11 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// Gets the DWM window frame bounds within monitor.
     /// </summary>
     Rectangle DwmWindowBoundsWithinMonitor { get; }
+    
+    /// <summary>
+    /// Gets window border size using legacy API
+    /// </summary>
+    Size BorderSize { get; }
 
     /// <summary>
     /// Gets the icon of the window.

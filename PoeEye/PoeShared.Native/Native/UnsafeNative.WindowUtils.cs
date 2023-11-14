@@ -4,9 +4,11 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Interop;
+using NAudio.Utils;
 using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
+using HResult = PInvoke.HResult;
 
 namespace PoeShared.Native;
 
@@ -33,10 +35,49 @@ public partial class UnsafeNative
     
     [DllImport("dwmapi.dll", PreserveSig = false)]
     public static extern bool DwmIsCompositionEnabled();
+    
+    /// <summary>Determines whether a window is maximized.</summary>
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool IsZoomed(IntPtr hWnd);
 
     public static IntPtr MakeLParam(int loWord, int hiWord)
     {
         return new IntPtr((hiWord << 16) | (loWord & 0xffff));
+    }
+    
+    public static bool TryGetWindowBorderSize(IntPtr handle, out Size size)
+    {
+        var wi = User32.WINDOWINFO.Create();
+        var result = User32.GetWindowInfo(handle, ref wi);
+        size = result ? new Size((int)wi.cxWindowBorders, (int)wi.cyWindowBorders) : Size.Empty;
+        return result;
+    }
+    
+    public static Rectangle LegacyMaximizedWindowFix(IntPtr handle, Rectangle windowRect)
+    {
+        if (TryGetWindowBorderSize(handle, out Size size))
+        {
+            windowRect = new Rectangle(windowRect.X + size.Width, windowRect.Y + size.Height, windowRect.Width - size.Width * 2, windowRect.Height - size.Height * 2);
+        }
+
+        return windowRect;
+    }
+    
+    public static Rectangle RetrieveWindowRectangle(IntPtr handle)
+    {
+        var rect = Rectangle.Empty;
+        if (IsDWMEnabled() && TryGetDwmWindowFrameBounds(handle, out var dwmRect))
+        {
+            rect = dwmRect;
+        }
+
+        if (rect.IsEmpty)
+        {
+            rect = GetWindowRect(handle);
+        }
+
+        return rect;
     }
 
     /// <summary>
@@ -96,30 +137,42 @@ public partial class UnsafeNative
         return resultValue;
     }
 
-    public static Rectangle DwmGetWindowFrameBounds(IntPtr hwnd)
+    public static bool TryGetDwmWindowFrameBounds(IntPtr hwnd, out Rectangle bounds)
     {
-        if (!IsWindows10OrGreater())
+        if (!IsDWMEnabled())
         {
-            return Rectangle.Empty;
+            bounds = default;
+            return false;
         }
 
         var result = DwmGetWindowAttribute(hwnd, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, out RECT frame, Marshal.SizeOf<RECT>());
         if (!result.Succeeded)
         {
-            Log.Warn($"Failed to DwmGetWindowAttribute by HWND {hwnd.ToHexadecimal()}, error: {result}");
-            return Rectangle.Empty;
+            bounds = default;
+            return false;
         }
 
-        return new Rectangle(frame.left, frame.top, frame.right - frame.left, frame.bottom - frame.top);
+        bounds = Rectangle.FromLTRB(frame.left, frame.top, frame.right, frame.bottom);
+        return true;
+    }
+    
+    public static Rectangle DwmGetWindowFrameBounds(IntPtr hwnd)
+    {
+        if (!TryGetDwmWindowFrameBounds(hwnd, out var frame))
+        {
+            return default;
+        }
+
+        return frame;
+    }
+    
+    public static bool IsDWMEnabled()
+    {
+        return IsWindows10OrGreater() && DwmIsCompositionEnabled();
     }
 
     public static Rectangle GetWindowBorders(IntPtr hwnd)
     {
-        var isDwmEnabled = IsWindows10OrGreater() && DwmIsCompositionEnabled();
-        var dwmRect = DwmGetWindowFrameBounds(hwnd);
-        var apiRect = GetWindowRect(hwnd);
-        var windowRect = isDwmEnabled ? DwmGetWindowFrameBounds(hwnd) : GetWindowRect(hwnd);
-
         var captionHeight = User32.GetSystemMetrics(User32.SystemMetric.SM_CYCAPTION);
         
         var leftBorder = 0;

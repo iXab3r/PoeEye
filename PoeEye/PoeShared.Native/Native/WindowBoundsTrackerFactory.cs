@@ -26,9 +26,15 @@ internal sealed class WindowBoundsTrackerFactory : IWindowBoundsTrackerFactory
             EventMax = User32.WindowsEventHookType.EVENT_OBJECT_LOCATIONCHANGE,
         });
 
-        return locationChangeHook.WhenWindowEventTriggered.Where(y => y.WindowHandle == windowToTrack.Handle)
+        return locationChangeHook
+            .WhenWindowEventTriggered
+            .Where(y => y.WindowHandle == windowToTrack.Handle)
             .StartWithDefault()
-            .Select(x => (Rectangle?)windowToTrack.DwmWindowBounds) // Dwm is more precise
+            .Select(x =>
+            {
+                // Dwm is more precise
+                return (Rectangle?) UnsafeNative.RetrieveWindowRectangle(windowToTrack.Handle);
+            }) 
             .DistinctUntilChanged();
     }
 

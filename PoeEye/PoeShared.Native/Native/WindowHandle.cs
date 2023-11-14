@@ -240,7 +240,9 @@ internal sealed class WindowHandle : IWindowHandle
     public Rectangle DwmWindowBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
 
     public Rectangle DwmWindowBoundsWithinMonitor => UnsafeNative.DwmGetWindowFrameBoundsWithinMonitor(Handle);
-        
+
+    public WinSize BorderSize => UnsafeNative.TryGetWindowBorderSize(Handle, out var borderSize) ? borderSize : WinSize.Empty;
+
     public Rectangle MonitorBounds => System.Windows.Forms.Screen.FromHandle(Handle).Bounds;
 
     [JsonIgnore] public Icon Icon => iconSupplier.Value;
