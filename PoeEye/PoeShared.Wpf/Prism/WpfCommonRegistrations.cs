@@ -40,6 +40,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IExceptionReportingService, ExceptionReportingService>()
             .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
             .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
+            .RegisterSingleton<SafeModeService>(typeof(ISafeModeService))
             .RegisterSingleton<INotificationsService, NotificationsService>()
             .RegisterSingleton<CharToKeysConverter>(typeof(IConverter<(char ch, KeyboardLayout layout), Keys>), typeof(IConverter<char, Keys>))
             .RegisterSingleton<IMMCaptureDeviceProvider, MMCaptureDeviceProvider>()

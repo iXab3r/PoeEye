@@ -27,6 +27,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private readonly Application application;
     private readonly IWindowHandleProvider windowHandleProvider;
     private readonly IUniqueIdGenerator idGenerator;
+    private readonly ISafeModeService safeModeService;
     private readonly FileLock loadingFileLock;
     private readonly FileLock runningFileLock;
     private readonly ISubject<int> whenTerminated = new Subject<int>();
@@ -35,11 +36,13 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Application application,
         IWindowHandleProvider windowHandleProvider,
         IUniqueIdGenerator idGenerator,
+        ISafeModeService safeModeService,
         IAppArguments appArguments)
     {
         this.application = application;
         this.windowHandleProvider = windowHandleProvider;
         this.idGenerator = idGenerator;
+        this.safeModeService = safeModeService;
         this.appArguments = appArguments;
         Log.Info(() => $"Initializing Application accessor for {application}");
         if (application == null)
@@ -219,6 +222,12 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
         if (arguments != null && arguments.Contains('-'))
         {
+            const string safeModeArgument = "--safeMode";
+            if (!arguments.Contains(safeModeArgument) && safeModeService.IsInSafeMode)
+            {
+                arguments += $" {safeModeArgument} true"; //enforce safe-mode
+            }
+            
             Log.Info($"Supplied arguments contain '-', compressing args: {arguments}");
             RestartAs(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb);
             return;
