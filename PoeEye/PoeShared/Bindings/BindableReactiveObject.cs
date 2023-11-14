@@ -36,7 +36,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
 
     protected IFluentLog Log { get; }
     
-    protected string ObjectId { get; }
+    public string ObjectId { get; }
 
     public bool HasBindings { get; [UsedImplicitly] private set; }
     

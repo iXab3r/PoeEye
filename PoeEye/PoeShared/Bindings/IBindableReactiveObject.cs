@@ -6,6 +6,7 @@ namespace PoeShared.Bindings;
 
 public interface IBindableReactiveObject : IDisposableReactiveObject
 {
+    string ObjectId { get; }
     bool HasBindings { get; }
     IObservableCache<IReactiveBinding, string> Bindings { get; }
     ReadOnlyObservableCollection<IReactiveBinding> BindingsList { get; }
