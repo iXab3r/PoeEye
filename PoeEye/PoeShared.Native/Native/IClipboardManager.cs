@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using JetBrains.Annotations;
 
@@ -10,20 +11,26 @@ public interface IClipboardManager
     TimeSpan ClipboardRestorationTimeout { get; }
 
     int ClipboardSetRetryCount { get; }
+    
+    bool Clear();
 
     void SetText([NotNull] string text);
-
-    bool ContainsText();
-
-    bool ContainsFileDropList();
-
-    IReadOnlyList<string> GetFileDropList();
-
-    IDataObject GetDataObject();
+    
+    void SetImage(Image image);
 
     void SetDataObject(object dataObject);
 
     string GetText();
+    
+    Image GetImage();
+    
+    IReadOnlyList<string> GetFileDropList();
 
-    bool Clear();
+    IDataObject GetDataObject();
+    
+    bool ContainsImage();
+    
+    bool ContainsText();
+
+    bool ContainsFileDropList();
 }

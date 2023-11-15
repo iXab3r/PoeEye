@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -34,6 +35,11 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
         ClipboardApi.SetText(text);
     }
 
+    public bool ContainsImage()
+    {
+        return Clipboard.ContainsImage();
+    }
+
     public bool ContainsText()
     {
         return ClipboardApi.ContainsText();
@@ -43,7 +49,7 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
     {
         return ClipboardApi.GetText();
     }
-
+    
     public bool Clear()
     {
         return ClipboardApi.Clear();
@@ -53,6 +59,18 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
     {
         EnsureUiThread();
         return Clipboard.GetDataObject();
+    }
+
+    public void SetImage(Image image)
+    {
+        EnsureUiThread();
+        Clipboard.SetImage(image);
+    }
+    
+    public Image GetImage()
+    {
+        EnsureUiThread();
+        return Clipboard.GetImage();
     }
 
     public void SetDataObject(object dataObject)
