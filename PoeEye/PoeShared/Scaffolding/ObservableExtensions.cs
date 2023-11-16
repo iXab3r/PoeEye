@@ -81,6 +81,11 @@ public static class ObservableExtensions
         return observable.Select(x => Observable.FromAsync(_ => supplier(x)).Take(1)).Concat().Subscribe(() => { }, onError);
     }
     
+    public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, CancellationToken, Task<T1>> supplier)
+    {
+        return observable.Select(x => Observable.FromAsync((token) => supplier(x, token)).Take(1)).Concat();
+    }
+    
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier)
     {
         return observable.Select(x => Observable.FromAsync(_ => supplier(x)).Take(1)).Concat();
