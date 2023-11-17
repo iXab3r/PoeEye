@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PoeShared.Blazor.Services;
+﻿using PoeShared.Blazor.Services;
 using PoeShared.Scaffolding;
-using Unity;
 using Unity.Extension;
 
 namespace PoeShared.Blazor.Prism;
 
-public sealed class BlazorWebExtensions : UnityContainerExtension
+public sealed class BlazorWebRegistrations : UnityContainerExtension
 {
     protected override void Initialize()
     {

@@ -21,9 +21,9 @@ public partial class App : ApplicationBase
     {
         base.OnStartup(e);
 
-        Container.AddNewExtensionIfNotExists<BlazorWpfExtensions>();
+        Container.AddNewExtensionIfNotExists<BlazorWpfRegistrations>();
         Container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
-        Container.AddNewExtensionIfNotExists<BlazorWebExtensions>();
+        Container.AddNewExtensionIfNotExists<BlazorWebRegistrations>();
 
         Container
             .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();

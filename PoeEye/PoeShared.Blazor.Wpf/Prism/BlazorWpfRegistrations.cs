@@ -6,7 +6,7 @@ using Unity.Extension;
 
 namespace PoeShared.Blazor.Wpf.Prism;
 
-public sealed class BlazorWpfExtensions : UnityContainerExtension
+public sealed class BlazorWpfRegistrations : UnityContainerExtension
 {
     protected override void Initialize()
     {
