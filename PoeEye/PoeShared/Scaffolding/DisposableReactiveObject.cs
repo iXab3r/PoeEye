@@ -5,6 +5,9 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding;
 
+/// <summary>
+/// Represents an object that supports both disposability and reactive property changes.
+/// </summary>
 public abstract class DisposableReactiveObject : IDisposableReactiveObject
 {
     private readonly INpcEventInvoker propertyChanged;
@@ -14,6 +17,7 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         propertyChanged = new ConcurrentNpcEventInvoker(this);
     }
 
+    /// <inheritdoc />
     public CompositeDisposable Anchors { get; } = new();
 
     public event PropertyChangedEventHandler PropertyChanged
@@ -22,11 +26,13 @@ public abstract class DisposableReactiveObject : IDisposableReactiveObject
         remove => propertyChanged.Remove(value);
     }
 
+    /// <inheritdoc />
     public void RaisePropertyChanged(string propertyName)
     {
         propertyChanged.Raise(propertyName);
     }
 
+    /// <inheritdoc />
     public virtual void Dispose()
     {
         Anchors.Dispose();

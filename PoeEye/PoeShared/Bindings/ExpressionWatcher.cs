@@ -135,16 +135,22 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
 
     public TSource Source { get; set; }
 
+    /// <inheritdoc />
     public Exception Error { get; private set; }
 
+    /// <inheritdoc />
     public bool HasValue { get; private set; }
 
+    /// <inheritdoc />
     public bool CanSetValue { get; private set; }
 
+    /// <inheritdoc />
     public bool SupportsSetValue { get; }
 
+    /// <inheritdoc />
     object IValueProvider.Value => Value;
 
+    /// <inheritdoc />
     object IValueWatcher.Source
     {
         get => Source;

@@ -2,22 +2,41 @@
 
 namespace PoeShared.Scaffolding;
 
+/// <summary>
+/// Represents a boolean value annotated with a string, providing additional context or information about the boolean value.
+/// </summary>
 public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBoolean>
 {
+    /// <summary>
+    /// Initializes a new instance of the AnnotatedBoolean struct with the specified value and annotation.
+    /// </summary>
+    /// <param name="value">The boolean value.</param>
+    /// <param name="annotation">The annotation providing additional context for the boolean value.</param>
     public AnnotatedBoolean(bool value, string annotation)
     {
         Value = value;
         Annotation = annotation;
     }
-        
+     
+    /// <summary>
+    /// Initializes a new instance of the AnnotatedBoolean struct with the specified value and a function to generate the annotation.
+    /// </summary>
+    /// <param name="value">The boolean value.</param>
+    /// <param name="annotationSupplier">The function to generate the annotation based on the boolean value.</param>
     public AnnotatedBoolean(bool value, Func<bool, string> annotationSupplier)
     {
         Value = value;
         Annotation = annotationSupplier(value);
     }
 
+    /// <summary>
+    /// Gets the boolean value.
+    /// </summary>
     public bool Value { get; }
         
+    /// <summary>
+    /// Gets the annotation associated with the boolean value.
+    /// </summary>
     public string Annotation { [UsedImplicitly] get; }
         
     public static bool operator true(AnnotatedBoolean x) => x.Value == true;

@@ -3,6 +3,11 @@ using PropertyBinder;
 
 namespace PoeShared.Bindings;
 
+/// <summary>
+/// A watcher class that monitors Property changes of a given source object.
+/// It extends the ExpressionWatcherBase to provide functionality specific to watching
+/// property paths within reactive programming contexts.
+/// </summary>
 public sealed class PropertyPathWatcher : ExpressionWatcherBase
 {
     private new static readonly Binder<PropertyPathWatcher> Binder;
@@ -16,13 +21,16 @@ public sealed class PropertyPathWatcher : ExpressionWatcherBase
         Binder.Bind(x => !string.IsNullOrEmpty(x.PropertyPath) ? $@"{ICsharpExpressionParser.InputParameterName}.{x.PropertyPath}" : default ).To(x => x.SourceExpression);
         Binder.Bind(x => BuildCondition(x.PropertyPath)).To(x => x.ConditionExpression);
     }
-
-    public string PropertyPath { get; set; }
         
     public PropertyPathWatcher()
     {
         Binder.Attach(this).AddTo(Anchors);
     }
+    
+    /// <summary>
+    /// Gets or sets the property path that this watcher is monitoring.
+    /// </summary>
+    public string PropertyPath { get; set; }
 
     private static Type ResolveTypeByPathOrDefault(object source, string propertyPath)
     {

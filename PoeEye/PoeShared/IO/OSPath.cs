@@ -3,7 +3,9 @@
 namespace PoeShared.IO;
 
 /// <summary>
-/// Platform-specific OS path, will normalize all input paths
+/// Represents a platform-agnostic file system path. This record normalizes input paths
+/// based on the operating system, providing utility methods to handle file paths
+/// in a cross-platform manner.
 /// </summary>
 [JsonConverter(typeof(OSPathConverter))]
 public record OSPath
@@ -22,20 +24,38 @@ public record OSPath
     }
 
     /// <summary>
-    /// Platform-specific full path
+    /// Gets the platform-specific full path.
     /// </summary>
     public string FullPath { get; }
 
+    /// <summary>
+    /// Gets the file name component of the path.
+    /// </summary>
     public string FileName => Path.GetFileName(FullPath);
 
+    /// <summary>
+    /// Gets the directory name component of the path.
+    /// </summary>
     public string DirectoryName => Path.GetDirectoryName(FullPath);
 
+    /// <summary>
+    /// Gets a value indicating whether the file denoted by this path exists.
+    /// </summary>
     public bool Exists => File.Exists(FullPath);
 
+    /// <summary>
+    /// Gets the depth of the path, calculated as the number of directory levels in the path.
+    /// </summary>
     public int Depth => PathUtils.GetDepth(FullPath);
 
+    /// <summary>
+    /// Gets the Windows-style path representation.
+    /// </summary>
     public string AsWindowsPath => ToWindowsPath(FullPath);
 
+    /// <summary>
+    /// Gets the Unix-style path representation.
+    /// </summary>
     public string AsUnixPath => ToUnixPath(FullPath);
 
     public OSPath Combine(string other)
