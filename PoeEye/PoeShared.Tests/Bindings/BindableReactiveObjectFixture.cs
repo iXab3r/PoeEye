@@ -145,7 +145,7 @@ public class AuraModelFixture : FixtureBase
         source.RemoveBinding(whatToRemove);
 
         //Then
-        var items = string.Join(" ",  source.BindingsList.Select(x => x.TargetPropertyPath).OrderBy(x => x));
+        var items = string.Join(" ",  source.Bindings.Items.Select(x => x.TargetPropertyPath).OrderBy(x => x));
         items.ShouldBe(expected);
     }
         
