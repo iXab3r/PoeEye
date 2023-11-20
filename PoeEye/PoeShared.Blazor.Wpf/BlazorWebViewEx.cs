@@ -53,11 +53,21 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.WebView.LostFocus += WebViewOnLostFocus;
 
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
+        Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
         foreach (var rootDirectory in drives)
         {
             var driveLetter = rootDirectory.GetDriveLetter();
-            if (string.IsNullOrEmpty(driveLetter))
+            try
             {
+                if (string.IsNullOrEmpty(driveLetter) || !rootDirectory.Exists)
+                {
+                    Log.Warn($"Could not update virtual mapping for drive {rootDirectory.FullName}, exists: {rootDirectory.Exists} (drive removed/renamed?)");
+                    continue;
+                }
+            }
+            catch(Exception ex)
+            {
+                Log.Warn($"Failed to update virtual mapping for drive {rootDirectory.FullName}", ex);
                 continue;
             }
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
