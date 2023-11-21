@@ -20,6 +20,8 @@ public sealed class SharedResource<T> : DisposableReactiveObject where T : Share
 
     private T Instance { get; set; }
 
+    public bool IsRented => Instance is {IsRented: true};
+
     public T RentOrCreate()
     {
         if (Instance == default || !Instance.TryRent() || Instance.Anchors.IsDisposed)

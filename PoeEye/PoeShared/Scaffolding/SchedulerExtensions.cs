@@ -1,3 +1,4 @@
+using System.Reactive;
 using System.Reactive.Concurrency;
 
 namespace PoeShared.Scaffolding;
@@ -10,8 +11,8 @@ public static class SchedulerExtensions
         Run(scheduler, action);
     }
     
-    public static void Run(this IScheduler scheduler, Action action)
+    public static Unit Run(this IScheduler scheduler, Action action)
     {
-        Observable.Start(action, scheduler).Wait();
+        return Observable.Start(action, scheduler).Wait();
     }
 }

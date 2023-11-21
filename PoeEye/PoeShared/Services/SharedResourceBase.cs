@@ -37,6 +37,8 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
         }).AddTo(Anchors);
     }
 
+    public bool IsRented => RefCount > 1;
+
     public long RefCount
     {
         get
