@@ -5,7 +5,7 @@ namespace PoeShared.Modularity;
 /// <summary>
 /// Provides properties and methods to track and report errors.
 /// </summary>
-public interface IHasErrors
+public interface IHasErrors : IDisposableReactiveObject
 {
     /// <summary>
     /// Gets the last error that occurred.
