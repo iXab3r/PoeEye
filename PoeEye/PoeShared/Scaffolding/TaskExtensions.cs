@@ -1,5 +1,6 @@
 using System.Configuration;
 using System.Threading;
+using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
 
@@ -89,4 +90,22 @@ public static class TaskExtensions
             await task;
         }
     }      
+    
+    /// <summary>
+    /// Task will be awaited and exceptions will be forwarded to MudBlazorGlobal.UnhandledExceptionHandler.
+    /// </summary>
+    public static async void AndForget(this Task task, bool ignoreExceptions = false)
+    {
+        try
+        {
+            await task;
+        }
+        catch (Exception ex)
+        {
+            if (!ignoreExceptions)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(ex);
+            }
+        }
+    }
 }

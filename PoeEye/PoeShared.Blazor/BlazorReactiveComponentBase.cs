@@ -31,6 +31,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 
     protected BlazorReactiveComponentBase()
     {
+        ComponentId = new ReactiveComponentId($"reactive-{Guid.NewGuid().ToString()}");
         this.WhenAnyProperty(x => x.DataContext)
             .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
             .AddTo(Anchors);
@@ -45,7 +46,21 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     
     [Parameter] public object DataContext { get; set; }
     
+    /// <summary>
+    /// User class names, separated by space.
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; }
+
+    /// <summary>
+    /// User styles, applied on top of the component's own classes and styles.
+    /// </summary>
+    [Parameter]
+    public string Style { get; set; }
+    
     public IObservable<object> WhenChanged => whenChanged;
+
+    public ReactiveComponentId ComponentId { get; } 
     
     private readonly ReactiveChangeDetector changeDetector = new();
 

@@ -42,12 +42,21 @@ function loadCss(sourceUrl) {
     document.head.appendChild(tag);
 }
 
-function scrollToBottom(){
+function scrollToBottom() {
     document.body.scroll(0, document.body.scrollHeight)
 }
 
-function scrollToTop(){
+function scrollToTop() {
     document.body.scroll(0, 0)
+}
+
+function scrollToSelectedOption(selectElementId) {
+    const $selectElement = $('#' + selectElementId);
+    const $selectedOption = $selectElement.find('option:selected');
+
+    if ($selectedOption.length) {
+        $selectedOption[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
 }
 
 function throwException(message) {

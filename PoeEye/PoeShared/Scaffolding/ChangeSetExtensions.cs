@@ -423,6 +423,30 @@ public static class ChangeSetExtensions
             list.Move(idx, idx - 1);
         });
     }
+    
+    public static T ElementAt<T>(this ISourceList<T> source, int index)
+    {
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        T element = default;
+        source.Edit(list => element = list[index]);
+        return element;
+    }
+   
+    public static int IndexOf<T>(this SourceList<T> source, T item)
+    {
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        var index = -1;
+        source.Edit(list => index = list.IndexOf(item));
+        return index;
+    }
 
     public static ISourceList<T> Concat<T>(this ISourceList<T> list, params T[] items)
     {

@@ -186,6 +186,10 @@ body, html {
     top: 0;
 }
 
+.bg-accent-mouseover {
+    background: #80d8ff;
+}
+
 /* MahAccentDoubleGradientBrush equivalent */
 .header-mah-accent-double-gradient {
     background: linear-gradient(45deg, rgba(13, 110, 253, 0.3) 0%, transparent 100%);
