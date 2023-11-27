@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using System.Reactive;
-using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -17,21 +11,30 @@ using PropertyBinder;
 
 namespace PoeShared.Blazor;
 
+/// <summary>
+/// Represents the base class for reactive components in a Blazor application.
+/// </summary>
 public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 {
     private static readonly Binder<BlazorReactiveComponentBase> Binder = new();
 
     private readonly Subject<object> whenChanged = new();
+    private readonly ReactiveChangeDetector changeDetector = new();
 
+    /// <summary>
+    /// Static constructor to initialize the binder for the component.
+    /// </summary>
     static BlazorReactiveComponentBase()
     {
         Binder.BindIf(x => !(x.JsRuntime is SafeJsRuntime), x => x.JsRuntime == null ? default(IJSRuntime) : new SafeJsRuntime(x.JsRuntime, x))
             .To(x => x.JsRuntime);
     }
 
+    /// <summary>
+    /// Constructor to initialize the BlazorReactiveComponentBase instance.
+    /// </summary>
     protected BlazorReactiveComponentBase()
     {
-        ComponentId = new ReactiveComponentId($"reactive-{Guid.NewGuid().ToString()}");
         this.WhenAnyProperty(x => x.DataContext)
             .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
             .AddTo(Anchors);
@@ -42,28 +45,41 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
         Binder.Attach(this).AddTo(Anchors);
     }
     
+    /// <summary>
+    /// Gets or sets the JavaScript runtime associated with the component.
+    /// </summary>
     [Inject] public IJSRuntime JsRuntime { get; private set; }
     
+    /// <summary>
+    /// Gets or sets the data context for the component.
+    /// </summary>
     [Parameter] public object DataContext { get; set; }
     
     /// <summary>
-    /// User class names, separated by space.
+    /// Gets or sets user-defined class names, separated by space.
     /// </summary>
     [Parameter]
     public string Class { get; set; }
 
     /// <summary>
-    /// User styles, applied on top of the component's own classes and styles.
+    /// Gets or sets user-defined styles, applied on top of the component's own classes and styles.
     /// </summary>
     [Parameter]
     public string Style { get; set; }
     
+    /// <summary>
+    /// Observable sequence that signals when a property of the component changes.
+    /// </summary>
     public IObservable<object> WhenChanged => whenChanged;
 
-    public ReactiveComponentId ComponentId { get; } 
-    
-    private readonly ReactiveChangeDetector changeDetector = new();
-
+    /// <summary>
+    /// Tracks changes in the specified context using a selector expression.
+    /// </summary>
+    /// <typeparam name="TExpressionContext">The type of the context to track changes in.</typeparam>
+    /// <typeparam name="TOut">The type of the output from the selector expression.</typeparam>
+    /// <param name="context">The context to track changes in.</param>
+    /// <param name="selector">The expression used to select the property to track.</param>
+    /// <returns>The value of the property selected by the provided expression.</returns>
     public TOut Track<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
     {
         try
@@ -76,41 +92,41 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
         }
     }
 
+    /// <summary>
+    /// Represents a safe wrapper around the IJSRuntime to ensure proper usage within the component.
+    /// </summary>
     private sealed class SafeJsRuntime : IJSRuntime
     {
+        private readonly IJSRuntime jsRuntime;
+        private readonly BlazorReactiveComponentBase owner;
+
         public SafeJsRuntime(IJSRuntime jsRuntime, BlazorReactiveComponentBase owner)
         {
-            JsRuntime = jsRuntime;
-            Owner = owner;
+            this.jsRuntime = jsRuntime;
+            this.owner = owner;
         }
 
-        public IJSRuntime JsRuntime { get; }
-
-        public BlazorReactiveComponentBase Owner { get; }
-
-        /// <inheritdoc />
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args)
         {
             return InvokeAsync<TValue>(identifier, CancellationToken.None, args);
         }
 
-        /// <inheritdoc />
         public async ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object[] args)
         {
-            if (Owner.Anchors.IsDisposed)
+            if (owner.Anchors.IsDisposed)
             {
                 return default;
             }
             try
             {
-                return await JsRuntime.InvokeAsync<TValue>(identifier, cancellationToken, args);
+                return await jsRuntime.InvokeAsync<TValue>(identifier, cancellationToken, args);
             }
             catch (Exception e)
             {
-                Owner.Log.Warn($"Component has encountered JS invocation error, identifier: {identifier}", e);
-                Owner.Dispose();
+                owner.Log.Warn($"Component has encountered JS invocation error, identifier: {identifier}", e);
+                owner.Dispose();
 
-                await Owner.InvokeAsync(() => throw new AggregateException(
+                await owner.InvokeAsync(() => throw new AggregateException(
                     new InvalidOperationException("Do not forget to await JS invocations!"),
                     e));
                 return default;

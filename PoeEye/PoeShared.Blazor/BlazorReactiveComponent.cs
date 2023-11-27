@@ -9,6 +9,7 @@ namespace PoeShared.Blazor;
 
 public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
 {
+    
 }
 
 public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponent where TContext : class

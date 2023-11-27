@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Blazor.Scaffolding;
 
 public sealed class RefFileInfo : IFileInfo
 {

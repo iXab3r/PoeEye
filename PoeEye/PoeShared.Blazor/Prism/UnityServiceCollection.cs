@@ -5,13 +5,16 @@ using PoeShared.Logging;
 
 namespace PoeShared.Blazor.Prism;
 
-public sealed class BlazorServiceCollection : ServiceCollection
+/// <summary>
+/// This ServiceCollection is expected to bind IUnityContainer world to .NET Core - it is expected to hold reference to the root IUnityContainer
+/// </summary>
+public sealed class UnityServiceCollection : ServiceCollection
 {
-    private static readonly Lazy<BlazorServiceCollection> InstanceSupplier = new();
+    private static readonly Lazy<UnityServiceCollection> InstanceSupplier = new();
 
-    public static BlazorServiceCollection Instance => InstanceSupplier.Value;
+    public static UnityServiceCollection Instance => InstanceSupplier.Value;
 
-    public BlazorServiceCollection()
+    public UnityServiceCollection()
     {
         this.AddLogging(builder =>
         {

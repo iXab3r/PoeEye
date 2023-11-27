@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
 using System.Reflection;
 using AutoFixture;
@@ -27,6 +28,7 @@ public class BlazorViewRepositoryFixture : FixtureBase
     [TestCase(typeof(object), null)]
     [TestCase(typeof(string), typeof(TestBlazorReactiveComponentForString))]
     [TestCase(typeof(ICollection), typeof(TestBlazorReactiveComponentForCollection))]
+    [TestCase(typeof(ArrayList), typeof(TestBlazorReactiveComponentForCollection))]
     public void ShouldResolve(Type contentType, Type expected)
     {
         //Given
@@ -38,6 +40,19 @@ public class BlazorViewRepositoryFixture : FixtureBase
 
         //Then
         viewType.ShouldBe(expected);
+    }
+
+    [Test]
+    public void ShouldResolveByInterface()
+    {
+        //Given
+        
+
+        //When
+
+
+        //Then
+
     }
     
     [Test]

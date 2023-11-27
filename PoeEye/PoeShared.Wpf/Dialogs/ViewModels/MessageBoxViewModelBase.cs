@@ -44,7 +44,7 @@ public abstract class MessageBoxViewModelBase<T> : WindowViewModelBase, IMessage
         CloseController?.Close(Result);
     }
 
-    public ICommand CloseCommand { get; }
+    public ICommandWrapper CloseCommand { get; }
     
     public bool CloseOnClickAway { get; [UsedImplicitly] protected set; }
     

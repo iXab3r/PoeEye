@@ -84,19 +84,40 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     
     public Type ResolveViewType(Type contentType, object key = default)
     {
-        var viewKey = new ViewKey() { ContentType = contentType, Key = key };
+        var viewKey = new ViewKey()
+        {
+            ContentType = contentType, 
+            Key = key
+        };
         var log = Log.WithSuffix(viewKey.ToString());
         log.Debug(() => $"Resolving view type");
         EnsureQueueIsProcessed();
 
-        if (!viewsByKey.TryGetValue(viewKey, out var registration))
         {
-            log.Warn(() => $"Failed to resolve registered view, known views:\n\t{viewsByKey.Keys.DumpToTable()}");
-            return null;
-        }    
-        
-        log.Debug(() => $"Resolved registered view: {registration}");
-        return registration.ViewType;
+            // resolve by content type
+            if (viewsByKey.TryGetValue(viewKey, out var registration))
+            {
+                log.Debug(() => $"Resolved registered view: {registration}");
+                return registration.ViewType;
+            }
+        }
+
+        {
+            // resolve by interface - only direct interfaces are supported
+            var interfaces = contentType.GetInterfaces();
+            foreach (var @interface in interfaces)
+            {
+                var byInterfaceKey = new ViewKey() {ContentType = @interface, Key = key};
+                if (viewsByKey.TryGetValue(byInterfaceKey, out var registrationByInterface))
+                {
+                    log.Debug(() => $"Resolved registered view by interface {byInterfaceKey}: {registrationByInterface}");
+                    return registrationByInterface.ViewType;
+                }
+            }
+        }
+
+        log.Warn(() => $"Failed to resolve registered view, known views:\n\t{viewsByKey.Keys.DumpToTable()}");
+        return null;
     }
     
     [MethodImpl(MethodImplOptions.Synchronized)]

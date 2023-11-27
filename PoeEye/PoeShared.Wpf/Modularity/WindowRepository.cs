@@ -128,7 +128,7 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
 
             });
             window.DataContext = content;
-            
+
             Disposable.Create(() =>
             {
                 Log.Info($"Shutting down dispatcher for {dispatcherId}");

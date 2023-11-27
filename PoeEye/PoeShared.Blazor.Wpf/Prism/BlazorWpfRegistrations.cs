@@ -15,7 +15,6 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
             .RegisterType<IWebViewInstallerWindow, WebViewInstallerWindow>();
         
         Container.RegisterSingleton<IWebViewInstallerDisplayer, WebViewInstallerDisplayer>();
-        Container.RegisterFactory<IServiceCollection>(x => BlazorServiceCollection.Instance);
         Container.RegisterFactory<IWebViewAccessor>(x => WebViewAccessor.Instance);
     }
 }

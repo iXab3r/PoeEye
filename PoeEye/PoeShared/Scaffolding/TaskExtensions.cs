@@ -92,7 +92,7 @@ public static class TaskExtensions
     }      
     
     /// <summary>
-    /// Task will be awaited and exceptions will be forwarded to MudBlazorGlobal.UnhandledExceptionHandler.
+    /// Task will be awaited and exceptions will be forwarded to RxApp.DefaultExceptionHandler.
     /// </summary>
     public static async void AndForget(this Task task, bool ignoreExceptions = false)
     {

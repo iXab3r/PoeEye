@@ -25,6 +25,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Blazor.Prism;
+using PoeShared.Blazor.Scaffolding;
+using PoeShared.Blazor.Services;
+using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -34,6 +37,7 @@ using PoeShared.UI;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
+using Unity.Lifetime;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -61,7 +65,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeContentAnchors;
     private readonly SerialDisposable activeViewAnchors;
-    private readonly ProxyServiceProvider proxyServiceProvider;
+    private readonly WebViewServiceProvider webViewServiceProvider;
 
     static BlazorContentControl()
     {
@@ -76,10 +80,17 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         activeContentAnchors = new SerialDisposable().AddTo(Anchors);
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
-        proxyServiceProvider = new ProxyServiceProvider().AddTo(Anchors);
+        webViewServiceProvider = new WebViewServiceProvider().AddTo(Anchors);
 
         WebView = new BlazorWebViewEx().AddTo(Anchors);
         WebView.UnhandledException += OnUnhandledException;
+
+        //FIXME I need a more robust solution for handling DI
+        /*
+        Assigning Services will trigger initialization of WebView.
+        That means that most registrations should be done at this point.
+        */
+        WebView.Services = webViewServiceProvider;
 
         var canExecuteHotkeys = this.Observe(EnableHotkeysProperty, x => x.EnableHotkeys)
             .Select(x => x);
@@ -100,18 +111,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             }
         }, canExecuteHotkeys);
         OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow(), canExecuteHotkeys);
-        
 
-        var serviceCollection = new ServiceCollection()
+        var serviceCollection = new ServiceCollection
         {
-            BlazorServiceCollection.Instance
+            UnityServiceCollection.Instance
         };
         serviceCollection.AddBlazorWebView();
         serviceCollection.AddWpfBlazorWebView();
         serviceCollection.AddBlazorWebViewDeveloperTools();
-        
-        //proxy is needed to allow BlazorComponentActivator to have access to Unity/ServiceProvider
-        WebView.Services = proxyServiceProvider;
 
         new RootComponent
         {
@@ -130,8 +137,11 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         var contentRoot = "wwwroot";
         var hostPage = Path.Combine(contentRoot, generatedIndexFileName); // wwwroot must be included as a part of path to become ContentRoot;
 
+        var unityContainerSource = this.WhenAnyValue(x => x.Container)
+            .Select(x => x ?? UnityServiceCollection.Instance.BuildServiceProvider().GetService<IUnityContainer>());
+
         this.WhenAnyValue(x => x.ViewType)
-            .CombineLatest(this.WhenAnyValue(x => x.Container), (viewType, container) => new {viewType, container})
+            .CombineLatest(unityContainerSource, (viewType, container) => new {viewType, container})
             .ObserveOnDispatcher()
             .SubscribeAsync(async state =>
             {
@@ -151,9 +161,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 try
                 {
                     var childServiceCollection = new ServiceCollection {serviceCollection};
-                    
+
                     // this is needed mostly for compatibility-reasons with views that use UnityContainer
-                    childServiceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(proxyServiceProvider, state.container));
+                    childServiceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(webViewServiceProvider, state.container));
 
                     // views have to be transient to allow to re-create them if needed (e.g. on error)
                     childServiceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
@@ -167,10 +177,22 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                             .AddTo(contentAnchors);
                         return contentPresenter;
                     });
-                    proxyServiceProvider.ServiceProvider = childServiceCollection.BuildServiceProvider();
 
-                    var repositoryAdditionalFiles =
-                        proxyServiceProvider.ServiceProvider.GetRequiredService<IBlazorContentRepository>().AdditionalFiles.Items.ToArray();
+                    childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
+
+                    var unityServiceDescriptors = state.container.ToServiceDescriptors();
+                    childServiceCollection.Add(unityServiceDescriptors);
+                    
+                    var childServiceProvider = childServiceCollection.BuildServiceProvider();
+                    
+                    var clock = childServiceProvider.GetRequiredService<IClock>();
+                    var scoped = childServiceProvider.CreateScope();
+                    var scopedClock = scoped.ServiceProvider.GetRequiredService<IClock>();
+                    
+                    webViewServiceProvider.ServiceProvider = childServiceProvider;
+
+                    var blazorContentRepository = childServiceProvider.GetRequiredService<IBlazorContentRepository>();
+                    var repositoryAdditionalFiles = blazorContentRepository.AdditionalFiles.Items.ToArray();
                     var controlAdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
                     var additionalFiles = repositoryAdditionalFiles.Concat(controlAdditionalFiles).ToArray();
                     if (additionalFiles.Any())
@@ -182,6 +204,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                             {
                                 continue;
                             }
+
                             WebView.FileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
@@ -271,14 +294,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         if (ReferenceEquals(sender, WebView.WebView))
         {
-            Log.Error( $"WebView has crashed: {sender}", e.Exception);
+            Log.Error($"WebView has crashed: {sender}", e.Exception);
             UnhandledException = e.Exception;
         }
         else
         {
-            Log.Error( $"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
+            Log.Error($"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
             UnhandledException = e.Exception;
         }
+
         e.Handled = true; // JS context is already dead at this point
     }
 
