@@ -35,7 +35,7 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
     
     public IDictionary<string, StringValues> QueryParameters { get; set; }
 
-    public string Error { get; protected set; }
+    public ErrorInfo? LastError { get; protected set; }
 
     public async Task OnParametersSetAsync()
     {
@@ -108,7 +108,7 @@ public abstract class DisposableReactiveComponent : DisposableReactiveObjectWith
         {
             //FIXME Due to problems with async validation it's safer to handle possible exceptions here
             Log.Error("Something went wrong during Submit operation", e);
-            Error = e.Message;
+            LastError = ErrorInfo.FromException(e);
         }
     }
 

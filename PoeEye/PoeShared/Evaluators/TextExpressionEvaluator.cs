@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using PoeShared.Bindings;
+using PoeShared.Modularity;
 using PropertyBinder;
 
 namespace PoeShared.Evaluators;
@@ -30,7 +31,7 @@ public sealed class TextExpressionEvaluator : DisposableReactiveObject, ITextEva
             
         Binder.BindIf(x => x.watcher.Error != default, x => x.watcher.Error.ToString())
             .Else(x => default)
-            .To(x => x.Error);
+            .To((x,v) => x.LastError = ErrorInfo.FromMessage(v));
     }
             
     public TextExpressionEvaluator()
@@ -48,5 +49,5 @@ public sealed class TextExpressionEvaluator : DisposableReactiveObject, ITextEva
     
     public string Match { get; [UsedImplicitly] private set; }
 
-    public string Error { get; [UsedImplicitly] private set; }
+    public ErrorInfo? LastError { get; [UsedImplicitly] private set; }
 }

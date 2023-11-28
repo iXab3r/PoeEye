@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using PoeShared.Modularity;
 using PropertyBinder;
 
 namespace PoeShared.Evaluators;
@@ -47,7 +48,7 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
     
     public string Match { get; [UsedImplicitly] private set; }
 
-    public string Error { get; [UsedImplicitly] private set; }
+    public ErrorInfo? LastError { get; [UsedImplicitly] private set; }
 
     private static string ExtractMatchText(Match regexMatch)
     {
@@ -66,7 +67,7 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
 
     private Regex RecalculateRegex(string text, bool ignoreCase)
     {
-        Error = default;
+        LastError = default;
         try
         {
             var options = RegexOptions.Compiled | RegexOptions.Singleline | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
@@ -74,7 +75,7 @@ public sealed class TextRegexEvaluator : DisposableReactiveObject, ITextEvaluato
         }
         catch (Exception e)
         {
-            Error = e.ToString();
+            LastError = ErrorInfo.FromException(e);
             return default;
         }
     }

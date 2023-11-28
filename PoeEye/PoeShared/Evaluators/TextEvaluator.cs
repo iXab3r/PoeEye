@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using PoeShared.Modularity;
 using PropertyBinder;
 
 namespace PoeShared.Evaluators;
@@ -25,7 +26,7 @@ public sealed class TextEvaluator : DisposableReactiveObject, ITextEvaluator
 
     public StringComparison StringComparison { get; set; }
 
-    public string Error { get; [UsedImplicitly] private set; }
+    public ErrorInfo? LastError { get; [UsedImplicitly] private set; }
     public string Text { get; set; }
     public string Expression { get; set; }
     public bool IsMatch { get; [UsedImplicitly] private set; }

@@ -4,5 +4,8 @@ namespace PoeShared.Modularity;
 
 public interface IHasError
 {
-    string Error { [CanBeNull] get; }
+    /// <summary>
+    /// Gets the last error that occurred.
+    /// </summary>
+    ErrorInfo? LastError { [CanBeNull] get; }
 }

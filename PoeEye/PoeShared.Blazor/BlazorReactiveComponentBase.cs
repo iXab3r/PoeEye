@@ -62,6 +62,12 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     public string Class { get; set; }
 
     /// <summary>
+    /// Gets or sets user-defined Id, not all components may be using it
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; }
+    
+    /// <summary>
     /// Gets or sets user-defined styles, applied on top of the component's own classes and styles.
     /// </summary>
     [Parameter]

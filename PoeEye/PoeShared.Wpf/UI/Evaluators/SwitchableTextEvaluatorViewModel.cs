@@ -1,6 +1,7 @@
 using System;
 using JetBrains.Annotations;
 using PoeShared.Evaluators;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
@@ -26,9 +27,9 @@ internal sealed class SwitchableTextEvaluatorViewModel : DisposableReactiveObjec
             .To(x => x.IsMatch);
         Binder.BindIf(x => x.Evaluator != default, x => x.Evaluator.Match)
             .To(x => x.Match);
-        Binder.BindIf(x => x.Evaluator != default, x => x.Evaluator.Error)
+        Binder.BindIf(x => x.Evaluator != default, x => x.Evaluator.LastError)
             .Else(x => default)
-            .To(x => x.Error);
+            .To(x => x.LastError);
 
         Binder.Bind(x => CreateEvaluator(x.EvaluatorType, x.IgnoreCase))
             .To(x => x.Evaluator);
@@ -44,7 +45,7 @@ internal sealed class SwitchableTextEvaluatorViewModel : DisposableReactiveObjec
 
     public ITextEvaluator Evaluator { get; [UsedImplicitly] private set; }
 
-    public string Error { get; [UsedImplicitly] private set; }
+    public ErrorInfo? LastError { get; [UsedImplicitly] private set; }
     public string Text { get; set; }
     public string Expression { get; set; }
     public bool IsMatch { get; [UsedImplicitly] private set; }
