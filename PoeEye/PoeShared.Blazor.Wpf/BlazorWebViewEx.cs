@@ -36,7 +36,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
         {
-            AdditionalBrowserArguments = ""
+            AdditionalBrowserArguments = "",
         };
     }
 
@@ -51,6 +51,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
             .AddTo(Anchors);
         e.WebView.GotFocus += WebViewOnGotFocus;
         e.WebView.LostFocus += WebViewOnLostFocus;
+        e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
 
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
         Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
@@ -72,6 +73,12 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
             }
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
         }
+    }
+
+    private void CoreWebView2OnPermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
+    {
+        Log.Debug(() => $"Permission requested: {e.PermissionKind}, state: {e.State}");
+        e.State = CoreWebView2PermissionState.Allow;
     }
 
     private void WebViewOnLostFocus(object sender, RoutedEventArgs e)
