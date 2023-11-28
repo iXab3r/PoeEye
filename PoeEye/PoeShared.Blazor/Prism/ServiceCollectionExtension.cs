@@ -1,4 +1,6 @@
+using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Services;
 using Unity;
 
@@ -18,6 +20,12 @@ public static class ServiceCollectionExtension
     {
         services.AddSingleton<BlazorContentRepository>(provider => unityContainer.Resolve<BlazorContentRepository>());
         services.AddSingleton<IBlazorContentRepository>(provider => unityContainer.Resolve<IBlazorContentRepository>());
+        return services;
+    }
+    
+    public static IServiceCollection AddBlazorUtils(this IServiceCollection services, IUnityContainer unityContainer)
+    {
+        services.AddScoped<IJsPoeBlazorUtils, JsPoeBlazorUtils>();
         return services;
     }
 }

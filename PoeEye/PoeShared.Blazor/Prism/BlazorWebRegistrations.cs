@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DynamicData;
+using Microsoft.Extensions.DependencyInjection;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Services;
 using PoeShared.Scaffolding;
 using Unity;
@@ -18,5 +20,7 @@ public sealed class BlazorWebRegistrations : UnityContainerExtension
         
         Container.RegisterSingleton<BlazorContentRepository>(typeof(IBlazorContentRepository));
         UnityServiceCollection.Instance.AddBlazorContentRepository(Container);
+        
+        UnityServiceCollection.Instance.AddBlazorUtils(Container);
     }
 }
