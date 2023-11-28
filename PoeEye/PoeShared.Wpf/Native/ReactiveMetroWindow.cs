@@ -83,118 +83,16 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
 
     private void OnLoaded(object sender, EventArgs ea)
     {
-        Log.Info(() => $"Window is loaded");
-#if WINDOW_ENABLE_STACKTRACE_LOG
-        Log.Debug(() => $"Resolving {nameof(HwndSource)} for {WindowHandle}");
-#endif
-        var hwndSource = (HwndSource) PresentationSource.FromVisual(this);
-        if (hwndSource == null)
+        try
         {
-            throw new InvalidStateException("HwndSource must be initialized at this point");
+            HandleLoaded();
         }
-
-        Disposable.Create(() =>
+        catch (Exception e)
         {
-#if WINDOW_ENABLE_STACKTRACE_LOG
-            Log.Debug(() => $"Releasing {nameof(HwndSource)}");
-#endif
-            hwndSource.Dispose();
-        }).AddTo(Anchors);
-
-        this.WhenAnyValue(ShowSystemMenuProperty, x => x.ShowSystemMenu)
-            .Subscribe(x =>
-            {
-                if (x)
-                {
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                    Log.Debug(() => "Showing system menu");
-#endif
-                    UnsafeNative.ShowSystemMenu(WindowHandle);
-                }
-                else
-                {
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                    Log.Debug(() => "Hiding system menu");
-#endif
-                    UnsafeNative.HideSystemMenu(WindowHandle);
-                }
-            })
-            .AddTo(Anchors);
-
-        Dpi = GetDpiFromHwndSource(hwndSource);
-        hwndSource.AddHook(WindowDragHook);
-        //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
-#if WINDOW_ENABLE_STACKTRACE_LOG
-        Log.Debug(() => $"Resolved {nameof(HwndSource)} for {WindowHandle}: {hwndSource}");
-#endif
-        hwndSource.AddHook(WindowPositionHook);
-
-        // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
-        // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
-        var isUpdatingActualBounds = false;
-        this.WhenAnyValue(x => x.NativeBounds)
-            .WithPrevious()
-            .Where(x => x.Current != x.Previous)
-            .SubscribeSafe(x =>
-            {
-                // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
-                if (isUpdatingActualBounds)
-                {
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                    Log.Debug(() =>
-                        $"Native bounds changed as a part of actual bounds update: {x.Previous} => {x.Current}");
-#endif
-                    return;
-                }
-
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                Log.Debug(() => $"Native bounds changed, setting windows rect: {x.Previous} => {x.Current}");
-#endif
-                UnsafeNative.SetWindowRect(WindowHandle, x.Current);
-                var actualBounds = UnsafeNative.GetWindowRect(WindowHandle);
-                if (actualBounds != x.Current)
-                {
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                    Log.Warn(() => $"Failed to resize: {x.Previous} => {x.Current}, resulting native bounds: {actualBounds}");
-#endif
-                }
-                else
-                {
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                    Log.Debug(() => $"Native bounds changed: {x.Previous} => {x.Current}");
-#endif
-                }
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.ActualBounds)
-            .WithPrevious()
-            .Where(x => x.Current != x.Previous)
-            .SubscribeSafe(x =>
-            {
-                if (NativeBounds == x.Current)
-                {
-                    return;
-                }
-
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                Log.Debug(() => $"Actual bounds have changed: {x.Previous} => {x.Current}");
-#endif
-                try
-                {
-                    isUpdatingActualBounds = true;
-                    NativeBounds = x.Current;
-                }
-                finally
-                {
-                    isUpdatingActualBounds = false;
-                }
-
-#if WINDOW_ENABLE_STACKTRACE_LOG
-                Log.Debug(() => $"Propagated actual bounds: {x.Current}");
-#endif
-            }, Log.HandleUiException)
-            .AddTo(Anchors);
+            // there are some cases, e.g. when the window is closed very quickly,
+            // when Loaded won't trigger fast enough and that will lead to exception
+            Log.Warn("Failed to process Loaded", e);
+        }
     }
 
     private IntPtr WindowPositionHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -308,6 +206,122 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
     protected override System.Windows.Automation.Peers.AutomationPeer OnCreateAutomationPeer()
     {
         return new NoopWindowAutomationPeer(this);
+    }
+
+    private void HandleLoaded()
+    {
+        Log.Info(() => $"Window is loaded");
+#if WINDOW_ENABLE_STACKTRACE_LOG
+        Log.Debug(() => $"Resolving {nameof(HwndSource)} for {WindowHandle}");
+#endif
+        var hwndSource = (HwndSource) PresentationSource.FromVisual(this);
+        if (hwndSource == null)
+        {
+            throw new InvalidStateException("HwndSource must be initialized at this point");
+        }
+
+        Disposable.Create(() =>
+        {
+#if WINDOW_ENABLE_STACKTRACE_LOG
+            Log.Debug(() => $"Releasing {nameof(HwndSource)}");
+#endif
+            hwndSource.Dispose();
+        }).AddTo(Anchors);
+
+        this.WhenAnyValue(ShowSystemMenuProperty, x => x.ShowSystemMenu)
+            .Subscribe(x =>
+            {
+                if (x)
+                {
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                    Log.Debug(() => "Showing system menu");
+#endif
+                    UnsafeNative.ShowSystemMenu(WindowHandle);
+                }
+                else
+                {
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                    Log.Debug(() => "Hiding system menu");
+#endif
+                    UnsafeNative.HideSystemMenu(WindowHandle);
+                }
+            })
+            .AddTo(Anchors);
+
+        Dpi = GetDpiFromHwndSource(hwndSource);
+        hwndSource.AddHook(WindowDragHook);
+        //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
+#if WINDOW_ENABLE_STACKTRACE_LOG
+        Log.Debug(() => $"Resolved {nameof(HwndSource)} for {WindowHandle}: {hwndSource}");
+#endif
+        hwndSource.AddHook(WindowPositionHook);
+
+        // this sync mechanism is needed to keep NativeBounds in sync with real current window position WITHOUT getting into recursive assignments
+        // i.e. Real position changes => NativeBounds tries to sync, fails to do so due to rounding or any other mechanism => changes window bounds => real position changes...
+        var isUpdatingActualBounds = false;
+        this.WhenAnyValue(x => x.NativeBounds)
+            .WithPrevious()
+            .Where(x => x.Current != x.Previous)
+            .SubscribeSafe(x =>
+            {
+                // WARNING - Get/SetWindowRect are blocking as they await for WndProc to process the corresponding WM_* messages
+                if (isUpdatingActualBounds)
+                {
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                    Log.Debug(() =>
+                        $"Native bounds changed as a part of actual bounds update: {x.Previous} => {x.Current}");
+#endif
+                    return;
+                }
+
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                Log.Debug(() => $"Native bounds changed, setting windows rect: {x.Previous} => {x.Current}");
+#endif
+                UnsafeNative.SetWindowRect(WindowHandle, x.Current);
+                var actualBounds = UnsafeNative.GetWindowRect(WindowHandle);
+                if (actualBounds != x.Current)
+                {
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                    Log.Warn(() => $"Failed to resize: {x.Previous} => {x.Current}, resulting native bounds: {actualBounds}");
+#endif
+                }
+                else
+                {
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                    Log.Debug(() => $"Native bounds changed: {x.Previous} => {x.Current}");
+#endif
+                }
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+
+        this.WhenAnyValue(x => x.ActualBounds)
+            .WithPrevious()
+            .Where(x => x.Current != x.Previous)
+            .SubscribeSafe(x =>
+            {
+                if (NativeBounds == x.Current)
+                {
+                    return;
+                }
+
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                Log.Debug(() => $"Actual bounds have changed: {x.Previous} => {x.Current}");
+#endif
+                try
+                {
+                    isUpdatingActualBounds = true;
+                    NativeBounds = x.Current;
+                }
+                finally
+                {
+                    isUpdatingActualBounds = false;
+                }
+
+#if WINDOW_ENABLE_STACKTRACE_LOG
+                Log.Debug(() => $"Propagated actual bounds: {x.Current}");
+#endif
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
     }
 
     private IntPtr WindowDragHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)

@@ -28,25 +28,18 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
         Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC");
         Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
-        WhenRendered = Observable
-            .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
-            .ToUnit();
-        WhenUnloaded = Observable
-            .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Unloaded += h, h => owner.Unloaded -= h)
-            .ToUnit();
-        WhenLoaded = Observable.Merge(
-                Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
-                Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
-            .Take(1);
+        WhenLoaded = owner.ListenWhenLoaded();
+        WhenRendered = owner.ListenWhenRendered();
+        WhenUnloaded = owner.ListenWhenUnloaded();
 
-        WhenKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.KeyUp += h, h => owner.KeyUp -= h).Select(x => x.EventArgs);
-        WhenKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.KeyDown += h, h => owner.KeyDown -= h).Select(x => x.EventArgs);
-        WhenPreviewKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.PreviewKeyDown += h, h => owner.PreviewKeyDown -= h).Select(x => x.EventArgs);
-        WhenPreviewKeyUp = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(h => owner.PreviewKeyUp += h, h => owner.PreviewKeyUp -= h).Select(x => x.EventArgs);
-        WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
-        WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
-        WhenActivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Activated += h, h => owner.Activated -= h).ToUnit();
-        WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
+        WhenKeyUp = owner.ListenWhenKeyUp();
+        WhenKeyDown = owner.ListenWhenKeyDown();
+        WhenPreviewKeyDown = owner.ListenWhenPreviewKeyDown();
+        WhenPreviewKeyUp = owner.ListenWhenPreviewKeyUp();
+        WhenClosing = owner.ListenWhenClosing();
+        WhenClosed = owner.ListenWhenClosed();
+        WhenActivated = owner.ListenWhenActivated();
+        WhenDeactivated = owner.ListenWhenDeactivated();
 
         this.WhenAnyValue(x => x.Topmost)
             .ObserveOn(Window.Dispatcher)

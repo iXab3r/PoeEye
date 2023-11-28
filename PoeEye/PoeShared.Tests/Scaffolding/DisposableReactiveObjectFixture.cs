@@ -1,11 +1,16 @@
 using NUnit.Framework;
 using AutoFixture;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Reactive;
+using System.Threading;
+using System.Threading.Tasks;
 using PoeShared.Bindings;
 using PoeShared.Scaffolding;
+using PoeShared.Tests.Helpers;
 using PropertyBinder;
 using ReactiveUI;
 using Shouldly;
@@ -175,6 +180,65 @@ public class DisposableReactiveObjectFixture
 
         //Then
         object2.DoubleProperty.ShouldBe(1);
+    }
+
+    [Test]
+    public void ShouldListenWhenDisposed()
+    {
+        //Given
+        var instance = CreateInstance();
+        var listener = instance.ListenWhenDisposed().Listen();
+        listener.ShouldBeEmpty();
+        
+        //When
+        instance.Dispose();
+
+        //Then
+        listener.CollectionShouldBe(Unit.Default);
+    }
+    
+    [Test]
+    public void ShouldListenWhenDisposedForAlreadyDisposedObject()
+    {
+        //Given
+        var instance = CreateInstance();
+        instance.Dispose();
+        
+        //When
+        var listener = instance.ListenWhenDisposed().Listen();
+
+        //Then
+        listener.CollectionShouldBe(Unit.Default);
+    }
+
+    [Test]
+    [Repeat(10000)]
+    public void ShouldListenWhenDisposedMultithread()
+    {
+        //Given
+        var instance = CreateInstance();
+        instance.Dispose();
+
+        var listener = new ConcurrentQueue<Unit>();
+        var startEvent = new ManualResetEvent(false);
+        var listenerTask = Task.Factory.StartNew(() =>
+        {
+            startEvent.WaitOne();
+            instance.ListenWhenDisposed().Subscribe(x => listener.Enqueue(x));
+        });
+        
+        var disposerTask = Task.Factory.StartNew(() =>
+        {
+            startEvent.WaitOne();
+            instance.Dispose();
+        });
+
+        //When
+        startEvent.Set();
+        Task.WaitAll(listenerTask, disposerTask);
+
+        //Then
+        listener.CollectionShouldBe(Unit.Default);
     }
 
     private TestStub CreateInstance()
