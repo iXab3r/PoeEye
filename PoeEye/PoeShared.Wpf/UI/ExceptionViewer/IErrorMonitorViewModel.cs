@@ -1,7 +1,9 @@
-﻿namespace PoeShared.UI;
+﻿using PoeShared.Scaffolding;
+
+namespace PoeShared.UI;
 
 public interface IErrorMonitorViewModel
 {
-    CommandWrapper ReportProblemCommand { get; }
-    CommandWrapper ThrowExceptionCommand { get; }
+    ICommandWrapper ReportProblemCommand { get; }
+    ICommandWrapper ThrowExceptionCommand { get; }
 }

@@ -131,6 +131,12 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
                 var dialogViewModel = dialogViewModelFactory.Create(closeController, reportItemsAggregator);
                 dialogViewModel.Config = config;
                 window.DataContext = dialogViewModel;
+                window.ListenWhenLoaded()
+                    .Subscribe(x =>
+                    {
+                        window.Activate();
+                    })
+                    .AddTo(windowAnchors);
                 window.ShowDialog();
             }
             catch (Exception e)

@@ -30,9 +30,9 @@ internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMo
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    public CommandWrapper ReportProblemCommand { get; }
+    public ICommandWrapper ReportProblemCommand { get; }
         
-    public CommandWrapper ThrowExceptionCommand { get; }
+    public ICommandWrapper ThrowExceptionCommand { get; }
 
     private async Task ReportProblemCommandExecuted()
     {
