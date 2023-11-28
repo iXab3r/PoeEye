@@ -51,12 +51,126 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
             };
         }*/
         var content = await Show(contentFactory);
-        Log.Debug($"Awaiting for window to close: {content}");
-        await content.WindowController.WhenClosed.Take(1).Do(x => { });
-        Log.Debug($"Window has closed: {content}");
+        var log = Log.WithSuffix(content);
+
+        log.Info($"Awaiting for window to close: {content}");
+
+        var closeReason = await
+            Observable.Merge(
+                content.WindowController.WhenClosed.Select(x => "window closed"),
+                content.WindowController.ListenWhenDisposed().Select(x => "content disposed"))
+            .Take(1)
+            .Do(x => { });
+        log.Info($"Window has been closed, reason: {closeReason}, content: {content}");
         return content;
     }
-    
+
+    public async Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel
+    {
+        Log.Info($"Showing new window with content of type {typeof(T)}");
+
+        var dispatcherId = $"UI-{Interlocked.Increment(ref globalIdx)}";
+        var dispatcher = schedulerProvider.CreateDispatcherScheduler(dispatcherId, ThreadPriority.Normal);
+        
+        var windowCompletionSource = new TaskCompletionSource<T>();
+        
+        dispatcher.Schedule(() =>
+        {
+            Log.Info($"Creating new window for data of type {typeof(T)}");
+
+            var window = new MetroChildWindow().AddTo(Anchors); // minor memory leak
+            var log = Log.WithSuffix(window);
+            Log.Info($"Created new window");
+
+            Log.Info($"Creating new data context for window of type {typeof(T)}");
+            var content = contentFactory().AddTo(window.Anchors);
+            log.AddSuffix(content);
+
+            if (content.Anchors.IsDisposed)
+            {
+                windowCompletionSource.SetException(new InvalidOperationException($"Window Content is already disposed before window is even created: {content}"));
+                return;
+            }
+            
+            Disposable.Create(() =>
+            {
+                log.Info($"Window content is being disposed");
+                if (!window.Anchors.IsDisposed)
+                {
+                    log.Info($"Window content is disposed - disposing the window itself");
+                    window.Dispose();
+                }
+            }).AddTo(content.Anchors);
+
+            Disposable.Create(() =>
+            {
+                log.Info($"Shutting down dispatcher for {dispatcherId}");
+                dispatcher.Dispatcher.InvokeShutdown();
+                log.Info($"Dispatcher disposed: {dispatcherId}");
+            }).AddTo(window.Anchors);
+
+            var mainWindowHandle = applicationAccessor.MainWindow.GetWindowHandle();
+            if (mainWindowHandle != IntPtr.Zero)
+            {
+                window.ListenWhenLoaded()
+                    .Subscribe(() =>
+                    {
+                        User32.SetWindowLong(window.WindowHandle, User32.WindowLongIndexFlags.GWLP_HWNDPARENT, (User32.SetWindowLongFlags) mainWindowHandle);
+                    })
+                    .AddTo(content.Anchors);
+            }
+            
+            window.DataContext = content;
+            var ownerWindowRect = UnsafeNative.GetWindowRect(mainWindowHandle);
+            var childSize = content.DefaultSize.IsNotEmptyArea() ? content.DefaultSize : content.MinSize;
+            var updatedBounds = childSize.CenterInsideBounds(ownerWindowRect);
+            log.Debug($"Centering rect {childSize} inside parent {ownerWindowRect}, result: {updatedBounds}");
+            content.NativeBounds = updatedBounds;
+
+            window.ListenWhenLoaded()
+                .Subscribe(() =>
+                {
+                    log.Info($"Window has been loaded");
+                    content.SetOverlayWindow(window.Controller);
+                    windowCompletionSource.SetResult(content);
+                })
+                .AddTo(content.Anchors);
+            
+            window.ListenWhenDisposed()
+                .Subscribe(() =>
+                {
+                    log.Info($"Window has been disposed");
+                    if (windowCompletionSource.TrySetCanceled())
+                    {
+                        log.Info($"Window creation has been cancelled");
+                    }
+                })
+                .AddTo(content.Anchors);
+            
+            try
+            {
+                log.Info($"Showing the window");
+                var closeController = new CloseController(() => window.Close());
+                if (content is ICloseable closeable)
+                {
+                    closeable.CloseController = closeController;
+                }
+                
+                window.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                log.Error("Window has closed with an error", e);
+                throw;
+            }
+        }).AddTo(Anchors);
+        
+        Log.Debug($"Awaiting for window to be loaded");
+        var result = await windowCompletionSource.Task;
+        Log.Debug($"Window has loaded: {result}");
+        return result;
+    }
+
     public Task<T> ShowWindow<T>(Func<T> windowFactory) where T : Window
     {
         Log.Debug($"Showing new window with content of type {typeof(T)}");
@@ -96,88 +210,5 @@ internal sealed class WindowRepository : DisposableReactiveObjectWithLogger, IWi
         isLoaded.Wait();
         Log.Debug($"Window has loaded");
         return windowCompletionSource.Task;
-    }
-
-    public async Task<T> Show<T>(Func<T> contentFactory) where T : IWindowViewModel
-    {
-        Log.Debug($"Showing new window with content of type {typeof(T)}");
-
-        var dispatcherId = $"UI-{Interlocked.Increment(ref globalIdx)}";
-        var dispatcher = schedulerProvider.CreateDispatcherScheduler(dispatcherId, ThreadPriority.Normal);
-        
-        var windowCompletionSource = new TaskCompletionSource<T>();
-        
-        dispatcher.Schedule(() =>
-        {
-            Log.Debug($"Creating new window for data of type {typeof(T)}");
-            var window = new MetroChildWindow().AddTo(Anchors); // minor memory leak
-            window.Anchors.Add(() => Log.WithSuffix(window).Debug($"Window is being disposed"));
-            
-            Log.Debug($"Created new window: {window}");
-
-            Log.Debug($"Creating new data context for window of type {typeof(T)}");
-            var content = contentFactory().AddTo(window.Anchors);
-            content.Anchors.Add(() =>
-            {
-                Log.WithSuffix(content).Debug($"Window content is being disposed");
-                if (!window.Anchors.IsDisposed)
-                {
-                    Log.WithSuffix(content).Debug($"Window content is disposed - disposing the window itself");
-                    window.Dispose();
-                }
-
-            });
-            window.DataContext = content;
-
-            Disposable.Create(() =>
-            {
-                Log.Info($"Shutting down dispatcher for {dispatcherId}");
-                dispatcher.Dispatcher.InvokeShutdown();
-                Log.Info($"Dispatcher disposed: {dispatcherId}");
-            }).AddTo(window.Anchors);
-            
-            var mainWindowHandle = applicationAccessor.MainWindow.GetWindowHandle();
-            if (mainWindowHandle != IntPtr.Zero)
-            {
-                window.Loaded += (sender, args) =>
-                {
-                    User32.SetWindowLong(window.WindowHandle, User32.WindowLongIndexFlags.GWLP_HWNDPARENT, (User32.SetWindowLongFlags) mainWindowHandle);
-                };
-            }
-            
-            var ownerWindowRect = UnsafeNative.GetWindowRect(mainWindowHandle);
-            var childSize = content.DefaultSize.IsNotEmptyArea() ? content.DefaultSize : content.MinSize;
-            var updatedBounds = childSize.CenterInsideBounds(ownerWindowRect);
-            Log.Debug($"Centering rect {childSize} inside parent {ownerWindowRect}, result: {updatedBounds}");
-            content.NativeBounds = updatedBounds;
-
-            window.Loaded += (sender, args) =>
-            {
-                Log.Debug($"Window has loaded: {window}");
-                content.SetOverlayWindow(window.Controller);
-                windowCompletionSource.SetResult(content);
-            };
-            
-            try
-            {
-                Log.Debug($"Showing the window: {window}");
-                var closeController = new CloseController(() => window.Close());
-                if (content is ICloseable closeable)
-                {
-                    closeable.CloseController = closeController;
-                }
-                window.ShowDialog();
-            }
-            catch (Exception e)
-            {
-                Log.Error("Window has closed with an error", e);
-                throw;
-            }
-        }).AddTo(Anchors);
-        
-        Log.Debug($"Awaiting for window to be loaded");
-        var result = await windowCompletionSource.Task;
-        Log.Debug($"Window has loaded: {result}");
-        return result;
     }
 }
