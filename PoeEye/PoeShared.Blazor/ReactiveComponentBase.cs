@@ -40,8 +40,8 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         WhenRefresh
             .Do(x => Interlocked.Increment(ref refreshRequestCount))
             .Sample(RefreshPeriod) //FIXME UI throttling
-            .Do(x => Interlocked.Increment(ref refreshCount))
-            .SubscribeAsync(async x => await Refresh()).AddTo(Anchors);
+            .Do(reason => Interlocked.Increment(ref refreshCount))
+            .SubscribeAsync(async reason => await Refresh(reason)).AddTo(Anchors);
     }
     
     /// <summary>
@@ -115,9 +115,9 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     }
 
     /// <summary>
-    /// Refreshes the component state, equivalent of StateHasChanged.
+    /// Refreshes the component state, equivalent of StateHasChanged but with additional information about reason(if possible).
     /// </summary>
-    protected async Task Refresh()
+    protected async Task Refresh(object tag = null)
     {
         await InvokeAsync(StateHasChanged);
     }
@@ -127,22 +127,36 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     {
         return base.ShouldRender();
     }
-
+    
     /// <inheritdoc />
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
-        
-        if (firstRender)
-        {
-            IsRendered = true;
-        }
+    }
+
+    /// <summary>
+    /// Method invoked first time the component has been rendered. Note that the component does
+    /// not automatically re-render after the completion of any returned <see cref="Task"/>, because
+    /// that would cause an infinite render loop.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing any asynchronous operation.</returns>
+    /// <remarks>
+    /// The <see cref="OnAfterRender(bool)"/> and <see cref="OnAfterRenderAsync(bool)"/> lifecycle methods
+    /// are useful for performing interop, or interacting with values received from <c>@ref</c>.
+    /// </remarks>
+    protected virtual async Task OnAfterFirstRenderAsync()
+    {
     }
 
     /// <inheritdoc />
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        return base.OnAfterRenderAsync(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await OnAfterFirstRenderAsync();
+            IsRendered = true;
+        }
     }
 
     /// <inheritdoc />

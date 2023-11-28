@@ -167,18 +167,10 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         using var isBusy = isBusyLatch.Rent();
         
         ResetError();
-        try
-        {
-            EnsureNotDisposed();
+        EnsureNotDisposed();
 
-            await InnerCommand.Execute(parameter);
-            whenExecuted.OnNext(parameter);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-            throw;
-        }
+        await InnerCommand.Execute(parameter);
+        whenExecuted.OnNext(parameter);
     }
 
     public void Execute(object parameter)
