@@ -1,24 +1,18 @@
-﻿using System;
-using System.Reactive.Disposables;
-using System.Threading;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
-
-namespace PoeShared.Native;
+﻿namespace PoeShared.Scaffolding;
 
 public class WorkerThread : DisposableReactiveObject
 {
-    private readonly Action<CancellationTokenSource> action;
+    private readonly Action<CancellationToken> action;
     private readonly CancellationTokenSource consumerTokenSource;
     private readonly Thread consumerThread;
     
-    public WorkerThread(string threadName, Action<CancellationTokenSource> action)
+    public WorkerThread(string threadName, Action<CancellationToken> action)
     {
         this.action = action;
         Log = GetType().PrepareLogger().WithSuffix($"WT {threadName}");
         Log.Info(() => $"Initializing buffered event log source");
         consumerTokenSource = new CancellationTokenSource();
-        consumerThread = new Thread(() => DoWork(Log,consumerTokenSource, action))
+        consumerThread = new Thread(() => DoWork(Log,consumerTokenSource.Token, action))
         {
             IsBackground = true,
             Name = threadName
@@ -36,13 +30,20 @@ public class WorkerThread : DisposableReactiveObject
             {
                 Log.Warn("Failed to send signal gracefully", e);
             }
+            
+            if (TerminationTimeout > TimeSpan.Zero && !consumerThread.Join(TerminationTimeout))
+            {
+                throw new InvalidStateException($"Failed to terminated capture thread in {TerminationTimeout}");
+            }
 
-            Log.Debug(() => $"Disposed successfully");
+            Log.Debug(() => $"Disposed and started processing successfully");
         }).AddTo(Anchors);
         Log.Info(() => $"Initialization completed");
     }
 
-    private static void DoWork(IFluentLog log, CancellationTokenSource cancellationTokenSource, Action<CancellationTokenSource> consumer)
+    public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
+
+    private static void DoWork(IFluentLog log, CancellationToken cancellationTokenSource, Action<CancellationToken> consumer)
     {
         try
         {
