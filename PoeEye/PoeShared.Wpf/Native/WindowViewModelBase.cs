@@ -156,7 +156,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     public bool EnableHeader { get; set; } = true;
 
-    public bool ShowInTaskbar { get; set; }
+    public bool ShowInTaskbar { get; set; } = true;
 
     public double? TargetAspectRatio { get; set; }
 
