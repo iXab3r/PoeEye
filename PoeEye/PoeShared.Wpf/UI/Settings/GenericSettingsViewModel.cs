@@ -53,6 +53,7 @@ internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSe
         DefaultSize = new WinSize(650, 500);
         MinSize = new WinSize(400, 200);
         Title = "SETTINGS";
+        ShowInTaskbar = true;
         CloseCommand = CommandWrapper.Create(Close);
         SaveCommand = CommandWrapper.Create(SaveExecuted);
 

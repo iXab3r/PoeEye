@@ -185,7 +185,7 @@ public sealed record HotkeyGesture
     /// <summary>
     /// Indicates if the gesture is empty.
     /// </summary>
-    public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None && MouseWheel == MouseWheelAction.None;
+    public bool IsEmpty => !(IsMouse || IsKeyboard || ModifierKeys != ModifierKeys.None);
 
 
     /// <summary>

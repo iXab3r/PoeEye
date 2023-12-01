@@ -1,3 +1,5 @@
+using System;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using PoeShared.Logging;
@@ -7,7 +9,7 @@ using ReactiveUI;
 
 namespace PoeShared.UI;
 
-internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
+internal sealed class HotkeyListener : SharedResourceBase<HotkeyListener>, IHotkeyListener
 {
     private readonly bool initialIsEnabled;
     
@@ -17,16 +19,14 @@ internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
         initialIsEnabled = hotkeyTracker.IsEnabled;
         hotkeyTracker.Reset();
         Log.Debug(() => $"Initializing listener, tracker IsEnabled: {initialIsEnabled}");
-                    
-        hotkeyTracker.WhenAnyValue(x => x.IsActive)
+
+        WhenActivated = hotkeyTracker.WhenAnyValue(x => x.IsActive)
             .Where(x => x)
             .Take(1)
-            .SubscribeSafe(_ =>
-            {
-                Log.Debug("Hotkey was pressed");
-                Activated = true;
-            }, Log.HandleException)
-            .AddTo(Anchors);
+            .Do(_ => Log.Debug("Hotkey was pressed"))
+            .ToUnit()
+            .Publish()
+            .RefCount();
     
         Disposable.Create(() =>
         {
@@ -41,7 +41,7 @@ internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
                 Log.Debug(() => $"Tracker IsEnabled is already in required state {initialIsEnabled}");
             }
     
-            Log.Debug("Disposing listener");
+            Log.Debug("Disposed listener");
         }).AddTo(Anchors);
                     
         if (!hotkeyTracker.IsEnabled)
@@ -53,5 +53,5 @@ internal sealed class HotkeyListener : SharedResourceBase, IHotkeyListener
     
     private new IFluentLog Log { get; }
     
-    public bool Activated { get; private set; }
+    public IObservable<Unit> WhenActivated { get; }
 }
