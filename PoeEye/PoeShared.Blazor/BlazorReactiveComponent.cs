@@ -22,10 +22,24 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
 
     public new TContext DataContext
     {
-        get => (TContext) base.DataContext;
+        get
+        {
+            var baseContext = base.DataContext;
+            if (baseContext == null)
+            {
+                return null;
+            }
+
+            if (baseContext is not TContext context)
+            {
+                throw new InvalidOperationException($"Component {GetType()} supports contexts of type {typeof(TContext)}, but assigned type {baseContext.GetType()}, value: {base.DataContext}");
+            }
+
+            return context;
+        }
         set => base.DataContext = value;
     }
-    
+
     protected BlazorReactiveComponent()
     {
         this.WhenAnyValue(x => x.DataContext)
