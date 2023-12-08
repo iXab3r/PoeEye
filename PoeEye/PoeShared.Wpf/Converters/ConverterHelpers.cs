@@ -17,9 +17,14 @@ public static class ConverterHelpers
         return value switch
         {
             int i => IsNullOrDefault(i),
+            uint m => IsNullOrDefault(m),
             float f => IsNullOrDefault(f),
             double d => IsNullOrDefault(d),
             decimal m => IsNullOrDefault(m),
+            long m => IsNullOrDefault(m),
+            ulong m => IsNullOrDefault(m),
+            short m => IsNullOrDefault(m),
+            ushort m => IsNullOrDefault(m),
             string s => IsNullOrDefault(s),
             DateTime dt => IsNullOrDefault(dt),
             Point p => IsNullOrDefault(p),
