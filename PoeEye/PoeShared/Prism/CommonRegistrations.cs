@@ -56,6 +56,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterType(typeof(INamedFactory<,>), typeof(Factory<,>))
             .RegisterType(typeof(INamedFactory<>),  typeof(Factory<>))
             .RegisterType(typeof(IMemoryCache<,>),  typeof(NaiveMemoryCache<,>))
+            .RegisterType<IBufferedItemsProcessor, BufferedItemsProcessor>()
             .RegisterType<IFolderCleanerService, FolderCleanerService>()
             .RegisterType<ISharedResourceLatch, SharedResourceLatch>();
         

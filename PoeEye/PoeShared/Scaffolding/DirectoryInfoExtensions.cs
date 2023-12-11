@@ -110,4 +110,25 @@ public static class DirectoryInfoExtensions
 
         return result;
     }
+    
+    /// <summary>
+    /// Recursively deletes a directory along with all its files and subdirectories.
+    /// It first resets any special file attributes (like read-only or hidden) to ensure
+    /// that all files and directories can be deleted without authorization issues.
+    /// </summary>
+    /// <param name="directoryInfo">The directory to be deleted.</param>
+    public static void RemoveDirectory(this DirectoryInfo directoryInfo)
+    {
+        foreach (var file in directoryInfo.GetFiles())
+        {
+            file.Attributes = FileAttributes.Normal;
+        }
+
+        foreach (var subDir in directoryInfo.GetDirectories())
+        {
+            RemoveDirectory(subDir); 
+        }
+
+        directoryInfo.Delete(true);
+    }
 }

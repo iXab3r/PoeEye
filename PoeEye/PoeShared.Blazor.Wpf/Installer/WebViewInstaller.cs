@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -34,9 +35,9 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger, IWe
 
     public Uri DownloadLink { get; } = new("https://go.microsoft.com/fwlink/p/?LinkId=2124703", UriKind.Absolute);
     
-    public async Task DownloadAndInstall()
+    public async Task DownloadAndInstall(CancellationToken cancellationToken)
     {
-        await Task.Delay(UiConstants.ArtificialVeryShortDelay);
+        await Task.Delay(UiConstants.ArtificialVeryShortDelay, cancellationToken);
         var tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         if (Directory.Exists(tempFolder))
         {
@@ -65,7 +66,7 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger, IWe
                 UseShellExecute = true,
                 Arguments = "/silent /install",
                 FileName = installerPath.FullName
-            }));
+            }), cancellationToken);
             if (result.ExitCode != 0)
             {
                 throw new InvalidStateException($"Installed returned ExitCode: {result.ExitCode} which indicates installation failure");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using PoeShared.Scaffolding;
 
@@ -8,5 +9,5 @@ public interface IWebViewInstaller : IDisposableReactiveObject
 {
     IWebViewAccessor WebViewAccessor { get; }
     Uri DownloadLink { get; }
-    Task DownloadAndInstall();
+    Task DownloadAndInstall(CancellationToken cancellationToken);
 }

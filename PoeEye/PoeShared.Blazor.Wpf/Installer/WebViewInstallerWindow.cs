@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Native;
@@ -33,7 +34,7 @@ internal sealed class WebViewInstallerWindow : DisposableReactiveObjectWithLogge
         WebViewInstaller = webViewInstaller;
         RefreshCommand = CommandWrapper.Create(WebViewInstaller.WebViewAccessor.Refresh);
 
-        DownloadAndInstallCommand = CommandWrapper.Create(webViewInstaller.DownloadAndInstall, this.WhenAnyValue(x => x.WebViewInstaller.WebViewAccessor.IsInstalled).Select(x => true));
+        DownloadAndInstallCommand = CommandWrapper.Create(() => webViewInstaller.DownloadAndInstall(CancellationToken.None), this.WhenAnyValue(x => x.WebViewInstaller.WebViewAccessor.IsInstalled).Select(x => true));
         CloseWindow = CommandWrapper.Create(viewController.Close);
         Binder.Attach(this).AddTo(Anchors);
     }
