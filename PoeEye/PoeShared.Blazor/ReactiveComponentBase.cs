@@ -106,6 +106,11 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         GC.SuppressFinalize(this);
     }
     
+    public async ValueTask DisposeAsync()
+    {
+        Dispose();
+    }
+    
     /// <summary>
     /// Prepares the logger for this component.
     /// </summary>

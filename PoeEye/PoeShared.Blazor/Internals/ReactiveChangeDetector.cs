@@ -20,7 +20,7 @@ internal sealed class ReactiveChangeDetector : DisposableReactiveObject
         TContext context,
         Expression<Func<TContext, TOut>> selector) where TContext : class
     {
-        var key = new ChangeTrackerKey(context, selector.ToString());
+        var key = new ChangeTrackerKey(context, selector);
 
         ChangeTracker<TContext, TOut> tracker;
         if (trackers.TryGetValue(key, out var existingTracker))

@@ -7,15 +7,30 @@
 
 <HeadContent>
     <meta name="description-counter" content="@DataContext.Count">
-     @if (DataContext.Count > 2)
-     {
-         <link href="/css/test.css" rel="stylesheet" />
-     }
+    @if (DataContext.Count > 2)
+    {
+        <link href="/css/test.css" rel="stylesheet"/>
+    }
 </HeadContent>
 
+<ReactiveSection Trackers="@(new() { this.Listen(x => x.RefreshRequestCount), DataContext.Listen(x => x.Count) })">
+    <div>Reactive @DataContext.Count</div>
+</ReactiveSection>
+
 @code {
+
     void IncrementCount()
     {
         DataContext.Count++;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(10))
+            .Where(x => DataContext != null)
+            .Subscribe(x => IncrementCount())
+            .AddTo(Anchors);
     }
 }

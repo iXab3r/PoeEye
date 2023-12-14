@@ -1,22 +1,24 @@
 using System;
+using System.Linq.Expressions;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Internals;
 
 internal sealed class ChangeTrackerKey : IChangeTrackerKey
 {
-    public ChangeTrackerKey(object context, string stampExpression)
+    public ChangeTrackerKey(object context, Expression expression)
     {
         Context = context;
-        StampExpression = stampExpression;
+        Expression = expression;
     }
 
     public object Context { get; }
 
-    public string StampExpression { get; }
+    public Expression Expression { get; }
 
     private bool Equals(ChangeTrackerKey other)
     {
-        return Equals(Context, other.Context) && StampExpression == other.StampExpression;
+        return Equals(Context, other.Context) && ExpressionEqualityComparer.Instance.Equals(Expression, other.Expression);
     }
 
     public override bool Equals(object obj)
@@ -26,6 +28,6 @@ internal sealed class ChangeTrackerKey : IChangeTrackerKey
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Context, StampExpression);
+        return HashCode.Combine(Context, ExpressionEqualityComparer.Instance.GetHashCode(Expression));
     }
 }

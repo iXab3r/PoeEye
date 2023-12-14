@@ -186,6 +186,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
         Dispatcher.CurrentDispatcher.UnhandledException -= DispatcherOnUnhandledException;
 
+
         ShowExceptionDialog(exception);
 
         Log.Warn("Shutting down...");

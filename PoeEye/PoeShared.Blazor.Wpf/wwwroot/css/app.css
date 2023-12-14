@@ -113,7 +113,6 @@
 
 body, html {
     background-color: transparent;
-    color: var(--eye-MaterialDesignBody);
     font-family: var(--eye-font-family);
     font-size: 12px;
     width: 100vw;
@@ -127,7 +126,7 @@ body, html {
 }
 
 .panel {
-    background-color: var(--eye-MaterialDesignPaper);
+    background-color: var(--eye-MaterialDesignBody);
 }
 
 .scroller {

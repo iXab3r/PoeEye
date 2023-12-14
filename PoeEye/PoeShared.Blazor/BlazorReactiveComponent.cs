@@ -27,7 +27,7 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
             var baseContext = base.DataContext;
             if (baseContext == null)
             {
-                return null;
+                return default;
             }
 
             if (baseContext is not TContext context)

@@ -22,6 +22,13 @@ internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TCont
     private static readonly MethodInfo AttachDependencyAsEnumerableMethod = typeof(ChangeTracker<TContext, TOut>).GetMethod(nameof(AttachDependencyAsEnumerable), BindingFlags.NonPublic | BindingFlags.Static)
                                                                             ?? throw new MissingMethodException($"Failed to find method {nameof(AttachDependencyAsEnumerableMethod)} in {typeof(ChangeTracker<TContext, TOut>)}");
 
+    private static readonly MethodInfo PropagateNullReferencesMethod = typeof(ChangeTracker<TContext, TOut>).GetMethod(nameof(PropagateNullReferences), BindingFlags.NonPublic | BindingFlags.Static)
+                                                             ?? throw new MissingMethodException($"Failed to find method {nameof(PropagateNullReferences)} in {typeof(ChangeTracker<TContext, TOut>)}");
+
+    private static readonly MethodInfo PropagateNullablesMethod = typeof(ChangeTracker<TContext, TOut>).GetMethod(nameof(PropagateNullables), BindingFlags.NonPublic | BindingFlags.Static)
+                                                            ?? throw new MissingMethodException($"Failed to find method {nameof(PropagateNullables)} in {typeof(ChangeTracker<TContext, TOut>)}");
+
+    
     private readonly TContext context;
     private readonly Expression<Func<TContext, TOut>> selector;
     private readonly CompositeDisposable anchors = new();
@@ -46,6 +53,8 @@ internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TCont
 
         var binder = CreateBinder(this, selector);
         binder.Attach(context).AddTo(anchors);
+
+        ChangeTrackerHolder.RecordCreate().AddTo(anchors);
     }
 
     public TOut Value => value;
@@ -60,13 +69,26 @@ internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TCont
     {
         var binder = new Binder<TContext>();
         var builder = binder.Bind(selector);
+
+        if (IsReference(typeof(TOut)))
+        {
+            var propagateNullValues = PropagateNullReferencesMethod.MakeGenericMethod(typeof(TOut), typeof(TContext));
+            propagateNullValues.Invoke(null, new object[]{ builder });
+        }
+        
+        if (TryGetNullableType(typeof(TOut), out var innerNullableType))
+        {
+            var propagateNullValues = PropagateNullablesMethod.MakeGenericMethod(innerNullableType, typeof(TContext));
+            propagateNullValues.Invoke(null, new object[]{ builder });
+        }
+        
         if (IsTypeOrInterfaceOfGenericType(typeof(TOut), typeof(IEnumerable<>)))
         {
             var itemType = GetTypeArgumentOfGenericType(typeof(TOut), typeof(IEnumerable<>));
             var appendMethod = AttachDependencyAsEnumerableMethod.MakeGenericMethod(itemType);
             appendMethod.Invoke(null, new object[] {builder, selector});
         }
-
+        
         var stamp = selector.ToString();
         builder.To((x, v) =>
         {
@@ -77,6 +99,39 @@ internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TCont
         return binder;
     }
 
+    private static bool IsReference(Type type)
+    {
+        if (type.IsClass || type.IsInterface)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+    private static bool TryGetNullableType(Type type, out Type innerType)
+    {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            innerType = type.GetGenericArguments()[0];
+            return true;
+        };
+        innerType = null;
+        return false;
+    }
+    
+    private static void PropagateNullReferences<TOutput, TOutputContext>(PropertyRuleBuilder<TOutput, TOutputContext> propertyRuleBuilder) 
+        where TOutput : class where TOutputContext : class
+    {
+        propertyRuleBuilder.PropagateNullValues();
+    }
+    
+    private static void PropagateNullables<TOutput, TOutputContext>(PropertyRuleBuilder<TOutput?, TOutputContext> propertyRuleBuilder) 
+        where TOutput : struct where TOutputContext : class
+    {
+        propertyRuleBuilder.PropagateNullValues();
+    }
+    
     private static void AttachDependencyAsEnumerable<TItem>(PropertyRuleBuilder<TOut, TContext> propertyRuleBuilder, LambdaExpression selector)
     {
         var updatedSelector = AppendAsEnumerable<TItem>(selector);
