@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Principal;
@@ -31,6 +32,58 @@ public partial class UnsafeNative
         }
     }
 
+    public static void FreeConsole()
+    {
+        if (!Kernel32.FreeConsole())
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+    }
+    
+    public static void AttachConsole()
+    {
+        const int ATTACH_PARENT_PROCESS = -1;
+        if (!Kernel32.AttachConsole(ATTACH_PARENT_PROCESS))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+    }
+
+    public static void AllocConsole()
+    {
+        if (!Kernel32.AllocConsole())
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        //https://developercommunity.visualstudio.com/content/problem/12166/console-output-is-gone-in-vs2017-works-fine-when-d.html
+        // Console.OpenStandardOutput eventually calls into GetStdHandle. As per MSDN documentation of GetStdHandle: http://msdn.microsoft.com/en-us/library/windows/desktop/ms683231(v=vs.85).aspx will return the redirected handle and not the allocated console:
+        // "The standard handles of a process may be redirected by a call to  SetStdHandle, in which case  GetStdHandle returns the redirected handle. If the standard handles have been redirected, you can specify the CONIN$ value in a call to the CreateFile function to get a handle to a console's input buffer. Similarly, you can specify the CONOUT$ value to get a handle to a console's active screen buffer."
+        // Get the handle to CONOUT$.    
+        var stdOutHandle = Kernel32.CreateFile(
+            "CONOUT$",
+            Kernel32.ACCESS_MASK.GenericRight.GENERIC_READ | Kernel32.ACCESS_MASK.GenericRight.GENERIC_WRITE,
+            Kernel32.FileShare.None,
+            0,
+            Kernel32.CreationDisposition.OPEN_EXISTING,
+            default,
+            Kernel32.SafeObjectHandle.Null);
+
+        if (stdOutHandle.IsInvalid)
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        if (!Kernel32.SetStdHandle(Kernel32.StdHandle.STD_OUTPUT_HANDLE, stdOutHandle.DangerousGetHandle()))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+        standardOutput.AutoFlush = true;
+        Console.SetOut(standardOutput);
+    }
+
     public static void AllowSetForegroundWindow()
     {
         try
@@ -57,7 +110,7 @@ public partial class UnsafeNative
         {
             var result = new StringBuilder(1024);
             var processPathLength = result.Capacity;
-                
+
             if (Kernel32.QueryFullProcessImageName(openProcessHandle, Kernel32.QueryFullProcessImageNameFlags.None, result, ref processPathLength) || processPathLength == 0)
             {
                 return result.ToString(0, processPathLength);
@@ -73,7 +126,7 @@ public partial class UnsafeNative
             return result.ToString(0, processPathLength);
         }
     }
-        
+
     public static void GetProcessTimes(int processId, out DateTime creationTime, out DateTime exitTime, out DateTime kernelTime, out DateTime userTime)
     {
         using (var openProcessHandle = OpenProcess(processId))
@@ -83,6 +136,7 @@ public partial class UnsafeNative
                 var lastError = Kernel32.GetLastError();
                 throw new Win32Exception(lastError, $"Failed to retrieve process times for processId: {processId}, error code: {lastError}");
             }
+
             creationTime = DateTime.FromFileTime(creation);
             exitTime = DateTime.FromFileTime(exit);
             kernelTime = DateTime.FromFileTime(kernel);
@@ -101,7 +155,7 @@ public partial class UnsafeNative
 
         return openProcessHandle;
     }
-        
+
     [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
     [DllImport("shell32.dll", EntryPoint = "CommandLineToArgvW", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern IntPtr _CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string cmdLine, out int numArgs);
@@ -113,7 +167,7 @@ public partial class UnsafeNative
         {
             return Array.Empty<string>();
         }
-            
+
         var argv = IntPtr.Zero;
         try
         {
@@ -123,7 +177,7 @@ public partial class UnsafeNative
                 var lastError = Kernel32.GetLastError();
                 throw new Win32Exception(lastError, $"Failed parse command line {cmdLine}, error code: {lastError}");
             }
-                
+
             var result = new string[numArgs];
 
             for (var i = 0; i < numArgs; i++)
@@ -142,7 +196,7 @@ public partial class UnsafeNative
             }
         }
     }
-        
+
     public static ModifierKeys GetCurrentModifierKeys()
     {
         var modifier = ModifierKeys.None;
