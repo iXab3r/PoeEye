@@ -25,25 +25,31 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
     private readonly IAppArguments appArguments;
     private readonly Application application;
+    private readonly IClock clock;
     private readonly IWindowHandleProvider windowHandleProvider;
     private readonly IUniqueIdGenerator idGenerator;
     private readonly ISafeModeService safeModeService;
     private readonly FileLock loadingFileLock;
     private readonly FileLock runningFileLock;
     private readonly ISubject<int> whenTerminated = new Subject<int>();
+    private readonly DateTimeOffset startupTimestamp;
+    private DateTimeOffset loadedTimestamp;
     
     public ApplicationAccessor(
         Application application,
+        IClock clock,
         IWindowHandleProvider windowHandleProvider,
         IUniqueIdGenerator idGenerator,
         ISafeModeService safeModeService,
         IAppArguments appArguments)
     {
         this.application = application;
+        this.clock = clock;
         this.windowHandleProvider = windowHandleProvider;
         this.idGenerator = idGenerator;
         this.safeModeService = safeModeService;
         this.appArguments = appArguments;
+        startupTimestamp = clock.Now;
         Log.Info(() => $"Initializing Application accessor for {application}");
         if (application == null)
         {
@@ -124,7 +130,9 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             throw new InvalidOperationException("Application is already loaded");
         }
 
-        Log.Info("Marking application as loaded");
+        loadedTimestamp = clock.Now;
+        var loadTime = loadedTimestamp - startupTimestamp;
+        Log.Info($"Marking application as loaded: {new { startupTimestamp, loadedTimestamp, loadTime }}");
         IsLoaded = true;
     }
 
