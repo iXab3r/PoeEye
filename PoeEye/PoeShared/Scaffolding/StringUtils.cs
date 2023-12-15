@@ -231,6 +231,13 @@ public static class StringUtils
         return ShortenFilename(_fileName, 8);
     }
 
+    public static Stream ToStream(string data)
+    {
+        var dataBytes = Encoding.Default.GetBytes(data);
+        var memoryStream = new MemoryStream(dataBytes);
+        return memoryStream;
+    }
+
     /// <summary>
     ///     Преобразовывает из HEX строки в байтовый массив
     /// </summary>

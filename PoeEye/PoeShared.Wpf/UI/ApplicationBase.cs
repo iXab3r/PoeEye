@@ -28,9 +28,12 @@ namespace PoeShared.UI;
 public abstract class ApplicationBase : Application
 {
     private readonly IAppArguments appArguments;
-    private readonly IMetricsRoot metrics;
 
-    protected ApplicationBase()
+    protected ApplicationBase() : this(new ApplicationStartupProperties())
+    {
+    }
+    
+    protected ApplicationBase(ApplicationStartupProperties startupProperties)
     {
         Log = GetType().PrepareLogger().WithSuffix(ToString);
         try
@@ -73,9 +76,39 @@ public abstract class ApplicationBase : Application
                 }
             }
 
-            InitializeLogging();
+            if (!startupProperties.SkipInitialization)
+            {
+                Initialize(startupProperties);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Unhandled application exception", ex);
+            throw;
+        }
+    }
 
-            metrics = Container.Resolve<IMetricsRoot>();
+    public IUnityContainer Container { get; }
+
+    public CompositeDisposable Anchors { get; } = new();
+
+    protected IFluentLog Log { get; }
+
+    protected void Initialize(ApplicationStartupProperties startupProperties)
+    {
+            InitializeLogging();
+            if (!startupProperties.DoNotLoadLogConfigFromFile)
+            {
+                InitializeLoggingFromFile();
+            }
+            
+            var metrics = Container.Resolve<IMetricsRoot>();
+            Log.Debug(() => $"UI Metrics: {metrics}");
+            
+            var applicationAccessor = Container.Resolve<IApplicationAccessor>();
+            Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
+            applicationAccessor.WhenExit.Subscribe(OnExit).AddTo(Anchors);
+
 
             Log.Debug(() => $"UI Scheduler: {RxApp.MainThreadScheduler}");
             RxApp.MainThreadScheduler = Container.Resolve<IScheduler>(WellKnownSchedulers.UI);
@@ -108,8 +141,6 @@ public abstract class ApplicationBase : Application
                     {
                         Log.Warn($"Failed to set DpiAwareness of current process");
                     }
-
-                    ;
                 }
             }
             else
@@ -129,29 +160,11 @@ public abstract class ApplicationBase : Application
 
             Log.Debug(() => $"Configuring AllowSetForegroundWindow permissions");
             UnsafeNative.AllowSetForegroundWindow();
-
-            var applicationAccessor = Container.Resolve<IApplicationAccessor>();
-            Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
-            applicationAccessor.WhenExit.Subscribe(OnExit).AddTo(Anchors);
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Unhandled application exception", ex);
-            throw;
-        }
     }
 
-    public IUnityContainer Container { get; }
-
-    public CompositeDisposable Anchors { get; } = new();
-
-    protected IFluentLog Log { get; }
-
-    private void InitializeLogging()
+    protected void InitializeLoggingFromFile()
     {
-        RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
-        SharedLog.Instance.InitializeLogging(appArguments);
-
+        Log.Debug("Attempting to load configuration from file");
         var candidates = new[]
             {
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"log4net.{appArguments.AppName}.config"),
@@ -159,12 +172,18 @@ public abstract class ApplicationBase : Application
             }.Select(x => new FileInfo(x))
             .Select(x => new {LogFile = x, x.Exists})
             .ToArray();
-        Log.Debug($"Log file: {candidates.DumpToString()}");
+        Log.Debug($"Log files: {candidates.DumpToString()}");
         var logFileConfigPath = candidates.FirstOrDefault(x => x.Exists);
         if (logFileConfigPath?.LogFile != null)
         {
             SharedLog.Instance.LoadLogConfiguration(appArguments, logFileConfigPath.LogFile);
         }
+    }
+
+    private void InitializeLogging()
+    {
+        RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
+        SharedLog.Instance.InitializeLogging(appArguments);
         SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
         Container.Resolve<IExceptionReportingService>();
     }

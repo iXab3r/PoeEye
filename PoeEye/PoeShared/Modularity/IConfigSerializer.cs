@@ -8,23 +8,25 @@ public interface IConfigSerializer
 {
     void RegisterConverter([NotNull] JsonConverter converter);
         
-    [NotNull]
     string Serialize(object data);
+    
+    void Serialize(object data, TextWriter textWriter);
+    
+    void Serialize(object data, FileInfo file);
 
-    [NotNull]
     T Deserialize<T>(string serializedData);
+    
+    T Deserialize<T>(TextReader textReader);
+    
+    T Deserialize<T>(FileInfo file);
 
-    [NotNull]
     T DeserializeOrDefault<T>(
         PoeConfigMetadata<T> metadata,
         Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : IPoeEyeConfig;
 
-    [NotNull]
     T[] DeserializeSingleOrList<T>(string serializedData);
 
-    [NotNull]
     string Compress(object data);
 
-    [NotNull]
     T Decompress<T>(string compressedData);
 }

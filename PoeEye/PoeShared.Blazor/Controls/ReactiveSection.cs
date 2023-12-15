@@ -15,7 +15,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
     public ReactiveSection()
     {
         this.WhenAnyValue(x => x.Trackers)
-            .Select(x => x ?? [])
+            .Select(x => x ?? new ReactiveTrackerList())
             .Select(x => x.Merge())
             .Switch()
             .SubscribeAsync(x => Refresh(x))

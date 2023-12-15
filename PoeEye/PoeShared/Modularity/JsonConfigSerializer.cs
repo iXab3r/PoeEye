@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System.Buffers;
+using System.Reactive;
 using System.Reactive.Subjects;
 using System.Runtime.Serialization;
 using DynamicData;
@@ -13,6 +14,7 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     private readonly int MaxCharsToLog = 1024;
 
     private JsonSerializerSettings jsonSerializerSettings;
+    private JsonSerializer jsonSerializer;
 
     public JsonConfigSerializer(PoeConfigConverter configConverter)
     {
@@ -27,27 +29,43 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
     public void RegisterConverter(JsonConverter converter)
     {
-        Guard.ArgumentNotNull(converter, nameof(converter));
-
         converters.Add(converter);
     }
 
-    public string Serialize(object data)
+    public void Serialize(object data, FileInfo file)
     {
-        Guard.ArgumentNotNull(() => data);
-
-        return JsonConvert.SerializeObject(data, jsonSerializerSettings);
+        using var writer = new StreamWriter(file.FullName);
+        Serialize(data, writer);
     }
 
-    public T Deserialize<T>(string serializedData)
+    public void Serialize(object data, TextWriter textWriter)
     {
-        Guard.ArgumentNotNullOrEmpty(() => serializedData);
+        using var jsonWriter = CreateWriter(textWriter);
+        jsonSerializer.Serialize(jsonWriter, data);
+    }
+    
+    public string Serialize(object data)
+    {
+        using var stringWriter = new StringWriter();
+        Serialize(data, stringWriter);
+        return stringWriter.ToString();
+    }
 
-        var result = JsonConvert.DeserializeObject(serializedData, typeof(T), jsonSerializerSettings);
+    public T Deserialize<T>(FileInfo file)
+    {
+        using var stringReader = new StreamReader(file.FullName);
+        return Deserialize<T>(stringReader);
+    }
+    
+    public T Deserialize<T>(TextReader textReader)
+    {
+        using var jsonReader = CreateReader(textReader);
+
+        var result = jsonSerializer.Deserialize(jsonReader, typeof(T));
         if (result == null)
         {
             throw new FormatException(
-                $"Could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
+                $"Could not deserialize data to instance of type {typeof(T)} from data stream");
         }
 
         if (!(result is T))
@@ -57,11 +75,24 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
         return (T) result;
     }
+    
+    public T Deserialize<T>(string serializedData)
+    {
+        using var stringReader = new StringReader(serializedData);
+        try
+        {
+            return Deserialize<T>(stringReader);
+        }
+        catch (FormatException e)
+        {
+            throw new FormatException($"Could not deserialize data to instance of type {typeof(T)}, serialized data: \\n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}", e);
+        }
+    }
 
     public T[] DeserializeSingleOrList<T>(string serializedData)
     {
         using (var textReader = new StringReader(serializedData))
-        using (var jsonReader = new JsonTextReader(textReader))
+        using (var jsonReader = CreateReader(textReader))
         {
             if (jsonReader.Read())
             {
@@ -82,20 +113,16 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
     public string Compress(object data)
     {
-        Guard.ArgumentNotNull(() => data);
-
         var serialized = Serialize(data);
         return StringUtils.CompressStringToGZip(serialized);
     }
 
     public T Decompress<T>(string compressedData)
     {
-        Guard.ArgumentNotNullOrEmpty(() => compressedData);
-
         var serialized = StringUtils.DecompressStringFromGZip(compressedData);
         return Deserialize<T>(serialized);
     }
-
+    
     private void ReinitializeSerializerSettings()
     {
         var newSettings = new JsonSerializerSettings
@@ -104,11 +131,13 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
             TypeNameHandling = TypeNameHandling.Auto,
             Error = HandleSerializerError,
             NullValueHandling = NullValueHandling.Ignore,
+            
         };
         newSettings.ContractResolver = new PoeSharedContractResolver();
         converters.Items.ForEach(newSettings.Converters.Add);
 
         jsonSerializerSettings = newSettings;
+        jsonSerializer = JsonSerializer.Create(newSettings);
     }
 
     private void HandleSerializerError(object sender, ErrorEventArgs args)
@@ -158,5 +187,60 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
         log.Debug(() => $"Returning value: {metadata.Value}");
         return metadata.Value;
+    }
+    
+    private static JsonTextReader CreateReader(TextReader reader)
+    {
+        return new JsonTextReader(reader)
+        {
+        };
+    }
+    
+    private static JsonTextWriter CreateWriter(TextWriter writer)
+    {
+        return new JsonTextWriter(writer)
+        {
+        };
+    }
+    
+    public class FakeArrayPool<T> : LazyReactiveObject<FakeArrayPool<T>>, IArrayPool<T>
+    {
+        private static readonly IFluentLog Log = typeof(FakeArrayPool<T>).PrepareLogger();
+
+        public T[] Rent(int minimumLength)
+        {
+            Log.Info(() => $"Renting array, min length: {minimumLength}");
+            var result = new T[minimumLength];
+            Log.Info(() => $"Array rented, requested: {minimumLength}, got: {result.Length}");
+            return result;
+        }
+
+        public void Return(T[] array)
+        {
+            Log.Info(() => $"Returning array, length: {array.Length}");
+            Log.Info(() => $"Returned array, length: {array.Length}");
+        }
+    }
+    
+    public class CustomArrayPool<T> : LazyReactiveObject<CustomArrayPool<T>>, IArrayPool<T>
+    {
+        private static readonly IFluentLog Log = typeof(CustomArrayPool<T>).PrepareLogger();
+
+        private readonly ArrayPool<T> inner = ArrayPool<T>.Shared;
+
+        public T[] Rent(int minimumLength)
+        {
+            Log.Info(() => $"Renting array, min length: {minimumLength}");
+            var result = inner.Rent(minimumLength);
+            Log.Info(() => $"Array rented, requested: {minimumLength}, got: {result.Length}");
+            return result;
+        }
+
+        public void Return(T[] array)
+        {
+            Log.Info(() => $"Returning array, length: {array.Length}");
+            inner.Return(array, clearArray: false);
+            Log.Info(() => $"Returned array, length: {array.Length}");
+        }
     }
 }
