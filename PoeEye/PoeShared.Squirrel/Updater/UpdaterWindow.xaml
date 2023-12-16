@@ -132,7 +132,7 @@
 
     <eye:CachedContentControl Content="{Binding}"></eye:CachedContentControl>
 
-    <mah:MetroWindow.RightWindowCommands>
+    <native:ReactiveMetroWindow.RightWindowCommands>
         <mah:WindowCommands ShowSeparators="True">
             <eye:CachedContentControl Content="{Binding ErrorMonitor}" />
             <eye:ButtonEx Command="{Binding ApplicationUpdater.RestartCommand}"
@@ -147,6 +147,6 @@
                 </eye:CachedContentControl.ToolTip>
             </eye:CachedContentControl>
         </mah:WindowCommands>
-    </mah:MetroWindow.RightWindowCommands>
+    </native:ReactiveMetroWindow.RightWindowCommands>
 
 </native:ReactiveMetroWindow>

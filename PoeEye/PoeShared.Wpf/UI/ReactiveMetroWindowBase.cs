@@ -110,7 +110,6 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         var behaviorTypeToRemove = new[]
         {
             typeof(GlowWindowBehavior), 
-            typeof(WindowsSettingBehavior), //WindowsSettingBehavior has an issue with multiple dispatchers - SaveWindowState crashes the app on shutdown
         };
         var behaviorToRemove = behaviors.Where(x => behaviorTypeToRemove.Contains(x.GetType())).ToArray();
         behaviors.RemoveMany(behaviorToRemove);
