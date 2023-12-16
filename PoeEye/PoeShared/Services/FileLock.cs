@@ -90,6 +90,16 @@ public sealed class FileLock : DisposableReactiveObject
     {
         log.Debug(() => $"Creating lock file: {lockFilePath}");
         var lockFileData = $"pid: {CurrentProcess.Id}, start time: {CurrentProcess.StartTime}";
+        var lockFile = new FileInfo(lockFilePath);
+        if (lockFile.Directory == null)
+        {
+            throw new ArgumentException($"Lock file {lockFilePath} directory is not set");
+        }
+        if (!lockFile.Directory.Exists)
+        {
+            log.Debug(() => $"Creating directory for lock file: {lockFile.Directory.FullName}");
+            lockFile.Directory.Create();
+        }
         var lockFileStream = new FileStream(lockFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
         var lockFileWriter = new StreamWriter(lockFileStream);
         log.Debug(() => $"Filling lock file with data: {lockFileData}");
