@@ -5,19 +5,42 @@ public class WorkerThread : DisposableReactiveObject
     private readonly Action<CancellationToken> action;
     private readonly CancellationTokenSource consumerTokenSource;
     private readonly Thread consumerThread;
-    
-    public WorkerThread(string threadName, Action<CancellationToken> action)
+    private bool isRunning;
+
+    public WorkerThread(
+        string threadName,
+        Action<CancellationToken> action,
+        bool autoStart = true)
     {
         this.action = action;
         Log = GetType().PrepareLogger().WithSuffix($"WT {threadName}");
         Log.Info(() => $"Initializing buffered event log source");
         consumerTokenSource = new CancellationTokenSource();
-        consumerThread = new Thread(() => DoWork(Log,consumerTokenSource.Token, action))
+        consumerThread = new Thread(() => DoWork(Log, consumerTokenSource.Token, action))
         {
             IsBackground = true,
             Name = threadName
         };
+        Log.Info(() => $"Initialization completed");
+        if (autoStart)
+        {
+            Log.Info(() => $"Auto-starting the thread");
+            Start();
+        }
+    }
+
+    public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
+
+    public void Start()
+    {
+        if (isRunning)
+        {
+            throw new InvalidOperationException("Thread is already running");
+        }
+        
+        Log.Info(() => $"Starting the thread");
         consumerThread.Start();
+        isRunning = true;
 
         Disposable.Create(() =>
         {
@@ -30,7 +53,7 @@ public class WorkerThread : DisposableReactiveObject
             {
                 Log.Warn("Failed to send signal gracefully", e);
             }
-            
+
             if (TerminationTimeout > TimeSpan.Zero && !consumerThread.Join(TerminationTimeout))
             {
                 throw new InvalidStateException($"Failed to terminated capture thread in {TerminationTimeout}");
@@ -38,10 +61,7 @@ public class WorkerThread : DisposableReactiveObject
 
             Log.Debug(() => $"Disposed and started processing successfully");
         }).AddTo(Anchors);
-        Log.Info(() => $"Initialization completed");
     }
-
-    public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
     private static void DoWork(IFluentLog log, CancellationToken cancellationTokenSource, Action<CancellationToken> consumer)
     {
