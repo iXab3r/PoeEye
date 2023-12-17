@@ -19,6 +19,8 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
     public PoeConfigConverterMigrationService(IAssemblyTracker assemblyTracker)
     {
+        Log.AddSuffix("Config Migrations");
+
         this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
             .Select(x => x
                 ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null).Distinct()
@@ -26,7 +28,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
             .Switch()
             .Subscribe(x =>
             {
-                Log.Info($"Adding assembly {x} to processing queue");
+                Log.Info($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
                 Log.Info($"Added assembly {x} to processing queue");
             })

@@ -15,6 +15,8 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
     public PoeConfigMetadataReplacementService(IAssemblyTracker assemblyTracker)
     {
+        Log.AddSuffix("Config Metadata Replacements");
+
         replacementsSource.Connect().BindToCollection(out var replacements).Subscribe().AddTo(Anchors);
         Replacements = replacements;
 
@@ -30,7 +32,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             .Switch()
             .Subscribe(x =>
             {
-                Log.Info($"Adding assembly {x} to processing queue");
+                Log.Info($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
                 Log.Info($"Added assembly {x} to processing queue");
             })

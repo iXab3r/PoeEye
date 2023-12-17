@@ -23,6 +23,8 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         IClock clock,
         IAssemblyTracker assemblyTracker)
     {
+        Log.AddSuffix("Blazor views cache");
+
         this.clock = clock;
         this.WhenAnyValue(x => x.AutomaticallyProcessAssemblies)
             .Select(x => x ? assemblyTracker.WhenLoaded : Observable.Empty<Assembly>())
