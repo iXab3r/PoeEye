@@ -21,7 +21,7 @@ namespace PoeShared.Services;
 internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicationAccessor
 {
     private static readonly int CurrentProcessId = Environment.ProcessId;
-    private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger().WithSuffix($"App#{CurrentProcessId}");
+    private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger().WithSuffix($"PID#{CurrentProcessId}");
     private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(5);
     private readonly IAppArguments appArguments;
     private readonly Application application;
@@ -43,6 +43,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         ISafeModeService safeModeService,
         IAppArguments appArguments)
     {
+        Log.AddSuffix($"v{appArguments.Version}");
         this.application = application;
         this.clock = clock;
         this.windowHandleProvider = windowHandleProvider;

@@ -10,6 +10,10 @@ namespace PoeShared.Squirrel.Prism;
 
 public sealed class UpdaterModule : DynamicModule
 {
+    public UpdaterModule()
+    {
+    }
+
     protected override void RegisterTypesInternal(IUnityContainer container)
     {
         container.AddNewExtensionIfNotExists<UpdaterRegistrations>();

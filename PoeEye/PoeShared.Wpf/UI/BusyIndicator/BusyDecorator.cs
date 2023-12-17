@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
@@ -13,6 +14,8 @@ namespace PoeShared.UI;
 [StyleTypedProperty(Property = "BusyStyle", StyleTargetType = typeof(Control))]
 public sealed class BusyDecorator : Decorator
 {
+    private static readonly IFluentLog Log = typeof(BusyDecorator).PrepareLogger();
+
     /// <summary>
     /// Identifies the IsBusyIndicatorShowing dependency property.
     /// </summary>
@@ -166,13 +169,22 @@ public sealed class BusyDecorator : Decorator
 
             var dataContextFactory = d.GetValue(DataContextFactoryProperty) as IFactory<object>;
             decorator.backgroundChildId = BackgroundVisualHost.AddChild(decorator,
-                () => new CachedContentControl()
+                () =>
                 {
-                    Style = style,
-                    HorizontalAlignment = horizAlign,
-                    VerticalAlignment = vertAlign,
-                    Margin = margin,
-                    DataContext = dataContextFactory?.Create()
+                    using var sw = new BenchmarkTimer(Log);
+                    sw.Debug(() => $"New child initialization requested, factory: {dataContextFactory}");
+                    var childContext = dataContextFactory?.Create();
+                    sw.Debug(() => $"New child context created: {childContext}");
+                    var element = new CachedContentControl()
+                    {
+                        Style = style,
+                        HorizontalAlignment = horizAlign,
+                        VerticalAlignment = vertAlign,
+                        Margin = margin,
+                        DataContext = childContext
+                    };
+                    return element;
+
                 });
 
             if (!decorator.IsEnabledWhenBusy)

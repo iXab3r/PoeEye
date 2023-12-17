@@ -18,7 +18,7 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             .Select(x => x.EventArgs.LoadedAssembly)
             .Subscribe(assembly =>
             {
-                if (assembly.FullName.StartsWith("ℛ*"))
+                if (assembly.FullName != null && assembly.FullName.StartsWith("ℛ*"))
                 {
                     // these are dynamically emitted assemblies by CSS
                     return;
@@ -35,7 +35,9 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             {
                 Log.Debug(() => $"Assembly is now tracked: {assembly}");
                 loadedSink.OnNext(assembly);
-            }).RemoveKey().AsObservableList().AddTo(Anchors);
+            }).RemoveKey()
+            .AsObservableList()
+            .AddTo(Anchors);
     }
 
     public IObservableList<Assembly> LoadedAssemblies { get; }

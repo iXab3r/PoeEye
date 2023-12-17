@@ -48,8 +48,10 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     public ApplicationUpdaterViewModel(
         IFactory<IUpdaterWindowDisplayer> updateWindowDisplayer,
         IApplicationUpdaterModel updaterModel,
+        IApplicationAccessor applicationAccessor,
         IConfigProvider<UpdateSettingsConfig> configProvider,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+        [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiIdleScheduler,
         [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
     {
         Guard.ArgumentNotNull(updateWindowDisplayer, nameof(updateWindowDisplayer));
@@ -153,10 +155,10 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                     .ObservableForProperty(x => x.UpdateSource, skipInitial: true)
                     .Do(source => Log.Debug(() => $"Update source changed: {source}"))
                     .Select(x => new { open = false, silent = false, reason =  $"update source change" }),
-                Observable.Return(new { open = false, silent = false, reason = $"initial tick" }),
+                applicationAccessor.WhenAnyValue(x => x.IsLoaded).Where(x => x).Delay(TimeSpan.FromSeconds(30)).Select(x => new { open = false, silent = false, reason = $"initial tick" }),
                 this.WhenAnyValue(x => x.AutomaticallyDownloadUpdates).Where(x => x).Skip(1).Select(x => new { open = true, silent = false, reason = $"settings changed, {nameof(AutomaticallyDownloadUpdates)} enabled" }),
                 checkForUpdatesCommandSink.Select(_ => new { open = true, silent = false, reason = $"user requested update" }))
-            .ObserveOn(uiScheduler)
+            .ObserveOn(uiIdleScheduler)
             .Do(x => Log.Debug(() => $"Checking for updates: {x}"))
             .Where(x => !IsBusy)
             .SubscribeAsync(async x =>

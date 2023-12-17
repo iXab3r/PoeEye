@@ -25,8 +25,8 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     
     public BenchmarkTimer(string benchmarkName, IFluentLog logger = null, [CallerMemberName] string propertyName = null) : this(logger, propertyName)
     {
-        AddStep(() => $" => {benchmarkName}");
-        Anchors.Add(() => AddStep(() => $" <= {benchmarkName}"));
+        AddStep(() => $" => {benchmarkName}", logLevel);
+        Anchors.Add(() => AddStep(() => $" <= {benchmarkName}", logLevel));
     }
 
     public BenchmarkTimer(IFluentLog logger = null, [CallerMemberName] string propertyName = null) 
@@ -104,21 +104,45 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
 
     public BenchmarkTimer Step(Func<string> messageFactory)
     {
-        AddStep(messageFactory);
+        AddStep(messageFactory, logLevel);
+        return this;
+    }
+    
+    public BenchmarkTimer Debug(Func<string> messageFactory)
+    {
+        AddStep(messageFactory, FluentLogLevel.Debug);
         return this;
     }
         
+    public BenchmarkTimer Info(Func<string> messageFactory)
+    {
+        AddStep(messageFactory, FluentLogLevel.Info);
+        return this;
+    }
+    
+    public BenchmarkTimer Warn(Func<string> messageFactory)
+    {
+        AddStep(messageFactory, FluentLogLevel.Warn);
+        return this;
+    }
+    
+    public BenchmarkTimer Error(Func<string> messageFactory)
+    {
+        AddStep(messageFactory, FluentLogLevel.Error);
+        return this;
+    }
+    
     public BenchmarkTimer Step(string message)
     {
         return Step(() => message);
     }
 
-    private void AddStep(Func<string> messageFactory)
+    private void AddStep(Func<string> messageFactory, FluentLogLevel messageLogLevel)
     {
-        AddStep(messageFactory, sw.Elapsed);
+        AddStep(messageFactory, sw.Elapsed, messageLogLevel);
     }
     
-    private void AddStep(Func<string> messageFactory, TimeSpan elapsed)
+    private void AddStep(Func<string> messageFactory, TimeSpan elapsed, FluentLogLevel messageLogLevel)
     {
         if (logCondition != null && !logCondition())
         {
@@ -129,7 +153,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
         operations.Enqueue(logMessage);
         if (logEachStep)
         {
-            logger.Write(logLevel, () => logMessage);
+            logger.Write(messageLogLevel, () => logMessage);
         }
         previousOperationTimestamp = elapsed;
     }

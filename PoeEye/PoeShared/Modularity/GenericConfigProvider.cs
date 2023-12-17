@@ -65,9 +65,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
 
         WhenChanged = changes;
         changes.Connect().AddTo(Anchors);
-            
-        Log.Debug(() => $"Initial re-save of config to update format using {configProvider}");
-        configProvider.Save();
     }
         
     public TConfig ActualConfig { get; private set; }
@@ -96,7 +93,7 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
         }
 
         Interlocked.Increment(ref saveCommandCounter);
-        Log.Debug(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+        Log.Info(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
         configProvider.Save(config);
         reloadSignal.OnNext("Reloading after Save");

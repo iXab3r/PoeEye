@@ -100,7 +100,6 @@ internal static class BackgroundVisualHost
 
         // this will either add the child now, or wait until it is loaded
         ChildHolders[id] = new AddedChildHolder(parent, createElement, id);
-
         return id;
     }
 

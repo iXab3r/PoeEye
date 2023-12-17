@@ -25,13 +25,13 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
             .RegisterSingleton<IAppArguments, AppArguments>()
             .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
-            .RegisterSingleton<IAssemblyTracker, AssemblyTracker>()
             .RegisterSingleton<IPoeConfigConverterMigrationService, PoeConfigConverterMigrationService>()
             .RegisterSingleton<PoeConfigMetadataReplacementService>(typeof(IPoeConfigMetadataReplacementRepository), typeof(IPoeConfigMetadataReplacementService))
             .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
             .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
             .RegisterSingleton<IFileSystem, FileSystem>()
+            .RegisterSingleton<IAssemblyTracker>(x => IAssemblyTracker.Instance)
             .RegisterSingleton<ICsharpExpressionParser>(x => CsharpExpressionParser.Instance)
             .RegisterSingleton<IMemoryPool>(x => MemoryPool.Shared);
             

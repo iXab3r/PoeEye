@@ -57,7 +57,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
 
     public void Save()
     {
-        Log.Info(() => $"Saving all configs, count: {loadedConfigsByType.Count}");
+        Log.Info(() => $"Saving configs(total: {loadedConfigsByType.Count})");
         foreach (var config in loadedConfigsByType.Items)
         {
             Log.Info(() => $"Saving config of type {config.GetType()}");
