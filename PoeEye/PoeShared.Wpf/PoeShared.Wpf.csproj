@@ -98,6 +98,9 @@
     <Compile Update="RegionSelector\SelectionAdorner.cs">
       <DependentUpon>SelectionAdornerEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UI\SimplifiedMetroWindow.cs">
+      <DependentUpon>SimplifiedMetroWindow.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\Styles.tabcontrol.xaml">
@@ -113,5 +116,6 @@
   </ItemGroup>
   <ItemGroup>
     <MauiXaml Include="Themes\Styles.datagrid.xaml" />
+    <MauiXaml Include="UI\WindowButtonCommands.xaml" />
   </ItemGroup>
 </Project>

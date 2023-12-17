@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using ControlzEx.Native;
 using MahApps.Metro.Controls;
 using PInvoke;
@@ -38,6 +39,8 @@ using Microsoft.Xaml.Behaviors;
 [TemplatePart(Name = PART_Content, Type = typeof(MetroContentControl))]
 public class MetroWindow : WindowChromeWindow
 {
+    private static readonly DependencyPropertyKey ParentWindowPropertyKey;
+    
     private const string PART_Icon = "PART_Icon";
     private const string PART_TitleBar = "PART_TitleBar";
     private const string PART_WindowTitleBackground = "PART_WindowTitleBackground";
@@ -757,6 +760,20 @@ public class MetroWindow : WindowChromeWindow
 
     static MetroWindow()
     {
+        var windowCommandFields = typeof(WindowCommands)
+            .GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+            .ToArray();
+        var parentWindowField = windowCommandFields.FirstOrDefault(x => x.Name == nameof(ParentWindowPropertyKey));
+        if (parentWindowField == null)
+        {
+            throw new InvalidStateException($"Failed to find field {nameof(ParentWindowPropertyKey)} in {typeof(WindowCommands)}, candidates: {windowCommandFields.Select(x => new {x.Name, x.FieldType}).DumpToString()}");
+        }
+
+        ParentWindowPropertyKey = (DependencyPropertyKey)parentWindowField.GetValue(null);
+        if (ParentWindowPropertyKey == null)
+        {
+            throw new InvalidStateException($"Failed to get value of field {parentWindowField} in {typeof(WindowCommands)}");
+        }
         DefaultStyleKeyProperty.OverrideMetadata(typeof(MetroWindow), new FrameworkPropertyMetadata(typeof(MetroWindow)));
 
         IconProperty.OverrideMetadata(
@@ -904,10 +921,9 @@ public class MetroWindow : WindowChromeWindow
         RightWindowCommands ??= new WindowCommands();
         WindowButtonCommands ??= new WindowButtonCommands();
 
-        //FIXME aaaaa
-        //LeftWindowCommands.SetValue(WindowCommands.ParentWindowPropertyKey, this);
-        //RightWindowCommands.SetValue(WindowCommands.ParentWindowPropertyKey, this);
-        //WindowButtonCommands.SetValue(WindowButtonCommands.ParentWindowPropertyKey, this);
+        LeftWindowCommands.SetValue(ParentWindowPropertyKey, this);
+        RightWindowCommands.SetValue(ParentWindowPropertyKey, this);
+        WindowButtonCommands.SetValue(ParentWindowPropertyKey, this);
 
         icon = GetTemplateChild(PART_Icon) as FrameworkElement;
         titleBar = GetTemplateChild(PART_TitleBar) as UIElement;

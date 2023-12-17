@@ -23,13 +23,6 @@ public partial class OverlayWindowView
         var window = sender as Window;
         var windowViewModel = window?.DataContext as WindowContainerBase<IOverlayViewModel>;
         var overlayViewModel = windowViewModel?.Content;
-        
-        var behaviors = Interaction.GetBehaviors(this);
-        var chromeBehavior = behaviors.OfType<WindowChromeBehavior>().FirstOrDefault();
-        if (chromeBehavior == null)
-        {
-            return;
-        }
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)

@@ -14,7 +14,7 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     
-      <ControlTemplate x:Key="MahApps.Templates.MetroWindow" TargetType="{x:Type ui:MetroWindow}">
+      <ControlTemplate x:Key="PoeShared.Templates.MetroWindow" TargetType="{x:Type ui:MetroWindow}">
         <mahControls:ClipBorder x:Name="PART_Border"
                         Margin="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
@@ -187,7 +187,7 @@
 
     </ControlTemplate>
 
-    <ControlTemplate x:Key="MahApps.Templates.MetroWindow.Center" TargetType="{x:Type ui:MetroWindow}">
+    <ControlTemplate x:Key="PoeShared.Templates.MetroWindow.Center" TargetType="{x:Type ui:MetroWindow}">
         <mahControls:ClipBorder x:Name="PART_Border"
                         Margin="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
@@ -395,7 +395,7 @@
         <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MahApps.Brushes.WindowTitle.NonActive}" />
         <Setter Property="OverlayBrush" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Template" Value="{StaticResource MahApps.Templates.MetroWindow}" />
+        <Setter Property="Template" Value="{StaticResource PoeShared.Templates.MetroWindow}" />
         <Setter Property="TextElement.FontSize" Value="{DynamicResource MahApps.Font.Size.Content}" />
         <Setter Property="TitleForeground" Value="{DynamicResource MahApps.Brushes.IdealForeground}" />
         <Setter Property="TitleTemplate">
@@ -427,7 +427,7 @@
                 </Setter>
             </DataTrigger>
             <Trigger Property="TitleAlignment" Value="Center">
-                <Setter Property="Template" Value="{StaticResource MahApps.Templates.MetroWindow.Center}" />
+                <Setter Property="Template" Value="{StaticResource PoeShared.Templates.MetroWindow.Center}" />
             </Trigger>
         </Style.Triggers>
     </Style>
