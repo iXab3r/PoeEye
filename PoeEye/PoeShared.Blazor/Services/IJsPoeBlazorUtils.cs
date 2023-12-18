@@ -48,4 +48,24 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <param name="elementId">The id of the element to be clicked on.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task ClickElementById(string elementId);
+    
+    /// <summary>
+    /// Scrolls to the top of an element matching specified selector using jQuery.
+    /// </summary>
+    Task ScrollToTop(string elementId, TimeSpan duration);
+    
+    /// <summary>
+    /// Scrolls to the top of an element matching specified selector using jQuery.
+    /// </summary>
+    Task ScrollToTop(string elementSelector);
+    
+    /// <summary>
+    /// Scrolls to the bottom of an element matching specified selector using jQuery.
+    /// </summary>
+    Task ScrollToBottom(string elementSelector, TimeSpan duration);
+    
+    /// <summary>
+    /// Scrolls to the bottom of an element matching specified selector using jQuery.
+    /// </summary>
+    Task ScrollToBottom(string elementSelector);
 }

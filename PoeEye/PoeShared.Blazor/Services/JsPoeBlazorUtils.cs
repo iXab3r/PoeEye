@@ -59,6 +59,35 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         await module.InvokeVoidAsync("clickElementById", elementId);
     }
 
+    public Task ScrollToTopById(string elementId, TimeSpan duration)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task ScrollToTop(string elementSelector)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("scrollToTop", elementSelector);
+    }
+
+    public async Task ScrollToBottom(string elementSelector)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("scrollToBottom", elementSelector);
+    }
+    
+    public async Task ScrollToTop(string elementSelector, TimeSpan duration)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("scrollToTop", elementSelector, (int)duration.TotalMilliseconds);
+    }
+
+    public async Task ScrollToBottom(string elementSelector, TimeSpan duration)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("scrollToBottom", elementSelector, (int)duration.TotalMilliseconds);
+    }
+
     public async ValueTask DisposeAsync()
     {
         if (moduleTask.IsValueCreated)

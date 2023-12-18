@@ -1,5 +1,6 @@
 import swal from 'sweetalert';
 import log from 'loglevel';
+import $ from 'jquery'; // Ensure jQuery is imported
 
 log.setLevel('info'); // Change this level as needed.
 
@@ -121,4 +122,43 @@ export function clickElementById(elementId: string): void {
     }
 }
 
+/**
+ * Scrolls to the top of an element matched by the specified jQuery selector.
+ * @param selector The jQuery selector to identify the element to scroll.
+ * @param speed Optional. The duration of the scroll animation in milliseconds.
+ * @throws An error if the element is not found or if there's an error during scrolling.
+ */
+export function scrollToTop(selector: string, speed: number = 600): void {
+    const targetElement = $(selector);
 
+    if (targetElement.length === 0) {
+        logAndThrow(`Element with selector '${selector}' not found`);
+    }
+
+    try {
+        targetElement.animate({ scrollTop: 0 }, speed);
+    } catch (error) {
+        logAndThrow(`Error scrolling to top of element with selector '${selector}'`, error);
+    }
+}
+
+/**
+ * Scrolls to the bottom of an element matched by the specified jQuery selector.
+ * @param selector The jQuery selector to identify the element to scroll.
+ * @param speed Optional. The duration of the scroll animation in milliseconds.
+ * @throws An error if the element is not found or if there's an error during scrolling.
+ */
+export function scrollToBottom(selector: string, speed: number = 600): void {
+    const targetElement = $(selector);
+
+    if (targetElement.length === 0) {
+        logAndThrow(`Element with selector '${selector}' not found`);
+    }
+
+    try {
+        const height = targetElement[0].scrollHeight;
+        targetElement.animate({ scrollTop: height }, speed);
+    } catch (error) {
+        logAndThrow(`Error scrolling to bottom of element with selector '${selector}'`, error);
+    }
+}
