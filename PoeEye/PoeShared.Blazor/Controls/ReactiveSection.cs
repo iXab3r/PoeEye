@@ -26,7 +26,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
     
     [Parameter] public ReactiveTrackerList Trackers { get; set; }
 
-    [Parameter] public string AsElement { get; set; } = "span";
+    [Parameter] public string AsElement { get; set; }
     
     [Parameter(CaptureUnmatchedValues = true)] public IEnumerable<KeyValuePair<string, object>> AdditionalAttributes { get; set; }
     
@@ -35,36 +35,51 @@ public sealed class ReactiveSection : BlazorReactiveComponent
         base.BuildRenderTree(builder);
 
         var seq = 0;
-        builder.OpenElement(seq++, AsElement);
 
-        if (!string.IsNullOrEmpty(Id))
+        var hasAttribute = !string.IsNullOrEmpty(Id) ||
+                           !string.IsNullOrEmpty(Class) ||
+                           !string.IsNullOrEmpty(Style) ||
+                           AdditionalAttributes != null;
+        if (AsElement != null || hasAttribute)
         {
-            builder.AddAttribute(seq++, "id", Id);
-        }
+            builder.OpenElement(seq++, AsElement ?? "span");
         
-        if (!string.IsNullOrEmpty(Class))
-        {
-            builder.AddAttribute(seq++, "class", Class);
-        }
-        
-        if (!string.IsNullOrEmpty(Style))
-        {
-            builder.AddAttribute(seq++, "style", Style);
-        }
-        
-        if (AdditionalAttributes != null)
-        {
-            foreach (var attribute in AdditionalAttributes)
+            if (!string.IsNullOrEmpty(Id))
             {
-                builder.AddAttribute(seq++, attribute.Key, attribute.Value);
+                builder.AddAttribute(seq++, "id", Id);
+            }
+        
+            if (!string.IsNullOrEmpty(Class))
+            {
+                builder.AddAttribute(seq++, "class", Class);
+            }
+        
+            if (!string.IsNullOrEmpty(Style))
+            {
+                builder.AddAttribute(seq++, "style", Style);
+            }
+        
+            if (AdditionalAttributes != null)
+            {
+                foreach (var attribute in AdditionalAttributes)
+                {
+                    builder.AddAttribute(seq++, attribute.Key, attribute.Value);
+                }
+            }
+        
+            if (ChildContent != null)
+            {
+                builder.AddContent(seq++, ChildContent);
+            }
+            builder.CloseElement();
+        }
+        else
+        {
+            if (ChildContent != null)
+            {
+                builder.AddContent(seq++, ChildContent);
             }
         }
-        
-        if (ChildContent != null)
-        {
-            builder.AddContent(seq++, ChildContent);
-        }
-        builder.CloseElement();
     }
 
 }
