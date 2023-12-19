@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <MauiXaml Include="Themes\Styles.datagrid.xaml" />
+    <MauiXaml Include="Themes\Styles.mahapps.xaml" />
     <MauiXaml Include="UI\WindowButtonCommands.xaml" />
   </ItemGroup>
 </Project>

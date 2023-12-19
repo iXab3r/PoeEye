@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 
 namespace PoeShared.Blazor.Services;
 
@@ -28,4 +29,6 @@ public interface IBlazorViewRepository
     /// </code>
     /// </example>
     Type ResolveViewType(Type contentType, object key = default);
+    
+    IObservable<Unit> WhenChanged { get; }
 }

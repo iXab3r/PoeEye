@@ -4,6 +4,7 @@ using ReactiveUI;
 using PoeShared.Scaffolding;
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PropertyBinder;
@@ -51,7 +52,7 @@ partial class BlazorContentPresenter
     {
         Binder
             .BindIf(x => x.ViewType != null, x => x.ViewType)
-            .ElseIf(x => x.ViewRepository != null && x.Content != null, x => x.ViewRepository.ResolveViewType(x.Content.GetType(), x.ViewTypeKey))
+            .ElseIf(x => x.ViewRepository != null && x.Content != null, x => new ViewResolver(x.ViewRepository, x.Content.GetType(), x.ViewTypeKey).ViewType)
             .Else(x => null)
             .To((x, v) =>
             {
@@ -108,5 +109,30 @@ partial class BlazorContentPresenter
     {
         IsInitialized = true;
         Binder.Attach(this).AddTo(Anchors);
+    }
+
+    private sealed class ViewResolver : DisposableReactiveObject
+    {
+        public ViewResolver(IBlazorViewRepository viewRepository, Type contentType, object viewTypeKey)
+        {
+            ViewRepository = viewRepository;
+            ContentType = contentType;
+            ViewTypeKey = viewTypeKey;
+            Resolve();
+            //FIXME Implement delayed template initialization, i.e. support reload if view is registered AFTER display
+        }
+        
+        public IBlazorViewRepository ViewRepository { get; }
+        
+        public Type ContentType { get; }
+        
+        public object ViewTypeKey { get; }
+        
+        public Type ViewType { get; private set; }
+
+        private void Resolve()
+        {
+            ViewType = ViewRepository.ResolveViewType(ContentType, key: ViewTypeKey);
+        }
     }
 }

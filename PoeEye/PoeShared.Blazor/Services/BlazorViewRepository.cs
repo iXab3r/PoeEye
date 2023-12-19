@@ -6,9 +6,13 @@ using PoeShared.Services;
 using ReactiveUI;
 using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
+using DynamicData;
 using DynamicData.Kernel;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Logging;
 
 namespace PoeShared.Blazor.Services;
@@ -17,7 +21,8 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 {
     private readonly IClock clock;
     private readonly ConcurrentQueue<Assembly> unprocessedAssemblies = new();
-    private readonly ConcurrentDictionary<ViewKey, ViewRegistration> viewsByKey = new();
+    private readonly SourceCache<ViewRegistration, ViewKey> viewsByKey = new(x => x.Key);
+    private readonly ISubject<Unit> whenChanged = new Subject<Unit>();
 
     public BlazorViewRepository(
         IClock clock,
@@ -26,30 +31,29 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         Log.AddSuffix("Blazor views cache");
 
         this.clock = clock;
+        
         this.WhenAnyValue(x => x.AutomaticallyProcessAssemblies)
-            .Select(x => x ? assemblyTracker.WhenLoaded : Observable.Empty<Assembly>())
+            .Select(x => x ? assemblyTracker.WhenLoaded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>() != null) : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {
-                var assemblyName = x.GetName();
-                if (assemblyName.Name == null)
-                {
-                    return;
-                }
-
-                if (assemblyName.Name.Equals("Microsoft.GeneratedCode"))
-                {
-                    return;
-                }
                 Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
                 Log.Debug($"Added assembly {x} to processing queue");
             }, Log.HandleUiException)
             .AddTo(Anchors);
+
+        viewsByKey
+            .Connect()
+            .ToUnit()
+            .Subscribe(whenChanged)
+            .AddTo(Anchors);
     }
     
     public bool AutomaticallyProcessAssemblies { get; set; } = true;
-    
+
+    public IObservable<Unit> WhenChanged => whenChanged;
+
     public void RegisterViewType(Type viewType, object key = default)
     {
         EnsureQueueIsProcessed();
@@ -71,8 +75,10 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         var registration = new ViewRegistration()
         {
             RegistrationTimestamp = clock.Now,
-            ViewType = viewType
+            ViewType = viewType,
+            Key = viewKey
         };
+
         viewsByKey.AddOrUpdate(viewKey, () =>
         {
             log.Debug(() => $"Registered new view type: {registration}");
@@ -83,7 +89,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             return registration;
         });
     }
-    
+
     public Type ResolveViewType(Type contentType, object key = default)
     {
         var viewKey = new ViewKey()
@@ -95,13 +101,11 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         log.Debug(() => $"Resolving view type");
         EnsureQueueIsProcessed();
 
+        // resolve by content type
+        if (TryResolveViewType(viewKey, out var registration))
         {
-            // resolve by content type
-            if (viewsByKey.TryGetValue(viewKey, out var registration))
-            {
-                log.Debug(() => $"Resolved registered view: {registration}");
-                return registration.ViewType;
-            }
+            log.Debug(() => $"Resolved registered view by key {viewKey}: {registration}");
+            return registration.ViewType;
         }
 
         {
@@ -110,7 +114,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             foreach (var @interface in interfaces)
             {
                 var byInterfaceKey = new ViewKey() {ContentType = @interface, Key = key};
-                if (viewsByKey.TryGetValue(byInterfaceKey, out var registrationByInterface))
+                if (TryResolveViewType(byInterfaceKey, out var registrationByInterface))
                 {
                     log.Debug(() => $"Resolved registered view by interface {byInterfaceKey}: {registrationByInterface}");
                     return registrationByInterface.ViewType;
@@ -121,7 +125,18 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         log.Warn(() => $"Failed to resolve registered view, known views:\n\t{viewsByKey.Keys.DumpToTable()}");
         return null;
     }
-    
+
+    private bool TryResolveViewType(ViewKey viewKey, out ViewRegistration registration)
+    {
+        if (viewsByKey.TryGetValue(viewKey, out registration))
+        {
+            return true;
+        }
+
+        registration = default;
+        return false;
+    }
+
     [MethodImpl(MethodImplOptions.Synchronized)]
     private void EnsureQueueIsProcessed()
     {
@@ -206,6 +221,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
     private readonly record struct ViewRegistration
     {
+        public ViewKey Key { get; init; }
         public Type ViewType { get; init; }
         public DateTime RegistrationTimestamp { get; init; }
     }

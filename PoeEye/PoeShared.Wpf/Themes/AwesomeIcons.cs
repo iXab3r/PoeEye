@@ -64,6 +64,7 @@ public static class AwesomeIcons
     public const string IsNotLoaded = "\uf070";
     public const string Trigger = "\uf0e7";
     public const string LinkIcon = "\uf0c1";
+    public const string ListUlIcon = "\uf0ca";
     public const string MousePointer = "\uf245";
     public const string Padlock = "\uf023";
     public const string PlayOutlined = "\uf01d";
