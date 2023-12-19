@@ -12,10 +12,10 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
 
     protected BindableReactiveObject()
     {
-        ObjectId = $"O#{Interlocked.Increment(ref globalIdx)}";
+        SessionObjectId = $"O#{Interlocked.Increment(ref globalIdx)}";
         Log = GetType().PrepareLogger()
             .WithSuffix(ToString)
-            .WithSuffix(ObjectId);
+            .WithSuffix(SessionObjectId);
         bindings.Connect()
             .OnItemRemoved(x => x.Dispose())
             .Subscribe()
@@ -33,7 +33,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
     protected IFluentLog Log { get; }
     
     /// <inheritdoc />
-    public string ObjectId { get; }
+    public string SessionObjectId { get; }
 
     /// <inheritdoc />
     public bool HasBindings { get; [UsedImplicitly] private set; }

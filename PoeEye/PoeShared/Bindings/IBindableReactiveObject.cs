@@ -10,9 +10,9 @@ namespace PoeShared.Bindings;
 public interface IBindableReactiveObject : IDisposableReactiveObject
 {
     /// <summary>
-    /// Gets the unique identifier of the object. It will be globally-unique across all Bindable objects
+    /// Gets the unique identifier of the object that is unique amongst all BindableReactiveObjects for app lifetime
     /// </summary>
-    string ObjectId { get; }
+    string SessionObjectId { get; }
 
     /// <summary>
     /// Indicates whether the object has any bindings.
