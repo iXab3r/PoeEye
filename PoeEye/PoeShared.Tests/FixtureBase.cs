@@ -39,11 +39,22 @@ public abstract class FixtureBase
     {
         runIdx= $"RunIdx: {Interlocked.Increment(ref GlobalRunIdx)}"; 
         
+        UnityContainer = new UnityContainer();
+        UnityContainer
+            .RegisterType(typeof(IFactory<,,,,,>), typeof(Factory<,,,,,>))
+            .RegisterType(typeof(IFactory<,,,,>), typeof(Factory<,,,,>))
+            .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
+            .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
+            .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
+            .RegisterType(typeof(IFactory<>), typeof(Factory<>))
+            .RegisterType(typeof(INamedFactory<>), typeof(Factory<,,,>))
+            .RegisterType(typeof(INamedFactory<,,>), typeof(Factory<,,>))
+            .RegisterType(typeof(INamedFactory<,>), typeof(Factory<,>))
+            .RegisterType(typeof(INamedFactory<>), typeof(Factory<>));
+        
         Container = new Fixture();
         Container.Customize(new AutoMoqCustomization());
         Container.OmitAutoProperties = true;
-
-        UnityContainer = new UnityContainer();
         Container.Register(() => UnityContainer);
         Container.Register(() => Log);
 
