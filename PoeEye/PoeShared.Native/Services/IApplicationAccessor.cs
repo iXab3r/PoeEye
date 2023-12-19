@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -13,6 +14,8 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     IObservable<int> WhenExit { get; }
     
     IObservable<int> WhenTerminate { get; }
+    
+    IObservable<Unit> WhenLoaded { get; }
 
     void Exit();
 

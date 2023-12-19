@@ -83,12 +83,15 @@ public abstract class ApplicationBase : Application
 
     protected void Initialize(ApplicationStartupProperties startupProperties)
     {
-            InitializeLogging();
             if (!startupProperties.DoNotLoadLogConfigFromFile)
             {
+                InitializeLogging();
                 InitializeLoggingFromFile();
             }
             
+            var erService = Container.Resolve<IExceptionReportingService>();
+            Log.Debug(() => $"Error reporting service: {erService}");
+
             var metrics = Container.Resolve<IMetricsRoot>();
             Log.Debug(() => $"UI Metrics: {metrics}");
             
@@ -149,9 +152,16 @@ public abstract class ApplicationBase : Application
             UnsafeNative.AllowSetForegroundWindow();
     }
 
+    protected void InitializeLoggingToConsole()
+    {
+        InitializeLogging();
+        SharedLog.Instance.AddConsoleAppender();
+
+    }
     protected void InitializeLoggingFromFile()
     {
         Log.Debug("Attempting to load configuration from file");
+        InitializeLogging();
         var candidates = new[]
             {
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"log4net.{appArguments.AppName}.config"),
@@ -172,7 +182,6 @@ public abstract class ApplicationBase : Application
         RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
         SharedLog.Instance.InitializeLogging(appArguments);
         SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
-        Container.Resolve<IExceptionReportingService>();
     }
 
     private void OnExit(int exitCode)
