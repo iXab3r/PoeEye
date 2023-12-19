@@ -63,7 +63,7 @@
                                         Content="{TemplateBinding Icon}"
                                         ContentTemplate="{TemplateBinding IconTemplate}"
                                         Focusable="False"
-                                        Visibility="{TemplateBinding ShowIconOnTitleBar, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        Visibility="{TemplateBinding ShowIconOnTitleBar, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
 
                         <mahControls:MetroThumb x:Name="PART_WindowTitleThumb"
                                         Grid.Row="0"
@@ -236,7 +236,7 @@
                                         Content="{TemplateBinding Icon}"
                                         ContentTemplate="{TemplateBinding IconTemplate}"
                                         Focusable="False"
-                                        Visibility="{TemplateBinding ShowIconOnTitleBar, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        Visibility="{TemplateBinding ShowIconOnTitleBar, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
 
                         <mahControls:MetroThumb x:Name="PART_WindowTitleThumb"
                                         Grid.Row="0"

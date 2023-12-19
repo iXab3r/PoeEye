@@ -1,0 +1,65 @@
+<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             mc:Ignorable="d">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <!--
+
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Shadows.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Page.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ValidationError.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Scrollbars.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ListView.xaml" />
+        -->
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Buttons.xaml" />
+        <!--
+
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Calendar.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.CheckBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ComboBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.MenuItem.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Menu.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ContextMenu.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.DatePicker.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.DataGrid.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Expander.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.GridSplitter.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.GroupBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ListBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.PasswordBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ProgressBar.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.RadioButton.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Slider.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.FlatSlider.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TabControl.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TextBlock.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TextBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.RichTextBox.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Hyperlink.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Label.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Tooltip.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ToolBar.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TreeView.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.StatusBar.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ContentControl.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/NumericUpDown.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/Flyout.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/MetroHeader.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/WindowCommands.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/WindowButtonCommands.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/Dialogs/BaseMetroDialog.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/HamburgerMenu.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/RangeSlider.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/MetroProgressBar.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ToggleSwitch.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/FlipView.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ColorPicker/ColorEyeDropper.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ColorPicker/ColorCanvas.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ColorPicker/ColorPalette.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ColorPicker/ColorPicker.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/MultiSelectionComboBox.xaml" />
+                -->
+    </ui:SharedResourceDictionary.MergedDictionaries>
+</ui:SharedResourceDictionary>
