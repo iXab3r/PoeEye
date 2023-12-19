@@ -6,5 +6,4 @@ using PoeShared.Blazor.Scaffolding;
 using PoeShared.Modularity;
 
 [assembly: AssemblyHasPoeConfigConverters]
-[assembly: AssemblyHasPoeMetadataReplacements]
 [assembly: AssemblyHasBlazorViews]
