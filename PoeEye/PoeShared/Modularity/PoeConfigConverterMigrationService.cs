@@ -23,14 +23,14 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
         this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
             .Select(x => x
-                ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null).Distinct()
+                ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null)
                 : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {
-                Log.Info($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
+                Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
-                Log.Info($"Added assembly {x} to processing queue");
+                Log.Debug($"Added assembly {x} to processing queue");
             })
             .AddTo(Anchors);
     }

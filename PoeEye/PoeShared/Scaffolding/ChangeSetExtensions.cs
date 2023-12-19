@@ -226,6 +226,30 @@ public static class ChangeSetExtensions
         value = default;
         return false;
     }
+
+    public static TValue AddOrUpdate<TValue, TKey>(this ISourceCache<TValue, TKey> instance, TKey key, Func<TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
+    {
+        TValue returnValue = default;
+        instance.Edit(cache =>
+        {
+            var result = cache.Lookup(key);
+            returnValue = result.HasValue ? updateValueFactory(key, result.Value) : addValueFactory();
+            cache.AddOrUpdate(returnValue);
+        });
+        return returnValue;
+    }
+    
+    public static TValue AddOrUpdate<TValue, TKey>(this ISourceCache<TValue, TKey> instance, TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
+    {
+        TValue returnValue = default;
+        instance.Edit(cache =>
+        {
+            var result = cache.Lookup(key);
+            returnValue = result.HasValue ? updateValueFactory(key, result.Value) : addValueFactory(key);
+            cache.AddOrUpdate(returnValue);
+        });
+        return returnValue;
+    }
     
     public static bool TryGetValue<T, TKey>(this IObservableCache<T, TKey> instance, TKey key, out T value)
     {

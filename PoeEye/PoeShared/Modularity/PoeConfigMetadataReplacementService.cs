@@ -27,14 +27,14 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
         this.WhenAnyValue(x => x.AutomaticallyLoadReplacements)
             .Select(x => x
-                ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>() != null).Distinct()
+                ? assemblyTracker.WhenLoaded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>() != null)
                 : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {
-                Log.Info($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
+                Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
-                Log.Info($"Added assembly {x} to processing queue");
+                Log.Debug($"Added assembly {x} to processing queue");
             })
             .AddTo(Anchors);
     }

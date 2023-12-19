@@ -2,45 +2,55 @@
 using System.Reflection;
 using DynamicData;
 using PoeShared.Modularity;
+using ReactiveUI;
 
 namespace PoeShared.Services;
 
 internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAssemblyTracker
 {
-    private readonly ISourceCache<Assembly, Assembly> loadedCache = new SourceCache<Assembly, Assembly>(x => x);
+    private readonly ISourceList<Assembly> loadedAssemblies = new SourceList<Assembly>();
     private readonly ReplaySubject<Assembly> loadedSink = new();
 
     public AssemblyTracker()
     {
         var domain = AppDomain.CurrentDomain;
-        Observable
+        Log.AddSuffix($"AppDomain {domain.FriendlyName}");
+        Log.Info(() => $"Assembly tracker is created for app domain {new { domain, domain.Id, domain.BaseDirectory, domain.IsFullyTrusted, domain.MonitoringTotalAllocatedMemorySize, domain.MonitoringTotalProcessorTime }}");   
+
+        var loadedAssembliesSource = Observable
+            .Defer(() => domain.GetAssemblies().ToObservable());
+        var loadedAfterStartupSource = Observable
             .FromEventPattern<AssemblyLoadEventHandler, AssemblyLoadEventArgs>(h => domain.AssemblyLoad += h, h => domain.AssemblyLoad -= h)
-            .Select(x => x.EventArgs.LoadedAssembly)
+            .Select(x => x.EventArgs.LoadedAssembly);
+
+        loadedAssembliesSource
+            .Concat(loadedAfterStartupSource)
             .Subscribe(assembly =>
             {
-                if (assembly.FullName != null && assembly.FullName.StartsWith("ℛ*"))
+                var assemblyName = assembly.GetName();
+                if (assemblyName.Name.StartsWith("ℛ*") || assemblyName.Name.StartsWith("Microsoft.GeneratedCod"))
                 {
-                    // these are dynamically emitted assemblies by CSS
+                    Log.Debug(() => $"Assembly is loaded, but not tracked, reason - blacklist: {assembly}");
+                    // these are dynamically emitted assemblies
                     return;
                 }
 
-                loadedCache.AddOrUpdate(assembly);
+                loadedAssemblies.Add(assembly);
             })
             .AddTo(Anchors);
-        loadedCache.AddOrUpdate(domain.GetAssemblies());
 
-        LoadedAssemblies = loadedCache
+        loadedAssemblies
             .Connect()
             .OnItemAdded(assembly =>
             {
                 Log.Debug(() => $"Assembly is now tracked: {assembly}");
                 loadedSink.OnNext(assembly);
-            }).RemoveKey()
-            .AsObservableList()
+            })
+            .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
     }
 
-    public IObservableList<Assembly> LoadedAssemblies { get; }
+    public IObservableList<Assembly> LoadedAssemblies => loadedAssemblies;
 
     public IObservable<Assembly> WhenLoaded => loadedSink.AsObservable();
 }
