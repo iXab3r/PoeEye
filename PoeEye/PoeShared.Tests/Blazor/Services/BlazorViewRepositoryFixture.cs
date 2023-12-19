@@ -41,19 +41,6 @@ public class BlazorViewRepositoryFixture : FixtureBase
         //Then
         viewType.ShouldBe(expected);
     }
-
-    [Test]
-    public void ShouldResolveByInterface()
-    {
-        //Given
-        
-
-        //When
-
-
-        //Then
-
-    }
     
     [Test]
     [TestCase(typeof(object), null)]

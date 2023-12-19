@@ -28,7 +28,6 @@ public abstract class MetaFixtureBase : FixtureBase
                 baseDir.GetFiles("*.exe", SearchOption.AllDirectories),
             }
             .SelectMany(x => x)
-            .Except(new[]{ new FileInfo(currentAssembly.Location) })
             .Select(x => LoadModuleDef(File.ReadAllBytes(x.FullName), context, x.FullName))
             .Where(x => x != null)
             .ToArray();
@@ -41,20 +40,21 @@ public abstract class MetaFixtureBase : FixtureBase
     public void ShouldHaveAssemblyHasBlazorViews(ModuleDefMD module)
     {
         //Given
-        var viewBaseType = typeof(BlazorReactiveComponent);
+        var baseTypes = new[] { typeof(BlazorReactiveComponent), typeof(BlazorReactiveComponent<>) };
 
         //When
-        var allViews =
-            (from type in module.GetTypes()
-                where type.IsClass && !type.IsAbstract && type.BaseType != null && string.Equals(type.BaseType.TypeName, viewBaseType.Name, StringComparison.Ordinal)
-                select type).ToArray();
+        var allViews = FindImplementations(module, baseTypes).ToList();
         Log.Debug($"Detected views:\n\t{allViews.DumpToTable()}");
 
         //Then
-        foreach (var viewType in allViews)
+        var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasBlazorViewsAttribute).FullName);
+        if (allViews.Any())
         {
-            var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasBlazorViewsAttribute).FullName);
-            attribute.ShouldNotBeNull($"Assembly {module} contains view {viewType} thus it must has attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it");
+            attribute.ShouldNotBeNull($"Assembly {module} contains Blazor views thus it must has attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it:\n\t{allViews.Select(x => x.FullName).DumpToTable()}");
+        }
+        else
+        {
+            attribute.ShouldBeNull($"Assembly {module} does not contain any blazor views thus it does not need attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it");
         }
     }
 
@@ -67,17 +67,18 @@ public abstract class MetaFixtureBase : FixtureBase
         var converterBaseType = typeof(ConfigMetadataConverter<,>);
 
         //When
-        var allConverters =
-            (from type in module.GetTypes()
-                where type.IsClass && !type.IsAbstract && type.BaseType != null && string.Equals(type.BaseType.TypeName, converterBaseType.Name, StringComparison.Ordinal)
-                select type).ToArray();
+        var allConverters = FindImplementations(module, converterBaseType).ToList();
         Log.Debug($"Detected converters:\n\t{allConverters.DumpToTable()}");
 
         //Then
-        foreach (var converter in allConverters)
+        var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeConfigConvertersAttribute).FullName);
+        if (allConverters.Any())
         {
-            var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeConfigConvertersAttribute).FullName);
-            attribute.ShouldNotBeNull($"Assembly {module} contains converter {converter} thus it must has attribute {typeof(AssemblyHasPoeConfigConvertersAttribute)} on it");
+            attribute.ShouldNotBeNull($"Assembly {module} contains converters thus it must has attribute {typeof(AssemblyHasPoeConfigConvertersAttribute)} on it:\n\t{allConverters.Select(x => x.FullName).DumpToTable()}");
+        }
+        else
+        {
+            attribute.ShouldBeNull($"Assembly {module} does not contain any converters thus it does not need attribute {typeof(AssemblyHasPoeConfigConvertersAttribute)} on it");
         }
     }
 
@@ -89,21 +90,45 @@ public abstract class MetaFixtureBase : FixtureBase
         var baseType = typeof(IPoeConfigMetadataReplacementProvider);
 
         //When
-        var allMetadataReplacements =
-            (from type in module.GetTypes()
-                where type.IsClass && !type.IsAbstract && type.Interfaces != null && type.Interfaces.Any(y => y.Interface.FullName == baseType.FullName)
-                select type).ToArray();
+        var allMetadataReplacements = FindImplementations(module, baseType).ToList();
         Log.Debug($"Detected metadata providers:\n\t{allMetadataReplacements.DumpToTable()}");
 
         //Then
-        foreach (var metadataReplacement in allMetadataReplacements)
+        var attribute = module.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeMetadataReplacementsAttribute).FullName);
+        if (allMetadataReplacements.Any())
         {
-            var assembly = metadataReplacement.Module.Assembly;
-            var attribute = assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeMetadataReplacementsAttribute).FullName);
-            attribute.ShouldNotBeNull($"Assembly {assembly} contains metadata replacements {metadataReplacement} thus it must has attribute {typeof(AssemblyHasPoeMetadataReplacementsAttribute)} on it");
+            attribute.ShouldNotBeNull($"Assembly {module} contains metadata replacements thus it must has attribute {typeof(AssemblyHasPoeMetadataReplacementsAttribute)} on it:\n\t{allMetadataReplacements.Select(x => x.FullName).DumpToTable()}");
+        }
+        else
+        {
+            attribute.ShouldBeNull($"Assembly {module} does not contain any metadata replacements thus it does not need attribute {typeof(AssemblyHasPoeMetadataReplacementsAttribute)} on it");
         }
     }
 
+    protected static IEnumerable<TypeDef> FindImplementations(ModuleDefMD module, params Type[] baseTypes)
+    {
+        var allTypes =
+            (from type in module.GetTypes()
+                let isMatch = type.IsClass && !type.IsAbstract && type.BaseType != null &&  baseTypes.Any(baseType => IsMatch(type, baseType)) 
+                select new { type, isMatch}).ToList();
+        Log.Debug($"Analysis of module {module}, base types:\n\t{baseTypes.Select(x => $"{x.FullName} (isInterface: {x.IsInterface})").DumpToTable()}");
+        foreach (var typeInfo in allTypes)
+        {
+            Log.Debug($"IsMatch: {typeInfo.isMatch}, Type: {typeInfo.type}");
+        }
+        return allTypes.Where(x => x.isMatch).Select(x => x.type).ToList();
+    }
+
+    protected static bool IsMatch(TypeDef typeDef, Type baseType)
+    {
+        if (baseType.IsInterface)
+        {
+            return typeDef.Interfaces.Any(x => x.Interface.FullName.StartsWith(baseType.FullName!, StringComparison.Ordinal));
+        }
+
+        return typeDef.BaseType.FullName.StartsWith(baseType.FullName!, StringComparison.Ordinal);
+    }
+    
     public static IEnumerable<ModuleDefMD> EnumerateAllModules()
     {
         foreach (var module in AllModules)

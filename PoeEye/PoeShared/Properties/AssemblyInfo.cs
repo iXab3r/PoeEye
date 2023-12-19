@@ -22,8 +22,6 @@ using PoeShared.Modularity;
 [assembly: AssemblyVersion("0.0.0.0")]
 [assembly: AssemblyFileVersion("0.0.0.0")]
 [assembly: AssemblyMetadata("SquirrelAwareVersion", "0")]
-[assembly: AssemblyHasPoeConfigConverters]
-[assembly: AssemblyHasPoeMetadataReplacements]
 
 [assembly: InternalsVisibleTo("PoeShared.Benchmarks")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
