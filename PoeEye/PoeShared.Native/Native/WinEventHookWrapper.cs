@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Reactive.Concurrency;
@@ -20,13 +22,35 @@ namespace PoeShared.Native;
 [SuppressMessage("ReSharper", "IdentifierTypo")]
 public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHookWrapper
 {
+    
+    /*
+     * Performance considerations:
+     * EventMin: EVENT_OBJECT_NAMECHANGE, EventMax: EVENT_OBJECT_DESCRIPTIONCHANGE, ProcessId: 0, ThreadId: 0, Flags: WINEVENT_OUTOFCONTEXT
+     * About 20-30k events per 5 minutes, processing time < 250ms in total
+     *
+     * EventMin: EVENT_OBJECT_LOCATIONCHANGE
+     * About 50k events per 5 minutes, processing time < 400ms in total
+     */
+    
     private readonly IScheduler bgScheduler;
 
     private readonly User32.WinEventProc eventDelegate;
     private readonly WinEventHookArguments hookArgs;
 
-    private readonly ISubject<WinEventHookData> whenWindowEventTriggered = new Subject<WinEventHookData>();
-    private readonly Thread hookThread;
+    private readonly WorkerThread hookThread;
+
+    private readonly Subject<WinEventHookData> whenWindowEventTriggered = new();
+    private readonly BlockingCollection<WinEventHookData> unprocessedEvents = new();
+    private readonly WorkerThread notificationsThread;
+
+#if DEBUG
+    private long invocationsCount;
+    private long totalProcessingTimeTicks;
+    private long totalNotificationsTimeTicks;
+    private long errorsCount;
+    private TimeSpan TotalProcessingTime => Stopwatch.GetElapsedTime(0, totalProcessingTimeTicks);
+    private TimeSpan TotalNotificationsTime => Stopwatch.GetElapsedTime(0, totalNotificationsTimeTicks);
+#endif
 
     public WinEventHookWrapper(
         WinEventHookArguments hookArgs,
@@ -36,20 +60,16 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         this.hookArgs = hookArgs;
         this.bgScheduler = bgScheduler;
         eventDelegate = WinEventDelegateProc;
-        Log.Debug(() => $"New WinEvent hook created, args: {hookArgs}");
+        Log.Debug(() => $"New WinEvent hook created");
 
         Disposable.Create(() => Log.Info(() => $"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
-        hookThread = new Thread(Run)
-        {
-            Name = $"Hook {hookArgs.ToString()}",
-            IsBackground = true,
-        };
-        hookThread.Start(); // realistically, this thread is never stopped - hooks live for entire lifetime of an app
+        hookThread = new WorkerThread($"Hook {hookArgs.ToString()}", token => RunHookThread(), autoStart: true).AddTo(Anchors);
+        notificationsThread = new WorkerThread($"HookNotifications {hookArgs.ToString()}", token => RunNotificationsThread(), autoStart: true).AddTo(Anchors);
         Disposable.Create(() => Log.Info(() => $"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
     }
     private IFluentLog Log { get; }
 
-    public IObservable<WinEventHookData> WhenWindowEventTriggered => whenWindowEventTriggered.Synchronize().ObserveOn(bgScheduler);
+    public IObservable<WinEventHookData> WhenWindowEventTriggered => whenWindowEventTriggered;
 
     private void WinEventDelegateProc(IntPtr hWinEventHook,
         User32.WindowsEventHookType @event,
@@ -59,9 +79,13 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         int dwEventThread,
         uint dwmsEventTime)
     {
+#if DEBUG
+        Interlocked.Increment(ref invocationsCount);
+        var startTimestamp = Stopwatch.GetTimestamp();
+#endif
         try
         {
-            var data = new WinEventHookData
+            var eventHookData = new WinEventHookData
             {
                 EventId = @event,
                 WindowHandle = hwnd,
@@ -71,30 +95,89 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
                 EventTimeInMs = dwmsEventTime,
                 WinEventHookHandle = hWinEventHook
             };
-                
+
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"[{hookArgs}] Event hook triggered: {data}");
+                Log.Debug(() => $"Event hook triggered: {eventHookData}");
             }
-            whenWindowEventTriggered.OnNext(data);
+
+            unprocessedEvents.Add(eventHookData);
         }
         catch (Exception e)
         {
-            Log.Warn($"Exception in window hook, args: {hookArgs}", e);
+            Log.Warn($"Exception in window hook", e);
+#if DEBUG
+            Interlocked.Increment(ref errorsCount);
+#endif
+        }
+        finally
+        {
+#if DEBUG
+            var endTimestamp = Stopwatch.GetTimestamp();
+            var elapsedTimeTicks = endTimestamp - startTimestamp;
+            Interlocked.Add(ref totalProcessingTimeTicks, elapsedTimeTicks);
+#endif
         }
     }
 
-    private void Run()
+    private void RunHookThread()
     {
-        Log.Info(() => $"Starting up event sink, args: {hookArgs}");
+        Log.Info(() => $"Registering the hook");
         RegisterHook().AddTo(Anchors);
-        Log.Debug(() => $"Initializing event sink, args: {hookArgs}");
+        Log.Debug(() => $"Initializing event loop to allow retrieval of hook messages");
+        //Even though GetMessage does not directly retrieve hook notifications,
+        //having a message loop running in the thread that set the hook is still important.
+        //The message loop maintains the thread in a state that allows the OS to invoke the callback function asynchronously when an event occurs.
         EventLoop.RunWindowEventLoop(Log);
+    }
+
+    private void RunNotificationsThread()
+    {
+        Log.Info(() => $"Starting up event notifications loop");
+        try
+        {
+            foreach (var eventHookData in unprocessedEvents.GetConsumingEnumerable())
+            {
+#if DEBUG
+                var startTimestamp = Stopwatch.GetTimestamp();
+#endif
+                try
+                {
+
+                    if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug(() => $"Raising event hook notification(queue: {unprocessedEvents.Count}): {eventHookData}");
+                    }
+
+                    whenWindowEventTriggered.OnNext(eventHookData);
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"Failed to process Win event hook data: {eventHookData}", e);
+                }
+                finally
+                {
+#if DEBUG
+                    var endTimestamp = Stopwatch.GetTimestamp();
+                    var elapsedTimeTicks = endTimestamp - startTimestamp;
+                    Interlocked.Add(ref totalNotificationsTimeTicks, elapsedTimeTicks);
+#endif
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error("Win event hooks notifications thread has encountered an error", e);
+        }
+        finally
+        {
+            Log.Info(() => $"Event notifications loop completed");
+        }
     }
 
     private IDisposable RegisterHook()
     {
-        Log.Info(() => $"Registering hook, args: {hookArgs}");
+        Log.Info(() => $"Registering hook");
             
         var hook = User32.SetWinEventHook(
             hookArgs.EventMin,
@@ -157,7 +240,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             }
             finally
             {
-                log.Info(() => $"Event loop completed");
+                log.Info(() => $"Event hook loop completed");
             }
         }
             
