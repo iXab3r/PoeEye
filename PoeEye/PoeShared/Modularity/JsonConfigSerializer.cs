@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.Runtime.Serialization;
 using DynamicData;
 using Newtonsoft.Json;
+using PoeShared.Services;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity;
@@ -16,7 +17,8 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     private JsonSerializerSettings jsonSerializerSettings;
     private JsonSerializer jsonSerializer;
 
-    public JsonConfigSerializer(PoeConfigConverter configConverter)
+    public JsonConfigSerializer(
+        PoeConfigConverter configConverter)
     {
         RegisterConverter(configConverter);
         converters
@@ -193,6 +195,7 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     {
         return new JsonTextReader(reader)
         {
+            ArrayPool = SharedArrayPool<char>.Instance
         };
     }
     
@@ -200,6 +203,7 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     {
         return new JsonTextWriter(writer)
         {
+            ArrayPool = SharedArrayPool<char>.Instance
         };
     }
     
@@ -218,28 +222,6 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
         public void Return(T[] array)
         {
             Log.Info(() => $"Returning array, length: {array.Length}");
-            Log.Info(() => $"Returned array, length: {array.Length}");
-        }
-    }
-    
-    public class CustomArrayPool<T> : LazyReactiveObject<CustomArrayPool<T>>, IArrayPool<T>
-    {
-        private static readonly IFluentLog Log = typeof(CustomArrayPool<T>).PrepareLogger();
-
-        private readonly ArrayPool<T> inner = ArrayPool<T>.Shared;
-
-        public T[] Rent(int minimumLength)
-        {
-            Log.Info(() => $"Renting array, min length: {minimumLength}");
-            var result = inner.Rent(minimumLength);
-            Log.Info(() => $"Array rented, requested: {minimumLength}, got: {result.Length}");
-            return result;
-        }
-
-        public void Return(T[] array)
-        {
-            Log.Info(() => $"Returning array, length: {array.Length}");
-            inner.Return(array, clearArray: false);
             Log.Info(() => $"Returned array, length: {array.Length}");
         }
     }
