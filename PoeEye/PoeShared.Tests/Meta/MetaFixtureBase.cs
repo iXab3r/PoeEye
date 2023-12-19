@@ -50,7 +50,7 @@ public abstract class MetaFixtureBase : FixtureBase
         var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasBlazorViewsAttribute).FullName);
         if (allViews.Any())
         {
-            attribute.ShouldNotBeNull($"Assembly {module} contains Blazor views thus it must has attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it:\n\t{allViews.Select(x => x.FullName).DumpToTable()}");
+            attribute.ShouldNotBeNull($"Assembly {module} contains Blazor views thus it must have attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it:\n\t{allViews.Select(x => x.FullName).DumpToTable()}");
         }
         else
         {
@@ -74,7 +74,7 @@ public abstract class MetaFixtureBase : FixtureBase
         var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeConfigConvertersAttribute).FullName);
         if (allConverters.Any())
         {
-            attribute.ShouldNotBeNull($"Assembly {module} contains converters thus it must has attribute {typeof(AssemblyHasPoeConfigConvertersAttribute)} on it:\n\t{allConverters.Select(x => x.FullName).DumpToTable()}");
+            attribute.ShouldNotBeNull($"Assembly {module} contains converters thus it must have attribute {typeof(AssemblyHasPoeConfigConvertersAttribute)} on it:\n\t{allConverters.Select(x => x.FullName).DumpToTable()}");
         }
         else
         {
@@ -94,10 +94,10 @@ public abstract class MetaFixtureBase : FixtureBase
         Log.Debug($"Detected metadata providers:\n\t{allMetadataReplacements.DumpToTable()}");
 
         //Then
-        var attribute = module.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeMetadataReplacementsAttribute).FullName);
+        var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasPoeMetadataReplacementsAttribute).FullName);
         if (allMetadataReplacements.Any())
         {
-            attribute.ShouldNotBeNull($"Assembly {module} contains metadata replacements thus it must has attribute {typeof(AssemblyHasPoeMetadataReplacementsAttribute)} on it:\n\t{allMetadataReplacements.Select(x => x.FullName).DumpToTable()}");
+            attribute.ShouldNotBeNull($"Assembly {module} contains metadata replacements thus it must have attribute {typeof(AssemblyHasPoeMetadataReplacementsAttribute)} on it:\n\t{allMetadataReplacements.Select(x => x.FullName).DumpToTable()}");
         }
         else
         {
