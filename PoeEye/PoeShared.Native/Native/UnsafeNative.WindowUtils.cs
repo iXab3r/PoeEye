@@ -496,7 +496,7 @@ public partial class UnsafeNative
                 throw new InvalidStateException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
             }
 
-            Thread.Sleep(10);
+            CancellationToken.None.Sleep(10, log);
         }
     }
 
@@ -691,7 +691,7 @@ public partial class UnsafeNative
                 return false;
             }
 
-            Thread.Sleep(1);
+            Thread.Sleep(1); //force context switch
         }
 
         if (result == false)

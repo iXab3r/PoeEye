@@ -8,7 +8,7 @@ public static class TaskExtensions
 {
     private const int warningThresholdMs = 20;
     private static readonly IFluentLog Log = typeof(TaskExtensions).PrepareLogger();
-    private static readonly int MinWaitHandleTimeoutInMs = 20;
+    private static readonly int MinWaitHandleTimeoutInMs = 50;
 
     public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout)
     {
@@ -19,17 +19,22 @@ public static class TaskExtensions
     {
         var sw = Stopwatch.StartNew();
         bool cancelled;
+        
         if (millisecondsTimeout < MinWaitHandleTimeoutInMs)
         {
-            log.Debug(() => $"Sleeping for {millisecondsTimeout}ms using context-switching");
-            while (!cancellationToken.IsCancellationRequested)
+            log.Debug(() => $"Sleeping for {millisecondsTimeout}ms using combined wait");
+
+            var sleepDuration = millisecondsTimeout - 8;
+            if (sleepDuration > 0)
             {
-                if (sw.ElapsedMilliseconds >= millisecondsTimeout)
+                Thread.Sleep(sleepDuration);
+                
+                while (!cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < millisecondsTimeout)
                 {
-                    break;
+                    Thread.Yield();
                 }
-                Thread.Sleep(1);
             }
+
             cancelled = cancellationToken.IsCancellationRequested;
         }
         else
