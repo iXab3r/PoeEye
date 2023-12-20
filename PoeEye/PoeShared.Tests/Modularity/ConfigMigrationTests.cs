@@ -306,6 +306,8 @@ public class ConfigMigrationTests : FixtureBase
 
     private JsonConfigSerializer CreateInstance()
     {
-        return new JsonConfigSerializer(configConverter);
+        var instance = new JsonConfigSerializer();
+        instance.RegisterConverter(configConverter);
+        return instance;
     }
 }

@@ -56,7 +56,7 @@ public class ConfigProviderTests<T> : FixtureBase where T : IConfigProvider
         Container.Register(() => metadataReplacementService);
         Container.Register(() => poeConfigConverterMigrationService);
         Container.Register(() => appArguments.Object);
-        Container.Register<IConfigSerializer>(() => Container.Create<JsonConfigSerializer>());
+        Container.Register<IConfigSerializer>(() => new JsonConfigSerializer(new PoeConfigConverter(metadataReplacementService, poeConfigConverterMigrationService)));
 
         if (Directory.Exists(appDataDirectory))
         {

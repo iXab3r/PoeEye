@@ -290,6 +290,38 @@ public class PoeConfigConverterTests : FixtureBase
     }
 
     [Test]
+    public void ShouldThrowWhenVersionIsNotSupported()
+    {
+        //Given
+        var instance = CreateInstance();
+        var value = new SampleVersionedConfig() {Value = "value", Version = new SampleVersionedConfig().Version + 1};
+
+        //When
+        var serializedValue = instance.Serialize(value);
+        var action = () => instance.Deserialize<SampleVersionedConfig>(serializedValue);
+
+        //Then
+        action.ShouldThrow<PoeConfigException>();
+    }
+    
+    [Test]
+    public void ShouldThrowWhenFailedToReplaceMetadata()
+    {
+        //Given
+        var instance = CreateInstance();
+        var sourceMetadata = new SampleConfig();
+        var serializedMetadata = instance.Serialize(sourceMetadata);
+
+        replacementService.Setup(x => x.ReplaceIfNeeded(It.IsAny<PoeConfigMetadata>())).Returns(default(PoeConfigMetadata));
+
+        //When
+        var action = () =>  instance.Deserialize<PoeConfigMetadata>(serializedMetadata);
+
+        //Then
+        action.ShouldThrow<PoeConfigException>();
+    }
+
+    [Test]
     [Ignore("Does not work because currently everything is hard-wired onto IPoeEyeConfig")]
     public void ShouldSerializeMetadataContainer()
     {
@@ -317,6 +349,8 @@ public class PoeConfigConverterTests : FixtureBase
         
     private JsonConfigSerializer CreateInstance()
     {
-        return new JsonConfigSerializer(configConverter);
+        var instance = new JsonConfigSerializer();
+        instance.RegisterConverter(configConverter);
+        return instance;
     }
 }

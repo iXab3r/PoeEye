@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using DynamicData;
 using Newtonsoft.Json;
 using PoeShared.Services;
+using Unity;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity;
@@ -17,10 +18,12 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     private JsonSerializerSettings jsonSerializerSettings;
     private JsonSerializer jsonSerializer;
 
-    public JsonConfigSerializer(
-        PoeConfigConverter configConverter)
+    public JsonConfigSerializer([OptionalDependency] params JsonConverter[] defaultConverters)
     {
-        RegisterConverter(configConverter);
+        if (defaultConverters != null)
+        {
+            converters.AddRange(defaultConverters);
+        }
         converters
             .Connect()
             .ToUnit()

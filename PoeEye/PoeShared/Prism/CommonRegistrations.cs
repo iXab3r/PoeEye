@@ -21,7 +21,18 @@ public sealed class CommonRegistrations : UnityContainerExtension
         Container
             .RegisterSingleton<IClock, Clock>()
             .RegisterSingleton<IComparisonService, ComparisonService>()
-            .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
+            .RegisterSingleton<IConfigSerializer>(x =>
+            {
+                var serializer = x.Resolve<JsonConfigSerializer>();
+                
+                var configConverter = x.Resolve<PoeConfigConverter>();
+                serializer.RegisterConverter(configConverter);
+
+                var binaryDataConverter = x.Resolve<BinaryResourceReferenceConverter>();
+                serializer.RegisterConverter(binaryDataConverter);
+                
+                return serializer;
+            })
             .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
             .RegisterSingleton<IAppArguments, AppArguments>()
             .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()

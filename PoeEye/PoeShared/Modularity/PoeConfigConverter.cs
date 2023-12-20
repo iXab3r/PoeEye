@@ -7,6 +7,9 @@ using Newtonsoft.Json.Linq;
 
 namespace PoeShared.Modularity;
 
+using Newtonsoft.Json;
+using System;
+
 //FIXME This whole PoeConfigConverter is an awful mess that must be rewritten at some point
 internal sealed class PoeConfigConverter : JsonConverter
 {
@@ -128,7 +131,10 @@ internal sealed class PoeConfigConverter : JsonConverter
             };
         }
 
-        throw new InvalidOperationException($"Failed to convert value {value} of type {value.GetType()} to {nameof(PoeConfigMetadata)}");
+        throw new PoeConfigException($"Failed to convert value {value} of type {value.GetType()} to {nameof(PoeConfigMetadata)}")
+        {
+            Value = value,
+        };
     }
 
     private PoeConfigMetadata DeserializeMetadata(JsonReader reader, Type serializedType, JsonSerializer serializer)
@@ -136,10 +142,14 @@ internal sealed class PoeConfigConverter : JsonConverter
         var metadata = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType)
             ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
             : serializer.Deserialize<PoeConfigMetadata>(reader);
+        
         var result = replacementService.ReplaceIfNeeded(metadata);
         if (result == null)
         {
-            throw new ArgumentException($"Replacement service returned null for metadata: {metadata}");
+            throw new PoeConfigException($"Replacement service returned null for metadata: {metadata}")
+            {
+                Metadata = metadata,
+            };
         }
         return result;
     }
@@ -159,8 +169,19 @@ internal sealed class PoeConfigConverter : JsonConverter
             return DeserializeFromToken(metadata.ConfigValue, serializer, resolvedValueType);
         }
 
-        Log.Info(() => $"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
+        Log.Warn(() => $"Config {metadata.TypeName} version {metadata.Version} is greater than expected: {innerTypeSample.Version}");
 
+        if (innerTypeSample.Version < metadata.Version)
+        {
+            throw new PoeConfigException($"The configuration '{metadata.TypeName}' version {metadata.Version} is newer than the version supported by the current application (v{innerTypeSample.Version}). Please update the application to the latest version to handle this configuration.")
+            {
+                Metadata = metadata,
+                ExceptionType = PoeConfigExceptionType.VersionIsGreaterThanSupported,
+                MaxSupportedVersion = innerTypeSample.Version,
+            };
+        }
+
+        Log.Warn(() => $"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
         if (metadata.Version != null)
         {
             Log.Debug(() => $"Looking up converter {metadata.TypeName} (v{metadata.Version}) => {resolvedValueType.FullName} (v{innerTypeSample.Version})");
@@ -196,7 +217,11 @@ internal sealed class PoeConfigConverter : JsonConverter
                 catch (Exception e)
                 {
                     Log.Error($"Failed to convert intermediary value {convertedValue} ({sourceMetadata}) to {metadata}", e);
-                    throw;
+                    throw new PoeConfigException($"Failed to convert intermediary value {convertedValue} ({sourceMetadata}) to {metadata}", e)
+                    {
+                        ExceptionType = PoeConfigExceptionType.ConversionFailed,
+                        Metadata = metadata,
+                    };
                 }
             }
         }
