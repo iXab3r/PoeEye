@@ -295,4 +295,23 @@ public class PathUtilsFixture : FixtureBase
         //Then
         PathUtils.IsSamePath(first, second).ShouldBe(true);
     }
+
+    [Test]
+    [TestCase("example.txt", "example")]
+    [TestCase("anotherExample.json", "anotherExample")]
+    [TestCase("noExtension", "noExtension")]
+    [TestCase(".hiddenFile", ".hiddenFile")]
+    [TestCase("complex.file.name.txt", "complex.file.name")]
+    [TestCase("a", "a")]
+    [TestCase("", "")]
+    [TestCase(null, null)]
+    public void ShouldReturnFileNameWithoutExtension(string path, string expected)
+    {
+        // Given
+        // When
+        var fileName = PathUtils.GetFileNameWithoutExtension(path);
+
+        // Then
+        fileName.ShouldBe(expected);
+    }
 }

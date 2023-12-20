@@ -34,7 +34,6 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             {
                 Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
-                Log.Debug($"Added assembly {x} to processing queue");
             })
             .AddTo(Anchors);
     }

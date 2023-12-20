@@ -104,7 +104,7 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
             }
             catch (Exception e)
             {
-                Log.Warn($"Failed to process item {item}, changes({itemChanges.Length}): {changes.Select(x => x.State).DumpToString()}", e);
+                Log.Warn($"Failed to process item {item}, changes({itemChanges.Length}): {changes.Select(x => $"{x.State} {x.Item.Id}").DumpToString()}", e);
             }
         }
 

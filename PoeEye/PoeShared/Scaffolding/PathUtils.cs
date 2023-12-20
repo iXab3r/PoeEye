@@ -1,5 +1,4 @@
-﻿using System.Text;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Meziantou.Framework;
 
 namespace PoeShared.Scaffolding;
@@ -7,8 +6,6 @@ namespace PoeShared.Scaffolding;
 public static class PathUtils
 {
     private static readonly Func<string, string> PathConverter;
-    public static bool IsWindows { get; }
-    public static bool IsLinux { get; }
 
     static PathUtils()
     {
@@ -22,15 +19,18 @@ public static class PathUtils
         PathConverter = IsWindows ? x => x?.ToLower() : x => x;
     }
 
+    public static bool IsWindows { get; }
+    public static bool IsLinux { get; }
+
     /// <summary>
-    /// Gets the root directory for the common paths provided
+    ///     Gets the root directory for the common paths provided
     /// </summary>
     /// <param name="paths">A read-only list of path strings.</param>
     /// <returns>
-    /// The common root director as a string. 
+    ///     The common root director as a string.
     /// </returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// GetRootDirectory(new List<string> { "C:\\Program Files", "C:\\Windows" }); //Returns "C:\\"
     /// </code>
     /// </example>
@@ -41,14 +41,14 @@ public static class PathUtils
         {
             throw new ArgumentException("At least one path must be supplied");
         }
-        
+
         var roots = paths.Select(GetRootDirectory).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToArray();
 
         if (roots.Length == 1)
         {
             return roots[0];
         }
-        
+
         if (!roots.Any())
         {
             throw new ArgumentException($"There is no common root for paths {paths.DumpToString()}");
@@ -58,16 +58,16 @@ public static class PathUtils
     }
 
     /// <summary>
-    /// Adds a specified prefix to the extension of a file path.
+    ///     Adds a specified prefix to the extension of a file path.
     /// </summary>
     /// <param name="path">The original file path.</param>
     /// <param name="prefix">The prefix to append to the file extension.</param>
     /// <returns>
-    /// The file path with the prefix appended to the file extension.
-    /// If the directory of the path could not be determined, an empty string is used.
+    ///     The file path with the prefix appended to the file extension.
+    ///     If the directory of the path could not be determined, an empty string is used.
     /// </returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// AddExtensionPrefix("C:\\temp\\file.txt", "bak"); // Returns "C:\\temp\\file.bak.txt"
     /// </code>
     /// </example>
@@ -78,29 +78,33 @@ public static class PathUtils
     }
 
     /// <summary>
-    /// Finds the longest common path for the paths provided. 
+    ///     Finds the longest common path for the paths provided.
     /// </summary>
     /// <param name="paths">A read-only list of path strings.</param>
     /// <returns>The common path as a string</returns>
     /// <example>
-    /// <code>
-    /// GetLongestCommonPath(new List<string> { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information" }); //Returns "C:\\Program Files"
+    ///     <code>
+    /// GetLongestCommonPath(new List<string>
+    ///             { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information"
+    ///             }); //Returns "C:\\Program Files"
     /// </code>
     /// </example>
     public static string GetLongestCommonPath(IReadOnlyList<string> paths)
     {
         return GetLongestCommonPath(paths, Path.DirectorySeparatorChar);
     }
-    
+
     /// <summary>
-    /// Finds the longest common path for the paths provided. 
+    ///     Finds the longest common path for the paths provided.
     /// </summary>
     /// <param name="paths">A read-only list of path strings.</param>
     /// <param name="separator">The character used as a directory separator in the paths.</param>
     /// <returns>The common path as a string</returns>
     /// <example>
-    /// <code>
-    /// GetLongestCommonPath(new List<string> { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information" }, '\\'); //Returns "C:\\Program Files"
+    ///     <code>
+    /// GetLongestCommonPath(new List<string>
+    ///             { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information"
+    ///             }, '\\'); //Returns "C:\\Program Files"
     /// </code>
     /// </example>
     public static string GetLongestCommonPath(IReadOnlyList<string> paths, char separator)
@@ -109,19 +113,20 @@ public static class PathUtils
         {
             throw new ArgumentException("At least one path must be supplied");
         }
+
         var commonPath = string.Empty;
         var separatedPath = paths
-            .First ( str => str.Length == paths.Max ( st2 => st2.Length ) )
-            .Split (separator, StringSplitOptions.RemoveEmptyEntries )
-            .ToList ( );
- 
-        foreach ( var segment in separatedPath.AsEnumerable ( ) )
+            .First(str => str.Length == paths.Max(st2 => st2.Length))
+            .Split(separator, StringSplitOptions.RemoveEmptyEntries)
+            .ToList();
+
+        foreach (var segment in separatedPath.AsEnumerable())
         {
-            if ( commonPath.Length == 0 && paths.All ( str => str.StartsWith ( segment ) ) )
+            if (commonPath.Length == 0 && paths.All(str => str.StartsWith(segment)))
             {
                 commonPath = segment;
             }
-            else if ( paths.All ( str => str.StartsWith ( commonPath + separator + segment ) ) )
+            else if (paths.All(str => str.StartsWith(commonPath + separator + segment)))
             {
                 commonPath += separator + segment;
             }
@@ -135,17 +140,59 @@ public static class PathUtils
         {
             throw new ArgumentException($"Failed to find common path: {paths.DumpToString()}");
         }
- 
+
         return commonPath;
     }
 
     /// <summary>
-    /// Determines the root directory of a given path.
+    /// Gets the file name from the specified path string without the extension.
+    /// </summary>
+    /// <param name="path">The file path.</param>
+    /// <returns>The file name without the extension, or null if the path is null.</returns>
+    public static string GetFileNameWithoutExtension(string path)
+    {
+        if (path == null)
+        {
+            return null;
+        }
+
+        var result = GetFileNameWithoutExtension(path.AsSpan());
+        if (path.Length == result.Length)
+        {
+            return path;
+        }
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// Returns the file name without the extension from a ReadOnlySpan<char> representing the path.
+    /// This method is useful for span-based parsing to avoid string allocations.
+    /// </summary>
+    /// <param name="path">The file path as a ReadOnlySpan<char>.</param>
+    /// <returns>A ReadOnlySpan<char> containing the file name without the extension.</returns>
+    /// <remarks>
+    /// This method operates on a ReadOnlySpan<char> to allow for more efficient memory usage
+    /// when working with substrings. If there is no extension in the path, the method returns
+    /// the file name as-is. If the path is empty or consists only of directory separators,
+    /// an empty ReadOnlySpan<char> is returned.
+    /// </remarks>
+    public static ReadOnlySpan<char> GetFileNameWithoutExtension(ReadOnlySpan<char> path)
+    {
+        var fileName = Path.GetFileName(path);
+        var firstPeriod = fileName.IndexOf('.');
+        return firstPeriod < 0
+            ? fileName
+            : fileName.Slice(0, firstPeriod);
+    }
+
+    /// <summary>
+    ///     Determines the root directory of a given path.
     /// </summary>
     /// <param name="path">The path for which to determine the root directory.</param>
     /// <returns>If the root path of the directory is found, it's returned as a string. If not, an empty string is returned.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// GetRootDirectory("C:\\temp\\file.txt"); // Returns "C:\\"
     /// </code>
     /// </example>
@@ -161,16 +208,17 @@ public static class PathUtils
         {
             separatorIdx = path.IndexOf(Path.AltDirectorySeparatorChar);
         }
+
         return separatorIdx <= 0 ? path : path.Substring(0, separatorIdx);
     }
 
     /// <summary>
-    /// Calculates the depth of a directory path.
+    ///     Calculates the depth of a directory path.
     /// </summary>
     /// <param name="path">The path for which to calculate the depth.</param>
     /// <returns>The depth of the path as an integer. Returns 0 if path is null or whitespace.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// GetDepth("C:\\temp\\file.txt"); // Returns 2
     /// </code>
     /// </example>
@@ -178,15 +226,31 @@ public static class PathUtils
     {
         return string.IsNullOrWhiteSpace(path) ? 0 : path.Count(x => x == Path.DirectorySeparatorChar || x == Path.AltDirectorySeparatorChar);
     }
-
+    
     /// <summary>
-    /// Checks if the two provided paths are the same.
+    ///     Checks if the two provided paths are the same.
     /// </summary>
     /// <param name="first">First path to compare.</param>
     /// <param name="second">Second path to compare.</param>
     /// <returns>Boolean value indicating whether the two paths are the same.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
+    /// IsSamePath("C:\\temp\\file.txt", "C:/temp/file.txt"); //Returns true
+    /// </code>
+    /// </example>
+    public static bool IsSamePath(FileSystemInfo first, FileSystemInfo second)
+    {
+        return first.FullName.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).SequenceEqual(second.FullName.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+    }
+
+    /// <summary>
+    ///     Checks if the two provided paths are the same.
+    /// </summary>
+    /// <param name="first">First path to compare.</param>
+    /// <param name="second">Second path to compare.</param>
+    /// <returns>Boolean value indicating whether the two paths are the same.</returns>
+    /// <example>
+    ///     <code>
     /// IsSamePath("C:\\temp\\file.txt", "C:/temp/file.txt"); //Returns true
     /// </code>
     /// </example>
@@ -196,13 +260,13 @@ public static class PathUtils
     }
 
     /// <summary>
-    /// Checks if a given path is a parent directory of another.
+    ///     Checks if a given path is a parent directory of another.
     /// </summary>
     /// <param name="candidatePath">Potential child directory path.</param>
     /// <param name="parentDir">Potential parent directory path.</param>
     /// <returns>Boolean value indicating whether the candidatePath is a child of parentDir.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// IsParentDir("C:\\temp\\file", "C:\\temp"); //Returns true
     /// </code>
     /// </example>
@@ -212,20 +276,20 @@ public static class PathUtils
         {
             return false;
         }
-        
+
         var path1 = FullPath.FromPath(PathConverter(candidatePath));
         var path2 = FullPath.FromPath(PathConverter(parentDir));
         return path2.IsChildOf(path1);
     }
-    
+
     /// <summary>
-    /// Determines if a given path is a subdirectory of another path.
+    ///     Determines if a given path is a subdirectory of another path.
     /// </summary>
     /// <param name="candidatePath">The path to test for subdirectory status.</param>
     /// <param name="parentDir">The parent directory path.</param>
     /// <returns>A boolean representing whether the path is a subdirectory of the parent directory.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// IsSubDir("C:\\Program Files\\Common Files", "C:\\Program Files"); //Returns true
     /// </code>
     /// </example>
@@ -249,15 +313,15 @@ public static class PathUtils
         var path2 = FullPath.FromPath(PathConverter(subPath));
         return path1 == path2 || path2.IsChildOf(path1);
     }
-    
+
     /// <summary>
-    /// Checks if a given path is a directory or a subdirectory of another.
+    ///     Checks if a given path is a directory or a subdirectory of another.
     /// </summary>
     /// <param name="candidate">Potential subdirectory path.</param>
     /// <param name="parentDir">Parent directory path.</param>
     /// <returns>Boolean value indicating whether the candidate is a subdirectory of parentDir, or is the same as parentDir.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// IsDirOrSubDir("C:\\temp", "C:\\"); //Returns true
     /// </code>
     /// </example>
@@ -267,7 +331,7 @@ public static class PathUtils
         {
             return true;
         }
-        
+
         if (string.IsNullOrEmpty(candidate) || string.IsNullOrEmpty(parentDir))
         {
             return false;
@@ -279,21 +343,24 @@ public static class PathUtils
     }
 
     /// <summary>
-    /// Generates a valid path name by mutating a base path name.
+    ///     Generates a valid path name by mutating a base path name.
     /// </summary>
     /// <param name="baseName">The base path.</param>
     /// <param name="mutation">A function defining how to mutate the baseName when the pathValidator returns false.</param>
-    /// <param name="pathValidator">A function to check the validity of a path, which returns true when valid and false otherwise.</param>
+    /// <param name="pathValidator">
+    ///     A function to check the validity of a path, which returns true when valid and false
+    ///     otherwise.
+    /// </param>
     /// <returns>A valid path based on the baseName.</returns>
     /// <exception cref="ArgumentException">Thrown when no folder path is specified or invalid new folder path is provided.</exception>
     public static string GenerateValidName(
-        string baseName, 
+        string baseName,
         Func<string, int, string> mutation,
         Predicate<string> pathValidator)
     {
         if (string.IsNullOrEmpty(baseName))
         {
-            throw new ArgumentException($"New folder path must be specified");
+            throw new ArgumentException("New folder path must be specified");
         }
 
         var extension = Path.GetExtension(baseName);
@@ -319,15 +386,15 @@ public static class PathUtils
             }
         }
     }
-    
+
     /// <summary>
-    /// Creates a valid path name by appending a number to a base path name.
+    ///     Creates a valid path name by appending a number to a base path name.
     /// </summary>
     /// <param name="baseName">The base path.</param>
     /// <param name="pathValidator">A function to validate a path, which returns true when valid and false otherwise.</param>
     /// <returns>A valid path converted from the base path.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// GenerateValidName("C:\\temp", path => !Directory.Exists(path)); //Returns "C:\\temp (1)" if "C:\\temp" exists
     /// </code>
     /// </example>
@@ -337,13 +404,13 @@ public static class PathUtils
     }
 
     /// <summary>
-    /// Expands a relative path to an absolute path based on a provided root.
+    ///     Expands a relative path to an absolute path based on a provided root.
     /// </summary>
     /// <param name="rootPath">The root path.</param>
     /// <param name="path">The relative path.</param>
     /// <returns>The expanded path.</returns>
     /// <example>
-    /// <code>
+    ///     <code>
     /// ExpandPath("C:\\temp", "..\\file.txt"); //Returns "C:\\file.txt"
     /// </code>
     /// </example>
@@ -382,7 +449,8 @@ public static class PathUtils
                 {
                     throw new FormatException($"Invalid path: {path}, root: {rootPath}");
                 }
-            } else if (part == ".")
+            }
+            else if (part == ".")
             {
                 //
             }

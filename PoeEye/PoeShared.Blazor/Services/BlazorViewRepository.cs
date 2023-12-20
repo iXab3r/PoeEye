@@ -39,7 +39,6 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             {
                 Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
-                Log.Debug($"Added assembly {x} to processing queue");
             }, Log.HandleUiException)
             .AddTo(Anchors);
 
