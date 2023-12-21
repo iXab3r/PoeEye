@@ -22,5 +22,7 @@ public sealed class BlazorWebRegistrations : UnityContainerExtension
         UnityServiceCollection.Instance.AddBlazorContentRepository(Container);
         
         UnityServiceCollection.Instance.AddBlazorUtils(Container);
+
+        Container.RegisterSingleton<Microsoft.Extensions.Internal.ISystemClock, MicrosoftExtensionsSystemClock>();
     }
 }

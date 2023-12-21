@@ -3,6 +3,9 @@ using Castle.DynamicProxy;
 
 namespace PoeShared.Caching;
 
+/// <summary>
+/// Intercepts method calls to cache their results based on configured time-to-live (TTL) settings.
+/// </summary>
 internal sealed class CachingInterceptor : IInterceptor
 {
     private readonly IClock clock;
@@ -14,13 +17,18 @@ internal sealed class CachingInterceptor : IInterceptor
         Log = log;
     }
 
-    public IFluentLog Log { get; }
-    
     /// <summary>
-    ///   Items is considered valid if it's lifetime is less than TTL, will be replaced with a new one otherwise on next request
+    /// Gets or sets the time-to-live (TTL) for cache items. 
+    /// Items are considered valid if their age is less than this TTL; otherwise, they are replaced with a new value.
     /// </summary>
     public TimeSpan TimeToLive { get; set; }
 
+    private IFluentLog Log { get; }
+    
+    /// <summary>
+    /// Intercepts a method invocation, caches its result, and returns the cached result for subsequent calls within the TTL.
+    /// </summary>
+    /// <param name="invocation">The method invocation to intercept.</param>
     public void Intercept(IInvocation invocation)
     {
         var key = new InvocationKey

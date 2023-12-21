@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace PoeShared;
+﻿namespace PoeShared;
 
 internal sealed class Clock : IClock
 {

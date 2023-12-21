@@ -26,6 +26,8 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddBlazorUtils(this IServiceCollection services, IUnityContainer unityContainer)
     {
         services.AddScoped<IJsPoeBlazorUtils, JsPoeBlazorUtils>();
+        services.AddSingleton<Microsoft.Extensions.Internal.ISystemClock>(provider => unityContainer.Resolve<Microsoft.Extensions.Internal.ISystemClock>());
+
         return services;
     }
 }
