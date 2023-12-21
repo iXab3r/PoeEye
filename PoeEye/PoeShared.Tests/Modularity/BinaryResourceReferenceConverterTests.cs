@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net.Mime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoeShared.Modularity;
@@ -37,7 +38,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Then
         serialized.ShouldNotBeEmpty();
     }
-    
+
     [Test]
     public void ShouldDeserializeTestClass()
     {
@@ -58,7 +59,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         container.IntValue.ShouldBe(1);
         container.StringValue.ShouldBe("test");
     }
-    
+
     [Test]
     [TestCase(1)]
     [TestCase(10)]
@@ -70,13 +71,13 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Given
         var instance = CreateInstance();
 
-        var data = Enumerable.Range(0, dataLength).Select(x => (byte)x).ToArray();
+        var data = Enumerable.Range(0, dataLength).Select(x => (byte) x).ToArray();
         var base64 = Convert.ToBase64String(data);
         var container = new TestClass()
         {
             ByteArray = data,
         };
-        
+
         //When
         var serialized = Serialize(container, instance);
 
@@ -97,7 +98,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Given
         var instance = CreateInstance();
 
-        var data = Enumerable.Range(0, dataLength).Select(x => (byte)x).ToArray();
+        var data = Enumerable.Range(0, dataLength).Select(x => (byte) x).ToArray();
         var base64 = Convert.ToBase64String(data);
         var serialized = $$"""
                            {
@@ -123,7 +124,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Given
         var instance = CreateInstance();
 
-        var data = Enumerable.Range(0, dataLength).Select(x => (byte)x).ToArray();
+        var data = Enumerable.Range(0, dataLength).Select(x => (byte) x).ToArray();
         var base64 = Convert.ToBase64String(data);
         var container = new TestBinaryClass()
         {
@@ -132,7 +133,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
                 Data = data
             }
         };
-        
+
         //When
         var serialized = Serialize(container, instance);
 
@@ -141,8 +142,8 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         var json = JToken.Parse(serialized);
         json["ByteArray"].ShouldBe(base64);
     }
-    
-    
+
+
     [Test]
     [TestCase(1)]
     [TestCase(10)]
@@ -151,7 +152,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Given
         var instance = CreateInstance();
 
-        var data = Enumerable.Range(0, dataLength).Select(x => (byte)x).ToArray();
+        var data = Enumerable.Range(0, dataLength).Select(x => (byte) x).ToArray();
         var base64 = Convert.ToBase64String(data);
         var container = new TestBinaryClass()
         {
@@ -161,7 +162,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
                 Uri = "file"
             }
         };
-        
+
         //When
         var serialized = Serialize(container, instance);
 
@@ -171,7 +172,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         json["ByteArray"]["Data"].ShouldBe(base64);
         json["ByteArray"]["Uri"].ShouldBe(container.ByteArray.Uri);
     }
-    
+
     [Test]
     public void ShouldSerializeBinaryDataWithoutDataToObject()
     {
@@ -185,7 +186,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
                 Uri = "file"
             }
         };
-        
+
         //When
         var serialized = Serialize(container, instance);
 
@@ -207,13 +208,13 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Given
         var instance = CreateInstance();
 
-        var data = Enumerable.Range(0, dataLength).Select(x => (byte)x).ToArray();
+        var data = Enumerable.Range(0, dataLength).Select(x => (byte) x).ToArray();
         var base64 = Convert.ToBase64String(data);
         var serialized = $$"""
-                         {
-                           "ByteArray": "{{base64}}"
-                         }
-                         """;
+                           {
+                             "ByteArray": "{{base64}}"
+                           }
+                           """;
 
         //When
         var container = Deserialize<TestBinaryClass>(serialized, instance);
@@ -221,7 +222,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         //Then
         container.ByteArray.Data.ShouldBe(data);
     }
-    
+
     [Test]
     public void ShouldDeserializeBinaryDataFromObject()
     {
@@ -245,6 +246,138 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         container.ByteArray.Uri.ShouldBe("file");
     }
 
+    [Test]
+    public void ShouldHandleInvalidBase64InDataField()
+    {
+        // Given
+        var instance = CreateInstance();
+        var serialized = "{ \"Data\": \"InvalidBase64==\" }"; // Invalid Base64 string
+
+        // When
+        var action = () => Deserialize<BinaryResourceReference>(serialized, instance);
+
+        // Then
+        action.ShouldThrow<FormatException>(); // Expecting a format exception due to invalid Base64
+    }
+
+    [Test]
+    public void ShouldHandleMissingUriField()
+    {
+        // Given
+        var instance = CreateInstance();
+        var serialized = $$"""
+                           {
+                             "SHA1": "someSHA1",
+                             "Data": "VGhpcyBpcyBzb21lIGRhdGE=", // Sample base64 data
+                             "FileName": "sample.txt",
+                             "ContentType": "text/plain",
+                             "ContentLength": 123,
+                             "LastModified": "2021-01-01T12:00:00Z"
+                           }
+                           """;
+
+        // When
+        var result = Deserialize<BinaryResourceReference>(serialized, instance);
+
+        // Then
+        result.Uri.ShouldBe(null);
+        result.SHA1.ShouldBe("someSHA1");
+        result.Data.ShouldNotBeNull();
+        result.FileName.ShouldBe("sample.txt");
+        result.ContentType.ToString().ShouldBe("text/plain");
+        result.ContentLength.ShouldBe(123);
+        result.LastModified.ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
+    }
+
+
+    [Test]
+    public void ShouldHandleMissingSHA1Field()
+    {
+        // Given
+        var instance = CreateInstance();
+        var serialized = $$"""
+                           {
+                             "Uri": "someUri",
+                             "Data": "VGhpcyBpcyBzb21lIGRhdGE=", // Sample base64 data
+                             "FileName": "sample.txt",
+                             "ContentType": "text/plain",
+                             "ContentLength": 123,
+                             "LastModified": "2021-01-01T12:00:00Z"
+                           }
+                           """;
+
+        // When
+        var result = Deserialize<BinaryResourceReference>(serialized, instance);
+
+        // Then
+        result.Uri.ShouldBe("someUri");
+        result.SHA1.ShouldBe(null);
+        result.Data.ShouldNotBeNull();
+        result.FileName.ShouldBe("sample.txt");
+        result.ContentType.ToString().ShouldBe("text/plain");
+        result.ContentLength.ShouldBe(123);
+        result.LastModified.ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
+    }
+
+    [Test]
+    public void ShouldHandleMissingContentTypeField()
+    {
+        // Given
+        var instance = CreateInstance();
+        var serialized = $$"""
+                           {
+                             "Uri": "someUri",
+                             "SHA1": "someSHA1",
+                             "Data": "VGhpcyBpcyBzb21lIGRhdGE=", 
+                             "FileName": "sample.txt",
+                             "ContentLength": 123,
+                             "LastModified": "2021-01-01T12:00:00Z"
+                           }
+                           """;
+
+        // When
+        var result = Deserialize<BinaryResourceReference>(serialized, instance);
+
+        // Then
+        result.Uri.ShouldBe("someUri");
+        result.SHA1.ShouldBe("someSHA1");
+        result.Data.ShouldNotBeNull();
+        result.FileName.ShouldBe("sample.txt");
+        result.ContentType.ShouldBe(null);
+        result.ContentLength.ShouldBe(123);
+        result.LastModified.ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
+    }
+    
+    [Test]
+    public void ShouldSerializeWithAllFields()
+    {
+        // Given
+        var instance = CreateInstance();
+        var resource = new BinaryResourceReference
+        {
+            Uri = "someUri",
+            SHA1 = "someSHA1",
+            Data = Convert.FromBase64String("VGhpcyBpcyBzb21lIGRhdGE="), // Sample base64 data
+            FileName = "sample.txt",
+            ContentType = new ContentType("text/plain"),
+            ContentLength = 123,
+            LastModified = DateTimeOffset.Parse("2021-01-01T12:00:00Z")
+        };
+
+        // When
+        var serialized = Serialize(resource, instance);
+        var jsonObject = JObject.Parse(serialized);
+
+        // Then
+        jsonObject["Uri"].ShouldBe("someUri");
+        jsonObject["SHA1"].ShouldBe("someSHA1");
+        jsonObject["Data"].ShouldBe("VGhpcyBpcyBzb21lIGRhdGE=");
+        jsonObject["FileName"].ShouldBe("sample.txt");
+        jsonObject["ContentType"].ShouldBe("text/plain");
+        jsonObject["ContentLength"].ShouldBe(123);
+        jsonObject["LastModified"].ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
+    }
+
     private string Serialize(object container, JsonConfigSerializer serializer)
     {
         Log.Info($"Serializing container:\n{container}");
@@ -252,7 +385,7 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
         Log.Info($"Serialized:\n{serialized}");
         return serialized;
     }
-    
+
     private T Deserialize<T>(string serialized, JsonConfigSerializer serializer)
     {
         Log.Info($"Deserializing:\n{serialized}");
@@ -263,25 +396,26 @@ public class BinaryResourceReferenceConverterTests : FixtureBase
 
     private JsonConfigSerializer CreateInstance()
     {
-        return new JsonConfigSerializer();
+        var result = new JsonConfigSerializer();
+        result.RegisterConverter(new BinaryResourceReferenceConverter());
+        return result;
     }
-    
+
     public sealed record TestClass
     {
         public int IntValue { get; set; }
-        
+
         public string StringValue { get; set; }
-        
+
         public byte[] ByteArray { get; set; }
     }
-    
+
     public sealed record TestBinaryClass
     {
         public int IntValue { get; set; }
-        
+
         public string StringValue { get; set; }
-        
-        [JsonConverter(typeof(BinaryResourceReferenceConverter))]
+
         public BinaryResourceReference ByteArray { get; set; }
     }
 }
