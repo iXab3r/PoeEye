@@ -191,13 +191,13 @@ internal sealed class PoeConfigConverter : JsonConverter
                 Log.Debug(() => $"Found converter {converterKvp.Key}");
                 var sourceMetadata = new PoeConfigMetadata()
                 {
-                    TypeName = converterKvp.Key.LegacyType.FullName,
+                    TypeName = converterKvp.Key.SourceType.FullName,
                     Version = converterKvp.Key.SourceVersion,
                     ConfigValue = metadata.ConfigValue,
                 };
 
-                var convertedValue = DeserializeMetadataValue(sourceMetadata, serializer, converterKvp.Key.LegacyType);
-                Log.Debug(() => $"Deserialized config v{metadata.Version} into interim value of type {converterKvp.Key.LegacyType} v{sourceMetadata.Version}");
+                var convertedValue = DeserializeMetadataValue(sourceMetadata, serializer, converterKvp.Key.SourceType);
+                Log.Debug(() => $"Deserialized config v{metadata.Version} into interim value of type {converterKvp.Key.SourceType} v{sourceMetadata.Version}");
                 try
                 {
                     var result = converterKvp.Converter(convertedValue);

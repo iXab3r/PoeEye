@@ -30,6 +30,12 @@ public class ConfigMigrationTests : FixtureBase
 
         public int Version { get; set; } = 3;
     }
+    
+    private sealed record ConfigV3a : IPoeEyeConfigVersioned
+    {
+        public int Version { get; set; } = 3;
+    }
+
 
     private sealed record Config : IPoeEyeConfigVersioned
     {
@@ -41,7 +47,7 @@ public class ConfigMigrationTests : FixtureBase
     private abstract class ConfigMetadataConverterV1ToV2Base : ConfigMetadataConverter<ConfigMigrationTests.ConfigV1, ConfigMigrationTests.ConfigV2>
     {
     }
-        
+
     private sealed class ConfigMetadataConverterV1ToV2 : ConfigMetadataConverterV1ToV2Base
     {
         public override ConfigMigrationTests.ConfigV2 Convert(ConfigMigrationTests.ConfigV1 value)
@@ -58,9 +64,17 @@ public class ConfigMigrationTests : FixtureBase
         public override ConfigMigrationTests.ConfigV3 Convert(ConfigMigrationTests.ConfigV2 value)
         {
             return new ConfigMigrationTests.ConfigV3()
-            { 
+            {
                 DoubleValue = value.IntValue * 10
             };
+        }
+    }
+    
+    private sealed class ConfigMetadataConverterV3ToV4ThatThrows : ConfigMetadataConverter<ConfigMigrationTests.ConfigV3, ConfigMigrationTests.ConfigV3a>
+    {
+        public override ConfigMigrationTests.ConfigV3a Convert(ConfigMigrationTests.ConfigV3 value)
+        {
+            throw new NotSupportedException();
         }
     }
 
@@ -69,7 +83,7 @@ public class ConfigMigrationTests : FixtureBase
         public override ConfigMigrationTests.Config Convert(ConfigMigrationTests.ConfigV3 value)
         {
             return new ConfigMigrationTests.Config()
-            { 
+            {
                 StringValue = $"Number is {value.DoubleValue:F0}"
             };
         }
@@ -119,7 +133,7 @@ public class ConfigMigrationTests : FixtureBase
             AutomaticallyLoadConverters = false
         };
         migrationService.Clear();
-        
+
         replacementService = new PoeConfigMetadataReplacementService(assemblyTracker);
         configConverter = new PoeConfigConverter(replacementService, migrationService);
     }
@@ -223,7 +237,7 @@ public class ConfigMigrationTests : FixtureBase
     [Test]
     [TestCase(typeof(ConfigMetadataConverter<,>), false)]
     [TestCase(typeof(ConfigMetadataConverterV1ToV2Base), false)]
-    [TestCase(typeof(ConfigMetadataConverter<SampleVersionedConfig,SampleVersionedConfig>), false)]
+    [TestCase(typeof(ConfigMetadataConverter<SampleVersionedConfig, SampleVersionedConfig>), false)]
     [TestCase(typeof(ConfigMetadataConverterV1ToV2), true)]
     [TestCase(typeof(ConfigMetadataConverterV2ToV3), true)]
     [TestCase(typeof(ConfigMetadataConverterV3ToV4), true)]
@@ -272,9 +286,22 @@ public class ConfigMigrationTests : FixtureBase
         var action = () => RegisterAll();
 
         //Then
-        action.ShouldThrow<InvalidOperationException>();
+        action.ShouldThrow<ArgumentException>();
     }
     
+    [Test]
+    public void ShouldThrowOnAddingConverterForSameVersionsAndDifferentTargetTypes()
+    {
+        //Given
+        migrationService.AutomaticallyLoadConverters = true;
+
+        //When
+        var action = () => RegisterAll();
+
+        //Then
+        action.ShouldThrow<ArgumentException>();
+    }
+
     [Test]
     public void ShouldReplaceIfNeeded()
     {
@@ -296,7 +323,20 @@ public class ConfigMigrationTests : FixtureBase
         result.AssemblyName.ShouldBe(typeof(SampleConfig).Assembly.GetName().Name);
         result.TypeName.ShouldBe(typeof(SampleConfig).FullName);
     }
-        
+
+    [Test]
+    public void ShouldThrowIfDuplicate()
+    {
+        //Given
+        migrationService.RegisterMetadataConverter(new ConfigMetadataConverterV3ToV4());
+
+        //When
+        var action = () => migrationService.RegisterMetadataConverter(new ConfigMetadataConverterV3ToV4());
+
+        //Then
+        action.ShouldThrow<ArgumentException>();
+    }
+
     private void RegisterAll()
     {
         migrationService.RegisterMetadataConverter(new ConfigMetadataConverterV3ToV4());
