@@ -28,7 +28,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
                 var configConverter = x.Resolve<PoeConfigConverter>();
                 serializer.RegisterConverter(configConverter);
 
-                var binaryDataConverter = x.Resolve<BinaryResourceReferenceConverter>();
+                var binaryDataConverter = x.Resolve<BinaryResourceRefConverter>();
                 serializer.RegisterConverter(binaryDataConverter);
                 
                 return serializer;

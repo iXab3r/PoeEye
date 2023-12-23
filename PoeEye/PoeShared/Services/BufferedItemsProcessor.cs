@@ -42,7 +42,7 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
     
     public uint Capacity { get; set; } = uint.MaxValue;
 
-    public void Add(BufferedItemState state, IBufferedItem item)
+    public void Add<T>(BufferedItemState state, T item) where T : IBufferedItemId
     {
         while (requestsBuffer.Count > Capacity - 1 && requestsBuffer.TryTake(out var removedItem))
         {
@@ -91,7 +91,19 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
                 for (var index = 0; index < itemChanges.Length; index++)
                 {
                     var change = itemChanges[index];
-                    change.Item.HandleState(change.State);
+
+                    if (change.Item is IBufferedItem bufferedItem)
+                    {
+                        bufferedItem.HandleState(change.State);
+                    }
+                    else if (change.Item is IBufferedItemAsync bufferedItemAsync)
+                    {
+                        Task.Run(() => bufferedItemAsync.HandleStateAsync(change.State)).Wait();
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"Items of type {change.Item.GetType()} are not supported");
+                    }
 
                     if (change.State is BufferedItemState.Added or BufferedItemState.Changed)
                     {
@@ -114,6 +126,6 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
     private readonly record struct ItemUpdateRequest
     {
         public BufferedItemState State { get; init; }
-        public IBufferedItem Item { get; init; }
+        public IBufferedItemId Item { get; init; }
     }
 }

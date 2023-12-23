@@ -8,7 +8,8 @@ public static class FileUtils
     
     public static void RemoveFilesInDirectory(this DirectoryInfo directory)
     {
-        if (!directory.Exists) {
+        if (!directory.Exists) 
+        {
             return;
         }
         var filesToRemove = directory.GetFiles("*", SearchOption.AllDirectories);
@@ -17,6 +18,10 @@ public static class FileUtils
 
     public static void RemoveDirectoryIfEmpty(this DirectoryInfo directory)
     {
+        if (!directory.Exists)
+        {
+            return;
+        }
         var hasFiles = directory.EnumerateFiles().Any();
         var hasDirectories = directory.EnumerateDirectories().Any();
         if (directory.Exists && !hasFiles && !hasDirectories)

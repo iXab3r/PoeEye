@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace PoeShared.Modularity;
 
-internal sealed class BinaryResourceReferenceConverter : JsonConverter
+public sealed class BinaryResourceRefConverter : JsonConverter
 {
-    private static readonly Lazy<BinaryResourceReferenceConverter> InstanceSupplier = new();
+    private static readonly Lazy<BinaryResourceRefConverter> InstanceSupplier = new();
     
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
@@ -13,11 +13,12 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
         {
             case JsonToken.StartObject:
             {
-                string sha1 = null;
+                string hash = null;
                 string uri = null;
                 string fileName = null;
                 byte[] data = null;
                 int? contentLength = null;
+                bool? supportsMaterialization = null;
                 DateTimeOffset? lastModified = null;
                 ContentType contentType = null;
 
@@ -28,37 +29,42 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
                         var propertyName = reader.Value.ToString();
                         switch (propertyName)
                         {
-                            case nameof(BinaryResourceReference.Uri):
+                            case nameof(BinaryResourceRef.Uri):
                             {
                                 uri = reader.ReadAsString();
                                 break;
                             }
-                            case nameof(BinaryResourceReference.SHA1):
+                            case nameof(BinaryResourceRef.Hash):
                             {
-                                sha1 = reader.ReadAsString();
+                                hash = reader.ReadAsString();
                                 break;
                             }
-                            case nameof(BinaryResourceReference.FileName):
+                            case nameof(BinaryResourceRef.FileName):
                             {
                                 fileName = reader.ReadAsString();
                                 break;
                             }
-                            case nameof(BinaryResourceReference.ContentLength):
+                            case nameof(BinaryResourceRef.ContentLength):
                             {
                                 contentLength = reader.ReadAsInt32();
                                 break;
                             }
-                            case nameof(BinaryResourceReference.LastModified):
+                            case nameof(BinaryResourceRef.LastModified):
                             {
                                 lastModified = reader.ReadAsDateTimeOffset();
                                 break;
                             }
-                            case nameof(BinaryResourceReference.ContentType):
+                            case nameof(BinaryResourceRef.SupportsMaterialization):
+                            {
+                                supportsMaterialization = reader.ReadAsBoolean();
+                                break;
+                            }
+                            case nameof(BinaryResourceRef.ContentType):
                             {
                                 contentType = new ContentType(reader.ReadAsString());
                                 break;
                             }
-                            case nameof(BinaryResourceReference.Data):
+                            case nameof(BinaryResourceRef.Data):
                             {
                                 data = reader.ReadAsBytes();
                                 break;
@@ -71,15 +77,16 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
                     }
                 }
 
-                return new BinaryResourceReference
+                return new BinaryResourceRef
                 {
                     Uri = uri,
                     Data = data,
-                    SHA1 = sha1,
+                    Hash = hash,
                     ContentType = contentType,
                     ContentLength = contentLength,
                     FileName = fileName,
-                    LastModified = lastModified
+                    LastModified = lastModified,
+                    SupportsMaterialization = supportsMaterialization ?? false
                 };
             }
             case JsonToken.String:
@@ -89,7 +96,7 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
                     ? Array.Empty<byte>()
                     : Convert.FromBase64String(base64Data);
 
-                return new BinaryResourceReference
+                return new BinaryResourceRef
                 {
                     Uri = null,
                     Data = data
@@ -102,7 +109,7 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        var binaryData = (BinaryResourceReference) value;
+        var binaryData = (BinaryResourceRef) value;
         if (binaryData.HasMetadata)
         {
             writer.WriteStartObject();
@@ -130,6 +137,12 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
                 writer.WritePropertyName(nameof(binaryData.ContentLength));
                 writer.WriteValue(binaryData.ContentLength);
             }
+            
+            if (binaryData.SupportsMaterialization)
+            {
+                writer.WritePropertyName(nameof(binaryData.SupportsMaterialization));
+                writer.WriteValue(binaryData.SupportsMaterialization);
+            }
 
             if (binaryData.LastModified != null)
             {
@@ -137,10 +150,10 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
                 writer.WriteValue(binaryData.LastModified);
             }
 
-            if (!string.IsNullOrEmpty(binaryData.SHA1))
+            if (!string.IsNullOrEmpty(binaryData.Hash))
             {
-                writer.WritePropertyName(nameof(binaryData.SHA1));
-                writer.WriteValue(binaryData.SHA1);
+                writer.WritePropertyName(nameof(binaryData.Hash));
+                writer.WriteValue(binaryData.Hash);
             }
 
             if (binaryData.Data != null)
@@ -168,6 +181,6 @@ internal sealed class BinaryResourceReferenceConverter : JsonConverter
 
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(BinaryResourceReference);
+        return objectType == typeof(BinaryResourceRef);
     }
 }

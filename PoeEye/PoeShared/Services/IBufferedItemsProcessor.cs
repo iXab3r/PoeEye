@@ -6,7 +6,7 @@ public interface IBufferedItemsProcessor : IDisposableReactiveObject
     
     uint Capacity { get; set; }
     
-    void Add(BufferedItemState state, IBufferedItem item);
+    void Add<T>(BufferedItemState state, T item) where T : IBufferedItemId;
     
     void Flush(bool immediateFlush);
 }
