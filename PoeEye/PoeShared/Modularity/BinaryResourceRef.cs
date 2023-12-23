@@ -61,14 +61,13 @@ public sealed record BinaryResourceRef : IHasValidation
     public bool IsMaterialized => Data != null;
 
     /// <summary>
-    /// Gets a value indicating whether any metadata (like Uri, SHA1, FileName, etc.) is associated with the binary resource.
+    /// Gets a value indicating whether any metadata (like Uri, Hash, FileName, etc.) is associated with the binary resource.
     /// </summary>
     [JsonIgnore]
     public bool HasMetadata => !string.IsNullOrEmpty(Uri) || 
                                !string.IsNullOrEmpty(Hash) || 
                                !string.IsNullOrEmpty(FileName) || 
                                ContentType != null || 
-                               ContentLength != null || 
                                LastModified != null;
 
     /// <summary>
