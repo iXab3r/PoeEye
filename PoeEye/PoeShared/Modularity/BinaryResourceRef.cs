@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using Newtonsoft.Json;
+// ReSharper disable SealedMemberInSealedClass
 
 namespace PoeShared.Modularity;
 
@@ -76,32 +77,7 @@ public sealed record BinaryResourceRef : IHasValidation
     [JsonIgnore]
     public bool IsValid => !string.IsNullOrEmpty(Uri) || Data != null;
 
-    public bool Equals(BinaryResourceRef other)
-    {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return Uri == other.Uri && Hash == other.Hash && 
-               ReferenceEquals(Data, other.Data) && 
-               Nullable.Equals(LastModified, other.LastModified) && 
-               Equals(ContentType, other.ContentType) && 
-               FileName == other.FileName && 
-               ContentLength == other.ContentLength;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Uri, Hash, Data, LastModified, ContentType, FileName, ContentLength);
-    }
-
-    public override string ToString()
+    public sealed override string ToString()
     {
         var builder = new ToStringBuilder(this);
         builder.AppendParameterIfNotDefault(nameof(Uri), Uri);
@@ -113,6 +89,6 @@ public sealed record BinaryResourceRef : IHasValidation
         builder.AppendParameterIfNotDefault(nameof(FileName), FileName);
         builder.AppendParameterIfNotDefault(nameof(ContentType), ContentType);
         builder.AppendParameterIfNotDefault(nameof(ContentLength), ContentLength);
-        return base.ToString();
+        return builder.ToString();
     }
 }
