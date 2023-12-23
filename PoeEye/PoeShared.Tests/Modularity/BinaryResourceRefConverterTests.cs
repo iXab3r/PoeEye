@@ -392,6 +392,35 @@ public class BinaryResourceRefConverterTests : FixtureBase
         jsonObject[nameof(BinaryResourceRef.LastModified)].ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
     }
 
+    [Test]
+    public void ShouldSerializeEmpty()
+    {
+        //Given
+        var instance = CreateInstance();
+        var resource = BinaryResourceRef.Empty;
+
+        //When
+        var serialized = Serialize(resource, instance);
+
+        //Then
+        serialized.ShouldBe("\"\"");
+
+    }
+    
+    [Test]
+    public void ShouldDeserializeEmpty()
+    {
+        //Given
+        var instance = CreateInstance();
+        var serialized = "\"\"";
+
+        //When
+        var result = Deserialize<BinaryResourceRef>(serialized, instance);
+
+        //Then
+        result.ShouldBe(BinaryResourceRef.Empty);
+    }
+
     private string Serialize(object container, JsonConfigSerializer serializer)
     {
         Log.Info($"Serializing container:\n{container}");

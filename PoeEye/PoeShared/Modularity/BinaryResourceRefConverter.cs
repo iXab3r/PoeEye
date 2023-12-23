@@ -93,7 +93,7 @@ public sealed class BinaryResourceRefConverter : JsonConverter
             {
                 var base64Data = reader.Value.ToString();
                 var data = string.IsNullOrEmpty(base64Data)
-                    ? Array.Empty<byte>()
+                    ? null
                     : Convert.FromBase64String(base64Data);
 
                 return new BinaryResourceRef
@@ -167,15 +167,8 @@ public sealed class BinaryResourceRefConverter : JsonConverter
         }
         else
         {
-            if (binaryData.Data != null)
-            {
-                var base64Data = Convert.ToBase64String(binaryData.Data);
-                writer.WriteValue(base64Data);
-            }
-            else
-            {
-                throw new ArgumentException($"Data must be set in object {binaryData}");
-            }
+            var base64Data = Convert.ToBase64String(binaryData.Data ?? Array.Empty<byte>());
+            writer.WriteValue(base64Data);
         }
     }
 
