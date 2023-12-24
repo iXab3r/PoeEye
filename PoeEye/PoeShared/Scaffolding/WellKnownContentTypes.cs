@@ -18,6 +18,11 @@ public static class WellKnownContentTypes
     public static readonly ContentType Svg = new("image/svg+xml");
     public static readonly ContentType Tiff = new("image/tiff");
     public static readonly ContentType Webp = new("image/webp");
+    public static readonly ContentType BinaryBgra32 = new("image/bgra-32");
+    public static readonly ContentType BinaryBgr24 = new("image/bgr-24");
+    public static readonly ContentType BinaryArgb32 = new("image/argb-32");
+    public static readonly ContentType BinaryRgba32 = new("image/rgba-32");
+    public static readonly ContentType BinaryRgb24 = new("image/rgba-24");
 
     public static readonly ContentType Mp3 = new("audio/mpeg");
     public static readonly ContentType Wav = new("audio/wav");

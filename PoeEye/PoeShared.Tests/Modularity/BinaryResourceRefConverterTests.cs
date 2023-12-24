@@ -296,7 +296,6 @@ public class BinaryResourceRefConverterTests : FixtureBase
         result.ContentLength.ShouldBe(123);
         result.LastModified.ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
         result.IsMaterialized.ShouldBe(true);
-        result.SupportsMaterialization.ShouldBe(true);
     }
 
 
@@ -329,7 +328,6 @@ public class BinaryResourceRefConverterTests : FixtureBase
         result.ContentLength.ShouldBe(123);
         result.LastModified.ShouldBe(DateTimeOffset.Parse("2021-01-01T12:00:00Z"));
         result.IsMaterialized.ShouldBe(true);
-        result.SupportsMaterialization.ShouldBe(false);
     }
 
     [Test]

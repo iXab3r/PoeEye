@@ -48,11 +48,6 @@ public sealed record BinaryResourceRef : IHasValidation
     /// Gets the length of the content in bytes, if known.
     /// </summary>
     public int? ContentLength { get; init; }
-    
-    /// <summary>
-    /// Gets a value indicating whether the binary data stored in this blob could be materialized(downloaded)/de-materialized(converted to URI).
-    /// </summary>
-    public bool SupportsMaterialization { get; init; }
 
     /// <summary>
     /// Gets a value indicating whether the binary data is stored directly in this object.

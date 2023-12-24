@@ -18,7 +18,6 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                 string fileName = null;
                 byte[] data = null;
                 int? contentLength = null;
-                bool? supportsMaterialization = null;
                 DateTimeOffset? lastModified = null;
                 ContentType contentType = null;
 
@@ -54,11 +53,6 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                                 lastModified = reader.ReadAsDateTimeOffset();
                                 break;
                             }
-                            case nameof(BinaryResourceRef.SupportsMaterialization):
-                            {
-                                supportsMaterialization = reader.ReadAsBoolean();
-                                break;
-                            }
                             case nameof(BinaryResourceRef.ContentType):
                             {
                                 contentType = new ContentType(reader.ReadAsString());
@@ -86,7 +80,6 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                     ContentLength = contentLength,
                     FileName = fileName,
                     LastModified = lastModified,
-                    SupportsMaterialization = supportsMaterialization ?? false
                 };
             }
             case JsonToken.String:
@@ -138,12 +131,6 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                 writer.WriteValue(binaryData.ContentLength);
             }
             
-            if (binaryData.SupportsMaterialization)
-            {
-                writer.WritePropertyName(nameof(binaryData.SupportsMaterialization));
-                writer.WriteValue(binaryData.SupportsMaterialization);
-            }
-
             if (binaryData.LastModified != null)
             {
                 writer.WritePropertyName(nameof(binaryData.LastModified));
