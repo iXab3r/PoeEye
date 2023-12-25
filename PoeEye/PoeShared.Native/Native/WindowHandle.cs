@@ -19,6 +19,7 @@ namespace PoeShared.Native;
 
 internal sealed class WindowHandle : IWindowHandle  
 {
+    private readonly Lazy<string> titleSupplier;
     private readonly Lazy<string> classSupplier;
     private readonly Lazy<Icon> iconSupplier;
     private readonly Lazy<BitmapSource> iconBitmapSupplier;
@@ -34,7 +35,7 @@ internal sealed class WindowHandle : IWindowHandle
     {
         Log = typeof(WindowHandle).PrepareLogger().WithSuffix(() => $"HWND {handle.ToHexadecimal()}, Title {Title}, Class: {Class}");
         Handle = handle;
-        Title = UnsafeNative.GetWindowTitle(handle);
+        titleSupplier = new Lazy<string>(() => UnsafeNative.GetWindowTitle(handle));
 
         processIdSupplier = new Lazy<(int processId, int threadId)>(() =>
         {
@@ -223,7 +224,7 @@ internal sealed class WindowHandle : IWindowHandle
         
     public IntPtr Handle { get; }
 
-    public string Title { get; }
+    public string Title => titleSupplier.Value;
 
     public int ParentProcessId => parentProcessIdSupplier.Value;
 

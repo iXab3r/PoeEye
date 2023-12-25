@@ -12,7 +12,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     private readonly string propertyName;
     private readonly ConcurrentQueue<string> operations = new ConcurrentQueue<string>();
     private TimeSpan previousOperationTimestamp;
-    private readonly Stopwatch sw;
+    private readonly ValueStopwatch sw;
     private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
     private Func<bool> logCondition = () => true;
     private bool logEachStep = true;
@@ -33,8 +33,7 @@ public sealed class BenchmarkTimer : DisposableReactiveObject
     {
         this.logger = logger ?? DefaultLogger;
         this.propertyName = propertyName ?? "unknown";
-        sw = Stopwatch.StartNew();
-        Anchors.Add(() => sw.Stop());
+        sw = ValueStopwatch.StartNew();
         Anchors.Add(() =>
         {
             if (!logOnDisposal || sw.Elapsed <= loggingElapsedThreshold)

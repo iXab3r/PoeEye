@@ -475,7 +475,7 @@ public partial class UnsafeNative
         log.Debug(() => $"SetForegroundWindow returned {activationResult}");
 
         var maxActivationTimeout = timeout <= TimeSpan.Zero ? MinWindowActivationTimeout : timeout;
-        var sw = Stopwatch.StartNew();
+        var sw = ValueStopwatch.StartNew();
         IntPtr foregroundWindow;
         while ((foregroundWindow = GetForegroundWindow()) != window.Handle)
         {
@@ -496,7 +496,7 @@ public partial class UnsafeNative
                 throw new InvalidStateException($"Failed to switch to window {window} in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
             }
 
-            CancellationToken.None.Sleep(10, log);
+            TaskExtensions.Sleep(10);
         }
     }
 
@@ -674,7 +674,7 @@ public partial class UnsafeNative
         log.Debug(() => "Calling SetForegroundWindow");
         var result = User32.SetForegroundWindow(window.Handle); // SetForegroundWindow may lie, result must be double-checked via GetForegroundWindow
         log.Debug(() => $"Call result for SetForegroundWindow is {result}, double-checking...");
-        var sw = Stopwatch.StartNew();
+        var sw = ValueStopwatch.StartNew();
         IntPtr foregroundWindow;
         while ((foregroundWindow = GetForegroundWindow()) != window.Handle &&
                User32.GetWindow(foregroundWindow, User32.GetWindowCommands.GW_OWNER) != window.Handle)

@@ -7,7 +7,7 @@ public abstract class LoggingChangeSetAdaptorBase : DisposableReactiveObject
     protected readonly ConcurrentQueue<string> Messages = new();
     
     private readonly int maxLogLength = 30;
-    private readonly Stopwatch sw = Stopwatch.StartNew();
+    private readonly ValueStopwatch sw = ValueStopwatch.StartNew();
     
     public IFluentLog Logger { get; set; }
 

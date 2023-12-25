@@ -59,7 +59,7 @@ public static class TestExtensions
     {
         var log = Log.WithSuffix(instance).WithSuffix(extractor.ToString()).WithSuffix($"Expected: {expected}");
 
-        var sw = Stopwatch.StartNew();
+        var sw = ValueStopwatch.StartNew();
 
         while (sw.ElapsedMilliseconds < timeout)
         {

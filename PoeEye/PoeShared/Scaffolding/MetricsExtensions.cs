@@ -19,7 +19,7 @@ public static class MetricsExtensions
         
     public static IDisposable Time(this IMeasureGaugeMetrics metrics, GaugeOptions options)
     {
-        var initial = Stopwatch.StartNew();
+        var initial = ValueStopwatch.StartNew();
         return Disposable.Create(() => metrics.SetValue(options, initial.ElapsedMilliseconds));
     }
 }

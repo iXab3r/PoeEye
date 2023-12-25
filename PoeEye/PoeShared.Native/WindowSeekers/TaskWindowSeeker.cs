@@ -11,6 +11,7 @@ namespace PoeShared.WindowSeekers;
 public sealed class TaskWindowSeeker : BaseWindowSeeker
 {
     private readonly IWindowHandleProvider windowHandleProvider;
+    
     public override IReadOnlyCollection<IWindowHandle> Windows { get; protected set; } = new List<IWindowHandle>();
 
     public TaskWindowSeeker(IWindowHandleProvider windowHandleProvider)

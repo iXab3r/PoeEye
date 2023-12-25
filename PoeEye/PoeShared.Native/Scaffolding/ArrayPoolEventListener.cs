@@ -70,7 +70,7 @@ public sealed class ArrayPoolEventListener : DisposableReactiveObjectWithLogger
                     return;
                 }
                 
-                if (bufferSize < minBufferSizeToLogStackTrace && eventType is BufferEvent.BufferRented or BufferEvent.BufferReturned)
+                if (eventType is BufferEvent.BufferRented or BufferEvent.BufferReturned)
                 {
                     return;
                 }

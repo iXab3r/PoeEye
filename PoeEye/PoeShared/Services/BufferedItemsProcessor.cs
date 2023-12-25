@@ -62,7 +62,7 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
     
     private void ProcessRequests(string reason)
     {
-        var sw = Stopwatch.StartNew();
+        var sw = ValueStopwatch.StartNew();
 
         var changesToProcess = requestsBuffer.Count;
         if (changesToProcess <= 0)

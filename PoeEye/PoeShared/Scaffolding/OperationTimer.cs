@@ -4,7 +4,7 @@ namespace PoeShared.Scaffolding;
 
 public sealed class OperationTimer : IDisposable
 {
-    private readonly Stopwatch sw;
+    private readonly ValueStopwatch sw;
 
     private readonly Action<TimeSpan> endAction;
 
@@ -13,7 +13,7 @@ public sealed class OperationTimer : IDisposable
     public OperationTimer(Action<TimeSpan> endAction)
     {
         this.endAction = endAction;
-        sw = Stopwatch.StartNew();
+        sw = ValueStopwatch.StartNew();
     }
 
     public void PutTimestamp()
@@ -32,7 +32,6 @@ public sealed class OperationTimer : IDisposable
 
     public void Dispose()
     {
-        sw.Stop();
         endAction(sw.Elapsed);
     }
 }

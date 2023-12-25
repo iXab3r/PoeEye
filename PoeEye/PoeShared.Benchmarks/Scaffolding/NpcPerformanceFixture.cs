@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using PoeShared.Tests.Helpers;
 
 namespace PoeShared.Benchmarks.Scaffolding;

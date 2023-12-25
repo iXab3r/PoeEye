@@ -20,6 +20,32 @@ public static class FluentLogExtensions
         };
     }
     
+    public static void Write(this IFluentLog log, FluentLogLevel logLevel, FormattableString messageSupplier)
+    {
+        if (!log.IsEnabled(logLevel))
+        {
+            return;
+        }
+        switch (logLevel)
+        {
+            case FluentLogLevel.Trace:
+            case FluentLogLevel.Debug:
+                log.Debug(messageSupplier);
+                break;
+            case FluentLogLevel.Info:
+                log.Info(messageSupplier);
+                break;
+            case FluentLogLevel.Warn:
+                log.Warn(messageSupplier);
+                break;
+            case FluentLogLevel.Error:
+                log.Error(messageSupplier);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
     public static void Write(this IFluentLog log, FluentLogLevel logLevel, Func<string> messageSupplier)
     {
         if (!log.IsEnabled(logLevel))

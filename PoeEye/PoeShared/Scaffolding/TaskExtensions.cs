@@ -6,57 +6,96 @@ namespace PoeShared.Scaffolding;
 
 public static class TaskExtensions
 {
-    private const int warningThresholdMs = 20;
+    public const int SleepWarningThresholdMs = 20;
+    public const int SleepLowPrecisionThresholdMs = 12;
+
     private static readonly IFluentLog Log = typeof(TaskExtensions).PrepareLogger();
     private static readonly int MinWaitHandleTimeoutInMs = 50;
 
     public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout)
     {
-        Sleep(cancellationToken, timeout, Log);
+        Sleep(cancellationToken, timeout, null);
     }
 
+    public static void Sleep(this CancellationToken cancellationToken, int millisecondsTimeout)
+    {
+        Sleep(cancellationToken, millisecondsTimeout, null);
+    }
+
+    public static void Sleep(TimeSpan timeout)
+    {
+        Sleep((int)timeout.TotalMilliseconds);
+    }
+    
+    public static void Sleep(int millisecondsTimeout)
+    {
+        Sleep(CancellationToken.None, millisecondsTimeout, null);
+    }
+    
+       
+    public static void Sleep(int millisecondsTimeout, IFluentLog log)
+    {
+        Sleep(CancellationToken.None, millisecondsTimeout, log);
+    }
+    
     public static void Sleep(this CancellationToken cancellationToken, int millisecondsTimeout, IFluentLog log)
     {
-        var sw = Stopwatch.StartNew();
+        var sw = ValueStopwatch.StartNew();
+        var isLogging = log?.IsDebugEnabled ?? false;
         bool cancelled;
         
         if (millisecondsTimeout < MinWaitHandleTimeoutInMs)
         {
-            log.Debug(() => $"Sleeping for {millisecondsTimeout}ms using combined wait");
+            if (isLogging)
+            {
+                log.Debug($"Sleeping for {millisecondsTimeout}ms using combined wait");
+            }
 
-            var sleepDuration = millisecondsTimeout - 8;
+            var sleepDuration = millisecondsTimeout - SleepLowPrecisionThresholdMs;
             if (sleepDuration > 0)
             {
                 Thread.Sleep(sleepDuration);
-                
-                while (!cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < millisecondsTimeout)
-                {
-                    Thread.Yield();
-                }
+            }
+            
+            while (!cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < millisecondsTimeout)
+            {
+                Thread.Yield();
             }
 
             cancelled = cancellationToken.IsCancellationRequested;
         }
         else
         {
-            log.Debug(() => $"Sleeping for {millisecondsTimeout}ms");
+            if (isLogging)
+            {
+                log.Debug($"Sleeping for {millisecondsTimeout}ms using wait handle");
+            }
             cancelled = cancellationToken.WaitHandle.WaitOne(millisecondsTimeout);
         }
-        sw.Stop();
+        
         if (cancelled)
         {
-            log.Warn(() => $"Sleep for {millisecondsTimeout} was interrupted after {sw.ElapsedMilliseconds}ms");
+            if (isLogging)
+            {
+                log.Debug($"Sleep for {millisecondsTimeout} was interrupted after {sw.ElapsedMilliseconds}ms");
+            }
         }
         else
         {
             var elapsedMilliseconds = sw.ElapsedMilliseconds;
-            if (elapsedMilliseconds > warningThresholdMs && elapsedMilliseconds > millisecondsTimeout * 2)
+            if (elapsedMilliseconds > SleepWarningThresholdMs && elapsedMilliseconds > millisecondsTimeout * 2)
             {
-                log.Warn(() => $"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms which is much longer than expected");
+                if (isLogging)
+                {
+                    log.Debug($"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms which is much longer than expected");
+                }
             }
             else
             {
-                log.Debug(() => $"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms");
+                if (isLogging)
+                {
+                    log.Debug($"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms");
+                }
             }
         }
     }

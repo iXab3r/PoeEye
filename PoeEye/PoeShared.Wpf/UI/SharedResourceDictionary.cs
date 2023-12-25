@@ -42,14 +42,13 @@ public class SharedResourceDictionary : ResourceDictionary
             sourceUri = value;
             if (!SharedDictionaries.ContainsKey(value))
             {
-                using var sw = new BenchmarkTimer(Log);
-                sw.Step(() => $"Loading {nameof(SharedResourceDictionary)} from {value}");
+                Log.Info($"Loading {nameof(SharedResourceDictionary)} from {value}");
                 try
                 {
                     // If the dictionary is not yet loaded, load it by setting
                     // the source of the base class
                     base.Source = value;
-                    sw.Step(() => $"Loaded resources from {value}");
+                    Log.Info($"Loaded resources from {value}");
                 }
                 catch (Exception e)
                 {
@@ -58,7 +57,7 @@ public class SharedResourceDictionary : ResourceDictionary
 
                 // add it to the cache
                 SharedDictionaries.Add(value, this);
-                sw.Step(() => $"Added resource {value} to cache, size: {SharedDictionaries.Count}");
+                Log.Info($"Added resource {value} to cache, size: {SharedDictionaries.Count}");
             }
             else
             {
@@ -84,23 +83,23 @@ public class SharedResourceDictionary : ResourceDictionary
 
         try
         {
-            using var sw = new BenchmarkTimer(Log.WithSuffix(mappedKey)).WithoutLoggingEachStep();
-            sw.Step(() => $"Resolving resource");
+            var log = Log.WithSuffix(mappedKey);
+            log.Debug($"Resolving resource");
             base.OnGettingValue(key, ref value, out canCache);
             if (value is not DispatcherObject dispatcherObject)
             {
-                sw.Step($"Resolved non-dispatcher resource, canCache: {canCache}");
+                log.Debug($"Resolved non-dispatcher resource, canCache: {canCache}");
                 return;
             }
 
             if (!dispatcherObject.CheckAccess())
             {
                 var message = $"Resolved object by key {key} is owned by another dispatcher, current: {dispatcherObject.Dispatcher.Thread.Name}, expected: {Dispatcher.CurrentDispatcher.Thread.Name}";
-                sw.Step(message);
+                log.Debug(message);
                 throw new InvalidOperationException(message);
             }
 
-            sw.Step($"Resolved resource, canCache: {canCache}");
+            log.Debug($"Resolved resource, canCache: {canCache}");
         }
         finally
         {

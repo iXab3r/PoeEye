@@ -62,4 +62,41 @@ public class FluentLogBuilderFixture
         var expectedMessage = @$"[test1] info, Items: 3, #1 a, #2 b, #3 c";
         logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == expectedMessage &&  y.LogLevel == FluentLogLevel.Info)));
     }
+
+    [Test]
+    [TestCase(FluentLogLevel.Debug, true)]
+    [TestCase(FluentLogLevel.Info, true)]
+    [TestCase(FluentLogLevel.Warn, true)]
+    [TestCase(FluentLogLevel.Error, true)]
+    [TestCase(FluentLogLevel.Debug, false)]
+    [TestCase(FluentLogLevel.Info, false)]
+    [TestCase(FluentLogLevel.Warn, false)]
+    [TestCase(FluentLogLevel.Error, false)]
+    public void ShouldNotFormatWhenDisabled(FluentLogLevel logLevel, bool isEnabled)
+    {
+        //Given
+        var instance = (IFluentLog)new FluentLogBuilder(logWriter.Object);
+        var container = new TestValueContainer();
+        container.ToStringCount.ShouldBe(0);
+        FluentLogSettings.Instance.MinLogLevel = isEnabled ? logLevel  : logLevel + 1;
+
+        //When
+        instance.Write(logLevel, $"Test: {container}");
+
+        //Then
+        container.ToStringCount.ShouldBe(isEnabled == true ? 1 : 0);
+    }
+
+    private sealed record TestValueContainer
+    {
+        public int Value { get; set; }
+        
+        public int ToStringCount { get; private set; }
+        
+        public override string ToString()
+        {
+            ToStringCount++;
+            return base.ToString();
+        }
+    }
 }

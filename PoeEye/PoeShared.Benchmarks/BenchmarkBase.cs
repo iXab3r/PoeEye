@@ -19,7 +19,7 @@ public class BenchmarkBase : FixtureBase
                     new NetCoreAppSettings(
                         targetFrameworkMoniker: targetFrameworkMoniker,
                         runtimeFrameworkVersion: null,
-                        name: "6.0").WithTimeout(TimeSpan.FromMinutes(10))))
+                        name: "7.0").WithTimeout(TimeSpan.FromMinutes(10))))
             .WithArguments(new Argument[]{ new MsBuildArgument("/p:ValidateExecutableReferencesMatchSelfContained=false") })
             .AsDefault();
         return job;
@@ -49,7 +49,7 @@ public class BenchmarkBase : FixtureBase
         return result;
     }
 
-    protected IConfig PrepareDefaultConfig(string targetFrameworkMoniker = "net6-windows10.0.19041")
+    protected IConfig PrepareDefaultConfig(string targetFrameworkMoniker = "net7-windows10.0.20348.0")
     {
         var job = PrepareJob(targetFrameworkMoniker);
         var result = PrepareConfig()

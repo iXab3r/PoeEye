@@ -171,10 +171,9 @@ public sealed class BusyDecorator : Decorator
             decorator.backgroundChildId = BackgroundVisualHost.AddChild(decorator,
                 () =>
                 {
-                    using var sw = new BenchmarkTimer(Log);
-                    sw.Debug(() => $"New child initialization requested, factory: {dataContextFactory}");
+                    Log.Debug($"New child initialization requested, factory: {dataContextFactory}");
                     var childContext = dataContextFactory?.Create();
-                    sw.Debug(() => $"New child context created: {childContext}");
+                    Log.Debug($"New child context created: {childContext}");
                     var element = new CachedContentControl()
                     {
                         Style = style,
