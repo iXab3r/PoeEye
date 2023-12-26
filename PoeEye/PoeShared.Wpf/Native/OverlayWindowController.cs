@@ -64,13 +64,13 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             logger.Debug($"Disposed overlay view model: {viewModel}");
         }).AddTo(childAnchors);
 
-        logger.Debug(() =>"Initializing window container view model");
+        logger.Debug("Initializing window container view model");
         var windowContainer = new OverlayWindowContainer(logger)
         {
             Content = viewModel
         }.AddTo(childAnchors);
         
-        logger.Debug(() => $"Initialized window container: {windowContainer}");
+        logger.Debug($"Initialized window container: {windowContainer}");
         var window = new OverlayWindowView
         {
             Visibility = Visibility.Collapsed,
@@ -80,9 +80,9 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
         };
         logger.AddSuffix(() => window);
         
-        logger.Info(() => $"Created overlay window");
+        logger.Info($"Created overlay window");
         window.DataContext = windowContainer;
-        logger.Debug(() => $"Assigned data context");
+        logger.Debug($"Assigned data context");
 
         var activationController = new ActivationController(window);
         viewModel.SetActivationController(activationController);
@@ -93,10 +93,10 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             .AddTo(childAnchors);
 
         window.WhenLoaded()
-            .Do(_ => logger.Debug(() => $"Overlay is loaded"))
+            .Do(_ => logger.Debug($"Overlay is loaded"))
             .SubscribeSafe(() =>
             {
-                logger.Debug(() => $"Assigning overlay view {window} to view-model {viewModel}");
+                logger.Debug($"Assigning overlay view {window} to view-model {viewModel}");
                 viewModel.SetOverlayWindow(window.Controller);
             }, logger.HandleUiException)
             .AddTo(childAnchors);
@@ -109,7 +109,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             .ObserveOn(overlayScheduler)
             .SubscribeSafe(reason =>
             {
-                logger.Debug(() => $"Processing visibility change, reason: {reason}");
+                logger.Debug($"Processing visibility change, reason: {reason}");
                 HandleVisibilityChange(logger, window, viewModel);
             }, logger.HandleUiException)
             .AddTo(childAnchors);
@@ -120,7 +120,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             .ObserveOn(overlayScheduler)
             .SubscribeSafe(x =>
             {
-                logger.Debug(() => $"Changing overlay mode to {x}");
+                logger.Debug($"Changing overlay mode to {x}");
                 window.SetOverlayMode(x);
             }, logger.HandleUiException)
             .AddTo(childAnchors);
@@ -131,7 +131,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             .ObserveOn(overlayScheduler)
             .SubscribeSafe(x =>
             {
-                logger.Debug(() => $"Changing isFocusable to {x}");
+                logger.Debug($"Changing isFocusable to {x}");
                 window.SetActivation(x);
             }, logger.HandleUiException)
             .AddTo(childAnchors);
@@ -139,7 +139,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
         window
             .WhenRendered
             .Take(1)
-            .Do(_ => { logger.Debug(() => $"Overlay is rendered"); })
+            .Do(_ => { logger.Debug($"Overlay is rendered"); })
             .SubscribeToErrors(logger.HandleUiException)
             .AddTo(childAnchors);
 
@@ -147,7 +147,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             
         Disposable.Create(() =>
         {
-            logger.Debug(() => $"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
+            logger.Debug($"Removing overlay, overlayList: {windows.Items.Select(x => x.Name).ToArray()}");
             windows.Remove(window);
         }).AddTo(childAnchors);
         
@@ -160,8 +160,8 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
         childAnchors.AddTo(viewModel.Anchors);
         childAnchors.AddTo(Anchors);
 
-        Log.Info(() => $"Overlay view initialized: {window}");
-        logger.Debug(() => $"Registration completed");
+        Log.Info($"Overlay view initialized: {window}");
+        logger.Debug($"Registration completed");
 
         return childAnchors;
     }
@@ -174,20 +174,20 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
         {
             if (overlayWindow.Visibility != Visibility.Visible)
             {
-                logger.Debug(() => $"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
+                logger.Debug($"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
                 overlayWindow.Visibility = Visibility.Visible;
             }
 
             var currentRect = UnsafeNative.GetWindowRect(overlayWindow.WindowHandle);
-            logger.Debug(() => $"Showing overlay {overlayWindow}, native bounds: {currentRect}");
+            logger.Debug($"Showing overlay {overlayWindow}, native bounds: {currentRect}");
             UnsafeNative.ShowInactiveTopmost(overlayWindow.WindowHandle);
         } else if (overlayWindow.WindowHandle == IntPtr.Zero)
         {
-            logger.Debug(() => $"Overlay is not initialized yet");
+            logger.Debug($"Overlay is not initialized yet");
         }
         else
         {
-            logger.Debug(() => $"Hiding overlay");
+            logger.Debug($"Hiding overlay");
 
             UnsafeNative.HideWindow(overlayWindow.WindowHandle);
         }
@@ -200,7 +200,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
             return;
         }
 
-        Log.Debug(() => $"Overlay controller IsVisible = {IsVisible} => {isVisible}");
+        Log.Debug($"Overlay controller IsVisible = {IsVisible} => {isVisible}");
         IsVisible = isVisible;
     }
 

@@ -15,7 +15,7 @@ internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewM
             .Else(x => 0d)
             .To((x, v) =>
             {
-                x.Log.Debug(() => $"Setting {nameof(x.GlassFrameThickness)} to {v}, content native bounds: {x.Content?.NativeBounds}");
+                x.Log.Debug($"Setting {nameof(x.GlassFrameThickness)} to {v}, content native bounds: {x.Content?.NativeBounds}");
                 x.GlassFrameThickness = v;
             });
 
@@ -24,7 +24,7 @@ internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewM
             .Else(x => 0d)
             .To((x, v) =>
             {
-                x.Log.Debug(() => $"Setting {nameof(x.ResizeBorderThickness)} to {v}");
+                x.Log.Debug($"Setting {nameof(x.ResizeBorderThickness)} to {v}");
                 x.ResizeBorderThickness = v;
             });
         

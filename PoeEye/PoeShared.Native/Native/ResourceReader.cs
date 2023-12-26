@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -52,7 +52,7 @@ public static class ResourceReader
         {
             if (!TryToLoadResourceByName(assembly, match, out var resourceData))
             {
-                Log.Debug(() => $"Failed to load resource resource '{match}'");
+                Log.Debug($"Failed to load resource resource '{match}'");
                 continue;
             }
 
@@ -67,18 +67,18 @@ public static class ResourceReader
         var internalResourceName = name;
         if (string.IsNullOrEmpty(internalResourceName))
         {
-            Log.Debug(() => $"Failed to find internal resource name for '{name}'");
+            Log.Debug($"Failed to find internal resource name for '{name}'");
 
             resourceData = null;
             return false;
         }
 
-        Log.Debug(() => $"Loading resource '{internalResourceName}'...");
+        Log.Debug($"Loading resource '{internalResourceName}'...");
         var resourceStream = assembly.GetManifestResourceStream(internalResourceName);
         if (resourceStream == null)
         {
             var resourcesList = assembly.GetManifestResourceNames();
-            Log.Debug(() => $"Resource was not found '{internalResourceName}', embedded res.list: {resourcesList.DumpToString()}");
+            Log.Debug($"Resource was not found '{internalResourceName}', embedded res.list: {resourcesList.DumpToString()}");
             resourceData = null;
             return false;
         }
@@ -88,7 +88,7 @@ public static class ResourceReader
             var buffer = new byte[stream.Length];
             stream.Read(buffer, 0, buffer.Length);
 
-            Log.Debug(() => $"Loaded resource '{internalResourceName}' : {buffer.Length}b");
+            Log.Debug($"Loaded resource '{internalResourceName}' : {buffer.Length}b");
             resourceData = buffer;
             return true;
         }

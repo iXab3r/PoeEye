@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 
 namespace PoeShared.Services;
 
@@ -42,21 +42,21 @@ public sealed class SharedResourceRepository<TKey, TResource> where TResource : 
                 continue;
             }
 
-            Log.Debug(() => $"Removing disposed item: {kvp}");
+            Log.Debug($"Removing disposed item: {kvp}");
             if (!cache.TryRemove(kvp.Key, out var _))
             {
-                Log.Debug(() => $"Successfully removed disposed item {kvp}");
+                Log.Debug($"Successfully removed disposed item {kvp}");
                 removedItemCount++;
             }
             else
             {
-                Log.Debug(() => $"Someone else already removed disposed item {kvp}");
+                Log.Debug($"Someone else already removed disposed item {kvp}");
             }
         }
 
         if (removedItemCount > 0)
         {
-            Log.Debug(() => $"Removed {removedItemCount} disposed item(s) from cache, total item count: {cache.Count}");
+            Log.Debug($"Removed {removedItemCount} disposed item(s) from cache, total item count: {cache.Count}");
         }
     }
 
@@ -66,28 +66,28 @@ public sealed class SharedResourceRepository<TKey, TResource> where TResource : 
         Cleanup();
         if (cache.TryGetValue(key, out var existingResource))
         {
-            Log.WithSuffix(key).Debug(() => $"Resource already exists: {existingResource}, renting it");
+            Log.WithSuffix(key).Debug($"Resource already exists: {existingResource}, renting it");
             if (existingResource.TryRent())
             {
                 return existingResource;
             }
 
-            Log.WithSuffix(key).WithSuffix(existingResource).Debug(() => $"Failed to rent resource, removing it from cache");
+            Log.WithSuffix(key).WithSuffix(existingResource).Debug($"Failed to rent resource, removing it from cache");
             if (!cache.TryRemove(key, out var _))
             {
-                Log.WithSuffix(key).WithSuffix(existingResource).Debug(() => $"Resource was already removed by someone else");
+                Log.WithSuffix(key).WithSuffix(existingResource).Debug($"Resource was already removed by someone else");
             }
             else
             {
-                Log.WithSuffix(key).WithSuffix(existingResource).Debug(() => $"Removed resource");
+                Log.WithSuffix(key).WithSuffix(existingResource).Debug($"Removed resource");
             }
 
             return RentOrAddSession(key, resourceFactory);
         }
-        Log.WithSuffix(key).Debug(() => $"Resource does not exist, creating a new one");
+        Log.WithSuffix(key).Debug($"Resource does not exist, creating a new one");
         var newValue = resourceFactory(key);
             
-        Log.WithSuffix(key).Debug(() => $"Created new resource: {newValue}");
+        Log.WithSuffix(key).Debug($"Created new resource: {newValue}");
         if (!cache.TryAdd(key, newValue))
         {
             throw new ApplicationException($"Something went wrong - failed to add new resource {newValue} for key {key}");

@@ -50,11 +50,11 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
 
         var now = clock.Now;
         var timeSinceBackup = now - lastBackup;
-        Log.Debug(() => $"Configuration file saved, last backup was made {timeSinceBackup} ago");
+        Log.Debug($"Configuration file saved, last backup was made {timeSinceBackup} ago");
 
         if (timeSinceBackup < Properties.BackupTimeout)
         {
-            Log.Debug(() => $"Backup timeout has not passed yet: {timeSinceBackup} < {Properties.BackupTimeout}");
+            Log.Debug($"Backup timeout has not passed yet: {timeSinceBackup} < {Properties.BackupTimeout}");
             return;
         }
 
@@ -67,13 +67,13 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
         {
             if (backupDirectory.Exists)
             {
-                Log.Debug(() => $"Backup directory {backupDirectory} already exists, removing it");
+                Log.Debug($"Backup directory {backupDirectory} already exists, removing it");
                 backupDirectory.Delete(true);
             }
-            Log.Debug(() => $"Creating backup directory {backupDirectory}");
+            Log.Debug($"Creating backup directory {backupDirectory}");
             backupDirectory.Create();
 
-            Log.Debug(() => $"Copying existing configuration to backup, {configFile.FullName} => {backupConfigPath}");
+            Log.Debug($"Copying existing configuration to backup, {configFile.FullName} => {backupConfigPath}");
             configFile.CopyTo(backupConfigPath);
             lastBackup = now;
         }
@@ -94,7 +94,7 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
 
     public bool TryHandleConfigLoadException(FileInfo configFile, out ConfigProviderFromFile.PoeEyeCombinedConfig replacementConfig)
     {
-        Log.Debug(() => $"Creating backup of config {configFile.FullName}");
+        Log.Debug($"Creating backup of config {configFile.FullName}");
         CreateBackupOfConfig(configFile, clock.Now);
         replacementConfig = null;
         return false;
@@ -113,18 +113,18 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
         }
 
         var possibleOldestBackupTimestamp = now - backupStoragePeriod;
-        Log.Debug(() => $"Cleaning up backup storage, period: {backupStoragePeriod} (LastWriteTime <= {possibleOldestBackupTimestamp})");
+        Log.Debug($"Cleaning up backup storage, period: {backupStoragePeriod} (LastWriteTime <= {possibleOldestBackupTimestamp})");
         var obsoleteBackups = backupDirectory
             .EnumerateFiles("*.*", SearchOption.AllDirectories)
             .Where(x => x.LastWriteTime < possibleOldestBackupTimestamp)
             .OrderByDescending(x => x.LastWriteTime)
             .ToArray();
-        Log.Debug(() => $"Backup storage contains {obsoleteBackups.Length} obsolete backups, min storage size: {backupStorageMinSize}");
+        Log.Debug($"Backup storage contains {obsoleteBackups.Length} obsolete backups, min storage size: {backupStorageMinSize}");
         obsoleteBackups = obsoleteBackups.Skip((int)backupStorageMinSize).ToArray();
-        Log.Debug(() => $"Cleaning up {obsoleteBackups.Length} obsolete backups:\r\n\t{obsoleteBackups.Select(x => x.FullName).DumpToString()}");
+        Log.Debug($"Cleaning up {obsoleteBackups.Length} obsolete backups:\r\n\t{obsoleteBackups.Select(x => x.FullName).DumpToString()}");
         foreach (var obsoleteFile in obsoleteBackups)
         {
-            Log.Debug(() => $"Removing file {obsoleteFile}");
+            Log.Debug($"Removing file {obsoleteFile}");
             obsoleteFile.Delete();
             if (obsoleteFile.Directory == null || !obsoleteFile.Directory.Exists)
             {
@@ -133,10 +133,10 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
             obsoleteFile.Directory.Refresh();
             if (obsoleteFile.Directory.GetFiles().Any())
             {
-                Log.Debug(() => $"Directory {obsoleteFile.Directory} still has files, skipping it");
+                Log.Debug($"Directory {obsoleteFile.Directory} still has files, skipping it");
                 continue;
             }
-            Log.Debug(() => $"Removing empty directory {obsoleteFile.Directory}");
+            Log.Debug($"Removing empty directory {obsoleteFile.Directory}");
             obsoleteFile.Directory.Delete(true);
         }
     }
@@ -159,7 +159,7 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
             var corruptedFileName = $"{configFileName}.corrupted.{timestamp:yyyyMMddHHmmss}{configFile.Extension}";
             var backupFilePath = Path.Combine(configFile.DirectoryName!, corruptedFileName);
                 
-            Log.Debug(() => $"Creating a backup of existing config data '{configFile}' to '{backupFilePath}'");
+            Log.Debug($"Creating a backup of existing config data '{configFile}' to '{backupFilePath}'");
             configFile.CopyTo(backupFilePath, true);
         }
         catch (Exception ex)

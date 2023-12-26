@@ -50,15 +50,15 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             .WithPrevious()
             .SubscribeSafe(x =>
             {
-                Log.Debug(() => $"Update source changed: {x}");
+                Log.Debug($"Update source changed: {x}");
                 UpdateSource = x.Current;
             }, Log.HandleUiException)
             .AddTo(Anchors);
             
-        Log.Debug(() => $"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
+        Log.Debug($"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
         RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
         LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
-        Log.Debug(() => $"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
+        Log.Debug($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
         Binder.Attach(this).AddTo(Anchors);
     }
 
@@ -93,9 +93,9 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var progressTracker = new ComplexProgressTracker();
         using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
 
-        Log.Debug(() => $"Verifying update files {updateInfo}");
+        Log.Debug($"Verifying update files {updateInfo}");
         var verificationResult = await mgr.VerifyReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "VerifyRelease"));
-        Log.Debug(() => $"Verification result: {verificationResult}, update: {updateInfo}");
+        Log.Debug($"Verification result: {verificationResult}, update: {updateInfo}");
         return verificationResult;
     }
 
@@ -108,7 +108,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var progressTracker = new ComplexProgressTracker();
         using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
 
-        Log.Debug(() => $"Downloading release, update {updateInfo}");
+        Log.Debug($"Downloading release, update {updateInfo}");
         var downloadedReleases = await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "DownloadRelease"));
         Log.Warn($"Downloaded following releases:\n\t{downloadedReleases.DumpToTable()}");
     }
@@ -117,7 +117,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     {
         Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
 
-        Log.Debug(() => $"Applying update {updateInfo}");
+        Log.Debug($"Applying update {updateInfo}");
 
         using var unused = CreateIsBusyAnchor();
         using var mgr = await CreateManager();
@@ -141,7 +141,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
         else
         {
-            Log.Debug(() => $"Applying releases: {updateInfo}");
+            Log.Debug($"Applying releases: {updateInfo}");
             newVersionFolder = await mgr.ApplyReleases(updateInfo, x => progressTracker.Update(x, applyReleaseTaskName));
         }
 
@@ -171,11 +171,11 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     public async Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry releaseEntry)
     {
-        Log.Debug(() => $"Force update to {new { releaseEntry.Version, releaseEntry.Filename, releaseEntry.Filesize }} requested");
+        Log.Debug($"Force update to {new { releaseEntry.Version, releaseEntry.Filename, releaseEntry.Filesize }} requested");
 
         using var mgr = await CreateManager();
         var updateInfo = await mgr.PrepareUpdate(IgnoreDeltaUpdates, ArraySegment<IReleaseEntry>.Empty, new[] { releaseEntry });
-        Log.Debug(() => $"Force UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
+        Log.Debug($"Force UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
         return updateInfo;
     }
 
@@ -185,15 +185,15 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     /// <returns>True if application was updated</returns>
     public async Task CheckForUpdates()
     {
-        Log.Debug(() => "Update check requested");
+        Log.Debug("Update check requested");
         using var unused = CreateIsBusyAnchor();
         Reset();
 
         using var mgr = await CreateManager();
-        Log.Debug(() => $"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
+        Log.Debug($"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
 
         var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
-        Log.Debug(() => $"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
+        Log.Debug($"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
         LatestUpdate = updateInfo;
     }
 
@@ -210,7 +210,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     private async Task Restart(FileInfo executable)
     {
         using var unused = CreateIsBusyAnchor();
-        Log.Debug(() => $"Starting application @ '{executable.FullName}', args: {appArguments.StartupArgs} ...");
+        Log.Debug($"Starting application @ '{executable.FullName}', args: {appArguments.StartupArgs} ...");
         applicationAccessor.RestartAs(executable.FullName, appArguments.StartupArgs);
     }
 
@@ -220,9 +220,9 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             UpdateSource.Uris,
             async uri =>
             {
-                Log.Debug(() => $"Creating manager for URL {uri}");
+                Log.Debug($"Creating manager for URL {uri}");
                 var manager = await CreateManager(uri);
-                Log.Debug(() => $"Created manager: {manager}");
+                Log.Debug($"Created manager: {manager}");
                 return manager;
             }
         );
@@ -230,7 +230,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     }
     private async Task<IPoeUpdateManager> CreateManager(string updateUrl)
     {
-        Log.Debug(() => $"Using update source: {UpdateSource.Dump()}");
+        Log.Debug($"Using update source: {UpdateSource.Dump()}");
 
         var downloader = new BasicAuthFileDownloader(
             new NetworkCredential(
@@ -238,7 +238,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
                 UpdateSource.Password?.ToUnsecuredString()));
         if (updateUrl.Contains("github"))
         {
-            Log.Debug(() => $"Using GitHub source: {UpdateSource.Dump()}");
+            Log.Debug($"Using GitHub source: {UpdateSource.Dump()}");
 
             var mgr = await PoeUpdateManager.GitHubUpdateManager(
                 updateUrl,
@@ -249,7 +249,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
         else
         {
-            Log.Debug(() => $"Using BasicHTTP source: {UpdateSource.Dump()}");
+            Log.Debug($"Using BasicHTTP source: {UpdateSource.Dump()}");
             var mgr = new PoeUpdateManager(
                 updateUrl, 
                 downloader,
@@ -261,7 +261,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
     private void CheckUpdateProgress(int progressPercent)
     {
-        Log.Debug(() => $"Check update is in progress: {progressPercent}%");
+        Log.Debug($"Check update is in progress: {progressPercent}%");
     }
 
     private IDisposable CreateIsBusyAnchor()

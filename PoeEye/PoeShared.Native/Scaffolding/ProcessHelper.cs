@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +13,7 @@ public class ProcessHelper
 
     public static ProcessRunInfo RunCmdAs(string cmd, string arguments, bool showWindow = false)
     {
-        Log.Info(() => $"Preparing to execute application with admin permissions: {new {cmd, arguments}}");
+        Log.Info($"Preparing to execute application with admin permissions: {new {cmd, arguments}}");
         var startInfo = new ProcessStartInfo
         {
             FileName = cmd,
@@ -31,7 +31,7 @@ public class ProcessHelper
     
     public static ProcessRunInfo RunCmd(string cmd, string arguments, TimeSpan? timeout = null)
     {
-        Log.Info(() => $"Preparing to execute application: {new {cmd, arguments, timeout}}");
+        Log.Info($"Preparing to execute application: {new {cmd, arguments, timeout}}");
 
         var startInfo = new ProcessStartInfo
         {
@@ -90,7 +90,7 @@ public class ProcessHelper
             stderr.Add(eventArgs.Data);
         };
             
-        Log.Info(() => $"Starting process: {processStartInfo.FileName} {process.StartInfo.Arguments}");
+        Log.Info($"Starting process: {processStartInfo.FileName} {process.StartInfo.Arguments}");
         process.Start();
         try
         {
@@ -105,18 +105,18 @@ public class ProcessHelper
         
         if (process.StartInfo.RedirectStandardOutput)
         {
-            log.Info(() => $"Starting to read process output");
+            log.Info($"Starting to read process output");
             process.BeginOutputReadLine();
-            log.Info(() => $"Started reading process output");
+            log.Info($"Started reading process output");
         }
         if (process.StartInfo.RedirectStandardError)
         {
-            log.Info(() => $"Starting to read process errors output");
+            log.Info($"Starting to read process errors output");
             process.BeginErrorReadLine();
-            log.Info(() => $"Started reading process errors output");
+            log.Info($"Started reading process errors output");
         }
         
-        log.Info(() => $"Awaiting {timeout} for process to exit");
+        log.Info($"Awaiting {timeout} for process to exit");
         var processExited = process.WaitForExit(timeout != null ? (int)timeout.Value.TotalMilliseconds : int.MaxValue);
         if (processExited == false)	
         {

@@ -126,14 +126,14 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
         return Observable.Create<Rect>(
             subscriber =>
             {
-                Log.Debug(() => $"Initializing Selection");
+                Log.Debug($"Initializing Selection");
                 if (IsVisible)
                 {
                     subscriber.OnError(new InvalidOperationException("Selection is already in progress"));
                 }
                 IsVisible = true;
                 var selectionAnchors = new CompositeDisposable();
-                Disposable.Create(() => Log.Debug(() => $"Disposing SelectionAnchors")).AddTo(selectionAnchors);
+                Disposable.Create(() => Log.Debug($"Disposing SelectionAnchors")).AddTo(selectionAnchors);
                 Disposable.Create(() => IsVisible = false).AddTo(selectionAnchors);
                 Selection = Rect.Empty;
                 
@@ -143,7 +143,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                         mainWindowTracker.WhenAnyValue(x => x.ActiveProcessId).Where(x => StopWhenAppFocusLost).Where(x => x != CurrentProcessId).Select(x => $"main window lost focus - processId changed"),
                         keyboardEventsSource.WhenKeyDown.Where(x => x.KeyData == Keys.Escape).Do(x => x.Handled = true).Select(x => $"{x.KeyData} pressed"),
                         keyboardEventsSource.WhenMouseDown.Where(x => x.Button != MouseButtons.Left).Do(x => x.Handled = true).Select(x => $"mouse {x.Button} pressed"))
-                    .Do(reason => Log.Info(() => $"Closing SelectionAdorner, reason: {reason}, activeWindow: {mainWindowTracker.ActiveWindowTitle}, activeProcess: {mainWindowTracker.ActiveProcessId}, currentProcess: {CurrentProcessId}"))
+                    .Do(reason => Log.Info($"Closing SelectionAdorner, reason: {reason}, activeWindow: {mainWindowTracker.ActiveWindowTitle}, activeProcess: {mainWindowTracker.ActiveProcessId}, currentProcess: {CurrentProcessId}"))
                     .ObserveOn(uiDispatcher)
                     .SubscribeSafe(subscriber.OnCompleted, Log.HandleUiException)
                     .AddTo(selectionAnchors);

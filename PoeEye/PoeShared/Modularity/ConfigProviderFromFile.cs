@@ -1,4 +1,4 @@
-﻿using System.Reactive;
+using System.Reactive;
 using System.Reactive.Subjects;
 using System.Text;
 using DynamicData;
@@ -25,7 +25,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         IConfigSerializer configSerializer,
         IAppArguments appArguments)
     {
-        Log.Info(() => $"Initializing config provider, profile: {appArguments.Profile}");
+        Log.Info($"Initializing config provider, profile: {appArguments.Profile}");
         MigrateLegacyConfig(appArguments);
         this.configSerializer = configSerializer;
         var candidates = new[]
@@ -36,17 +36,17 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             .Select(x => Path.Combine(x, appArguments.Profile, ConfigFileName))
             .Select(x => new {Path = x, Exists = File.Exists(x)})
             .ToArray();
-        Log.Debug(() => $"Configuration matrix, configuration file name: {ConfigFileName}:\n\t{candidates.DumpToString()}");
+        Log.Debug($"Configuration matrix, configuration file name: {ConfigFileName}:\n\t{candidates.DumpToString()}");
         var existingFilePath = candidates.FirstOrDefault(x => x.Exists);
         if (existingFilePath != null)
         {
             ConfigFilePath = existingFilePath.Path;
-            Log.Info(() => $"Using existing configuration file @ {ConfigFilePath}");
+            Log.Info($"Using existing configuration file @ {ConfigFilePath}");
         }
         else
         {
             ConfigFilePath = candidates.Last().Path;
-            Log.Info(() => $"Configuration file not found, using path {ConfigFilePath}");
+            Log.Info($"Configuration file not found, using path {ConfigFilePath}");
         }
 
         if (string.IsNullOrEmpty(ConfigFilePath))
@@ -63,7 +63,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
     public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
     {
-        Log.Debug(() => $"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToString()}");
+        Log.Debug($"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToString()}");
         strategies.Insert(0, strategy);
         return Disposable.Create(() => strategies.Remove(strategy));
     }
@@ -72,7 +72,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     {
         using (fileLock.Enter())
         {
-            Log.Debug(() => $"Reloading configuration...");
+            Log.Debug($"Reloading configuration...");
             var config = LoadInternal();
 
             config.Items
@@ -83,7 +83,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
                 });
         }
 
-        Log.Debug(() => $"Sending notification about config update");
+        Log.Debug($"Sending notification about config update");
         configHasChanged.OnNext(Unit.Default);
     }
 
@@ -100,7 +100,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         var metaConfig = new PoeEyeCombinedConfig();
         loadedConfigsByType.Items.ToList().ForEach(x => metaConfig.Add(x));
-        Log.Debug(() => $"Saving all configs, metadata: {new {MetadataVersion = metaConfig.Version, Items = metaConfig.Items.Select(x => new {Type = x.GetType()}).ToArray()}.ToString().TakeChars(500)}");
+        Log.Debug($"Saving all configs, metadata: {new {MetadataVersion = metaConfig.Version, Items = metaConfig.Items.Select(x => new {Type = x.GetType()}).ToArray()}.ToString().TakeChars(500)}");
 
         SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
     }
@@ -110,11 +110,11 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         var targetFile = new FileInfo(ConfigFilePath);
         using (fileLock.Enter())
         {
-            Log.Debug(() => $"Saving config to {targetFile}");
+            Log.Debug($"Saving config to {targetFile}");
             SaveToFile(targetFile);
         }
 
-        Log.Debug(() => $"Saved config to {targetFile}, sending notification about config update");
+        Log.Debug($"Saved config to {targetFile}, sending notification about config update");
         configHasChanged.OnNext(Unit.Default);
     }
 
@@ -129,7 +129,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (loadedConfigurationFile == null)
         {
-            Log.Info(() => $"Forcing to load initial configuration from file");
+            Log.Info($"Forcing to load initial configuration from file");
             Reload();
         }
 
@@ -137,7 +137,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (config is PoeConfigMetadata metadata)
         {
-            Log.Debug(() => $"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+            Log.Debug($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
             var serialized = configSerializer.Serialize(metadata);
             if (string.IsNullOrEmpty(serialized))
             {
@@ -160,11 +160,11 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     {
         try
         {
-            Log.Debug(() => $"Saving config to file '{configFilePath}'");
-            Log.Debug(() => $"Serializing config data...");
+            Log.Debug($"Saving config to file '{configFilePath}'");
+            Log.Debug($"Serializing config data...");
             var serializedData = configSerializer.Serialize(config);
 
-            Log.Debug(() => $"Successfully serialized config, got {serializedData.Length} chars");
+            Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
 
             var directoryPath = Path.GetDirectoryName(configFilePath);
             if (directoryPath != null && !Directory.Exists(directoryPath))
@@ -183,31 +183,31 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             var temporaryFile = new FileInfo(temporaryConfigPath);
             var backupFile = new FileInfo(backupConfigPath);
 
-            Log.Debug(() => $"Preparing temporary file '{temporaryFile}'...");
+            Log.Debug($"Preparing temporary file '{temporaryFile}'...");
             if (temporaryFile.Exists)
             {
-                Log.Debug(() => $"Removing previous temporary file '{temporaryFile}'...");
+                Log.Debug($"Removing previous temporary file '{temporaryFile}'...");
                 temporaryFile.Delete();
             }
 
-            Log.Debug(() => $"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
+            Log.Debug($"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
             File.WriteAllText(temporaryConfigPath, serializedData, Encoding.Unicode);
             temporaryFile.Refresh();
-            Log.Debug(() => $"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
+            Log.Debug($"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
 
             if (backupFile.Exists)
             {
-                Log.Debug(() => $"Removing previous backup file {backupFile}");
+                Log.Debug($"Removing previous backup file {backupFile}");
                 backupFile.Delete();
             }
 
             if (configFile.Exists)
             {
-                Log.Debug(() => $"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
+                Log.Debug($"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
                 configFile.MoveTo(backupConfigPath);
             }
 
-            Log.Debug(() => $"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
+            Log.Debug($"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
             temporaryFile.MoveTo(configFilePath);
 
             strategies.ForEach(x => x.HandleConfigSave(new FileInfo(configFilePath)));
@@ -220,13 +220,13 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
     private PoeEyeCombinedConfig LoadInternal()
     {
-        Log.Debug(() => $"Loading config from file '{ConfigFilePath}'");
+        Log.Debug($"Loading config from file '{ConfigFilePath}'");
         loadedConfigsByType.Clear();
         loadedConfigurationFile = string.Empty;
 
         if (!File.Exists(ConfigFilePath))
         {
-            Log.Debug(() => $"File not found, fileName: '{ConfigFilePath}'");
+            Log.Debug($"File not found, fileName: '{ConfigFilePath}'");
             return new PoeEyeCombinedConfig();
         }
 
@@ -235,11 +235,11 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         try
         {
             var fileData = File.ReadAllText(ConfigFilePath);
-            Log.Debug(() => $"Successfully read {fileData.Length} chars, deserializing...");
+            Log.Debug($"Successfully read {fileData.Length} chars, deserializing...");
             loadedConfigurationFile = fileData;
 
             result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
-            Log.Debug(() => $"Successfully deserialized config data");
+            Log.Debug($"Successfully deserialized config data");
         }
         catch (Exception ex)
         {
@@ -250,7 +250,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             {
                 if (strategy.TryHandleConfigLoadException(new FileInfo(ConfigFilePath), out var strategyResult) && strategyResult != null)
                 {
-                    Log.Debug(() => $"Strategy {strategy} has handled exception");
+                    Log.Debug($"Strategy {strategy} has handled exception");
                     result = strategyResult;
                     break;
                 }
@@ -278,11 +278,11 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (string.IsNullOrEmpty(appArguments.Profile))
         {
-            Log.Debug(() => $"Profile is not defined - skipping migration");
+            Log.Debug($"Profile is not defined - skipping migration");
             return;
         }
 
-        Log.Debug(() => $"Checking if legacy config file migration is needed for profile {appArguments.Profile}");
+        Log.Debug($"Checking if legacy config file migration is needed for profile {appArguments.Profile}");
         var configName = appArguments.Profile.ToLower() switch
         {
             "debug" => DebugConfigFileName,
@@ -292,42 +292,42 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
 
         if (string.IsNullOrEmpty(configName))
         {
-            Log.Info(() => $"Non-legacy profile {appArguments.Profile} - skipping migration");
+            Log.Info($"Non-legacy profile {appArguments.Profile} - skipping migration");
             return;
         }
 
         var configFile = new FileInfo(Path.Combine(appArguments.SharedAppDataDirectory, configName));
         if (!configFile.Exists)
         {
-            Log.Info(() => $"Legacy config file {configFile.FullName} does not exist");
+            Log.Info($"Legacy config file {configFile.FullName} does not exist");
             return;
         }
         
         var targetConfigFilePathBackup = Path.ChangeExtension(configFile.FullName, "bak");
         if (File.Exists(targetConfigFilePathBackup))
         {
-            Log.Info(() => $"Cleaning up existing legacy backup config @ {targetConfigFilePathBackup}");
+            Log.Info($"Cleaning up existing legacy backup config @ {targetConfigFilePathBackup}");
             File.Delete(targetConfigFilePathBackup);
         }
 
         var targetConfigFilePath = Path.Combine(appArguments.AppDataDirectory, ReleaseConfigFileName);
-        Log.Info(() => $"Moving legacy config file {configFile.FullName} => {targetConfigFilePath}");
+        Log.Info($"Moving legacy config file {configFile.FullName} => {targetConfigFilePath}");
         if (!Directory.Exists(appArguments.AppDataDirectory))
         {
-            Log.Info(() => $"Creating directory {appArguments.AppDataDirectory}");
+            Log.Info($"Creating directory {appArguments.AppDataDirectory}");
             Directory.CreateDirectory(appArguments.AppDataDirectory);
         }
 
         if (File.Exists(targetConfigFilePath))
         {
-            Log.Info(() => $"Cleaning up existing non-legacy config @ {targetConfigFilePath}");
+            Log.Info($"Cleaning up existing non-legacy config @ {targetConfigFilePath}");
             File.Delete(targetConfigFilePath);
         }
         configFile.MoveTo(targetConfigFilePath);
 
        
         
-        Log.Info(() => $"Migration is completed");
+        Log.Info($"Migration is completed");
     }
 
 

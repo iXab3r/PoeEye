@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using DynamicData;
 using JetBrains.Annotations;
 
@@ -51,7 +51,7 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
         var existingBindingsToRemove = bindings.Items.Where(x => x.TargetPropertyPath.StartsWith(targetPropertyPath)).ToArray();
         if (existingBindingsToRemove.Any())
         {
-            Log.Debug(() => $"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyPath}:\n\t{existingBindingsToRemove.DumpToTable()}");
+            Log.Debug($"Removing bindings(count: {existingBindingsToRemove.Length}) for {targetPropertyPath}:\n\t{existingBindingsToRemove.DumpToTable()}");
             existingBindingsToRemove.ForEach(RemoveBinding);
         }
     }
@@ -59,14 +59,14 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
     /// <inheritdoc />
     public void ClearBindings()
     {
-        Log.Debug(() => $"Clearing bindings, count: {bindings.Count}");
+        Log.Debug($"Clearing bindings, count: {bindings.Count}");
         bindings.Clear();
     }
 
     /// <inheritdoc />
     public IReactiveBinding AddOrUpdateBinding<TSource>(string targetPropertyPath, TSource source, string sourcePropertyPath) where TSource : DisposableReactiveObject
     {
-        Log.Debug(() => $"Adding binding for '{targetPropertyPath}', source path: {sourcePropertyPath}, source: {source}");
+        Log.Debug($"Adding binding for '{targetPropertyPath}', source path: {sourcePropertyPath}, source: {source}");
             
         var sourceWatcher = new PropertyPathWatcher() { Source = source, PropertyPath = sourcePropertyPath };
         var targetWatcher = new PropertyPathWatcher() { Source = this, PropertyPath = targetPropertyPath };
@@ -99,14 +99,14 @@ public abstract class BindableReactiveObject : DisposableReactiveObject, IBindab
     /// <inheritdoc />
     public void RemoveBinding(IReactiveBinding binding)
     {
-        Log.Debug(() => $"Removing binding: {binding}");
+        Log.Debug($"Removing binding: {binding}");
         bindings.Remove(binding);
     }
 
     /// <inheritdoc />
     public void AddOrUpdateBinding(IReactiveBinding binding)
     {
-        Log.Debug(() => $"Adding binding with key {binding.TargetPropertyPath}: {binding}");
+        Log.Debug($"Adding binding with key {binding.TargetPropertyPath}: {binding}");
             
         foreach (var propertyPathPart in IteratePath(binding.TargetPropertyPath))
         {

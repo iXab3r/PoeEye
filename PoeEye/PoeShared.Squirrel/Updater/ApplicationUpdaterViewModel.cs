@@ -143,7 +143,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                 configProvider
                     .ListenTo(x => x.AutoUpdateTimeout)
                     .WithPrevious((prev, curr) => new {prev, curr})
-                    .Do(timeout => Log.Debug(() => $"AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
+                    .Do(timeout => Log.Debug($"AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
                     .Select(
                         timeout => timeout.curr <= TimeSpan.Zero
                             ? Observable.Never<long>()
@@ -153,13 +153,13 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                     .Skip(1),
                 updaterModel
                     .ObservableForProperty(x => x.UpdateSource, skipInitial: true)
-                    .Do(source => Log.Debug(() => $"Update source changed: {source}"))
+                    .Do(source => Log.Debug($"Update source changed: {source}"))
                     .Select(x => new { open = false, silent = false, reason =  $"update source change" }),
                 applicationAccessor.WhenAnyValue(x => x.IsLoaded).Where(x => x).Delay(TimeSpan.FromSeconds(30)).Select(x => new { open = false, silent = false, reason = $"initial tick" }),
                 this.WhenAnyValue(x => x.AutomaticallyDownloadUpdates).Where(x => x).Skip(1).Select(x => new { open = true, silent = false, reason = $"settings changed, {nameof(AutomaticallyDownloadUpdates)} enabled" }),
                 checkForUpdatesCommandSink.Select(_ => new { open = true, silent = false, reason = $"user requested update" }))
             .ObserveOn(uiIdleScheduler)
-            .Do(x => Log.Debug(() => $"Checking for updates: {x}"))
+            .Do(x => Log.Debug($"Checking for updates: {x}"))
             .Where(x => !IsBusy)
             .SubscribeAsync(async x =>
             {
@@ -226,7 +226,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public async Task PrepareForceUpdate(IReleaseEntry targetRelease)
     {
-        Log.Debug(() => $"Force update preparation requested, target: {new { targetRelease.Version, targetRelease.Filename, targetRelease.Filesize }}");
+        Log.Debug($"Force update preparation requested, target: {new { targetRelease.Version, targetRelease.Filename, targetRelease.Filesize }}");
         LatestUpdate = await updaterModel.PrepareForceUpdate(targetRelease);
         updaterModel.Reset();
         SetStatus($"Ready to update to v{LatestVersion}");
@@ -234,7 +234,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     private void ShowUpdaterCommandExecuted(object arg)
     {
-        Log.Debug(() => $"Show updater command executed, arg: {arg}");
+        Log.Debug($"Show updater command executed, arg: {arg}");
         var owner = arg switch
         {
             Window wnd => wnd,
@@ -255,10 +255,10 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             return;
         }
 
-        Log.Debug(() => $"Preparing to open uri {uri}");
+        Log.Debug($"Preparing to open uri {uri}");
         await Task.Run(() =>
         {
-            Log.Debug(() => $"Starting new process for uri: {uri}");
+            Log.Debug($"Starting new process for uri: {uri}");
             var result = new Process {StartInfo = {FileName = uri, UseShellExecute = true}};
             if (!result.Start())
             {
@@ -266,7 +266,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             }
             else
             {
-                Log.Debug(() => $"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
+                Log.Debug($"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
             }
         });
     }
@@ -278,7 +278,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             Log.Debug("Update is already in progress");
             return;
         }
-        Log.Debug(() => $"Update check requested, source: {updaterModel.UpdateSource}");
+        Log.Debug($"Update check requested, source: {updaterModel.UpdateSource}");
         SetStatus("Checking for updates...");
         
         using var isBusyRent = isBusyLatch.Rent();
@@ -334,7 +334,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     private async Task ApplyUpdateCommandExecuted(bool applyRelease)
     {
-        Log.Debug(() => $"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
+        Log.Debug($"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
         if (ApplyUpdateCommand.IsBusy)
         {
             Log.Debug("Already in progress");

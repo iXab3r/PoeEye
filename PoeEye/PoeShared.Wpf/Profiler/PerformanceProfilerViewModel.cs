@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -38,7 +38,7 @@ internal sealed class PerformanceProfilerViewModel : DisposableReactiveObjectWit
         this.messageBoxService = messageBoxService;
         TracesFolder = traceSnapshotReportProvider.TracesFolder;
 
-        Log.Info(() => $"Registering traces report provider");
+        Log.Info($"Registering traces report provider");
         exceptionReportingService.AddReportItemProvider(traceSnapshotReportProvider);
 
         StartProfilingCommand = CommandWrapper.Create(StartProfilingExecuted, this.WhenAnyValue(x => x.IsCollecting).Select(x => IsCollecting == false).ObserveOn(uiScheduler));
@@ -63,23 +63,23 @@ internal sealed class PerformanceProfilerViewModel : DisposableReactiveObjectWit
 
     private async Task TakeMemorySnapshotCommandExecuted()
     {
-        Log.Info(() => $"Saving memory snapshot");
-        Log.Info(() => $"Checking memory profiler prerequisites");
+        Log.Info($"Saving memory snapshot");
+        Log.Info($"Checking memory profiler prerequisites");
         await DotMemory.EnsurePrerequisiteAsync();
-        Log.Info(() => $"Memory profiler prerequisites checked");
+        Log.Info($"Memory profiler prerequisites checked");
         
         EnsureTracesDirectoryExists();
 
-        Log.Info(() => $"Awaiting for data collection start");
+        Log.Info($"Awaiting for data collection start");
         await Task.Run(() =>
         {
             var newSnapshotName = Path.Combine(TracesFolder.FullName, $"Memory-PID{Environment.ProcessId}-{idGenerator.Next()}");
-            Log.Info(() => $"Starting collecting memory data to file {newSnapshotName}");
+            Log.Info($"Starting collecting memory data to file {newSnapshotName}");
             var config = new DotMemory.Config().SaveToFile(newSnapshotName, overwrite: true); 
             var snapshotFilePath = DotMemory.GetSnapshotOnce(config);
-            Log.Info(() => $"Memory profiler returned: {snapshotFilePath}");
+            Log.Info($"Memory profiler returned: {snapshotFilePath}");
             var snapshotFile = new FileInfo(snapshotFilePath);
-            Log.Info(() => $"Detached memory profiler, snapshot: {snapshotFilePath} (exists: {snapshotFile.Exists}, size: {new ByteSize(snapshotFile.Length)})");
+            Log.Info($"Detached memory profiler, snapshot: {snapshotFilePath} (exists: {snapshotFile.Exists}, size: {new ByteSize(snapshotFile.Length)})");
         });
     }
 
@@ -87,30 +87,30 @@ internal sealed class PerformanceProfilerViewModel : DisposableReactiveObjectWit
     {
         if (IsCollecting)
         {
-            Log.Info(() => $"Saving profiler data");
+            Log.Info($"Saving profiler data");
             DotTrace.SaveData();
-            Log.Info(() => $"Awaiting for profiler data archive");
+            Log.Info($"Awaiting for profiler data archive");
             await Task.Run(() =>
             {
-                Log.Info(() => $"Saving profiler data archive");
+                Log.Info($"Saving profiler data archive");
                 var snapshotFilesArchive = DotTrace.GetCollectedSnapshotFilesArchive(true);
-                Log.Info(() => $"Profiler provide the following data archive: {snapshotFilesArchive}");
+                Log.Info($"Profiler provide the following data archive: {snapshotFilesArchive}");
                 var newSnapshotName = Path.Combine(Path.GetDirectoryName(snapshotFilesArchive) ?? string.Empty, $"Performance-PID{Environment.ProcessId}-{Path.GetFileName(snapshotFilesArchive)}");
                 File.Move(snapshotFilesArchive, newSnapshotName);
-                Log.Info(() => $"Snapshot data archive: {newSnapshotName}");
+                Log.Info($"Snapshot data archive: {newSnapshotName}");
             });
             IsCollecting = false; // after SaveData profiler stops collection automatically
         }
 
-        Log.Info(() => $"Awaiting profiler Detach");
+        Log.Info($"Awaiting profiler Detach");
         await Task.Run(() =>
         {
-            Log.Info(() => $"Detaching profiler");
+            Log.Info($"Detaching profiler");
             DotTrace.Detach();
-            Log.Info(() => $"Detached profiler");
+            Log.Info($"Detached profiler");
         });
         IsRunning = false;
-        Log.Info(() => $"Stopped profiling");
+        Log.Info($"Stopped profiling");
     }
 
     private async Task StartProfilingExecuted()
@@ -120,22 +120,22 @@ internal sealed class PerformanceProfilerViewModel : DisposableReactiveObjectWit
             try
             {
                 IsBusy = true;
-                Log.Info(() => $"Checking prerequisites");
+                Log.Info($"Checking prerequisites");
                 await DotTrace.EnsurePrerequisiteAsync();
-                Log.Info(() => $"Prerequisites checked");
+                Log.Info($"Prerequisites checked");
 
                 EnsureTracesDirectoryExists();
                 var config = new DotTrace.Config()
                     .SaveToDir(TracesFolder.FullName);
 
-                Log.Info(() => $"Starting profiling using config: {config}");
+                Log.Info($"Starting profiling using config: {config}");
                 await Task.Run(() =>
                 {
-                    Log.Info(() => $"Attaching profiler");
+                    Log.Info($"Attaching profiler");
                     DotTrace.Attach(config);
-                    Log.Info(() => $"Attached profiler");
+                    Log.Info($"Attached profiler");
                 });
-                Log.Info(() => $"Successfully attached profiler");
+                Log.Info($"Successfully attached profiler");
                 IsRunning = true;
             }
             finally
@@ -144,16 +144,16 @@ internal sealed class PerformanceProfilerViewModel : DisposableReactiveObjectWit
             }
         }
 
-        Log.Info(() => $"Awaiting for data collection start");
+        Log.Info($"Awaiting for data collection start");
         await Task.Run(() =>
         {
-            Log.Info(() => $"Starting collecting data");
+            Log.Info($"Starting collecting data");
             DotTrace.StartCollectingData();
-            Log.Info(() => $"Detached profiler");
-            Log.Info(() => $"Started collecting data");
+            Log.Info($"Detached profiler");
+            Log.Info($"Started collecting data");
         });
         IsCollecting = true;
-        Log.Info(() => $"Started profiling session");
+        Log.Info($"Started profiling session");
     }
 
     private void EnsureTracesDirectoryExists()
@@ -161,11 +161,11 @@ internal sealed class PerformanceProfilerViewModel : DisposableReactiveObjectWit
         TracesFolder.Refresh();
         if (TracesFolder.Exists)
         {
-            Log.Info(() => $"Directory for traces: {TracesFolder.FullName}");
+            Log.Info($"Directory for traces: {TracesFolder.FullName}");
         }
         else
         {
-            Log.Info(() => $"Creating directory for traces: {TracesFolder.FullName}");
+            Log.Info($"Creating directory for traces: {TracesFolder.FullName}");
             TracesFolder.Create();
         }
     }

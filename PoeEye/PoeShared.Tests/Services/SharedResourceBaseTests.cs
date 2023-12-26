@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -215,15 +215,15 @@ public class SharedResourceBaseTests : FixtureBase
         //When
         var task1 = Task.Run(() =>
         {
-            logger.Debug(() => $"Disposing instance {instance}");
+            logger.Debug($"Disposing instance {instance}");
             instance.Dispose();
-            logger.Debug(() => $"Disposed instance {instance}");
+            logger.Debug($"Disposed instance {instance}");
         });
         var task2 = Task.Run(() =>
         {
-            logger.Debug(() => $"Renting instance {instance}");
+            logger.Debug($"Renting instance {instance}");
             var rented = instance.TryRent();
-            logger.Debug(() => $"Rent result: {rented} for instance {instance}");
+            logger.Debug($"Rent result: {rented} for instance {instance}");
             if (instance.RefCount > 0)
             {
                 logger.Debug("Expecting rent to succeed");

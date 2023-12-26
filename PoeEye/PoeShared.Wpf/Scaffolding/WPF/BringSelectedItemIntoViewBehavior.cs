@@ -1,4 +1,4 @@
-﻿using System.Reactive.Disposables;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
@@ -29,7 +29,7 @@ public class BringSelectedItemIntoViewBehavior : Behavior<TreeView>
                 {
                     return;
                 }
-                Log.Debug(() => $"Bringing item into view: {treeViewItem}");
+                Log.Debug($"Bringing item into view: {treeViewItem}");
                 treeViewItem.BringIntoView();
             }, Log.HandleUiException)
             .AddTo(anchors);

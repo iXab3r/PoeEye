@@ -51,7 +51,7 @@ internal sealed class NotificationContainerViewModel : DisposableReactiveObject,
                     
                 if (TimeLeft <= TimeSpan.Zero)
                 {
-                    Log.Debug(() => $"Closing notification - timeout {TimeLeft}");
+                    Log.Debug($"Closing notification - timeout {TimeLeft}");
                     notification.CloseController.Close();
                 }
             })

@@ -1,4 +1,4 @@
-﻿using System.Reactive;
+using System.Reactive;
 using System.Reactive.Subjects;
 using System.Text;
 using DynamicData;
@@ -31,22 +31,22 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
             }
             .Select(x => new DirectoryInfo(x))
             .ToArray();
-        Log.Debug(() => $"Configuration matrix, directories:\n\t{candidates.SelectSafe(x => new { x.FullName, x.Exists }).DumpToString()}");
+        Log.Debug($"Configuration matrix, directories:\n\t{candidates.SelectSafe(x => new { x.FullName, x.Exists }).DumpToString()}");
         var existingDirectory = candidates.FirstOrDefault(x => x.Exists);
         if (existingDirectory != null)
         {
             configDirectory = existingDirectory;
-            Log.Info(() => $"Using existing configuration directory {configDirectory}");
+            Log.Info($"Using existing configuration directory {configDirectory}");
         }
         else
         {
             configDirectory = candidates.Last();
-            Log.Info(() => $"Configuration directory not found, using {configDirectory}");
+            Log.Info($"Configuration directory not found, using {configDirectory}");
         }
 
         if (!configDirectory.Exists)
         {
-            Log.Info(() => $"Creating configuration directory: {configDirectory.FullName}");
+            Log.Info($"Creating configuration directory: {configDirectory.FullName}");
             Directory.CreateDirectory(configDirectory.FullName);
         }
     }
@@ -57,15 +57,15 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
 
     public void Save()
     {
-        Log.Info(() => $"Saving configs(total: {loadedConfigsByType.Count})");
+        Log.Info($"Saving configs(total: {loadedConfigsByType.Count})");
         foreach (var config in loadedConfigsByType.Items)
         {
-            Log.Info(() => $"Saving config of type {config.GetType()}");
+            Log.Info($"Saving config of type {config.GetType()}");
             SaveInternal(config);
-            Log.Info(() => $"Saved config of type {config.GetType()}");
+            Log.Info($"Saved config of type {config.GetType()}");
         }
         
-        Log.Debug(() => $"Saved config, sending notification about config update");
+        Log.Debug($"Saved config, sending notification about config update");
         configHasChanged.OnNext(Unit.Default);
     }
 
@@ -94,7 +94,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
                 return eyeConfig;
             }
 
-            Log.Debug(() => $"Config is not of type {typeof(TConfig)}, but of {existingConfig.GetType()}, attempting to deserialize");
+            Log.Debug($"Config is not of type {typeof(TConfig)}, but of {existingConfig.GetType()}, attempting to deserialize");
             var result = DeserializeIfNeeded<TConfig>(existingConfig);
             loadedConfigsByType.AddOrUpdate(result);
             return GetActualConfig<TConfig>();
@@ -112,12 +112,12 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         {
             return (TConfig) config;
         }
-        Log.Warn(() => $"Supplied config is not of expected type, expected: {typeof(TConfig)}, got: {config.GetType()}");
+        Log.Warn($"Supplied config is not of expected type, expected: {typeof(TConfig)}, got: {config.GetType()}");
         if (config is not PoeConfigMetadata metadata)
         {
             throw new InvalidStateException($"Expected config of type {typeof(TConfig)}, got: {config.GetType()}");
         }
-        Log.Debug(() => $"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+        Log.Debug($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
         var serialized = configSerializer.Serialize(metadata);
         if (string.IsNullOrEmpty(serialized))
         {
@@ -138,11 +138,11 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         var configFilePath = GetConfigFilePath(config);
         try
         {
-            Log.Debug(() => $"Saving config to file '{configFilePath}'");
-            Log.Debug(() => $"Serializing config data...");
+            Log.Debug($"Saving config to file '{configFilePath}'");
+            Log.Debug($"Serializing config data...");
             var serializedData = configSerializer.Serialize(config);
 
-            Log.Debug(() => $"Successfully serialized config, got {serializedData.Length} chars");
+            Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
 
             var directoryPath = Path.GetDirectoryName(configFilePath);
             if (directoryPath != null && !Directory.Exists(directoryPath))
@@ -160,31 +160,31 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
             var temporaryFile = new FileInfo(temporaryConfigPath);
             var backupFile = new FileInfo(backupConfigPath);
 
-            Log.Debug(() => $"Preparing temporary file '{temporaryFile}'...");
+            Log.Debug($"Preparing temporary file '{temporaryFile}'...");
             if (temporaryFile.Exists)
             {
-                Log.Debug(() => $"Removing previous temporary file '{temporaryFile}'...");
+                Log.Debug($"Removing previous temporary file '{temporaryFile}'...");
                 temporaryFile.Delete();
             }
 
-            Log.Debug(() => $"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
+            Log.Debug($"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
             File.WriteAllText(temporaryConfigPath, serializedData, Encoding.Unicode);
             temporaryFile.Refresh();
-            Log.Debug(() => $"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
+            Log.Debug($"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
 
             if (backupFile.Exists)
             {
-                Log.Debug(() => $"Removing previous backup file {backupFile}");
+                Log.Debug($"Removing previous backup file {backupFile}");
                 backupFile.Delete();
             }
 
             if (configFile.Exists)
             {
-                Log.Debug(() => $"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
+                Log.Debug($"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
                 configFile.MoveTo(backupConfigPath);   
             }
                 
-            Log.Debug(() => $"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
+            Log.Debug($"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
             temporaryFile.MoveTo(configFilePath);
         }
         catch (Exception ex)
@@ -212,10 +212,10 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
     private TConfig LoadInternal<TConfig>() where TConfig : new()
     {
         var configFilePath = GetConfigFilePath(typeof(TConfig));
-        Log.Debug(() => $"Loading config from file '{configFilePath}'");
+        Log.Debug($"Loading config from file '{configFilePath}'");
         if (!File.Exists(configFilePath))
         {
-            Log.Debug(() => $"File not found, fileName: '{configFilePath}'");
+            Log.Debug($"File not found, fileName: '{configFilePath}'");
             return new TConfig();
         }
 
@@ -224,10 +224,10 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         try
         {
             var fileData = File.ReadAllText(configFilePath);
-            Log.Debug(() => $"Successfully read {fileData.Length} chars, deserializing...");
+            Log.Debug($"Successfully read {fileData.Length} chars, deserializing...");
 
             result = configSerializer.Deserialize<TConfig>(fileData);
-            Log.Debug(() => $"Successfully deserialized config data");
+            Log.Debug($"Successfully deserialized config data");
         }
         catch (Exception ex)
         {

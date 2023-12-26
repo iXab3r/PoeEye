@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Threading;
 
@@ -32,7 +32,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                 return $"Tmr{name}, {dueTime.TotalMilliseconds:F0}ms, {period.TotalMilliseconds:F0}ms";
             }
         });
-        Log.Debug(() => $"[{this}] Initializing timer");
+        Log.Debug($"[{this}] Initializing timer");
         this.period = period;
         this.amendPeriod = amendPeriod;
         timer = new Timer(Callback, null, dueTime, TimeSpan.FromMilliseconds(-1));
@@ -40,13 +40,13 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
         {
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"[{this}] Disposing - acquiring lock");
+                Log.Debug($"[{this}] Disposing - acquiring lock");
             }
             lock (padlock)
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{this}] Disposing timer {timer}");
+                    Log.Debug($"[{this}] Disposing timer {timer}");
                 }
                 timer?.Dispose();
                 timer = null;
@@ -63,7 +63,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
         {
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"[{this}] Executing timer handler");
+                Log.Debug($"[{this}] Executing timer handler");
             }
                
             lock (padlock)
@@ -72,14 +72,14 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                 {
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug(() => $"[{this}] Callback - timer is already disposed on entry");
+                        Log.Debug($"[{this}] Callback - timer is already disposed on entry");
                     }
                     return;
                 }
 
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{this}] Stopping timer loop temporarily");
+                    Log.Debug($"[{this}] Stopping timer loop temporarily");
                 }
                 timer.Change(Timeout.Infinite, Timeout.Infinite);
             }
@@ -87,12 +87,12 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
             var now = Stopwatch.GetTimestamp();
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"[{this}] Producing OnNext");
+                Log.Debug($"[{this}] Producing OnNext");
             }
             sink.OnNext(cycleIdx++);
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"[{this}] Processed OnNext");
+                Log.Debug($"[{this}] Processed OnNext");
             }
 
             executionTime = TimeSpan.FromSeconds((Stopwatch.GetTimestamp() - now) / (float) Stopwatch.Frequency);
@@ -102,7 +102,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                 {
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug(() => $"[{this}] Callback - timer is already disposed on exit");
+                        Log.Debug($"[{this}] Callback - timer is already disposed on exit");
                     }
                     return;
                 }
@@ -113,7 +113,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                         : period.TotalMilliseconds);
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{this}] Re-arming timer loop, execute in: {executeIn}");
+                    Log.Debug($"[{this}] Re-arming timer loop, execute in: {executeIn}");
                 }
                 timer.Change(executeIn, TimeSpan.Zero);
             }
@@ -130,7 +130,7 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
         {
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"[{this}] Timer handler completed in {executionTime.TotalMilliseconds:F0}ms");
+                Log.Debug($"[{this}] Timer handler completed in {executionTime.TotalMilliseconds:F0}ms");
             }
         }
     }

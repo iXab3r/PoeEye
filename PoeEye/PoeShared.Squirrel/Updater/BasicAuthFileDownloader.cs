@@ -39,7 +39,7 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
         }
         try
         {
-            Log.Debug(() => $"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
+            Log.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
             await wc.DownloadFileTaskAsync(url, targetFile);
             progress(100);
         }
@@ -54,7 +54,7 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
     public async Task<byte[]> DownloadUrl(string url)
     {
         using var wc = CreateClient();
-        Log.Debug(() => $"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
+        Log.Debug($"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
 
         return await wc.DownloadDataTaskAsync(url);
     }

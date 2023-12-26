@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -126,13 +126,13 @@ public class ScrollViewerExtensions
 
         if (Log.IsDebugEnabled)
         {
-            Log.Debug(() => $"Scrolling {scrollViewer} to top...");
+            Log.Debug($"Scrolling {scrollViewer} to top...");
         }
 
         scrollViewer.ScrollToTop();
         if (Log.IsDebugEnabled)
         {
-            Log.Debug(() => $"Resetting value of {nameof(AutoScrollToTopProperty)} of {scrollViewer} to default value...");
+            Log.Debug($"Resetting value of {nameof(AutoScrollToTopProperty)} of {scrollViewer} to default value...");
         }
 
         dependencyObject.SetCurrentValue(AutoScrollToTopProperty, false);

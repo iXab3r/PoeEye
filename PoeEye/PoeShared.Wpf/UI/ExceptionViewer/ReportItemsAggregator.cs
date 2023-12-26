@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reactive.Concurrency;
 using DynamicData;
@@ -28,7 +28,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
         IAppArguments appArguments,
         [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
     {
-        Log.Info(() => $"Report items aggregator initialized, config: {config}");
+        Log.Info($"Report items aggregator initialized, config: {config}");
         if (!config.IsValid)
         {
             throw new ArgumentException($"Provided exception dialog config is not valid: {config}");
@@ -40,7 +40,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
         {
             Log.Debug("Retrieving report items");
             PrepareReportItemsInternal();
-            Log.Debug(() => $"Retrieved {reportItems.Count} report items");
+            Log.Debug($"Retrieved {reportItems.Count} report items");
         }).AddTo(Anchors);
     }
 
@@ -54,7 +54,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
     {
         try
         {
-            Log.Info(() => $"Preparing report items infrastructure");
+            Log.Info($"Preparing report items infrastructure");
             Status = "Preparing infrastructure...";
             var crashReportDirectoryPath = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "reports", $"{appArguments.AppName} {appArguments.Version} {appArguments.Profile} Id{CurrentProcessId} {clock.Now.ToString($"yyyy-MM-dd HHmmss")}"));
             if (crashReportDirectoryPath.Exists)
@@ -63,7 +63,7 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
                 crashReportDirectoryPath.Delete(true);
             }
 
-            Log.Debug(() => $"Creating directory {crashReportDirectoryPath.FullName}");
+            Log.Debug($"Creating directory {crashReportDirectoryPath.FullName}");
             crashReportDirectoryPath.Create();
 
             if (config.Exception != null)
@@ -78,12 +78,12 @@ internal sealed class ReportItemsAggregator : DisposableReactiveObject, IReportI
 
                 try
                 {
-                    Log.Debug(() => $"Getting report item from {reportItemProvider}");
+                    Log.Debug($"Getting report item from {reportItemProvider}");
                     Status = $"Preparing report {providerIdx}/{config.ItemProviders.Length}...";
 
                     foreach (var item in reportItemProvider.Prepare(crashReportDirectoryPath))
                     {
-                        Log.Debug(() => $"Successfully received report item from {reportItemProvider}: {item}");
+                        Log.Debug($"Successfully received report item from {reportItemProvider}: {item}");
                         reportItems.Add(item);
                     }
                 }

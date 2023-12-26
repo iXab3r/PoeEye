@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -242,7 +242,7 @@ internal sealed class WindowHandle : IWindowHandle
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"Failed to wrap Process with Id {ProcessId} - {ex.Message} ({ex.GetType().Name})");
+                    Log.Debug($"Failed to wrap Process with Id {ProcessId} - {ex.Message} ({ex.GetType().Name})");
                 }
             }
             return default;

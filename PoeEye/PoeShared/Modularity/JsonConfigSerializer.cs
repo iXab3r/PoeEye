@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using System.Reactive;
 using System.Reactive.Subjects;
 using System.Runtime.Serialization;
@@ -163,17 +163,17 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
         var log = Log.WithSuffix(metadata);
         if (metadata.Value == null)
         {
-            log.Debug(() => $"Metadata does not contain a value, trying to re-serialize it");
+            log.Debug($"Metadata does not contain a value, trying to re-serialize it");
             var serialized = Serialize(metadata);
             if (string.IsNullOrEmpty(serialized))
             {
                 throw new ApplicationException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
             }
-            log.Debug(() => $"Deserializing metadata again");
+            log.Debug($"Deserializing metadata again");
             var deserialized = Deserialize<PoeConfigMetadata<T>>(serialized);
             if (deserialized.Value != null)
             {
-                log.Debug(() => $"Successfully restored value: {deserialized.Value}");
+                log.Debug($"Successfully restored value: {deserialized.Value}");
                 metadata = deserialized;
             }
             else
@@ -184,13 +184,13 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
             
         if (metadata.Value == null)
         {
-            log.Debug(() => $"Metadata does not contain a valid value, preparing default");
+            log.Debug($"Metadata does not contain a valid value, preparing default");
             var defaultItem = defaultItemFactory(metadata);
-            log.Debug(() => $"Returning default value: {defaultItem}");
+            log.Debug($"Returning default value: {defaultItem}");
             return defaultItem;
         }
 
-        log.Debug(() => $"Returning value: {metadata.Value}");
+        log.Debug($"Returning value: {metadata.Value}");
         return metadata.Value;
     }
     
@@ -216,16 +216,16 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
         public T[] Rent(int minimumLength)
         {
-            Log.Info(() => $"Renting array, min length: {minimumLength}");
+            Log.Info($"Renting array, min length: {minimumLength}");
             var result = new T[minimumLength];
-            Log.Info(() => $"Array rented, requested: {minimumLength}, got: {result.Length}");
+            Log.Info($"Array rented, requested: {minimumLength}, got: {result.Length}");
             return result;
         }
 
         public void Return(T[] array)
         {
-            Log.Info(() => $"Returning array, length: {array.Length}");
-            Log.Info(() => $"Returned array, length: {array.Length}");
+            Log.Info($"Returning array, length: {array.Length}");
+            Log.Info($"Returned array, length: {array.Length}");
         }
     }
 }

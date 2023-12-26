@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -60,12 +60,12 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         this.hookArgs = hookArgs;
         this.bgScheduler = bgScheduler;
         eventDelegate = WinEventDelegateProc;
-        Log.Debug(() => $"New WinEvent hook created");
+        Log.Debug($"New WinEvent hook created");
 
-        Disposable.Create(() => Log.Info(() => $"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
+        Disposable.Create(() => Log.Info($"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
         hookThread = new WorkerThread($"Hook {hookArgs.ToString()}", token => RunHookThread(), autoStart: true).AddTo(Anchors);
         notificationsThread = new WorkerThread($"HookNotifications {hookArgs.ToString()}", token => RunNotificationsThread(), autoStart: true).AddTo(Anchors);
-        Disposable.Create(() => Log.Info(() => $"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
+        Disposable.Create(() => Log.Info($"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
     }
     private IFluentLog Log { get; }
 
@@ -98,7 +98,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"Event hook triggered: {eventHookData}");
+                Log.Debug($"Event hook triggered: {eventHookData}");
             }
 
             unprocessedEvents.Add(eventHookData);
@@ -122,9 +122,9 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
     private void RunHookThread()
     {
-        Log.Info(() => $"Registering the hook");
+        Log.Info($"Registering the hook");
         RegisterHook().AddTo(Anchors);
-        Log.Debug(() => $"Initializing event loop to allow retrieval of hook messages");
+        Log.Debug($"Initializing event loop to allow retrieval of hook messages");
         //Even though GetMessage does not directly retrieve hook notifications,
         //having a message loop running in the thread that set the hook is still important.
         //The message loop maintains the thread in a state that allows the OS to invoke the callback function asynchronously when an event occurs.
@@ -133,7 +133,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
     private void RunNotificationsThread()
     {
-        Log.Info(() => $"Starting up event notifications loop");
+        Log.Info($"Starting up event notifications loop");
         try
         {
             foreach (var eventHookData in unprocessedEvents.GetConsumingEnumerable())
@@ -146,7 +146,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
                     if (Log.IsDebugEnabled)
                     {
-                        Log.Debug(() => $"Raising event hook notification(queue: {unprocessedEvents.Count}): {eventHookData}");
+                        Log.Debug($"Raising event hook notification(queue: {unprocessedEvents.Count}): {eventHookData}");
                     }
 
                     whenWindowEventTriggered.OnNext(eventHookData);
@@ -171,13 +171,13 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         }
         finally
         {
-            Log.Info(() => $"Event notifications loop completed");
+            Log.Info($"Event notifications loop completed");
         }
     }
 
     private IDisposable RegisterHook()
     {
-        Log.Info(() => $"Registering hook");
+        Log.Info($"Registering hook");
             
         var hook = User32.SetWinEventHook(
             hookArgs.EventMin,
@@ -187,7 +187,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             hookArgs.ProcessId,
             hookArgs.ThreadId,
             hookArgs.Flags);
-        Log.Debug(() => $"Hook handle(args: {hookArgs}): {hook.DangerousGetHandle().ToHexadecimal()}");
+        Log.Debug($"Hook handle(args: {hookArgs}): {hook.DangerousGetHandle().ToHexadecimal()}");
 
         if (hook.IsInvalid)
         {
@@ -196,7 +196,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 
         return Disposable.Create(() =>
         {
-            Log.Debug(() => $"Unregistering hook (args: {hookArgs}) {hook.DangerousGetHandle().ToHexadecimal()}");
+            Log.Debug($"Unregistering hook (args: {hookArgs}) {hook.DangerousGetHandle().ToHexadecimal()}");
             hook.DangerousRelease();
         });
     }
@@ -209,7 +209,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         {
             try
             {
-                log.Info(() => $"Event loop started");
+                log.Info($"Event loop started");
                 long messagesProcessed = 0;
                 while(GetMessage(out var msg, IntPtr.Zero, 0, 0 ))
                 {
@@ -217,7 +217,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
                     {
                         if (msg.Message == WM_QUIT)
                         {
-                            log.Info(() => $"Received {nameof(WM_QUIT)}, breaking event loop");
+                            log.Info($"Received {nameof(WM_QUIT)}, breaking event loop");
                             break;
                         }
 
@@ -240,7 +240,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             }
             finally
             {
-                log.Info(() => $"Event hook loop completed");
+                log.Info($"Event hook loop completed");
             }
         }
             

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using PoeShared.Logging;
@@ -44,7 +44,7 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
 
             Log.Debug("Preparing config dump for crash report...");
             var configFromMemoryPath = new FileInfo(Path.Combine(outputDirectory.FullName, "configDump.cfg"));
-            Log.Debug(() => $"Saving configuration to {configFromMemoryPath}");
+            Log.Debug($"Saving configuration to {configFromMemoryPath}");
             configProviderFromFile.SaveToFile(configFromMemoryPath);
             reportItems.Add(new ExceptionReportItem()
             {
@@ -97,7 +97,7 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
             Log.Debug("Preparing config copy for crash report");
 
             var configCopy = new FileInfo(Path.Combine(outputDirectory.FullName, Path.GetFileName(existingConfig)));
-            Log.Debug(() => $"Copying existing configuration to {configCopy}");
+            Log.Debug($"Copying existing configuration to {configCopy}");
             File.Copy(existingConfig, configCopy.FullName);
             reportItems.Add(new ExceptionReportItem()
             {

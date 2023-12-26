@@ -1,4 +1,4 @@
-﻿using Castle.DynamicProxy;
+using Castle.DynamicProxy;
 using PoeShared.Prism;
 using Unity;
 
@@ -31,14 +31,14 @@ internal sealed class CachingProxyFactory : DisposableReactiveObjectWithLogger, 
     /// <inheritdoc />
     public void SetupTimeToLive<T>(TimeSpan timeToLive) where T : class
     {
-        Log.Debug(() => $"Setting TTL of proxy for type {typeof(T)} to {timeToLive}");
+        Log.Debug($"Setting TTL of proxy for type {typeof(T)} to {timeToLive}");
         var interceptor = interceptorByType.GetOrAdd(typeof(T), _ => new CachingInterceptor(Log, clock));
         interceptor.TimeToLive = timeToLive;
     }
 
     private ProxyInfo CreateCachingProxy<T>() where T : class
     {
-        Log.Debug(() => $"Creating new proxy for type {typeof(T)}");
+        Log.Debug($"Creating new proxy for type {typeof(T)}");
         var factory = container.Resolve<IFactory<T>>();
         var result = factory.Create();
         var interceptor = interceptorByType.GetOrAdd(typeof(T), _ => new CachingInterceptor(Log, clock));

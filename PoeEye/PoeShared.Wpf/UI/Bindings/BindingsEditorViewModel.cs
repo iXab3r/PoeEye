@@ -63,16 +63,16 @@ internal sealed class BindingsEditorViewModel : DisposableReactiveObjectWithLogg
     {
         var sourcePath = string.IsNullOrEmpty(ValueSourceExpression) ? TargetProperty : ValueSourceExpression;
         var targetPath = TargetProperty;
-        Log.Debug(() => $"Adding new binding to {Source}: { new { targetPath, Source, sourcePath  } }");
+        Log.Debug($"Adding new binding to {Source}: { new { targetPath, Source, sourcePath  } }");
         var binding = Source.AddOrUpdateBinding(targetPropertyPath: targetPath, source: ValueSource, sourcePropertyPath: sourcePath);
-        Log.Debug(() => $"Added new binding: {binding}");
+        Log.Debug($"Added new binding: {binding}");
     }
     
     private void RemoveBinding(object arg)
     {
         if (arg is string targetPropertyPath)
         {
-            Log.Debug(() => $"Removing binding of {Source}, path: {targetPropertyPath}");
+            Log.Debug($"Removing binding of {Source}, path: {targetPropertyPath}");
             Source.RemoveBinding(targetPropertyPath);
         }
         else

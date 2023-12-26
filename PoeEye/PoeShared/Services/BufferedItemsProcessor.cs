@@ -46,11 +46,11 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
     {
         while (requestsBuffer.Count > Capacity - 1 && requestsBuffer.TryTake(out var removedItem))
         {
-            Log.Debug(() => $"Removed item from the queue(capacity: {Capacity}, item count: {requestsBuffer.Count}): {removedItem}");
+            Log.Debug($"Removed item from the queue(capacity: {Capacity}, item count: {requestsBuffer.Count}): {removedItem}");
         }
 
         var itemToAdd = new ItemUpdateRequest {Item = item, State = state};
-        Log.Debug(() => $"Adding item to the queue(capacity: {Capacity}, item count: {requestsBuffer.Count}): {itemToAdd}");
+        Log.Debug($"Adding item to the queue(capacity: {Capacity}, item count: {requestsBuffer.Count}): {itemToAdd}");
         requestsBuffer.Add(itemToAdd);
         updateSink.OnNext($"Update: {itemToAdd}");
     }
@@ -67,11 +67,11 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
         var changesToProcess = requestsBuffer.Count;
         if (changesToProcess <= 0)
         {
-            Log.Debug(() => $"No changes to flush");
+            Log.Debug($"No changes to flush");
             return;
         }
         
-        Log.Debug(() => $"Processing {changesToProcess} changes:\n\t{requestsBuffer.DumpToTable()}");
+        Log.Debug($"Processing {changesToProcess} changes:\n\t{requestsBuffer.DumpToTable()}");
         var changes = new ItemUpdateRequest[changesToProcess];
         var itemIndex = 0;
         while (requestsBuffer.TryTake(out var itemChange) && itemIndex < changes.Length)
@@ -80,7 +80,7 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
         }
 
         var changesByItem = changes.GroupBy(x => x.Item.Id).ToArray();
-        Log.Debug(() => $"Grouped {changes.Length} changes into {changesByItem.Length} packs");
+        Log.Debug($"Grouped {changes.Length} changes into {changesByItem.Length} packs");
 
         foreach (var grouping in changesByItem)
         {
@@ -120,7 +120,7 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
             }
         }
 
-        Log.Debug(() => $"Processed all changes in {sw.ElapsedMilliseconds}ms");
+        Log.Debug($"Processed all changes in {sw.ElapsedMilliseconds}ms");
     }
 
     private readonly record struct ItemUpdateRequest

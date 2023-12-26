@@ -48,7 +48,7 @@ public sealed class SharedResource<T> : DisposableReactiveObject where T : Share
             var existing = Interlocked.Exchange(ref instance, null);
             if (existing != null)
             {
-                Log.Debug(() => $"Disposing instance of type {typeof(T)}: {existing}");
+                Log.Debug($"Disposing instance of type {typeof(T)}: {existing}");
                 existing.Dispose();
             }
         }).AddTo(Anchors);
@@ -78,7 +78,7 @@ public sealed class SharedResource<T> : DisposableReactiveObject where T : Share
             return instance;
         }
 
-        Log.Debug(() => $"{(instance == null ? $"Initializing new instance of type {typeof(T)}" : $"Re-initializing instance of type {typeof(T)}")}");
+        Log.Debug($"{(instance == null ? $"Initializing new instance of type {typeof(T)}" : $"Re-initializing instance of type {typeof(T)}")}");
         var newInstance = factory();
 
         if (!newInstance.TryRent())
@@ -87,7 +87,7 @@ public sealed class SharedResource<T> : DisposableReactiveObject where T : Share
         }
 
         instance = newInstance;
-        Log.Debug(() => $"Created new instance of type {typeof(T)}: {instance}");
+        Log.Debug($"Created new instance of type {typeof(T)}: {instance}");
 
         return instance;
     }

@@ -129,14 +129,14 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject
     public void CreateShortcutsForExecutable(string exeName, ShortcutLocation locations, bool updateOnly, string programArguments = null,
         string icon = null)
     {
-        Log.Debug(() => $"Setting up shortcuts for {exeName} in {locations}, updateOnly: {updateOnly}, args: {programArguments}");
+        Log.Debug($"Setting up shortcuts for {exeName} in {locations}, updateOnly: {updateOnly}, args: {programArguments}");
         var installHelpers = new ApplyReleasesImpl(RootAppDirectory);
         installHelpers.CreateShortcutsForExecutable(exeName, locations, updateOnly, programArguments, icon);
     }
 
     public void RemoveShortcutsForExecutable(string exeName, ShortcutLocation locations)
     {
-        Log.Debug(() => $"Removing shortcuts for {exeName} in {locations}");
+        Log.Debug($"Removing shortcuts for {exeName} in {locations}");
         var installHelpers = new ApplyReleasesImpl(RootAppDirectory);
         installHelpers.RemoveShortcutsForExecutable(exeName, locations);
     }

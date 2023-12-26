@@ -138,7 +138,7 @@ internal sealed class InstanceChangeDetector<TContext> : DisposableReactiveObjec
                 propertyListener
                     .Subscribe(args =>
                     {
-                        //log.Debug(() => $"Component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
+                        //log.Debug($"Component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
                         observer.OnNext(args);
                     })
                     .AddTo(anchors);
@@ -164,7 +164,7 @@ internal sealed class InstanceChangeDetector<TContext> : DisposableReactiveObjec
                     .Switch()
                     .SubscribeSafe(args =>
                     {
-                        //log.Debug(() => $"Component property of {args.Sender} has notified about changes: {args.EventArgs.PropertyName}, requesting redraw");
+                        //log.Debug($"Component property of {args.Sender} has notified about changes: {args.EventArgs.PropertyName}, requesting redraw");
                         observer.OnNext(args);
                     }, log.HandleException)
                     .AddTo(anchors);
@@ -177,7 +177,7 @@ internal sealed class InstanceChangeDetector<TContext> : DisposableReactiveObjec
                         .Switch()
                         .Subscribe(args =>
                         {
-                            //log.Debug(() => $"Nested component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
+                            //log.Debug($"Nested component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
                             observer.OnNext(args);
                         })
                         .AddTo(anchors);
@@ -193,7 +193,7 @@ internal sealed class InstanceChangeDetector<TContext> : DisposableReactiveObjec
 
     protected static IObservable<EventPattern<PropertyChangedEventArgs>> RaiseOnPropertyChanges(IFluentLog log, INotifyPropertyChanged source)
     {
-        //log.Debug(() => $"Initializing reactive properties of {source}");
+        //log.Debug($"Initializing reactive properties of {source}");
         return Observable.Create<EventPattern<PropertyChangedEventArgs>>(observer =>
         {
             var anchors = new CompositeDisposable();
@@ -201,7 +201,7 @@ internal sealed class InstanceChangeDetector<TContext> : DisposableReactiveObjec
             source.WhenAnyProperty()
                 .SubscribeSafe(args =>
                 {
-                    //log.Debug(() => $"Component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
+                    //log.Debug($"Component property of {args.Sender} has changed: {args.EventArgs.PropertyName}, requesting redraw");
                     observer.OnNext(args);
                 }, log.HandleException)
                 .AddTo(anchors);

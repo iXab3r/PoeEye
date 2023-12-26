@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -169,7 +169,7 @@ public class KeyboardMouseEventsProviderFixture
 
         Task.Run(() =>
         {
-            Log.Debug(() => $"Creating {hooksCount} hooks");
+            Log.Debug($"Creating {hooksCount} hooks");
 
             Enumerable.Range(0, hooksCount).AsParallel()
                 .WithDegreeOfParallelism(hooksCount)
@@ -263,11 +263,11 @@ public class KeyboardMouseEventsProviderFixture
         public IDisposable Create()
         {
             var updatedSubscriptions = Interlocked.Increment(ref subcriptions);
-            Log.Debug(() => $"Resource created, count: {updatedSubscriptions}");
+            Log.Debug($"Resource created, count: {updatedSubscriptions}");
             return Disposable.Create(() =>
             {
                 var updatedSubscriptions = Interlocked.Decrement(ref subcriptions);
-                Log.Debug(() => $"Resource Disposed, count: {updatedSubscriptions}");
+                Log.Debug($"Resource Disposed, count: {updatedSubscriptions}");
             });
         }
     }

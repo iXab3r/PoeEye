@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -31,7 +31,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     static WindowViewModelBase()
     {
-        Binder.BindAction(x => x.Log.Info(() => $"Title updated to {x.Title}"));
+        Binder.BindAction(x => x.Log.Info($"Title updated to {x.Title}"));
 
         Binder.BindIf(x => x.WindowController != null, x => x.TargetAspectRatio).To((x, v) => x.WindowController.Window.TargetAspectRatio = v);
         Binder.BindIf(x => x.WindowController != null, x => x.SizeToContent).To((x, v) => x.WindowController.Window.SizeToContent = v);
@@ -65,7 +65,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
         dpi = this.WhenAnyValue(x => x.WindowController).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.WhenAnyValue(y => y.Window.Dpi))
             .Switch()
-            .Do(x => Log.Debug(() => $"DPI updated to {x}"))
+            .Do(x => Log.Debug($"DPI updated to {x}"))
             .ToProperty(this, x => x.Dpi)
             .AddTo(Anchors);
 
@@ -79,9 +79,9 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             .Subscribe(x =>
             {
                 // always on UI thread
-                //Log.Debug(() => $"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+                //Log.Debug($"Updating {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
                 NativeBounds = x.ActualBounds;
-                //Log.Debug(() => $"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
+                //Log.Debug($"Updated {nameof(NativeBounds)}: {NativeBounds} => {x.ActualBounds}");
             })
             .AddTo(Anchors);
 
@@ -93,9 +93,9 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             {
                 // always on UI thread, possible recursive assignment
                 var overlayBounds = x.Window.NativeBounds;
-                //Log.Debug(() => $"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+                //Log.Debug($"Updating Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
                 x.Window.NativeBounds = x.DesiredBounds;
-                //Log.Debug(() => $"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
+                //Log.Debug($"Updated Overlay {nameof(NativeBounds)}: {overlayBounds} => {x}");
             })
             .AddTo(Anchors);
 
@@ -174,14 +174,14 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
         if (WindowController != null)
         {
-            Log.Info(() => $"Re-assigning overlay window: {WindowController} => {owner}");
+            Log.Info($"Re-assigning overlay window: {WindowController} => {owner}");
         }
         else
         {
-            Log.Info(() => $"Assigning overlay window: {owner}");
+            Log.Info($"Assigning overlay window: {owner}");
         }
 
-        Log.Info(() => $"Syncing window parameters with view model");
+        Log.Info($"Syncing window parameters with view model");
         WinRect initialBounds;
         if (NativeBounds.IsNotEmptyArea())
         {
@@ -193,7 +193,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         }
         owner.Window.NativeBounds = initialBounds;
         WindowController = owner;
-        Log.Info(() => $"Overlay window is assigned: {WindowController}");
+        Log.Info($"Overlay window is assigned: {WindowController}");
     }
 
     public DispatcherOperation BeginInvoke(Action dispatcherAction)

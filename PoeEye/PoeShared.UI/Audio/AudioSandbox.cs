@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Threading;
@@ -91,7 +91,7 @@ internal sealed class AudioSandbox : DisposableReactiveObjectWithLogger
             .Switch()
             .Subscribe(x =>
             {
-                Log.Debug(() => $"New buffer received: {x}");
+                Log.Debug($"New buffer received: {x}");
                 bufferedWaveProvider.AddSamples(x.Buffer, 0, x.BufferLength);
 
                 if (bufferedWaveProvider.BufferedDuration > bufferDuration)

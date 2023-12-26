@@ -73,7 +73,7 @@ internal sealed class PoeConfigConverter : JsonConverter
         var metadata = DeserializeMetadata(reader, serializedType, serializer);
         if (metadata == null)
         {
-            Log.Warn(() => $"Failed to convert type {serializedType}, returning empty object instead");
+            Log.Warn($"Failed to convert type {serializedType}, returning empty object instead");
             return null;
         }
 
@@ -86,7 +86,7 @@ internal sealed class PoeConfigConverter : JsonConverter
         var innerType = AssemblyHelper.Instance.ResolveType(metadata);
         if (innerType == null)
         {
-            Log.Warn(() => $"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {metadata.AssemblyName}, returning wrapper object {new { metadata.TypeName, metadata.Version }}");
+            Log.Warn($"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {metadata.AssemblyName}, returning wrapper object {new { metadata.TypeName, metadata.Version }}");
             return metadata;
         }
             
@@ -163,13 +163,13 @@ internal sealed class PoeConfigConverter : JsonConverter
 
         var valueFactory = new Func<IPoeEyeConfigVersioned>(() => (IPoeEyeConfigVersioned) Activator.CreateInstance(resolvedValueType));
         var innerTypeSample = VersionedConfigByType.GetOrAdd(resolvedValueType, _ => valueFactory());
-        Log.Debug(() => $"Validating config of type {resolvedValueType}, metadata version: {metadata.Version}, loaded in-memory version: {innerTypeSample.Version}");
+        Log.Debug($"Validating config of type {resolvedValueType}, metadata version: {metadata.Version}, loaded in-memory version: {innerTypeSample.Version}");
         if (innerTypeSample.Version == metadata.Version)
         {
             return DeserializeFromToken(metadata.ConfigValue, serializer, resolvedValueType);
         }
 
-        Log.Warn(() => $"Config {metadata.TypeName} version {metadata.Version} is greater than expected: {innerTypeSample.Version}");
+        Log.Warn($"Config {metadata.TypeName} version {metadata.Version} is greater than expected: {innerTypeSample.Version}");
 
         if (innerTypeSample.Version < metadata.Version)
         {
@@ -181,14 +181,14 @@ internal sealed class PoeConfigConverter : JsonConverter
             };
         }
 
-        Log.Warn(() => $"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
+        Log.Warn($"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
         if (metadata.Version != null)
         {
-            Log.Debug(() => $"Looking up converter {metadata.TypeName} (v{metadata.Version}) => {resolvedValueType.FullName} (v{innerTypeSample.Version})");
+            Log.Debug($"Looking up converter {metadata.TypeName} (v{metadata.Version}) => {resolvedValueType.FullName} (v{innerTypeSample.Version})");
                     
             if (migrationService.TryGetConverter(resolvedValueType, metadata.Version.Value, innerTypeSample.Version, out var converterKvp))
             {
-                Log.Debug(() => $"Found converter {converterKvp.Key}");
+                Log.Debug($"Found converter {converterKvp.Key}");
                 var sourceMetadata = new PoeConfigMetadata()
                 {
                     TypeName = converterKvp.Key.SourceType.FullName,
@@ -197,18 +197,18 @@ internal sealed class PoeConfigConverter : JsonConverter
                 };
 
                 var convertedValue = DeserializeMetadataValue(sourceMetadata, serializer, converterKvp.Key.SourceType);
-                Log.Debug(() => $"Deserialized config v{metadata.Version} into interim value of type {converterKvp.Key.SourceType} v{sourceMetadata.Version}");
+                Log.Debug($"Deserialized config v{metadata.Version} into interim value of type {converterKvp.Key.SourceType} v{sourceMetadata.Version}");
                 try
                 {
                     var result = converterKvp.Converter(convertedValue);
-                    Log.Info(() => $"Successfully used converter {converterKvp.Key}");
+                    Log.Info($"Successfully used converter {converterKvp.Key}");
                     if (result is IPoeEyeConfigVersioned versioned)
                     {
                         // realistically, this should always be the case
-                        Log.Info(() => $"Bumping up version in metadata after converter {converterKvp.Key}: {metadata.Version} => {versioned.Version}");
+                        Log.Info($"Bumping up version in metadata after converter {converterKvp.Key}: {metadata.Version} => {versioned.Version}");
                         if (versioned.Version != converterKvp.Key.TargetVersion)
                         {
-                            Log.Warn(() => $"Something is off - expected that converter {converterKvp.Key} will convert version {metadata.Version} to {converterKvp.Key.TargetVersion}, but got {versioned.Version}");
+                            Log.Warn($"Something is off - expected that converter {converterKvp.Key} will convert version {metadata.Version} to {converterKvp.Key.TargetVersion}, but got {versioned.Version}");
                         }
                         metadata.Version = versioned.Version;
                     }
@@ -226,7 +226,7 @@ internal sealed class PoeConfigConverter : JsonConverter
             }
         }
                 
-        Log.Warn(() => $"Using default of {resolvedValueType} v{innerTypeSample.Version} instead of {metadata}");
+        Log.Warn($"Using default of {resolvedValueType} v{innerTypeSample.Version} instead of {metadata}");
         return valueFactory();
 
     }

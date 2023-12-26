@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 using CommandLine;
@@ -206,7 +206,7 @@ public static class ObjectExtensions
         {
             if (Log.IsDebugEnabled)
             {
-                Log.Debug(() => $"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}");
+                Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}");
             }
         }
     }

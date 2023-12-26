@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +20,7 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
 
     public void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
     {
-        Log.Info(() => $"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+        Log.Info($"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
 
         var uniqueFiles = filesToAdd.Select(x => x.FullName).ToHashSet();
         if (uniqueFiles.Count != filesToAdd.Count)
@@ -44,7 +44,7 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
             throw new FileNotFoundException($"Could not add/update archive {outputFileName} - file not found after operation");
         }
             
-        Log.Info(() => $"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
+        Log.Info($"Created/updated archive {outputFileName}, size: {outputFileName.Length}b");
     }
 
     public void ExtractArchive(
@@ -56,10 +56,10 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
 
     public void ExtractArchive(SevenZipExtractArguments arguments)
     {
-        Log.Info(() => $"Extracting archive, args: {arguments}");
+        Log.Info($"Extracting archive, args: {arguments}");
         if (!arguments.OutputDirectory.Exists)
         {
-            Log.Info(() => $"Creating output directory {arguments.OutputDirectory}");
+            Log.Info($"Creating output directory {arguments.OutputDirectory}");
             arguments.OutputDirectory.Create();
         }
 
@@ -73,7 +73,7 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
         };
         processStartInfo.Arguments = args.JoinStrings(" ");
         ProcessHelper.RunCmd(processStartInfo);
-        Log.Info(() => $"Output directory contains following files: {arguments.OutputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+        Log.Info($"Output directory contains following files: {arguments.OutputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
     }
 
     private static ProcessStartInfo PrepareProcessStartInfo()

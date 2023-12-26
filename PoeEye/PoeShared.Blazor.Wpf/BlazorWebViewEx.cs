@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -77,7 +77,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 
     private void CoreWebView2OnPermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
     {
-        Log.Debug(() => $"Permission requested: {e.PermissionKind}, state: {e.State}");
+        Log.Debug($"Permission requested: {e.PermissionKind}, state: {e.State}");
         e.State = CoreWebView2PermissionState.Allow;
     }
 

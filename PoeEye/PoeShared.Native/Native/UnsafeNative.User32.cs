@@ -268,7 +268,7 @@ public partial class UnsafeNative
             return Disposable.Empty;
         }
         log = log.WithSuffix($"{threadIdAttach} => {threadIdAttachTo}");
-        log.Debug(() => $"Attaching thread input of thread {threadIdAttach} to thread {threadIdAttachTo}");
+        log.Debug($"Attaching thread input of thread {threadIdAttach} to thread {threadIdAttachTo}");
         if (!User32.AttachThreadInput(threadIdAttach, threadIdAttachTo, true))
         {
             var error = new Win32Exception();
@@ -278,7 +278,7 @@ public partial class UnsafeNative
 
         return Disposable.Create(() =>
         {
-            log.Debug(() => $"Detaching thread input");
+            log.Debug($"Detaching thread input");
             if (!User32.AttachThreadInput(threadIdAttach, threadIdAttachTo, false))
             {
                 var error = new Win32Exception();
@@ -291,7 +291,7 @@ public partial class UnsafeNative
     private static IDisposable AttachThreadInput(IWindowHandle hwnd)
     {
         var log = Log.WithSuffix(hwnd);
-        log.Debug(() => $"Resolving target window threadId");
+        log.Debug($"Resolving target window threadId");
         var targetThreadId = hwnd.ThreadId;
         if (targetThreadId <= 0)
         {
@@ -301,10 +301,10 @@ public partial class UnsafeNative
         }
 
         var currentThreadId = Kernel32.GetCurrentThreadId();
-        log.Debug(() => $"Resolved window threadId: {currentThreadId}, current threadId: {currentThreadId}");
+        log.Debug($"Resolved window threadId: {currentThreadId}, current threadId: {currentThreadId}");
         if (targetThreadId == currentThreadId)
         {
-            log.Debug(() => $"Attachment is not needed - we're already on thread {targetThreadId}");
+            log.Debug($"Attachment is not needed - we're already on thread {targetThreadId}");
             return Disposable.Empty;
         }
 

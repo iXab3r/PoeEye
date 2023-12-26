@@ -147,7 +147,7 @@ public class AppArguments : AppOptions, IAppArguments
 
     private static bool Parse(AppOptions instance, string[] args)
     {
-        Log.Info(() => $"Parsing command line args: {args.DumpToString()}");
+        Log.Info($"Parsing command line args: {args.DumpToString()}");
         var parser = new Parser(
             settings =>
             {
@@ -155,19 +155,19 @@ public class AppArguments : AppOptions, IAppArguments
                 settings.IgnoreUnknownArguments = true;
                 settings.ParsingCulture = CultureInfo.InvariantCulture;
             });
-        Log.Info(() => $"Command line parser settings: {parser.Settings.Dump()}");
+        Log.Info($"Command line parser settings: {parser.Settings.Dump()}");
         var result = parser.ParseArguments<AppOptions>(args ?? Array.Empty<string>());
-        Log.Info(() => $"Command line parsing result: {result.Tag}, type: {result}");
+        Log.Info($"Command line parsing result: {result.Tag}, type: {result}");
         switch (result)
         {
             case Parsed<AppOptions> parsedResult:
                 parsedResult.Value.CopyPropertiesTo(instance);
                 return true;
             case NotParsed<AppOptions> notParsed:
-                Log.Warn(() => $"Parsing failed:\n\t{notParsed.Errors.DumpToTable()}");
+                Log.Warn($"Parsing failed:\n\t{notParsed.Errors.DumpToTable()}");
                 return false;
             default:
-                Log.Warn(() => $"Parsing failed due to unknown error in parser: {result}");
+                Log.Warn($"Parsing failed due to unknown error in parser: {result}");
                 return false;
         } 
     }

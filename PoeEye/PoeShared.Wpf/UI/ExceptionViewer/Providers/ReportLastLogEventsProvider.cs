@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
@@ -39,7 +39,7 @@ internal sealed class ReportLastLogEventsProvider : DisposableReactiveObject, IE
 
         var head = lastEvents.Front();
         var tail = lastEvents.Back();
-        Log.Debug(() => $"Saving log dump to {lastLogEvents} [{head.TimeStamp};{tail.TimeStamp}]");
+        Log.Debug($"Saving log dump to {lastLogEvents} [{head.TimeStamp};{tail.TimeStamp}]");
         using (var rw = lastLogEvents.OpenWrite())
         using (var writer = new StreamWriter(rw))
         {

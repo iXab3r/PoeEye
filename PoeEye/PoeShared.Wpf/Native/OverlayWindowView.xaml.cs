@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -27,7 +27,7 @@ public partial class OverlayWindowView
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
     {
-        Log.Debug(() => $"Window size changed");
+        Log.Debug($"Window size changed");
 
         var window = sender as Window;
         var windowViewModel = window?.DataContext as WindowContainerBase<IOverlayViewModel>;

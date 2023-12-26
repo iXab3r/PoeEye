@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -55,7 +55,7 @@ internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IE
             var destinationFileName = Path.Combine(outputDirectory.FullName, snapshotFileName);
             try
             {
-                Log.Debug(() => $"Copying {snapshotFile.FullName} ({snapshotFile.Length}b) to {destinationFileName}");
+                Log.Debug($"Copying {snapshotFile.FullName} ({snapshotFile.Length}b) to {destinationFileName}");
 
                 var destinationDirectory = Path.GetDirectoryName(destinationFileName);
                 if (destinationDirectory == null)
@@ -106,7 +106,7 @@ internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IE
             var destinationFileName = Path.Combine(outputDirectory.FullName, snapshotFileName);
             try
             {
-                Log.Debug(() => $"Copying {snapshotFile.FullName} ({snapshotFile.Length}b) to {destinationFileName}");
+                Log.Debug($"Copying {snapshotFile.FullName} ({snapshotFile.Length}b) to {destinationFileName}");
 
                 var destinationDirectory = Path.GetDirectoryName(destinationFileName);
                 if (destinationDirectory == null)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using NAudio.CoreAudioApi;
@@ -49,7 +49,7 @@ internal sealed class ProcessAudioController : DisposableReactiveObjectWithLogge
     {
         SetIsMuted((sessionControl, volumeController) =>
         {
-            Log.Info(() => $"Matched process {sessionControl.GetProcessID}, setting {nameof(SimpleAudioVolume.Mute)} to {isMuted} using {volumeController}");
+            Log.Info($"Matched process {sessionControl.GetProcessID}, setting {nameof(SimpleAudioVolume.Mute)} to {isMuted} using {volumeController}");
             volumeController.Mute = isMuted;
         }, processId);
     }

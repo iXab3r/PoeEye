@@ -27,7 +27,7 @@ internal sealed class SingleGlobalInstance : IDisposable, IEnableLogger
         var st = new Stopwatch();
         st.Start();
 
-        Log.Debug(() => $"Acquiring update lock @ {path}");
+        Log.Debug($"Acquiring update lock @ {path}");
         var fh = default(FileStream);
         while (st.Elapsed < timeOut)
         {
@@ -54,7 +54,7 @@ internal sealed class SingleGlobalInstance : IDisposable, IEnableLogger
         handle = Disposable.Create(
             () =>
             {
-                Log.Debug(() => $"Releasing update lock @ {path}");
+                Log.Debug($"Releasing update lock @ {path}");
                 fh.Dispose();
                 File.Delete(path);
             });

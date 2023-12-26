@@ -14,7 +14,7 @@ internal sealed class ShBrowseForFolderDialog : DisposableReactiveObjectWithLogg
 
     public DirectoryInfo ShowDialog()
     {
-        Log.Info(() => $"Showing Open folder dialog, parameters: {new {Title, InitialDirectory, LastDirectory = SelectedPath}}");
+        Log.Info($"Showing Open folder dialog, parameters: {new {Title, InitialDirectory, LastDirectory = SelectedPath}}");
 
         var parentWindow = User32.GetForegroundWindow();
         var bi = new BROWSEINFO
@@ -40,7 +40,7 @@ internal sealed class ShBrowseForFolderDialog : DisposableReactiveObjectWithLogg
         }
 
         SelectedPath = path.ToString();
-        Log.Info(() => $"User has selected folder {SelectedPath}");
+        Log.Info($"User has selected folder {SelectedPath}");
         InitialDirectory = Path.GetDirectoryName(SelectedPath);
 
         return string.IsNullOrEmpty(SelectedPath) ? null : new DirectoryInfo(SelectedPath);

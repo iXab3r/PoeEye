@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Polly;
 
 namespace PoeShared.Services;
@@ -19,10 +19,10 @@ public sealed class FileLock : DisposableReactiveObject
         LockFile = lockFile;
         Timeout = timeout;
         ExistedInitially = Exists;
-        Log.Debug(() => $"Preparing lock file, existed since start: {ExistedInitially}");
+        Log.Debug($"Preparing lock file, existed since start: {ExistedInitially}");
         fileStream = PrepareLockFileSafe(Log, LockFile.FullName, Timeout).AddTo(Anchors);
         Disposable.Create(() => CleanupLockFile(Log, LockFile.FullName)).AddTo(Anchors);
-        Log.Debug(() => $"File lock created successfully");
+        Log.Debug($"File lock created successfully");
     }
         
     private IFluentLog Log { get; }
@@ -46,11 +46,11 @@ public sealed class FileLock : DisposableReactiveObject
 
     private static void CleanupLockFile(IFluentLog log, string lockFilePath)
     {
-        log.Debug(() => $"Preparing to remove lock file: {lockFilePath}");
+        log.Debug($"Preparing to remove lock file: {lockFilePath}");
         var lockFileExists = File.Exists(lockFilePath);
         if (lockFileExists)
         {
-            log.Info(() => $"Removing lock file {lockFilePath}");
+            log.Info($"Removing lock file {lockFilePath}");
             File.Delete(lockFilePath);
         }
         else
@@ -64,7 +64,7 @@ public sealed class FileLock : DisposableReactiveObject
         }
         else
         {
-            log.Info(() => $"Removed lock file {lockFilePath}");
+            log.Info($"Removed lock file {lockFilePath}");
         }
     }
 
@@ -88,7 +88,7 @@ public sealed class FileLock : DisposableReactiveObject
     
     private static Stream PrepareLockFile(IFluentLog log, string lockFilePath)
     {
-        log.Debug(() => $"Creating lock file: {lockFilePath}");
+        log.Debug($"Creating lock file: {lockFilePath}");
         var lockFileData = $"pid: {CurrentProcess.Id}, start time: {CurrentProcess.StartTime}";
         var lockFile = new FileInfo(lockFilePath);
         if (lockFile.Directory == null)
@@ -97,12 +97,12 @@ public sealed class FileLock : DisposableReactiveObject
         }
         if (!lockFile.Directory.Exists)
         {
-            log.Debug(() => $"Creating directory for lock file: {lockFile.Directory.FullName}");
+            log.Debug($"Creating directory for lock file: {lockFile.Directory.FullName}");
             lockFile.Directory.Create();
         }
         var lockFileStream = new FileStream(lockFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
         var lockFileWriter = new StreamWriter(lockFileStream);
-        log.Debug(() => $"Filling lock file with data: {lockFileData}");
+        log.Debug($"Filling lock file with data: {lockFileData}");
         lockFileWriter.Write(lockFileStream);
         return lockFileStream;
     }

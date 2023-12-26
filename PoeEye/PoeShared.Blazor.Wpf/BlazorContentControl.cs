@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -147,7 +147,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             {
                 using var rent = isBusyLatch.Rent();
 
-                Log.Debug(() => $"Reloading control, new content type: {state.viewType}");
+                Log.Debug($"Reloading control, new content type: {state.viewType}");
 
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 WebView.FileProvider.FilesByName.Clear();
@@ -197,7 +197,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     var additionalFiles = repositoryAdditionalFiles.Concat(controlAdditionalFiles).ToArray();
                     if (additionalFiles.Any())
                     {
-                        Log.Debug(() => $"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
+                        Log.Debug($"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
                         foreach (var file in additionalFiles)
                         {
                             if (file is RefFileInfo)

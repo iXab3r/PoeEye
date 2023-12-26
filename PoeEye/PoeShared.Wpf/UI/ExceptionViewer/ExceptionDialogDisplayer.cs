@@ -53,7 +53,7 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
 
     private void ShowMessageBox(ExceptionDialogConfig config)
     {
-        Log.Debug(() => $"Showing MessageBox, exception: {config.Exception}, config: {config}");
+        Log.Debug($"Showing MessageBox, exception: {config.Exception}, config: {config}");
 
         Window owner = null;
         var appWindow = Application.Current.MainWindow;
@@ -94,13 +94,13 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
             {
                 Log.Warn("Exception occurred on non-UI thread, rescheduling to UI");
                 appDispatcher.Invoke(() => ShowExceptionViewer(config), DispatcherPriority.Send);
-                Log.Debug(() => $"Sent signal to UI thread to report crash related to exception {config.Exception.Message}");
+                Log.Debug($"Sent signal to UI thread to report crash related to exception {config.Exception.Message}");
                 return;
             }
 
-            Log.Info(() => $"Acquiring dialog lock");
+            Log.Info($"Acquiring dialog lock");
             using var @lock = dialogLock.Enter();
-            Log.Info(() => $"Showing custom ExceptionViewer, exception: {config.Exception}, config: {new { config.Title, config.AppName, config.Timestamp, config.Exception }}");
+            Log.Info($"Showing custom ExceptionViewer, exception: {config.Exception}, config: {new { config.Title, config.AppName, config.Timestamp, config.Exception }}");
 
             var windowAnchors = new CompositeDisposable();
             Window window = null;
@@ -121,7 +121,7 @@ internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExce
                 Disposable.Create(
                         () =>
                         {
-                            Log.Debug(() => $"Closing ExceptionViewer, value: {config.Exception}");
+                            Log.Debug($"Closing ExceptionViewer, value: {config.Exception}");
                             window.Close();
                         })
                     .AddTo(windowAnchors);

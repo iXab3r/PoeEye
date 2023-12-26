@@ -1,4 +1,4 @@
-﻿using System.Reactive.Disposables;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -35,7 +35,7 @@ public class BringSelectedItemIntoViewBehaviorForSelector : Behavior<Selector>
                 {
                     return;
                 }
-                Log.Debug(() => $"Bringing item into view: {selectedItem}");
+                Log.Debug($"Bringing item into view: {selectedItem}");
                 frameworkElement.BringIntoView();
             }, Log.HandleUiException)
             .AddTo(anchors);

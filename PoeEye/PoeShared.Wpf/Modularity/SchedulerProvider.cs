@@ -47,13 +47,13 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
     public IScheduler GetOrAdd(string name)
     {
-        Log.Debug(() => $"Retrieving scheduler {name}");
+        Log.Debug($"Retrieving scheduler {name}");
         return schedulers.GetOrAdd(name, x => CreateDispatcherScheduler(name, ThreadPriority.Normal));
     }
 
     public bool TryGet(string name, out IScheduler scheduler)
     {
-        Log.Debug(() => $"Trying to retrieve scheduler {name}");
+        Log.Debug($"Trying to retrieve scheduler {name}");
         var result = schedulers.TryGetValue(name, out scheduler);
         if (result)
         {
@@ -108,7 +108,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     {
         Guard.ArgumentNotNull(name, nameof(name));
 
-        Log.WithSuffix(name).Debug(() => $"Creating new enforced thread scheduler");
+        Log.WithSuffix(name).Debug($"Creating new enforced thread scheduler");
         return new EnforcedThreadScheduler(name, priority);
     }
 
@@ -116,7 +116,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     {
         Guard.ArgumentNotNull(name, nameof(name));
 
-        Log.WithSuffix(name).Debug(() => $"Creating new dispatcher");
+        Log.WithSuffix(name).Debug($"Creating new dispatcher");
         var consumer = new TaskCompletionSource<DispatcherScheduler>();
         var dispatcherThread = new Thread(InitializeDispatcherThread)
         {
@@ -125,9 +125,9 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
             IsBackground = true
         };
         dispatcherThread.SetApartmentState(ApartmentState.STA);
-        Log.WithSuffix(name).Debug(() => $"Starting dispatcher thread");
+        Log.WithSuffix(name).Debug($"Starting dispatcher thread");
         dispatcherThread.Start(consumer);
-        Log.WithSuffix(name).Debug(() => $"Dispatcher thread started");
+        Log.WithSuffix(name).Debug($"Dispatcher thread started");
         return consumer.Task.Result;
     }
 
@@ -147,7 +147,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         {
             Log.Debug("Dispatcher thread started");
             var dispatcher = Dispatcher.CurrentDispatcher;
-            Log.Debug(() => $"Dispatcher: {dispatcher}");
+            Log.Debug($"Dispatcher: {dispatcher}");
             var scheduler = new DispatcherScheduler(dispatcher);
             using var anchors = new CompositeDisposable();
             Observable
@@ -180,7 +180,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
                     h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs), Log.HandleUiException)
                 .AddTo(anchors);
-            Log.Debug(() => $"Scheduler: {dispatcher}");
+            Log.Debug($"Scheduler: {dispatcher}");
             consumer.TrySetResult(scheduler);
 
             Log.Debug("Starting dispatcher...");

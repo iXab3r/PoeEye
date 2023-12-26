@@ -97,7 +97,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
                 return;
             }
 
-            Log.Debug(() => $"Suppressing physical mouse up: {eventArgs}");
+            Log.Debug($"Suppressing physical mouse up: {eventArgs}");
             eventArgs.Handled = true;
             return;
         }
@@ -111,7 +111,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
             }
                 
             pressedKeys[gesture] = eventArgs;
-            Log.Debug(() => $"Suppressing physical mouse down: {eventArgs}");
+            Log.Debug($"Suppressing physical mouse down: {eventArgs}");
             eventArgs.Handled = true;
             return;
         }
@@ -123,7 +123,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
             {
                 return;
             }
-            Log.Debug(() => $"Suppressing physical mouse wheel: {eventArgs}");
+            Log.Debug($"Suppressing physical mouse wheel: {eventArgs}");
             eventArgs.Handled = true;
             return;
         }
@@ -133,7 +133,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
             return;
         }
             
-        Log.Debug(() => $"Suppressing physical mouse event: {eventArgs}");
+        Log.Debug($"Suppressing physical mouse event: {eventArgs}");
         eventArgs.Handled = true;
     }
 
@@ -155,7 +155,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
             }
             pressedKeys[gesture] = eventArgs;
 
-            Log.Debug(() => $"Suppressing physical key down: {eventArgs}");
+            Log.Debug($"Suppressing physical key down: {eventArgs}");
             eventArgs.Handled = true;
             return;
         }
@@ -167,7 +167,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
                 return;
             }
 
-            Log.Debug(() => $"Suppressing physical key up: {eventArgs}");
+            Log.Debug($"Suppressing physical key up: {eventArgs}");
             eventArgs.Handled = true;
             return;
         }
@@ -177,7 +177,7 @@ internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlo
             return;
         }
             
-        Log.Debug(() => $"Suppressing physical keyboard event: {eventArgs}");
+        Log.Debug($"Suppressing physical keyboard event: {eventArgs}");
         eventArgs.Handled = true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using AutoFixture;
 using System;
 using System.Collections.Concurrent;
@@ -43,9 +43,9 @@ public class ObservableExtensionsFixture : FixtureBase
         });
         ;
 
-        Log.Debug(() => $"Pushing value");
+        Log.Debug($"Pushing value");
         source.OnNext(1);
-        Log.Debug(() => $"Pushed value");
+        Log.Debug($"Pushed value");
 
         //Then
         Log.Debug($"Awaiting for result");
@@ -71,9 +71,9 @@ public class ObservableExtensionsFixture : FixtureBase
 
         dispatcher.BeginInvoke(() =>
         {
-            Log.Debug(() => $"Pushing value");
+            Log.Debug($"Pushing value");
             source.OnNext(1);
-            Log.Debug(() => $"Pushed value");
+            Log.Debug($"Pushed value");
         });
 
         //Then
@@ -100,9 +100,9 @@ public class ObservableExtensionsFixture : FixtureBase
 
         dispatcher.Invoke(() =>
         {
-            Log.Debug(() => $"Pushing value");
+            Log.Debug($"Pushing value");
             source.OnNext(1);
-            Log.Debug(() => $"Pushed value");
+            Log.Debug($"Pushed value");
         });
 
         //Then

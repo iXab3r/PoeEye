@@ -29,9 +29,9 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
             .Select(
                 x =>
                 {
-                    Log.Debug(() => $"Refreshing actual config, reason: {x}");
+                    Log.Debug($"Refreshing actual config, reason: {x}");
                     var result = configProvider.GetActualConfig<TConfig>();
-                    Log.Debug(() => "Refreshed actual config");
+                    Log.Debug("Refreshed actual config");
                     return result;
                 })
             .Subscribe(x => ActualConfig = x)
@@ -88,12 +88,12 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
 
         if (compare.AreEqual)
         {
-            Log.Debug(() => $"Attempted to save config that is an exact duplicate of an Actual config, skipping request");
+            Log.Debug($"Attempted to save config that is an exact duplicate of an Actual config, skipping request");
             return;
         }
 
         Interlocked.Increment(ref saveCommandCounter);
-        Log.Info(() => $"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+        Log.Info($"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
         configProvider.Save(config);
         reloadSignal.OnNext("Reloading after Save");
@@ -101,6 +101,6 @@ public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObjectWit
         
     private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
     {
-        Log.Debug(() => $"Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.Dump())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.Dump())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+        Log.Debug($"Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.Dump())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.Dump())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
     }
 }

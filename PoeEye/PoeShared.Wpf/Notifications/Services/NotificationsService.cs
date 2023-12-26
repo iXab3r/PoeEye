@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -31,7 +31,7 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
         IFactory<INotificationContainerViewModel, INotificationViewModel> notificationContainerFactory,
         IFactory<OverlayNotificationsContainerViewModel> overlayNotificationsContainerFactory)
     {
-        Log.Debug(() => "Initializing notification service");
+        Log.Debug("Initializing notification service");
 
         this.notificationContainerFactory = notificationContainerFactory;
         overlayWindowController = overlayWindowControllerFactory.Create(uiOverlayScheduler);
@@ -52,10 +52,10 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
             .AddTo(Anchors);
         Items = items;
 
-        Log.Debug(() => "Sending notification containers creation to UI thread");
+        Log.Debug("Sending notification containers creation to UI thread");
         uiOverlayScheduler.Schedule(() =>
         {
-            Log.Debug(() => "Preparing notification containers");
+            Log.Debug("Preparing notification containers");
             var layeredContainer = overlayNotificationsContainerFactory.Create().AddTo(Anchors);
             layeredContainer.OverlayMode = OverlayMode.Layered;
             overlayWindowController.RegisterChild(layeredContainer).AddTo(Anchors);
@@ -84,7 +84,7 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
                 .ObserveOn(uiOverlayScheduler)
                 .SubscribeSafe(containerOffset =>
                 {
-                    Log.Debug(() => $"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");
+                    Log.Debug($"Layered container bounds have changed: {containerOffset}, transparent: {transparentContainer.NativeBounds}, offset: {transparentContainer.Offset}");
                     transparentContainer.Offset = new System.Drawing.Point(0, containerOffset.Height + 5);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -103,12 +103,12 @@ internal sealed class NotificationsService : DisposableReactiveObject, INotifica
         var container = notificationContainerFactory.Create(notification);
         var closeController = new ItemCloseController<INotificationViewModel>(notification, () =>
         {
-            Log.Debug(() => $"Removing notification: {notification} in container: {container}");
+            Log.Debug($"Removing notification: {notification} in container: {container}");
             notificationsSource.Remove(notification);
         });
         notification.CloseController = closeController;
 
-        Log.Debug(() => $"Embedded notification: {notification} in container: {container}");
+        Log.Debug($"Embedded notification: {notification} in container: {container}");
         return container;
     }
 

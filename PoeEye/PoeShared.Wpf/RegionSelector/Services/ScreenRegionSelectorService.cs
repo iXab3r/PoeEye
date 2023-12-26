@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
@@ -26,12 +26,12 @@ internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IS
         [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler,
         IFactory<IWindowRegionSelector> regionSelectorWindowFactory)
     {
-        Log.Debug(() => $"Initializing region selector service");
+        Log.Debug($"Initializing region selector service");
         this.viewController = viewController;
         this.overlayController = overlayControllerFactory.Create(uiScheduler).AddTo(Anchors);
         windowRegionSelector = regionSelectorWindowFactory.Create();
         windowRegionSelector.IsVisible = false;
-        Log.Debug(() => $"Registering region selector overlay");
+        Log.Debug($"Registering region selector overlay");
         overlayController.RegisterChild(windowRegionSelector).AddTo(Anchors);
     }
 
@@ -41,11 +41,11 @@ internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IS
         windowRegionSelector.NativeBounds = workingArea;
         using var regionSelectorAnchors = windowRegionSelector.Show();
 
-        Log.Debug(() => $"Showing new selector window: {windowRegionSelector}");
+        Log.Debug($"Showing new selector window: {windowRegionSelector}");
         viewController.Minimize();
         try
         {
-            Log.Debug(() => $"Awaiting for selection result from {windowRegionSelector}");
+            Log.Debug($"Awaiting for selection result from {windowRegionSelector}");
             return await windowRegionSelector.StartSelection(minSelection);
         }
         catch (Exception ex)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using PoeShared.Scaffolding;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -24,7 +24,7 @@ public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveF
     
     FileInfo IOpenFileDialog.ShowDialog()
     {
-        Log.Info(() => $"Showing Open file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
+        Log.Info($"Showing Open file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
         var dialog = new OpenFileDialog()
         {
             Title = Title, 
@@ -43,13 +43,13 @@ public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveF
 
         var result = new FileInfo(dialog.FileName);
         LastFile = result;
-        Log.Info(() => $"User has selected file {result} (exists: {result.Exists})");
+        Log.Info($"User has selected file {result} (exists: {result.Exists})");
         return result;
     }
 
     FileInfo ISaveFileDialog.ShowDialog()
     {
-        Log.Info(() => $"Showing Save file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
+        Log.Info($"Showing Save file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
         var dialog = new SaveFileDialog
         {
             Title = Title, 
@@ -68,7 +68,7 @@ public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveF
 
         var result = new FileInfo(dialog.FileName);
         LastFile = result;
-        Log.Info(() => $"User has selected file {result} (exists: {result.Exists})");
+        Log.Info($"User has selected file {result} (exists: {result.Exists})");
         return result;
     }
 }

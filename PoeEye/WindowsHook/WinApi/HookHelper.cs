@@ -1,4 +1,4 @@
-﻿// This code is distributed under MIT license. 
+// This code is distributed under MIT license. 
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
@@ -35,17 +35,17 @@ public static class HookHelper
 
     public static HookResult SetHook(User32.WindowsHookType hookType, WinHookCallback callback)
     {
-        Log.Debug(() => $"Creating a new hook with id {hookType}");
+        Log.Debug($"Creating a new hook with id {hookType}");
         var hookHandle = new HookResultWithCallback(hookType, callback);
-        Log.Debug(() => $"Successfully set new hook with id {hookType}, result: {hookHandle}");
+        Log.Debug($"Successfully set new hook with id {hookType}, result: {hookHandle}");
         return hookHandle;
     }
         
     public static HookResult SetHook(User32.WindowsHookType hookType, User32.WindowsHookDelegate hookProcedure)
     {
-        Log.Debug(() => $"Creating a new hook with id {hookType}");
+        Log.Debug($"Creating a new hook with id {hookType}");
         var hookHandle = new HookResultWithProcedure(hookType, hookProcedure);
-        Log.Debug(() => $"Successfully set new hook with id {hookType}, result: {hookHandle}");
+        Log.Debug($"Successfully set new hook with id {hookType}, result: {hookHandle}");
         return hookHandle;
     }
 }

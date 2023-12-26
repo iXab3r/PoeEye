@@ -151,7 +151,7 @@ internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObj
         
     private void AddSoundCommandExecuted()
     {
-        Log.Info(() => $"Showing OpenFileDialog to user");
+        Log.Info($"Showing OpenFileDialog to user");
 
         var op = new OpenFileDialog
         {
@@ -169,7 +169,7 @@ internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObj
             return;
         }
 
-        Log.Debug(() => $"Adding notification {op.FileName}");
+        Log.Debug($"Adding notification {op.FileName}");
         LastOpenedDirectory = Path.GetDirectoryName(op.FileName);
         var notification = notificationsManager.AddFromFile(new FileInfo(op.FileName));
         SelectedValue = notification;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -88,7 +88,7 @@ public partial class UnsafeNative
     {
         try
         {
-            Log.Debug(() => $"Calling AllowSetForegroundWindow(pid: {CurrentProcessId})");
+            Log.Debug($"Calling AllowSetForegroundWindow(pid: {CurrentProcessId})");
             Win32ErrorCode error;
             if (!AllowSetForegroundWindow(CurrentProcessId) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
@@ -96,7 +96,7 @@ public partial class UnsafeNative
                 throw new Win32Exception(error, $"Failed to {nameof(AllowSetForegroundWindow)}");
             }
 
-            Log.Debug(() => $"Successfully executed AllowSetForegroundWindow(pid: {CurrentProcessId})");
+            Log.Debug($"Successfully executed AllowSetForegroundWindow(pid: {CurrentProcessId})");
         }
         catch (Exception e)
         {

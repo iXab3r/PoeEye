@@ -24,7 +24,7 @@ internal abstract class BaseListener : DisposableReactiveObject
         var listenerType = GetType();
  
         Disposable.Create(() => Log.Debug("Disposing listener...")).AddTo(Anchors);
-        Log.Debug(() => $"Created new listener of type {listenerType}");
+        Log.Debug($"Created new listener of type {listenerType}");
         Disposable.Create(() => Log.Debug("Disposed listener")).AddTo(Anchors);
     }
 

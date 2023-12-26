@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
@@ -83,15 +83,15 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
     private void InitializeSchedulers()
     {
         var uiDispatcher = Dispatcher.CurrentDispatcher;
-        Log.Info(() => $"Dispatcher set to: {uiDispatcher}");
-        Log.Info(() => $"Capturing {uiDispatcher} as {WellKnownDispatchers.UI}");
+        Log.Info($"Dispatcher set to: {uiDispatcher}");
+        Log.Info($"Capturing {uiDispatcher} as {WellKnownDispatchers.UI}");
         
         var syncContext = new DispatcherSynchronizationContext(uiDispatcher);
-        Log.Info(() => $"Synchronization context: {syncContext}");
+        Log.Info($"Synchronization context: {syncContext}");
         SynchronizationContext.SetSynchronizationContext(syncContext);
         var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         
-        Log.Info(() => $"Task scheduler: {taskScheduler}");
+        Log.Info($"Task scheduler: {taskScheduler}");
 
         //FIXME For stability reasons this is disabled for now - should test other changes related to multiple dispatchers first
         //var overlayDispatcher = SchedulerProvider.Instance.AddDispatcher(WellKnownDispatchers.UIOverlay, ThreadPriority.Normal);
@@ -102,13 +102,13 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<Dispatcher>(WellKnownDispatchers.UI, x => uiDispatcher)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.UI, x =>
             {
-                Log.Debug(() => $"Initializing {WellKnownSchedulers.UI} scheduler on {uiDispatcher}");
+                Log.Debug($"Initializing {WellKnownSchedulers.UI} scheduler on {uiDispatcher}");
                 return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Normal);
             })
             .RegisterSingleton<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler)
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.UIIdle, x =>
             {
-                Log.Debug(() => $"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
+                Log.Debug($"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
                 return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Background);
             })
             .RegisterSingleton<IScheduler>(WellKnownSchedulers.Background, x => ThreadPoolScheduler.Instance.DisableOptimizations())
@@ -122,7 +122,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
         var schedulerProvider = Container.Resolve<ISchedulerProvider>();
         if (schedulerProvider is SchedulerProvider provider)
         {
-            Log.Info(() => $"Initializing scheduler provider: {provider}");
+            Log.Info($"Initializing scheduler provider: {provider}");
             provider.Initialize(Container);
         }
         else

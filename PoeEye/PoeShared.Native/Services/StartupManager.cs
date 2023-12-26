@@ -21,7 +21,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
         Guard.ArgumentNotNull(appArguments, nameof(appArguments));
         Guard.ArgumentNotNull(args, nameof(args));
-        Log.Debug(() => $"Creating startup helper using args: {args.Dump()}, isElevated: {appArguments.IsElevated}...");
+        Log.Debug($"Creating startup helper using args: {args.Dump()}, isElevated: {appArguments.IsElevated}...");
 
         Guard.ArgumentNotNull(args.ExecutablePath, nameof(args.ExecutablePath));
         Guard.ArgumentNotNull(args.UniqueAppName, nameof(args.UniqueAppName));
@@ -38,7 +38,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
                 true,
                 StartupProviders.Task,
                 args.AutostartFlag ?? appArguments.AutostartFlag);
-            Log.Debug(() => $"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
+            Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
                 
             if (IsElevated)
             {
@@ -66,7 +66,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
         EnsureManagerIsReady();
             
-        Log.Debug(() => $"Registering application as {manager.Name} (dir {manager.WorkingDirectory})");
+        Log.Debug($"Registering application as {manager.Name} (dir {manager.WorkingDirectory})");
         var result = manager.Register(args.CommandLineArgs);
         if (!result)
         {
@@ -85,7 +85,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
         EnsureManagerIsReady();
             
-        Log.Debug(() => $"Unregistering application as {manager.Name} (dir {manager.WorkingDirectory})");
+        Log.Debug($"Unregistering application as {manager.Name} (dir {manager.WorkingDirectory})");
 
         var result = manager.Unregister();
         if (!result)
@@ -106,13 +106,13 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
         EnsureManagerIsReady();
         if (manager.IsRegistered)
         {
-            Log.Debug(() => $"Reregistering application startup");
+            Log.Debug($"Reregistering application startup");
             Unregister();
             Register();
         }
         else
         {
-            Log.Debug(() => $"Application startup is not registered");
+            Log.Debug($"Application startup is not registered");
         }
     }
 

@@ -69,7 +69,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
-        log.Debug(() => $"Registering view type");
+        log.Debug($"Registering view type");
 
         var registration = new ViewRegistration()
         {
@@ -80,11 +80,11 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
         viewsByKey.AddOrUpdate(viewKey, () =>
         {
-            log.Debug(() => $"Registered new view type: {registration}");
+            log.Debug($"Registered new view type: {registration}");
             return registration;
         }, (_, existingRegistration) =>
         {
-            log.Debug(() => $"Overriding registration with a new view type: {registration}, existing: {existingRegistration}");
+            log.Debug($"Overriding registration with a new view type: {registration}, existing: {existingRegistration}");
             return registration;
         });
     }
@@ -97,13 +97,13 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
-        log.Debug(() => $"Resolving view type");
+        log.Debug($"Resolving view type");
         EnsureQueueIsProcessed();
 
         // resolve by content type
         if (TryResolveViewType(viewKey, out var registration))
         {
-            log.Debug(() => $"Resolved registered view by key {viewKey}: {registration}");
+            log.Debug($"Resolved registered view by key {viewKey}: {registration}");
             return registration.ViewType;
         }
 
@@ -115,13 +115,13 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
                 var byInterfaceKey = new ViewKey() {ContentType = @interface, Key = key};
                 if (TryResolveViewType(byInterfaceKey, out var registrationByInterface))
                 {
-                    log.Debug(() => $"Resolved registered view by interface {byInterfaceKey}: {registrationByInterface}");
+                    log.Debug($"Resolved registered view by interface {byInterfaceKey}: {registrationByInterface}");
                     return registrationByInterface.ViewType;
                 }
             }
         }
 
-        log.Warn(() => $"Failed to resolve registered view, known views:\n\t{viewsByKey.Keys.DumpToTable()}");
+        log.Warn($"Failed to resolve registered view, known views:\n\t{viewsByKey.Keys.DumpToTable()}");
         return null;
     }
 
@@ -149,7 +149,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     private void LoadViewsFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.ToString());
-        logger.Debug(() => "Loading Blazor views from assembly");
+        logger.Debug("Loading Blazor views from assembly");
 
         try
         {
@@ -164,19 +164,19 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             {
                 return;
             }
-            logger.Debug(() => $"Detected Blazor views in assembly:\n\t{matchingTypes.DumpToTable()}");
+            logger.Debug($"Detected Blazor views in assembly:\n\t{matchingTypes.DumpToTable()}");
             foreach (var typeInfo in matchingTypes)
             {
                 var blazorViewAttribute = typeInfo.ViewType.GetCustomAttribute<BlazorViewAttribute>();
                 if (blazorViewAttribute != null && blazorViewAttribute.IsForManualRegistrationOnly)
                 {
-                    logger.Debug(() => $"Skipping Blazor view {typeInfo} as it is marked for manual registration only");
+                    logger.Debug($"Skipping Blazor view {typeInfo} as it is marked for manual registration only");
                     continue;
                 }
 
                 var contentType = ResolveContentType(typeInfo.BaseViewType);
                 RegisterViewType(viewType: typeInfo.ViewType, viewContentType: contentType, key: blazorViewAttribute?.ViewKey);
-                logger.Debug(() => $"Successfully registered Blazor view {typeInfo}");
+                logger.Debug($"Successfully registered Blazor view {typeInfo}");
             }
         }
         catch (Exception e)

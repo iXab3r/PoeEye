@@ -49,7 +49,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
         this.clock = clock;
 
         Disposable
-            .Create(() => Log.Debug(() => $"Disposing HotkeyTracker"))
+            .Create(() => Log.Debug($"Disposing HotkeyTracker"))
             .AddTo(Anchors);
 
         hotkeysSource
@@ -85,7 +85,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
             .SubscribeSafe(
                 x =>
                 {
-                    Log.Debug(() => $"Tracking hotkey changed, {x.Previous} => {x.Current}");
+                    Log.Debug($"Tracking hotkey changed, {x.Previous} => {x.Current}");
                     Reset();
                 }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -120,42 +120,42 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                         {
                             if (HotkeyMode == HotkeyMode.Click)
                             {
-                                Log.Debug(() => $"Skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                                Log.Debug($"Skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                                 return false;
                             }
 
-                            Log.Debug(() => $"Application is active, but mode is {HotkeyMode}, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            Log.Debug($"Application is active, but mode is {HotkeyMode}, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         }
                         else
                         {
-                            Log.Debug(() => $"Application is active, but {nameof(HandleApplicationKeys)} is set to true, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            Log.Debug($"Application is active, but {nameof(HandleApplicationKeys)} is set to true, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         }
                     }
                     else
                     {
-                        Log.Debug(() => $"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                        Log.Debug($"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, SuppressKey: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                     }
 
                     if (SuppressKey)
                     {
                         if (KeyToModifier(hotkeyData.Hotkey.Key) != ModifierKeys.None)
                         {
-                            Log.Debug(() => $"Supplied key {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}) is a modifier, skipping suppression");
+                            Log.Debug($"Supplied key {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}) is a modifier, skipping suppression");
                         }
                         else
                         {
-                            Log.Debug(() => $"Marking hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}) as handled");
+                            Log.Debug($"Marking hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}) as handled");
                             hotkeyData.MarkAsHandled();
                         }
                     }
 
                     if (hotkeyData.IsHandled)
                     {
-                        Log.Debug(() => $"Hotkey is marked as handled - it will not be seen by the system {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown})");
+                        Log.Debug($"Hotkey is marked as handled - it will not be seen by the system {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown})");
                     }
                     else
                     {
-                        Log.Debug(() => $"Hotkey is not marked as handled - it will be seen by the system {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown})");
+                        Log.Debug($"Hotkey is not marked as handled - it will be seen by the system {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown})");
                     }
 
                     return true;
@@ -167,7 +167,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                 {
                     if (hotkeysPair.Current == null)
                     {
-                        Log.Debug(() => $"Skipping event, hotkey data is null: {hotkeysPair}");
+                        Log.Debug($"Skipping event, hotkey data is null: {hotkeysPair}");
                         return;
                     }        
                         
@@ -178,23 +178,23 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                         
                     if (sameHotkey && sameState && sameTimestamp && !isMouseWheelEvent)
                     {
-                        Log.Debug(() => $"Skipping duplicate event: {hotkeysPair}");
+                        Log.Debug($"Skipping duplicate event: {hotkeysPair}");
                         return;
                     }
 
                     var hotkeyData = hotkeysPair.Current;
-                    Log.Debug(() => $"Updating tracker state, hotkey {hotkeyData.Hotkey} pressed(isMouseWheel: {isMouseWheelEvent}), state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}");
+                    Log.Debug($"Updating tracker state, hotkey {hotkeyData.Hotkey} pressed(isMouseWheel: {isMouseWheelEvent}), state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {SuppressKey}, IgnoreModifiers: {IgnoreModifiers}");
 
                     if (isMouseWheelEvent)
                     {
                         if (HotkeyMode == HotkeyMode.Click)
                         {
-                            Log.Debug(() => $"Toggling hotkey state for Wheel event");
+                            Log.Debug($"Toggling hotkey state for Wheel event");
                             IsActive = !IsActive;
                         }
                         else
                         {
-                            Log.Debug(() => $"Blinking hotkey state");
+                            Log.Debug($"Blinking hotkey state");
                             IsActive = true;
                             IsActive = false;
                         }
@@ -205,13 +205,13 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                         {
                             if (!hotkeyData.KeyDown)
                             {
-                                Log.Debug(() => $"Toggling hotkey state");
+                                Log.Debug($"Toggling hotkey state");
                                 IsActive = !IsActive;
                             }
                         }
                         else
                         {
-                            Log.Debug(() => $"Setting state to KeyDown: {hotkeyData.KeyDown}");
+                            Log.Debug($"Setting state to KeyDown: {hotkeyData.KeyDown}");
                             IsActive = hotkeyData.KeyDown;
                         }
                     }
@@ -221,7 +221,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
         this.WhenAnyValue(x => x.IsActive)
             .WithPrevious()
-            .SubscribeSafe(x => Log.Debug(() => $"Hotkey state changed: {x}"), Log.HandleException)
+            .SubscribeSafe(x => Log.Debug($"Hotkey state changed: {x}"), Log.HandleException)
             .AddTo(Anchors);
             
         Binder.Attach(this).AddTo(Anchors);
@@ -251,7 +251,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
     public void Add(params HotkeyGesture[] hotkeysToAdd)
     {
-        Log.Debug(() => $"Registering hotkeys {hotkeysToAdd.DumpToString()}");
+        Log.Debug($"Registering hotkeys {hotkeysToAdd.DumpToString()}");
         hotkeysSource.Edit(list =>
         {
             hotkeysToAdd.ForEach(list.AddOrUpdate);
@@ -260,7 +260,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
     public void Remove(params HotkeyGesture[] hotkeysToRemove)
     {
-        Log.Debug(() => $"Unregistering hotkeys {hotkeysToRemove.DumpToString()}");
+        Log.Debug($"Unregistering hotkeys {hotkeysToRemove.DumpToString()}");
         hotkeysSource.Edit(list =>
         {
             hotkeysToRemove.ForEach(list.Remove);
@@ -269,7 +269,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
     public void Clear()
     {
-        Log.Debug(() => $"Unregistering all hotkeys");
+        Log.Debug($"Unregistering all hotkeys");
         Hotkey = HotkeyGesture.Empty;
         hotkeysSource.Clear();
     }
@@ -323,7 +323,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                 
             if (data.KeyDown)
             {
-                Log.Debug(() => $"Adding hotkey {data.Hotkey} to pressed keys");
+                Log.Debug($"Adding hotkey {data.Hotkey} to pressed keys");
                 pressedKeys.Add(data.Hotkey);
             }
             else
@@ -331,17 +331,17 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
                 var isPressed = pressedKeys.FirstOrDefault(x => x.Equals(data.Hotkey, true));
                 if (isPressed == null && !data.Hotkey.IsMouseWheel)
                 {
-                    Log.Debug(() => $"Released hotkey {data.Hotkey} is not in pressed keys or is not a mouse wheel event list skipping it");
+                    Log.Debug($"Released hotkey {data.Hotkey} is not in pressed keys or is not a mouse wheel event list skipping it");
                     return false;
                 }
                 else
                 {
-                    Log.Debug(() => $"Removing released hotkey {data.Hotkey} from pressed keys");
+                    Log.Debug($"Removing released hotkey {data.Hotkey} from pressed keys");
                     pressedKeys.Remove(isPressed);
                 }
             }
 
-            Log.Debug(() => $"Processing matching hotkey {data}");
+            Log.Debug($"Processing matching hotkey {data}");
             return true;
         }
             
@@ -376,19 +376,19 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
         if (pressed.Length > 1)
         {
-            Log.Warn(() => $"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToString()}");
+            Log.Warn($"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToString()}");
             return false;
         }
 
         if (IgnoreModifiers)
         {
-            Log.Debug(() => $"Released modifier will be ignored: {data}");
+            Log.Debug($"Released modifier will be ignored: {data}");
             return false;
         }
 
         // if user releases one of modifiers we simulate "release" of the button itself
         var newHotkey = pressed[0];
-        Log.Debug(() => $"Replacing hotkey {data.Hotkey} => {newHotkey} in {data}");
+        Log.Debug($"Replacing hotkey {data.Hotkey} => {newHotkey} in {data}");
         return IsConfiguredHotkey(data with { Hotkey = newHotkey});
     }
 
@@ -397,14 +397,14 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
     {
         if (hotkeysSource.Count == 0)
         {
-            Log.Debug(() => $"Hotkey is not set");
+            Log.Debug($"Hotkey is not set");
             return Observable.Empty<HotkeyData>();
         }
 
         var result = new List<IObservable<HotkeyData>>();
         if (hotkeysSource.Items.Any(x => x.IsKeyboard))
         {
-            Log.Debug(() => $"Subscribing to Keyboard events");
+            Log.Debug($"Subscribing to Keyboard events");
             eventSource.WhenKeyDown.Select(x => HotkeyData.FromEvent(x, clock))
                 .Select(x => x.SetKeyDown(true))
                 .Where(IsConfiguredHotkey)
@@ -418,7 +418,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
         if (hotkeysSource.Items.Any(x => x.IsMouse))
         {
-            Log.Debug(() => $"Subscribing to Mouse events");
+            Log.Debug($"Subscribing to Mouse events");
             eventSource.WhenMouseDown.Select(x => HotkeyData.FromEvent(x, clock))
                 .Select(x => x.SetKeyDown(true))
                 .Where(IsConfiguredHotkey)
@@ -432,7 +432,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
         if (hotkeysSource.Items.Any(x => x.IsMouseWheel))
         {
-            Log.Debug(() => $"Subscribing to Mouse Wheel events");
+            Log.Debug($"Subscribing to Mouse Wheel events");
             eventSource.WhenMouseWheel.Select(x => HotkeyData.FromEvent(x, clock))
                 .Select(x => x.SetKeyDown(false))
                 .Where(IsConfiguredHotkey)
@@ -441,7 +441,7 @@ internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
 
         if (result.Count == 0)
         {
-            Log.Debug(() => $"Could not find correct subscription for hotkeys");
+            Log.Debug($"Could not find correct subscription for hotkeys");
             return Observable.Empty<HotkeyData>();
         }
 

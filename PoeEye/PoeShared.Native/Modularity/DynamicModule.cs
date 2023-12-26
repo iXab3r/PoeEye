@@ -1,4 +1,4 @@
-﻿using PoeShared.Scaffolding;
+using PoeShared.Scaffolding;
 using Prism.Ioc;
 using Prism.Unity;
 using Unity;
@@ -21,16 +21,16 @@ public abstract class DynamicModule : DisposableReactiveObjectWithLogger, IDynam
             return;
         }
         
-        Log.Info(() => "Registering types");
+        Log.Info("Registering types");
         RegisterTypesInternal(containerRegistry.GetContainer());
-        Log.Info(() => "Registered types");
+        Log.Info("Registered types");
     }
 
     public void OnInitialized(IContainerProvider containerProvider)
     {
-        Log.Info(() => "Initializing module");
+        Log.Info("Initializing module");
         OnInitializedInternal(containerProvider.GetContainer());
-        Log.Info(() => "Initialized module");
+        Log.Info("Initialized module");
     }
 
     protected virtual void RegisterTypesInternal(IUnityContainer container)

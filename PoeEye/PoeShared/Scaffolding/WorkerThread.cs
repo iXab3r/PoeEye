@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Scaffolding;
+namespace PoeShared.Scaffolding;
 
 public class WorkerThread : DisposableReactiveObject
 {
@@ -14,17 +14,17 @@ public class WorkerThread : DisposableReactiveObject
     {
         this.action = action;
         Log = GetType().PrepareLogger().WithSuffix($"WT {threadName}");
-        Log.Info(() => $"Initializing buffered event log source");
+        Log.Info($"Initializing buffered event log source");
         consumerTokenSource = new CancellationTokenSource();
         consumerThread = new Thread(() => DoWork(Log, consumerTokenSource.Token, action))
         {
             IsBackground = true,
             Name = threadName
         };
-        Log.Info(() => $"Initialization completed");
+        Log.Info($"Initialization completed");
         if (autoStart)
         {
-            Log.Info(() => $"Auto-starting the thread");
+            Log.Info($"Auto-starting the thread");
             Start();
         }
     }
@@ -38,13 +38,13 @@ public class WorkerThread : DisposableReactiveObject
             throw new InvalidOperationException("Thread is already running");
         }
         
-        Log.Info(() => $"Starting the thread");
+        Log.Info($"Starting the thread");
         consumerThread.Start();
         isRunning = true;
 
         Disposable.Create(() =>
         {
-            Log.Debug(() => $"Sending signal to stop threads");
+            Log.Debug($"Sending signal to stop threads");
             try
             {
                 consumerTokenSource.Cancel();
@@ -59,7 +59,7 @@ public class WorkerThread : DisposableReactiveObject
                 throw new InvalidStateException($"Failed to terminated capture thread in {TerminationTimeout}");
             }
 
-            Log.Debug(() => $"Disposed and started processing successfully");
+            Log.Debug($"Disposed and started processing successfully");
         }).AddTo(Anchors);
     }
 

@@ -33,7 +33,7 @@ internal sealed class OverlayNotificationsContainerViewModel : OverlayViewModelB
             .Select(x => new { DesiredBounds = CalculateBounds(x.NativeBounds, x.Offset), x.Offset, x.NativeBounds })
             .SubscribeSafe(x =>
             {
-                Log.Debug(() => $"Resizing notification container: {NativeBounds}, params: {x}");
+                Log.Debug($"Resizing notification container: {NativeBounds}, params: {x}");
                 NativeBounds = x.DesiredBounds;
             }, Log.HandleUiException)
             .AddTo(Anchors);

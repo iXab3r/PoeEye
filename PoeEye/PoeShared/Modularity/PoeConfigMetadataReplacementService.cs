@@ -1,4 +1,4 @@
-﻿using System.Reactive;
+using System.Reactive;
 using System.Reflection;
 using DynamicData;
 using PoeShared.Services;
@@ -99,7 +99,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             AssemblyName = resolvedMetadata.TargetMetadata.AssemblyName,
             TypeName = resolvedMetadata.TargetMetadata.TypeName
         };
-        Log.Debug(() => $"Replacing legacy metadata: {metadata} => {replacement}");
+        Log.Debug($"Replacing legacy metadata: {metadata} => {replacement}");
         return replacement;
     }
 
@@ -115,7 +115,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
     private void LoadMetadataReplacementsFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.GetName().Name);
-        logger.Debug(() => "Loading metadata replacements from assembly");
+        logger.Debug("Loading metadata replacements from assembly");
 
         try
         {
@@ -126,13 +126,13 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             {
                 return;
             }
-            logger.Debug(() => $"Detected replacements in assembly:\n\t{matchingTypes.DumpToTable()}");
+            logger.Debug($"Detected replacements in assembly:\n\t{matchingTypes.DumpToTable()}");
             foreach (var providerType in matchingTypes)
             {
-                logger.Debug(() => $"Creating new replacement provider: {providerType}");
+                logger.Debug($"Creating new replacement provider: {providerType}");
                 var provider = (IPoeConfigMetadataReplacementProvider)Activator.CreateInstance(providerType);
                 var replacements = provider.Replacements.ToArray();
-                logger.Debug(() => $"Received following replacements from provider {providerType}:\n\t{replacements.DumpToTable()}");
+                logger.Debug($"Received following replacements from provider {providerType}:\n\t{replacements.DumpToTable()}");
                 replacements.ForEach(AddMetadataReplacement);
             }
         }
@@ -144,7 +144,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
     public void AddMetadataReplacement(MetadataReplacement replacement)
     {
-        Log.Debug(() => $"Registering metadata replacement: {replacement.SourceTypeName} => {replacement.TargetMetadata.TypeName}");
+        Log.Debug($"Registering metadata replacement: {replacement.SourceTypeName} => {replacement.TargetMetadata.TypeName}");
         replacementsSource.Add(replacement);
     }
     

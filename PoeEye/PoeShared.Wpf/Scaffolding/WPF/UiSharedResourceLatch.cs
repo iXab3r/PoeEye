@@ -37,7 +37,7 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
         this.isBusyAnchor = new SerialDisposable().AddTo(Anchors);
         this.pauseLatch = new SharedResourceLatch($"UI-Pause").AddTo(Anchors);
         this.isBusyLatch = new SharedResourceLatch($"UI-IsBusy").AddTo(Anchors);
-        Log.Info(() => $"UI latch is initialized");
+        Log.Info($"UI latch is initialized");
 
         isBusyLatch.WhenAnyValue(x => x.IsBusy)
             .SubscribeSafe(HandleIsBusyChange, Log.HandleUiException)
@@ -70,33 +70,33 @@ internal sealed class UiSharedResourceLatch : DisposableReactiveObject, IUiShare
         // 2) If IsBusy is set to FALSE it must be sent to UI thread, but only as a low-priority task, this will make UI thread process all other messages before
         // 3) If there are multiple assignments next one should cancel previous, otherwise it will make state unreliable (e.g. IsBusy = false (sends to queue with low-priority), then IsBusy = true(executed on the same thread) will not work correctly
         var isOnDispatcher = dispatcher.CheckAccess();
-        Log.Debug(() => $"Processing IsBusy: {isBusyLatch.IsBusy} {isBusyLatch}, isOnDispatcher: {isOnDispatcher}");
+        Log.Debug($"Processing IsBusy: {isBusyLatch.IsBusy} {isBusyLatch}, isOnDispatcher: {isOnDispatcher}");
         if (isBusyAnchor.Disposable != null)
         {
-            Log.Debug(() => $"Clearing previous anchors");
+            Log.Debug($"Clearing previous anchors");
             isBusyAnchor.Disposable = null;
-            Log.Debug(() => $"Cleared previous anchors");
+            Log.Debug($"Cleared previous anchors");
         }
             
         switch (isBusyLatch.IsBusy)
         {
             case true when isOnDispatcher:
-                Log.Debug(() => $"Changing IsBusy(on dispatcher): {IsBusy} => true");
+                Log.Debug($"Changing IsBusy(on dispatcher): {IsBusy} => true");
                 IsBusy = true;
-                Log.Debug(() => $"Changed IsBusy(on dispatcher) to {IsBusy}");
+                Log.Debug($"Changed IsBusy(on dispatcher) to {IsBusy}");
                 break;
             case true:
-                Log.Debug(() => $"Invoking operation to change IsBusy to true");
+                Log.Debug($"Invoking operation to change IsBusy to true");
                 dispatcher.Invoke(HandleIsBusyChange);
-                Log.Debug(() => $"Invocation completed for operation to change IsBusy to true");
+                Log.Debug($"Invocation completed for operation to change IsBusy to true");
                 break;
             case false:
                 Log.Debug("Scheduling IsBusy reset");
                 isBusyAnchor.Disposable = uiIdleScheduler.Schedule(() =>
                 {
-                    Log.Info(() => $"Resetting IsBusy: {IsBusy} => false");
+                    Log.Info($"Resetting IsBusy: {IsBusy} => false");
                     IsBusy = false;
-                    Log.Info(() => $"Reset IsBusy to {IsBusy}");
+                    Log.Info($"Reset IsBusy to {IsBusy}");
                 });
                 Log.Debug("Scheduled IsBusy reset");
                 break;

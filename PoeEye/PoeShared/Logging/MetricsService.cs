@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Threading;
 using App.Metrics;
 using App.Metrics.Gauge;
@@ -29,7 +29,7 @@ internal sealed class MetricsService : DisposableReactiveObject
 
     public void Initialize(IAppArguments appArguments)
     {
-        Log.Debug(() => $"Initializing metrics service, args: {appArguments}");
+        Log.Debug($"Initializing metrics service, args: {appArguments}");
         if (this.appArguments != default)
         {
             throw new InvalidOperationException($"Service is already initialized");
@@ -46,7 +46,7 @@ internal sealed class MetricsService : DisposableReactiveObject
                 try
                 {
                     ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
-                    Log.Debug(() => $"Reporting metrics #{idx}, available thread pool threads: worker {workerThreads}, completionPort {completionPortThreads}");
+                    Log.Debug($"Reporting metrics #{idx}, available thread pool threads: worker {workerThreads}, completionPort {completionPortThreads}");
                     await Task.WhenAll(Metrics.ReportRunner.RunAllAsync());
                 }
                 catch (Exception e)
@@ -66,7 +66,7 @@ internal sealed class MetricsService : DisposableReactiveObject
         Log.Info("Initializing metrics...");
 
         var metricsOutput = Path.Combine(appArguments.AppDataDirectory, $"logs", $"metrics.txt");
-        Log.Info(() => $"Exporting metrics to file {metricsOutput}");
+        Log.Info($"Exporting metrics to file {metricsOutput}");
         var metrics = new MetricsBuilder()
             .Configuration.Configure(
                 options =>

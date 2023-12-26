@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.Reflection;
 
@@ -64,22 +64,22 @@ public class SharedLog : DisposableReactiveObject
 
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         XmlConfigurator.ConfigureAndWatch(repository, logConfig);
-        Log.Info(() => $"Logging settings loaded from {logConfig}");
+        Log.Info($"Logging settings loaded from {logConfig}");
         DumpApplicationInfo(appArguments);
     }
 
     public void DumpApplicationInfo(IAppArguments appArguments)
     {
-        Log.Info(() => $"Parsed args: {appArguments.Dump()}");
-        Log.Info(() => $"CmdLine: {Environment.CommandLine}");
-        Log.Info(() => $"CommandLineArgs: {appArguments.StartupArgs}");
-        Log.Info(() => $"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
-        Log.Info(() => $"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
-        Log.Info(() => $"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
-        Log.Info(() => $"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
-        Log.Info(() => $"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
-        Log.Info(() => $"Is Elevated: {appArguments.IsElevated}");
-        Log.Info(() => $"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
+        Log.Info($"Parsed args: {appArguments.Dump()}");
+        Log.Info($"CmdLine: {Environment.CommandLine}");
+        Log.Info($"CommandLineArgs: {appArguments.StartupArgs}");
+        Log.Info($"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
+        Log.Info($"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
+        Log.Info($"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
+        Log.Info($"Runtime: {new { System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, System.Runtime.InteropServices.RuntimeInformation.OSDescription, OSVersion = Environment.OSVersion.Version }}");
+        Log.Info($"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
+        Log.Info($"Is Elevated: {appArguments.IsElevated}");
+        Log.Info($"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
     }
 
     public void SwitchLoggingLevel(Level loggingLevel)
@@ -89,7 +89,7 @@ public class SharedLog : DisposableReactiveObject
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         repository.Root.Level = loggingLevel;
         repository.RaiseConfigurationChanged(EventArgs.Empty);
-        Log.Warn(() => $"Logging level switched to '{loggingLevel}'");
+        Log.Warn($"Logging level switched to '{loggingLevel}'");
     }
     
     public void SwitchImmediateFlush(bool immediateFlush)
@@ -107,18 +107,18 @@ public class SharedLog : DisposableReactiveObject
             updatedAppenders.Add(appender);
         }
         repository.RaiseConfigurationChanged(EventArgs.Empty);
-        Log.Warn(() => $"ImmediateFlush switched to {immediateFlush} for {updatedAppenders.Count} appender(s):\n\t{updatedAppenders.Select(x => new { x.Name, x.File, x.Threshold, x.LockingModel }).DumpToTable()}");
+        Log.Warn($"ImmediateFlush switched to {immediateFlush} for {updatedAppenders.Count} appender(s):\n\t{updatedAppenders.Select(x => new { x.Name, x.File, x.Threshold, x.LockingModel }).DumpToTable()}");
     }
 
     public IDisposable AddTraceAppender()
     {
         var listener = new Log4NetTraceListener(Log);
-        Log.Debug(() => $"Adding TraceListener");
+        Log.Debug($"Adding TraceListener");
         Trace.Listeners.Add(listener);
         Trace.WriteLine("TraceListener initialized");
         return Disposable.Create(() =>
         {
-            Log.Debug(() => $"Removing TraceListener");
+            Log.Debug($"Removing TraceListener");
             Trace.Listeners.Remove(listener);
         });
     }
@@ -129,18 +129,18 @@ public class SharedLog : DisposableReactiveObject
 
         var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
         var root = repository.Root;
-        Log.Debug(() => $"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
+        Log.Debug($"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
         root.AddAppender(appender);
         if (!repository.Configured)
         {
-            Log.Debug(() => $"Repository is not configured, invoking basic configuration");
+            Log.Debug($"Repository is not configured, invoking basic configuration");
             BasicConfigurator.Configure(repository);
         }
         repository.RaiseConfigurationChanged(EventArgs.Empty);
 
         return Disposable.Create(() =>
         {
-            Log.Debug(() => $"Removing appender {appender}, currently root contains {root.Appenders.Count} appenders");
+            Log.Debug($"Removing appender {appender}, currently root contains {root.Appenders.Count} appenders");
             root.RemoveAppender(appender);
             repository.RaiseConfigurationChanged(EventArgs.Empty);
         });
@@ -174,7 +174,7 @@ public class SharedLog : DisposableReactiveObject
             {
                 return;
             }
-            log.Debug(() => $"[TraceListener] {message}");
+            log.Debug($"[TraceListener] {message}");
         }
 
         public override void WriteLine(string message)
@@ -183,7 +183,7 @@ public class SharedLog : DisposableReactiveObject
             {
                 return;
             }
-            log.Debug(() => $"[TraceListener] {message}");
+            log.Debug($"[TraceListener] {message}");
         }
     }
 }

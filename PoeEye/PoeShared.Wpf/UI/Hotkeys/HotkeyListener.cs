@@ -18,7 +18,7 @@ internal sealed class HotkeyListener : SharedResourceBase<HotkeyListener>, IHotk
         Log = base.Log.WithSuffix(hotkeyTracker);
         initialIsEnabled = hotkeyTracker.IsEnabled;
         hotkeyTracker.Reset();
-        Log.Debug(() => $"Initializing listener, tracker IsEnabled: {initialIsEnabled}");
+        Log.Debug($"Initializing listener, tracker IsEnabled: {initialIsEnabled}");
 
         WhenActivated = hotkeyTracker.WhenAnyValue(x => x.IsActive)
             .Where(x => x)
@@ -33,12 +33,12 @@ internal sealed class HotkeyListener : SharedResourceBase<HotkeyListener>, IHotk
             Log.Debug("Disposing listener");
             if (hotkeyTracker.IsEnabled != initialIsEnabled)
             {
-                Log.Debug(() => $"Restoring tracker IsEnabled to {initialIsEnabled}");
+                Log.Debug($"Restoring tracker IsEnabled to {initialIsEnabled}");
                 hotkeyTracker.IsEnabled = initialIsEnabled;
             }
             else
             {
-                Log.Debug(() => $"Tracker IsEnabled is already in required state {initialIsEnabled}");
+                Log.Debug($"Tracker IsEnabled is already in required state {initialIsEnabled}");
             }
     
             Log.Debug("Disposed listener");

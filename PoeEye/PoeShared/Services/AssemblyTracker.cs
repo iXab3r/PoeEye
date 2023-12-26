@@ -1,4 +1,4 @@
-﻿using System.Reactive.Subjects;
+using System.Reactive.Subjects;
 using System.Reflection;
 using DynamicData;
 using PoeShared.Modularity;
@@ -15,7 +15,7 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
     {
         var domain = AppDomain.CurrentDomain;
         Log.AddSuffix($"AppDomain {domain.FriendlyName}");
-        Log.Info(() => $"Assembly tracker is created for app domain {new { domain, domain.Id, domain.BaseDirectory, domain.IsFullyTrusted, domain.MonitoringTotalAllocatedMemorySize, domain.MonitoringTotalProcessorTime }}");   
+        Log.Info($"Assembly tracker is created for app domain {new { domain, domain.Id, domain.BaseDirectory, domain.IsFullyTrusted, domain.MonitoringTotalAllocatedMemorySize, domain.MonitoringTotalProcessorTime }}");   
 
         var loadedAssembliesSource = Observable
             .Defer(() => domain.GetAssemblies().ToObservable());
@@ -30,7 +30,7 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
                 var assemblyName = assembly.GetName();
                 if (assemblyName.Name.StartsWith("ℛ*") || assemblyName.Name.StartsWith("Microsoft.GeneratedCod"))
                 {
-                    Log.Debug(() => $"Assembly is loaded, but not tracked, reason - blacklist: {assembly}");
+                    Log.Debug($"Assembly is loaded, but not tracked, reason - blacklist: {assembly}");
                     // these are dynamically emitted assemblies
                     return;
                 }
@@ -43,7 +43,7 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             .Connect()
             .OnItemAdded(assembly =>
             {
-                Log.Debug(() => $"Assembly is now tracked: {assembly}");
+                Log.Debug($"Assembly is now tracked: {assembly}");
                 loadedSink.OnNext(assembly);
             })
             .SubscribeToErrors(Log.HandleUiException)

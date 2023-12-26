@@ -16,11 +16,11 @@ public static class WindowExtensions {
 
     public static IDisposable RegisterWndProc(this HwndSource hwndSource, HwndSourceHook hook)
     {
-        Log.Info(() => $"Adding hook to {hwndSource}");
+        Log.Info($"Adding hook to {hwndSource}");
         hwndSource.AddHook(hook);
         return Disposable.Create(() =>
         {
-            Log.Info(() => $"Removing hook from {hwndSource}");
+            Log.Info($"Removing hook from {hwndSource}");
             hwndSource.RemoveHook(hook);
         });
     }
@@ -34,14 +34,14 @@ public static class WindowExtensions {
 
     public static IDisposable LogWndProc(this Window instance, string prefix)
     {
-        Log.Info(() => $"[{prefix}] Registering log hook to {instance}");
+        Log.Info($"[{prefix}] Registering log hook to {instance}");
         return RegisterWndProc(instance,
             (IntPtr hwnd, int msgRaw, IntPtr param, IntPtr lParam, ref bool handled) =>
             {
                 var msg = (User32.WindowMessage) msgRaw;
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug(() => $"[{prefix}] Message: {msg} ({msgRaw.ToHexadecimal()} = {msgRaw})");
+                    Log.Debug($"[{prefix}] Message: {msg} ({msgRaw.ToHexadecimal()} = {msgRaw})");
                 }
                 return IntPtr.Zero;
             });

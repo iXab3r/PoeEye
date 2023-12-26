@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -41,16 +41,16 @@ public abstract class ApplicationBase : Application
             AppDomain.CurrentDomain.DomainUnload += delegate
             {
                 var log = Log.WithSuffix("DomainUnload");
-                log.Debug(() => $"[App.DomainUnload] Detected DomainUnload");
+                log.Debug($"[App.DomainUnload] Detected DomainUnload");
                 if (Anchors.IsDisposed)
                 {
-                    log.Debug(() => $"Application anchors are already disposed");
+                    log.Debug($"Application anchors are already disposed");
                 }
                 else
                 {
-                    log.Debug(() => $"Disposing application anchors");
+                    log.Debug($"Disposing application anchors");
                     Anchors.Dispose();
-                    log.Debug(() => $"Disposed application anchors");
+                    log.Debug($"Disposed application anchors");
                 }
             };
 
@@ -90,26 +90,26 @@ public abstract class ApplicationBase : Application
             }
             
             var erService = Container.Resolve<IExceptionReportingService>();
-            Log.Debug(() => $"Error reporting service: {erService}");
+            Log.Debug($"Error reporting service: {erService}");
 
             var metrics = Container.Resolve<IMetricsRoot>();
-            Log.Debug(() => $"UI Metrics: {metrics}");
+            Log.Debug($"UI Metrics: {metrics}");
             
             var applicationAccessor = Container.Resolve<IApplicationAccessor>();
             Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
             applicationAccessor.WhenExit.Subscribe(OnExit).AddTo(Anchors);
 
 
-            Log.Debug(() => $"UI Scheduler: {RxApp.MainThreadScheduler}");
+            Log.Debug($"UI Scheduler: {RxApp.MainThreadScheduler}");
             RxApp.MainThreadScheduler = Container.Resolve<IScheduler>(WellKnownSchedulers.UI);
             RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
             Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            Log.Debug(() => $"New UI Scheduler: {RxApp.MainThreadScheduler}");
-            Log.Debug(() => $"BG Scheduler: {RxApp.TaskpoolScheduler}");
+            Log.Debug($"New UI Scheduler: {RxApp.MainThreadScheduler}");
+            Log.Debug($"BG Scheduler: {RxApp.TaskpoolScheduler}");
 
             ThreadPool.GetMaxThreads(out var maxWorkerThreads, out var maxCompletionPortThreads);
             ThreadPool.GetMinThreads(out var minWorkerThreads, out var minCompletionPortThreads);
-            Log.Debug(() => $"ThreadPool: worker [{minWorkerThreads}; {maxWorkerThreads}], completionPort [{minCompletionPortThreads}; {maxCompletionPortThreads}]");
+            Log.Debug($"ThreadPool: worker [{minWorkerThreads}; {maxWorkerThreads}], completionPort [{minCompletionPortThreads}; {maxCompletionPortThreads}]");
 
             Log.Debug("Initializing housekeeping");
             var cleanupService = Container.Resolve<IFolderCleanerService>();
@@ -118,15 +118,15 @@ public abstract class ApplicationBase : Application
             cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
             cleanupService.FileTimeToLive = TimeSpan.FromDays(14);
 
-            Log.Debug(() => $"Trying to configure DpiAwareness, OS version: {Environment.OSVersion}");
+            Log.Debug($"Trying to configure DpiAwareness, OS version: {Environment.OSVersion}");
             if (UnsafeNative.IsWindows10OrGreater())
             {
                 PInvoke.SHCore.GetProcessDpiAwareness(IntPtr.Zero, out var dpiAwareness);
-                Log.Debug(() => $"DpiAwareness: {dpiAwareness}");
+                Log.Debug($"DpiAwareness: {dpiAwareness}");
                 //This process checks for the DPI when it is created and adjusts the scale factor whenever the DPI changes. These processes are not automatically scaled by the system.
                 if (dpiAwareness != PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE)
                 {
-                    Log.Debug(() => $"Setting DpiAwareness of current process {dpiAwareness} => {PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE}");
+                    Log.Debug($"Setting DpiAwareness of current process {dpiAwareness} => {PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE}");
                     if (SHCore.SetProcessDpiAwareness(PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE).Failed)
                     {
                         Log.Warn($"Failed to set DpiAwareness of current process");
@@ -148,7 +148,7 @@ public abstract class ApplicationBase : Application
                 Log.Warn("Failed to upgrade process priority class", e);
             }
 
-            Log.Debug(() => $"Configuring AllowSetForegroundWindow permissions");
+            Log.Debug($"Configuring AllowSetForegroundWindow permissions");
             UnsafeNative.AllowSetForegroundWindow();
     }
 
@@ -186,7 +186,7 @@ public abstract class ApplicationBase : Application
 
     private void OnExit(int exitCode)
     {
-        Log.Debug(() => $"Processing application OnExit, exit code: {exitCode}");
+        Log.Debug($"Processing application OnExit, exit code: {exitCode}");
         Log.Debug("Disposing application resources");
         Anchors.Dispose();
         Log.Debug("Disposed application resources");

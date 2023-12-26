@@ -53,7 +53,7 @@ public partial class UnsafeNative
             
             var graphics = Graphics.FromHdc(screenDc.DangerousGetHandle());
             var dpi = GetDpi(graphics);
-            Log.Debug(() => $"Monitor for window {windowHandle.ToHexadecimal()}: {GetMonitorInfo(windowHandle)}");
+            Log.Debug($"Monitor for window {windowHandle.ToHexadecimal()}: {GetMonitorInfo(windowHandle)}");
             return CalculateScreenBounds(screen, dpi);
         }
     }
@@ -128,9 +128,9 @@ public partial class UnsafeNative
     public static void ShowWindow(Window window)
     {
         Guard.ArgumentNotNull(() => window);
-        Log.Debug(() => $"ShowWindow command executed, windowState: {window.WindowState}");
+        Log.Debug($"ShowWindow command executed, windowState: {window.WindowState}");
 
-        Log.Debug(() => $"Activating window, title: '{window.Title}' {new Point(window.Left, window.Top)}, isActive: {window.IsActive}, state: {window.WindowState}, topmost: {window.Topmost}, style:{window.WindowStyle}");
+        Log.Debug($"Activating window, title: '{window.Title}' {new Point(window.Left, window.Top)}, isActive: {window.IsActive}, state: {window.WindowState}, topmost: {window.Topmost}, style:{window.WindowStyle}");
 
         if (window.Topmost)
         {
@@ -141,7 +141,7 @@ public partial class UnsafeNative
         var windowHelper = new WindowInteropHelper(window);
         var windowHandle = new WindowHandle(windowHelper.EnsureHandle());
 
-        Log.Debug(() => $"Showing window, hWnd: {windowHandle}, windowState: {window.WindowState}");
+        Log.Debug($"Showing window, hWnd: {windowHandle}, windowState: {window.WindowState}");
         window.Show();
 
         if (window.WindowState == WindowState.Minimized)
@@ -155,7 +155,7 @@ public partial class UnsafeNative
     {
         Guard.ArgumentNotNull(() => mainWindow);
 
-        Log.Debug(() => $"HideWindow command executed, windowState: {mainWindow.WindowState}");
+        Log.Debug($"HideWindow command executed, windowState: {mainWindow.WindowState}");
         mainWindow.Hide();
     }
 }

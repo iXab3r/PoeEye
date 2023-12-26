@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -24,7 +24,7 @@ public sealed partial class PoeUpdateManager : IPoeUpdateManager
     {
         var repoUri = new Uri(repoUrl);
         var userAgent = new ProductInfoHeaderValue("Squirrel", Assembly.GetExecutingAssembly().GetName().Version?.ToString());
-        Log.Debug(() => $"Creating GitHub UpdateManager for {repoUri}, userAgent: {userAgent}");
+        Log.Debug($"Creating GitHub UpdateManager for {repoUri}, userAgent: {userAgent}");
 
         if (repoUri.Segments.Length != 3)
         {

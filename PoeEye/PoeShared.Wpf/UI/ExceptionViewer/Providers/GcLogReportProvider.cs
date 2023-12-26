@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using PoeShared.Logging;
@@ -17,7 +17,7 @@ internal sealed class GcLogReportProvider : DisposableReactiveObject, IException
     {
         this.appArguments = appArguments;
         LogFilePath = new FileInfo(Path.Combine(appArguments.AppDataDirectory, "logs", $"gc{(appArguments.IsDebugMode ? "DebugMode" : null)}.csv"));
-        Log.Info(() => "Gc log report provider has been initialized");
+        Log.Info("Gc log report provider has been initialized");
     }
     
     public FileInfo LogFilePath { get; }

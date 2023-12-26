@@ -115,7 +115,7 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         InnerCommand = command;
         WpfCommand.CanExecuteChanged += InnerCommandOnCanExecuteChanged;
 
-        Disposable.Create(() => Log.Debug(() => $"Command disposed")).AddTo(Anchors);
+        Disposable.Create(() => Log.Debug($"Command disposed")).AddTo(Anchors);
     }
 
     private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)

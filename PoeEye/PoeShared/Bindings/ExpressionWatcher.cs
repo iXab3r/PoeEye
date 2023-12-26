@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using PropertyBinder;
@@ -66,7 +66,7 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         Expression<Func<TSource, bool>> condition)
     {
         Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger("ExpressionWatcher").WithSuffix(watcherId).WithSuffix(ToString);
-        Log.Debug(() => $"Expression created, source: {sourceAccessor}, condition: {condition}");
+        Log.Debug($"Expression created, source: {sourceAccessor}, condition: {condition}");
 
         this.sourceAccessor = sourceAccessor;
         this.condition = condition;
@@ -97,13 +97,13 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
             {
                 if (sourceBinderAnchors.Disposable != null && x.Previous != null)
                 {
-                    Log.Debug(() => $"Unbinding from existing source {x.Previous}");
+                    Log.Debug($"Unbinding from existing source {x.Previous}");
                     sourceBinderAnchors.Disposable = default;
                 }
 
                 if (x.Current != null)
                 {
-                    Log.Debug(() => $"Binding to source {x.Current}");
+                    Log.Debug($"Binding to source {x.Current}");
                 }
                 Error = default;
                 sourceBinderAnchors.Disposable = sourceBinder.Attach(x.Current);
@@ -233,7 +233,7 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         }
 
         var beforeUpdate = Value;
-        Log.Debug(() => $"Updating value: {beforeUpdate} => {newValue}");
+        Log.Debug($"Updating value: {beforeUpdate} => {newValue}");
         try
         {
             Error = default;
@@ -241,11 +241,11 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
             var afterUpdate = Value;
             if (EqualityComparer<TProperty>.Default.Equals(newValue, afterUpdate))
             {
-                Log.Debug(() => $"Updated value to {afterUpdate}, source: {Source}");
+                Log.Debug($"Updated value to {afterUpdate}, source: {Source}");
             }
             else
             {
-                Log.Debug(() => $"Failed to update value to {newValue}, currently it is {afterUpdate}, source: {Source}");
+                Log.Debug($"Failed to update value to {newValue}, currently it is {afterUpdate}, source: {Source}");
             }
         }
         catch (Exception e)

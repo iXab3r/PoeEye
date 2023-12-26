@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Linq;
@@ -56,16 +56,16 @@ public class KeyboardEventsSourceFixture
         {
             try
             {
-                Log.Debug(() => $"Creating form for hooking keyboard and mouse events");
+                Log.Debug($"Creating form for hooking keyboard and mouse events");
                 hookForm = new HookForm();
-                Log.Debug(() => $"Running message loop in hook form");
+                Log.Debug($"Running message loop in hook form");
                 hookForm.Loaded += delegate
                 {
-                    Log.Debug(() => $"Hook form is loaded");
+                    Log.Debug($"Hook form is loaded");
                     hookFormReady.Set();
                 };
                 var result = hookForm.ShowDialog();
-                Log.Debug(() => $"Message loop terminated gracefully, dialog result: {result}");
+                Log.Debug($"Message loop terminated gracefully, dialog result: {result}");
             }
             catch (Exception e)
             {
@@ -73,7 +73,7 @@ public class KeyboardEventsSourceFixture
             }
             finally
             {
-                Log.Debug(() => $"Hook form thread terminated");
+                Log.Debug($"Hook form thread terminated");
             }
         })
         {
@@ -96,10 +96,10 @@ public class KeyboardEventsSourceFixture
                 {
                     var wrapper = new HookWrapper();
                     wrappers.Add(wrapper);
-                    Log.Debug(() => $"Created {wrapper}");
+                    Log.Debug($"Created {wrapper}");
                     wrappersCreated[idx].Set();
                     startEvent.WaitOne();
-                    Log.Debug(() => $"Starting {wrapper}");
+                    Log.Debug($"Starting {wrapper}");
                     wrapper.Start();
                     wrappersReady[idx].Set();
                 });
@@ -155,7 +155,7 @@ public class KeyboardEventsSourceFixture
 
             Log.Info("HookForm loaded, applying style...");
             var hwnd = new WindowInteropHelper(this).EnsureHandle();
-            Log.Debug(() => $"HookForm handle: {hwnd.ToHexadecimal()}");
+            Log.Debug($"HookForm handle: {hwnd.ToHexadecimal()}");
             UnsafeNative.HideSystemMenu(hwnd);
             UnsafeNative.SetWindowExTransparent(hwnd);
             UnsafeNative.SetWindowRgn(hwnd, Rectangle.Empty);
@@ -191,7 +191,7 @@ public class KeyboardEventsSourceFixture
 
         private void Hook2OnKeyDown(object sender, KeyEventArgs e)
         {
-            Log.Debug(() => $"[{HookId}] Key down: {e.KeyCode}");
+            Log.Debug($"[{HookId}] Key down: {e.KeyCode}");
             Events.Enqueue(e);
         }
 

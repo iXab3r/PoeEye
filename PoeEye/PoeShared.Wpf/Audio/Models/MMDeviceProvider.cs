@@ -45,13 +45,13 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
         Observable
             .Start(() =>
             {
-                Log.Debug(() => $"Registering NotificationCallback using {deviceEnumerator}");
+                Log.Debug($"Registering NotificationCallback using {deviceEnumerator}");
                 var hResult = deviceEnumerator.RegisterEndpointNotificationCallback(notificationClient);
                 if (hResult != HResult.S_OK)
                 {
                     throw new ApplicationException($"Failed to subscribe to Notifications using {deviceEnumerator}, hResult: {hResult}");
                 }
-                Log.Debug(() => $"Successfully subscribed to Notifications using {deviceEnumerator}");
+                Log.Debug($"Successfully subscribed to Notifications using {deviceEnumerator}");
             })
             .RetryWithDelay(RetryTimeout)
             .SubscribeToErrors(Log.HandleUiException)
@@ -59,27 +59,27 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
 
         Observable.Merge(
                 Observables.BlockingTimer(RetryTimeout).ToUnit(),
-                notificationClient.WhenDeviceAdded.Do(deviceId => Log.Debug(() => $"[Notification] Device added, id: {deviceId}")).ToUnit(),
-                notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug(() => $"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
-                notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug(() => $"[Notification] Device removed, id: {deviceId}")).ToUnit())
+                notificationClient.WhenDeviceAdded.Do(deviceId => Log.Debug($"[Notification] Device added, id: {deviceId}")).ToUnit(),
+                notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug($"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
+                notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug($"[Notification] Device removed, id: {deviceId}")).ToUnit())
             .Throttle(ThrottlingTimeout)
             .StartWithDefault()
             .Select(x => EnumerateLines())
             .DistinctUntilChanged(x => x.Dump())
             .SubscribeSafe(newLines =>
             {
-                Log.Debug(() => $"Lines list changed:\n\tCurrent lines list:\n\t\t{lines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
+                Log.Debug($"Lines list changed:\n\tCurrent lines list:\n\t\t{lines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
                 var linesToAdd = newLines.Except(lines.Items).ToArray();
                 if (linesToAdd.Any())
                 {
-                    Log.Debug(() => $"Adding lines: {linesToAdd.Dump()}");
+                    Log.Debug($"Adding lines: {linesToAdd.Dump()}");
                     lines.AddRange(linesToAdd);
                 }
 
                 var linesToRemove = lines.Items.Except(newLines).ToArray();
                 if (linesToRemove.Any())
                 {
-                    Log.Debug(() => $"Removing lines: {linesToRemove.Dump()}");
+                    Log.Debug($"Removing lines: {linesToRemove.Dump()}");
                     lines.RemoveMany(linesToRemove);
                 }
             }, Log.HandleUiException)

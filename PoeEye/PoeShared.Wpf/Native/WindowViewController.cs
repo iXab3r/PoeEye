@@ -26,7 +26,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
         Window = owner;
         windowHandle = new Lazy<IntPtr>(() => new WindowInteropHelper(owner).EnsureHandle());
         Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC");
-        Log.Debug(() => $"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
+        Log.Debug($"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
         WhenLoaded = owner.ListenWhenLoaded();
         WhenRendered = owner.ListenWhenRendered();
@@ -51,7 +51,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
             .ObserveOn(Window.Dispatcher)
             .SubscribeSafe(() =>
             {
-                Log.Debug(() => $"Window is deactivated, reactivating {nameof(Topmost)} style");
+                Log.Debug($"Window is deactivated, reactivating {nameof(Topmost)} style");
                 owner.Topmost = false;
                 owner.Topmost = true;
             }, Log.HandleUiException)
@@ -110,7 +110,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
 
     public void Close(bool? result)
     {
-        Log.Debug(() => $"Closing window, result: {result}");
+        Log.Debug($"Closing window, result: {result}");
         if (!Window.Dispatcher.CheckAccess())
         {
             Log.Debug("Rescheduling to window dispatcher");
@@ -132,13 +132,13 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
 
     public void Hide()
     {
-        Log.Debug(() => $"Hiding window");
+        Log.Debug($"Hiding window");
         UnsafeNative.HideWindow(Window);
     }
 
     public void Show()
     {
-        Log.Debug(() => $"Showing window");
+        Log.Debug($"Showing window");
         UnsafeNative.ShowWindow(Window);
         //FIXME Mahapps window resets topmost after minimize/maximize operations
         Window.Topmost = Topmost;
@@ -151,7 +151,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
 
     public void Minimize()
     {
-        Log.Debug(() => $"Minimizing window");
+        Log.Debug($"Minimizing window");
         Window.WindowState = WindowState.Minimized;
     }
         

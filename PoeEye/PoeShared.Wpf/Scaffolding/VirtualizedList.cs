@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -98,7 +98,7 @@ public sealed class VirtualizedList<T, TContainer> : DisposableReactiveObjectWit
             .ForEachItemChange(x =>
             {
                 var itemChange = new { x.Reason, x.Current, x.CurrentIndex, x.Previous, x.PreviousIndex };
-                log.Debug(() => $"Processing container collection item change: {itemChange}");
+                log.Debug($"Processing container collection item change: {itemChange}");
                 try
                 {
                     switch (x.Reason)
@@ -164,7 +164,7 @@ public sealed class VirtualizedList<T, TContainer> : DisposableReactiveObjectWit
                         }
                     }
 
-                    log.Debug(() => $"Processed container collection item change: {itemChange}");
+                    log.Debug($"Processed container collection item change: {itemChange}");
                 }
                 catch (Exception e)
                 {

@@ -9,7 +9,7 @@ internal sealed class Win32FolderBrowserDialog : DisposableReactiveObjectWithLog
 {
     public DirectoryInfo ShowDialog()
     {
-        Log.Info(() => $"Showing Open folder dialog, parameters: {new { Title, InitialDirectory, LastDirectory = SelectedPath }}");
+        Log.Info($"Showing Open folder dialog, parameters: {new { Title, InitialDirectory, LastDirectory = SelectedPath }}");
         var dialog = new FolderBrowserDialog()
         {
             Description = Title,
@@ -28,7 +28,7 @@ internal sealed class Win32FolderBrowserDialog : DisposableReactiveObjectWithLog
         SelectedPath = dialog.SelectedPath;
         if (SelectedPath != null)
         {
-            Log.Info(() => $"User has selected folder {SelectedPath}");
+            Log.Info($"User has selected folder {SelectedPath}");
             InitialDirectory = Path.GetDirectoryName(SelectedPath);
         }
 

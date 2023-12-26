@@ -58,7 +58,7 @@ public static class UnityContainerExtensions
             return container;
         }
 
-        Log.Debug(() => $"Adding new extension of type {typeof(TExtension)} to container, registered types: {container.Registrations.Count()}");
+        Log.Debug($"Adding new extension of type {typeof(TExtension)} to container, registered types: {container.Registrations.Count()}");
         return container.AddNewExtension<TExtension>();
     }
 

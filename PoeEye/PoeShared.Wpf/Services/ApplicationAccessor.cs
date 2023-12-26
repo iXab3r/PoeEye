@@ -55,13 +55,13 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         this.safeModeService = safeModeService;
         this.appArguments = appArguments;
         startupTimestamp = clock.Now;
-        Log.Info(() => $"Initializing Application accessor for {application}");
+        Log.Info($"Initializing Application accessor for {application}");
         if (application == null)
         {
             throw new ApplicationException("Application is not initialized");
         }
 
-        Log.Info(() => $"Binding to application {application}");
+        Log.Info($"Binding to application {application}");
 
         var whenAppHasExited = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
             .Select(x => x.EventArgs.ApplicationExitCode)
@@ -71,23 +71,23 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         WhenExit = Observable.Amb(whenTerminated, whenAppHasExited).Take(1);
         WhenExit.SubscribeSafe(x =>
         {
-            Log.Info(() => $"Application exit requested, exit code: {x}");
+            Log.Info($"Application exit requested, exit code: {x}");
             IsExiting = true;
         }, Log.HandleException).AddTo(Anchors);
 
         var lockFileAcquireTimeout = TimeSpan.FromSeconds(10);
         runningFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".running")), lockFileAcquireTimeout).AddTo(Anchors);
         loadingFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".loading")), lockFileAcquireTimeout).AddTo(Anchors);
-        Log.Info(() => $"Application load state: {new {runningFileLock, loadingFileLock}}");
+        Log.Info($"Application load state: {new {runningFileLock, loadingFileLock}}");
         LastExitWasGraceful = !runningFileLock.ExistedInitially;
         LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
 
         this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
         {
-            Log.Info(() => $"Performing GC after app is loaded");
+            Log.Info($"Performing GC after app is loaded");
             GC.Collect();
 
-            Log.Info(() => $"Application is loaded - cleaning up lock file {loadingFileLock}");
+            Log.Info($"Application is loaded - cleaning up lock file {loadingFileLock}");
             loadingFileLock.Dispose();
         }, Log.HandleException).AddTo(Anchors);
         WhenExit
@@ -95,9 +95,9 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             {
                 if (exitCode == 0)
                 {
-                    Log.Info(() => $"Graceful exit - cleaning up lock file {runningFileLock}");
+                    Log.Info($"Graceful exit - cleaning up lock file {runningFileLock}");
                     runningFileLock.Dispose();
-                    Log.Info(() => $"Graceful exit - cleaning up lock file {loadingFileLock}");
+                    Log.Info($"Graceful exit - cleaning up lock file {loadingFileLock}");
                     loadingFileLock.Dispose(); // this may happen if we're restarting before the app is loaded
                 }
                 else
@@ -156,22 +156,22 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         ReportTermination(exitCode);
 
         using var processHandle = Kernel32.GetCurrentProcess();
-        Log.Info(() => $"Closing application via Terminate with code {exitCode}");
+        Log.Info($"Closing application via Terminate with code {exitCode}");
         if (Kernel32.TerminateProcess(processHandle.DangerousGetHandle(), exitCode))
         {
-            Log.Info(() => $"Awaiting for process to exit for {TerminationTimeout}, handle: {processHandle}");
+            Log.Info($"Awaiting for process to exit for {TerminationTimeout}, handle: {processHandle}");
             var waitResult = Kernel32.WaitForSingleObject(processHandle, (int) TerminationTimeout.TotalMilliseconds);
-            Log.Info(() => $"Terminate process wait result: {waitResult}");
+            Log.Info($"Terminate process wait result: {waitResult}");
         }
 
         Log.Warn($"Failed to Terminate process", new Win32Exception());
-        Log.Info(() => $"Closing application via Environment.Exit with code {exitCode}");
+        Log.Info($"Closing application via Environment.Exit with code {exitCode}");
         Environment.Exit(exitCode);
     }
 
     public void Exit()
     {
-        Log.Info(() => $"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
+        Log.Info($"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
         lock (application)
         {
             if (IsExiting)
@@ -187,7 +187,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         try
         {
             Shutdown();
-            Log.Info(() => $"Awaiting for termination for {TerminationTimeout}");
+            Log.Info($"Awaiting for termination for {TerminationTimeout}");
             Thread.Sleep(TerminationTimeout);
             Log.Warn($"Application should've terminated by now");
             throw new InvalidStateException("Something went wrong - application failed to Shutdown gracefully");
@@ -213,25 +213,25 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             throw new InvalidOperationException($"{nameof(Shutdown)} invoked on non-main thread");
         }
 
-        Log.Info(() => $"Terminating application (shutdownMode: {application.ShutdownMode}, window: {new {application.MainWindow}})...");
+        Log.Info($"Terminating application (shutdownMode: {application.ShutdownMode}, window: {new {application.MainWindow}})...");
         var mainWindow = application.MainWindow;
         if (mainWindow != null &&
             application.ShutdownMode == ShutdownMode.OnMainWindowClose &&
             mainWindow.IsLoaded)
         {
-            Log.Info(() => $"Closing main window {mainWindow}...");
+            Log.Info($"Closing main window {mainWindow}...");
             mainWindow.Close();
             if (mainWindow is IDisposable disposable)
             {
-                Log.Info(() => $"Disposing main window {disposable}...");
+                Log.Info($"Disposing main window {disposable}...");
                 disposable.Dispose();
-                Log.Info(() => $"Disposed main window");
+                Log.Info($"Disposed main window");
             }
 
-            Log.Info(() => $"Closed main window");
+            Log.Info($"Closed main window");
         }
 
-        Log.Info(() => $"Terminating app environment");
+        Log.Info($"Terminating app environment");
         Terminate(0); // using this instead of App.Shutdown() to avoid async issues
     }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -48,18 +48,18 @@ internal sealed class WebViewInstaller : DisposableReactiveObjectWithLogger, IWe
         {
             Directory.CreateDirectory(tempFolder);
             var installerPath = new FileInfo(Path.Combine(tempFolder, "MicrosoftEdgeWebview2Setup.exe"));
-            Log.Debug(() => $"Downloading installer to {installerPath.FullName} from {DownloadLink}");
+            Log.Debug($"Downloading installer to {installerPath.FullName} from {DownloadLink}");
             await fileDownloader.DownloadFile(DownloadLink.ToString(), installerPath.FullName, progressPercent =>
             {
                 Log.Info($"Downloading installer from {DownloadLink}... {progressPercent}%");
             });
             installerPath.Refresh();
-            Log.Debug(() => $"Downloaded installer to {installerPath.FullName}, exists: {installerPath.Exists}");
+            Log.Debug($"Downloaded installer to {installerPath.FullName}, exists: {installerPath.Exists}");
             if (!installerPath.Exists)
             {
                 throw new InvalidStateException($"Could not download WebView2 installer from {DownloadLink}");
             }
-            Log.Debug(() => $"Executing installer {installerPath.FullName}, size: {new ByteSizeLib.ByteSize(installerPath.Length)}");
+            Log.Debug($"Executing installer {installerPath.FullName}, size: {new ByteSizeLib.ByteSize(installerPath.Length)}");
 
             var result = await Task.Run(() => ProcessHelper.RunCmd(new ProcessStartInfo()
             {

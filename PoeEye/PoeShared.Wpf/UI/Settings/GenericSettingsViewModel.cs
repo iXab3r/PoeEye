@@ -83,7 +83,7 @@ internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSe
 
     public void SaveConfigs()
     {
-        Log.Info(() => $"Saving settings");
+        Log.Info($"Saving settings");
         moduleSettings.Items.ForEach(SaveConfig);
     }
 
@@ -118,7 +118,7 @@ internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSe
     private void ReloadConfig(ISettingsViewModel viewModel)
     {
         var configType = GetConfigType(viewModel);
-        Log.Info(() => $"[PoeSettingsViewModel.ReloadConfig] Loading data into view model {viewModel} (configType {configType}");
+        Log.Info($"[PoeSettingsViewModel.ReloadConfig] Loading data into view model {viewModel} (configType {configType}");
         var invocationMethod = reloadConfigByType.GetOrAdd(configType, x => ReloadConfigMethod.MakeGenericMethod(x));
         invocationMethod.Invoke(this, new object[] {viewModel});
     }
@@ -126,7 +126,7 @@ internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSe
     private void SaveConfig(ISettingsViewModel viewModel)
     {
         var configType = GetConfigType(viewModel);
-        Log.Info(() => $"[PoeSettingsViewModel.SaveConfig] Saving view model {viewModel} (configType {configType}");
+        Log.Info($"[PoeSettingsViewModel.SaveConfig] Saving view model {viewModel} (configType {configType}");
         var invocationMethod = saveConfigByType.GetOrAdd(configType, x => SaveConfigMethod.MakeGenericMethod(x));
         invocationMethod.Invoke(this, new object[] {viewModel});
     }

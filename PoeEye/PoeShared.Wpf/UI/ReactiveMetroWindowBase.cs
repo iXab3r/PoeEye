@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -73,25 +73,25 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
 
     private void OnDeactivated(object sender, EventArgs e)
     {
-        Log.Debug(() => "Window is deactivated");
+        Log.Debug("Window is deactivated");
     }
 
     private void OnInitialized(object sender, EventArgs e)
     {
-        Log.Debug(() => "Window initialized");
+        Log.Debug("Window initialized");
         Log.Debug("Initializing native window handle");
         new WindowInteropHelper(this).EnsureHandle(); //EnsureHandle leads to SourceInitialized
-        Log.Debug(() => "Native window initialized");
+        Log.Debug("Native window initialized");
     }
 
     private void OnActivated(object sender, EventArgs e)
     {
-        Log.Debug(() => "Window is activated");
+        Log.Debug("Window is activated");
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        Log.Debug(() => "Setting WindowExNoActivate");
+        Log.Debug("Setting WindowExNoActivate");
         AllowsTransparencyAfterLoad = AllowsTransparency;
     }
 
@@ -106,7 +106,7 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         }
 
         var behaviors = Interaction.GetBehaviors(this);
-        Log.Debug(() => $"Default behaviors: {behaviors.DumpToString()}");
+        Log.Debug($"Default behaviors: {behaviors.DumpToString()}");
 
         var behaviorTypeToRemove = new[]
         {
@@ -115,7 +115,7 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
         var behaviorToRemove = behaviors.Where(x => behaviorTypeToRemove.Contains(x.GetType())).ToArray();
         behaviors.RemoveMany(behaviorToRemove);
         behaviors.Add(new RestoreWindowWhenActivatedXamlBehavior());
-        Log.Debug(() => $"Removing the following behaviors: {behaviorToRemove.DumpToString()}");
+        Log.Debug($"Removing the following behaviors: {behaviorToRemove.DumpToString()}");
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -143,13 +143,13 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
 
     protected void MakeTransparent()
     {
-        Log.Debug(() => "Making window transparent");
+        Log.Debug("Making window transparent");
         UnsafeNative.SetWindowExTransparent(WindowHandle);
     }
 
     protected void MakeLayered()
     {
-        Log.Debug(() => "Making window layered");
+        Log.Debug("Making window layered");
         UnsafeNative.SetWindowExLayered(WindowHandle);
     }
 

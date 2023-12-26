@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using PropertyBinder;
 using PropertyChanged;
 
@@ -29,7 +29,7 @@ public class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
             .ElseIf(x => x.TargetWatcher.HasValue, x => default)
             .To((x, v) =>
             {
-                x.Log.Debug(() => $"Propagating value {v ?? "NULL"}");
+                x.Log.Debug($"Propagating value {v ?? "NULL"}");
                 x.TargetWatcher.SetCurrentValue(v);
             });
             
@@ -37,7 +37,7 @@ public class ReactiveBinding : DisposableReactiveObject, IReactiveBinding
         Binder.BindIf(x => x.TargetWatcher.HasValue, x => x.TargetWatcher.Value)
             .To((x, v) =>
             {
-                x.Log.Debug(() => $"Target value has changed to {v}");
+                x.Log.Debug($"Target value has changed to {v}");
             });
     }
         

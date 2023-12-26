@@ -35,9 +35,9 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
         this.audioPlayer = audioPlayer;
         devicesSource
             .Connect()
-            .OnItemAdded(x => Log.Debug(() => $"Added WaveOut device: {x}"))
-            .OnItemRemoved(x => Log.Debug(() => $"Removed WaveOut device: {x}"))
-            .OnItemUpdated((prev, curr) => Log.Debug(() => $"Updated WaveOut device, previous: {prev}, current: {curr}"))
+            .OnItemAdded(x => Log.Debug($"Added WaveOut device: {x}"))
+            .OnItemRemoved(x => Log.Debug($"Removed WaveOut device: {x}"))
+            .OnItemUpdated((prev, curr) => Log.Debug($"Updated WaveOut device, previous: {prev}, current: {curr}"))
             .ObserveOnCurrentDispatcher()
             .BindToCollection(out var devices)
             .SubscribeToErrors(Log.HandleException)
@@ -46,9 +46,9 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
             
         Observable.Merge(
                 Observables.BlockingTimer(RetryTimeout).ToUnit(),
-                notificationClient.WhenDeviceAdded.Do(deviceId => Log.Debug(() => $"[Notification] Device added, id: {deviceId}")).ToUnit(),
-                notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug(() => $"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
-                notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug(() => $"[Notification] Device removed, id: {deviceId}")).ToUnit())
+                notificationClient.WhenDeviceAdded.Do(deviceId => Log.Debug($"[Notification] Device added, id: {deviceId}")).ToUnit(),
+                notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug($"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
+                notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug($"[Notification] Device removed, id: {deviceId}")).ToUnit())
             .Throttle(ThrottlingTimeout)
             .RetryWithDelay(RetryTimeout)
             .SubscribeSafe(HandleDevicesUpdate, Log.HandleException)
@@ -58,13 +58,13 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
         Observable
             .Start(() =>
             {
-                Log.Debug(() => $"Registering NotificationCallback using {deviceEnumerator}");
+                Log.Debug($"Registering NotificationCallback using {deviceEnumerator}");
                 var hResult = deviceEnumerator.RegisterEndpointNotificationCallback(notificationClient);
                 if (hResult != HResult.S_OK)
                 {
                     throw new ApplicationException($"Failed to subscribe to Notifications using {deviceEnumerator}, hResult: {hResult}");
                 }
-                Log.Debug(() => $"Successfully subscribed to Notifications using {deviceEnumerator}");
+                Log.Debug($"Successfully subscribed to Notifications using {deviceEnumerator}");
             })
             .RetryWithDelay(RetryTimeout)
             .SubscribeToErrors(Log.HandleException)
@@ -90,9 +90,9 @@ internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject,
         {
             return;
         }
-        Log.Debug(() => $"Selecting item by id {deviceId} out of {devicesSource.Count}");
+        Log.Debug($"Selecting item by id {deviceId} out of {devicesSource.Count}");
         var device = devicesSource.Lookup(deviceId);
-        Log.Debug(() => $"Found device {device}");
+        Log.Debug($"Found device {device}");
         SelectedItem = device.HasValue ? device.Value : null;
     }
 

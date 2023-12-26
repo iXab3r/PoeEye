@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -80,16 +80,16 @@ public static class TestExtensions
         var log = Log.WithSuffix(instance).WithSuffix(extractor.ToString()).WithSuffix($"Expected: {expected}");
 
         instance.WhenAnyValue(extractor)
-            .Subscribe(x => log.Debug(() => $"Value raised for {x}"));
+            .Subscribe(x => log.Debug($"Value raised for {x}"));
         
         try
         {
-            log.Debug(() => $"Awaiting for value change");
+            log.Debug($"Awaiting for value change");
             instance.WaitForValue(extractor, x =>
             {
                 latest = x;
                 var equals = EqualityComparer<T1>.Default.Equals(x, expected);
-                log.Debug(() => $"Value updated to {x} (isEqual: {equals})");
+                log.Debug($"Value updated to {x} (isEqual: {equals})");
                 return equals;
             }, TimeSpan.FromMilliseconds(timeout));
         }

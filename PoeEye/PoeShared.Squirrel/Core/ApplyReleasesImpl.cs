@@ -44,7 +44,7 @@ internal class ApplyReleasesImpl : IEnableLogger
         }
 
         progress(5);
-        Log.Debug(() => $"Initializing unpacking, updateInfo: {new {updateInfo.FutureReleaseEntry.Filename, updateInfo.FutureReleaseEntry.Filesize, updateInfo.FutureReleaseEntry.EntryAsString }}");
+        Log.Debug($"Initializing unpacking, updateInfo: {new {updateInfo.FutureReleaseEntry.Filename, updateInfo.FutureReleaseEntry.Filesize, updateInfo.FutureReleaseEntry.EntryAsString }}");
         var release = await UnpackRelease(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
         progress(10);
 
@@ -77,7 +77,7 @@ internal class ApplyReleasesImpl : IEnableLogger
             "Failed to update local releases file");
         progress(50);
             
-        Log.Debug(() => $"Updated local releases file, list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
+        Log.Debug($"Updated local releases file, list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
         if (localReleases.Count != 1)
         {
             Log.Warn($"Invalid local releases list: {localReleases.Select(x => new { x.Filename, x.Filesize, x.IsDelta, x.EntryAsString }).DumpToString()}");
@@ -86,7 +86,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
         var localRelease = localReleases.Single();
         var localReleaseVersion = localRelease.Version;
-        Log.Debug(() => $"Performing self-update activities for {new { localRelease.Filename, localRelease.Filesize, localRelease.EntryAsString }}");
+        Log.Debug($"Performing self-update activities for {new { localRelease.Filename, localRelease.Filesize, localRelease.EntryAsString }}");
         ExecuteSelfUpdate(localReleaseVersion);
 
         progress(75);
@@ -204,7 +204,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
     public Dictionary<ShortcutLocation, ShellLink> GetShortcutsForExecutable(string exeName, ShortcutLocation locations, string programArguments)
     {
-        Log.Info(() => $"About to create shortcuts for {exeName}, rootAppDir {rootAppDirectory}");
+        Log.Info($"About to create shortcuts for {exeName}, rootAppDir {rootAppDirectory}");
 
         var releases = Utility.LoadLocalReleases(Utility.LocalReleaseFileForAppDir(rootAppDirectory));
         var thisRelease = Utility.FindCurrentVersion(releases);
@@ -229,8 +229,8 @@ internal class ApplyReleasesImpl : IEnableLogger
             var appUserModelId = $"com.squirrel.{zf.Id.Replace(" ", "")}.{exeName.Replace(".exe", "").Replace(" ", "")}";
             var toastActivatorClsdid = Utility.CreateGuidFromHash(appUserModelId).ToString();
 
-            Log.Info(() => $"Creating shortcut for {exeName} => {file}");
-            Log.Info(() => $"appUserModelId: {appUserModelId} | toastActivatorCLSID: {toastActivatorClsdid}");
+            Log.Info($"Creating shortcut for {exeName} => {file}");
+            Log.Info($"appUserModelId: {appUserModelId} | toastActivatorCLSID: {toastActivatorClsdid}");
 
             var target = Path.Combine(rootAppDirectory, exeName);
             var sl = new ShellLink
@@ -258,7 +258,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
     public void CreateShortcutsForExecutable(string exeName, ShortcutLocation locations, bool updateOnly, string programArguments, string icon)
     {
-        Log.Info(() => $"About to create shortcuts for {exeName}, rootAppDir {rootAppDirectory}");
+        Log.Info($"About to create shortcuts for {exeName}, rootAppDir {rootAppDirectory}");
 
         var releases = Utility.LoadLocalReleases(Utility.LocalReleaseFileForAppDir(rootAppDirectory));
         var thisRelease = Utility.FindCurrentVersion(releases);
@@ -291,7 +291,7 @@ internal class ApplyReleasesImpl : IEnableLogger
                 continue;
             }
 
-            Log.Info(() => $"Creating shortcut for {exeName} => {file}");
+            Log.Info($"Creating shortcut for {exeName} => {file}");
 
             ShellLink sl;
             Log.ErrorIfThrows(
@@ -321,7 +321,7 @@ internal class ApplyReleasesImpl : IEnableLogger
                         sl.SetAppUserModelId(appUserModelId);
                         sl.SetToastActivatorCLSID(toastActivatorClsid);
 
-                        Log.Info(() => $"About to save shortcut: {file} (target {sl.Target}, workingDir {sl.WorkingDirectory}, args {sl.Arguments}, toastActivatorCSLID {toastActivatorClsid})");
+                        Log.Info($"About to save shortcut: {file} (target {sl.Target}, workingDir {sl.WorkingDirectory}, args {sl.Arguments}, toastActivatorCSLID {toastActivatorClsid})");
                         if (ModeDetector.InUnitTestRunner() == false)
                         {
                             sl.Save(file);
@@ -356,7 +356,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
             var file = LinkTargetForVersionInfo(f, zf, fileVerInfo);
 
-            Log.Info(() => $"Removing shortcut for {exeName} => {file}");
+            Log.Info($"Removing shortcut for {exeName} => {file}");
 
             Log.ErrorIfThrows(
                 () =>
@@ -388,7 +388,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
                 target.Create();
 
-                Log.Info(() => $"Writing files to app directory: {target.FullName}");
+                Log.Info($"Writing files to app directory: {target.FullName}");
                 await ReleasePackage.ExtractZipForInstall(
                     Path.Combine(updateInfo.PackageDirectory, release.Filename),
                     target.FullName,
@@ -409,7 +409,7 @@ internal class ApplyReleasesImpl : IEnableLogger
             return null;
         }
                 
-        Log.Debug(() => $"Applying delta-releases to {new { currentVersion?.PackageName, currentVersion?.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
+        Log.Debug($"Applying delta-releases to {new { currentVersion?.PackageName, currentVersion?.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
         // If there are no deltas in our list, we're already done
         if (releasesToApply.All(x => !x.IsDelta))
         {
@@ -434,13 +434,13 @@ internal class ApplyReleasesImpl : IEnableLogger
                 var deltaPkg = new ReleasePackage(Path.Combine(rootAppDirectory, "packages", releasesToApply.First().Filename));
 
                 using var tempDirectoryAnchor = Utility.WithTempDirectory(out var parentDirectory, rootAppDirectory);
-                Log.Debug(() => $"Preparing delta-package in {parentDirectory}, base: {basePkg}, delta: {deltaPkg}");
+                Log.Debug($"Preparing delta-package in {parentDirectory}, base: {basePkg}, delta: {deltaPkg}");
                 var deltaBuilder = new DeltaPackageBuilder(parentDirectory);
 
                 var finalPkgPath = Regex.Replace(deltaPkg.InputPackageFile, @"-delta.nupkg$", ".nupkg", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                 if (File.Exists(finalPkgPath))
                 {
-                    Log.Debug(() => $"Final package already exists @ {finalPkgPath}, removing it");
+                    Log.Debug($"Final package already exists @ {finalPkgPath}, removing it");
                     File.Delete(finalPkgPath);
                 }
                         
@@ -449,12 +449,12 @@ internal class ApplyReleasesImpl : IEnableLogger
                     deltaPkg,
                     finalPkgPath);
             });
-        Log.Debug(() => $"Prepared package: {deltaPackage}");
+        Log.Debug($"Prepared package: {deltaPackage}");
             
         if (releasesToApply.Length == 1)
         {
             var finalReleaseEntry = ReleaseEntry.GenerateFromFile(deltaPackage.InputPackageFile);
-            Log.Debug(() => $"No delta-updates left, prepared release entry: { new { finalReleaseEntry.Filename, finalReleaseEntry.Filesize, finalReleaseEntry.IsDelta, finalReleaseEntry.EntryAsString } } ");
+            Log.Debug($"No delta-updates left, prepared release entry: { new { finalReleaseEntry.Filename, finalReleaseEntry.Filesize, finalReleaseEntry.IsDelta, finalReleaseEntry.EntryAsString } } ");
             return finalReleaseEntry;
         }
 
@@ -463,7 +463,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
         // Recursively combine the rest of them
         var updatesToApply = releasesToApply.Skip(1).ToArray();
-        Log.Debug(() => $"Recursively applying {updatesToApply.Length} updates to entry {entry.EntryAsString}, updates: {updatesToApply.Select(x => x.EntryAsString).DumpToString()}");
+        Log.Debug($"Recursively applying {updatesToApply.Length} updates to entry {entry.EntryAsString}, updates: {updatesToApply.Select(x => x.EntryAsString).DumpToString()}");
         return await UnpackRelease(updatesToApply, entry);
     }
 
@@ -499,7 +499,7 @@ internal class ApplyReleasesImpl : IEnableLogger
         var targetDir = GetDirectoryForRelease(currentVersion);
         var squirrelApps = SquirrelAwareExecutableDetector.GetAllSquirrelAwareApps(targetDir.FullName);
 
-        Log.Info(() => $"Squirrel Enabled Apps for post-install notification: [{string.Join(",", squirrelApps)}]");
+        Log.Info($"Squirrel Enabled Apps for post-install notification: [{string.Join(",", squirrelApps)}]");
 
         // If this is the first run, we run the apps with first-run and 
         // *don't* wait for them, since they're probably the main EXE
@@ -599,12 +599,12 @@ internal class ApplyReleasesImpl : IEnableLogger
 
     private void UpdateLink(ShellLink shortcut, string newAppPath)
     {
-        Log.Info(() => $"Processing shortcut '{shortcut.ShortCutFile}'");
+        Log.Info($"Processing shortcut '{shortcut.ShortCutFile}'");
 
         var target = Environment.ExpandEnvironmentVariables(shortcut.Target);
         var targetIsUpdateDotExe = target.EndsWith("update.exe", StringComparison.OrdinalIgnoreCase);
 
-        Log.Info(() => $"Old shortcut target: '{target}'");
+        Log.Info($"Old shortcut target: '{target}'");
 
         // NB: In 1.5.0 we accidentally fixed the target of pinned shortcuts but left the arguments,
         // so if we find a shortcut with --processStart in the args, we're gonna stomp it even though
@@ -623,12 +623,12 @@ internal class ApplyReleasesImpl : IEnableLogger
             target = Path.Combine(rootAppDirectory, Path.GetFileName(shortcut.IconPath));
         }
 
-        Log.Info(() => $"New shortcut target: '{target}'");
+        Log.Info($"New shortcut target: '{target}'");
 
         shortcut.WorkingDirectory = newAppPath;
         shortcut.Target = target;
 
-        Log.Info(() => $"Old iconPath is: '{shortcut.IconPath}'");
+        Log.Info($"Old iconPath is: '{shortcut.IconPath}'");
         shortcut.IconPath = target;
         shortcut.IconIndex = 0;
 
@@ -698,17 +698,17 @@ internal class ApplyReleasesImpl : IEnableLogger
             return;
         }
 
-        Log.Info(() => $"CleanDeadVersions: for version {currentVersion}, original: {originalVersion}, forceUninstall: {forceUninstall}");
+        Log.Info($"CleanDeadVersions: for version {currentVersion}, original: {originalVersion}, forceUninstall: {forceUninstall}");
 
         string originalVersionFolder = null;
         if (originalVersion != null)
         {
             originalVersionFolder = GetDirectoryForRelease(originalVersion).Name;
-            Log.Info(() => $"CleanDeadVersions: exclude folder {originalVersionFolder}");
+            Log.Info($"CleanDeadVersions: exclude folder {originalVersionFolder}");
         }
 
         var currentVersionFolder = GetDirectoryForRelease(currentVersion).Name;
-        Log.Info(() => $"CleanDeadVersions: exclude folder {currentVersionFolder}");
+        Log.Info($"CleanDeadVersions: exclude folder {currentVersionFolder}");
 
         // NB: If we try to access a directory that has already been 
         // scheduled for deletion by MoveFileEx it throws what seems like
@@ -767,7 +767,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
             try
             {
-                Log.Debug(() => $"Removing old package: {package.FullName}");
+                Log.Debug($"Removing old package: {package.FullName}");
                 package.Delete();
             }
             catch (Exception e)

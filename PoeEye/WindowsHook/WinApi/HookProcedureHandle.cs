@@ -1,4 +1,4 @@
-﻿// This code is distributed under MIT license. 
+// This code is distributed under MIT license. 
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
@@ -27,7 +27,7 @@ public sealed class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
     public HookProcedureHandle(User32.SafeHookHandle hookHandle)
         : base(true)
     {
-        Log.Debug(() => $"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
+        Log.Debug($"Creating hook handle for {hookHandle}, isClosed: {hookHandle.IsClosed}, isInvalid: {hookHandle.IsInvalid}");
         this.hookHandle = hookHandle;
         if (hookHandle.IsClosed || hookHandle.IsInvalid)
         {
@@ -47,13 +47,13 @@ public sealed class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
 
         if (hookHandle.IsInvalid)
         {
-            Log.Debug(() => $"Hook is invalid");
+            Log.Debug($"Hook is invalid");
             return false;
         }
             
         if (hookHandle.IsClosed)
         {
-            Log.Debug(() => $"Hook is already disposed");
+            Log.Debug($"Hook is already disposed");
             return true;
         }
             
@@ -63,7 +63,7 @@ public sealed class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
         hookHandle.Dispose();
         if (hookHandle.IsClosed)
         {
-            Log.Debug(() => $"Successfully removed hook");
+            Log.Debug($"Successfully removed hook");
             return true;
         }
         Log.Warn($"Failed to remove hook"); // throw here ? 

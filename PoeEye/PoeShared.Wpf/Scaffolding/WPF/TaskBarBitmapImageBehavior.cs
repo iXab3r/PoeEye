@@ -52,9 +52,9 @@ public sealed class TaskBarBitmapImageBehavior : Behavior<TaskbarIcon>
                 (exception, timeSpan, context) => { Log.Warn($"Failed to update taskbar icon", exception); }
             ).ExecuteAndCapture(context =>
             {
-                Log.Info(() => "Assigning new taskbar icon");
+                Log.Info("Assigning new taskbar icon");
                 AssociatedObject.Icon = source;
-                Log.Info(() => "Assigned new taskbar icon");
+                Log.Info("Assigned new taskbar icon");
             }, new Context());
         
         if (result.Outcome != OutcomeType.Successful)

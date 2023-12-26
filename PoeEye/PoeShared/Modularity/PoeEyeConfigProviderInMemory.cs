@@ -18,7 +18,7 @@ public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
             
         if (appArguments.IsDebugMode)
         {
-            Log.Debug(() => $"[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
+            Log.Debug($"[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
         }
         else
         {

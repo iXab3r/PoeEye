@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -66,22 +66,22 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
     {
         var log = Log.WithSuffix(getterExpr.ToString());
         
-        log.Debug(() => $"Acquiring lock {gate}");
+        log.Debug($"Acquiring lock {gate}");
         using var @lock = gate.Enter();
 
         var allUris = uriChooser.ToArray();
-        log.Debug(() => $"Contacting URIs in the following order: {allUris.DumpToString()}");
+        log.Debug($"Contacting URIs in the following order: {allUris.DumpToString()}");
         foreach (var uri in allUris)
         {
             try
             {
-                log.WithSuffix(uri).Debug(() => $"Contacting URIs: {uri}");
+                log.WithSuffix(uri).Debug($"Contacting URIs: {uri}");
                 var manager = await Task.Run(() => managerFactory(uri));
                 var getter = getterExpr.Compile();
                 
-                log.WithSuffix(uri).Debug(() => $"Performing request");
+                log.WithSuffix(uri).Debug($"Performing request");
                 var result = await Task.Run(() => getter(manager));
-                log.WithSuffix(uri).Debug(() => $"Got request result: {result.Dump()}");
+                log.WithSuffix(uri).Debug($"Got request result: {result.Dump()}");
                 uriChooser.ReportAlive(uri);
                 return result;
             }

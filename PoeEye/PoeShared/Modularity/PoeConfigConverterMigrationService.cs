@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using PoeShared.Services;
 using ReactiveUI;
 
@@ -52,17 +52,17 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
         EnsureQueueIsProcessed();
         
         var logger = Log.WithSuffix($"{targetType} v{sourceVersion} => v{targetVersion}");
-        logger.Debug(() => $"Looking up converter");
+        logger.Debug($"Looking up converter");
         var converterKvp = convertersByMetadata
             .FirstOrDefault(x => x.Key.TargetType == targetType && x.Key.SourceVersion == sourceVersion && x.Key.TargetVersion == targetVersion);
         if (converterKvp.Value != null)
         {
-            Log.Debug(() => $"Found converter: {converterKvp}");
+            Log.Debug($"Found converter: {converterKvp}");
             result = new PoeConfigMigrationConverter {Key = converterKvp.Key, Converter = converterKvp.Value.ConverterFunc};
             return true;
         }
 
-        Log.Debug(() => $"Could not find matching converter");
+        Log.Debug($"Could not find matching converter");
         result = default;
         return false;
     }
@@ -90,10 +90,10 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
         var assemblyV1 = sourceType.Assembly;
         var assemblyV2 = targetType.Assembly;
 
-        Log.Debug(() => $"Registering converter {converter} for {sourceType}  => {targetType}");
+        Log.Debug($"Registering converter {converter} for {sourceType}  => {targetType}");
         var sourceSample = versionedConfigByType.GetOrAdd(sourceType, _ => new T1());
         var targetSample = versionedConfigByType.GetOrAdd(targetType, _ => new T2());
-        Log.Debug(() => $"Version of source type {sourceType} is {sourceSample.Version}, version of target type {targetType} is {targetSample.Version}");
+        Log.Debug($"Version of source type {sourceType} is {sourceSample.Version}, version of target type {targetType} is {targetSample.Version}");
 
         if (targetSample.Version < sourceSample.Version)
         {
@@ -121,7 +121,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
             TargetVersion = targetSample.Version
         };
 
-        Log.Debug(() => $"Registering explicit converter: {explicitConverterKey}");
+        Log.Debug($"Registering explicit converter: {explicitConverterKey}");
         RegisterConverter(new ConverterData {Key = explicitConverterKey, ConverterFunc = ExplicitConvert});
         RegisterImplicitConverters(explicitConverterKey);
         return;
@@ -155,10 +155,10 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
     private void RegisterConverter(ConverterData converterData)
     {
-        Log.Debug(() => $"Adding new converter {converterData}");
+        Log.Debug($"Adding new converter {converterData}");
         convertersByMetadata.AddOrUpdate(converterData.Key, () =>
         {
-            Log.Debug(() => $"Registered new converter successfully: {converterData}");
+            Log.Debug($"Registered new converter successfully: {converterData}");
             return converterData;
         }, (_, existing) =>
         {
@@ -195,7 +195,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     private void LoadConvertersFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.GetName().Name);
-        logger.Debug(() => "Loading converters from assembly");
+        logger.Debug("Loading converters from assembly");
 
         try
         {
@@ -205,16 +205,16 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
             {
                 return;
             }
-            logger.Debug(() => $"Detected converters in assembly:\n\t{matchingTypes.DumpToTable()}");
+            logger.Debug($"Detected converters in assembly:\n\t{matchingTypes.DumpToTable()}");
             foreach (var converterType in matchingTypes)
             {
-                logger.Debug(() => $"Creating new converter: {converterType}");
+                logger.Debug($"Creating new converter: {converterType}");
                 var converter = Activator.CreateInstance(converterType.InstanceType);
                 var sourceConfigType = converterType.ConverterType.GetGenericArguments()[0];
                 var targetConfigType = converterType.ConverterType.GetGenericArguments()[1];
                 var registrationMethodTyped = RegistrationMethod.MakeGenericMethod(sourceConfigType, targetConfigType);
                 registrationMethodTyped.Invoke(this, new[] {converter});
-                logger.Debug(() => $"Successfully registered converter {converter}");
+                logger.Debug($"Successfully registered converter {converter}");
             }
         }
         catch (Exception e)
@@ -246,14 +246,14 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 return;
             }
 
-            Log.Debug(() => $"Registering implicit descending converter: {implicitConverterKey}");
+            Log.Debug($"Registering implicit descending converter: {implicitConverterKey}");
             var explicitConverter = convertersByMetadata[converterKey];
             
             Func<object, object> descendingConverter = src =>
             {
-                Log.Debug(() => $"Converting source using implicit {implicitConverterKey}");
+                Log.Debug($"Converting source using implicit {implicitConverterKey}");
                 var interimConversionResult = previousConverter.Value.ConverterFunc(src);
-                Log.Debug(() => $"Converting source using {converterKey}");
+                Log.Debug($"Converting source using {converterKey}");
                 return explicitConverter.ConverterFunc(interimConversionResult);
             };
             
@@ -279,14 +279,14 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
                 return;
             }
 
-            Log.Debug(() => $"Registering implicit ascending converter: {implicitConverterKey}");
+            Log.Debug($"Registering implicit ascending converter: {implicitConverterKey}");
             var explicitConverter = convertersByMetadata[converterKey];
             
             Func<object, object> ascendingConverter = src =>
             {
-                Log.Debug(() => $"Converting source using implicit {converterKey}");
+                Log.Debug($"Converting source using implicit {converterKey}");
                 var interimConversionResult = explicitConverter.ConverterFunc(src);
-                Log.Debug(() => $"Converting source using {implicitConverterKey}");
+                Log.Debug($"Converting source using {implicitConverterKey}");
                 return nextConverter.Value.ConverterFunc(interimConversionResult);
             };
             RegisterConverter(new ConverterData {Key = implicitConverterKey, ConverterFunc = ascendingConverter, Comment = "Ascending Implicit"});

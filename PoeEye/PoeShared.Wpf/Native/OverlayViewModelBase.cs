@@ -153,7 +153,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
         var center = UnsafeNative.GetPositionAtTheCenter(WindowController.Window).ScaleToScreen(Dpi);
         var size = DefaultSize.IsNotEmpty() ? DefaultSize : MinSize;
         NativeBounds = new Rectangle(center, size);
-        Log.Info(() => $"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
+        Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
 
         if (UnlockWindowCommand.CanExecute(null))
         {
@@ -168,7 +168,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
 
     protected virtual void ApplyConfig(IOverlayConfig config)
     {
-        Log.Debug(() => $"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
+        Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
 
         var desktopHandle = UnsafeNative.GetDesktopWindow();
         var systemInformation = new
@@ -179,7 +179,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
             MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
         };
 
-        Log.Debug(() => $"[{OverlayDescription}] Current SystemInformation: {systemInformation}");
+        Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation}");
 
         var overlayBounds = config.OverlayBounds;
         if (!overlayBounds.IsNotEmptyArea() || overlayBounds.IsNotEmptyArea() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
@@ -219,7 +219,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this}");
         }
 
-        Log.Debug(() => $"[{OverlayDescription}] Unlocking window @ {NativeBounds}");
+        Log.Debug($"[{OverlayDescription}] Unlocking window @ {NativeBounds}");
         IsLocked = false;
     }
 
@@ -235,7 +235,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this}");
         }
 
-        Log.Debug(() => $"[{OverlayDescription}] Locking window @ {NativeBounds}");
+        Log.Debug($"[{OverlayDescription}] Locking window @ {NativeBounds}");
         IsLocked = true;
     }
 
@@ -256,7 +256,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
         }
 
-        Log.Debug(() => $"[{OverlayDescription}] Making overlay Layered");
+        Log.Debug($"[{OverlayDescription}] Making overlay Layered");
         OverlayMode = OverlayMode.Layered;
     }
 
@@ -272,7 +272,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
             throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
         }
 
-        Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
+        Log.Debug($"[{OverlayDescription}] Making overlay Transparent");
         OverlayMode = OverlayMode.Transparent;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace PoeShared.Modularity;
 
@@ -60,7 +60,7 @@ public sealed class AssemblyHelper
 
         foreach (var candidateAssembly in candidates)
         {
-            Log.Debug(() => $"Type {metadata.TypeName} is not loaded, trying to read type from assembly {metadata.AssemblyName}");
+            Log.Debug($"Type {metadata.TypeName} is not loaded, trying to read type from assembly {metadata.AssemblyName}");
 
             if (TryToLoadFromAssemblyName(candidateAssembly, metadata.TypeName, out var loadedType))
             {

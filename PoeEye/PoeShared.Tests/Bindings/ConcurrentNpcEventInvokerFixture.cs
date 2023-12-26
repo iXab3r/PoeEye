@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,7 +35,7 @@ public class ConcurrentNpcEventInvokerFixture : FixtureBase
         var received = RecordInvocationsObsolete(item);
         
         // Then
-        Log.Debug(() => $"Asserting");
+        Log.Debug($"Asserting");
         item.Value.ShouldBe(2);
         Assert.That(received == 2 == expectToSucceeed); // this shows the problem, it must be 2 in all cases !
     }
@@ -54,7 +54,7 @@ public class ConcurrentNpcEventInvokerFixture : FixtureBase
         var received = RecordInvocationsObsolete(item);
         
         // Then
-        Log.Debug(() => $"Asserting");
+        Log.Debug($"Asserting");
         item.Value.ShouldBe(2);
         received.ShouldBe(2);
     }
@@ -275,7 +275,7 @@ public class ConcurrentNpcEventInvokerFixture : FixtureBase
         Task.WaitAll(subscriber, setter);
 
         //Then
-        Log.Debug(() => "Asserting");
+        Log.Debug("Asserting");
         item.Value.ShouldBe(2);
         Assert.That(received.LastOrDefault() == 2 == expectToSucceeed); // this shows the problem, it must be 2 in all cases !
     }

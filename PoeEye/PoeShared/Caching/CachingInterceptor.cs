@@ -1,4 +1,4 @@
-﻿using System.Reactive.Concurrency;
+using System.Reactive.Concurrency;
 using Castle.DynamicProxy;
 
 namespace PoeShared.Caching;
@@ -38,11 +38,11 @@ internal sealed class CachingInterceptor : IInterceptor
             Arguments = invocation.Arguments.Select(x => $"{x ?? "null"}").JoinStrings(", ")
         };
         var log = Log.WithSuffix($"{key.TypeName}.{key.MethodName}({(!string.IsNullOrEmpty(key.Arguments) ? key.Arguments : string.Empty)})");
-        log.Debug(() => $"Invocation requested from cache via key {key}");
+        log.Debug($"Invocation requested from cache via key {key}");
 
         InvocationResult AddValueFactory(InvocationKey key)
         {
-            log.Debug(() => $"Performing invocation on source");
+            log.Debug($"Performing invocation on source");
             try
             {
                 invocation.Proceed();
@@ -52,7 +52,7 @@ internal sealed class CachingInterceptor : IInterceptor
                 Log.Error("Invocation has thrown exception", e);
                 throw;
             }
-            log.Debug(() => $"Invocation on source completed: {invocation.ReturnValue}");
+            log.Debug($"Invocation on source completed: {invocation.ReturnValue}");
             return new InvocationResult {Timestamp = clock.UtcNow, ReturnValue = invocation.ReturnValue};
         }
 
@@ -63,9 +63,9 @@ internal sealed class CachingInterceptor : IInterceptor
             return elapsed > TimeToLive ? AddValueFactory(key) : existing;
         });
         
-        log.Debug(() => $"Cache result: {result}");
+        log.Debug($"Cache result: {result}");
         invocation.ReturnValue = result.ReturnValue;
-        log.Debug(() => $"Returning result(elapsed: {(clock.UtcNow - result.Timestamp).TotalMilliseconds}ms): {invocation.ReturnValue}");
+        log.Debug($"Returning result(elapsed: {(clock.UtcNow - result.Timestamp).TotalMilliseconds}ms): {invocation.ReturnValue}");
     }
 
     private record struct InvocationKey

@@ -15,7 +15,7 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
 
     public UpdateSourceProviderFromConfig(IConfigProvider<UpdateSettingsConfig> configProvider)
     {
-        Log.Debug(() => $"Initializing update sources using configProvider {configProvider}");
+        Log.Debug($"Initializing update sources using configProvider {configProvider}");
 
         configProvider.ListenTo(x => x.UpdateSourceId)
             .SubscribeSafe(x => UpdateSourceId = x, Log.HandleUiException)
@@ -28,7 +28,7 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
                     return;
                 }
                 
-                Log.Debug(() => $"Saving update source to config: {x}");
+                Log.Debug($"Saving update source to config: {x}");
                 var config = configProvider.ActualConfig with
                 {
                     UpdateSourceId = x
@@ -60,7 +60,7 @@ internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject,
                 }
 
                 var defaultSource = x.items[0];
-                Log.Debug(() => $"Defaulting update source to {defaultSource}");
+                Log.Debug($"Defaulting update source to {defaultSource}");
                 UpdateSourceId = defaultSource.Id;
             }, Log.HandleUiException)
             .AddTo(Anchors);

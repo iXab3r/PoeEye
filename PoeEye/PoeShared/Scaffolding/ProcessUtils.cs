@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Scaffolding;
+namespace PoeShared.Scaffolding;
 
 public static class ProcessUtils
 {
@@ -7,10 +7,10 @@ public static class ProcessUtils
 
     public static async Task OpenUri(string uri)
     {
-        Log.Debug(() => $"Preparing to open uri {uri}");
+        Log.Debug($"Preparing to open uri {uri}");
         await Task.Run(() =>
         {
-            Log.Debug(() => $"Starting new process for uri: {uri}");
+            Log.Debug($"Starting new process for uri: {uri}");
             var result = new Process {StartInfo = {FileName = uri, UseShellExecute = true}};
             if (!result.Start())
             {
@@ -18,7 +18,7 @@ public static class ProcessUtils
             }
             else
             {
-                Log.Debug(() => $"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
+                Log.Debug($"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
             }
         });
     }
@@ -28,7 +28,7 @@ public static class ProcessUtils
         await Task.Run(
             () =>
             {
-                Log.Debug(() => $"Selecting: {fileSystemInfo}");
+                Log.Debug($"Selecting: {fileSystemInfo}");
                 fileSystemInfo.Refresh();
                 if (!fileSystemInfo.Exists)
                 {
@@ -45,7 +45,7 @@ public static class ProcessUtils
             () =>
             {
                 var appDirectory = directory.FullName;
-                Log.Debug(() => $"Opening App directory: {appDirectory}");
+                Log.Debug($"Opening App directory: {appDirectory}");
                 if (!directory.Exists)
                 {
                     throw new InvalidOperationException($"Directory {appDirectory} does not exist");

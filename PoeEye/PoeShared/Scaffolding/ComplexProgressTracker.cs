@@ -27,7 +27,7 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
     {
         progressByTask[taskName] = progressPercent;
         var totalProgress = (int)progressByTask.Values.Average();
-        Log.Debug(() => $"{taskName} is in progress: {progressPercent}%");
+        Log.Debug($"{taskName} is in progress: {progressPercent}%");
         ProgressPercent = totalProgress;
     }
 }

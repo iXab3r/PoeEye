@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -26,9 +26,9 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
         applicationAccessor.WhenTerminate
             .Select(x => $"Terminate with code {x}").Subscribe(x =>
             {
-                Log.Info(() => $"Detected application termination with code {x}, disposing mutex to avoid leak");
+                Log.Info($"Detected application termination with code {x}, disposing mutex to avoid leak");
                 Dispose();
-                Log.Info(() => $"Processed application termination");
+                Log.Info($"Processed application termination");
             })
             .AddTo(Anchors);
         AcquireMutexOrShutdown(MutexId, applicationAccessor, parent).AddTo(Anchors);
@@ -42,12 +42,12 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
         Application application)
     {
         var anchors = new CompositeDisposable();
-        Log.Info(() => $"Acquiring mutex {mutexId}...");
+        Log.Info($"Acquiring mutex {mutexId}...");
         var mutex = new Mutex(true, mutexId);
 
         var initialThread = Thread.CurrentThread;
         var threadDispatcher = Dispatcher.CurrentDispatcher;
-        Log.Info(() => $"Mutex will be disposed on dispatcher {threadDispatcher}, thread: { new { initialThread.Name, initialThread.ManagedThreadId } }");
+        Log.Info($"Mutex will be disposed on dispatcher {threadDispatcher}, thread: { new { initialThread.Name, initialThread.ManagedThreadId } }");
         
         var mutexAcquired = 
             Policy.Handle<Exception>(ex =>
@@ -65,7 +65,7 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
                 TimeSpan.FromSeconds(13)
             }).Execute(() =>
             {
-                Log.Info(() => $"Trying to acquire mutex {mutexId}");
+                Log.Info($"Trying to acquire mutex {mutexId}");
                 if (!mutex.WaitOne(TimeSpan.Zero, true))
                 {
                     throw new InvalidStateException($"Failed to await mutex {mutexId}, another instance is running?");
@@ -76,11 +76,11 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
 
         if (mutexAcquired)
         {
-            Log.Info(() => $"Acquired mutex {mutexId}");
+            Log.Info($"Acquired mutex {mutexId}");
 
             var mutexReleaseAction = () =>
             {
-                Log.Info(() => $"Releasing mutex {mutexId}");
+                Log.Info($"Releasing mutex {mutexId}");
                 mutex.ReleaseMutex();
                 Log.Info("Released mutex");
             };
@@ -89,10 +89,10 @@ internal sealed class SingleInstanceValidationHelper : DisposableReactiveObject,
             {
                 if (Thread.CurrentThread != initialThread)
                 {
-                    Log.Info(() => $"Dispatching mutex release action as current thread differs from initial");
+                    Log.Info($"Dispatching mutex release action as current thread differs from initial");
                     threadDispatcher.Invoke(() =>
                     {
-                        Log.Info(() => $"Invoking mutex release action");
+                        Log.Info($"Invoking mutex release action");
                         mutexReleaseAction();
                     });
                 }

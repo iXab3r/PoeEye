@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +39,7 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
             var destinationFileName = Path.Combine(outputDirectory.FullName, logFileName);
             try
             {
-                Log.Debug(() => $"Copying {logFile.FullName} ({logFile.Length}b) to {destinationFileName}");
+                Log.Debug($"Copying {logFile.FullName} ({logFile.Length}b) to {destinationFileName}");
 
                 var destinationDirectory = Path.GetDirectoryName(destinationFileName);
                 if (destinationDirectory == null)

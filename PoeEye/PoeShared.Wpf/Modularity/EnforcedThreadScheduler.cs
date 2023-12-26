@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
@@ -15,7 +15,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
     public EnforcedThreadScheduler(Thread thread, IScheduler threadScheduler)
     {
         Log = GetType().PrepareLogger();
-        Log.Info(() => $"Using existing thread scheduler: {threadScheduler}");
+        Log.Info($"Using existing thread scheduler: {threadScheduler}");
         this.threadScheduler = threadScheduler;
         this.schedulerThread = thread;
     }
@@ -24,10 +24,10 @@ public sealed class EnforcedThreadScheduler : IScheduler
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Log = GetType().PrepareLogger().WithSuffix($"SchedulerName: {name}");
-        Log.Info(() => $"Initializing new scheduler {name}");
+        Log.Info($"Initializing new scheduler {name}");
         var eventLoopScheduler = new EventLoopScheduler(start =>
         {
-            Log.Info(() => $"Initializing thread for scheduler {name} with priority {priority}");
+            Log.Info($"Initializing thread for scheduler {name} with priority {priority}");
             if (schedulerThread != null)
             {
                 throw new InvalidOperationException("This method must(and will in current implementation) be called only once");
@@ -38,9 +38,9 @@ public sealed class EnforcedThreadScheduler : IScheduler
                 IsBackground = true,
                 Priority = priority
             };
-            Log.Debug(() => $"Setting apartment state for thread {schedulerThread.Name}");
+            Log.Debug($"Setting apartment state for thread {schedulerThread.Name}");
             schedulerThread.SetApartmentState(ApartmentState.STA);
-            Log.Info(() => $"Scheduler {name} with thread {schedulerThread.Name} initialized");
+            Log.Info($"Scheduler {name} with thread {schedulerThread.Name} initialized");
             return schedulerThread;
         });
         threadScheduler = eventLoopScheduler;
@@ -52,7 +52,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
     {
         try
         {
-            Log.Info(() => $"Scheduler thread has started, priority: {Thread.CurrentThread.Priority}");
+            Log.Info($"Scheduler thread has started, priority: {Thread.CurrentThread.Priority}");
             innerFunc();
         }
         catch (Exception e)
@@ -62,7 +62,7 @@ public sealed class EnforcedThreadScheduler : IScheduler
         }
         finally{
         {
-            Log.Info(() => $"Scheduler thread has completed");
+            Log.Info($"Scheduler thread has completed");
         }}
     }
 

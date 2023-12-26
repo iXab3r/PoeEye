@@ -71,8 +71,8 @@ public class BindableSelectedItemBehavior : Behavior<TreeView>
     private void OnTreeViewSelectedItemChanged(ITreeViewItemViewModel previousValue, ITreeViewItemViewModel currentValue)
     {
         var previousSelectedItem = SelectedItem;
-        Log.Debug(() => $"[{AssociatedObject}({AssociatedObject.Name})] Changing {previousValue} => {currentValue}, SelectedItem: {previousSelectedItem}");
+        Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Changing {previousValue} => {currentValue}, SelectedItem: {previousSelectedItem}");
         SelectedItem = currentValue;
-        Log.Debug(() => $"[{AssociatedObject}({AssociatedObject.Name})] Selected item changed {previousSelectedItem} => {SelectedItem}");
+        Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Selected item changed {previousSelectedItem} => {SelectedItem}");
     }
 }

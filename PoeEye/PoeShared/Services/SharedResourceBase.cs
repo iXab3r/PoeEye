@@ -1,4 +1,4 @@
-﻿//#define SHAREDRESOURCE_ENABLE_STACKTRACE_LOG
+//#define SHAREDRESOURCE_ENABLE_STACKTRACE_LOG
 //#define SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS
 
 using System.Threading;
@@ -13,12 +13,12 @@ public abstract class SharedResourceBase<T> : SharedResourceBase
     protected SharedResourceBase()
     {
         var beforeAliveCount = Interlocked.Increment(ref aliveResourcesCount);
-        Log.Debug(() => $"Created, alive items count: {beforeAliveCount}");
+        Log.Debug($"Created, alive items count: {beforeAliveCount}");
 
         Disposable.Create(() =>
         {
             var afterAliveCount = Interlocked.Decrement(ref aliveResourcesCount);
-            Log.Debug(() => $"Disposed, alive items count: {afterAliveCount}");
+            Log.Debug($"Disposed, alive items count: {afterAliveCount}");
         }).AddTo(Anchors);
     }
 }
@@ -42,11 +42,11 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
         ResourceId = $"Resource#{Interlocked.Increment(ref globalIdx)}";
         refCountGate = new NamedLock(ResourceId);
         Log = GetType().PrepareLogger().WithSuffix(ToString);
-        Log.Debug(() => $"Resource of type {GetType()} is created");
+        Log.Debug($"Resource of type {GetType()} is created");
 
         Disposable.Create(() =>
         {
-            Log.Debug(() => $"Resource of type {GetType()} has been disposed");
+            Log.Debug($"Resource of type {GetType()} has been disposed");
         }).AddTo(Anchors);
     }
     
@@ -77,7 +77,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
     public IDisposable RentReadLock()
     {
-        Log.Debug(() => "Entering Read lock");
+        Log.Debug("Entering Read lock");
         EnsureIsAlive();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
         WriteLog($"Entering Read lock: {resourceGate}");
@@ -91,7 +91,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exiting Read lock: {resourceGate}");
 #endif
-            Log.Debug(() => "Exiting Read lock");
+            Log.Debug("Exiting Read lock");
             resourceGate.ExitReadLock();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exited Read lock: {resourceGate}");
@@ -101,7 +101,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
     public IDisposable RentWriteLock()
     {
-        Log.Debug(() => "Entering Write lock");
+        Log.Debug("Entering Write lock");
         EnsureIsAlive();
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
         WriteLog($"Entering Write lock: {resourceGate}");
@@ -112,7 +112,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 #endif
         return Disposable.Create(() =>
         {
-            Log.Debug(() => "Exiting Write lock");
+            Log.Debug("Exiting Write lock");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && SHAREDRESOURCE_ENABLE_STACKTRACE_LOG_LOCKS && DEBUG
             WriteLog($"Exiting Write lock: {resourceGate}");
 #endif
@@ -127,10 +127,10 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
     {
         using (refCountGate.Enter())
         {
-            Log.Debug(() => $"Resource is being rented, refCount: {refCount}");
+            Log.Debug($"Resource is being rented, refCount: {refCount}");
             if (refCount <= 0)
             {
-                Log.Debug(() => "Failed to rent - resource is already disposed");
+                Log.Debug("Failed to rent - resource is already disposed");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
                     WriteLog($"Failed to increment - already disposed");
 #endif
@@ -139,7 +139,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
             if (!CanRent())
             {
-                Log.Debug(() => "Failed to rent - resource could not be rented");
+                Log.Debug("Failed to rent - resource could not be rented");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
                 WriteLog($"Failed to increment - resource could not be rented");
 #endif
@@ -147,7 +147,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
             }
 
             var usages = ++refCount;
-            Log.Debug(() => $"Resource is rented, refCount: {usages}");
+            Log.Debug($"Resource is rented, refCount: {usages}");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
                 WriteLog($"Incremented");
 #endif
@@ -183,7 +183,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
         if (usages > 0)
         {
-            Log.Debug(() => $"Resource is still in use - keeping it, refCount: {refCount}");
+            Log.Debug($"Resource is still in use - keeping it, refCount: {refCount}");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
                 WriteLog($"Decrement, ignoring, still in use");
 #endif
@@ -210,12 +210,12 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
             throw new ObjectDisposedException($"Resource is already disposed: {this}");
         }
 
-        Log.Debug(() => "Disposing resource");
+        Log.Debug("Disposing resource");
 #if SHAREDRESOURCE_ENABLE_STACKTRACE_LOG && DEBUG
             WriteLog($"Disposing");
 #endif
         base.Dispose();
-        Log.Debug(() => "Resource disposed");
+        Log.Debug("Resource disposed");
     }
 
     public void AddResource(IDisposable resource)
@@ -233,7 +233,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
         using (refCountGate.Enter())
         {
             var usages = --refCount;
-            Log.Debug(() => $"Resource is released, refCount: {usages}");
+            Log.Debug($"Resource is released, refCount: {usages}");
             return usages;
         }
     }

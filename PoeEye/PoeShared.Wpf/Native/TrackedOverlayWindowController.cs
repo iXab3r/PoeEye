@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -14,7 +14,7 @@ internal sealed class TrackedOverlayWindowController : OverlayWindowController, 
         IWindowTracker windowTracker, 
         [Unity.Dependency(WellKnownDispatchers.UIOverlay)] IScheduler overlayScheduler) : base(overlayScheduler)
     {
-        Log.Info(() => $"Creating overlay window controller using {windowTracker}");
+        Log.Info($"Creating overlay window controller using {windowTracker}");
         WindowTracker = windowTracker;
         
         Observable.Merge(windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit(), this.WhenAnyValue(x => x.IsEnabled).ToUnit())
@@ -26,10 +26,10 @@ internal sealed class TrackedOverlayWindowController : OverlayWindowController, 
                     OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowHandle),
                     IsEnabled
                 })
-            .Do(x => Log.Debug(() => $"Active window has changed: {x}"))
+            .Do(x => Log.Debug($"Active window has changed: {x}"))
             .Select(x => (x.WindowIsActive || x.OverlayIsActive) && IsEnabled)
             .DistinctUntilChanged()
-            .Do(x => Log.Debug(() => $"Sending SetVisibility({x}) to window scheduler"))
+            .Do(x => Log.Debug($"Sending SetVisibility({x}) to window scheduler"))
             .ObserveOn(overlayScheduler)
             .SubscribeSafe(SetVisibility, Log.HandleUiException)
             .AddTo(Anchors);

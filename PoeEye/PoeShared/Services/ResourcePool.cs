@@ -36,25 +36,25 @@ public sealed class ResourcePool<TKey, TResource> : DisposableReactiveObjectWith
     {
         using var @lock = resourcesLock.Enter();
             
-        Log.Debug(() => $"Retrieving resource using key {key} from the pool");
+        Log.Debug($"Retrieving resource using key {key} from the pool");
             
         Cleanup();
             
         if (!TryGetFromPool(key, out var container))
         {
-            Log.Debug(() => $"Not enough resources for the key {key}, creating a new one");
+            Log.Debug($"Not enough resources for the key {key}, creating a new one");
             var newResource = resourceFactory(key);
             container = new ResourceContainer(newResource);
-            Log.Debug(() => $"Created new resource {newResource} and container {container}");
+            Log.Debug($"Created new resource {newResource} and container {container}");
         }
         container.LastAccessTimestamp = clock.Elapsed;
             
         instance = container.Resource;
         return Disposable.Create(() =>
         {
-            Log.Debug(() => $"Returning resource {container} to the pool");
+            Log.Debug($"Returning resource {container} to the pool");
             ReturnToPool(key, container);
-            Log.Debug(() => $"Returned resource {container} to the pool");
+            Log.Debug($"Returned resource {container} to the pool");
         });
     }
 
@@ -72,7 +72,7 @@ public sealed class ResourcePool<TKey, TResource> : DisposableReactiveObjectWith
             return;
         }
             
-        Log.Debug(() => $"Performing the cleanup, time elapsed: {elapsedSinceCleanup}");
+        Log.Debug($"Performing the cleanup, time elapsed: {elapsedSinceCleanup}");
         lastCleanupTimestamp = elapsed;
         LastCleanupTimestamp = clock.Now;
 
@@ -85,17 +85,17 @@ public sealed class ResourcePool<TKey, TResource> : DisposableReactiveObjectWith
                     throw new InvalidStateException("Should've never happen - Peeked but failed to Dequeue an item");
                 }
 
-                Log.Debug(() => $"Removed container {containerToRemove} from the pool");
+                Log.Debug($"Removed container {containerToRemove} from the pool");
 
                 if (containerToRemove.Resource is IDisposable disposableResource)
                 {
-                    Log.Debug(() => $"Disposing the resource {disposableResource} from container {containerToRemove}");
+                    Log.Debug($"Disposing the resource {disposableResource} from container {containerToRemove}");
                     disposableResource.Dispose();
                 }
             }
         }
             
-        Log.Debug(() => $"Cleanup completed");
+        Log.Debug($"Cleanup completed");
     }
 
     private bool TryGetFromPool(TKey key, out ResourceContainer instance)
