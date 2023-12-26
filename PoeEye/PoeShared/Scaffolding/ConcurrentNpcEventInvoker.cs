@@ -111,7 +111,7 @@ internal sealed class ConcurrentNpcEventInvoker : INpcEventInvoker
                         }
                     }
                 }
-                action?.DynamicInvoke(owner, args);
+                action?.Invoke(owner, args);
                 cursor = next;
             }
         }
