@@ -47,7 +47,10 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (Exception ex)
             {
-                Log.Warn($"Failed to get processId via {nameof(User32.GetWindowThreadProcessId)}, last error: {Kernel32.GetLastError()}", ex);
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn($"Failed to get processId via {nameof(User32.GetWindowThreadProcessId)}, last error: {Kernel32.GetLastError()}", ex);
+                }
             } 
 
             return (processId: processId, threadId: threadId);
@@ -62,7 +65,10 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (Exception ex)
             {
-                Log.Warn($"Failed to get owner via {nameof(User32.GetWindow)}, last error: {Kernel32.GetLastError()}", ex);
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn($"Failed to get owner via {nameof(User32.GetWindow)}, last error: {Kernel32.GetLastError()}", ex);
+                }
             }
             return default;
         }, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -75,7 +81,10 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (Exception ex)
             {
-                Log.Warn($"Failed to get parent via {nameof(UnsafeNative.GetParent)}, last error: {Kernel32.GetLastError()}", ex);
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn($"Failed to get parent via {nameof(UnsafeNative.GetParent)}, last error: {Kernel32.GetLastError()}", ex);
+                }
             }
 
             return default;
@@ -97,7 +106,11 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (Exception ex)
             {
-                Log.Warn($"Failed to get IconBitmap, class: {Class}", ex);
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn($"Failed to get IconBitmap, class: {Class}", ex);
+                }
+
                 return default;
             }
         }, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -113,7 +126,11 @@ internal sealed class WindowHandle : IWindowHandle
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(() => $"Failed to retrieve native process path for process Id {ProcessId}", ex);
+                    if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug($"Failed to retrieve native process path for process Id {ProcessId}", ex);
+                    }
+
                     nativeProcessPath = default;
                 }
                     
@@ -125,7 +142,11 @@ internal sealed class WindowHandle : IWindowHandle
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}, using native path: {nativeProcessPath}", ex);
+                    if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug($"Failed to retrieve process times information for process Id {ProcessId}, using native path: {nativeProcessPath}", ex);
+                    }
+
                     processPath = nativeProcessPath;
                 }
                     
@@ -145,7 +166,11 @@ internal sealed class WindowHandle : IWindowHandle
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(() => $"Failed to retrieve process name for process Id {ProcessId}", ex);
+                    if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug($"Failed to retrieve process name for process Id {ProcessId}", ex);
+                    }
+
                     processName = default;
                 }
 
@@ -156,7 +181,11 @@ internal sealed class WindowHandle : IWindowHandle
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(() => $"Failed to retrieve command linefor process Id {ProcessId}", ex);
+                    if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug($"Failed to retrieve command linefor process Id {ProcessId}", ex);
+                    }
+
                     commandLine = default;
                 }
 
@@ -167,7 +196,11 @@ internal sealed class WindowHandle : IWindowHandle
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(() => $"Failed to parse command line args for process Id {ProcessId}, command line: {commandLine}", ex);
+                    if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug($"Failed to parse command line args for process Id {ProcessId}, command line: {commandLine}", ex);
+                    }
+
                     processArgs = default;
                 }
 
@@ -181,7 +214,10 @@ internal sealed class WindowHandle : IWindowHandle
                     }
                     catch (Win32Exception ex)
                     {
-                        Log.Debug(() => $"Failed to retrieve process times information for process Id {ProcessId}", ex);
+                        if (Log.IsDebugEnabled)
+                        {
+                            Log.Debug($"Failed to retrieve process times information for process Id {ProcessId}", ex);
+                        }
                     }
                 }
                     
@@ -193,7 +229,10 @@ internal sealed class WindowHandle : IWindowHandle
                     }
                     catch (Win32Exception ex)
                     {
-                        Log.Debug(() => $"Failed to retrieve native process times information for process Id {ProcessId}", ex);
+                        if (Log.IsDebugEnabled)
+                        {
+                            Log.Debug($"Failed to retrieve native process times information for process Id {ProcessId}", ex);
+                        }
                     }
                 }
                     
@@ -201,7 +240,10 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (Exception ex)
             {
-                Log.Debug(() => $"Failed to wrap Process with Id {ProcessId} - {ex.Message} ({ex.GetType().Name})");
+                if (Log.IsDebugEnabled)
+                {
+                    Log.Debug(() => $"Failed to wrap Process with Id {ProcessId} - {ex.Message} ({ex.GetType().Name})");
+                }
             }
             return default;
         });
@@ -214,7 +256,11 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (Exception ex)
             {
-                Log.Debug($"Failed to get parent process Id of process {ProcessId} - {ex.Message} ({ex.GetType().Name})");
+                if (Log.IsDebugEnabled)
+                {
+                    Log.Debug($"Failed to get parent process Id of process {ProcessId} - {ex.Message} ({ex.GetType().Name})");
+                }
+
                 return default;
             }
         });

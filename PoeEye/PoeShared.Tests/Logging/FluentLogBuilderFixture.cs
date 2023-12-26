@@ -81,7 +81,7 @@ public class FluentLogBuilderFixture
         FluentLogSettings.Instance.MinLogLevel = isEnabled ? logLevel  : logLevel + 1;
 
         //When
-        instance.Write(logLevel, $"Test: {container}");
+        instance.Write(logLevel, () => $"Test: {container}");
 
         //Then
         container.ToStringCount.ShouldBe(isEnabled == true ? 1 : 0);

@@ -87,7 +87,7 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
             }
             catch (Exception e)
             {
-                log.WithSuffix(uri).Warn(() => $"Failed to get result", e);
+                log.WithSuffix(uri).Warn($"Failed to get result", e);
                 uriChooser.ReportBroken(uri);
             }
         }

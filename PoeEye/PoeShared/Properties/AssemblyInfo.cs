@@ -26,5 +26,6 @@ using PoeShared.Modularity;
 [assembly: InternalsVisibleTo("PoeShared.Benchmarks")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo("EyeAuras.Tests")]
+[assembly: InternalsVisibleTo("PoeShared.Fody.Tests")]
 [assembly: InternalsVisibleTo("EyeAuras.Benchmarks")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
