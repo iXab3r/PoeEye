@@ -24,24 +24,16 @@ public interface IFluentLog
     void Debug(string message);
     void Debug(Func<string> messageSupplier);
     void Debug(string message, Exception exception);
-    void Debug(FormattableString message);
-    void Debug(FormattableString message, Exception exception);
     
     void Info(string message);
     void Info(Func<string> messageSupplier);
     void Info(string message, Exception exception);
-    void Info(FormattableString message);
-    void Info(FormattableString message, Exception exception);
     
     void Warn(string message);
     void Warn(Func<string> messageSupplier);
     void Warn(string message, Exception exception);
-    void Warn(FormattableString message);
-    void Warn(FormattableString message, Exception exception);
     
     void Error(string message);
     void Error(Func<string> messageSupplier);
     void Error(string message, Exception exception);
-    void Error(FormattableString message);
-    void Error(FormattableString message, Exception exception);
 }

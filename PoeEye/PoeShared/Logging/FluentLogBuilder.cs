@@ -54,27 +54,6 @@ internal sealed class FluentLogBuilder : IFluentLog
         Debug(message, default);
     }
 
-    public void Debug(FormattableString message)
-    {
-        if (!IsDebugEnabled)
-        {
-            return;
-        }
-
-        Debug(message, default);
-    }
-
-    public void Debug(FormattableString message, Exception exception)
-    {
-        if (!IsDebugEnabled)
-        {
-            return;
-        }
-
-        var messageString = SafeExtract(this, message);
-        Debug(messageString, exception);
-    }
-
     public void Debug(Func<string> message)
     {
         if (!IsDebugEnabled)
@@ -235,83 +214,6 @@ internal sealed class FluentLogBuilder : IFluentLog
 
         var messageString = SafeExtract(this, message);
         Error(messageString, exception);
-    }
-
-    public void Info(FormattableString message)
-    {
-        if (!IsInfoEnabled)
-        {
-            return;
-        }
-
-        Info(message, default);
-    }
-
-    public void Info(FormattableString message, Exception exception)
-    {
-        if (!IsInfoEnabled)
-        {
-            return;
-        }
-
-        var messageString = SafeExtract(this, message);
-        Info(messageString, exception);
-    }
-
-    public void Warn(FormattableString message)
-    {
-        if (!IsWarnEnabled)
-        {
-            return;
-        }
-
-        Warn(message, default);
-    }
-
-    public void Warn(FormattableString message, Exception exception)
-    {
-        if (!IsWarnEnabled)
-        {
-            return;
-        }
-
-        var messageString = SafeExtract(this, message);
-        Warn(messageString, exception);
-    }
-
-    public void Error(FormattableString message)
-    {
-        if (!IsErrorEnabled)
-        {
-            return;
-        }
-
-        Error(message, default);
-    }
-
-    public void Error(FormattableString message, Exception exception)
-    {
-        if (!IsErrorEnabled)
-        {
-            return;
-        }
-
-        var messageString = SafeExtract(this, message);
-        Error(messageString, exception);
-    }
-
-    private static string SafeExtract(IFluentLog log, FormattableString supplier)
-    {
-        try
-        {
-            return supplier.ToString();
-        }
-        catch (Exception e)
-        {
-            var errorMessage = $"Failed to write formatted log message, message: {supplier.Format}, argsCount: {supplier.ArgumentCount}, args: {supplier.GetArguments().DumpToString()}";
-            log.Error(errorMessage, e);
-            return default;
-        }
     }
 
     private static string SafeExtract(IFluentLog log, Func<string> supplier)
