@@ -81,7 +81,7 @@ partial class BlazorContentPresenter
     public BlazorContentPresenter()
     {
         Disposable.Create(() => View = null).AddTo(Anchors);
-
+        
         this.WhenAnyValue(x => x.View)
             .WithPrevious()
             .Subscribe(x =>
@@ -108,6 +108,10 @@ partial class BlazorContentPresenter
     internal void Initialize()
     {
         IsInitialized = true;
+        this.WhenAnyValue(x => x.Content)
+            .Skip(1)
+            .SubscribeAsync(x => Refresh($"Content has been updated to {x}"))
+            .AddTo(Anchors);
         Binder.Attach(this).AddTo(Anchors);
     }
 

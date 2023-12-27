@@ -1,6 +1,9 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -10,7 +13,7 @@ namespace PoeShared.Blazor.Wpf;
 /// </summary>
 internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
 {
-    [Parameter] public object Content { get; set; }
+    public object Content { get; set; }
     
     public object ViewTypeKey { get; init; }
     
@@ -26,5 +29,13 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
         builder.AddAttribute(seq++, "ViewTypeKey", ViewTypeKey);
         builder.AddAttribute(seq++, "ViewType", ViewType);
         builder.CloseComponent();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.WhenAnyProperty(x => x.Content)
+            .SubscribeAsync(x => Refresh($"Content has been updated"))
+            .AddTo(Anchors);
     }
 }

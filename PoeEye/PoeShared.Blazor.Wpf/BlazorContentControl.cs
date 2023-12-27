@@ -172,8 +172,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                         {
                             ViewType = state.viewType,
                         }.AddTo(contentAnchors);
-                        this.WhenAnyValue(content => content.Content)
-                            .Subscribe(content => contentPresenter.Content = content)
+                        
+                        this.WhenAnyValue(contentControl => contentControl.Content)
+                            .Subscribe(content =>
+                            {
+                                contentPresenter.Content = content;
+                            })
                             .AddTo(contentAnchors);
                         return contentPresenter;
                     });

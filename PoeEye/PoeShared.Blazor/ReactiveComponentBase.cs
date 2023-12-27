@@ -41,7 +41,8 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
             .Do(x => Interlocked.Increment(ref refreshRequestCount))
             .Sample(RefreshPeriod) //FIXME UI throttling
             .Do(reason => Interlocked.Increment(ref refreshCount))
-            .SubscribeAsync(async reason => await Refresh(reason)).AddTo(Anchors);
+            .SubscribeAsync(async reason => await Refresh(reason))
+            .AddTo(Anchors);
     }
     
     /// <summary>
