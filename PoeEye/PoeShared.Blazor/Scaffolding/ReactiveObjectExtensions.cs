@@ -21,4 +21,42 @@ public static class ReactiveObjectExtensions
             return anchors;
         });
     }
+    
+    public static IObservable<string> Listen<TContext, TOut1, TOut2>(
+        this TContext context, 
+        Expression<Func<TContext, TOut1>> selector1, 
+        Expression<Func<TContext, TOut2>> selector2) where TContext : class
+    {
+        return Observable.Merge(
+            Listen(context, selector1),
+            Listen(context, selector2));
+    }
+    
+    public static IObservable<string> Listen<TContext, TOut1, TOut2, TOut3>(
+        this TContext context, 
+        Expression<Func<TContext, TOut1>> selector1, 
+        Expression<Func<TContext, TOut2>> selector2,
+        Expression<Func<TContext, TOut3>> selector3) 
+        where TContext : class
+    {
+        return Observable.Merge(
+            Listen(context, selector1),
+            Listen(context, selector2),
+            Listen(context, selector3));
+    }
+    
+    public static IObservable<string> Listen<TContext, TOut1, TOut2, TOut3, TOut4>(
+        this TContext context, 
+        Expression<Func<TContext, TOut1>> selector1, 
+        Expression<Func<TContext, TOut2>> selector2,
+        Expression<Func<TContext, TOut3>> selector3,
+        Expression<Func<TContext, TOut4>> selector4) 
+        where TContext : class
+    {
+        return Observable.Merge(
+            Listen(context, selector1),
+            Listen(context, selector2),
+            Listen(context, selector3),
+            Listen(context, selector4));
+    }
 }

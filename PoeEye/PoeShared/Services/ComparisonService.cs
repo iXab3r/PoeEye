@@ -7,6 +7,8 @@ namespace PoeShared.Services;
 
 internal sealed class ComparisonService : IComparisonService
 {
+    private static readonly IFluentLog Log = typeof(ComparisonService).PrepareLogger();
+
     private readonly ComparisonConfig diffLogicConfig = new ComparisonConfig
     {
         DoublePrecision = 0.01,
@@ -39,15 +41,31 @@ internal sealed class ComparisonService : IComparisonService
 
     public ComparisonResult Compare(object first, object second)
     {
-        var result = diffLogic.Compare(first, second);
-        return result;
+        try
+        {
+            var result = diffLogic.Compare(first, second);
+            return result;
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to perform comparison of two objects:\nFirst({first.GetType()}):\n{first}\n\nSecond({second.GetType()}):\n{second}", e);
+            throw;
+        }
     }
 
     public ComparisonResult Compare(object first, object second, Action<ComparisonConfig> configBuilder)
     {
-        var config = diffLogicConfig.DeepClone();
-        configBuilder(config);
-        var diff = new CompareLogic(config);
-        return diff.Compare(first, second);
+        try
+        {
+            var config = diffLogicConfig.DeepClone();
+            configBuilder(config);
+            var diff = new CompareLogic(config);
+            return diff.Compare(first, second);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to perform comparison of two objects with custom configuration:\nFirst({first.GetType()}):\n{first}\n\nSecond({second.GetType()}):\n{second}", e);
+            throw;
+        }
     }
 }
