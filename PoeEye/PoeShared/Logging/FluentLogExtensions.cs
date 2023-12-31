@@ -25,6 +25,7 @@ public static class FluentLogExtensions
         {
             return;
         }
+
         switch (logLevel)
         {
             case FluentLogLevel.Trace:
@@ -44,22 +45,43 @@ public static class FluentLogExtensions
                 throw new ArgumentOutOfRangeException();
         }
     }
-    
-    public static void DebugIfDebug(this IFluentLog log, Func<string> message)
+
+    public static void DebugIfDebug(this IFluentLog log, Func<string> messageSupplier)
+    {
+#if DEBUG
+        log.Debug(messageSupplier);
+#endif
+    }
+
+    public static void DebugIfDebug(this IFluentLog log, string message)
     {
 #if DEBUG
         log.Debug(message);
 #endif
     }
 
-    public static void WarnIfDebug(this IFluentLog log, Func<string> message)
+    public static void WarnIfDebug(this IFluentLog log, Func<string> messageSupplier)
+    {
+#if DEBUG
+        log.Warn(messageSupplier);
+#endif
+    }
+
+    public static void WarnIfDebug(this IFluentLog log, string message)
     {
 #if DEBUG
         log.Warn(message);
 #endif
     }
 
-    public static void InfoIfDebug(this IFluentLog log, Func<string> message)
+    public static void InfoIfDebug(this IFluentLog log, Func<string> messageSupplier)
+    {
+#if DEBUG
+        log.Info(messageSupplier);
+#endif
+    }
+    
+    public static void InfoIfDebug(this IFluentLog log, string message)
     {
 #if DEBUG
         log.Info(message);
@@ -89,7 +111,7 @@ public static class FluentLogExtensions
     {
         return new BenchmarkTimer(benchmarkName, log, propertyName);
     }
-    
+
     public static IFluentLog WithPrefix(this IFluentLog log, Func<string> prefixSupplier)
     {
         return log.WithLogData(log.Data.WithPrefix(prefixSupplier, brackets: true));
@@ -109,7 +131,7 @@ public static class FluentLogExtensions
     {
         return log.WithLogData(log.Data.WithSuffix(suffix));
     }
-    
+
     public static void AddPrefix(this IFluentLog log, Func<string> prefixSupplier)
     {
         log.Data = log.Data.WithPrefix(prefixSupplier, brackets: true);
@@ -157,7 +179,7 @@ public static class FluentLogExtensions
         });
         return new FluentLogBuilder(writerAdapter, log.Data);
     }
-    
+
     private static IFluentLog WithLogData(this IFluentLog log, LogData newLogData)
     {
         return new FluentLogBuilder(log.Writer, newLogData);
