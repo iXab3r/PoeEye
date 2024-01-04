@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using PoeShared.Modularity;
 using PoeShared.Services;
 using PoeShared.Tests.Helpers;
 
@@ -84,7 +85,7 @@ internal class ComparisonServiceFixtureTests : FixtureBase
 
     private ComparisonService CreateInstance()
     {
-        return new ComparisonService();
+        return new ComparisonService(new JsonConfigSerializer());
     }
 
     public sealed record TestClass
