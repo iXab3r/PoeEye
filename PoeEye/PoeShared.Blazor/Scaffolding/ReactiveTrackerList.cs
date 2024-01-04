@@ -5,7 +5,8 @@ namespace PoeShared.Blazor.Scaffolding;
 
 public sealed class ReactiveTrackerList : List<IObservable<string>>
 {
-    public ReactiveTrackerList()
+    public ReactiveTrackerList(params IObservable<string>[] sources)
     {
+        AddRange(sources);
     }
 }
