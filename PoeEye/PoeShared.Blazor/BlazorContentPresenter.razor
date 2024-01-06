@@ -1,4 +1,5 @@
 @using PoeShared.Blazor.Scaffolding
+@using JetBrains.Annotations
 @inherits ReactiveComponentBase
 
 <BlazorErrorBoundary @ref="errorBoundary">
@@ -15,7 +16,14 @@
             }
             else
             {
-                <div>View for @($"{Content.GetType()}") is not resolved</div>
+                if (NotFoundTemplate != null)
+                {
+                    @NotFoundTemplate
+                }
+                else
+                {
+                    <div>View for @($"{Content.GetType()}") is not resolved</div>
+                }
             }
         }
     </ChildContent>
@@ -39,6 +47,8 @@
 @code {
 
     private BlazorErrorBoundary errorBoundary;
+    
+    [Parameter] public RenderFragment NotFoundTemplate { get; set; }
 
     protected override void OnParametersSet()
     {
