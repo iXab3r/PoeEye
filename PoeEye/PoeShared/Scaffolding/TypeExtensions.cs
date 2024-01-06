@@ -34,4 +34,40 @@ public static class TypeExtensions
         return type.GetConstructor(types)
                ?? throw new MissingMethodException($"Failed to find constructor in {type} for types: {types.Select(x => x.Name).DumpToString()}");
     }
+    
+    /// <summary>
+    /// Gets all base types and interfaces for the specified type, including those inherited by its base types.
+    /// </summary>
+    /// <param name="type">The type for which to retrieve base types and interfaces.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> containing the specified type, all of its base types, and all of its interfaces.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the specified type is null.</exception>
+    public static IEnumerable<Type> GetAllBaseTypesAndInterfaces(this Type type)
+    {
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type), "Type cannot be null.");
+        }
+
+        var types = new HashSet<Type>();
+        CollectTypes(type, types);
+        return types;
+    }
+
+    private static void CollectTypes(Type type, HashSet<Type> types)
+    {
+        if (type == null || !types.Add(type))
+        {
+            // Base case for recursion: type is null or already processed
+            return;
+        }
+
+        // Add interfaces implemented by this type
+        foreach (var interfaceType in type.GetInterfaces())
+        {
+            CollectTypes(interfaceType, types);
+        }
+
+        // Recursive call for the base type
+        CollectTypes(type.BaseType, types);
+    }
 }
