@@ -52,12 +52,6 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    /// <inheritdoc />
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
-
     public void TrackState<TOut>(Expression<Func<TContext, TOut>> selector)
     {
         Track(selector);
