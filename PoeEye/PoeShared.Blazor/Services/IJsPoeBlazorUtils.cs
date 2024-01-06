@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.JSInterop;
 
 namespace PoeShared.Blazor.Services;
 
@@ -68,4 +69,6 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// Scrolls to the bottom of an element matching specified selector using jQuery.
     /// </summary>
     Task ScrollToBottom(string elementSelector);
+
+    Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default);
 }

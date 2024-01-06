@@ -21,6 +21,7 @@
      </ItemGroup>
 
      <ItemGroup>
+         <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="8.0.0" />
          <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
      </ItemGroup>
 

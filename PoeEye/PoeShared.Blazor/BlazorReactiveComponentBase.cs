@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Microsoft.JSInterop.Infrastructure;
 using PoeShared.Blazor.Internals;
 using PoeShared.Scaffolding;
 using PropertyBinder;
@@ -20,7 +22,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 
     private readonly Subject<object> whenChanged = new();
     private readonly ReactiveChangeDetector changeDetector = new();
-
+    
     /// <summary>
     /// Static constructor to initialize the binder for the component.
     /// </summary>
@@ -98,6 +100,35 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
         }
     }
 
+    protected T GetObject<T>(JsonObject dotNetObjectId)
+    {
+        var reference = GetObjectReference(dotNetObjectId);
+        if (reference.Value != null && reference.Value is not T)
+        {
+            throw new ArgumentException($"Expected reference object to be of type {typeof(T)}, but was {reference.Value.GetType()}");
+        }
+
+        return (T) reference.Value;
+    }
+    
+    protected IDotNetObjectReference GetObjectReference(JsonObject dotNetObjectId)
+    {
+        const string objectIdPropertyName = "__dotNetObject";
+        if (!dotNetObjectId.TryGetPropertyValue(objectIdPropertyName, out var objectIdProperty) || objectIdProperty == null)
+        {
+            throw new FormatException($"Incorrect JSON, failed to extract object id @ {objectIdPropertyName} in {dotNetObjectId}");
+        }
+
+        var objectId = objectIdProperty.GetValue<long>();
+        return GetObjectReference(objectId);
+    }
+    
+    protected IDotNetObjectReference GetObjectReference(long dotNetObjectId)
+    {
+        var safeJsRuntime = (SafeJsRuntime) JsRuntime;
+        return safeJsRuntime.GetObjectReference(dotNetObjectId);
+    }
+
     /// <summary>
     /// Represents a safe wrapper around the IJSRuntime to ensure proper usage within the component.
     /// </summary>
@@ -110,6 +141,16 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
         {
             this.jsRuntime = jsRuntime;
             this.owner = owner;
+        }
+
+        public IDotNetObjectReference GetObjectReference(long dotNetObjectId)
+        {
+            if (jsRuntime is not JSRuntime runtime)
+            {
+                throw new NotSupportedException($"JSRuntime of this type is not supported: {jsRuntime}, expected {typeof(JSRuntime)}, got {jsRuntime.GetType()}");
+            }
+            var dotNetObjectReference = runtime.GetObjectReference(dotNetObjectId);
+            return dotNetObjectReference;
         }
 
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object[] args)

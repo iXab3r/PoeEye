@@ -75,7 +75,14 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         var module = await GetModuleAsync();
         await module.InvokeVoidAsync("scrollToBottom", elementSelector);
     }
-    
+
+    public async Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default)
+    {
+        var module = await GetModuleAsync();
+        var dynamicComponentRef = await module.InvokeAsync<IJSObjectReference>("addRootComponent", elementId, componentIdentifier, initialParameters);
+        return new DynamicRootComponent(dynamicComponentRef, elementId, componentIdentifier);
+    }
+
     public async Task ScrollToTop(string elementSelector, TimeSpan duration)
     {
         var module = await GetModuleAsync();

@@ -61,6 +61,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public static readonly DependencyProperty ContainerProperty = DependencyProperty.Register(
         nameof(Container), typeof(IUnityContainer), typeof(BlazorContentControl), new PropertyMetadata(default(IUnityContainer)));
+    
+    public static readonly DependencyProperty CustomElementsProperty = DependencyProperty.Register(
+        nameof(CustomElements), typeof(IEnumerable<BlazorCustomElementDescriptor>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<BlazorCustomElementDescriptor>)));
 
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeContentAnchors;
@@ -132,6 +135,17 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             ComponentType = typeof(BlazorContentPresenterWrapper)
         }.AddTo(WebView.RootComponents);
 
+        this.WhenAnyValue(x => x.CustomElements)
+            .Select(x => x ?? Array.Empty<BlazorCustomElementDescriptor>())
+            .Subscribe(descriptors =>
+            {
+                foreach (var elementDescriptor in descriptors)
+                {
+                    WebView.RootComponents.RegisterForJavaScript(elementDescriptor.ComponentType, elementDescriptor.Identifier);
+                }
+            })
+            .AddTo(Anchors);
+        
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
         var generatedIndexFileName = "index.g.html";
         var contentRoot = "wwwroot";
@@ -260,6 +274,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     {
         get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
         set => SetValue(AdditionalFilesProperty, value);
+    }
+
+    public IEnumerable<BlazorCustomElementDescriptor> CustomElements
+    {
+        get => (IEnumerable<BlazorCustomElementDescriptor>) GetValue(CustomElementsProperty);
+        set => SetValue(CustomElementsProperty, value);
     }
 
     public bool EnableHotkeys
