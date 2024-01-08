@@ -1,16 +1,14 @@
-using log4net;
 using Microsoft.Extensions.Logging;
 
 namespace PoeShared.Logging;
 
-public sealed class Logger4Log4Net : ILogger
+public sealed class FluentLogger : ILogger
 {
-    private readonly ILog logger;
+    private readonly IFluentLog logger;
 
-    public Logger4Log4Net(string name)
+    public FluentLogger(IFluentLog logger)
     {
-        var repository = LogManager.GetAllRepositories().FirstOrDefault();
-        logger = LogManager.GetLogger(repository?.Name, name);
+        this.logger = logger;
     }
     
     public void Log<TState>(
@@ -19,7 +17,6 @@ public sealed class Logger4Log4Net : ILogger
         Func<TState, Exception, string> formatter)
     {
         var message = formatter(state, exception);
-
         switch (logLevel)
         {
             case LogLevel.None:
@@ -52,7 +49,6 @@ public sealed class Logger4Log4Net : ILogger
             LogLevel.Information => logger.IsInfoEnabled,
             LogLevel.Warning => logger.IsWarnEnabled,
             LogLevel.Error => logger.IsErrorEnabled,
-            LogLevel.Critical => logger.IsFatalEnabled,
             var _ => false
         };
     }
