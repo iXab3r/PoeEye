@@ -253,6 +253,24 @@
                     </st:StackPanel>
                 </ScrollViewer>
             </TabItem>
+            
+            <TabItem Header="ScreenRegion">
+                <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
+                     <st:StackPanel Orientation="Horizontal">
+                         <CheckBox x:Name="PickRegionMinimizeCheckbox">Minimize</CheckBox>
+                         <TextBlock
+                            Text="{Binding SelectedRegion, StringFormat='Selection: {0:F1}'}" />
+                    </st:StackPanel>
+                      <st:StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding SelectionRectangle, StringFormat='SelectionRectangle: {0:F1}'}" />
+                    </st:StackPanel>
+                    <eye:ButtonEx Command="{Binding SelectRegionCommand}">Start SCREEN REGION selection</eye:ButtonEx>
+                    
+                    <eye:WindowFinder 
+                        MinimizeActiveWindow="{Binding ElementName=PickRegionMinimizeCheckbox, Path=IsChecked}"
+                        PickCommand="{Binding SetWindowFinderMatchCommand}"></eye:WindowFinder>
+                </st:StackPanel>
+            </TabItem>
 
             <TabItem Header="SelectionAdorner">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">

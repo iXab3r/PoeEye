@@ -35,7 +35,30 @@ internal sealed class WindowHandle : IWindowHandle
     {
         Log = typeof(WindowHandle).PrepareLogger().WithSuffix(() => $"HWND {handle.ToHexadecimal()}, Title {Title}, Class: {Class}");
         Handle = handle;
-        titleSupplier = new Lazy<string>(() => UnsafeNative.GetWindowTitle(handle));
+        titleSupplier = new Lazy<string>(() =>
+        {
+            var windowTitle = UnsafeNative.GetWindowTitle(Handle);
+
+            if (!string.IsNullOrEmpty(windowTitle))
+            {
+                return windowTitle;
+            }
+
+            try
+            {
+                var process = Process.GetProcessById(ProcessId);
+                var mainWindowTitle = process.MainWindowTitle;
+                if (!string.IsNullOrEmpty(mainWindowTitle))
+                {
+                    return mainWindowTitle;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            return string.Empty;
+        });
 
         processIdSupplier = new Lazy<(int processId, int threadId)>(() =>
         {
@@ -280,17 +303,19 @@ internal sealed class WindowHandle : IWindowHandle
 
     public DateTime CreatedAt => processDataSupplier.Value.createdAt;
 
-    public Rectangle WindowBounds => UnsafeNative.GetWindowRect(Handle);
+    public Rectangle WindowRect => UnsafeNative.GetWindowRect(Handle);
 
-    public Rectangle ClientBounds => UnsafeNative.GetClientRect(Handle);
+    public Rectangle ClientRect => UnsafeNative.GetClientRect(Handle);
 
-    public Rectangle DwmWindowBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
+    public WinRect DwmFrameBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
 
-    public Rectangle DwmWindowBoundsWithinMonitor => UnsafeNative.DwmGetWindowFrameBoundsWithinMonitor(Handle);
+    public WinRect DwmFrameBoundsWithinMonitor => UnsafeNative.DwmGetWindowFrameBoundsWithinMonitor(Handle);
 
-    public WinSize BorderSize => UnsafeNative.TryGetWindowBorderSize(Handle, out var borderSize) ? borderSize : WinSize.Empty;
+    public WinRect TitleBarBounds => UnsafeNative.GetTitleBarRect(Handle);
 
-    public Rectangle MonitorBounds => System.Windows.Forms.Screen.FromHandle(Handle).Bounds;
+    public RECT AdjustWindowRectForDpi => UnsafeNative.AdjustWindowRectExForDpi(Handle);
+
+    public WinRect MonitorBounds => System.Windows.Forms.Screen.FromHandle(Handle).Bounds;
 
     [JsonIgnore] public Icon Icon => iconSupplier.Value;
 

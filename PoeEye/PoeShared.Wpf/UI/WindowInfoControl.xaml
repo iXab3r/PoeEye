@@ -1,0 +1,51 @@
+<UserControl x:Class="PoeShared.UI.WindowInfoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="clr-namespace:PoeShared.UI"
+             xmlns:st="http://schemas.spicytaco.io/"
+             d:DesignHeight="40"
+             d:DesignWidth="600"
+             FontSize="14"
+             SnapsToDevicePixels="True"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextHintingMode="Fixed"
+             TextOptions.TextRenderingMode="Aliased"
+             UseLayoutRounding="True"
+             mc:Ignorable="d">
+    
+    <!-- The TextOptions set above are important to get a crisp and clear image of this control when it's converted to an image/cursor -->
+    <Border>
+        <StackPanel Height="40"
+                    Margin="8 0 0 0"
+                    d:DataContext="{d:DesignInstance ui:WindowFinderWindowInfo}"
+                    Orientation="Horizontal">
+            <Path Width="16"
+                  Height="16"
+                  Margin="0 0 2 0"
+                  Data="{DynamicResource WindowFinderCrosshairGeometry}"
+                  Fill="CornflowerBlue"
+                  Stretch="Fill" />
+
+            <Grid x:Name="WindowInfoContainer"
+                  Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Background="White"
+                        BorderBrush="Black"
+                        TextBlock.Foreground="Black"
+                        BorderThickness="1">
+                    <TextBlock Text="{Binding Title}"
+                               TextTrimming="CharacterEllipsis" />
+                </Border>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

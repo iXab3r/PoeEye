@@ -1,9 +1,11 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace PoeShared.RegionSelector.Services;
 
-public interface IScreenRegionSelectorService
+[Obsolete("Must be migrated to WindowFinder")]
+internal interface IScreenRegionSelectorService
 {
-    Task<RegionSelectorResult> SelectRegion(Size minSelection);
+    Task<RegionSelectorResult> SelectRegion(WinSize minSelection);
 }

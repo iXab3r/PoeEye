@@ -21,10 +21,17 @@
             <Grid x:Name="RegionSelectorRoot">
                 <Canvas>
                     <Rectangle x:Name="RegionCandidate" Stroke="Red" StrokeThickness="1" 
-                               Canvas.Left="{Binding SelectionCandidateBounds.Left}"
-                               Canvas.Top="{Binding SelectionCandidateBounds.Top}"
-                               Width="{Binding SelectionCandidateBounds.Width}"
-                               Height="{Binding SelectionCandidateBounds.Height}"
+                               Canvas.Left="{Binding SelectionCandidate.WindowBounds.Left}"
+                               Canvas.Top="{Binding SelectionCandidate.WindowBounds.Top}"
+                               Width="{Binding SelectionCandidate.WindowBounds.Width}"
+                               Height="{Binding SelectionCandidate.WindowBounds.Height}"
+                               Visibility="{Binding SelectionCandidate, Converter={StaticResource NullToCollapsedConverter}}"/>
+                    
+                    <Rectangle x:Name="RegionTitleBar" Stroke="IndianRed" Fill="IndianRed" Opacity="0.5" StrokeThickness="1" 
+                               Canvas.Left="{Binding SelectionCandidate.TitleBarBounds.Left}"
+                               Canvas.Top="{Binding SelectionCandidate.TitleBarBounds.Top}"
+                               Width="{Binding SelectionCandidate.TitleBarBounds.Width}"
+                               Height="{Binding SelectionCandidate.TitleBarBounds.Height}"
                                Visibility="{Binding SelectionCandidate, Converter={StaticResource NullToCollapsedConverter}}"/>
                 </Canvas>
                 <TextBlock VerticalAlignment="Center"
@@ -35,7 +42,7 @@
                            HorizontalAlignment="Center">
                     <TextBlock.Inlines>
                         <Run Text="{Binding SelectionCandidate.Window.Title, Mode=OneWay}" /><LineBreak />
-                        Window bounds: <Run Text="{Binding SelectionCandidate.Window.WindowBounds, Mode=OneWay}" /><LineBreak />
+                        Window bounds: <Run Text="{Binding SelectionCandidate.Window.WindowRect, Mode=OneWay}" /><LineBreak />
                         Selection bounds: <Run Text="{Binding SelectionCandidate.Selection, Mode=OneWay}" />
                     </TextBlock.Inlines>
                 </TextBlock>

@@ -21,6 +21,7 @@ using RestEase;
 [assembly: InternalsVisibleTo("EyeAuras.Tests")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
+[assembly: InternalsVisibleTo("PoeShared.Wpf")]
 [assembly: InternalsVisibleTo(RestClient.FactoryAssemblyName)]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly:

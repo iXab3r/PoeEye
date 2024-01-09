@@ -101,6 +101,12 @@
     <Compile Update="UI\SimplifiedMetroWindow.cs">
       <DependentUpon>SimplifiedMetroWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UI\WindowFinderWindowInfo.cs">
+      <DependentUpon>WindowFinder.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UI\WindowFinderOverlayForm.cs">
+      <DependentUpon>WindowFinder.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\Styles.tabcontrol.xaml">

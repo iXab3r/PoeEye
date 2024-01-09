@@ -3,6 +3,7 @@
                               xmlns:ice="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                               xmlns:eye="clr-namespace:PoeShared.UI"
                               xmlns:converters="http://schemas.kent.boogaart.com/converters"
+                              xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                               xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
     <FontFamily x:Key="FontAwesome">pack://application:,,,/PoeShared.Wpf;component/Resources/#FontAwesome</FontFamily>
@@ -30,6 +31,10 @@
             <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="LightGray" />
         </DrawingBrush.Drawing>
     </DrawingBrush>
+    
+    <StreamGeometry x:Key="WindowFinderCrosshairGeometry" po:Freeze="true">
+        M19,16 C20.656855,16 22,17.343145 22,19 22,20.656855 20.656855,22 19,22 17.343145,22 16,20.656855 16,19 16,17.343145 17.343145,16 19,16 z M17.416698,6.4314003 C11.687,7.1457996 7.1457996,11.687 6.4312992,17.416698 L9.5,17.416698 9.5,20.583302 6.4312992,20.583302 C7.1457996,26.313 11.687,30.854198 17.416698,31.568699 L17.416698,28.5 20.583302,28.5 20.583302,31.568699 C26.313,30.854198 30.854198,26.313 31.5686,20.583302 L28.5,20.583302 28.5,17.416698 31.5686,17.416698 C30.854198,11.687 26.313,7.1457996 20.583302,6.4314003 L20.583302,9.5 17.416698,9.5 z M17.416698,0 L20.583302,0 20.583302,3.2448008 C28.063702,3.9874992 34.012501,9.9363003 34.755199,17.416698 L38,17.416698 38,20.583302 34.755199,20.583302 C34.012501,28.063702 28.063702,34.012501 20.583302,34.755199 L20.583302,38 17.416698,38 17.416698,34.755199 C9.9363003,34.012501 3.9874992,28.063702 3.2448008,20.583302 L0,20.583302 0,17.416698 3.2448008,17.416698 C3.9874992,9.9363003 9.9363003,3.9874992 17.416698,3.2448008 z
+    </StreamGeometry>
 
     <LinearGradientBrush x:Key="PrimaryHueMidGradientBrush" StartPoint="0,0" EndPoint="1,1" ice:Freeze="True" >
         <GradientStop Color="{StaticResource OverlayTitleBackgroundColorKey}" Offset="0.0" />

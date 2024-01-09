@@ -14,6 +14,11 @@ namespace PoeShared.Native;
 
 public partial class UnsafeNative
 {
+    public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+    public static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+    public static readonly IntPtr HWND_TOP = new IntPtr(0);
+    public static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+    
     /// <summary>
     /// Specifies the method which will be used when calling ActivateWindow
     /// </summary>
@@ -26,6 +31,17 @@ public partial class UnsafeNative
     private static readonly TimeSpan MaxWindowActivationTimeout = TimeSpan.FromSeconds(10);
 
     private static readonly TimeSpan MinWindowActivationTimeout = TimeSpan.FromMilliseconds(10);
+    
+    [StructLayout(LayoutKind.Sequential)]
+    // ReSharper disable once InconsistentNaming
+    public struct TITLEBARINFO
+    {
+        public const int CCHILDREN_TITLEBAR = 5;
+        public uint cbSize;
+        public RECT rcTitleBar;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CCHILDREN_TITLEBAR + 1)]
+        public uint[] rgstate;
+    }
 
     [DllImport("dwmapi.dll")]
     private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out RECT pvAttribute, int cbAttribute);
@@ -36,32 +52,51 @@ public partial class UnsafeNative
     [DllImport("dwmapi.dll", PreserveSig = false)]
     public static extern bool DwmIsCompositionEnabled();
     
+    [DllImport("user32.dll")]
+    private static extern bool GetTitleBarInfo(IntPtr hwnd, ref TITLEBARINFO pti);
+    
+    
     /// <summary>Determines whether a window is maximized.</summary>
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsZoomed(IntPtr hWnd);
 
+    public static WinRect GetTitleBarRect(IntPtr hwnd)
+    {
+        var titleBarInfo = GetTitleBarInformation(hwnd);
+        return Rectangle.FromLTRB(titleBarInfo.rcTitleBar.left, titleBarInfo.rcTitleBar.top, titleBarInfo.rcTitleBar.right, titleBarInfo.rcTitleBar.bottom);
+    }
+    
+    public static RECT AdjustWindowRectExForDpi(IntPtr hwnd)
+    {
+        var dpi = User32.GetDpiForWindow(hwnd);
+        var rect = new RECT();
+        if (!AdjustWindowRectExForDpi(ref rect, User32.WindowStyles.WS_OVERLAPPEDWINDOW, false, 0, dpi))
+        {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        return rect;
+    }
+    
+    public static TITLEBARINFO GetTitleBarInformation(IntPtr hwnd)
+    {
+        var tbi = new TITLEBARINFO
+        {
+            cbSize = (uint)Marshal.SizeOf(typeof(TITLEBARINFO))
+        };
+
+        if (!GetTitleBarInfo(hwnd, ref tbi))
+        {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        return tbi;
+    }
+    
     public static IntPtr MakeLParam(int loWord, int hiWord)
     {
         return new IntPtr((hiWord << 16) | (loWord & 0xffff));
-    }
-    
-    public static bool TryGetWindowBorderSize(IntPtr handle, out Size size)
-    {
-        var wi = User32.WINDOWINFO.Create();
-        var result = User32.GetWindowInfo(handle, ref wi);
-        size = result ? new Size((int)wi.cxWindowBorders, (int)wi.cyWindowBorders) : Size.Empty;
-        return result;
-    }
-    
-    public static Rectangle LegacyMaximizedWindowFix(IntPtr handle, Rectangle windowRect)
-    {
-        if (TryGetWindowBorderSize(handle, out Size size))
-        {
-            windowRect = new Rectangle(windowRect.X + size.Width, windowRect.Y + size.Height, windowRect.Width - size.Width * 2, windowRect.Height - size.Height * 2);
-        }
-
-        return windowRect;
     }
     
     public static Rectangle RetrieveWindowRectangle(IntPtr handle)
@@ -169,18 +204,6 @@ public partial class UnsafeNative
     public static bool IsDWMEnabled()
     {
         return IsWindows10OrGreater() && DwmIsCompositionEnabled();
-    }
-
-    public static Rectangle GetWindowBorders(IntPtr hwnd)
-    {
-        var captionHeight = User32.GetSystemMetrics(User32.SystemMetric.SM_CYCAPTION);
-        
-        var leftBorder = 0;
-        var topBorder = captionHeight;
-        var rightBorder = 0;
-        var bottomBorder = 0;
-
-        return new Rectangle(leftBorder, topBorder, rightBorder, bottomBorder);
     }
 
     public static bool SetWindowLong(IntPtr hwnd, Func<User32.SetWindowLongFlags, User32.SetWindowLongFlags> flagsChanger)

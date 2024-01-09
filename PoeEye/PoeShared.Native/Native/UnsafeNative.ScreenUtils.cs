@@ -12,6 +12,37 @@ namespace PoeShared.Native;
 
 public partial class UnsafeNative
 {
+    public static Point GetCursorPosition()
+    {
+        return User32.GetCursorPos();
+    }
+    
+    public static IntPtr GetWindowUnderCursor()
+    {
+        var cursorPosition = Cursor.Position;
+        return WindowFromPoint(cursorPosition);
+    }
+
+    public static IntPtr FindRootWindow(IntPtr window)
+    {
+        const int maxDepth = 100;
+
+        var depth = 0;
+        IntPtr parentWindow;
+        var lastWindow = window;
+        while ((parentWindow = GetParent(lastWindow)) != IntPtr.Zero)
+        {
+            if (depth++ > maxDepth)
+            {
+                throw new ArgumentException($"Failed to find parent of window {window}, it has too many parents (> {maxDepth})");
+            }
+
+            lastWindow = parentWindow;
+        }
+        
+        return lastWindow;
+    }
+
     public static IntPtr GetTopmostHwnd(IntPtr[] handles)
     {
         var topmostHwnd = IntPtr.Zero;

@@ -7,11 +7,15 @@ public sealed record RegionSelectorResult
 {
     public IWindowHandle Window { get; set; }
         
-    public Rectangle Selection { get; set; }
+    public WinRect Selection { get; set; }
         
-    public Rectangle AbsoluteSelection { get; set; }
+    public WinRect AbsoluteSelection { get; set; }
         
+    public WpfRect WindowBounds { get; set; }
+    
+    public WpfRect TitleBarBounds { get; set; }
+    
     public string Reason { get; set; }
 
-    public bool IsValid => Selection.Width > 0 && Selection.Height > 0 && Window != null;
+    public bool IsValid => Selection is {Width: > 0, Height: > 0} && Window != null;
 }

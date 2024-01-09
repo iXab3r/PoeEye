@@ -40,7 +40,7 @@ public static class WindowHandleExtensions
                 return false;
             }
             
-            if (windowHandle.ClientBounds.Width <= 0 || windowHandle.ClientBounds.Height <= 0)
+            if (windowHandle.ClientRect.Width <= 0 || windowHandle.ClientRect.Height <= 0)
             {
                 return false;
             }

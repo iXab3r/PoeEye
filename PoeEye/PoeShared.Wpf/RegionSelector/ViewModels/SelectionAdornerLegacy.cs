@@ -48,7 +48,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
             
         Binder
             .BindIf(x => x.ProjectionBounds.IsNotEmptyArea(), x => ScreenRegionUtils.CalculateProjection(
-                new Rect(x.MousePosition, new Size(1, 1)),
+                new WpfRect(x.MousePosition, new Size(1, 1)),
                 x.RenderSize,
                 x.ProjectionBounds).Location)
             .Else(x => x.MousePosition.ToWinPoint())
@@ -102,7 +102,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
 
     public bool IsVisible { get; private set; }
 
-    public Rect Selection { get; private set; }
+    public WpfRect Selection { get; private set; }
 
     public bool StopWhenAppFocusLost { get; set; }
 
@@ -120,10 +120,10 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
 
     public UIElement Owner { get; set; }
         
-    public IObservable<Rect> StartSelection(bool supportBoxSelection)
+    public IObservable<WpfRect> StartSelection(bool supportBoxSelection)
     {
         //FIXME Remove side-effects, code became too complicated
-        return Observable.Create<Rect>(
+        return Observable.Create<WpfRect>(
             subscriber =>
             {
                 Log.Debug($"Initializing Selection");
@@ -135,7 +135,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                 var selectionAnchors = new CompositeDisposable();
                 Disposable.Create(() => Log.Debug($"Disposing SelectionAnchors")).AddTo(selectionAnchors);
                 Disposable.Create(() => IsVisible = false).AddTo(selectionAnchors);
-                Selection = Rect.Empty;
+                Selection = WpfRect.Empty;
                 
                 
 
@@ -174,7 +174,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
                     {
                         var coords = x.GetPosition(Owner);
                         AnchorPoint = coords;
-                        var region = new Rect(AnchorPoint.X, AnchorPoint.Y, 1, 1);
+                        var region = new WpfRect(AnchorPoint.X, AnchorPoint.Y, 1, 1);
                         Selection = region;
                         return supportBoxSelection ? keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ToUnit() : Observable.Return(Unit.Default);
                     })
@@ -203,8 +203,8 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
         var renderSize = Owner.RenderSize;
         if (e.Button == MouseButtons.Left)
         {
-            var destinationRect = new Rect(0, 0, renderSize.Width, renderSize.Height);
-            var newSelection = new Rect
+            var destinationRect = new WpfRect(0, 0, renderSize.Width, renderSize.Height);
+            var newSelection = new WpfRect
             {
                 X = MousePosition.X < AnchorPoint.X
                     ? MousePosition.X
@@ -220,7 +220,7 @@ internal sealed class SelectionAdornerLegacy : DisposableReactiveObject, ISelect
         }
         else
         {
-            Selection = new Rect(MousePosition, Size.Empty);
+            Selection = new WpfRect(MousePosition, Size.Empty);
         }
     }
 }

@@ -1,12 +1,13 @@
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Blazor;
+using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding;
@@ -18,6 +19,7 @@ using PoeShared.UI.Bindings;
 using PoeShared.UI.Blazor;
 using PropertyBinder;
 using Unity;
+using Color = System.Windows.Media.Color;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.UI;
@@ -47,11 +49,13 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
         ExceptionSandboxViewModel exceptionSandbox,
         AutoCompleteSandboxViewModel autoCompleteSandbox,
         BindingsSandboxViewModel bindingsSandbox,
-        AudioSandbox audioSandbox)
+        AudioSandbox audioSandbox,
+        IKeyboardEventsSource keyboardEventsSource)
     {
         SelectionAdorner = selectionAdorner.AddTo(Anchors);
         AutoCompleteSandbox = autoCompleteSandbox;
         AudioSandbox = audioSandbox;
+        KeyboardEventsSource = keyboardEventsSource;
         this.regionSelectorService = regionSelectorService;
         BindingsSandbox = bindingsSandbox.AddTo(Anchors);
         NotificationSandbox = notificationSandbox.AddTo(Anchors);
@@ -88,7 +92,8 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
             }
         });
 
-        SelectRegionCommnad = CommandWrapper.Create(SelectRegionExecuted);
+        SelectRegionCommand = CommandWrapper.Create(SelectRegionExecuted);
+        SetWindowFinderMatchCommand = CommandWrapper.Create<object>(SetWindowFinderMatchCommandExecuted);
         BlazorSandbox = blazorHostViewModelFactory.Create();
 
         var idx = 0;
@@ -109,8 +114,21 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
             .AddTo(Anchors);
         LargeList = largeList;
         VirtualizedList = virtualizedList;
+        
 
         Binder.Attach(this).AddTo(Anchors);
+    }
+
+    private async Task SetWindowFinderMatchCommandExecuted(object arg)
+    {
+        if (arg is WindowFinderMatch match)
+        {
+            SelectedRegion = new RegionSelectorResult()
+            {
+                AbsoluteSelection = new Rectangle(match.CursorLocation, Size.Empty),
+                Window = match.Window
+            };
+        }
     }
 
     public SelectionAdorner SelectionAdorner { get; }
@@ -149,7 +167,9 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
 
     public ICommand SetCachedControlContentCommand { get; }
 
-    public ICommand SelectRegionCommnad { get; }
+    public ICommand SelectRegionCommand { get; }
+    
+    public ICommand SetWindowFinderMatchCommand { get; }
 
     public RegionSelectorResult SelectedRegion { get; private set; }
 
@@ -158,6 +178,8 @@ internal sealed class MainWindowViewModel : DisposableReactiveObject
     public TimeSpan RandomPeriod { get; set; }
 
     public CommandWrapper ShowBlazorWindow { get; }
+    
+    public IKeyboardEventsSource KeyboardEventsSource { get; }
 
     private async Task SelectRegionExecuted()
     {

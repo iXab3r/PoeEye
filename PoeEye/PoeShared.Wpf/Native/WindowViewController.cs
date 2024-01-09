@@ -146,37 +146,13 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
 
     public void TakeScreenshot(string fileName)
     {
-        CreateBitmapFromVisual(Window?.Content as Visual ?? Window, fileName);
+        var visual = Window?.Content as Visual ?? Window;
+        visual?.CreateBitmapFromVisual(fileName);
     }
 
     public void Minimize()
     {
         Log.Debug($"Minimizing window");
         Window.WindowState = WindowState.Minimized;
-    }
-        
-    public static void CreateBitmapFromVisual(Visual target, string fileName)
-    {
-        if (target == null || string.IsNullOrEmpty(fileName))
-        {
-            return;
-        }
-
-        var bounds = target is FrameworkElement frameworkElement ? new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight) : VisualTreeHelper.GetDescendantBounds(target);
-        var dpi = VisualTreeHelper.GetDpi(target);
-        var renderTarget = new RenderTargetBitmap(
-            (int)(bounds.Width / 96d * dpi.PixelsPerInchX), 
-            (int)(bounds.Height / 96d * dpi.PixelsPerInchY), 
-            dpi.PixelsPerInchX, 
-            dpi.PixelsPerInchY, 
-            PixelFormats.Pbgra32);
-        renderTarget.Render(target);
-
-        var bitmapEncoder = new PngBitmapEncoder();
-        bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
-        using (Stream stm = File.Create(fileName))
-        {
-            bitmapEncoder.Save(stm);
-        }
     }
 }

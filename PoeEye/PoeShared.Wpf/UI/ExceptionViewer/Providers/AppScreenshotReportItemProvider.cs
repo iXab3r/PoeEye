@@ -27,7 +27,7 @@ internal sealed class AppScreenshotReportItemProvider : IExceptionReportItemProv
 
         var visibleWindows = appWindows
             .Where(x => !string.IsNullOrEmpty(x.Title))
-            .Select(x => new {Window = x, Area = x.WindowBounds.Size.Area(), CanScreenshot = x.IsVisible && !x.IsIconic})
+            .Select(x => new {Window = x, Area = x.WindowRect.Size.Area(), CanScreenshot = x.IsVisible && !x.IsIconic})
             .Where(x => x.CanScreenshot && x.Area > minWindowArea)
             .OrderBy(x => x.Area)
             .ToArray();

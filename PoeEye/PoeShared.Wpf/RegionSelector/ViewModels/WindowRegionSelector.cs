@@ -25,6 +25,7 @@ namespace PoeShared.RegionSelector.ViewModels;
 internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegionSelector
 {
     private static readonly double MinSelectionArea = 20;
+    
     private readonly TaskWindowSeeker windowSeeker;
 
     public WindowRegionSelector(
@@ -51,7 +52,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
             .Select(x => x.MousePosition.ToScreen(x.Owner))
             .Sample(UiConstants.UiThrottlingDelay)
             .ObserveOn(overlayScheduler)
-            .Select(x => new Rectangle(x.X, x.Y, 1, 1))
+            .Select(x => new WinRect(x.X, x.Y, 1, 1))
             .Select(ToRegionResult)
             .Do(x => Log.Debug($"Selection candidate: {x}"))
             .SubscribeSafe(x => SelectionCandidate = x, Log.HandleUiException)
@@ -83,38 +84,11 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
                 IsBusy = false;
             }, Log.HandleUiException)
             .AddTo(Anchors);
-            
-        this.WhenAnyValue(x => x.SelectionCandidate)
-            .ObserveOn(overlayScheduler)
-            .SubscribeSafe(
-                regionResult =>
-                {
-                    if (regionResult == null || !regionResult.IsValid)
-                    {
-                        SelectionCandidateBounds = Rect.Empty;
-                        return;
-                    }
-
-                    var bounds = regionResult.Window.DwmWindowBounds.ToWpfRectangle();
-                    var topLeft = SelectionAdorner.Owner.PointFromScreen(bounds.Location);
-                    var bottomRight = SelectionAdorner.Owner.PointFromScreen(new WpfPoint(bounds.Location.X + bounds.Width, bounds.Location.Y + bounds.Height));
-                    var wpfBounds = new Rect
-                    {
-                        X = topLeft.X,
-                        Y = topLeft.Y,
-                        Width = bottomRight.X - topLeft.X,
-                        Height = bottomRight.Y - topLeft.Y
-                    };
-                    SelectionCandidateBounds = wpfBounds;
-                }, Log.HandleUiException)
-            .AddTo(Anchors);
     }
 
     public ISelectionAdornerLegacy SelectionAdorner { get; }
 
     public bool IsBusy { get; private set; }
-
-    public Rect SelectionCandidateBounds { get; private set; }
 
     public RegionSelectorResult SelectionCandidate { get; private set; }
 
@@ -132,18 +106,16 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
                 .TakeUntil(this.WhenAnyValue(x => x.IsBusy).Where(x => x == false))
                 .Select(x =>
                 {
-                    var selection = new Rect(SelectionAdorner.Owner.PointToScreen(x.Location), x.Size).ToWinRectangle();
+                    var selection = new WpfRect(SelectionAdorner.Owner.PointToScreen(x.Location), x.Size).ToWinRectangle();
                     if (selection.Width >= minSelection.Width && selection.Height >= minSelection.Height)
                     {
                         Log.Debug($"Selected region: {x} (screen: {selection}) (min size: {minSelection})");
                         return selection;
                     }
-                    else
-                    {
-                        var result = new WinRect(selection.X, selection.Y, 0, 0);
-                        Log.Debug($"Selected region({x}, screen: {selection}) is less than required({minSelection}, converting selection {selection} to {result}");
-                        return result;
-                    }
+
+                    var result = selection with {Width = 0, Height = 0};
+                    Log.Debug($"Selected region({x}, screen: {selection}) is less than required({minSelection}, converting selection {selection} to {result}");
+                    return result;
                 })
                 .Select(ToRegionResult)
                 .Do(x => Log.Debug($"Selection Result: {x}"))
@@ -157,7 +129,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
         }
     }
 
-    private RegionSelectorResult ToRegionResult(Rectangle screenRegion)
+    private RegionSelectorResult ToRegionResult(WinRect screenRegion)
     {
         if (screenRegion.IsEmpty)
         {
@@ -170,14 +142,27 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
         if (window != null)
         {
             var absoluteSelection = selection;
-            absoluteSelection.Offset(window.ClientBounds.Left, window.ClientBounds.Top);
+            absoluteSelection.Offset(window.ClientRect.Left, window.ClientRect.Top);
             Log.Debug($"Found a window using region {screenRegion}: {window}");
+            
+            var frameRect = window.DwmFrameBounds.ToWpfRectangle();
+            var topLeft = SelectionAdorner.Owner.PointFromScreen(frameRect.Location);
+            var bottomRight = SelectionAdorner.Owner.PointFromScreen(new WpfPoint(frameRect.Location.X + frameRect.Width, frameRect.Location.Y + frameRect.Height));
+            var wpfBounds = new WpfRect
+            {
+                X = topLeft.X,
+                Y = topLeft.Y,
+                Width = bottomRight.X - topLeft.X,
+                Height = bottomRight.Y - topLeft.Y
+            };
+            
             return new RegionSelectorResult
             {
                 AbsoluteSelection = absoluteSelection,
                 Selection = selection,
                 Window = window,
-                Reason = "OK"
+                Reason = "OK",
+                WindowBounds = wpfBounds
             };
         }
 
@@ -185,27 +170,27 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
         return new RegionSelectorResult { Reason = $"Could not find matching window in region {screenRegion}" };
     }
 
-    private static (IWindowHandle window, Rectangle selection) FindMatchingWindow(Rectangle selection, IEnumerable<IWindowHandle> windows)
+    private static (IWindowHandle window, WinRect selection) FindMatchingWindow(WinRect selection, IEnumerable<IWindowHandle> windows)
     {
         var topLeft = new WinPoint(selection.Left, selection.Top);
         var intersections = windows
             .Where(x => x.ProcessId != Environment.ProcessId)
             .Where(x => UnsafeNative.WindowIsVisible(x.Handle))
-            .Where(x => x.ClientBounds.IsNotEmptyArea())
-            .Where(x => x.ClientBounds.Contains(topLeft))
+            .Where(x => x.ClientRect.IsNotEmptyArea())
+            .Where(x => x.ClientRect.Contains(topLeft))
             .Select(
-                (x, idx) =>
+                (x, _) =>
                 {
-                    Rectangle intersection;
-                    if (selection.Width > 0 && selection.Height > 0)
+                    WinRect intersection;
+                    if (selection is {Width: > 0, Height: > 0})
                     {
-                        intersection = x.ClientBounds;
+                        intersection = x.ClientRect;
                         intersection.Intersect(selection);
-                        intersection.Offset(-x.ClientBounds.Left, -x.ClientBounds.Top);
+                        intersection.Offset(-x.ClientRect.Left, -x.ClientRect.Top);
                     }
                     else
                     {
-                        intersection = new Rectangle(0, 0, x.ClientBounds.Width, x.ClientBounds.Height);
+                        intersection = x.ClientRect with {X = 0, Y = 0};
                     }
                         
                     return new
@@ -215,7 +200,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
                         Area = intersection.Width * intersection.Height
                     };
                 })
-            .Where(x => GeometryExtensions.IsNotEmptyArea(x.Intersection))
+            .Where(x => x.Intersection.IsNotEmptyArea())
             .OrderBy(x => x.Window.ZOrder)
             .ToArray();
 
@@ -223,7 +208,7 @@ internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegion
         var result = intersections.FirstOrDefault(x => x.Window.Handle == topmostHandle);
 
         return result == null
-            ? (null, Rectangle.Empty)
+            ? (null, WinRect.Empty)
             : (result.Window, result.Intersection);
     }
 }

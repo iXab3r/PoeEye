@@ -12,6 +12,7 @@ using Unity;
 
 namespace PoeShared.RegionSelector.Services;
 
+[Obsolete("Must be migrated to WindowFinder")]
 internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IScreenRegionSelectorService
 {
     private static readonly IFluentLog Log = typeof(ScreenRegionSelectorService).PrepareLogger();
@@ -21,10 +22,10 @@ internal sealed class ScreenRegionSelectorService : DisposableReactiveObject, IS
     private readonly IWindowRegionSelector windowRegionSelector;
 
     public ScreenRegionSelectorService(
-        [Dependency(WellKnownWindows.MainWindow)] IWindowViewController viewController,
         IFactory<IOverlayWindowController, IScheduler> overlayControllerFactory,
-        [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler,
-        IFactory<IWindowRegionSelector> regionSelectorWindowFactory)
+        IFactory<IWindowRegionSelector> regionSelectorWindowFactory,
+        [Dependency(WellKnownWindows.MainWindow)] IWindowViewController viewController,
+        [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiScheduler)
     {
         Log.Debug($"Initializing region selector service");
         this.viewController = viewController;

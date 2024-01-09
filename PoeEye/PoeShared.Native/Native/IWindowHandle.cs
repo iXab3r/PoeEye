@@ -20,27 +20,29 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// <summary>
     /// Gets the outer dimensions of the window, including any title bar and border.
     /// </summary>
-    Rectangle WindowBounds { get; }
+    WinRect WindowRect { get; }
 
     /// <summary>
     /// Gets the dimensions of the client area of the window.
     /// </summary>
-    Rectangle ClientBounds { get; }
-
+    WinRect ClientRect { get; }
+    
     /// <summary>
     /// Gets the extended window frame bounds provided by DWM.
     /// </summary>
-    Rectangle DwmWindowBounds { get; }
+    WinRect DwmFrameBounds { get; }
     
     /// <summary>
     /// Gets the DWM window frame bounds within monitor.
     /// </summary>
-    Rectangle DwmWindowBoundsWithinMonitor { get; }
+    WinRect DwmFrameBoundsWithinMonitor { get; }
     
     /// <summary>
-    /// Gets window border size using legacy API
+    /// Gets window title bar bounds
     /// </summary>
-    Size BorderSize { get; }
+    WinRect TitleBarBounds { get; }
+    
+    RECT AdjustWindowRectForDpi { get; }
 
     /// <summary>
     /// Gets the icon of the window.
