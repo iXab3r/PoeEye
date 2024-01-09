@@ -18,25 +18,23 @@
 
     <ControlTemplate x:Key="BlazorContentControlTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
         <Grid Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.InputBindings>
                 <KeyBinding Gesture="F5"
                             Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}" />
             </Grid.InputBindings>
-             <st:StackPanel Orientation="Vertical" MarginBetweenChildren="0">
-                 <Grid st:StackPanel.Fill="Fill">
-                     <ContentPresenter
-                         x:Name="WebView"
-                         Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}" />
-                 </Grid>
-                 <Grid 
-                     x:Name="WebViewIsBusyAdorner"
-                     Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
-                     <ProgressBar IsIndeterminate="True"
-                                  Height="4" />
-                 </Grid>
-             </st:StackPanel>
+            <ContentPresenter Grid.Row="0"
+                              x:Name="WebView"
+                              Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WebView}" />
+            <ProgressBar Grid.Row="1" IsIndeterminate="True"
+                         Height="4"
+                         x:Name="WebViewIsBusyAdorner"
+                         Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
         </Grid>
-        
+
         <ControlTemplate.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledException, Converter={StaticResource NullToFalseConverter}}">
                 <Setter TargetName="WebView" Property="Content">

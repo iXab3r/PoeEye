@@ -39,6 +39,9 @@ public sealed class MultiplicationConverter : IMultiValueConverter
     
 public sealed class MultiDoubleSumConverter : IMultiValueConverter
 {
+    private static readonly Lazy<MultiDoubleSumConverter> InstanceSupplier = new(() => new MultiDoubleSumConverter());
+    public static MultiDoubleSumConverter Instance => InstanceSupplier.Value;
+    
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
         if (values == null)
