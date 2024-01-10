@@ -20,7 +20,7 @@ internal sealed class KeyboardLayoutManager : DisposableReactiveObject, IKeyboar
 
     public KeyboardLayoutManager()
     {
-        Observables.BlockingTimer(TimeSpan.FromSeconds(10))
+        Observables.BlockingTimer(TimeSpan.FromSeconds(30))
             .StartWithDefault()
             .SubscribeSafe(HandleKeyboardListUpdateRequest, Log.HandleException)
             .AddTo(Anchors);
@@ -115,10 +115,24 @@ internal sealed class KeyboardLayoutManager : DisposableReactiveObject, IKeyboar
     private void HandleKeyboardListUpdateRequest()
     {
         var layouts = new List<KeyboardLayout>();
-        for (var i = 0; i < InputLanguage.InstalledInputLanguages.Count; i++)
+
+        Log.Debug("Updating installed keyboard layouts");
+        var languages = InputLanguage.InstalledInputLanguages;
+        Log.Debug($"Got {languages.Count} keyboard layouts");
+        
+        for (var i = 0; i < languages.Count; i++)
         {
-            var layout = new KeyboardLayout(InputLanguage.InstalledInputLanguages[i]);
-            layouts.Add(layout);
+            var language = InputLanguage.InstalledInputLanguages[i];
+            try
+            {
+                Log.Debug($"Adapting keyboard layout #{i}: {new { language.Handle, language.LayoutName, language.Culture }}");
+                var layout = new KeyboardLayout(language);
+                layouts.Add(layout);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Failed to adapt keyboard layout #{i}: {new { language.Handle, language.LayoutName, language.Culture }}", e);
+            }
         }
 
         var addedLayouts = layouts.Where(x => !layoutByLocaleId.Lookup(x.Handle).HasValue).ToArray();
