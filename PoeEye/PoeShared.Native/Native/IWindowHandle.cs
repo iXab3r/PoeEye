@@ -20,11 +20,13 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// <summary>
     /// Gets the outer dimensions of the window, including any title bar and border.
     /// </summary>
+    [Obsolete("In most cases DwmFrameBounds is much-much more reliable as WindowRect will include invisible borders/decorations/etc")]
     WinRect WindowRect { get; }
 
     /// <summary>
     /// Gets the dimensions of the client area of the window.
     /// </summary>
+    [Obsolete("Not very reliable as will be affected by system settings")]
     WinRect ClientRect { get; }
     
     /// <summary>

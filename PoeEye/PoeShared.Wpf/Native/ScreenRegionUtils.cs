@@ -150,14 +150,14 @@ public static class ScreenRegionUtils
         return (ToWinInputCoordinates(screenCoordinates.X, screenBounds.X, screenBounds.Width), ToWinInputCoordinates(screenCoordinates.Y, screenBounds.Y, screenBounds.Height));
     }
 
-    public static (double X, double Y) ToWinInputCoordinates(WinPoint screenCoordinates)
-    {
-        return ToWinInputCoordinates(screenCoordinates, SystemInformation.VirtualScreen);
-    }
-
     private static int ToScreenCoordinates(double absolute, int offset, int size)
     {
         return (int)Math.Round(absolute / 65535 * size + offset - (absolute < 0 ? -1 : 1));
+    }
+
+    public static (double X, double Y) ToWinInputCoordinates(WinPoint screenCoordinates)
+    {
+        return ToWinInputCoordinates(screenCoordinates, SystemInformation.VirtualScreen);
     }
 
     private static double ToWinInputCoordinates(int coord, int offset, int size)

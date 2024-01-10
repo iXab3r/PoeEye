@@ -22,6 +22,7 @@ using Unity;
 
 namespace PoeShared.RegionSelector.ViewModels;
 
+[Obsolete("Should net be used as it is way worse than WindowFinder")]
 internal sealed class WindowRegionSelector : OverlayViewModelBase, IWindowRegionSelector
 {
     private static readonly double MinSelectionArea = 20;

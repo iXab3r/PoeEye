@@ -7,7 +7,7 @@ public static class WindowHandleExtensions
 {
     public static WinPoint ToScreen(this IWindowHandle windowHandle, Point windowPoint)
     {
-        var windowBounds = windowHandle.WindowRect;
+        var windowBounds = windowHandle.DwmFrameBounds;
         if (!windowBounds.IsNotEmptyArea())
         {
             throw new InvalidStateException($"Something went wrong - target window {windowHandle} is not found or does not have valid window bounds");
@@ -18,7 +18,7 @@ public static class WindowHandleExtensions
     
     public static WinPoint FromScreen(this IWindowHandle windowHandle, Point screenPoint)
     {
-        var windowBounds = windowHandle.WindowRect;
+        var windowBounds = windowHandle.DwmFrameBounds;
         if (!windowBounds.IsNotEmptyArea())
         {
             throw new InvalidStateException($"Something went wrong - target window {windowHandle} is not found or does not have valid window bounds");

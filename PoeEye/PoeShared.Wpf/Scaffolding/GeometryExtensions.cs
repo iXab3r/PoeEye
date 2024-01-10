@@ -97,6 +97,11 @@ public static class GeometryExtensions
         result.Offset(offset);
         return result;
     }
+    
+    public static WinPoint OffsetBy(this WinPoint point, int deltaX, int deltaY)
+    {
+        return new WinPoint(point.X + deltaX, point.Y + deltaY);
+    }
 
     public static Rectangle IntersectWith(this Rectangle rect, Rectangle otherRectangle)
     {

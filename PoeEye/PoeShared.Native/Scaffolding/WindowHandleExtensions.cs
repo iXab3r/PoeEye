@@ -40,7 +40,9 @@ public static class WindowHandleExtensions
                 return false;
             }
             
+#pragma warning disable CS0618 // Type or member is obsolete 
             if (windowHandle.ClientRect.Width <= 0 || windowHandle.ClientRect.Height <= 0)
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return false;
             }
