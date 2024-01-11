@@ -41,10 +41,6 @@ internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TCont
         if (!IsParameterUsedAtLeastOnce(selector))
         {
             Log.Warn($"The parameter is not used in the expression body: {selector}, expecting that {selector.Body} will use it at least once");
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Break();
-            }
         }
 
         this.context = context;

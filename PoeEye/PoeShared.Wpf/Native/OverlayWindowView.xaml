@@ -53,11 +53,6 @@
             <Setter Property="Background" Value="{x:Null}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="DataContext" Value="{Binding}" />
-            <Setter Property="MinWidth" Value="{Binding MinWidth, Mode=OneWay}" />
-            <Setter Property="MaxWidth" Value="{Binding MaxWidth, Mode=OneWay}" />
-            <Setter Property="MinHeight" Value="{Binding MinHeight, Mode=OneWay}" />
-            <Setter Property="MaxHeight" Value="{Binding MaxHeight, Mode=OneWay}" />
-
             <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
 
             <Setter Property="AllowsTransparency" Value="True" />
