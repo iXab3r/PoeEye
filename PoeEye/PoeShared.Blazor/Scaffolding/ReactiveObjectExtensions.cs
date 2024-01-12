@@ -2,13 +2,24 @@ using System;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using DynamicData;
 using PoeShared.Blazor.Internals;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Scaffolding;
 
 public static class ReactiveObjectExtensions
 {
+    public static IObservable<string> Listen<TContext, TItem>(this TContext context, Expression<Func<TContext, IObservableList<TItem>>> selector) where TContext : class
+    {
+        var selectorDescription = selector.ToString();
+        return context.WhenAnyValue(selector)
+            .Select(x => x ?? new SourceList<TItem>())
+            .Switch()
+            .Select(x => $"{selectorDescription}: {x}");
+    }
+
     public static IObservable<string> Listen<TContext, TOut>(this TContext context, Expression<Func<TContext, TOut>> selector) where TContext : class
     {
         return Observable.Create<string>(observer =>
