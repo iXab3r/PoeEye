@@ -47,36 +47,6 @@
         </StackPanel>
     </DataTemplate>
     
-    <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
-         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-             <ComboBox ItemsSource="{Binding Items}" 
-                       SelectedItem="{Binding SelectedItem}" 
-                       IsSynchronizedWithCurrentItem="True"
-                       MinWidth="200"
-                       IsTextSearchCaseSensitive="False"
-                       ItemTemplate="{StaticResource NotificationTypeWrapperTextBlock}" />
-
-             <eye:ButtonEx Command="{Binding AddSoundCommand}"
-                           ToolTip="Load from file"
-                           Icon="&#xf115;" 
-                           Content="Load..."/>
-
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Left" Text="Volume" />
-                <TextBlock DockPanel.Dock="Right" MinWidth="20"
-                           Text="{Binding Volume, Converter={StaticResource DoubleToPercentConverter},  StringFormat='{}{0:F2}%'}" />
-                <Slider DockPanel.Dock="Left"
-                        Margin="5,0,0,0"
-                        Value="{Binding Volume, Converter={StaticResource DoubleToPercentConverter}}"
-                        Minimum="0"
-                        Maximum="100"
-                        TickFrequency="0.5"
-                        IsSnapToTickEnabled="True"
-                        MinWidth="140"
-                        VerticalAlignment="Center" />
-            </DockPanel>
-        </st:StackPanel>
-    </DataTemplate>
     
     <DataTemplate x:Key="AudioNotificationSelectorButtonTemplate" DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
         <Viewbox>
@@ -111,5 +81,35 @@
                 </i:Interaction.Behaviors>
             </ToggleButton>
         </Viewbox>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
+        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+            <TextBlock Text="{Binding SelectedItem.Name}"
+                       FontWeight="Bold"/>
+            <ContentPresenter Content="{Binding}" 
+                              Width="24" Height="24"
+                              ContentTemplate="{StaticResource AudioNotificationSelectorButtonTemplate}"/>
+
+            <eye:ButtonEx Command="{Binding AddSoundCommand}"
+                          ToolTip="Load from file"
+                          Icon="&#xf115;" 
+                          Content="Load..."/>
+
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left" Text="Volume" />
+                <TextBlock DockPanel.Dock="Right" MinWidth="20"
+                           Text="{Binding Volume, Converter={StaticResource DoubleToPercentConverter},  StringFormat='{}{0:F2}%'}" />
+                <Slider DockPanel.Dock="Left"
+                        Margin="5,0,0,0"
+                        Value="{Binding Volume, Converter={StaticResource DoubleToPercentConverter}}"
+                        Minimum="0"
+                        Maximum="100"
+                        TickFrequency="0.5"
+                        IsSnapToTickEnabled="True"
+                        MinWidth="140"
+                        VerticalAlignment="Center" />
+            </DockPanel>
+        </st:StackPanel>
     </DataTemplate>
 </eye:SharedResourceDictionary>

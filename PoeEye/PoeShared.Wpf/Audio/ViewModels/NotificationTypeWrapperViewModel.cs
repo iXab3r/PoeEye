@@ -32,4 +32,12 @@ internal sealed class NotificationTypeWrapperViewModel : DisposableReactiveObjec
     public string Name { get; }
         
     public IAudioNotificationSelectorViewModel Owner { get; }
+
+    protected override void FormatToString(ToStringBuilder builder)
+    {
+        base.FormatToString(builder);
+        builder.Append("Notification");
+        builder.AppendParameter(nameof(Name), Name);
+        builder.AppendParameter(nameof(Value), Value);
+    }
 }
