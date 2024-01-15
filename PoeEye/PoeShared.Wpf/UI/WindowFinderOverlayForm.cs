@@ -131,7 +131,7 @@ internal sealed class WindowFinderOverlayForm : ReactiveForm
             DwmFrameBounds = windowFrame,
             WindowRect = window.WindowRect,
             ClientRect = window.ClientRect,
-            TitleRect = window.TitleBarBounds,
+            TitleRect = window.TitleBarRect,
             Handle = window.Handle,
             Title = window.Title,
             TransformationMatrix = Matrix3x2.CreateTranslation(-frameBounds.Left, -frameBounds.Top)

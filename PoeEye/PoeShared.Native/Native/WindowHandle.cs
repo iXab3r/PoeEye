@@ -303,15 +303,15 @@ internal sealed class WindowHandle : IWindowHandle
 
     public DateTime CreatedAt => processDataSupplier.Value.createdAt;
 
-    public Rectangle WindowRect => UnsafeNative.GetWindowRect(Handle);
+    public WinRect WindowRect => UnsafeNative.GetWindowRect(Handle);
 
-    public Rectangle ClientRect => UnsafeNative.GetClientRect(Handle);
+    public WinRect ClientRect => UnsafeNative.GetClientRect(Handle);
 
     public WinRect DwmFrameBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
 
     public WinRect DwmFrameBoundsWithinMonitor => UnsafeNative.DwmGetWindowFrameBoundsWithinMonitor(Handle);
 
-    public WinRect TitleBarBounds => UnsafeNative.GetTitleBarRect(Handle);
+    public WinRect TitleBarRect => UnsafeNative.GetTitleBarRect(Handle);
 
     public RECT AdjustWindowRectForDpi => UnsafeNative.AdjustWindowRectExForDpi(Handle);
 

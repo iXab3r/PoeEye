@@ -42,7 +42,7 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// <summary>
     /// Gets window title bar bounds
     /// </summary>
-    WinRect TitleBarBounds { get; }
+    WinRect TitleBarRect { get; }
     
     RECT AdjustWindowRectForDpi { get; }
 
