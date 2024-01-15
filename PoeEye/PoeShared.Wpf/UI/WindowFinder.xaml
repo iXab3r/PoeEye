@@ -7,6 +7,8 @@
              Width="24" Height="24"
              mc:Ignorable="d">
     <Button x:Name="StartSearchButton"
+            ToolTip="Drag Me!"
+            ToolTipService.InitialShowDelay="0"
             Padding="0" Margin="0">
         <Path Width="16" x:Name="CrosshairImage"
               Height="16"
