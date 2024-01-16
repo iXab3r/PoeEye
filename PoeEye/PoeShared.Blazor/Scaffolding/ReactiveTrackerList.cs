@@ -19,7 +19,7 @@ public sealed class ReactiveTrackerList : List<IObservable<string>>
     
     public void Add<T>(IObservable<T> source)
     {
-        base.Add(source.Select(x => x.ToString()));
+        base.Add(source.Select(x => x?.ToString()));
     }
     
     public void Add<T, T1>(IObservable<T> source1, IObservable<T1> source2)

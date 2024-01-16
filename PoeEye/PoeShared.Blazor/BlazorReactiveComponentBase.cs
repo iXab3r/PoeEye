@@ -37,6 +37,11 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     /// </summary>
     protected BlazorReactiveComponentBase()
     {
+        ComponentContext = SynchronizationContext.Current;
+        if (ComponentContext == null)
+        {
+            throw new InvalidOperationException("Synchronization context must be set for components to work correctly");
+        }
         this.WhenAnyProperty(x => x.DataContext)
             .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
             .AddTo(Anchors);
@@ -79,6 +84,8 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     /// Observable sequence that signals when a property of the component changes.
     /// </summary>
     public IObservable<object> WhenChanged => whenChanged;
+    
+    protected SynchronizationContext ComponentContext { get; }
 
     /// <summary>
     /// Tracks changes in the specified context using a selector expression.
