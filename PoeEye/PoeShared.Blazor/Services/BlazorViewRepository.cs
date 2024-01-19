@@ -121,7 +121,6 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             }
         }
 
-        log.Warn($"Failed to resolve registered view, known views:\n\t{viewsByKey.Keys.DumpToTable()}");
         return null;
     }
 

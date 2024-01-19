@@ -24,7 +24,8 @@
             </Grid.RowDefinitions>
             <Grid.InputBindings>
                 <KeyBinding Gesture="F5"
-                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}" />
+                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent},Path=EnableHotkeys}"/>
             </Grid.InputBindings>
             <ContentPresenter Grid.Row="0"
                               x:Name="WebView"

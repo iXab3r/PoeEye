@@ -43,9 +43,8 @@ namespace PoeShared.Blazor.Wpf;
 
 public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 {
-    private static readonly IFluentLog Log = typeof(BlazorContentControl).PrepareLogger();
-
     private static readonly Binder<BlazorContentControl> Binder = new();
+    private static readonly IFluentLog Log = typeof(BlazorContentControl).PrepareLogger();
 
     public static readonly DependencyProperty ViewTypeProperty = DependencyProperty.Register(
         nameof(ViewType), typeof(Type), typeof(BlazorContentControl), new PropertyMetadata(default(Type)));
@@ -88,32 +87,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         WebView = new BlazorWebViewEx().AddTo(Anchors);
         WebView.UnhandledException += OnUnhandledException;
 
-        //FIXME I need a more robust solution for handling DI
         /*
         Assigning Services will trigger initialization of WebView.
         That means that most registrations should be done at this point.
         */
         WebView.Services = webViewServiceProvider;
 
-        var canExecuteHotkeys = this.Observe(EnableHotkeysProperty, x => x.EnableHotkeys)
-            .Select(x => x);
-
-        ReloadCommand = CommandWrapper.Create(async () =>
-        {
-            if (UnhandledException != null)
-            {
-                Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
-                UnhandledException = null;
-            }
-
-            var webView = WebView.WebView;
-            if (webView != null)
-            {
-                await webView.EnsureCoreWebView2Async();
-                webView.Reload();
-            }
-        }, canExecuteHotkeys);
-        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow(), canExecuteHotkeys);
+        ReloadCommand = CommandWrapper.Create<object>(ReloadExecuted);
+        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
 
         var serviceCollection = new ServiceCollection
         {
@@ -252,6 +233,26 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         Binder.Attach(this).AddTo(Anchors);
     }
 
+    private async Task ReloadExecuted(object arg)
+    {
+        if (arg is false)
+        {
+            return;
+        }
+        if (UnhandledException != null)
+        {
+            Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
+            UnhandledException = null;
+        }
+
+        var webView = WebView?.WebView;
+        if (webView != null)
+        {
+            await webView.EnsureCoreWebView2Async();
+            webView.Reload();
+        }
+    }
+
     public Type ViewType
     {
         get => (Type) GetValue(ViewTypeProperty);
@@ -303,7 +304,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public ICommand ReloadCommand { get; }
 
     public ICommand OpenDevTools { get; }
-
+    
     private static string FormatExceptionMessage(Exception exception)
     {
         return $"{exception.GetType().Name}: {exception.Message} @ {exception.StackTrace}";
