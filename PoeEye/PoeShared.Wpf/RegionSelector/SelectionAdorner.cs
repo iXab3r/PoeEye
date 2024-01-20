@@ -52,6 +52,8 @@ public interface ISelectionAdorner : IDisposableReactiveObject, ICanBeVisible
     IObservable<WinRect> SelectVirtualRegion();
     
     IObservable<WinPoint> SelectVirtualPoint();
+
+    void Reset();
 }
 
 public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorner
@@ -108,12 +110,7 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
             IsVisible = true;
             IsInEditMode = true;
             IsBoxSelectionEnabled = supportBoxSelection;
-            Disposable.Create(() =>
-            {
-                IsInEditMode = false;
-                IsVisible = false;
-                SelectionProjected = WinRect.Empty;
-            }).AddTo(anchors);
+            Disposable.Create(Reset).AddTo(anchors);
 
             var selectionSource = isVirtual 
                 ? this.WhenAnyValue(x => x.SelectionProjected) 
@@ -147,5 +144,12 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
     public IObservable<WinPoint> SelectVirtualPoint()
     {
         return StartSelection(isVirtual: true, supportBoxSelection: false).Select(x => x.Location);
+    }
+
+    public void Reset()
+    {
+        IsInEditMode = false;
+        IsVisible = false;
+        SelectionProjected = WinRect.Empty;
     }
 }

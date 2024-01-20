@@ -57,25 +57,21 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
 
     public IDataObject GetDataObject()
     {
-        EnsureUiThread();
         return Clipboard.GetDataObject();
     }
 
     public void SetImage(Image image)
     {
-        EnsureUiThread();
         Clipboard.SetImage(image);
     }
     
     public Image GetImage()
     {
-        EnsureUiThread();
         return Clipboard.GetImage();
     }
 
     public void SetDataObject(object dataObject)
     {
-        EnsureUiThread();
         Log.Debug(
             $"[PoeChatService] Setting new clipboard object '{dataObject}' (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})...");
         Clipboard.SetDataObject(dataObject, true, ClipboardSetRetryCount, (int) ClipboardRestorationTimeout.TotalMilliseconds);
@@ -83,13 +79,11 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
 
     public bool ContainsFileDropList()
     {
-        EnsureUiThread();
         return Clipboard.ContainsFileDropList();
     }
 
     public IReadOnlyList<string> GetFileDropList()
     {
-        EnsureUiThread();
         var files = Clipboard.GetFileDropList();
         var result = new List<string>();
         foreach (var file in files)
