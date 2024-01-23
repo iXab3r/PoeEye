@@ -31,7 +31,6 @@ public static class TaskExtensions
     {
         Sleep(CancellationToken.None, millisecondsTimeout, null);
     }
-    
        
     public static void Sleep(int millisecondsTimeout, IFluentLog log)
     {

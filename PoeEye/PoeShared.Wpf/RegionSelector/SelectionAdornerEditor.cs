@@ -234,10 +234,8 @@ public class SelectionAdornerEditor : ReactiveControl
                 {
                     Reset();
                 }
-                
-                e.Handled = true;
             }
-            
+            e.Handled = true;
         }
         finally
         {
@@ -297,9 +295,9 @@ public class SelectionAdornerEditor : ReactiveControl
         IsInEditMode = false;
     }
 
-    private static Point CalculatePosition(Point mousePositionAbs, Size actualSize)
+    private static WpfPoint CalculatePosition(WpfPoint mousePositionAbs, WpfSize actualSize)
     {
-        var mousePosition = new Point()
+        var mousePosition = new WpfPoint()
         {
             X = mousePositionAbs.X.EnsureInRange(0, actualSize.Width),
             Y = mousePositionAbs.Y.EnsureInRange(0, actualSize.Height),
@@ -309,7 +307,7 @@ public class SelectionAdornerEditor : ReactiveControl
 
     private static WpfRect CalculateSelectionPoint(WpfRect destinationRect, WpfRect selectionRect)
     {
-        var newSelection = new Rect
+        var newSelection = new WpfRect
         {
             X = Math.Min(destinationRect.Width - 0.01, selectionRect.X),
             Y = Math.Min(destinationRect.Height - 0.01, selectionRect.Y),
@@ -320,20 +318,20 @@ public class SelectionAdornerEditor : ReactiveControl
         return newSelection;
     }
     
-    private static bool TryToCalculateSelectionForPoint(Point mousePosition, Point anchorPoint, Size actualSize, out WpfRect selection)
+    private static bool TryToCalculateSelectionForPoint(WpfPoint mousePosition, WpfPoint anchorPoint, WpfSize actualSize, out WpfRect selection)
     {
         if (anchorPoint.X < 0 || anchorPoint.Y < 0 || anchorPoint.X  > actualSize.Width || anchorPoint.Y > actualSize.Height)
         {
             return false;
         }
-        var destinationRect = new Rect(new Point(0, 0), actualSize);
-        selection = CalculateSelectionPoint(destinationRect, new Rect(mousePosition, new Size(1, 1)));
+        var destinationRect = new WpfRect(new WpfPoint(0, 0), actualSize);
+        selection = CalculateSelectionPoint(destinationRect, new WpfRect(mousePosition, new WpfSize(1, 1)));
         return true;
     }
     
-    private static bool TryToCalculateSelection(Point mousePosition, Point anchorPoint, Size actualSize, out WpfRect selection)
+    private static bool TryToCalculateSelection(WpfPoint mousePosition, WpfPoint anchorPoint, WpfSize actualSize, out WpfRect selection)
     {
-        var destinationRect = new Rect(new Point(0, 0), actualSize);
+        var destinationRect = new WpfRect(new WpfPoint(0, 0), actualSize);
 
         var topLeft = new WpfPoint(mousePosition.X < anchorPoint.X ? mousePosition.X : anchorPoint.X, mousePosition.Y < anchorPoint.Y ? mousePosition.Y : anchorPoint.Y);
         var bottomRight = new WpfPoint(mousePosition.X > anchorPoint.X ? mousePosition.X : anchorPoint.X, mousePosition.Y > anchorPoint.Y ? mousePosition.Y : anchorPoint.Y);
@@ -359,6 +357,8 @@ public class SelectionAdornerEditor : ReactiveControl
     {
         var projectedSelection = ScreenRegionUtils.CalculateProjection(selection, ActualSize, ProjectionBounds);
         SetCurrentValue(SelectionProjectedProperty, projectedSelection);
-        ApplySelection(ScreenRegionUtils.ReverseProjection(projectedSelection, ActualSize, ProjectionBounds));
+
+        var reversedProjection = ScreenRegionUtils.ReverseProjection(projectedSelection, ActualSize, ProjectionBounds);
+        ApplySelection(reversedProjection);
     }
 }

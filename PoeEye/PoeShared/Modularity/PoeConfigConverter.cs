@@ -169,7 +169,7 @@ internal sealed class PoeConfigConverter : JsonConverter
             return DeserializeFromToken(metadata.ConfigValue, serializer, resolvedValueType);
         }
 
-        Log.Warn($"Config {metadata.TypeName} version {metadata.Version} is greater than expected: {innerTypeSample.Version}");
+        Log.Warn($"Config {metadata.TypeName} version {metadata.Version} differs from expected: {innerTypeSample.Version}");
 
         if (innerTypeSample.Version < metadata.Version)
         {

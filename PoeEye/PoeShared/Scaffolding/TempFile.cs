@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding;
 
@@ -10,7 +11,6 @@ public sealed class TempFile : IDisposable
     private static readonly IFluentLog Log = typeof(TempFile).PrepareLogger();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TempFile"/> class.
     /// Creates a copy of the provided source file in a temporary location.
     /// </summary>
     /// <param name="sourceFile">The source file to be copied to a temporary location.</param>
@@ -22,7 +22,6 @@ public sealed class TempFile : IDisposable
     }
     
     /// <summary>
-    /// Initializes a new instance of the <see cref="TempFile"/> class.
     /// Creates a file in temporary location.
     /// </summary>
     public TempFile()
@@ -31,6 +30,26 @@ public sealed class TempFile : IDisposable
         var tempFilePath = Path.GetTempFileName();
         File = new FileInfo(tempFilePath);
         Log.Debug($"Temporary file is now at @ {File.FullName}");
+    }
+    
+    /// <summary>
+    /// Creates a file with given extension(starting with '.') in temporary location.
+    /// </summary>
+    public TempFile([NotNull] string extension)
+    {
+        if (extension == null)
+        {
+            throw new ArgumentNullException(nameof(extension));
+        }
+
+        Log.Debug($"Creating temporary file with extension {extension}");
+        if (!extension.StartsWith('.'))
+        {
+            throw new ArgumentException($"Extension must start with '.', got {extension}");
+        }
+        var tempFilePath = $"{Path.GetTempFileName()}{extension}";
+        File = new FileInfo(tempFilePath);
+        Log.Debug($"Temporary file with extension {extension} is now at @ {File.FullName}");
     }
     
     /// <summary>

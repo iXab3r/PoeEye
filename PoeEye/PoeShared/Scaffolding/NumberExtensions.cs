@@ -37,6 +37,11 @@ public static class NumberExtensions
     {
         return Math.Max(Math.Min(value, max), min);
     }
+    
+    public static long EnsureInRange(this long value, long min, long max)
+    {
+        return Math.Max(Math.Min(value, max), min);
+    }
 
     public static int EnsureOdd(this int value)
     {
