@@ -1,0 +1,69 @@
+using System.Collections.Immutable;
+using System.Reactive.Subjects;
+
+namespace PoeShared.Scaffolding;
+
+public interface IReactiveList<T> : IReadOnlyReactiveList<T>
+{
+    void Add(T element);
+}
+
+public interface IReadOnlyReactiveList<T>
+{
+    IObservable<T> WhenAdded { get; }
+    ImmutableArray<T> Items { get; }
+}
+
+public interface IReadOnlyReactiveSet<T>
+{
+    IObservable<T> WhenAdded { get; }
+    IImmutableSet<T> Items { get; }
+}
+
+public class ReactiveSet<T> : DisposableReactiveObject, IReadOnlyReactiveSet<T>
+{
+    private readonly ReplaySubject<T> whenAdded = new();
+    private ImmutableHashSet<T> items;
+
+    public ReactiveSet() : this(EqualityComparer<T>.Default)
+    {
+    }
+
+    public ReactiveSet(IEqualityComparer<T> comparer)
+    {
+        items = ImmutableHashSet.Create(comparer);
+        whenAdded.Subscribe(x =>
+        {
+            items = items.Add(x);
+            Items = items;
+        }).AddTo(Anchors);
+    }
+    
+    public IImmutableSet<T> Items { get; private set; } 
+
+    public IObservable<T> WhenAdded => whenAdded;
+
+    public void Add(T element)
+    {
+        whenAdded.OnNext(element);
+    }
+}
+
+public class ReactiveList<T> : DisposableReactiveObject, IReactiveList<T>
+{
+    private readonly ReplaySubject<T> whenAdded = new();
+
+    public ReactiveList()
+    {
+        whenAdded.Subscribe(x => Items = Items.Add(x)).AddTo(Anchors);
+    }
+    
+    public ImmutableArray<T> Items { get; private set; } = ImmutableArray<T>.Empty;
+
+    public IObservable<T> WhenAdded => whenAdded;
+
+    public void Add(T element)
+    {
+        whenAdded.OnNext(element);
+    }
+}

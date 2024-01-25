@@ -27,7 +27,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
         this.WhenAnyValue(x => x.AutomaticallyLoadReplacements)
             .Select(x => x
-                ? assemblyTracker.WhenLoaded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>() != null)
+                ? assemblyTracker.Assemblies.WhenAdded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>() != null)
                 : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>

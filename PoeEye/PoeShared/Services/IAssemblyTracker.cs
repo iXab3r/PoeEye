@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using DynamicData;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 
 namespace PoeShared.Services;
 
@@ -8,8 +8,6 @@ public interface IAssemblyTracker
     private static readonly Lazy<AssemblyTracker> InstanceSupplier = new(() => new AssemblyTracker());
 
     public static IAssemblyTracker Instance => InstanceSupplier.Value;
-    
-    IObservableList<Assembly> LoadedAssemblies { get; }
-    
-    IObservable<Assembly> WhenLoaded { get; }
+
+    IReadOnlyReactiveList<Assembly> Assemblies { get; }
 }

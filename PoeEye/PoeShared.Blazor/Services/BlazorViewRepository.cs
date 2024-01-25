@@ -33,7 +33,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         this.clock = clock;
         
         this.WhenAnyValue(x => x.AutomaticallyProcessAssemblies)
-            .Select(x => x ? assemblyTracker.WhenLoaded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>() != null) : Observable.Empty<Assembly>())
+            .Select(x => x ? assemblyTracker.Assemblies.WhenAdded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>() != null) : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {

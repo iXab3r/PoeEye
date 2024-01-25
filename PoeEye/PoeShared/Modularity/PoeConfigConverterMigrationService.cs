@@ -23,7 +23,7 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
         this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
             .Select(x => x
-                ? assemblyTracker.WhenLoaded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null)
+                ? assemblyTracker.Assemblies.WhenAdded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null)
                 : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>

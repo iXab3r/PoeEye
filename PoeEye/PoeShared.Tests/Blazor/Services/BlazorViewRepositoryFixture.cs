@@ -16,12 +16,13 @@ namespace PoeShared.Tests.Blazor.Services;
 public class BlazorViewRepositoryFixture : FixtureBase
 {
     private Mock<IAssemblyTracker> assemblyTracker;
-    private ISubject<Assembly> whenLoadedSink;
+    private ReactiveList<Assembly> loadedAssemblies;
     
     protected override void SetUp()
     {
         assemblyTracker = Container.RegisterMock<IAssemblyTracker>();
-        whenLoadedSink = assemblyTracker.SetupGet(x => x.WhenLoaded).ReturnsPublisher();
+        loadedAssemblies = new ReactiveList<Assembly>();
+        assemblyTracker.SetupGet(x => x.Assemblies).Returns(loadedAssemblies);
     }
 
     [Test]
@@ -33,7 +34,7 @@ public class BlazorViewRepositoryFixture : FixtureBase
     {
         //Given
         var instance = CreateInstance();
-        whenLoadedSink.OnNext(Assembly.GetExecutingAssembly());
+        loadedAssemblies.Add(Assembly.GetExecutingAssembly());
 
         //When
         var viewType = instance.ResolveViewType(contentType);
@@ -50,7 +51,7 @@ public class BlazorViewRepositoryFixture : FixtureBase
     {
         //Given
         var instance = CreateInstance();
-        whenLoadedSink.OnNext(Assembly.GetExecutingAssembly());
+        loadedAssemblies.Add(Assembly.GetExecutingAssembly());
         instance.RegisterViewType(typeof(BlazorTestViewForString));
         instance.RegisterViewType(typeof(BlazorTestViewForCollection));
 

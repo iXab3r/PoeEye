@@ -1,15 +1,10 @@
-using System.Reactive.Subjects;
 using System.Reflection;
-using DynamicData;
-using PoeShared.Modularity;
-using ReactiveUI;
 
 namespace PoeShared.Services;
 
 internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAssemblyTracker
 {
-    private readonly ISourceList<Assembly> loadedAssemblies = new SourceList<Assembly>();
-    private readonly ReplaySubject<Assembly> loadedSink = new();
+    private readonly ReactiveList<Assembly> loadedAssemblies = new();
 
     public AssemblyTracker()
     {
@@ -25,32 +20,25 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
 
         loadedAssembliesSource
             .Concat(loadedAfterStartupSource)
-            .Subscribe(assembly =>
+            .Where(assembly =>
             {
                 var assemblyName = assembly.GetName();
                 if (assemblyName.Name.StartsWith("ℛ*") || assemblyName.Name.StartsWith("Microsoft.GeneratedCod"))
                 {
                     Log.Debug($"Assembly is loaded, but not tracked, reason - blacklist: {assembly}");
                     // these are dynamically emitted assemblies
-                    return;
+                    return false;
                 }
 
+                return true;
+            })
+            .Subscribe(assembly =>
+            {
+                Log.Debug($"Assembly is now tracked: {assembly}");
                 loadedAssemblies.Add(assembly);
             })
             .AddTo(Anchors);
-
-        loadedAssemblies
-            .Connect()
-            .OnItemAdded(assembly =>
-            {
-                Log.Debug($"Assembly is now tracked: {assembly}");
-                loadedSink.OnNext(assembly);
-            })
-            .SubscribeToErrors(Log.HandleUiException)
-            .AddTo(Anchors);
     }
 
-    public IObservableList<Assembly> LoadedAssemblies => loadedAssemblies;
-
-    public IObservable<Assembly> WhenLoaded => loadedSink.AsObservable();
+    public IReadOnlyReactiveList<Assembly> Assemblies => loadedAssemblies;
 }
