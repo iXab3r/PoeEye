@@ -31,6 +31,8 @@ public class WorkerThread : DisposableReactiveObject
 
     public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
+    private IFluentLog Log { get; }
+
     public void Start()
     {
         if (isRunning)
@@ -92,6 +94,4 @@ public class WorkerThread : DisposableReactiveObject
             log.Info("Thread has completed");
         }
     }
-
-    private IFluentLog Log { get; }
 }

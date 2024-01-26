@@ -17,6 +17,7 @@ public static class UiConstants
     public static readonly int UiThrottlingDelayInMilliseconds = (int)UiThrottlingDelay.TotalMilliseconds;
     public static readonly int UiThrottlingShortDelayInMilliseconds = (int)UiThrottlingShortDelay.TotalMilliseconds;
     public static readonly int UiAnimationDelayInMilliseconds = (int)UiAnimationDelay.TotalMilliseconds;
+    public static readonly int UiArtificialDelayInMilliseconds = (int)ArtificialDelay.TotalMilliseconds;
     public static readonly double WeekInMilliseconds = Week.TotalMilliseconds;
     public static readonly double ArtificialVeryLongDelayInMilliseconds = ArtificialVeryLongDelay.TotalMilliseconds;
 }
