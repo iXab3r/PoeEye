@@ -2,31 +2,39 @@ namespace PoeShared.Scaffolding;
 
 public class WorkerThread : DisposableReactiveObject
 {
-    private readonly Action<CancellationToken> action;
     private readonly CancellationTokenSource consumerTokenSource;
     private readonly Thread consumerThread;
     private bool isRunning;
 
     public WorkerThread(
         string threadName,
-        Action<CancellationToken> action,
+        Func<CancellationToken, Task> actionSupplier,
         bool autoStart = true)
     {
-        this.action = action;
         Log = GetType().PrepareLogger().WithSuffix($"WT {threadName}");
-        Log.Info($"Initializing buffered event log source");
+        Log.Info($"Initializing new worker thread");
         consumerTokenSource = new CancellationTokenSource();
-        consumerThread = new Thread(() => DoWork(Log, consumerTokenSource.Token, action))
+        consumerThread = new Thread(() => DoWork(Log, consumerTokenSource.Token, actionSupplier))
         {
             IsBackground = true,
             Name = threadName
         };
-        Log.Info($"Initialization completed");
         if (autoStart)
         {
             Log.Info($"Auto-starting the thread");
             Start();
         }
+    }
+
+    public WorkerThread(
+        string threadName,
+        Action<CancellationToken> action,
+        bool autoStart = true) : this(threadName, actionSupplier: token =>
+    {
+        action(token);
+        return Task.CompletedTask;
+    }, autoStart)
+    {
     }
 
     public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
@@ -39,7 +47,7 @@ public class WorkerThread : DisposableReactiveObject
         {
             throw new InvalidOperationException("Thread is already running");
         }
-        
+
         Log.Info($"Starting the thread");
         consumerThread.Start();
         isRunning = true;
@@ -65,20 +73,15 @@ public class WorkerThread : DisposableReactiveObject
         }).AddTo(Anchors);
     }
 
-    private static void DoWork(IFluentLog log, CancellationToken cancellationTokenSource, Action<CancellationToken> consumer)
+    private static void DoWork(IFluentLog log, CancellationToken cancellationToken, Func<CancellationToken, Task> consumerSupplier)
     {
         try
         {
             log.Info("Thread has started");
-            consumer(cancellationTokenSource);
-            if (cancellationTokenSource.IsCancellationRequested)
-            {
-                log.Info("Thread cancellation was requested");
-            }
-            else
-            {
-                log.Info("Thread consumer has completed its work");
-            }
+            var consumer = consumerSupplier(cancellationToken);
+            log.Info($"Thread consumer has been resolved, awaiting for completion");
+            consumer.Wait(cancellationToken);
+            log.Info(cancellationToken.IsCancellationRequested ? "Thread cancellation was requested" : "Thread consumer has completed its work without errors");
         }
         catch (OperationCanceledException)
         {
@@ -91,7 +94,7 @@ public class WorkerThread : DisposableReactiveObject
         }
         finally
         {
-            log.Info("Thread has completed");
+            log.Info("Thread is terminating");
         }
     }
 }
