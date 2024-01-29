@@ -93,6 +93,7 @@ public static class AwesomeIcons
     public const string Space = " ";
     public const string StopOutlined = "\uf28e";
     public const string Stop = "\uf28d";
+    public const string Tachometer = "\uf0e4";
     public const string Thermometer = "\uf2c7";
     public const string Tree = "\uf1bb";
     public const string Undo = "\uf0e2";
