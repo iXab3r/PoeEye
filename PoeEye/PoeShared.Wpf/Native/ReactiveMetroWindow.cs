@@ -378,8 +378,12 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
 
                 var initialBounds = dragParams.Value.InitialBounds;
                 var aspectRatio = TargetAspectRatio.Value;
+                var maxWidth = double.IsInfinity(MaxWidth) ? short.MaxValue : MaxWidth;
+                var maxHeight = double.IsInfinity(MaxHeight) ? short.MaxValue : MaxHeight;
+                var maxSize = new WpfSize(maxWidth, maxHeight).Scale(Dpi).ToWinSize();
+                
                 var minSize = new WpfSize(MinWidth, MinHeight).Scale(Dpi).ToWinSize();
-                var maxSize = new WpfSize(MaxWidth, MaxHeight).Scale(Dpi).ToWinSize();
+                
                 var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
 #if WINDOW_ENABLE_STACKTRACE_LOG
                 var logSuffix =
