@@ -78,7 +78,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public BlazorContentControl()
     {
         Disposable.Create(() => Log.Debug("Blazor content control is being disposed")).AddTo(Anchors);
-        Loaded += OnLoaded;
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         activeContentAnchors = new SerialDisposable().AddTo(Anchors);
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
@@ -166,6 +165,8 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                         return contentPresenter;
                     });
 
+                    childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(sp => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
+
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
@@ -235,7 +236,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        Window parentWindow = Window.GetWindow(this);
      
     }
 

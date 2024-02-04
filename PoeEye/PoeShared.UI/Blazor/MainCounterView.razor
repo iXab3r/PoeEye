@@ -1,4 +1,6 @@
-﻿@inherits PoeShared.Blazor.BlazorReactiveComponent<PoeShared.UI.Blazor.MainCounterViewModel>
+﻿@using PoeShared.Blazor.Wpf.Services
+@inherits PoeShared.Blazor.BlazorReactiveComponent<PoeShared.UI.Blazor.MainCounterViewModel>
+@inject IBlazorControlLocationTracker LocationTracker
 
 <h1>Counter</h1>
 
@@ -15,6 +17,10 @@
 
 <ReactiveSection Trackers="@(new() { this.Listen(x => x.RefreshRequestCount), DataContext.Listen(x => x.Count) })">
     <div>Reactive @DataContext.Count</div>
+</ReactiveSection>
+
+<ReactiveSection Trackers="@(new() { LocationTracker.Listen(x => x.BoundsOnScreen) })">
+    <div>@LocationTracker.BoundsOnScreen</div>
 </ReactiveSection>
 
 @code {
