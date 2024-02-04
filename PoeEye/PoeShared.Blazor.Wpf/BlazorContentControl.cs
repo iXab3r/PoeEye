@@ -61,9 +61,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public static readonly DependencyProperty ContainerProperty = DependencyProperty.Register(
         nameof(Container), typeof(IUnityContainer), typeof(BlazorContentControl), new PropertyMetadata(default(IUnityContainer)));
     
-    public static readonly DependencyProperty CustomElementsProperty = DependencyProperty.Register(
-        nameof(CustomElements), typeof(IEnumerable<BlazorCustomElementDescriptor>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<BlazorCustomElementDescriptor>)));
-
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeContentAnchors;
     private readonly SerialDisposable activeViewAnchors;
@@ -115,17 +112,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             Selector = "#app",
             ComponentType = typeof(BlazorContentPresenterWrapper)
         }.AddTo(WebView.RootComponents);
-
-        this.WhenAnyValue(x => x.CustomElements)
-            .Select(x => x ?? Array.Empty<BlazorCustomElementDescriptor>())
-            .Subscribe(descriptors =>
-            {
-                foreach (var elementDescriptor in descriptors)
-                {
-                    WebView.RootComponents.RegisterForJavaScript(elementDescriptor.ComponentType, elementDescriptor.Identifier);
-                }
-            })
-            .AddTo(Anchors);
         
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
         var generatedIndexFileName = "index.g.html";
@@ -207,6 +193,21 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                             WebView.FileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
+                    
+                    foreach (var kvp in blazorContentRepository.JSComponents.JSComponentParametersByIdentifier)
+                    {
+                        var componentIdentifier = kvp.Key;
+                        if (!blazorContentRepository.JSComponents.TryGetComponentType(componentIdentifier, out var componentType))
+                        {
+                            continue;
+                        }
+                        if (WebView.RootComponents.JSComponents.TryGetComponentType(componentIdentifier, out var _))
+                        {
+                            //already registered
+                            continue;
+                        }
+                        WebView.RootComponents.RegisterForJavaScript(componentType, componentIdentifier);
+                    }
 
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                     WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
@@ -276,13 +277,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
         set => SetValue(AdditionalFilesProperty, value);
     }
-
-    public IEnumerable<BlazorCustomElementDescriptor> CustomElements
-    {
-        get => (IEnumerable<BlazorCustomElementDescriptor>) GetValue(CustomElementsProperty);
-        set => SetValue(CustomElementsProperty, value);
-    }
-
+    
     public bool EnableHotkeys
     {
         get => (bool) GetValue(EnableHotkeysProperty);

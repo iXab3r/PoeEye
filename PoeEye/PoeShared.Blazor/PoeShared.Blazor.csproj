@@ -24,7 +24,7 @@
             <ExcludeAssets>runtime</ExcludeAssets>
             <IncludeAssets>All</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="StronglyTypedId" Version="1.0.0-beta06" />
+        <PackageReference Include="StronglyTypedId" Version="1.0.0-beta07" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,5 +2,5 @@ using StronglyTypedIds;
 
 namespace PoeShared.Blazor;
 
-[StronglyTypedId(StronglyTypedIdBackingType.NullableString, StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson)]
+[StronglyTypedId(Template.String)]
 public partial struct ReactiveComponentId {}

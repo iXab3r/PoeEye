@@ -2,5 +2,5 @@ using StronglyTypedIds;
 
 namespace PoeShared.Modularity;
 
-[StronglyTypedId(StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson)]
+[StronglyTypedId(Template.Guid)]
 public partial struct ErrorInfoId {}
