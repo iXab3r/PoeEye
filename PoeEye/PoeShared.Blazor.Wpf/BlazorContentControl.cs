@@ -27,6 +27,7 @@ using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Services;
+using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Native;
@@ -65,6 +66,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     private readonly SerialDisposable activeContentAnchors;
     private readonly SerialDisposable activeViewAnchors;
     private readonly WebViewServiceProvider webViewServiceProvider;
+    private readonly JSComponentConfigurationStoreAccessor jsComponentConfigurationStoreAccessor;
 
     static BlazorContentControl()
     {
@@ -76,6 +78,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public BlazorContentControl()
     {
         Disposable.Create(() => Log.Debug("Blazor content control is being disposed")).AddTo(Anchors);
+        Loaded += OnLoaded;
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         activeContentAnchors = new SerialDisposable().AddTo(Anchors);
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
@@ -193,20 +196,16 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                             WebView.FileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
-                    
-                    foreach (var kvp in blazorContentRepository.JSComponents.JSComponentParametersByIdentifier)
+
+                    var jsComponentsAccessor = new JSComponentConfigurationStoreAccessor(blazorContentRepository.JSComponents);
+                    var webRootComponentsAccessor = new JSComponentConfigurationStoreAccessor(WebView.RootComponents.JSComponents);
+                    foreach (var kvp in jsComponentsAccessor.JsComponentTypesByIdentifier)
                     {
-                        var componentIdentifier = kvp.Key;
-                        if (!blazorContentRepository.JSComponents.TryGetComponentType(componentIdentifier, out var componentType))
+                        if (webRootComponentsAccessor.JsComponentTypesByIdentifier.ContainsKey(kvp.Key))
                         {
                             continue;
                         }
-                        if (WebView.RootComponents.JSComponents.TryGetComponentType(componentIdentifier, out var _))
-                        {
-                            //already registered
-                            continue;
-                        }
-                        WebView.RootComponents.RegisterForJavaScript(componentType, componentIdentifier);
+                        webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
 
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
@@ -232,6 +231,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             .AddTo(Anchors);
 
         Binder.Attach(this).AddTo(Anchors);
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Window parentWindow = Window.GetWindow(this);
+     
     }
 
     private async Task ReloadExecuted(object arg)
