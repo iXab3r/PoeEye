@@ -10,7 +10,7 @@ using Size = System.Windows.Size;
 
 namespace PoeShared.Blazor.Wpf.Scaffolding;
 
-internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject, IBlazorControlLocationTracker
+internal sealed class FrameworkElementLocationTracker : DisposableReactiveObjectWithLogger, IBlazorControlLocationTracker
 {
     public FrameworkElementLocationTracker(FrameworkElement frameworkElement)
     {
@@ -53,6 +53,7 @@ internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject
         Parent.DpiChanged += ParentOnDpiChanged; 
         FrameworkElement.Unloaded += FrameworkElementOnUnloaded; 
         FrameworkElement.SizeChanged += FrameworkElementOnSizeChanged;
+        FrameworkElement.LayoutUpdated += FrameworkElementOnLayoutUpdated;
         
         Disposable.Create(() =>
         {
@@ -60,8 +61,15 @@ internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject
             Parent.SizeChanged -= ParentOnLocationChanged;
             Parent.DpiChanged -= ParentOnDpiChanged;
             FrameworkElement.Unloaded -= FrameworkElementOnUnloaded; 
+            FrameworkElement.SizeChanged -= FrameworkElementOnSizeChanged; 
+            FrameworkElement.LayoutUpdated += FrameworkElementOnLayoutUpdated;
         }).AddTo(Anchors);
 
+        UpdateBounds();
+    }
+
+    private void FrameworkElementOnLayoutUpdated(object sender, EventArgs e)
+    {
         UpdateBounds();
     }
 
@@ -87,10 +95,15 @@ internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject
 
     private void UpdateBounds()
     {
-        var rect = GetControlScreenCoordinates(FrameworkElement, Parent);
-        var dpi = VisualTreeHelper.GetDpi(FrameworkElement);
-        var screenRect = rect.ScaleToScreen(new PointF((float)dpi.DpiScaleX, (float)dpi.DpiScaleY));
-        BoundsOnScreen = rect.ToWinRectangle();
+        try
+        {
+            var rect = GetControlScreenCoordinates(FrameworkElement, Parent);
+            BoundsOnScreen = rect.ToWinRectangle();
+        }
+        catch (Exception e)
+        {
+            Log.Warn("Failed to calculate bounds of a control", e);
+        }
     }
     
     private static Rect GetControlScreenCoordinates(FrameworkElement control, Window window)

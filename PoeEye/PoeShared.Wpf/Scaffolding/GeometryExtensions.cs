@@ -364,14 +364,19 @@ public static class GeometryExtensions
         return new WinSize((int)(sourceSize.Width * factorX), (int)(sourceSize.Height * factorY));
     }
 
-    public static Rect ScaleToWpf(this WinRect sourceSize, PointF dpi)
+    public static WpfRect ScaleToWpf(this WinRect sourceSize, float devicePixelRatio)
+    {
+        return ScaleToWpf(sourceSize, new PointF(devicePixelRatio, devicePixelRatio));
+    }
+    
+    public static WpfRect ScaleToWpf(this WinRect sourceSize, PointF dpi)
     {
         var result = sourceSize.ToWpfRectangle();
         result.Scale(1 / dpi.X, 1 / dpi.Y);
         return result;
     }
         
-    public static Rect ScaleToWpf(this WinRect sourceSize)
+    public static WpfRect ScaleToWpf(this WinRect sourceSize)
     {
         var dpi = UnsafeNative.GetDesktopDpi();
         return ScaleToWpf(sourceSize, dpi);
@@ -380,6 +385,16 @@ public static class GeometryExtensions
     public static WpfPoint ScaleToWpf(this WinPoint source)
     {
         var dpi = UnsafeNative.GetDesktopDpi();
+        return ScaleToWpf(source, dpi);
+    }
+    
+    public static WpfPoint ScaleToWpf(this WinPoint sourceSize, float devicePixelRatio)
+    {
+        return ScaleToWpf(sourceSize, new PointF(devicePixelRatio, devicePixelRatio));
+    }
+    
+    public static WpfPoint ScaleToWpf(this WinPoint source, PointF dpi)
+    {
         return new WpfPoint(source.X / dpi.X, source.Y / dpi.Y);
     }
         
