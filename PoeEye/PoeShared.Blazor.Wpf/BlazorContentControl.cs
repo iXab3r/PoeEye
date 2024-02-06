@@ -30,6 +30,7 @@ using PoeShared.Blazor.Services;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
@@ -67,6 +68,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     private readonly SerialDisposable activeViewAnchors;
     private readonly WebViewServiceProvider webViewServiceProvider;
     private readonly JSComponentConfigurationStoreAccessor jsComponentConfigurationStoreAccessor;
+    private readonly DispatcherScheduler uiScheduler = DispatcherScheduler.Current;
 
     static BlazorContentControl()
     {
@@ -312,22 +314,21 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
     {
-        if (sender is BlazorWebView webView)
+        switch (sender)
         {
-            webView.UnhandledException -= OnUnhandledException;
+            case BlazorWebView webView:
+                webView.UnhandledException -= OnUnhandledException; //after webview crash it will be recreated anyways
+                Log.Error(ReferenceEquals(sender, WebView.WebView) ? $"WebView has crashed: {sender}" : $"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
+                break;
+            case Dispatcher dispatcher:
+                Log.Error($"WebView dispatcher has encountered an error", e.Exception);
+                break;
+            default:
+                Log.Error($"WebView has encountered an error from {sender}", e.Exception);
+                break;
         }
-
-        if (ReferenceEquals(sender, WebView.WebView))
-        {
-            Log.Error($"WebView has crashed: {sender}", e.Exception);
-            UnhandledException = e.Exception;
-        }
-        else
-        {
-            Log.Error($"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
-            UnhandledException = e.Exception;
-        }
-
+        
+        UnhandledException = e.Exception;
         e.Handled = true; // JS context is already dead at this point
     }
 
