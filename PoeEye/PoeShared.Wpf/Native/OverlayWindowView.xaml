@@ -221,7 +221,6 @@
         </Border>
 
         <Grid Visibility="{Binding ElementName=WindowBorder, Path=Visibility}">
-
             <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}"
                    IsHitTestVisible="False"
                    Width="{Binding ResizeThumbSize}"
@@ -236,14 +235,6 @@
                    Width="{Binding ResizeThumbSize}"
                    Height="{Binding ResizeThumbSize}" />
         </Grid>
-
-        <scaffolding:DataPiping.DataPipes>
-            <scaffolding:DataPipeCollection>
-                <scaffolding:DataPipe
-                    Source="{Binding ElementName=WindowRoot, Path=NativeBounds}"
-                    Target="{Binding NativeBounds, Mode=OneWayToSource}" />
-            </scaffolding:DataPipeCollection>
-        </scaffolding:DataPiping.DataPipes>
     </Grid>
 
 </native:ReactiveMetroWindow>

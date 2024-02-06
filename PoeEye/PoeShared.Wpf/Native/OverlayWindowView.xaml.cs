@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using ControlzEx.Behaviors;
 using Microsoft.Xaml.Behaviors;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Native;
 
@@ -23,6 +25,12 @@ public partial class OverlayWindowView
         var window = sender as Window;
         var windowViewModel = window?.DataContext as WindowContainerBase<IOverlayViewModel>;
         var overlayViewModel = windowViewModel?.Content;
+
+        this.Observe(DataContextProperty, x => x.DataContext).OfType<OverlayWindowContainer>()
+            .CombineLatest(this.WhenAnyValue(x => x.NativeBounds), (container, bounds) => (container, bounds))
+            .Where(x => x.container != null)
+            .Subscribe(x => x.container.NativeBounds = x.bounds)
+            .AddTo(Anchors);
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
