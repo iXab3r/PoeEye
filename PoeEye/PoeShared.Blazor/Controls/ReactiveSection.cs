@@ -14,9 +14,13 @@ public sealed class ReactiveSection : BlazorReactiveComponent
 {
     public ReactiveSection()
     {
-        this.WhenAnyValue(x => x.Trackers)
+        var refreshRequestSource = this.WhenAnyValue(x => x.Trackers)
             .Select(x => x ?? new ReactiveTrackerList())
             .Select(x => x.Merge())
+            .Switch();
+        
+        this.WhenAnyValue(x => x.DebounceTime)
+            .Select(x => x <= TimeSpan.Zero ? refreshRequestSource : refreshRequestSource.Sample(x))
             .Switch()
             .SubscribeAsync(x => Refresh(x))
             .AddTo(Anchors);
@@ -29,6 +33,8 @@ public sealed class ReactiveSection : BlazorReactiveComponent
     [Parameter] public string AsElement { get; set; }
     
     [Parameter(CaptureUnmatchedValues = true)] public IEnumerable<KeyValuePair<string, object>> AdditionalAttributes { get; set; }
+    
+    [Parameter] public TimeSpan DebounceTime { get; set; } = TimeSpan.Zero;
     
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
