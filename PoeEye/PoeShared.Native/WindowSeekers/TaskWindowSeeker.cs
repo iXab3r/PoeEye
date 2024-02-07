@@ -45,8 +45,15 @@ public sealed class TaskWindowSeeker : BaseWindowSeeker
             return true;
         }
 
-        var handle = windowHandleProvider.GetByWindowHandle(hwnd);
-        return InspectWindow(handle, addHandler);
+        try
+        {
+            var handle = windowHandleProvider.GetByWindowHandle(hwnd);
+            return InspectWindow(handle, addHandler);
+        }
+        catch (Exception)
+        {
+            return true;
+        }
     }
 
     /// <summary>
