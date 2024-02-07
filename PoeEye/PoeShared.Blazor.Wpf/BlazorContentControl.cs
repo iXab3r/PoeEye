@@ -332,22 +332,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         e.Handled = true; // JS context is already dead at this point
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
-    {
-        if (e.OriginalSource is not WebView2)
-        {
-            base.OnKeyDown(e);
-        }
-    }
-
-    protected override void OnKeyUp(KeyEventArgs e)
-    {
-        if (e.OriginalSource is not WebView2)
-        {
-            base.OnKeyUp(e);
-        }
-    }
-
     private static string PrepareIndexFileContext(string template, IReadOnlyList<IFileInfo> additionalFiles)
     {
         var cssLinksText = additionalFiles

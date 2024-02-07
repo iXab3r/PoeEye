@@ -6,12 +6,15 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -23,11 +26,26 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 {
     private static readonly IFluentLog Log = typeof(BlazorWebViewEx).PrepareLogger();
     private static readonly ConcurrentDictionary<string, IFileProvider> StaticFilesProvidersByPath = new();
+    private const string WebViewTemplateChildName = "WebView";
 
     protected CompositeDisposable Anchors { get; } = new();
-    
+
     public BlazorWebViewEx()
     {
+        var existingTemplate = Template;
+        if (existingTemplate?.VisualTree is not { } frameworkElementFactory)
+        {
+            throw new InvalidStateException($"It is expected than inner WebView2 will be hosted as {WebViewTemplateChildName} inside visual tree of {this}, got nothing instead");
+        }
+        if (frameworkElementFactory.Type != typeof(WebView2))
+        {
+            throw new InvalidStateException($"It is expected than inner WebView2 will be hosted as WPF version of WebView2 ({typeof(WebView2)}) {WebViewTemplateChildName} inside visual tree of {this}, got other control instead: {frameworkElementFactory.Type}");
+        }
+        Template = new ControlTemplate
+        {
+            VisualTree = new FrameworkElementFactory(typeof(WebView2Ex), WebViewTemplateChildName)
+        };
+        
         this.BlazorWebViewInitializing += OnBlazorWebViewInitializing;
         this.BlazorWebViewInitialized += OnBlazorWebViewInitialized;
     }
@@ -44,15 +62,12 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         this.Observe(BackgroundProperty, x => Background)
             .Select(x => x is SolidColorBrush solidColorBrush ? solidColorBrush.Color : default)
-            .Subscribe(x =>
-            {
-                WebView.DefaultBackgroundColor = Color.FromArgb(x.A, x.R, x.G, x.B);
-            })
+            .Subscribe(x => { WebView.DefaultBackgroundColor = Color.FromArgb(x.A, x.R, x.G, x.B); })
             .AddTo(Anchors);
+
         e.WebView.GotFocus += WebViewOnGotFocus;
         e.WebView.LostFocus += WebViewOnLostFocus;
         e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
-
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
         Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
         foreach (var rootDirectory in drives)
@@ -66,19 +81,13 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
                     continue;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Warn($"Failed to update virtual mapping for drive {rootDirectory.FullName}", ex);
                 continue;
             }
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
         }
-    }
-
-    private void CoreWebView2OnPermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
-    {
-        Log.Debug($"Permission requested: {e.PermissionKind}, state: {e.State}");
-        e.State = CoreWebView2PermissionState.Allow;
     }
 
     private void WebViewOnLostFocus(object sender, RoutedEventArgs e)
@@ -88,6 +97,13 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     private void WebViewOnGotFocus(object sender, RoutedEventArgs e)
     {
     }
+
+    private void CoreWebView2OnPermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
+    {
+        Log.Debug($"Permission requested: {e.PermissionKind}, state: {e.State}");
+        e.State = CoreWebView2PermissionState.Allow;
+    }
+
 
     public InMemoryFileProvider FileProvider { get; } = new();
 
