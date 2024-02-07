@@ -37,4 +37,11 @@ public static class GeometryExtensions
         var bottomRight = Vector2.Transform(new Vector2(bounds.Right, bounds.Bottom), transformationMatrix);
         return WinRect.FromLTRB((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
     }
+    
+    public static WinRectangleF Transform(this WinRectangleF bounds, Matrix3x2 transformationMatrix)
+    {
+        var topLeft = Vector2.Transform(new Vector2(bounds.Left, bounds.Top), transformationMatrix);
+        var bottomRight = Vector2.Transform(new Vector2(bounds.Right, bounds.Bottom), transformationMatrix);
+        return WinRectangleF.FromLTRB((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
+    }
 }

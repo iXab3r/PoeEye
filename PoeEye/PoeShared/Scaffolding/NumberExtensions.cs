@@ -57,4 +57,9 @@ public static class NumberExtensions
     {
         return Math.Max(Math.Min(value, max), min);
     }
+    
+    public static float EnsureInRange(this float value, float min, float max)
+    {
+        return Math.Max(Math.Min(value, max), min);
+    }
 }

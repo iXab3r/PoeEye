@@ -131,6 +131,15 @@
                                 <eye:NumericUpDownEx Value="1000" Width="100" />
                             </st:StackPanel>
                         </Expander>
+                        
+                        <Expander Header="Fast expander">
+                            <Expander Header="Some text" Style="{StaticResource FastExpander}">
+                                <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                                    <eye:NumericUpDownEx Value="100" Width="100" IsMouseDragEnabled="True" />
+                                    <eye:NumericUpDownEx Value="1000" Width="100" />
+                                </st:StackPanel>
+                            </Expander>
+                        </Expander>
 
                         <Expander Header="Random period selector">
                             <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
