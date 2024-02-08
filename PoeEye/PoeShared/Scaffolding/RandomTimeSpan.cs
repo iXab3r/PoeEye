@@ -2,6 +2,22 @@ namespace PoeShared.Scaffolding;
 
 public readonly record struct RandomTimeSpan
 {
+    public RandomTimeSpan()
+    {
+    }
+
+    public RandomTimeSpan(TimeSpan min)
+    {
+        Min = min;
+    }
+
+    public RandomTimeSpan(TimeSpan min, TimeSpan max)
+    {
+        Min = min;
+        Max = max;
+        Randomize = true;
+    }
+
     /// <summary>
     /// Gets or sets the fixed delay duration. This is the default delay used if randomization is not enabled.
     /// </summary>

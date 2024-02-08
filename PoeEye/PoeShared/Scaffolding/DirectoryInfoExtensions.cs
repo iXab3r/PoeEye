@@ -5,6 +5,28 @@ public static class DirectoryInfoExtensions
     private static readonly IFluentLog Log = typeof(DirectoryInfoExtensions).PrepareLogger();
 
     /// <summary>
+    /// Creates a <see cref="DirectoryInfo"/> instance representing a subdirectory within the specified parent directory.
+    /// </summary>
+    /// <param name="parentDir">The parent directory.</param>
+    /// <param name="subdirName">The name of the subdirectory.</param>
+    /// <returns>A <see cref="DirectoryInfo"/> instance for the specified subdirectory.</returns>
+    public static DirectoryInfo GetSubdirectory(this DirectoryInfo parentDir, string subdirName)
+    {
+        return new DirectoryInfo(Path.Combine(parentDir.FullName, subdirName));
+    }
+    
+    /// <summary>
+    /// Creates a <see cref="FileInfo"/> instance for a file located in the specified directory or its subdirectories.
+    /// </summary>
+    /// <param name="parentDir">The parent directory to which the file path is relative.</param>
+    /// <param name="relativeFilePath">The file path relative to the parent directory.</param>
+    /// <returns>A <see cref="FileInfo"/> instance for the specified file.</returns>
+    public static FileInfo GetFileInfo(this DirectoryInfo parentDir, string relativeFilePath)
+    {
+        return new FileInfo(Path.Combine(parentDir.FullName, relativeFilePath));
+    }
+    
+    /// <summary>
     /// Checks if a given path is a parent directory of another.
     /// </summary>
     /// <param name="candidatePath">Potential child directory path.</param>
