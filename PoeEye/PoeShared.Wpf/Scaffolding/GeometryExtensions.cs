@@ -76,6 +76,15 @@ public static class GeometryExtensions
         };
     }
 
+    public static WpfPoint EnsureInBounds(this WpfPoint point, WpfRect rect)
+    {
+        return new WpfPoint()
+        {
+            X = point.X.EnsureInRange(rect.X, rect.X+rect.Width),
+            Y = point.Y.EnsureInRange(rect.Y, rect.Y+rect.Height),
+        };
+    }
+
     public static WpfPoint Center(this Rect rect)
     {
         return new(rect.Left + (float)rect.Width / 2, rect.Top + (float)rect.Height / 2);

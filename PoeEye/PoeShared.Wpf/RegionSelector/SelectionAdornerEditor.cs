@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using App.Metrics;
@@ -11,11 +12,16 @@ using PoeShared.Scaffolding;
 using PoeShared.UI;
 using PropertyBinder;
 using ReactiveUI;
+using Brush = System.Windows.Media.Brush;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace PoeShared.RegionSelector;
 
+[TemplatePart(Name = PART_Canvas, Type = typeof(Canvas))]
 public class SelectionAdornerEditor : ReactiveControl
 {
+    private const string PART_Canvas = "PART_Canvas";
+
     private static readonly Binder<SelectionAdornerEditor> Binder = new();
 
     public static readonly DependencyProperty IsInEditModeProperty = DependencyProperty.Register(
@@ -51,26 +57,34 @@ public class SelectionAdornerEditor : ReactiveControl
     public static readonly DependencyProperty IsBoxSelectionEnabledProperty = DependencyProperty.Register(
         nameof(IsBoxSelectionEnabled), typeof(bool), typeof(SelectionAdornerEditor), new FrameworkPropertyMetadata(true));
 
+    public static readonly DependencyProperty ViewTransformProperty = DependencyProperty.Register(
+        nameof(ViewTransform), typeof(Matrix), typeof(SelectionAdornerEditor), new PropertyMetadata(default(Matrix)));
+
+    private Matrix localToWorld = Matrix.Identity;
+    private Matrix worldToLocal = Matrix.Identity;
+    private Matrix localToView = Matrix.Identity;
+    private Matrix viewToLocal = Matrix.Identity;
+    private FrameworkElement canvas;
+
     static SelectionAdornerEditor()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(SelectionAdornerEditor), new FrameworkPropertyMetadata(typeof(SelectionAdornerEditor)));
 
-        Binder.Bind(x => new WpfSize(x.ActualWidth, x.ActualHeight)).To(x => x.ActualSize);
+        Binder.Bind(x => CalculateWorldToLocalTransform(x.LocalRect.Size, x.ProjectionBounds))
+            .To((x, v) =>
+            {
+                x.localToWorld = v;
+                x.worldToLocal = v.InverseOrIdentity();
+            });
 
-        Binder
-            .Bind(x => ScreenRegionUtils.CalculateProjection(
-                new WpfRect(x.MousePosition, new WpfSize(1, 1)),
-                x.ActualSize,
-                x.ProjectionBounds, 
-                true).Location)
-            .To((x, v) => x.SetCurrentValue(MousePositionProjectedProperty, v));
+        Binder.Bind(x => x.ViewTransform)
+            .To((x, v) =>
+            {
+                x.localToView = v;
+                x.viewToLocal = v.InverseOrIdentity();
+            });
 
-        Binder.Bind(x => ScreenRegionUtils.ReverseProjection(
-                x.SelectionProjected,
-                x.ActualSize,
-                x.ProjectionBounds
-            ))
-            .WithDependency(x => x.IsInEditMode)
+        Binder.Bind(x => x.localToView.Transform(x.worldToLocal.Transform(x.SelectionProjected.ToWpfRectangle())))
             .To((x, v) => x.Selection = v);
     }
 
@@ -145,40 +159,51 @@ public class SelectionAdornerEditor : ReactiveControl
         set => SetValue(IsBoxSelectionEnabledProperty, value);
     }
 
+    public Matrix ViewTransform
+    {
+        get => (Matrix) GetValue(ViewTransformProperty);
+        set => SetValue(ViewTransformProperty, value);
+    }
+
     public WpfRect Selection { get; private set; }
 
     public WpfPoint MousePosition { get; private set; }
 
     public WpfPoint AnchorPoint { get; private set; }
 
-    private WpfSize ActualSize { get; [UsedImplicitly] set; }
+    private WpfRect LocalRect { get; set; }
+
+    public WinRect SelectionProjectedTemp { get; private set; }
 
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
+        canvas = (Canvas) Template.FindName(PART_Canvas, this);
+        canvas.SizeChanged += CanvasOnSizeChanged;
+
         var mouseEvents = Observable.Using(() =>
         {
-            MouseMove += OnMouseMove;
-            PreviewMouseDown += OnPreviewMouseDown;
-            PreviewMouseUp += OnPreviewMouseUp;
-            PreviewKeyDown += OnPreviewKeyDown;
-            CaptureMouse();
-            Focus();
+            canvas.MouseMove += OnMouseMove;
+            canvas.PreviewMouseDown += OnPreviewMouseDown;
+            canvas.PreviewMouseUp += OnPreviewMouseUp;
+            canvas.PreviewKeyDown += OnPreviewKeyDown;
+            canvas.CaptureMouse();
+            canvas.Focus();
 
             return Disposable.Create(() =>
             {
-                MouseMove -= OnMouseMove;
-                PreviewMouseDown -= OnPreviewMouseDown;
-                PreviewMouseUp -= OnPreviewMouseUp;
-                PreviewKeyDown -= OnPreviewKeyDown;
-                ReleaseMouseCapture();
+                canvas.MouseMove -= OnMouseMove;
+                canvas.PreviewMouseDown -= OnPreviewMouseDown;
+                canvas.PreviewMouseUp -= OnPreviewMouseUp;
+                canvas.PreviewKeyDown -= OnPreviewKeyDown;
+                canvas.ReleaseMouseCapture();
             });
         }, disposable => Observable.Never<Unit>());
 
         var isInEditModeSource = this.WhenAnyValue(x => x.IsInEditMode);
 
-        var keyboardFocusLost = this.Observe(IsKeyboardFocusWithinProperty, x => x.IsKeyboardFocusWithin)
+        var keyboardFocusLost = canvas.Observe(IsKeyboardFocusWithinProperty, x => x.IsKeyboardFocusWithin)
             .Where(x => x == false)
             .Select(x => true);
 
@@ -191,11 +216,13 @@ public class SelectionAdornerEditor : ReactiveControl
         isInEditModeSource
             .Select(x => x ? keyboardFocusLost : Observable.Empty<bool>())
             .Switch()
-            .Subscribe(_ =>
-            {
-                Reset();
-            })
+            .Subscribe(_ => { Reset(); })
             .AddTo(Anchors);
+    }
+
+    private void CanvasOnSizeChanged(object sender, EventArgs e)
+    {
+        LocalRect = new WpfRect(new WpfPoint(0, 0), new WpfSize(canvas.ActualWidth, canvas.ActualHeight));
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
@@ -215,27 +242,20 @@ public class SelectionAdornerEditor : ReactiveControl
 
         try
         {
-            var mousePosition = e.GetPosition(this);
-
-            if (e.ChangedButton == MouseButton.Left)
+            switch (e.ChangedButton)
             {
-                if (IsBoxSelectionEnabled)
-                {
-                    if (TryToCalculateSelection(mousePosition, AnchorPoint, ActualSize, out var selection))
-                    {
-                        AdaptSelection(selection);
-                    }
-                    else
-                    {
-                        Reset();
-                    }
-                }
-                else
-                {
+                case MouseButton.Left:
+                    e.Handled = true;
+                    
+                    UpdateSelection();
+                    SetCurrentValue(SelectionProjectedProperty, SelectionProjectedTemp);
+                    break;
+                case MouseButton.Right:
+                    e.Handled = true;
+                    
                     Reset();
-                }
+                    break;
             }
-            e.Handled = true;
         }
         finally
         {
@@ -245,48 +265,75 @@ public class SelectionAdornerEditor : ReactiveControl
 
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left)
+        switch (e.ChangedButton)
         {
-            var mousePosition = e.GetPosition(this);
-            AnchorPoint = mousePosition;
+            case MouseButton.Left:
+                e.Handled = true;
 
-            if (!IsBoxSelectionEnabled)
-            {
-                if (TryToCalculateSelectionForPoint(mousePosition, AnchorPoint, ActualSize, out var selection))
+                AnchorPoint = GetMousePosition(e);
+                UpdateSelection();
+                if (IsBoxSelectionEnabled == false) 
                 {
-                    AdaptSelection(selection);
-                } 
-            } 
+                    SetCurrentValue(SelectionProjectedProperty, SelectionProjectedTemp);
+                }
+                break;
+            case MouseButton.Right:
+                e.Handled = true;
+
+                Reset();
+                break;
         }
-        else
-        {
-            Reset();
-        }
-        e.Handled = true;
+
+    }
+
+    private WpfPoint GetMousePosition(MouseEventArgs e)
+    {
+        var localMousePos = e.GetPosition(canvas);
+
+        var viewportRect = localToView.Transform(LocalRect);
+        return localMousePos.EnsureInBounds(viewportRect);
     }
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
-        MousePosition = CalculatePosition(e.GetPosition(this), ActualSize);
+        MousePosition = GetMousePosition(e);
+        UpdateMousePosition();
+        
         if (AnchorPoint.IsEmpty())
         {
+            //nothing to do without anchor point
             return;
         }
+        UpdateSelection();
+    }
 
-        if (IsBoxSelectionEnabled)
-        {
-            if (TryToCalculateSelection(MousePosition, AnchorPoint, ActualSize, out var selection))
-            {
-                ApplySelection(selection);
-            } 
-        }
-        else if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            if (TryToCalculateSelectionForPoint(MousePosition, AnchorPoint, ActualSize, out var selection))
-            {
-                AdaptSelection(selection);
-            }
-        }
+    private void UpdateMousePosition()
+    {
+        var localMousePos = MousePosition.IsEmpty()
+            ? new WpfPoint(0,0) 
+            : viewToLocal.Transform(MousePosition);
+        var worldMousePos = localMousePos.IsEmpty()
+            ? WinPoint.Empty
+            : localToWorld.Transform(localMousePos).ToWinPoint();
+        MousePositionProjected = worldMousePos;
+    }
+
+    private void UpdateSelection()
+    {
+        var localSelection = CalculateSelection(MousePosition, AnchorPoint, LocalRect.Size);
+        
+        var worldSelection = localSelection.IsEmpty
+            ? WpfRect.Empty
+            : localToWorld.Transform(localSelection);
+        Selection = worldToLocal.Transform(worldSelection);
+
+        var localViewSelection =  localSelection.IsEmpty 
+            ? WpfRect.Empty 
+            : viewToLocal.Transform(localSelection);
+        var worldViewSelection = localViewSelection.IsEmpty
+            ? WpfRect.Empty
+            : localToWorld.Transform(localViewSelection);
+        SelectionProjectedTemp = ToWinRegion(worldViewSelection);
     }
 
     private void Reset()
@@ -295,70 +342,60 @@ public class SelectionAdornerEditor : ReactiveControl
         IsInEditMode = false;
     }
 
-    private static WpfPoint CalculatePosition(WpfPoint mousePositionAbs, WpfSize actualSize)
+    private static WinRect ToWinRegion(WpfRect rect)
     {
-        var mousePosition = new WpfPoint()
+        if (rect.IsEmpty)
         {
-            X = mousePositionAbs.X.EnsureInRange(0, actualSize.Width),
-            Y = mousePositionAbs.Y.EnsureInRange(0, actualSize.Height),
-        };
-        return mousePosition;
-    }
-
-    private static WpfRect CalculateSelectionPoint(WpfRect destinationRect, WpfRect selectionRect)
-    {
-        var newSelection = new WpfRect
-        {
-            X = Math.Min(destinationRect.Width - 0.01, selectionRect.X),
-            Y = Math.Min(destinationRect.Height - 0.01, selectionRect.Y),
-            Width = Math.Max(1, selectionRect.Width),
-            Height = Math.Max(1, selectionRect.Height)
-        };
-        newSelection.Intersect(destinationRect);
-        return newSelection;
-    }
-    
-    private static bool TryToCalculateSelectionForPoint(WpfPoint mousePosition, WpfPoint anchorPoint, WpfSize actualSize, out WpfRect selection)
-    {
-        if (anchorPoint.X < 0 || anchorPoint.Y < 0 || anchorPoint.X  > actualSize.Width || anchorPoint.Y > actualSize.Height)
-        {
-            return false;
+            return WinRect.Empty;
         }
-        var destinationRect = new WpfRect(new WpfPoint(0, 0), actualSize);
-        selection = CalculateSelectionPoint(destinationRect, new WpfRect(mousePosition, new WpfSize(1, 1)));
-        return true;
-    }
-    
-    private static bool TryToCalculateSelection(WpfPoint mousePosition, WpfPoint anchorPoint, WpfSize actualSize, out WpfRect selection)
-    {
-        var destinationRect = new WpfRect(new WpfPoint(0, 0), actualSize);
 
+        var baseRect = new WinRect
+        {
+            X = (int)Math.Floor(rect.X),
+            Y = (int)Math.Floor(rect.Y),
+            Width = (int)Math.Floor(rect.Width),
+            Height = (int)Math.Floor(rect.Height)
+        };
+        var leftovers = new WpfRect
+        {
+            X = rect.X - baseRect.X,
+            Y = rect.Y - baseRect.Y,
+            Width = rect.Width - baseRect.Width,
+            Height = rect.Height - baseRect.Height
+        };
+
+        return new WinRect
+        {
+            X = baseRect.X + (int)Math.Round(leftovers.X),
+            Y = baseRect.Y + (int)Math.Round(leftovers.Y),
+            Width = Math.Max(1, baseRect.Width + (leftovers.Width > 0.2 ? 1 : 0)),
+            Height = Math.Max(1, baseRect.Height + (leftovers.Height > 0.2 ? 1 : 0)),
+        };
+    }
+
+    private static WpfRect CalculateSelection(WpfPoint mousePosition, WpfPoint anchorPoint, WpfSize actualSize)
+    {
         var topLeft = new WpfPoint(mousePosition.X < anchorPoint.X ? mousePosition.X : anchorPoint.X, mousePosition.Y < anchorPoint.Y ? mousePosition.Y : anchorPoint.Y);
         var bottomRight = new WpfPoint(mousePosition.X > anchorPoint.X ? mousePosition.X : anchorPoint.X, mousePosition.Y > anchorPoint.Y ? mousePosition.Y : anchorPoint.Y);
 
+        var destinationRect = new WpfRect(new WpfPoint(0, 0), actualSize);
         var selectionRect = new WpfRect(topLeft, bottomRight);
         selectionRect.Intersect(destinationRect);
 
-        if (selectionRect.Width <= 0 || selectionRect.Height <= 0)
+        return selectionRect;
+    }
+
+    private static Matrix CalculateWorldToLocalTransform(WpfSize actualSize, WinRect projectionBounds)
+    {
+        if (actualSize.IsEmpty || projectionBounds.IsEmpty)
         {
-            return false;
+            return Matrix.Identity;
         }
 
-        selection = CalculateSelectionPoint(destinationRect, selectionRect);
-        return true;
-    }
+        var scaleX = projectionBounds.Width / actualSize.Width;
+        var scaleY = projectionBounds.Height / actualSize.Height;
 
-    private void ApplySelection(WpfRect selection)
-    {
-        Selection = selection;
-    }
-
-    private void AdaptSelection(WpfRect selection)
-    {
-        var projectedSelection = ScreenRegionUtils.CalculateProjection(selection, ActualSize, ProjectionBounds);
-        SetCurrentValue(SelectionProjectedProperty, projectedSelection);
-
-        var reversedProjection = ScreenRegionUtils.ReverseProjection(projectedSelection, ActualSize, ProjectionBounds);
-        ApplySelection(reversedProjection);
+        var wpfToObjectMatrix = new Matrix(scaleX, 0, 0, scaleY, projectionBounds.X, projectionBounds.Y);
+        return wpfToObjectMatrix;
     }
 }

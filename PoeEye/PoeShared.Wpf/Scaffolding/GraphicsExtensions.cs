@@ -17,6 +17,25 @@ public static class GraphicsExtensions
         {WinPixelFormat.Format32bppPArgb, PixelFormats.Pbgra32},
     });
 
+    public static WpfRect Transform(this Matrix matrix, WpfRect rect)
+    {
+        var topLeft = matrix.Transform(rect.TopLeft);
+        var bottomRight = matrix.Transform(rect.BottomRight);
+        return new WpfRect(topLeft, bottomRight);
+    }
+    
+    public static Matrix InverseOrIdentity(this Matrix matrix)
+    {
+        return matrix.IsIdentity || matrix.HasInverse == false ? Matrix.Identity : Inverse(matrix);    
+    }
+    
+    public static Matrix Inverse(this Matrix matrix)
+    {
+        var result = matrix;
+        result.Invert();
+        return result;
+    }
+    
     public static WpfColor ToWpfColor(this WinColor color)
     {
         return WpfColor.FromArgb(color.A, color.R, color.G, color.B);

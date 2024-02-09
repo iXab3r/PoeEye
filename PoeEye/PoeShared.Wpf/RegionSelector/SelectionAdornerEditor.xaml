@@ -32,7 +32,7 @@
                                 <Border
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     BorderBrush="{TemplateBinding BorderBrush}"/>
-                                <Canvas>
+                                <Canvas x:Name="PART_Canvas" Focusable="True">
                                     <Path Fill="Black" 
                                           Opacity="{Binding BackgroundOpacity, RelativeSource={RelativeSource TemplatedParent}}"
                                           Visibility="{Binding ShowBackground, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
@@ -100,6 +100,7 @@
 
                                     <Grid
                                         x:Name="SelectionCrosshair">
+                                       
                                         <Grid.Visibility>
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}" 
                                                      Path="ShowCrosshair" 
@@ -188,10 +189,10 @@
                             <Setter TargetName="SelectionTextBlock" Property="Text">
                                 <Setter.Value>
                                     <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{}X:{0:F0} Y:{1:F0} W:{2:F0} H:{3:F0}" Mode="OneWay">
-                                        <Binding Path="SelectionProjected.X" RelativeSource="{RelativeSource TemplatedParent}" />
-                                        <Binding Path="SelectionProjected.Y" RelativeSource="{RelativeSource TemplatedParent}" />
-                                        <Binding Path="SelectionProjected.Width" RelativeSource="{RelativeSource TemplatedParent}" />
-                                        <Binding Path="SelectionProjected.Height" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="SelectionProjectedTemp.X" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="SelectionProjectedTemp.Y" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="SelectionProjectedTemp.Width" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="SelectionProjectedTemp.Height" RelativeSource="{RelativeSource TemplatedParent}" />
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>
