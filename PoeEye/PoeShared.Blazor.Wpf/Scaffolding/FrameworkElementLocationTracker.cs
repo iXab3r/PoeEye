@@ -53,7 +53,6 @@ internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject
         Parent.DpiChanged += ParentOnDpiChanged; 
         FrameworkElement.Unloaded += FrameworkElementOnUnloaded; 
         FrameworkElement.SizeChanged += FrameworkElementOnSizeChanged;
-        FrameworkElement.LayoutUpdated += FrameworkElementOnLayoutUpdated;
         
         Disposable.Create(() =>
         {
@@ -62,14 +61,8 @@ internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject
             Parent.DpiChanged -= ParentOnDpiChanged;
             FrameworkElement.Unloaded -= FrameworkElementOnUnloaded; 
             FrameworkElement.SizeChanged -= FrameworkElementOnSizeChanged; 
-            FrameworkElement.LayoutUpdated += FrameworkElementOnLayoutUpdated;
         }).AddTo(Anchors);
 
-        UpdateBounds();
-    }
-
-    private void FrameworkElementOnLayoutUpdated(object sender, EventArgs e)
-    {
         UpdateBounds();
     }
 
