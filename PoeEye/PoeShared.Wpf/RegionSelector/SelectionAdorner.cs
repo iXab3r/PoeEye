@@ -110,6 +110,8 @@ public sealed class SelectionAdorner : DisposableReactiveObject, ISelectionAdorn
             IsVisible = true;
             IsInEditMode = true;
             IsBoxSelectionEnabled = supportBoxSelection;
+            Selection = WinRect.Empty;
+            SelectionProjected = WinRect.Empty;
             Disposable.Create(Reset).AddTo(anchors);
 
             var selectionSource = isVirtual 
