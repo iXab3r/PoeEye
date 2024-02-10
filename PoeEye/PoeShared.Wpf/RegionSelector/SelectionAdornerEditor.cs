@@ -46,7 +46,7 @@ public class SelectionAdornerEditor : ReactiveControl
         nameof(BackgroundOpacity), typeof(double), typeof(SelectionAdornerEditor), new PropertyMetadata(0.5));
 
     public static readonly DependencyProperty ProjectionBoundsProperty = DependencyProperty.Register(
-        nameof(ProjectionBounds), typeof(WinRect), typeof(SelectionAdornerEditor), new FrameworkPropertyMetadata(default(WinRect), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        nameof(ProjectionBounds), typeof(WinRect), typeof(SelectionAdornerEditor), new FrameworkPropertyMetadata(default(WinRect)));
 
     public static readonly DependencyProperty SelectionProjectedProperty = DependencyProperty.Register(
         nameof(SelectionProjected), typeof(WinRect), typeof(SelectionAdornerEditor), new FrameworkPropertyMetadata(default(WinRect), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
@@ -64,7 +64,6 @@ public class SelectionAdornerEditor : ReactiveControl
     private Matrix worldToLocal = Matrix.Identity;
     private Matrix localToView = Matrix.Identity;
     private Matrix viewToLocal = Matrix.Identity;
-    private FrameworkElement canvas;
 
     static SelectionAdornerEditor()
     {
@@ -179,31 +178,30 @@ public class SelectionAdornerEditor : ReactiveControl
     {
         base.OnApplyTemplate();
 
-        canvas = (Canvas) Template.FindName(PART_Canvas, this);
-        canvas.SizeChanged += CanvasOnSizeChanged;
+        SizeChanged += CanvasOnSizeChanged;
 
         var mouseEvents = Observable.Using(() =>
         {
-            canvas.MouseMove += OnMouseMove;
-            canvas.PreviewMouseDown += OnPreviewMouseDown;
-            canvas.PreviewMouseUp += OnPreviewMouseUp;
-            canvas.PreviewKeyDown += OnPreviewKeyDown;
-            canvas.CaptureMouse();
-            canvas.Focus();
+            MouseMove += OnMouseMove;
+            PreviewMouseDown += OnPreviewMouseDown;
+            PreviewMouseUp += OnPreviewMouseUp;
+            PreviewKeyDown += OnPreviewKeyDown;
+            Focus();
+            CaptureMouse();
 
             return Disposable.Create(() =>
             {
-                canvas.MouseMove -= OnMouseMove;
-                canvas.PreviewMouseDown -= OnPreviewMouseDown;
-                canvas.PreviewMouseUp -= OnPreviewMouseUp;
-                canvas.PreviewKeyDown -= OnPreviewKeyDown;
-                canvas.ReleaseMouseCapture();
+               MouseMove -= OnMouseMove;
+               PreviewMouseDown -= OnPreviewMouseDown;
+               PreviewMouseUp -= OnPreviewMouseUp;
+               PreviewKeyDown -= OnPreviewKeyDown;
+               ReleaseMouseCapture();
             });
         }, disposable => Observable.Never<Unit>());
 
         var isInEditModeSource = this.WhenAnyValue(x => x.IsInEditMode);
 
-        var keyboardFocusLost = canvas.Observe(IsKeyboardFocusWithinProperty, x => x.IsKeyboardFocusWithin)
+        var keyboardFocusLost = this.Observe(IsKeyboardFocusWithinProperty, x => x.IsKeyboardFocusWithin)
             .Where(x => x == false)
             .Select(x => true);
 
@@ -216,13 +214,27 @@ public class SelectionAdornerEditor : ReactiveControl
         isInEditModeSource
             .Select(x => x ? keyboardFocusLost : Observable.Empty<bool>())
             .Switch()
-            .Subscribe(_ => { Reset(); })
+            .Subscribe(Reset)
             .AddTo(Anchors);
+
+        this.WhenAnyValue(x => x.IsInEditMode)
+            .Where(x => x == true)
+            .Subscribe(() =>
+            {
+                Selection = default;
+                SelectionProjectedTemp = default;
+            })
+            .AddTo(Anchors);
+    }
+
+    protected override void OnContextMenuOpening(ContextMenuEventArgs e)
+    {
+        e.Handled = true;
     }
 
     private void CanvasOnSizeChanged(object sender, EventArgs e)
     {
-        LocalRect = new WpfRect(new WpfPoint(0, 0), new WpfSize(canvas.ActualWidth, canvas.ActualHeight));
+        LocalRect = new WpfRect(new WpfPoint(0, 0), new WpfSize(ActualWidth, ActualHeight));
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
@@ -288,7 +300,7 @@ public class SelectionAdornerEditor : ReactiveControl
 
     private WpfPoint GetMousePosition(MouseEventArgs e)
     {
-        var localMousePos = e.GetPosition(canvas);
+        var localMousePos = e.GetPosition(this);
 
         var viewportRect = localToView.Transform(LocalRect);
         return localMousePos.EnsureInBounds(viewportRect);
@@ -309,13 +321,9 @@ public class SelectionAdornerEditor : ReactiveControl
 
     private void UpdateMousePosition()
     {
-        var localMousePos = MousePosition.IsEmpty()
-            ? new WpfPoint(0,0) 
-            : viewToLocal.Transform(MousePosition);
-        var worldMousePos = localMousePos.IsEmpty()
-            ? WinPoint.Empty
-            : localToWorld.Transform(localMousePos).ToWinPoint();
-        MousePositionProjected = worldMousePos;
+        var localMousePos = viewToLocal.Transform(MousePosition);
+        var worldMousePos = localToWorld.Transform(localMousePos);
+        MousePositionProjected = worldMousePos.IsEmpty() ? WinPoint.Empty : worldMousePos.ToWinPoint();
     }
 
     private void UpdateSelection()

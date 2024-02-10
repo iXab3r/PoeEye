@@ -15,6 +15,8 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="MinHeight" Value="27" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Command">
             <Setter.Value>
                 <Binding RelativeSource="{RelativeSource Self}" Path="(ui1:CommandWrapperHelper.Command)" />
@@ -67,7 +69,10 @@
                                 <Border
                                     x:Name="SubMenuBorder"
                                     Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuBase}}"
+                                    BorderBrush="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuBase}}"
+                                    BorderThickness="{Binding Path=BorderThickness, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuBase}}"
                                     Effect="{DynamicResource MaterialDesignShadowDepth1}"
+                                    
                                     CornerRadius="2">
 
                                     <Border

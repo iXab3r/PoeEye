@@ -3,7 +3,7 @@ namespace PoeShared.Scaffolding;
 /// <summary>
 /// Enforces a minimum duration for a block of code execution.
 /// </summary>
-public sealed class ForcedDelayBlock : IDisposable
+public sealed class ForcedDelayBlock : IDisposable, IAsyncDisposable
 {
     private readonly Stopwatch stopwatch;
 
@@ -38,6 +38,16 @@ public sealed class ForcedDelayBlock : IDisposable
         if (timeToSleep > TimeSpan.Zero)
         {
             TaskExtensions.Sleep(timeToSleep);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        var elapsed = stopwatch.Elapsed;
+        var timeToSleep = MinTime - elapsed;
+        if (timeToSleep > TimeSpan.Zero)
+        {
+            await Task.Delay(timeToSleep);
         }
     }
 }
