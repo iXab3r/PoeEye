@@ -44,4 +44,14 @@ public readonly record struct ErrorInfo
             Timestamp = DateTimeOffset.Now
         };
     }
+
+    public bool Equals(ErrorInfo other)
+    {
+        return Id.Equals(other.Id);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }
