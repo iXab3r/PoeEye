@@ -37,15 +37,14 @@ internal sealed class WindowHandle : IWindowHandle
         Handle = handle;
         titleSupplier = new Lazy<string>(() =>
         {
-            var windowTitle = UnsafeNative.GetWindowTitle(Handle);
-
-            if (!string.IsNullOrEmpty(windowTitle))
-            {
-                return windowTitle;
-            }
-
             try
             {
+                var windowTitle = UnsafeNative.GetWindowTitle(Handle);
+
+                if (!string.IsNullOrEmpty(windowTitle))
+                {
+                    return windowTitle;
+                }
                 var process = Process.GetProcessById(ProcessId);
                 var mainWindowTitle = process.MainWindowTitle;
                 if (!string.IsNullOrEmpty(mainWindowTitle))

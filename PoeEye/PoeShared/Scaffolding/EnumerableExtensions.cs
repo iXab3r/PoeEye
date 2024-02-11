@@ -12,6 +12,19 @@ public static class EnumerableExtensions
     {
         return !enumerable.Any();
     }
+    
+    public static async Task<TAccumulate> AggregateAsync<TSource, TAccumulate>(
+        this IEnumerable<TSource> source,
+        TAccumulate seed,
+        Func<TAccumulate, TSource, Task<TAccumulate>> func)
+    {
+        var result = seed;
+        foreach (var item in source)
+        {
+            result = await func(result, item);
+        }
+        return result;
+    }
 
     /// <summary>
     /// Inserts a specified separator between each element of a sequence, if the sequence has more than one item.
