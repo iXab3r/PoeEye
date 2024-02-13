@@ -1,24 +1,13 @@
+export * from './blazorUtils.input'
+
 import swal from 'sweetalert';
 import log from 'loglevel';
-import $ from 'jquery'; // Ensure jQuery is imported
+import $ from 'jquery';
+
+// noinspection ES6UnusedImports used from outside
+import {ComponentParameters, IDynamicRootComponent, IBlazor, Blazor, logAndThrow} from "./blazorUtils.common";
 
 log.setLevel('info'); // Change this level as needed.
-
-const Blazor:IBlazor = window['Blazor'];
-
-/**
- * Logs an error message and throws an error.
- * @param errorMessage The error message to log and throw.
- * @param error (Optional) The error object to include in the message.
- * @throws An error with the specified error message.
- */
-export function logAndThrow(errorMessage: string, error?: Error): never {
-    if (error) {
-        errorMessage += `: ${error.message}`;
-    }
-    log.error(errorMessage);
-    throw new Error(errorMessage);
-}
 
 /**
  * Reads text from the clipboard using the Clipboard API.
@@ -86,14 +75,27 @@ export function selectAllTextInElementById<T extends HTMLElement>(elementId: str
         logAndThrow(`Element with ID '${elementId}' not found`);
     }
 
+    selectAllTextInElement(targetElement);
+}
+
+/**
+ * Selects all text in an HTML input element with the specified ID.
+ * @throws An error if the element is not found, is not an input element, or if text selection fails.
+ * @param targetElement
+ */
+export function selectAllTextInElement(targetElement: HTMLElement): void {
+    if (!targetElement) {
+        logAndThrow(`Element not specified`);
+    }
+
     if (!(targetElement instanceof HTMLInputElement)) {
-        logAndThrow(`Element with ID '${elementId}' is not an input element`);
+        logAndThrow(`Element '${targetElement}' is not an input element`);
     }
 
     try {
         targetElement.select();
     } catch (error) {
-        logAndThrow(`Error selecting text in element with ID '${elementId}'`, error);
+        logAndThrow(`Error selecting text in element ${targetElement}`, error);
     }
 }
 
@@ -229,19 +231,4 @@ export function getElementByIdWithDelay(
 
         attemptToFindElement();
     });
-}
-
-export type ComponentParameters = object | null | undefined;
-
-export interface IDynamicRootComponent {
-    setParameters(parameters: ComponentParameters): void;
-    dispose(): Promise<void>;
-}
-
-export interface IRootComponentsFunctions {
-    add(toElement: Element, componentIdentifier: string, initialParameters: ComponentParameters): Promise<IDynamicRootComponent>;
-}
-
-export interface IBlazor {
-    rootComponents: IRootComponentsFunctions;
 }

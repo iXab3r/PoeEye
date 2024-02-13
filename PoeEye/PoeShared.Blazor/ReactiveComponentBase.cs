@@ -110,6 +110,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     public async ValueTask DisposeAsync()
     {
         Dispose();
+        GC.SuppressFinalize(this);
     }
     
     /// <summary>

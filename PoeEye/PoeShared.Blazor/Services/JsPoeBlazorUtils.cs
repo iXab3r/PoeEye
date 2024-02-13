@@ -1,3 +1,7 @@
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Components;
+using PoeShared.Blazor.Scaffolding;
+
 namespace PoeShared.Blazor.Services;
 
 using Microsoft.JSInterop;
@@ -6,7 +10,7 @@ using System.Threading.Tasks;
 
 internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
 {
-    public static readonly string JsUtilsFilePath = "./_content/PoeShared.Blazor/js/poeshared.utils.js";
+    public static readonly string JsUtilsFilePath = "./_content/PoeShared.Blazor/js/blazorUtils.js";
 
     private readonly Lazy<Task<IJSObjectReference>> moduleTask;
     private readonly IJSRuntime jsRuntime;
@@ -46,6 +50,12 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         var module = await GetModuleAsync();
         await module.InvokeVoidAsync("selectAllTextInElementById", elementId);
     }
+    
+    public async Task SelectAllTextInElement(ElementReference elementRef)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("selectAllTextInElement", elementRef);
+    }
 
     public async Task FocusElementById(string elementId)
     {
@@ -81,6 +91,24 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         var module = await GetModuleAsync();
         var dynamicComponentRef = await module.InvokeAsync<IJSObjectReference>("addRootComponent", elementId, componentIdentifier, initialParameters);
         return new DynamicRootComponent(dynamicComponentRef, elementId, componentIdentifier);
+    }
+
+    public async Task AddKeyboardHook<THandler>(ElementReference elementRef, DotNetObjectReference<THandler> dotNetObjectReference, string methodName) where THandler : class
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("addKeyboardHook", elementRef, dotNetObjectReference, methodName);
+    }
+    
+    public async Task RemoveKeyboardHook(ElementReference elementRef)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("removeKeyboardHook", elementRef);
+    }
+
+    public async Task<ElementKeyboardHookRef> AddKeyboardHook<THandler>(ElementReference elementRef, THandler handler, string methodName) where THandler : class
+    {
+        var hook = await ElementKeyboardHookRef.Create(this, elementRef, handler, methodName);
+        return hook;
     }
 
     public async Task ScrollToTop(string elementSelector, TimeSpan duration)

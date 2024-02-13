@@ -1,6 +1,9 @@
 using System;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PoeShared.Blazor.Scaffolding;
 
 namespace PoeShared.Blazor.Services;
 
@@ -35,6 +38,14 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <param name="elementId">The ID of the HTML element to select text in.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task SelectAllTextInElementById(string elementId);
+
+
+    /// <summary>
+    /// Selects all text within an HTML element identified by its ID.
+    /// </summary>
+    /// <param name="elementRef"></param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task SelectAllTextInElement(ElementReference elementRef);
 
     /// <summary>
     /// Sets focus on the element with the provided id.
@@ -71,4 +82,16 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     Task ScrollToBottom(string elementSelector);
 
     Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default);
+
+    Task AddKeyboardHook<THandler>(
+        ElementReference elementRef, 
+        DotNetObjectReference<THandler> dotNetObjectReference, 
+        string methodName) where THandler : class;
+    
+    Task<ElementKeyboardHookRef> AddKeyboardHook<THandler>(
+        ElementReference elementRef,
+        THandler handler, 
+        string methodName) where THandler : class;
+    
+    Task RemoveKeyboardHook(ElementReference elementRef);
 }
