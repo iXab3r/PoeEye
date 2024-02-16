@@ -196,7 +196,7 @@ public class ObservableExtensionsFixture : FixtureBase
         Log.Debug("Awaiting for value");
         var action = async () => await holder
             .WaitForValueAsync(x => x.Value, x => x == 2, TimeSpan.FromSeconds(1))
-            .TimeoutAfter(TimeSpan.FromMilliseconds(100));
+            .WithTimeout(TimeSpan.FromMilliseconds(100));
 
         //Then
         action.ShouldNotThrow();
