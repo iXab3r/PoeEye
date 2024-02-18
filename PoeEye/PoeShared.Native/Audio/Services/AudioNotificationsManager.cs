@@ -88,10 +88,9 @@ internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAud
         return audioPlayer.Play(new AudioPlayerRequest()
         {
             Volume = volume,
-            CancellationToken = cancellationToken,
             WaveData = notificationData,
             OutputDevice = waveOutDevice ?? WaveOutDevice.DefaultDevice
-        });
+        }, cancellationToken);
     }
 
     public string AddFromFile(FileInfo soundFile)

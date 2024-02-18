@@ -61,9 +61,9 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
         }
     }
 
-    public Task Play(byte[] waveData)
+    public Task Play(byte[] waveData, CancellationToken cancellationToken = default)
     {
-        return Play(waveData, volume: 1);
+        return Play(waveData, volume: 1, cancellationToken);
     }
 
     /// <summary>
@@ -71,15 +71,16 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
     /// </summary>
     /// <param name="waveData">WAV data to play</param>
     /// <param name="volume">Volume, 1.0 is full scale</param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task Play(byte[] waveData, float volume)
+    public Task Play(byte[] waveData, float volume, CancellationToken cancellationToken = default)
     {
-        return PlayInternal(new AudioPlayerRequest() {WaveData = waveData, Volume = volume, CancellationToken = CancellationToken.None});
+        return PlayInternal(new AudioPlayerRequest() {WaveData = waveData, Volume = volume}, cancellationToken);
     }
 
-    public Task Play(AudioPlayerRequest request)
+    public Task Play(AudioPlayerRequest request, CancellationToken cancellationToken = default)
     {
-        return PlayInternal(request);
+        return PlayInternal(request, cancellationToken);
     }
 
     private IDisposable PlayInternalMedia(Stream rawStream)
@@ -94,7 +95,7 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
         return Disposable.Empty;
     }
 
-    private Task PlayInternal(AudioPlayerRequest request)
+    private Task PlayInternal(AudioPlayerRequest request, CancellationToken cancellationToken = default)
     {
         Log.Debug($"Queueing audio stream, request: {request}");
         return Task.Factory.StartNew(() =>
@@ -128,8 +129,8 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
                             }
 
                             waveOut.Play();
-                            WaitHandle.WaitAny(new[] {(WaitHandle) playbackAnchor, request.CancellationToken.WaitHandle});
-                            if (request.CancellationToken.IsCancellationRequested)
+                            WaitHandle.WaitAny(new[] {(WaitHandle) playbackAnchor, cancellationToken.WaitHandle});
+                            if (cancellationToken.IsCancellationRequested)
                             {
                                 Log.Debug($"Cancelling audio stream");
                                 waveOut.Stop();
@@ -138,7 +139,7 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
                             else
                             {
                                 Log.Debug(
-                                    $"Successfully played audio stream({rawStream.Length}), token: {new {request.CancellationToken.IsCancellationRequested, request.CancellationToken.CanBeCanceled}}...");
+                                    $"Successfully played audio stream({rawStream.Length}), token: {new {cancellationToken.IsCancellationRequested, cancellationToken.CanBeCanceled}}...");
                             }
                         }
                         finally
@@ -156,6 +157,6 @@ internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
             {
                 Log.Error($"Failed to play audio stream, data: {request}", e);
             }
-        }, request.CancellationToken);
+        }, cancellationToken);
     }
 }
