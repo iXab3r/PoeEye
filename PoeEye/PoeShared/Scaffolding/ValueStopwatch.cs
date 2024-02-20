@@ -12,6 +12,8 @@ public readonly record struct ValueStopwatch
 
     public double ElapsedMilliseconds => GetElapsedTime().TotalMilliseconds;
     
+    public double ElapsedTicks => GetTimestamp();
+    
     public TimeSpan Elapsed => GetElapsedTime();
 
     public static ValueStopwatch StartNew() => new(GetTimestamp());
