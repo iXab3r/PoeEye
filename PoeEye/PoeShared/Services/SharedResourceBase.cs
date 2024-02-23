@@ -192,7 +192,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
 
         if (usages < 0)
         {
-            throw new ObjectDisposedException($"Attempted to dispose already disposed(or scheduled for disposal) resource, usages: {usages}, IsDisposed: {Anchors.IsDisposed}");
+            throw new ObjectDisposedException($"Attempted to dispose already disposed(or scheduled for disposal) resource, usages: {usages}, IsDisposed: {Anchors.IsDisposed}, resource: {this}");
         }
 
         if (resourceGate.IsWriteLockHeld)
@@ -243,7 +243,7 @@ public abstract class SharedResourceBase : DisposableReactiveObject, ISharedReso
         var usages = RefCount;
         if (usages <= 0)
         {
-            throw new ObjectDisposedException($"RefCount is {usages}, resource is not available");
+            throw new ObjectDisposedException($"RefCount is {usages}, resource is not available, resource: {this}");
         }
     }
 
