@@ -221,6 +221,7 @@ public class SelectionAdornerEditor : ReactiveControl
             .Where(x => x == true)
             .Subscribe(() =>
             {
+                AnchorPoint = default;
                 Selection = default;
                 SelectionProjectedTemp = default;
             })
