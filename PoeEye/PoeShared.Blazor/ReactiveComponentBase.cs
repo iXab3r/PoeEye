@@ -107,7 +107,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         GC.SuppressFinalize(this);
     }
     
-    public async ValueTask DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
         Dispose();
         GC.SuppressFinalize(this);
