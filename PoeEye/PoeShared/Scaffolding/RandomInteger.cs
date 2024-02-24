@@ -27,4 +27,6 @@ public readonly record struct RandomInteger
     /// When set to true, the actual delay will be a random value between <see cref="Min"/> and <see cref="Max"/>.
     /// </summary>
     public bool Randomize { get; init; }
+    
+    public static implicit operator RandomInteger(int min) => new(min);
 }
