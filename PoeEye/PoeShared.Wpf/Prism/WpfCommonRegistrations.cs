@@ -48,7 +48,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IMessageBoxService, MessageBoxService>()
             .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
             .RegisterSingleton<IErrorMonitorViewModel, ErrorMonitorViewModel>()
-            .RegisterSingleton<IProfilerViewModel, PerformanceProfilerViewModel>()
+            .RegisterSingleton<IProfilerService, PerformanceProfiler>()
             .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
             .RegisterSingleton<IWindowRepository, WindowRepository>()
             .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
@@ -58,6 +58,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
 
         Container
             .RegisterType<IHotkeyTracker, HotkeyTracker>()
+            .RegisterType<IProfilerViewModel, PerformanceProfilerViewModel>()
             .RegisterType<ISingleInstanceValidationHelper, SingleInstanceValidationHelper>()
             .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
 #pragma warning disable CS0618 // legacy registration
