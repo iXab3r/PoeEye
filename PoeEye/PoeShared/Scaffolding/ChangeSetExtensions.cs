@@ -16,11 +16,11 @@ public static class ChangeSetExtensions
     {
         return cache.Connect().RemoveKey().AsObservableList();
     }
-    
+
     [Obsolete("Contains some bug, do not use with further testing")]
     public static IObservable<IChangeSet<TObject>> Flatten<TObject>(this IObservable<IChangeSet<TObject>> source, Func<TObject, IObservable<IChangeSet<TObject>>> childrenAccessor)
     {
-        return source.TransformMany(node => 
+        return source.TransformMany(node =>
         {
             // Flatten the children's hierarchy recursively
             var children = childrenAccessor(node);
@@ -28,7 +28,7 @@ public static class ChangeSetExtensions
 
             // Combine the node itself with its flattened children
             var firstItem = new Change<TObject>(ListChangeReason.Add, node);
-            return flattenChildren.StartWith(new ChangeSet<TObject>(new[]{ firstItem })).AsObservableList();
+            return flattenChildren.StartWith(new ChangeSet<TObject>(new[] {firstItem})).AsObservableList();
         });
     }
 
@@ -43,7 +43,7 @@ public static class ChangeSetExtensions
     /// <param name="scheduler">The scheduler.</param>
     /// <returns>An observable change set with additional refresh changes.</returns>
     public static IObservable<IChangeSet<TObject>> AutoRefreshOnObservableSynchronized<TObject, TAny>(
-        this IObservable<IChangeSet<TObject>> source, 
+        this IObservable<IChangeSet<TObject>> source,
         Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler scheduler = null)
     {
         var gate = new object();
@@ -61,7 +61,8 @@ public static class ChangeSetExtensions
     /// <param name="changeSetBuffer">Batch up changes by specifying the buffer. This greatly increases performance when many elements require a refresh.</param>
     /// <param name="scheduler">The scheduler.</param>
     /// <returns>An observable change set with additional refresh changes.</returns>
-    public static IObservable<IChangeSet<TObject, TKey>> AutoRefreshOnObservableSynchronized<TObject, TKey, TAny>(this IObservable<IChangeSet<TObject, TKey>> source, Func<TObject, IObservable<TAny>> reevaluator, TimeSpan? changeSetBuffer = null, IScheduler scheduler = null)
+    public static IObservable<IChangeSet<TObject, TKey>> AutoRefreshOnObservableSynchronized<TObject, TKey, TAny>(this IObservable<IChangeSet<TObject, TKey>> source, Func<TObject, IObservable<TAny>> reevaluator,
+        TimeSpan? changeSetBuffer = null, IScheduler scheduler = null)
         where TKey : notnull
     {
         return source.AutoRefreshObservableSynchronized(reevaluator, changeSetBuffer, scheduler);
@@ -78,40 +79,40 @@ public static class ChangeSetExtensions
     /// <param name="changeSetBuffer">Batch up changes by specifying the buffer. This greatly increases performance when many elements require a refresh.</param>
     /// <param name="scheduler">The scheduler.</param>
     /// <returns>An observable change set with additional refresh changes.</returns>
-    public static IObservable<IChangeSet<TObject, TKey>> 
+    public static IObservable<IChangeSet<TObject, TKey>>
         AutoRefreshObservableSynchronized<TObject, TKey, TAny>(
-            this IObservable<IChangeSet<TObject, TKey>> source, 
-            Func<TObject, IObservable<TAny>> reevaluator, 
-            TimeSpan? changeSetBuffer = null, 
+            this IObservable<IChangeSet<TObject, TKey>> source,
+            Func<TObject, IObservable<TAny>> reevaluator,
+            TimeSpan? changeSetBuffer = null,
             IScheduler scheduler = null)
         where TKey : notnull
     {
         var gate = new object();
         return source.Synchronize(gate).AutoRefreshOnObservable((o, key) => reevaluator(o).Synchronize(gate), changeSetBuffer, scheduler);
     }
-    
+
     public static T EditGet<TItem, T>(this ISourceList<TItem> source, Func<IExtendedList<TItem>, T> supplier)
     {
         T result = default;
         source.Edit(list => result = supplier(list));
         return result;
     }
-    
+
     public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this IObservableList<T> source)
     {
         return source.Connect();
     }
-    
-     public static IObservable<IChangeSet<T, TKey>> ToObservableChangeSet<T, TKey>(this IObservableCache<T, TKey> source)
-        {
-            return source.Connect();
-        }
-    
+
+    public static IObservable<IChangeSet<T, TKey>> ToObservableChangeSet<T, TKey>(this IObservableCache<T, TKey> source)
+    {
+        return source.Connect();
+    }
+
     public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this IReadOnlyObservableCollection<T> source)
     {
         return source.ToObservableChangeSet<IReadOnlyObservableCollection<T>, T>();
     }
-    
+
     public static IObservable<IChangeSet<T>> Connect<T>(this IReadOnlyObservableCollection<T> source)
     {
         return source.ToObservableChangeSet<IReadOnlyObservableCollection<T>, T>();
@@ -121,12 +122,11 @@ public static class ChangeSetExtensions
     {
         return source.RemoveKey().BindToCollection(out collection);
     }
-    
+
     public static IObservable<NotifyCollectionChangedEventArgs> ToNotifyCollectionChanged<T>(this IObservable<IChangeSet<T>> source)
     {
         return Observable.Create<NotifyCollectionChangedEventArgs>(observer =>
         {
-
             var anchors = new CompositeDisposable();
             source
                 .ForEachChange(x =>
@@ -136,6 +136,7 @@ public static class ChangeSetExtensions
                     {
                         throw new ArgumentOutOfRangeException();
                     }
+
                     switch (x.Reason)
                     {
                         case ListChangeReason.Add:
@@ -145,7 +146,7 @@ public static class ChangeSetExtensions
                             changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, new[] {x.Item.Current}, new[] {x.Item.Previous.Value}, x.Item.CurrentIndex);
                             break;
                         case ListChangeReason.Remove:
-                            changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { x.Item.Current }, x.Item.CurrentIndex);
+                            changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] {x.Item.Current}, x.Item.CurrentIndex);
                             break;
                         case ListChangeReason.Clear:
                             changedEventArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
@@ -153,15 +154,16 @@ public static class ChangeSetExtensions
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
+
                     observer.OnNext(changedEventArgs);
                 })
                 .Subscribe()
                 .AddTo(anchors);
-            
+
             return anchors;
         });
     }
-    
+
     public static IObservable<IChangeSet<T>> BindToCollection<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
     {
         var result = new ObservableCollectionEx<T>();
@@ -169,7 +171,7 @@ public static class ChangeSetExtensions
         var adaptor = new ObservableCollectionAdaptorEx<T>(result);
         return source.Adapt(adaptor); // never reset to avoid breaking PropertyBinder
     }
-    
+
     public static IObservable<IChangeSet<T>> BindToCollectionSynchronized<T>(this IObservable<IChangeSet<T>> source, out IReadOnlyObservableCollection<T> collection)
     {
         var result = new SynchronizedObservableCollectionEx<T>();
@@ -182,27 +184,28 @@ public static class ChangeSetExtensions
     {
         Guard.ArgumentNotNull(source, nameof(source));
 
-        return new SourceListEx<T>(source); 
+        return new SourceListEx<T>(source);
     }
-    
+
     public static ISourceList<T> ToSourceList<T>(this IObservable<IChangeSet<T>> source)
     {
         return source.ToSourceListEx();
     }
-    
+
     public static ISourceCacheEx<T, TKey> ToSourceCacheEx<T, TKey>(this ISourceCache<T, TKey> source)
     {
         Guard.ArgumentNotNull(source, nameof(source));
 
         return new SourceCacheEx<T, TKey>(source);
     }
-    
+
     public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
     {
         if (instance.TryGetValue(key, out var value))
         {
             return value;
         }
+
         return default;
     }
 
@@ -238,7 +241,7 @@ public static class ChangeSetExtensions
         });
         return returnValue;
     }
-    
+
     public static TValue AddOrUpdate<TValue, TKey>(this ISourceCache<TValue, TKey> instance, TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
     {
         TValue returnValue = default;
@@ -250,7 +253,7 @@ public static class ChangeSetExtensions
         });
         return returnValue;
     }
-    
+
     public static bool TryGetValue<T, TKey>(this IObservableCache<T, TKey> instance, TKey key, out T value)
     {
         var result = instance.Lookup(key);
@@ -263,7 +266,7 @@ public static class ChangeSetExtensions
         value = default;
         return false;
     }
-    
+
     public static IObservable<IChangeSet<TOut, TKey>> SwitchCollectionIf<TIn, TOut, TKey>(
         this IObservable<TIn> observable,
         [NotNull] Predicate<TIn> condition,
@@ -274,7 +277,7 @@ public static class ChangeSetExtensions
             .Select(x => condition(x) ? trueSelector(x) : falseSelector(x))
             .Switch();
     }
-    
+
     public static IObservable<IChangeSet<TOut>> SwitchCollectionIf<TIn, TOut>(
         this IObservable<TIn> observable,
         [NotNull] Predicate<TIn> condition,
@@ -291,17 +294,17 @@ public static class ChangeSetExtensions
         [NotNull] Predicate<TIn> condition,
         [NotNull] Func<TIn, IObservableList<TOut>> trueSelector)
     {
-        return SwitchCollectionIf(observable,  condition, trueSelector, x => new SourceListEx<TOut>());
+        return SwitchCollectionIf(observable, condition, trueSelector, x => new SourceListEx<TOut>());
     }
-    
+
     public static IObservable<IChangeSet<TOut, TKey>> SwitchCollectionIf<TIn, TOut, TKey>(
         this IObservable<TIn> observable,
         [NotNull] Predicate<TIn> condition,
         [NotNull] Func<TIn, IObservableCache<TOut, TKey>> trueSelector)
     {
-        return SwitchCollectionIf(observable,  condition, trueSelector, x => new IntermediateCache<TOut, TKey>());
+        return SwitchCollectionIf(observable, condition, trueSelector, x => new IntermediateCache<TOut, TKey>());
     }
-    
+
     public static IObservable<IChangeSet<TOut, TKey>> SwitchCollectionIfNotDefault<TIn, TOut, TKey>(
         this IObservable<TIn> observable,
         [NotNull] Func<TIn, IObservableCache<TOut, TKey>> trueSelector)
@@ -315,9 +318,9 @@ public static class ChangeSetExtensions
     {
         return SwitchCollectionIf(observable, x => !EqualityComparer<TIn>.Default.Equals(default, x), trueSelector);
     }
-    
+
     public static T GetOrAdd<T, TKey>(
-        this ISourceCache<T, TKey> instance, 
+        this ISourceCache<T, TKey> instance,
         TKey key,
         Func<TKey, T> factoryFunc)
     {
@@ -330,7 +333,7 @@ public static class ChangeSetExtensions
                 result = existingItem;
                 return;
             }
-                    
+
             var newItem = factoryFunc(key);
             result = Optional<T>.Create(newItem);
         });
@@ -338,9 +341,10 @@ public static class ChangeSetExtensions
         {
             throw new InvalidStateException($"Failed to get or add new item for key {key}");
         }
+
         return result.Value;
     }
-    
+
     public static ISourceListEx<T> ToSourceListEx<T, TKey>(this IObservableCache<T, TKey> cache)
     {
         return cache.Connect().RemoveKey().ToSourceListEx();
@@ -350,7 +354,7 @@ public static class ChangeSetExtensions
     {
         return new SourceListEx<T>(items.ToSourceList());
     }
-    
+
     public static ISourceList<T> ToSourceList<T>(this IEnumerable<T> items)
     {
         var result = new SourceListEx<T>();
@@ -368,7 +372,7 @@ public static class ChangeSetExtensions
 
         return result.Or().ToSourceList();
     }
-    
+
     public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservable<Change<T, TKey>> events)
     {
         return events.Select(x => x.Reason switch
@@ -385,7 +389,7 @@ public static class ChangeSetExtensions
     {
         return events.Watch(key).WatchCurrentValue();
     }
-    
+
     public static IObservable<T> WatchCurrentValue<T, TKey>(this IObservableCache<T, TKey> cache, TKey key)
     {
         var result = cache.Watch(key).WatchCurrentValue();
@@ -447,7 +451,7 @@ public static class ChangeSetExtensions
             list.Move(idx, idx - 1);
         });
     }
-    
+
     public static T ElementAt<T>(this ISourceList<T> source, int index)
     {
         if (source is null)
@@ -459,7 +463,7 @@ public static class ChangeSetExtensions
         source.Edit(list => element = list[index]);
         return element;
     }
-   
+
     public static int IndexOf<T>(this SourceList<T> source, T item)
     {
         if (source is null)
@@ -482,7 +486,7 @@ public static class ChangeSetExtensions
     public static ISourceList<T> Concat<T>(this ISourceList<T> list, params ISourceList<T>[] lists)
     {
 #pragma warning disable CS0618 // This is currently the only way
-        return new[] { list }.Concat(lists).ToSourceList();
+        return new[] {list}.Concat(lists).ToSourceList();
 #pragma warning restore CS0618
     }
 
@@ -493,7 +497,7 @@ public static class ChangeSetExtensions
 
     public static void EditDiff<T, TKey>(this ISourceCache<T, TKey> source, T item)
     {
-        EditDiff(source, new[] { item });
+        EditDiff(source, new[] {item});
     }
 
     public static void EditDiff<T, TKey>(this ISourceCache<T, TKey> source, IEnumerable<T> items)
@@ -581,7 +585,8 @@ public static class ChangeSetExtensions
         return anchors;
     }
 
-    public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4, T5>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4, IObservableList<T5> list5)
+    public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4, T5>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4,
+        IObservableList<T5> list5)
         where T1 : T
         where T2 : T
         where T3 : T
@@ -596,8 +601,9 @@ public static class ChangeSetExtensions
         SyncListWithCache(list5, instance).AddTo(anchors);
         return anchors;
     }
-    
-    public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4, T5, T6>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4, IObservableList<T5> list5, IObservableList<T6> list6)
+
+    public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4, T5, T6>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4,
+        IObservableList<T5> list5, IObservableList<T6> list6)
         where T1 : T
         where T2 : T
         where T3 : T
@@ -622,6 +628,71 @@ public static class ChangeSetExtensions
         list.Connect().OnItemAdded(newObject => destination.AddOrUpdate(newObject)).Subscribe().AddTo(anchors);
         Disposable.Create(() => { destination.Edit(destinationList => { list.Items.ForEach(x => destinationList.Remove(x)); }); }).AddTo(anchors);
         return anchors;
+    }
+
+    public static IObservable<IChangeSet<TObject, TDestinationKey>> ChangeKeyDynamically<TObject, TSourceKey, TSource, TDestinationKey>(
+        this IObservable<IChangeSet<TObject, TSourceKey>> source,
+        Expression<Func<TObject, TSource>> keySourceSelectorExpression,
+        Expression<Func<TObject, TDestinationKey>> keySelectorExpression)
+        where TSourceKey : notnull
+        where TDestinationKey : notnull
+        where TObject : INotifyPropertyChanged
+    {
+        return Observable.Create<IChangeSet<TObject, TDestinationKey>>(observer =>
+        {
+            var disposables = new CompositeDisposable();
+            var keySelector = keySelectorExpression.Compile();
+            var targetCache = new SourceCache<TObject, TDestinationKey>(keySelector).AddTo(disposables);
+            var previousKeys = new Dictionary<TSourceKey, TDestinationKey>();
+
+            source
+                .AutoRefresh(keySourceSelectorExpression)
+                .Transform(item => new {Item = item, Key = keySelector(item)}, transformOnRefresh: true)
+                .Subscribe(changes =>
+                {
+                    changes.ForEach(change =>
+                    {
+                        switch (change.Reason)
+                        {
+                            case ChangeReason.Add:
+                            {
+                                targetCache.AddOrUpdate(change.Current.Item);
+                                previousKeys[change.Key] = change.Current.Key;
+                                break;
+                            }
+                            case ChangeReason.Remove:
+                            {
+                                if (previousKeys.TryGetValue(change.Key, out var prevKey))
+                                {
+                                    targetCache.RemoveKey(prevKey);
+                                    previousKeys.Remove(change.Key);
+                                }
+
+                                break;
+                            }
+                            case ChangeReason.Update:
+                            case ChangeReason.Refresh:
+                            {
+                                if (previousKeys.TryGetValue(change.Key, out var prevKey) && !EqualityComparer<TDestinationKey>.Default.Equals(prevKey, change.Current.Key))
+                                {
+                                    targetCache.RemoveKey(prevKey);
+                                    previousKeys[change.Key] = change.Current.Key;
+                                }
+
+                                targetCache.AddOrUpdate(change.Current.Item);
+                                break;
+                            }
+                        }
+                    });
+                })
+                .AddTo(disposables);
+
+            targetCache.Connect()
+                .SubscribeSafe(observer)
+                .AddTo(disposables);
+
+            return disposables;
+        });
     }
 
     public static IDisposable ChangeKeyDynamically<TObject, TSourceKey, TDestinationKey>(
@@ -676,7 +747,7 @@ public static class ChangeSetExtensions
         Func<TObject, TDestination> transformFactory,
         Action<TDestination, TObject> updateAction = null)
     {
-        return source.Scan((ChangeAwareCache<TDestination, TKey>)null, (cache, changes) =>
+        return source.Scan((ChangeAwareCache<TDestination, TKey>) null, (cache, changes) =>
         {
             //The change aware cache captures a history of all changes so downstream operators can replay the changes
             if (cache == null)
@@ -722,12 +793,12 @@ public static class ChangeSetExtensions
             return cache;
         }).Select(cache => cache.CaptureChanges()); //invoke capture changes to return the changeset
     }
-    
+
     public static IObservable<IChangeSet<T>> WithLogging<T>(this IObservable<IChangeSet<T>> source, string name = default, IFluentLog logger = default, FluentLogLevel logLevel = default)
     {
         return source.Adapt(new LoggingListChangeSetAdaptor<T>(name: name, logger: logger, logLevel: logLevel));
     }
-    
+
     public static IObservable<IChangeSet<T, TKey>> WithLogging<T, TKey>(this IObservable<IChangeSet<T, TKey>> source, string name = default, IFluentLog logger = default, FluentLogLevel logLevel = default)
     {
         return source.Adapt(new LoggingChangeSetAdaptor<T, TKey>(name: name, logger: logger, logLevel: logLevel));

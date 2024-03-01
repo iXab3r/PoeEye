@@ -8,7 +8,7 @@ namespace PoeShared.IO;
 /// in a cross-platform manner.
 /// </summary>
 [JsonConverter(typeof(OSPathConverter))]
-public record OSPath
+public record OSPath : IComparable
 {
     private static readonly char WindowsDirectorySeparator = '\\';
     private static readonly char UnixDirectorySeparator = '/';
@@ -90,6 +90,16 @@ public record OSPath
         return (FullPath != null ? FullPath.GetHashCode() : 0);
     }
 
+    public int CompareTo(object obj)
+    {
+        return obj switch
+        {
+            null => 1,
+            OSPath otherPath => string.Compare(FullPath, otherPath.FullPath, PathUtils.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal),
+            _ => throw new ArgumentException("Object is not an OSPath")
+        };
+    }
+
     internal static string ToWindowsPath(string path)
     {
         return path.Replace(UnixDirectorySeparator, WindowsDirectorySeparator).TrimEnd(AllSeparators);
@@ -109,4 +119,5 @@ public record OSPath
         }
         return isWindows ? ToWindowsPath(path) : ToUnixPath(path);
     }
+    
 }
