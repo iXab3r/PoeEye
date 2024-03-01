@@ -57,6 +57,8 @@ public record OSPath
     /// Gets the Unix-style path representation.
     /// </summary>
     public string AsUnixPath => ToUnixPath(FullPath);
+    
+    public static implicit operator OSPath(string path) => new(path);
 
     public OSPath Combine(string other)
     {
