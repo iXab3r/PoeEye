@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Meziantou.Framework;
+using PoeShared.IO;
 
 namespace PoeShared.Scaffolding;
 
@@ -401,6 +402,22 @@ public static class PathUtils
     public static string GenerateValidName(string baseName, Predicate<string> pathValidator)
     {
         return GenerateValidName(baseName, (candidateName, idx) => $"{candidateName} ({idx})", pathValidator);
+    }
+    
+    /// <summary>
+    ///     Creates a valid path name by appending a number to a base path name.
+    /// </summary>
+    /// <param name="baseName">The base path.</param>
+    /// <param name="pathValidator">A function to validate a path, which returns true when valid and false otherwise.</param>
+    /// <returns>A valid path converted from the base path.</returns>
+    /// <example>
+    ///     <code>
+    /// GenerateValidName("C:\\temp", path => !Directory.Exists(path)); //Returns "C:\\temp (1)" if "C:\\temp" exists
+    /// </code>
+    /// </example>
+    public static OSPath GenerateValidName(OSPath baseName, Predicate<OSPath> pathValidator)
+    {
+        return GenerateValidName(baseName.FullPath, (candidateName, idx) => $"{candidateName} ({idx})", x => pathValidator(new OSPath(x)));
     }
 
     /// <summary>
