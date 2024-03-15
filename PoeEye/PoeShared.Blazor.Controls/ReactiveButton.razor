@@ -1,0 +1,114 @@
+@using System.Diagnostics
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+@inject INotificationService notificationService
+
+@{
+    Track(this, x => x.IsBusy);
+    Track(this, x => x.Error);
+}
+
+@if (HideIfDisabled && !IsEnabled)
+{
+    // show nothing by default
+}
+else
+{
+    <button class="@Class" style="@Style" id="@Id" type="button" @onclick="Execute" disabled="@(IsBusy || !IsEnabled)">
+        @ChildContent
+        @if (ShowIsBusyIcon && IsBusy)
+        {
+            <div class="spinner-border align-self-center mx-2" style="width: 12px; height: 12px;"></div>
+        }
+        @if (ShowErrorIcon && !string.IsNullOrEmpty(Error))
+        {
+            <div>
+                <i class="fa fa-fixed fa-warning mx-2 text-warning"></i>
+            </div>  
+        }
+    </button>
+}
+
+@code{
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    [Obsolete("Use CommandEx")]
+    public Func<Task> Command { get; set; }
+    
+    [Parameter]
+    public ICommandWrapper CommandEx { get; set; }
+    
+    [Parameter]
+    public object CommandParameter { get; set; }
+
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
+    
+    [Parameter]
+    public bool CanExecute { get; set; } = true;
+    
+    [Parameter]
+    public bool ShowErrorIcon { get; set; } = false;
+    
+    [Parameter]
+    public bool ShowIsBusyIcon { get; set; } = true;
+    
+    [Parameter]
+    public bool HideIfDisabled { get; set; }
+
+    public bool IsBusy { get; private set; }
+
+    public string Error { get; private set; }
+    
+    [Parameter]
+    public TimeSpan MinExecutionTime { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+#pragma warning disable CS0618 // Type or member is obsolete, left for backward compatibility
+        if (Command != null && CommandEx == null)
+        {
+        CommandEx = BlazorCommandWrapper.Create(Command).AddTo(Anchors);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+    
+    private async Task Execute()
+    {
+        if (CommandEx == null)
+        {
+            throw new InvalidOperationException("Command is not specified");
+        }
+        if (IsBusy)
+        {
+            throw new InvalidOperationException("Command is already executing");
+        }
+
+        using var isBusy = isBusyLatch.Rent();
+
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            await CommandEx.ExecuteAsync(CommandParameter);
+        }
+        catch (Exception)
+        {
+            // logging and notifications are handled elsewhere
+        }
+        finally
+        {
+            sw.Stop();
+
+            var timeToSleep = MinExecutionTime - sw.Elapsed;
+            if (timeToSleep > TimeSpan.Zero)
+            {
+                await Task.Delay(timeToSleep);
+            }
+        }
+    }
+
+}

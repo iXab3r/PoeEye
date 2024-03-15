@@ -1,0 +1,25 @@
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+@typeparam TItem
+
+<select id="@(ComponentId)" @bind="@SelectedValue" 
+        class="@(new CssBuilder("form-control").AddClass(Class))" 
+        size="@(Math.Max(2, ItemsCount))">
+    @foreach (var item in ItemsSource.EmptyIfNull())
+    {
+        <option value="@ValueSelector(item)">
+            @if (ItemTemplate == null)
+            {
+                @item.ToString()
+            }
+            else
+            {
+                @ItemTemplate(item)
+            }
+        </option>
+    }
+</select>
+
+@code {
+    
+    
+}

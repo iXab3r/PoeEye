@@ -1,0 +1,14 @@
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+<span>
+    <input type="checkbox"
+           id="@Id"
+           class="toggle-checkbox"
+           @bind:get="@IsChecked"
+           @bind:set="@HandleCheckedChanged"
+           @bind:event="oninput"/>
+    <label for="@Id"
+           class="@(new CssBuilder("btn").AddClass(string.IsNullOrEmpty(Class) ? "btn-outline-secondary" : Class))">
+        @ChildContent
+    </label>
+</span>

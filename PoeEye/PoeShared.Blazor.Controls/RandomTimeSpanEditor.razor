@@ -1,0 +1,54 @@
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+<div class="d-flex flex-column gap-1 w-100">
+    <div >
+        <div class="input-group">
+            @if (Value.Randomize)
+            {
+                <span class="input-group-text" style="width: 4em;">Min</span>
+            }
+            <input type="number"
+                   class="form-control"
+                   min="0"
+                   step="@Step.TotalMilliseconds"
+                   value="@Value.Min.TotalMilliseconds"
+                   oninput="@((ChangeEventArgs x) => ValueChanged.InvokeAsync(Value with {Min = ParseMs(x.Value)}))">
+            <span class="input-group-text" style="min-width:50px;">ms</span>
+            @if (CanRandomize || Value.Randomize)
+            {
+                <ToggleButton
+                    @bind-IsChecked="@IsRandom"
+                    @bind-IsChecked:after="@(() => ValueChanged.InvokeAsync(Value with {Randomize = IsRandom}))">
+                    <i class="fa fa-random"></i>
+                </ToggleButton>
+            }
+        </div>
+    </div>
+
+    @if (Value.Randomize)
+    {
+        <div>
+            <div class="input-group">
+                @if (Value.Randomize)
+                {
+                    <span class="input-group-text" style="width: 4em;">Max</span>
+                }
+                <input type="number" class="form-control"
+                       step="@Step.TotalMilliseconds"
+                       min="@Value.Min.TotalMilliseconds"
+                       value="@Value.Max.TotalMilliseconds"
+                       oninput="@((ChangeEventArgs x) => ValueChanged.InvokeAsync(Value with {Max = ParseMs(x.Value)}))">
+                <span class="input-group-text" style="min-width:50px;">ms</span>
+                <span style="visibility: hidden;">
+                    <ToggleButton >
+                        <i class="fa fa-random"></i>
+                    </ToggleButton>
+                </span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+}

@@ -1,0 +1,18 @@
+.toggle-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.toggle-checkbox {
+    display: none;
+}
+
+.toggle-checkbox:not(:checked) + .btn:hover {
+    opacity: 0.5;
+}
+
+.toggle-checkbox:checked + .btn {
+    background-color: var(--bs-btn-active-bg);
+    color: var(--bs-btn-hover-color);
+    border: 1px solid var(--bs-primary-text-emphasis);
+}

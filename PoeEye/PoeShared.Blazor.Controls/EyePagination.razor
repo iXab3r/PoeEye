@@ -1,0 +1,76 @@
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+@using PropertyBinder
+@typeparam TItem
+
+<ReactiveSection Trackers="@(new() {this.Listen(x => x.ItemsSource)})">
+    @if (ItemsSource != null)
+    {
+        <div class="@Class">
+            <ul class="pagination m-0">
+                @foreach (var item in ItemsSource.EmptyIfNull())
+                {
+                    <li class="@($"page-item{(IsSelected(item) ? " active" : string.Empty)}")">
+
+                        <a class="page-link" role="button" @onclick="@(() => SelectedItem = item)">
+                            @if (ItemTemplate != null)
+                            {
+                                @ItemTemplate(item)
+                            }
+                            else
+                            {
+                                <span>@item</span>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</ReactiveSection>
+
+@code {
+    private static readonly Binder<EyePagination<TItem>> Binder = new();
+    private static readonly IEqualityComparer<TItem> Comparer = EqualityComparer<TItem>.Default;
+    private TItem selectedItem;
+
+    [Parameter]
+    public IEnumerable<TItem> ItemsSource { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+
+    [Parameter]
+    public TItem SelectedItem
+    {
+        get => selectedItem;
+        set
+        {
+            if (Comparer.Equals(selectedItem, value))
+            {
+                return;
+            }
+
+            selectedItem = value;
+            SelectedItemChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<TItem> SelectedItemChanged { get; set; }
+
+    public EyePagination()
+    {
+        Binder.Attach(this).AddTo(Anchors);
+    }
+
+    static EyePagination()
+    {
+    }
+
+    private bool IsSelected(TItem item)
+    {
+        var selected = this.selectedItem;
+        return selected != null && Comparer.Equals(item, selected);
+    }
+
+}

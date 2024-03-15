@@ -1,0 +1,50 @@
+﻿@using System.Threading
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+@inject INotificationService NotificationService
+@inject ModalService ModalService
+
+<AntContainer/>
+
+@code {
+    [Parameter]
+    public IObservable<NotificationConfig> Notifications { get; set; }
+    
+    [Parameter]
+    public IObservable<AntConfirmRequest> ConfirmRequests { get; set; }
+
+    public async void CloseAll()
+    {
+        await ModalService.DestroyAllConfirmAsync();
+    }
+
+    protected override async Task OnAfterFirstRenderAsync()
+    {
+        await base.OnAfterFirstRenderAsync();
+
+        var synchronizationContext = SynchronizationContext.Current ?? throw new InvalidOperationException("Synchronization context must be set");
+        
+        this.WhenAnyValue(x => x.Notifications)
+            .Select(x => x ?? Observable.Empty<NotificationConfig>())
+            .Switch()
+            .ObserveOn(synchronizationContext)
+            .Subscribe(x =>
+            {
+                Log.Info($"Showing notification {x}");
+                NotificationService.Open(x);
+            })
+            .AddTo(Anchors);
+        
+        this.WhenAnyValue(x => x.ConfirmRequests)
+            .Select(x => x ?? Observable.Empty<AntConfirmRequest>())
+            .Switch()
+            .ObserveOn(synchronizationContext)
+            .SubscribeAsync(async x =>
+            {
+                Log.Info($"Showing confirmation dialog {x}");
+                var result = await ModalService.ConfirmAsync(x.Options);
+                x.ReportResult(result);
+            })
+            .AddTo(Anchors);
+    }
+
+}

@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<div class="eye-groupbox-header @HeaderClass" style="@HeaderStyle">
+    @Header
+</div>
+<div class="eye-groupbox-content @BodyClass" style="@BodyStyle">@Body</div>
+
+@code {
+    [Parameter]
+    public RenderFragment Header { get; set; }
+    
+    [Parameter]
+    public string HeaderClass { get; set; }
+
+    [Parameter]
+    public string HeaderStyle { get; set; }
+    
+    [Parameter]
+    public string BodyClass { get; set; }
+
+    [Parameter]
+    public string BodyStyle { get; set; }
+}
