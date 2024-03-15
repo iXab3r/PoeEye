@@ -60,7 +60,10 @@
 
     <ItemGroup>
       <Folder Include="Prism\" />
-      <Folder Include="wwwroot\ts\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <TypeScriptCompile Include="wwwroot\ts\placeholder.ts" />
     </ItemGroup>
 
     <Target Name="NPMInstall" AfterTargets="PreBuildEvent">
