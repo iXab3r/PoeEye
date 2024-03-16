@@ -54,6 +54,18 @@ internal sealed class WindowHandle : IWindowHandle
             }
             catch (InvalidOperationException)
             {
+                //could be not enough permissions
+            }
+            catch (ArgumentException)
+            {
+                //invalid(obsolete process id) or process is already terminated
+            }
+            catch (Exception ex)
+            {
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn($"Failed to get window title via {nameof(Process.GetProcessById)}, last error: {Kernel32.GetLastError()}", ex);
+                }
             }
 
             return string.Empty;
