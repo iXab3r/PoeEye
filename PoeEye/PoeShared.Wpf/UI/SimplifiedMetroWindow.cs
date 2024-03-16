@@ -513,7 +513,7 @@ public class MetroWindow : WindowChromeWindow
         = DependencyProperty.Register(nameof(WindowTransitionsEnabled),
             typeof(bool),
             typeof(MetroWindow),
-            new PropertyMetadata(BooleanBoxes.TrueBox));
+            new PropertyMetadata(BooleanBoxes.FalseBox));
 
     /// <summary>
     /// Gets or sets whether the start animation of the window content is available.
