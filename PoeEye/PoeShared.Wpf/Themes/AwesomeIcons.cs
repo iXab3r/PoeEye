@@ -77,6 +77,8 @@ public static class AwesomeIcons
     public const string Reply = "\uf112";
     public const string ReplyAll = "\uf122";
     public const string QuestionCircle = "\uf29c";
+    public const string Random = "\uf074";
+    public const string Reorder = "\uf0c9";
     public const string Refresh = "\uf021";
     public const string RotateLeft = Undo;
     public const string RotateRight = Repeat;
