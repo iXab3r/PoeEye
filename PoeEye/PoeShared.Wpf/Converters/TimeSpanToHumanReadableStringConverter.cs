@@ -44,17 +44,22 @@ public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
 
         if (timeSpan.TotalHours > 24)
         {
-            return $"{timeSpan.TotalDays:F0}d {timeSpan.Hours:F0}h";
+            return $"{Math.Truncate(timeSpan.TotalDays):F0}d {timeSpan.Hours:F0}h";
         }
 
         if (timeSpan.TotalMinutes > 120)
         {
             return $"{timeSpan.TotalHours:F0}h";
         }
+        
+        if (timeSpan.TotalMinutes > 9)
+        {
+            return $"{timeSpan.TotalMinutes:F0}m";
+        }
 
         if (timeSpan.TotalSeconds > 120)
         {
-            return $"{timeSpan.TotalMinutes:F0}m";
+            return $"{Math.Truncate(timeSpan.TotalMinutes):F0}m{timeSpan.Seconds:F0}s";
         }
 
         if (timeSpan.TotalSeconds < 10)
