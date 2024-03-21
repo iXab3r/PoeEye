@@ -121,6 +121,11 @@ public static class FluentLogExtensions
     {
         return log.WithLogData(log.Data.WithPrefix(prefix));
     }
+    
+    public static IFluentLog WithMaxLineLength(this IFluentLog log, int? value)
+    {
+        return log.WithLogData(log.Data.WithMaxLineLength(value));
+    }
 
     public static IFluentLog WithSuffix(this IFluentLog log, Func<string> suffixSupplier)
     {

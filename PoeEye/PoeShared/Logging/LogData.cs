@@ -89,8 +89,9 @@ internal record struct LogData
         {
             message.Append(PrefixProvider());
         }
-                
-        message.Append(Message.TakeMidChars(MaxLineLength ?? DefaultMaxLineLength));
+
+        var messageContent = Message.TakeMidChars(MaxLineLength ?? DefaultMaxLineLength);
+        message.Append(messageContent);
 
         if (SuffixProvider != null)
         {

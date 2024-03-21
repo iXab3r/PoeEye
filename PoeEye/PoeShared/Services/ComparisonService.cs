@@ -50,15 +50,16 @@ internal sealed class ComparisonService : IComparisonService
         }
         catch (Exception)
         {
+            var extendedLogger = Log.WithMaxLineLength(int.MaxValue);
             try
             {
-                Log.Warn($"Failed to perform comparison of two objects:\nFirst({first.GetType()}):\n{first}\n\nSecond({second.GetType()}):\n{second}");
-                Log.Warn($"JSON dump of first object:\n{configSerializer.Serialize(first)}");
-                Log.Warn($"JSON dump of second object:\n{configSerializer.Serialize(second)}");
+                extendedLogger.Warn($"Failed to perform comparison of two objects:\nFirst({first.GetType()}):\n{first}\n\nSecond({second.GetType()}):\n{second}");
+                extendedLogger.Warn($"JSON dump of first object:\n{configSerializer.Serialize(first)}");
+                extendedLogger.Warn($"JSON dump of second object:\n{configSerializer.Serialize(second)}");
             }
             catch (Exception exception)
             {
-                Log.Warn("Failed to perform dump of failed comparison", exception);
+                extendedLogger.Warn("Failed to perform dump of failed comparison", exception);
             }
             throw;
         }

@@ -25,8 +25,6 @@ internal sealed class FluentLogBuilder : IFluentLog
     public bool IsErrorEnabled => logWriter.IsErrorEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Error;
 
     public LogData Data { get; set; }
-    
-    
         
     public void Debug(string message, Exception exception)
     {

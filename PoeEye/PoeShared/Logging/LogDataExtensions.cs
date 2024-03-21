@@ -7,6 +7,14 @@ internal static class LogDataExtensions
         return logData.WithPrefix(() => prefix.Dump());
     }
     
+    public static LogData WithMaxLineLength(this LogData logData, int? value)
+    {
+        return logData with
+        {
+            MaxLineLength = value
+        };
+    }
+    
     public static LogData WithPrefix(this LogData logData, Func<string> prefixSupplier, bool brackets = true)
     {
         return logData.WithPrefixProvider(() =>
