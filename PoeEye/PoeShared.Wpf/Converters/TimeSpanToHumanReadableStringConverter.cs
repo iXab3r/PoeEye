@@ -6,22 +6,12 @@ namespace PoeShared.Converters;
 
 public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
 {
-    //FIXME Remove duplicate converters
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    private static readonly Lazy<TimeSpanToHumanReadableStringConverter> InstanceSupplier = new();
+
+    public static TimeSpanToHumanReadableStringConverter Instance => InstanceSupplier.Value;
+
+    public string Convert(TimeSpan timeSpan)
     {
-        if (value is double)
-        {
-            var ts = TimeSpan.FromSeconds((double) value);
-            return Convert(ts, typeof(string), null, CultureInfo.InvariantCulture);
-        }
-
-        if (!(value is TimeSpan))
-        {
-            return value;
-        }
-
-        var timeSpan = (TimeSpan) value;
-
         if (timeSpan == TimeSpan.MaxValue)
         {
             return "∞";
@@ -51,7 +41,7 @@ public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
         {
             return $"{timeSpan.TotalHours:F0}h";
         }
-        
+
         if (timeSpan.TotalMinutes > 9)
         {
             return $"{timeSpan.TotalMinutes:F0}m";
@@ -68,6 +58,23 @@ public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
         }
 
         return $"{timeSpan.TotalSeconds:F0}s";
+    }
+
+    //FIXME Remove duplicate converters
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is double)
+        {
+            var ts = TimeSpan.FromSeconds((double) value);
+            return Convert(ts, typeof(string), null, CultureInfo.InvariantCulture);
+        }
+
+        if (!(value is TimeSpan timeSpan))
+        {
+            return value;
+        }
+
+        return Convert(timeSpan);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
