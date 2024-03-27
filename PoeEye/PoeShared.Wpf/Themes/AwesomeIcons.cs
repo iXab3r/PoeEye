@@ -56,6 +56,7 @@ public static class AwesomeIcons
     public const string FolderOpen = "\uf115";
     public const string Keyboard = "\uf11c";
     public const string Hourglass = "\uf252";
+    public const string Home = "\uf015";
     public const string Incognito = "\uf2a7";
     public const string InfoIcon = "\uf05a";
     public const string IsActive = "\uf05d";
