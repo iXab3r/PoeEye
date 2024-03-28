@@ -71,24 +71,24 @@ public class WorkerTask : DisposableReactiveObject
     {
         try
         {
-            log.Info("Thread has started");
+            log.Debug("Task has started");
             var consumer = consumerSupplier(cancellationToken);
-            log.Info($"Thread consumer has been resolved, awaiting for completion");
+            log.Debug($"Task consumer has been resolved, awaiting for completion");
             consumer.Wait(cancellationToken);
-            log.Info(cancellationToken.IsCancellationRequested ? "Thread cancellation was requested" : "Thread consumer has completed its work without errors");
+            log.Debug(cancellationToken.IsCancellationRequested ? "Thread cancellation was requested" : "Thread consumer has completed its work without errors");
         }
         catch (OperationCanceledException)
         {
-            log.Info("Thread was cancelled");
+            log.Debug("Task was cancelled");
         }
         catch (Exception e)
         {
-            log.Error("Thread encountered an exception", e);
+            log.Error("Task encountered an exception", e);
             throw;
         }
         finally
         {
-            log.Info("Thread is terminating");
+            log.Debug("Task is terminating");
         }
     }
 }
