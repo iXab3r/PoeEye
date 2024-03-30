@@ -168,7 +168,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     });
 
                     childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(sp => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
-
+                    childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(sp => new BlazorContentControlAccessor(this));
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();

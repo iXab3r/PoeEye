@@ -23,11 +23,10 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
     {
         base.BuildRenderTree(builder);
 
-        var seq = 0;
-        builder.OpenComponent<BlazorContentPresenter>(seq++);
-        builder.AddAttribute(seq++, "Content", Content);
-        builder.AddAttribute(seq++, "ViewTypeKey", ViewTypeKey);
-        builder.AddAttribute(seq++, "ViewType", ViewType);
+        builder.OpenComponent<BlazorContentPresenter>(0);
+        builder.AddAttribute(1, "Content", Content);
+        builder.AddAttribute(2, "ViewTypeKey", ViewTypeKey);
+        builder.AddAttribute(3, "ViewType", ViewType);
         builder.CloseComponent();
     }
 

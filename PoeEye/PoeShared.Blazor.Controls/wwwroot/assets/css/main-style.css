@@ -436,6 +436,11 @@ pre code.hljs{
     visibility: hidden;
 }
 
+.hover-container:not(:hover) .hover-container-controls-collapse {
+    visibility: collapse;
+    display: none;
+}
+
 .hover-container:not(:hover) .hover-container-controls {
     display: none;
 }

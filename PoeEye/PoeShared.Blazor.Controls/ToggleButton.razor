@@ -8,7 +8,8 @@
            @bind:set="@HandleCheckedChanged"
            @bind:event="oninput"/>
     <label for="@Id"
-           class="@(new CssBuilder("btn").AddClass(string.IsNullOrEmpty(Class) ? "btn-outline-secondary" : Class))">
+           class="@(new CssBuilder("btn").AddClass(string.IsNullOrEmpty(Class) ? "btn-outline-secondary" : Class))"
+           style="@Style">
         @ChildContent
     </label>
 </span>

@@ -4,7 +4,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace PoeShared.Blazor.Scaffolding;
 
-public sealed class RefFileInfo : IFileInfo
+public sealed record RefFileInfo : IFileInfo
 {
     public RefFileInfo(string filePath)
     {

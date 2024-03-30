@@ -73,17 +73,19 @@ public sealed class ReactiveSection : BlazorReactiveComponent
                 }
             }
         
-            if (ChildContent != null)
+            var childContent = ChildContent;
+            if (childContent != null)
             {
-                builder.AddContent(seq++, ChildContent);
+                builder.AddContent(seq++, childContent);
             }
             builder.CloseElement();
         }
         else
         {
-            if (ChildContent != null)
+            var childContent = ChildContent;
+            if (childContent != null)
             {
-                builder.AddContent(seq++, ChildContent);
+                builder.AddContent(seq++, childContent);
             }
         }
     }

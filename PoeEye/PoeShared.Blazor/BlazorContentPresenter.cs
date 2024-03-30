@@ -26,8 +26,6 @@ partial class BlazorContentPresenter
 
     public Type ResolvedViewType { get; [UsedImplicitly] private set; }
     
-    public bool IsInitialized { get; private set; }
-
     /// <summary>
     /// Instance of resolved object, populated using ReferenceCapture in default flow
     /// </summary>
@@ -35,16 +33,18 @@ partial class BlazorContentPresenter
     
     private RenderFragment DynamicView => builder =>
     {
-        var seq = -1;
-
         var viewType = ResolvedViewType;
         if (viewType == null)
         {
             return;
         }
 
-        builder.OpenComponent(seq++, viewType);
-        builder.AddComponentReferenceCapture(seq++, SetView);
+        builder.OpenComponent(0, viewType);
+        if (viewType.IsAssignableTo(typeof(BlazorReactiveComponent)))
+        {
+            builder.AddAttribute(1, nameof(BlazorReactiveComponent.DataContext), Content);
+        }
+        builder.AddComponentReferenceCapture(2, SetView);
         builder.CloseComponent();
     };
 
@@ -67,15 +67,6 @@ partial class BlazorContentPresenter
                 x.View = null;
                 x.StateHasChanged();
             });
-        
-        Binder
-            .BindIf(x => x.View is BlazorReactiveComponent, x => x.Content)
-            .To((x, v) =>
-            {
-#pragma warning disable BL0005 this is a special case
-                ((BlazorReactiveComponent) x.View).DataContext = v;
-#pragma warning restore BL0005
-            });
     }
 
     public BlazorContentPresenter()
@@ -94,20 +85,29 @@ partial class BlazorContentPresenter
             .AddTo(Anchors);
     }
 
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+    }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
         Initialize();
     }
 
-    internal void SetView(object value)
+    private void SetView(object value)
     {
         View = value;
     }
 
-    internal void Initialize()
+    private void Initialize()
     {
-        IsInitialized = true;
         this.WhenAnyValue(x => x.Content)
             .Skip(1)
             .SubscribeAsync(x => Refresh($"Content has been updated to {x}"))

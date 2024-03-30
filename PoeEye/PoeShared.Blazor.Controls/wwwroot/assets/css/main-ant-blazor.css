@@ -309,6 +309,10 @@ textarea,
     width: inherit;
 }
 
+.ant-tree-show-line .ant-tree-switcher {
+    background: inherit;
+}
+
 .ant-tree .ant-tree-node-content-wrapper{
     width: 100%;
 }
@@ -320,11 +324,11 @@ textarea,
 .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected{
     color: var(--eye-SecondaryHueMidForegroundBrush);
     text-decoration: none;
-    background-color: var(--eye-MahAccentBrush);
+    background-color: #1171BC60;
 }
 
 .ant-tree .ant-tree-node-content-wrapper:not(.ant-tree-node-content-wrapper.ant-tree-node-selected):hover{
-    background-color: var(--eye-MahAccentBrush);
+    background-color: #1171BC90;
 }
 
 .ant-collapse{
