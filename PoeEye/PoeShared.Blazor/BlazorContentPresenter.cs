@@ -101,7 +101,7 @@ partial class BlazorContentPresenter
         Initialize();
     }
 
-    private void SetView(object value)
+    internal void SetView(object value)
     {
         View = value;
     }
