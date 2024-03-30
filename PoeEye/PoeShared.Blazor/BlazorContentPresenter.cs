@@ -106,7 +106,7 @@ partial class BlazorContentPresenter
         View = value;
     }
 
-    private void Initialize()
+    internal void Initialize()
     {
         this.WhenAnyValue(x => x.Content)
             .Skip(1)
