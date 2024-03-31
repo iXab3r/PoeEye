@@ -1,0 +1,42 @@
+﻿@namespace PoeShared.Blazor.Controls
+@inherits AntDomComponentBase
+@typeparam TItem
+
+@if (RealDisplay)
+{
+    <CascadingValue Value="this" Name="SelfNode">
+        <div @key="NodeId" class="@ClassMapper.Class" style="@Style">
+
+            <TreeViewIndent TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
+
+            @if (TreeComponent.ShowExpand)
+            {
+                <TreeViewNodeSwitcher OnSwitcherClick="OnSwitcherClick" TItem="TItem"></TreeViewNodeSwitcher>
+            }
+
+            @if (TreeComponent.Checkable)
+            {
+                <TreeViewNodeCheckbox OnCheckBoxClick="OnCheckBoxClick" TItem="TItem"></TreeViewNodeCheckbox>
+            }
+
+            <TreeViewNodeTitle TItem="TItem"></TreeViewNodeTitle>
+        </div>
+    </CascadingValue>
+}
+<CascadingValue Value="this" Name="Node">
+    @if (DataItem != null)
+    {
+        foreach (var item in ChildDataItems)
+        {
+            <TreeViewNode DataItem="@item" @key="item.GetHashCode()"></TreeViewNode>
+        }
+    }
+    else if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        @Nodes
+    }
+</CascadingValue>

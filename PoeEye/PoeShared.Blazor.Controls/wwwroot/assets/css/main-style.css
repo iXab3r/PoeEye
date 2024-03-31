@@ -36,6 +36,12 @@ video {
     box-shadow: 5px 5px 15px 5px #000000;
 }
 
+.text-nowrap-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .image-style-align-left{
     float: left;
     margin: 10px;
