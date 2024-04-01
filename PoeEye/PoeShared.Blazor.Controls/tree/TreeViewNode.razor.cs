@@ -216,6 +216,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     
     public bool Matched { get; set; }
 
+    [Parameter] 
     public bool Hidden { get; set; }
 
     private IList<TItem> ChildDataItems
