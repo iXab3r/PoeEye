@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PoeShared.Blazor.Controls;
 
-public partial class TreeViewNodeTitle<TItem> : ComponentBase
+public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 {
     private const double OffSetx = 25;
 
@@ -19,7 +19,7 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
     [CascadingParameter(Name = "SelfNode")]
     public TreeViewNode<TItem> SelfNode { get; set; }
 
-    private bool CanDraggable => TreeComponent.Draggable && !SelfNode.Disabled;
+    private bool Draggable => TreeComponent.Draggable && !SelfNode.Disabled;
 
     private bool IsSwitcherOpen => SelfNode.Expanded && !SelfNode.IsLeaf;
 
@@ -31,7 +31,7 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
     {
         TitleClassMapper
             .Add("ant-tree-node-content-wrapper")
-            .If("draggable", () => CanDraggable)
+            .If("draggable", () => Draggable)
             .If("ant-tree-node-content-wrapper-open", () => IsSwitcherOpen)
             .If("ant-tree-node-content-wrapper-close", () => IsSwitcherClose)
             .If("ant-tree-node-selected", () => SelfNode.Selected);
@@ -45,12 +45,17 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
 
     private async Task OnClick(MouseEventArgs args)
     {
-        SelfNode.SetSelected(!SelfNode.Selected);
-        if (TreeComponent.OnClick.HasDelegate && args.Button == 0)
+        if (SelfNode.Selected)
+        {
+            return;
+        }
+        
+        SelfNode.SetSelected(true);
+        /*if (TreeComponent.OnClick.HasDelegate && args.Button == 0)
         {
             await TreeComponent.OnClick.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode, args));
         }
-
+        */
         TreeComponent.UpdateBindData();
     }
 
@@ -74,20 +79,21 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
     {
         TreeComponent.DragItem = SelfNode;
         SelfNode.Expand(false);
-        if (TreeComponent.OnDragStart.HasDelegate)
+        
+        /*if (TreeComponent.OnDragStart.HasDelegate)
         {
             TreeComponent.OnDragStart.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode));
-        }
+        }*/
     }
 
     private void OnDragLeave(DragEventArgs e)
     {
         SelfNode.DragTarget = false;
         SelfNode.SetParentTargetContainer();
-        if (TreeComponent.OnDragLeave.HasDelegate)
+        /*if (TreeComponent.OnDragLeave.HasDelegate)
         {
             TreeComponent.OnDragLeave.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode));
-        }
+        }*/
     }
 
     private void OnDragEnter(DragEventArgs e)
@@ -100,10 +106,10 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
         SelfNode.DragTarget = true;
         dragTargetClientX = e.ClientX;
 
-        if (TreeComponent.OnDragEnter.HasDelegate)
+     /*   if (TreeComponent.OnDragEnter.HasDelegate)
         {
             TreeComponent.OnDragEnter.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode));
-        }
+        }*/
     }
 
     /// <summary>
@@ -134,7 +140,7 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
     {
         SelfNode.DragTarget = false;
         SelfNode.SetParentTargetContainer();
-        if (SelfNode.DragTargetBottom)
+        if (SelfNode.IsTargetBottom)
         {
             TreeComponent.DragItem.DragMoveDown(SelfNode);
         }
@@ -145,7 +151,7 @@ public partial class TreeViewNodeTitle<TItem> : ComponentBase
 
         if (TreeComponent.OnDrop.HasDelegate)
         {
-            TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem, e, SelfNode.DragTargetBottom) {TargetNode = SelfNode});
+            TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem, e, SelfNode.IsTargetBottom) {TargetNode = SelfNode});
         }
     }
 

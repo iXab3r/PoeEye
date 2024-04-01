@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PoeShared.Blazor.Controls;
 
-public partial class TreeViewNodeCheckbox<TItem> : ComponentBase
+public partial class TreeViewNodeCheckbox<TItem> : BlazorReactiveComponent
 {
     [CascadingParameter(Name = "Tree")]
     public TreeView<TItem> TreeComponent { get; set; }

@@ -13,25 +13,18 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PoeShared.Blazor.Controls;
 
-public partial class TreeViewNode<TItem> : AntDomComponentBase
+public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 {
     private static long nextNodeId;
-
     private bool disableCheckbox;
-
     private bool disabled;
-
     private bool dragTarget;
-
     private string icon;
-
     private bool isLeaf = true;
-
     private string key;
-
     private bool selected;
-
     private string title;
+    private readonly ClassMapper classMapper = new();
 
     public TreeViewNode()
     {
@@ -47,19 +40,8 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
     [Parameter]
     public RenderFragment Nodes { get; set; }
 
-    [Parameter] public RenderFragment ChildContent { get; set; }
-
-    internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
-
-    internal bool HasChildNodes => ChildNodes?.Count > 0;
-
-    public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
-
-    internal int NodeIndex { get; set; }
-
-    internal bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
-
-    internal long NodeId { get; private set; }
+    [Parameter] 
+    public RenderFragment ChildContent { get; set; }
 
     [Parameter]
     public string Key
@@ -101,20 +83,6 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
     [Parameter]
     public bool Loading { get; set; }
 
-    internal bool DragTarget
-    {
-        get => dragTarget;
-        set
-        {
-            dragTarget = value;
-            StateHasChanged();
-        }
-    }
-
-    internal bool DragTargetBottom { get; private set; }
-
-    private bool TargetContainer { get; set; }
-
     [Parameter]
     public bool IsLeaf
     {
@@ -142,33 +110,6 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
     [Parameter]
     public bool Expanded { get; set; }
 
-    internal bool RealDisplay
-    {
-        get
-        {
-            if (Hidden)
-            {
-                return false;
-            }
-
-            if (ParentNode == null)
-            {
-                return true;
-            }
-
-            if (ParentNode.Expanded == false)
-            {
-                return false;
-            }
-
-            return ParentNode.RealDisplay;
-        }
-    }
-
-    private bool SwitcherOpen => Expanded && !IsLeaf;
-
-    private bool SwitcherClose => !Expanded && !IsLeaf;
-
     [Parameter]
     public bool Checked { get; set; }
 
@@ -186,15 +127,7 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
     [Parameter]
     public string Icon
     {
-        get
-        {
-            if (TreeComponent.IconExpression != null)
-            {
-                return TreeComponent.IconExpression(this);
-            }
-
-            return icon;
-        }
+        get => TreeComponent.IconExpression != null ? TreeComponent.IconExpression(this) : icon;
         set => icon = value;
     }
 
@@ -221,13 +154,69 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
 
     [Parameter] public RenderFragment TitleTemplate { get; set; }
 
+    [Parameter] public TItem DataItem { get; set; }
+    
+    internal bool RealDisplay
+    {
+        get
+        {
+            if (Hidden)
+            {
+                return false;
+            }
+
+            if (ParentNode == null)
+            {
+                return true;
+            }
+
+            if (ParentNode.Expanded == false)
+            {
+                return false;
+            }
+
+            return ParentNode.RealDisplay;
+        }
+    }
+    
+    internal bool DragTarget
+    {
+        get => dragTarget;
+        set
+        {
+            if (dragTarget == value)
+            {
+                return;
+            }
+            
+            dragTarget = value;
+            StateHasChanged();
+        }
+    }
+
+    internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
+
+    internal bool HasChildNodes => ChildNodes?.Count > 0;
+
+    public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
+
+    internal int NodeIndex { get; set; }
+
+    internal bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
+
+    internal long NodeId { get; private set; }
+    
+    internal bool IsTargetBottom { get; private set; }
+
+    private bool IsTargetContainer { get; set; }
+    
+    private bool SwitcherOpen => Expanded && !IsLeaf;
+
+    private bool SwitcherClose => !Expanded && !IsLeaf;
+    
     public bool Matched { get; set; }
 
     public bool Hidden { get; set; }
-
-    internal bool HasChildMatched { get; set; }
-
-    [Parameter] public TItem DataItem { get; set; }
 
     private IList<TItem> ChildDataItems
     {
@@ -341,14 +330,14 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
         StateHasChanged();
     }
 
-    public void SetTargetBottom(bool value = false)
+    internal void SetTargetBottom(bool value = false)
     {
-        if (DragTargetBottom == value)
+        if (IsTargetBottom == value)
         {
             return;
         }
 
-        DragTargetBottom = value;
+        IsTargetBottom = value;
         StateHasChanged();
     }
 
@@ -359,12 +348,12 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
             return;
         }
 
-        if (ParentNode.TargetContainer == value)
+        if (ParentNode.IsTargetContainer == value)
         {
             return;
         }
 
-        ParentNode.TargetContainer = value;
+        ParentNode.IsTargetContainer = value;
         ParentNode.StateHasChanged();
     }
 
@@ -380,7 +369,7 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
 
     private void SetTreeViewNodeClassMapper()
     {
-        ClassMapper
+        classMapper
             .Add("ant-tree-treenode")
             .If("ant-tree-treenode-disabled", () => Disabled)
             .If("ant-tree-treenode-switcher-open", () => SwitcherOpen)
@@ -390,9 +379,9 @@ public partial class TreeViewNode<TItem> : AntDomComponentBase
             .If("ant-tree-treenode-selected", () => Selected)
             .If("ant-tree-treenode-loading", () => Loading)
             .If("drop-target", () => DragTarget)
-            .If("drag-over-gap-bottom", () => DragTarget && DragTargetBottom)
-            .If("drag-over", () => DragTarget && !DragTargetBottom)
-            .If("drop-container", () => TargetContainer)
+            .If("drag-over-gap-bottom", () => DragTarget && IsTargetBottom)
+            .If("drag-over", () => DragTarget && !IsTargetBottom)
+            .If("drop-container", () => IsTargetContainer)
             .If("ant-tree-treenode-leaf-last", () => IsLastNode);
     }
 

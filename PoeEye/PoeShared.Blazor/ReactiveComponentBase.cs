@@ -27,6 +27,9 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     private readonly Lazy<IFluentLog> logSupplier;
     private long refreshRequestCount;
     private long refreshCount;
+    private long renderCount;
+    private long shouldRenderCount;
+    private long unrenderedChangeCount;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReactiveComponentBase"/> class.
@@ -40,7 +43,11 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         WhenRefresh
             .Do(x => Interlocked.Increment(ref refreshRequestCount))
             .Sample(RefreshPeriod) //FIXME UI throttling
-            .Do(reason => Interlocked.Increment(ref refreshCount))
+            .Do(reason =>
+            {
+                Interlocked.Increment(ref refreshCount);
+                Interlocked.Increment(ref unrenderedChangeCount);
+            })
             .SubscribeAsync(async reason => await Refresh(reason))
             .AddTo(Anchors);
     }
@@ -71,6 +78,16 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     public long RefreshCount => refreshCount;
     
     /// <summary>
+    /// Gets the total count of ShouldRender requests that have occurred.
+    /// </summary>
+    public long ShouldRenderCount => shouldRenderCount;
+    
+    /// <summary>
+    /// Gets the total count of successful renders that have occurred.
+    /// </summary>
+    public long RenderCount => renderCount;
+    
+    /// <summary>
     /// Gets the count of refresh requests that have been made. Not all of them will be served - throttling/sampling, filtering, etc.
     /// </summary>
     public long RefreshRequestCount => refreshRequestCount;
@@ -97,6 +114,12 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     /// Indicates whether the component is rendered. Set after the first OnAfterRender call.
     /// </summary>
     public bool IsRendered { get; private set; }
+    
+    /// <summary>
+    /// Controls rendering process - if set, StateHasChanged will be called only when there is at least one change detected
+    /// either by ChangeDetector or manually
+    /// </summary>
+    public bool RenderOnlyWhenChanged { get; set; }
     
     /// <summary>
     /// Disposes of the resources used by this component.
@@ -132,12 +155,26 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     /// <inheritdoc />
     protected override bool ShouldRender()
     {
-        return base.ShouldRender();
+        Interlocked.Increment(ref shouldRenderCount);
+
+        bool shouldRender;
+        if (RenderOnlyWhenChanged)
+        {
+            shouldRender = unrenderedChangeCount > 0;
+        }
+        else
+        {
+            shouldRender = base.ShouldRender();
+        }
+
+        return shouldRender;
     }
     
     /// <inheritdoc />
     protected override void OnAfterRender(bool firstRender)
     {
+        Interlocked.Increment(ref renderCount);
+        Interlocked.Exchange(ref unrenderedChangeCount, 0);
         base.OnAfterRender(firstRender);
     }
 

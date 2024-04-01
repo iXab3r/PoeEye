@@ -52,6 +52,11 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
         Binder.Attach(this).AddTo(Anchors);
     }
 
+    public void TrackState<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
+    {
+        Track(context, selector);
+    }
+    
     public void TrackState<TOut>(Expression<Func<TContext, TOut>> selector)
     {
         Track(selector);

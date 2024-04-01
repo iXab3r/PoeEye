@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace PoeShared.Blazor.Controls;
 
-public partial class TreeViewIndent<TItem> : ComponentBase
+public partial class TreeViewIndent<TItem> : BlazorReactiveComponent
 {
     [CascadingParameter(Name = "Tree")]
     public TreeView<TItem> TreeComponent { get; set; }
@@ -15,6 +15,7 @@ public partial class TreeViewIndent<TItem> : ComponentBase
     public TreeViewNode<TItem> SelfNode { get; set; }
 
     [Parameter] public int TreeLevel { get; set; }
+    
     private static TreeViewNode<TItem> GetParentNode(TreeViewNode<TItem> node, int level)
     {
         if (level > 0 && node.ParentNode != null)

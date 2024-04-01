@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace PoeShared.Blazor.Controls;
 
-public partial class TreeView<TItem> : AntDomComponentBase
+public partial class TreeView<TItem> : BlazorReactiveComponent
 {
     internal List<TreeViewNode<TItem>> allNodes = new();
 
@@ -22,11 +22,11 @@ public partial class TreeView<TItem> : AntDomComponentBase
 
     private readonly ConcurrentDictionary<long, TreeViewNode<TItem>> checkedNodes = new();
     private Dictionary<long, TreeViewNode<TItem>> SelectedNodesDictionary { get; set; } = new();
-
     private bool hasSetShowLeafIcon;
-    private bool nodeHasChanged;
     private bool showLeafIcon;
     private bool showLine;
+    private readonly ClassMapper classMapper = new();
+    
 
     [Parameter]
     public bool ShowExpand { get; set; } = true;
@@ -71,8 +71,6 @@ public partial class TreeView<TItem> : AntDomComponentBase
     [Parameter]
     public string SwitcherIcon { get; set; }
 
-    public bool Directory { get; set; }
-
     [Parameter] public RenderFragment Nodes { get; set; }
 
     [Parameter] public RenderFragment ChildContent { get; set; }
@@ -86,7 +84,6 @@ public partial class TreeView<TItem> : AntDomComponentBase
     public bool Multiple { get; set; }
 
     [Parameter] public string[] DefaultSelectedKeys { get; set; }
-
 
     [Parameter]
     public string SelectedKey { get; set; }
@@ -182,9 +179,11 @@ public partial class TreeView<TItem> : AntDomComponentBase
     [Parameter]
     public EventCallback<TreeViewEventArgs<TItem>> OnCheck { get; set; }
 
-    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnSelect { get; set; }
+    [Parameter] 
+    public EventCallback<TreeViewEventArgs<TItem>> OnSelect { get; set; }
 
-    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnUnselect { get; set; }
+    [Parameter] 
+    public EventCallback<TreeViewEventArgs<TItem>> OnUnselect { get; set; }
 
     [Parameter]
     public EventCallback<TreeViewEventArgs<TItem>> OnExpandChanged { get; set; }
@@ -233,15 +232,13 @@ public partial class TreeView<TItem> : AntDomComponentBase
 
     private void SetClassMapper()
     {
-        ClassMapper
+        classMapper
             .Add("ant-tree")
             .If("ant-tree-show-line", () => ShowLine)
             .If("ant-tree-icon-hide", () => ShowIcon)
             .If("ant-tree-block-node", () => BlockNode)
-            .If("ant-tree-directory", () => Directory)
             .If("draggable-tree", () => Draggable)
-            .If("ant-tree-unselectable", () => !Selectable)
-            .If("ant-tree-rtl", () => RTL);
+            .If("ant-tree-unselectable", () => !Selectable);
     }
 
     internal void AddChildNode(TreeViewNode<TItem> treeNode)
@@ -253,14 +250,6 @@ public partial class TreeView<TItem> : AntDomComponentBase
     internal void AddNode(TreeViewNode<TItem> treeNode)
     {
         allNodes.Add(treeNode);
-        nodeHasChanged = true;
-        CallAfterRender(async () =>
-        {
-            if (nodeHasChanged)
-            {
-                nodeHasChanged = false;
-            }
-        });
     }
 
     internal void SelectedNodeAdd(TreeViewNode<TItem> treeNode)
@@ -311,9 +300,10 @@ public partial class TreeView<TItem> : AntDomComponentBase
         else
         {
             var selectedFirst = SelectedNodesDictionary.FirstOrDefault();
+            
             SelectedKey = selectedFirst.Value?.Key;
             SelectedNode = selectedFirst.Value;
-            SelectedData = selectedFirst.Value.DataItem;
+            SelectedData = selectedFirst.Value == default ? default : selectedFirst.Value.DataItem;
             SelectedKeys = SelectedNodesDictionary.Select(x => x.Value.Key).ToArray();
             SelectedNodes = SelectedNodesDictionary.Select(x => x.Value).ToArray();
             SelectedDatas = SelectedNodesDictionary.Select(x => x.Value.DataItem).ToArray();
@@ -390,7 +380,7 @@ public partial class TreeView<TItem> : AntDomComponentBase
         base.OnInitialized();
     }
 
-    protected override Task OnFirstAfterRenderAsync()
+    protected override Task OnAfterFirstRenderAsync()
     {
         DefaultCheckedKeys?.ForEach(k =>
         {
@@ -410,7 +400,7 @@ public partial class TreeView<TItem> : AntDomComponentBase
             }
         });
 
-        return base.OnFirstAfterRenderAsync();
+        return base.OnAfterFirstRenderAsync();
     }
 
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -536,11 +526,10 @@ public partial class TreeView<TItem> : AntDomComponentBase
         IsCtrlKeyDown = eventArgs.CtrlKey || eventArgs.MetaKey;
     }
 
-    protected override void Dispose(bool disposing)
+    public override ValueTask DisposeAsync()
     {
         DomEventListener?.Dispose();
-
-        base.Dispose(disposing);
+        return base.DisposeAsync();
     }
 
     private void UpdateState()

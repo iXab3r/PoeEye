@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using DynamicData;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
@@ -75,6 +76,8 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     [Parameter]
     public string Style { get; set; }
     
+    public ElementReference Ref { get; set; }
+    
     /// <summary>
     /// Observable sequence that signals when a property of the component changes.
     /// </summary>
@@ -98,6 +101,16 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
         {
             throw new InvalidStateException($"Failed to initialize change tracking in component {this} ({GetType()}) (data context: {DataContext}) for expression: {selector}{(ReferenceEquals(context, DataContext) ? "" : $", expression context: {context}")}", e);
         }
+    }
+
+    public void TrackCollection<T, TKey>(IObservableCache<T, TKey> source)
+    {
+        changeDetector.TrackState(source);
+    }
+
+    public void TrackCollection<T>(IObservableList<T> source)
+    {
+        changeDetector.TrackState(source);
     }
     
     /// <summary>

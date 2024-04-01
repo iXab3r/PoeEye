@@ -1,11 +1,11 @@
 ﻿@namespace PoeShared.Blazor.Controls
-@inherits AntDomComponentBase
+@inherits BlazorReactiveComponent
 @typeparam TItem
 
 @if (RealDisplay)
 {
     <CascadingValue Value="this" Name="SelfNode">
-        <div @key="NodeId" class="@ClassMapper.Class" style="@Style">
+        <div @key="NodeId" class="@classMapper.Class" style="@Style">
 
             <TreeViewIndent TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
 

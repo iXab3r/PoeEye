@@ -1,8 +1,8 @@
 ﻿@namespace PoeShared.Blazor.Controls
-@inherits AntDomComponentBase
+@inherits BlazorReactiveComponent
 @typeparam TItem
 
-<div class="@ClassMapper.Class" style="@Style" @ref="Ref">
+<div class="@classMapper.Class" style="@Style" @ref="Ref">
     <div class="ant-tree-list">
         <div class="ant-tree-list-holder-inner">
             <CascadingValue Value="this" Name="Tree" IsFixed="@true">

@@ -1,14 +1,22 @@
 ﻿@namespace PoeShared.Blazor.Controls
-@inherits ComponentBase
+@inherits BlazorReactiveComponent
 @typeparam TItem
 
-@if (CanDraggable)
+@if (Draggable)
 {
-    <span class="@TitleClassMapper.Class" title="@SelfNode.Title" @onclick="@OnClick" @ondblclick="@OnDblClick" draggable="true"
-          @oncontextmenu="@OnContextMenu"
-          @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
-          @ondragover:preventDefault @ondragover="@OnDragOver" @ondragleave="@OnDragLeave" @ondragenter="@OnDragEnter" @ondrop:preventDefault @ondrop="@OnDrop"
-          @ondragstart="@OnDragStart" @ondragend="@OnDragEnd" aria-grabbed="true">
+    <span class="@TitleClassMapper.Class" 
+          title="@SelfNode.Title" 
+          @onclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))" 
+          @ondblclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnDblClick))" 
+          @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
+          @ondragover:preventDefault @ondragover="@OnDragOver" 
+          @ondragleave="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave))" 
+          @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter))"
+          @ondrop="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDrop))" @ondrop:preventDefault
+          @ondragstart="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragStart))" 
+          @ondragend="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnd))" 
+          draggable="true"
+          aria-grabbed="true">
         @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
         {
             <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") @(SelfNode.Loading ? "ant-tree-icon_loading" : "")">
@@ -47,13 +55,16 @@
         }
         @if (SelfNode.DragTarget)
         {
-            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.DragTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
+            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.IsTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
         }
     </span>
 }
 else
 {
-    <span class="@TitleClassMapper.Class" title="@SelfNode.Title" @onclick="@OnClick" @ondblclick="@OnDblClick"
+    <span class="@TitleClassMapper.Class" 
+          title="@SelfNode.Title" 
+          @onclick="@OnClick" 
+          @ondblclick="@OnDblClick"
           @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="TreeComponent.OnContextMenu.HasDelegate">
         @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
         {
@@ -94,7 +105,7 @@ else
         }
         @if (SelfNode.DragTarget)
         {
-            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.DragTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
+            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.IsTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
         }
     </span>
 }
