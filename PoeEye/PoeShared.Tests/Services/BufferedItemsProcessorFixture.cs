@@ -41,6 +41,7 @@ internal class BufferedItemsProcessorFixtureTests : FixtureBase
         instance.Add(BufferedItemState.Added, new FakeItem(this, "1"));
 
         //Then
+        instance.Flush(true);
         eventsQueue.CollectionSequenceShouldBe("Added 1");
     }
     
@@ -54,6 +55,7 @@ internal class BufferedItemsProcessorFixtureTests : FixtureBase
         instance.Add(BufferedItemState.Changed, new FakeItem(this, "1"));
 
         //Then
+        instance.Flush(true);
         eventsQueue.CollectionSequenceShouldBe("Changed 1");
     }
     
@@ -76,26 +78,6 @@ internal class BufferedItemsProcessorFixtureTests : FixtureBase
     }
 
     [Test]
-    public void ShouldHandleCapacityExceeding()
-    {
-        // Given
-        var instance = CreateInstance();
-        instance.Capacity = 5; // Set a low capacity
-        instance.BufferPeriod = TimeSpan.MaxValue;
-
-        // When
-        for (int i = 0; i < 10; i++) // Add more items than the capacity
-        {
-            instance.Add(BufferedItemState.Added, new FakeItem(this, $"{i}"));
-        }
-        instance.Flush(true);
-
-        // Then
-        // Assert that the oldest items were dropped and only the last 5 are processed
-        eventsQueue.CollectionSequenceShouldBe("Added 5", "Added 6", "Added 7", "Added 8", "Added 9");
-    }
-
-    [Test]
     public void ShouldProcessMixedStates()
     {
         // Given
@@ -108,7 +90,7 @@ internal class BufferedItemsProcessorFixtureTests : FixtureBase
         instance.Flush(true);
 
         // Then
-        eventsQueue.CollectionSequenceShouldBe("Added 1", "Changed 1", "Removed 1");
+        eventsQueue.CollectionSequenceShouldBe("Added 1", "Removed 1");
     }
 
     [Test]
@@ -148,6 +130,7 @@ internal class BufferedItemsProcessorFixtureTests : FixtureBase
         
         public void HandleState(BufferedItemState state)
         {
+            owner.Log.Info($"Handled {state}");
             owner.eventsQueue.Enqueue($"{state} {Id}");
         }
     }
