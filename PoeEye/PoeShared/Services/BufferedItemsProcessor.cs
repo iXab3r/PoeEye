@@ -1,5 +1,6 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
+using System.Threading.Channels;
 using ReactiveUI;
 using Unity;
 
@@ -9,33 +10,17 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
 {
     private static readonly IFluentLog Log = typeof(BufferedItemsProcessor).PrepareLogger();
 
-    private readonly BlockingCollection<ItemUpdateRequest> requestsBuffer = new();
+    private readonly Channel<Request> requests;
     private readonly IScheduler scheduler;
-    private readonly ISubject<bool> flushSink = new Subject<bool>();
-    private readonly ISubject<string> updateSink = new Subject<string>();
+    private readonly WorkerTask processingTask;
+    private readonly AutoResetEvent timeoutEvent;
 
     public BufferedItemsProcessor([OptionalDependency] IScheduler scheduler)
     {
         this.scheduler = scheduler;
-
-        var immediate = scheduler == null || ReferenceEquals(scheduler, Scheduler.Immediate);
-
-        var updateRequests = this.WhenAnyValue(x => x.BufferPeriod)
-            .Select(x => x > TimeSpan.Zero
-                ? x < TimeSpan.MaxValue ? updateSink.Sample(x) : Observable.Never<string>()
-                : updateSink)
-            .Switch()
-            .Select(x => immediate ? Observable.Return(x) : Observable.Return(x, this.scheduler))
-            .Switch();
-
-        var flushRequests = flushSink
-            .Select(x => x || immediate ? Observable.Return("Immediate flush") : Observable.Return("Delayed flush", this.scheduler))
-            .Switch();
-            
-        updateRequests
-            .Merge(flushRequests)
-            .SubscribeSafe(ProcessRequests, Log.HandleUiException)
-            .AddTo(Anchors);
+        timeoutEvent = new AutoResetEvent(false);
+        requests = Channel.CreateUnbounded<Request>();
+        processingTask = new WorkerTask(HandleRequests).AddTo(Anchors);
     }
 
     public TimeSpan BufferPeriod { get; set; } = TimeSpan.Zero;
@@ -44,41 +29,116 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
 
     public void Add<T>(BufferedItemState state, T item) where T : IBufferedItemId
     {
-        while (requestsBuffer.Count > Capacity - 1 && requestsBuffer.TryTake(out var removedItem))
-        {
-            Log.Debug($"Removed item from the queue(capacity: {Capacity}, item count: {requestsBuffer.Count}): {removedItem}");
-        }
-
-        var itemToAdd = new ItemUpdateRequest {Item = item, State = state};
-        Log.Debug($"Adding item to the queue(capacity: {Capacity}, item count: {requestsBuffer.Count}): {itemToAdd}");
-        requestsBuffer.Add(itemToAdd);
-        updateSink.OnNext($"Update: {itemToAdd}");
+        EnqueueRequest(state, item, CancellationToken.None).AndForget();
+        Log.Debug($"Adding item to the queue(capacity: {Capacity}, item count: {requests.Reader.Count})");
     }
 
-    public void Flush(bool immediateFlush)
+    public async Task FlushAsync()
     {
-        flushSink.OnNext(immediateFlush);
+        Log.Debug($"Adding flush request to the queue(capacity: {Capacity}, item count: {requests.Reader.Count})");
+        var flushRequest = EnqueueFlush(CancellationToken.None).Result;
+        timeoutEvent.Set();
+        
+        Log.Debug($"Awaiting for flush to complete");
+        await flushRequest.CompletionSource.Task;
+        Log.Debug($"Flush request has completed");
     }
     
-    private void ProcessRequests(string reason)
+    public void Flush(bool immediateFlush)
+    {
+        FlushAsync().Wait();
+    }
+    
+     private async Task HandleRequests(CancellationToken cancellationToken)
+    {
+        try
+        {
+            Log.Debug($"Initializing processing loop");
+            while (!cancellationToken.IsCancellationRequested && await requests.Reader.WaitToReadAsync(cancellationToken))
+            {
+                try
+                {
+                    var items = await GetItems(cancellationToken);
+                    await HandleRequest(items, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    switch (e)
+                    {
+                        case TaskCanceledException:
+                        {
+                            Log.Debug("Processing loop has been cancelled", e);
+                            break;
+                        }
+                        default:
+                            Log.Warn("Critical error in processing loop", e);
+                            break;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            Log.Debug($"Completed processing loop(cancelled: {cancellationToken.IsCancellationRequested})");
+        }
+    }
+     
+     
+    private async Task HandleRequest(Request[] items, CancellationToken cancellationToken)
     {
         var sw = ValueStopwatch.StartNew();
 
-        var changesToProcess = requestsBuffer.Count;
-        if (changesToProcess <= 0)
+        try
         {
-            Log.Debug($"No changes to flush");
-            return;
+            var changes = items.OfType<ItemUpdateRequest>().ToArray();
+            await Observable.StartAsync(() => ProcessRequests(changes, cancellationToken), scheduler);
+            foreach (var workItem in items)
+            {
+                workItem.CompletionSource.SetResult(true);
+            }
         }
-        
-        Log.Debug($"Processing {changesToProcess} changes:\n\t{requestsBuffer.DumpToTable()}");
-        var changes = new ItemUpdateRequest[changesToProcess];
-        var itemIndex = 0;
-        while (requestsBuffer.TryTake(out var itemChange) && itemIndex < changes.Length)
+        catch (Exception e)
         {
-            changes[itemIndex++] = itemChange;
+            foreach (var workItem in items)
+            {
+                workItem.CompletionSource.SetException(e);
+            }
+        }
+        finally
+        {
+            var timeout = BufferPeriod;
+            Log.Debug($"Processed all changes in {sw.ElapsedMilliseconds}ms, timeout: {timeout}");
+            if (timeout > TimeSpan.Zero)
+            {
+                while (!cancellationToken.IsCancellationRequested && requests.Reader.Count == 0)
+                {
+                    if (timeoutEvent.WaitOne(timeout))
+                    {
+                        Log.Debug("Timeout ended prematurely");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task<Request[]> GetItems(CancellationToken cancellationToken)
+    {
+        var changesToProcess = requests.Reader.Count;
+        Log.Debug($"Processing {changesToProcess} changes");
+
+        var changes = new Request[changesToProcess];
+        var itemIndex = 0;
+        while (requests.Reader.TryRead(out var item) && itemIndex < changes.Length)
+        {
+            changes[itemIndex++] = item;
         }
 
+        return itemIndex < changesToProcess ? changes[0..itemIndex] : changes;
+    }
+    
+    private static async Task ProcessRequests(ItemUpdateRequest[] changes, CancellationToken cancellationToken)
+    {
         var changesByItem = changes.GroupBy(x => x.Item.Id).ToArray();
         Log.Debug($"Grouped {changes.Length} changes into {changesByItem.Length} packs");
 
@@ -91,26 +151,27 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
                 for (var index = 0; index < itemChanges.Length; index++)
                 {
                     var change = itemChanges[index];
-
-                    if (change.Item is IBufferedItem bufferedItem)
+                    
+                    switch (change.Item)
                     {
-                        bufferedItem.HandleState(change.State);
-                    }
-                    else if (change.Item is IBufferedItemAsync bufferedItemAsync)
-                    {
-                        Task.Run(() => bufferedItemAsync.HandleStateAsync(change.State)).Wait();
-                    }
-                    else
-                    {
-                        throw new NotSupportedException($"Items of type {change.Item.GetType()} are not supported");
+                        case IBufferedItem bufferedItem:
+                            bufferedItem.HandleState(change.State);
+                            break;
+                        case IBufferedItemAsync bufferedItemAsync:
+                            await bufferedItemAsync.HandleStateAsync(change.State);
+                            break;
+                        default:
+                            throw new NotSupportedException($"Items of type {change.Item.GetType()} are not supported");
                     }
 
                     if (change.State is BufferedItemState.Added or BufferedItemState.Changed)
                     {
-                        while (index < itemChanges.Length && itemChanges[index].State == BufferedItemState.Changed)
+                        var nextIndex = index;
+                        while (nextIndex+1 < itemChanges.Length && itemChanges[nextIndex+1].State == BufferedItemState.Changed)
                         {
-                            index++;
+                            nextIndex++;
                         }
+                        index = nextIndex;
                     }
                 }
             }
@@ -119,11 +180,44 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
                 Log.Warn($"Failed to process item {item}, changes({itemChanges.Length}): {changes.Select(x => $"{x.State} {x.Item.Id}").DumpToString()}", e);
             }
         }
-
-        Log.Debug($"Processed all changes in {sw.ElapsedMilliseconds}ms");
+    }
+    
+    private async Task<ItemUpdateRequest> EnqueueRequest(
+        BufferedItemState request,
+        IBufferedItemId item,
+        CancellationToken cancellationToken)
+    {
+        var newRequest = new ItemUpdateRequest
+        {
+            Item = item,
+            State = request,
+            CompletionSource = new TaskCompletionSource<bool>()
+        };
+        await requests.Writer.WriteAsync(newRequest, cancellationToken);
+        return newRequest;
+    }
+    
+    private async Task<FlushRequest> EnqueueFlush(
+        CancellationToken cancellationToken)
+    {
+        var newRequest = new FlushRequest()
+        {
+            CompletionSource = new TaskCompletionSource<bool>()
+        };
+        await requests.Writer.WriteAsync(newRequest, cancellationToken);
+        return newRequest;
     }
 
-    private readonly record struct ItemUpdateRequest
+    private abstract record Request
+    {
+        public TaskCompletionSource<bool> CompletionSource { get; init; }
+    }
+    
+    private sealed record FlushRequest : Request
+    {
+    }
+    
+    private sealed record ItemUpdateRequest : Request
     {
         public BufferedItemState State { get; init; }
         public IBufferedItemId Item { get; init; }
