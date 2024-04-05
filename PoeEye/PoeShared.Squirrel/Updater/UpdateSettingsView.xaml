@@ -8,10 +8,11 @@
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:UpdateSettingsViewModel}">
-        <st:AutoGrid Columns="240, *" RowHeight="40" ChildMargin="5" x:Name="UpdateSettingsRoot">
-            <TextBlock Text="Check for updates: " HorizontalAlignment="Right" />
+        <st:AutoGrid Columns="240, *" RowHeight="40" ChildMargin="5" x:Name="UpdateSettingsRoot"
+                     IsEnabled="{Binding HasDataFolder, Converter={StaticResource NotConverter}}">
+            <TextBlock Text="Check for updates: " HorizontalAlignment="Right"/>
             <CheckBox IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}" />
-            <TextBlock Text="Updates channel: " HorizontalAlignment="Right" />
+            <TextBlock Text="Updates channel: " HorizontalAlignment="Right"/>
             <ListBox ItemsSource="{Binding KnownSources}"
                      SelectedItem="{Binding UpdateSource}">
                 <ListBox.ItemContainerStyle>
@@ -42,9 +43,8 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock Text="Automatically download updates: " HorizontalAlignment="Right" IsEnabled="{Binding CheckForUpdates}"/>
+            <TextBlock Text="Automatically download updates: " HorizontalAlignment="Right" />
             <CheckBox IsChecked="{Binding AutomaticallyDownloadUpdates}"
-                      IsEnabled="{Binding CheckForUpdates}"
                       ToolTip="The program will download updates as soon as they become available. You still can decide whether to apply an update or not." />
             <!-- Temporarily disabled - should be re-enabled only after supporting portable builds 
             <TextBlock Text="Download full updates: " HorizontalAlignment="Right" IsEnabled="{Binding CheckForUpdates}"/>

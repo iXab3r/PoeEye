@@ -54,7 +54,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             throw new ApplicationException($"Failed to get configuration file path");
         }
     }
-
+    
     public string ConfigFilePath { [NotNull] get; }
 
     public IObservableCache<IPoeEyeConfig, string> Configs => loadedConfigsByType;
@@ -94,15 +94,21 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         Save();
     }
 
-    public void SaveToFile(FileInfo file)
+    public void SaveToFile(FileInfo file, IReadOnlyList<IPoeEyeConfig> configs)
     {
         using var @lock = fileLock.Enter();
 
         var metaConfig = new PoeEyeCombinedConfig();
-        loadedConfigsByType.Items.ToList().ForEach(x => metaConfig.Add(x));
-        Log.Debug($"Saving all configs, metadata: {new {MetadataVersion = metaConfig.Version, Items = metaConfig.Items.Select(x => new {Type = x.GetType()}).ToArray()}.ToString().TakeChars(500)}");
+        configs.ForEach(x => metaConfig.Add(x));
+        Log.Debug($"Saving all configs to {file}, metadata: {new {MetadataVersion = metaConfig.Version, Items = metaConfig.Items.Select(x => new {Type = x.GetType()}).ToArray()}.ToString().TakeChars(500)}");
 
         SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
+    }
+    
+    public void SaveToFile(FileInfo file)
+    {
+        var configs = loadedConfigsByType.Items.ToList();
+        SaveToFile(file, configs);
     }
 
     public void Save()

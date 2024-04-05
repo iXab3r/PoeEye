@@ -33,6 +33,8 @@ public interface IAppArguments : IAppConfig
 {
     string Profile { get; }
     
+    string DataFolder { get; }
+    
     bool IsDebugMode { get; }
         
     bool IsLazyMode { get; }

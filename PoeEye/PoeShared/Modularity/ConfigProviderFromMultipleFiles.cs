@@ -57,16 +57,28 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
 
     public void Save()
     {
-        Log.Info($"Saving configs(total: {loadedConfigsByType.Count})");
-        foreach (var config in loadedConfigsByType.Items)
-        {
-            Log.Info($"Saving config of type {config.GetType()}");
-            SaveInternal(config);
-            Log.Info($"Saved config of type {config.GetType()}");
-        }
-        
+        SaveToDirectory(configDirectory);
         Log.Debug($"Saved config, sending notification about config update");
         configHasChanged.OnNext(Unit.Default);
+    }
+
+    public void SaveToDirectory(DirectoryInfo directory, IReadOnlyList<IPoeEyeConfig> configs)
+    {
+        using var @lock = fileLock.Enter();
+
+        Log.Info($"Saving configs(total: {configs.Count()})");
+        foreach (var config in configs)
+        {
+            Log.Info($"Saving config of type {config.GetType()}");
+            SaveInternal(configSerializer, config, directory);
+            Log.Info($"Saved config of type {config.GetType()}");
+        }
+    }
+    
+    public void SaveToDirectory(DirectoryInfo directory)
+    {
+        using var @lock = fileLock.Enter();
+        SaveToDirectory(directory, loadedConfigsByType.Items.ToArray());
     }
 
     public void Save(IPoeEyeConfig config)
@@ -132,10 +144,18 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         }
         return deserialized;
     }
-    
+
     private void SaveInternal(IPoeEyeConfig config)
     {
-        var configFilePath = GetConfigFilePath(config);
+        SaveInternal(configSerializer, config, configDirectory);
+    }
+
+    private static void SaveInternal(
+        IConfigSerializer configSerializer,
+        IPoeEyeConfig config, 
+        DirectoryInfo configDirectory)
+    {
+        var configFilePath = GetConfigFilePath(config, configDirectory);
         try
         {
             Log.Debug($"Saving config to file '{configFilePath}'");
@@ -193,17 +213,17 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
         }
     }
 
-    private string GetConfigFilePath(IPoeEyeConfig config)
+    private static string GetConfigFilePath(IPoeEyeConfig config, DirectoryInfo configDirectory)
     {
-        return GetConfigFilePath(ConfigProviderUtils.GetConfigName(config));
+        return GetConfigFilePath(ConfigProviderUtils.GetConfigName(config), configDirectory);
     }
     
-    private string GetConfigFilePath(Type configType)
+    private static string GetConfigFilePath(Type configType, DirectoryInfo configDirectory)
     {
-        return GetConfigFilePath(ConfigProviderUtils.GetConfigName(configType));
+        return GetConfigFilePath(ConfigProviderUtils.GetConfigName(configType), configDirectory);
     }
 
-    private string GetConfigFilePath(string configName)
+    private static string GetConfigFilePath(string configName, DirectoryInfo configDirectory)
     {
         var configFilePath = Path.Combine(configDirectory.FullName, $"{configName}.cfg");
         return configFilePath;
@@ -211,7 +231,7 @@ public sealed class ConfigProviderFromMultipleFiles : DisposableReactiveObject, 
     
     private TConfig LoadInternal<TConfig>() where TConfig : new()
     {
-        var configFilePath = GetConfigFilePath(typeof(TConfig));
+        var configFilePath = GetConfigFilePath(typeof(TConfig), configDirectory);
         Log.Debug($"Loading config from file '{configFilePath}'");
         if (!File.Exists(configFilePath))
         {

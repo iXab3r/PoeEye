@@ -16,7 +16,10 @@ public class AppOptions : DisposableReactiveObject
 
     [Option(AutostartFlagValue, Default = false)]
     public bool IsAutostart { get; set; }
-
+    
+    [Option("dataFolder", Default = null)]
+    public string DataFolder { get; set; }
+    
     [Option('d', "debugMode", Default = false)]
     public bool IsDebugMode { get; set; }
     
@@ -61,9 +64,9 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string AppDataDirectory { get; }
     
-    public string SharedAppDataDirectory => Path.Combine(EnvironmentAppData.FullName, AppName);
+    public string SharedAppDataDirectory { get; }
 
-    public string LocalAppDataDirectory => Path.Combine(EnvironmentLocalAppData.FullName, AppName);
+    public string LocalAppDataDirectory { get; }
 
     public AppArguments()
     {
@@ -103,6 +106,7 @@ public class AppArguments : AppOptions, IAppArguments
         ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
 
         var parsed = Parse(CommandLineArguments);
+        
         if (string.IsNullOrEmpty(Profile))
         {
             Profile = IsDebugMode ? "debug" : DefaultProfileName;
@@ -111,7 +115,25 @@ public class AppArguments : AppOptions, IAppArguments
         {
             IsDebugMode = Profile == "debug";
         }
-        AppDataDirectory = Path.Combine(SharedAppDataDirectory, Profile);
+
+        var defaultDataFolder = Path.Combine(AppDomainDirectory, "data");
+        if (Directory.Exists(defaultDataFolder) && string.IsNullOrEmpty(DataFolder))
+        {
+            DataFolder = defaultDataFolder;
+        }
+
+        if (DataFolder != null)
+        {
+            LocalAppDataDirectory = DataFolder;
+            SharedAppDataDirectory = DataFolder;
+            AppDataDirectory = Path.Combine(DataFolder, Profile);
+        }
+        else
+        {
+            LocalAppDataDirectory = Path.Combine(EnvironmentLocalAppData.FullName, AppName);
+            SharedAppDataDirectory = Path.Combine(EnvironmentAppData.FullName, AppName);
+            AppDataDirectory = Path.Combine(SharedAppDataDirectory, Profile);
+        }
         
         if (!parsed)
         {

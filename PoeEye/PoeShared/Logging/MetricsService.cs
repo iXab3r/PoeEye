@@ -65,6 +65,11 @@ internal sealed class MetricsService : DisposableReactiveObject
         }
         Log.Info("Initializing metrics...");
 
+        if (!Log.IsInfoEnabled)
+        {
+            return new MetricsBuilder().Build();
+        }
+
         var metricsOutput = Path.Combine(appArguments.AppDataDirectory, $"logs", $"metrics.txt");
         Log.Info($"Exporting metrics to file {metricsOutput}");
         var metrics = new MetricsBuilder()

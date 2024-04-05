@@ -25,12 +25,14 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
     private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
 
     public UpdateSettingsViewModel(
+        IAppArguments appArguments,
         IUpdateSourceProvider updateSourceProvider,
         IConfigProvider<UpdateSettingsConfig> configProvider,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
         this.configProvider = configProvider;
 
+        HasDataFolder = !string.IsNullOrWhiteSpace(appArguments.DataFolder);
         var knownSources = new ObservableCollectionEx<UpdateSourceInfo>();
         updateSourceProvider.WhenAnyValue(x => x.KnownSources)
             .SubscribeSafe(x =>
@@ -51,6 +53,8 @@ internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISetti
     public bool IgnoreDeltaUpdates { get; set; }
     
     public bool AutomaticallyDownloadUpdates { get; set; }
+    
+    public bool HasDataFolder { get; }
     
     public IReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         
