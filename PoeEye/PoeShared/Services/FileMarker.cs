@@ -3,62 +3,62 @@ using Polly;
 
 namespace PoeShared.Services;
 
-public sealed class FileLock : DisposableReactiveObject
+public sealed class FileMarker : DisposableReactiveObject
 {
     private static readonly Process CurrentProcess = Process.GetCurrentProcess();
 
     private readonly Stream fileStream;
 
-    public FileLock(FileInfo lockFile) : this(lockFile, TimeSpan.Zero)
+    public FileMarker(FileInfo file) : this(file, TimeSpan.Zero)
     {
     }
     
-    public FileLock(FileInfo lockFile, TimeSpan timeout)
+    public FileMarker(FileInfo file, TimeSpan timeout)
     {
         Log = GetType().PrepareLogger().WithSuffix(ToString);
-        LockFile = lockFile;
+        File = file;
         Timeout = timeout;
         ExistedInitially = Exists;
         Log.Debug($"Preparing lock file, existed since start: {ExistedInitially}");
-        fileStream = PrepareLockFileSafe(Log, LockFile.FullName, Timeout).AddTo(Anchors);
-        Disposable.Create(() => CleanupLockFile(Log, LockFile.FullName)).AddTo(Anchors);
+        fileStream = PrepareFileSafe(Log, File.FullName, Timeout).AddTo(Anchors);
+        Disposable.Create(() => CleanupFile(Log, File.FullName)).AddTo(Anchors);
         Log.Debug($"File lock created successfully");
     }
         
     private IFluentLog Log { get; }
         
-    public FileInfo LockFile { get; }
+    public FileInfo File { get; }
 
     public bool ExistedInitially { get; }
 
-    public bool Exists => File.Exists(LockFile.FullName);
+    public bool Exists => System.IO.File.Exists(File.FullName);
 
     public TimeSpan Timeout { get; }
 
     protected override void FormatToString(ToStringBuilder builder)
     {
         base.FormatToString(builder);
-        builder.Append(nameof(FileLock));
-        builder.AppendParameter(nameof(LockFile), LockFile.FullName);
+        builder.Append(nameof(FileMarker));
+        builder.AppendParameter(nameof(File), File.FullName);
         builder.AppendParameter(nameof(ExistedInitially), ExistedInitially);
         builder.AppendParameter(nameof(Exists), Exists);
     }
 
-    private static void CleanupLockFile(IFluentLog log, string lockFilePath)
+    private static void CleanupFile(IFluentLog log, string lockFilePath)
     {
         log.Debug($"Preparing to remove lock file: {lockFilePath}");
-        var lockFileExists = File.Exists(lockFilePath);
+        var lockFileExists = System.IO.File.Exists(lockFilePath);
         if (lockFileExists)
         {
             log.Info($"Removing lock file {lockFilePath}");
-            File.Delete(lockFilePath);
+            System.IO.File.Delete(lockFilePath);
         }
         else
         {
             log.Warn($"Lock file {lockFilePath} does not exist for some reason");
         }
 
-        if (File.Exists(lockFilePath))
+        if (System.IO.File.Exists(lockFilePath))
         {
             throw new ApplicationException("Failed to remove lock file");
         }
@@ -68,7 +68,7 @@ public sealed class FileLock : DisposableReactiveObject
         }
     }
 
-    private static Stream PrepareLockFileSafe(IFluentLog log, string lockFilePath, TimeSpan timeout)
+    private static Stream PrepareFileSafe(IFluentLog log, string lockFilePath, TimeSpan timeout)
     {
         var retryCount = 10;
         var attemptTimeout = timeout / retryCount;

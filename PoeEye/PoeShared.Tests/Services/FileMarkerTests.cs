@@ -7,13 +7,13 @@ using Shouldly;
 namespace PoeShared.Tests.Services;
 
 [TestFixture]
-public class LockFileTests : FixtureBase
+public class FileMarkerTests : FixtureBase
 {
     private FileInfo lockFile;
 
     protected override void SetUp()
     {
-        lockFile = new FileInfo(Path.Combine(Path.GetTempPath(), $".{nameof(LockFileTests)}"));
+        lockFile = new FileInfo(Path.Combine(Path.GetTempPath(), $".{nameof(FileMarkerTests)}"));
         if (lockFile.Exists)
         {
             lockFile.Delete();
@@ -90,8 +90,8 @@ public class LockFileTests : FixtureBase
         instance.ExistedInitially.ShouldBe(true);
     }
 
-    private FileLock CreateInstance()
+    private FileMarker CreateInstance()
     {
-        return new FileLock(lockFile);
+        return new FileMarker(lockFile);
     }
 }
