@@ -7,5 +7,5 @@ public class BlazorViewAttribute : Attribute
 {
     public bool IsForManualRegistrationOnly { get; set; }
     
-    public object ViewKey { get; set; }
+    public object ViewTypeKey { get; set; }
 }

@@ -12,6 +12,10 @@ video {
     outline: none;
 }
 
+.btn-small {
+    padding: 0 0.25rem;
+}
+
 .d-grid-center{
     display: grid;
     place-items: center;

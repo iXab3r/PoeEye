@@ -174,7 +174,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
                 }
 
                 var contentType = ResolveContentType(typeInfo.BaseViewType);
-                RegisterViewType(viewType: typeInfo.ViewType, viewContentType: contentType, key: blazorViewAttribute?.ViewKey);
+                RegisterViewType(viewType: typeInfo.ViewType, viewContentType: contentType, key: blazorViewAttribute?.ViewTypeKey);
                 logger.Debug($"Successfully registered Blazor view {typeInfo}");
             }
         }

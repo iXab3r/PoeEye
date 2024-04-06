@@ -33,8 +33,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private readonly IWindowHandleProvider windowHandleProvider;
     private readonly IUniqueIdGenerator idGenerator;
     private readonly ISafeModeService safeModeService;
-    private readonly FileLock loadingFileLock;
-    private readonly FileLock runningFileLock;
+    private readonly FileMarker loadingFileMarker;
+    private readonly FileMarker runningFileMarker;
     private readonly ISubject<int> whenTerminated = new Subject<int>();
     private readonly DateTimeOffset startupTimestamp;
     private DateTimeOffset loadedTimestamp;
@@ -76,33 +76,33 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         }, Log.HandleException).AddTo(Anchors);
 
         var lockFileAcquireTimeout = TimeSpan.FromSeconds(10);
-        runningFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".running")), lockFileAcquireTimeout).AddTo(Anchors);
-        loadingFileLock = new FileLock(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".loading")), lockFileAcquireTimeout).AddTo(Anchors);
-        Log.Info($"Application load state: {new {runningFileLock, loadingFileLock}}");
-        LastExitWasGraceful = !runningFileLock.ExistedInitially;
-        LastLoadWasSuccessful = !loadingFileLock.ExistedInitially;
+        runningFileMarker = new FileMarker(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".running")), lockFileAcquireTimeout).AddTo(Anchors);
+        loadingFileMarker = new FileMarker(new FileInfo(Path.Combine(appArguments.AppDataDirectory, $".loading")), lockFileAcquireTimeout).AddTo(Anchors);
+        Log.Info($"Application load state: {new {runningFileLock = runningFileMarker, loadingFileLock = loadingFileMarker}}");
+        LastExitWasGraceful = !runningFileMarker.ExistedInitially;
+        LastLoadWasSuccessful = !loadingFileMarker.ExistedInitially;
 
         this.WhenAnyValue(x => x.IsLoaded).Where(x => x == true).SubscribeSafe(x =>
         {
             Log.Info($"Performing GC after app is loaded");
             GC.Collect();
 
-            Log.Info($"Application is loaded - cleaning up lock file {loadingFileLock}");
-            loadingFileLock.Dispose();
+            Log.Info($"Application is loaded - cleaning up lock file {loadingFileMarker}");
+            loadingFileMarker.Dispose();
         }, Log.HandleException).AddTo(Anchors);
         WhenExit
             .SubscribeSafe(exitCode =>
             {
                 if (exitCode == 0)
                 {
-                    Log.Info($"Graceful exit - cleaning up lock file {runningFileLock}");
-                    runningFileLock.Dispose();
-                    Log.Info($"Graceful exit - cleaning up lock file {loadingFileLock}");
-                    loadingFileLock.Dispose(); // this may happen if we're restarting before the app is loaded
+                    Log.Info($"Graceful exit - cleaning up lock file {runningFileMarker}");
+                    runningFileMarker.Dispose();
+                    Log.Info($"Graceful exit - cleaning up lock file {loadingFileMarker}");
+                    loadingFileMarker.Dispose(); // this may happen if we're restarting before the app is loaded
                 }
                 else
                 {
-                    Log.Warn($"Erroneous exit detected, code: {exitCode} - leaving lock file intact {runningFileLock}");
+                    Log.Warn($"Erroneous exit detected, code: {exitCode} - leaving lock file intact {runningFileMarker}");
                 }
             }, Log.HandleException).AddTo(Anchors);
 
