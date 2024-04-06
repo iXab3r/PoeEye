@@ -29,6 +29,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     private const string WebViewTemplateChildName = "WebView";
 
     protected CompositeDisposable Anchors { get; } = new();
+    private WebView2Ex webView2Ex;
 
     public BlazorWebViewEx()
     {
@@ -50,6 +51,23 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         this.BlazorWebViewInitialized += OnBlazorWebViewInitialized;
     }
 
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+
+        
+        webView2Ex = (WebView2Ex)Template.FindName(WebViewTemplateChildName, this) ?? throw new InvalidStateException($"Failed to find web view control {WebViewTemplateChildName}");
+        
+        /*
+         * This is an attempt to fix flickering problem described here:
+         * https://github.com/MicrosoftEdge/WebView2Feedback/issues/1412
+         * and here
+         * https://www.cnblogs.com/liwuqingxin/p/16266683.html
+         * The idea is to temporarily relocate webview until it will be fully loaded 
+         */
+        webView2Ex.RenderTransform = new TranslateTransform(-int.MaxValue, -int.MaxValue);
+    }
+
     private void OnBlazorWebViewInitializing(object sender, BlazorWebViewInitializingEventArgs e)
     {
         e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
@@ -57,7 +75,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
             AdditionalBrowserArguments = "",
         };
     }
-
+    
     private void OnBlazorWebViewInitialized(object sender, BlazorWebViewInitializedEventArgs e)
     {
         this.Observe(BackgroundProperty, x => Background)
@@ -67,6 +85,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 
         e.WebView.GotFocus += WebViewOnGotFocus;
         e.WebView.LostFocus += WebViewOnLostFocus;
+        e.WebView.NavigationCompleted += WebViewOnNavigationCompleted;
         e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
         Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
@@ -88,6 +107,11 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
             }
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
         }
+    }
+
+    private void WebViewOnNavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+    {
+        webView2Ex.RenderTransform = new TranslateTransform(0, 0);
     }
 
     private void WebViewOnLostFocus(object sender, RoutedEventArgs e)
