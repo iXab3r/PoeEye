@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using log4net;
+using log4net.Appender;
+using log4net.Repository.Hierarchy;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
@@ -22,6 +26,8 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
     {
         const int logsToInclude = 7;
         const int logsToAttach = 5;
+        FlushAppenders();
+        
         Log.Debug("Preparing log files for report...");
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var logFilesToInclude = new DirectoryInfo(logFilesRoot)
@@ -66,6 +72,30 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
         foreach (var exceptionReportItem in result)
         {
             yield return exceptionReportItem;
+        }
+    }
+
+    private static void FlushAppenders()
+    {
+        Log.Debug("Flushing all appenders");
+
+        var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
+        
+        foreach (var appender in repository.GetAppenders().OfType<FileAppender>())
+        {
+            if (appender.ImmediateFlush)
+            {
+                continue;
+            }
+
+            if (appender.Flush(0))
+            {
+                Log.Debug($"Flushed appender {new { appender.Name, appender.File }}");
+            }
+            else
+            {
+                Log.Debug($"Failed to flush appender {new { appender.Name, appender.File }}");
+            }
         }
     }
 }
