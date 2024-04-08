@@ -16,6 +16,7 @@
     <Color x:Key="OverlayAlternateBackgroundColorKey">#303030</Color>
     <Color x:Key="OverlayBackgroundColorKey">#292C2A</Color>
     <Color x:Key="OverlayForegroundColorKey">White</Color>
+    <Color x:Key="MahApps.Colors.Accent">#CC0078D7</Color>
     <SolidColorBrush x:Key="TransparentBrushKey" Color="{StaticResource TransparentColorKey}" ice:Freeze="True" />
     <SolidColorBrush x:Key="OverlayBorderBrushKey" Color="{StaticResource OverlayBorderColorKey}" ice:Freeze="True" />
     <SolidColorBrush x:Key="OverlayTitleBrushKey" Color="{StaticResource OverlayTitleColorKey}" ice:Freeze="True" />

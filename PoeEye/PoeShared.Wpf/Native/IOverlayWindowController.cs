@@ -10,6 +10,4 @@ public interface IOverlayWindowController : IDisposableReactiveObject, IHasVisib
     bool ShowWireframes { get; set; }
         
     IDisposable RegisterChild(IOverlayViewModel viewModel);
-
-    IObservableList<IOverlayViewModel> Children { get; }
 }

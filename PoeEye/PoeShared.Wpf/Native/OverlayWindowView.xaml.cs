@@ -10,12 +10,15 @@ using ReactiveUI;
 
 namespace PoeShared.Native;
 
-public partial class OverlayWindowView
+public class OverlayWindowView : ReactiveMetroWindow
 {
+    static OverlayWindowView()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(OverlayWindowView), new FrameworkPropertyMetadata(typeof(OverlayWindowView)));
+    }
+    
     public OverlayWindowView()
     {
-        InitializeComponent();
-        BorderThickness = new Thickness(0);
         SizeChanged += OnSizeChanged;
         Loaded += OnLoaded;
     }

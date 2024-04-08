@@ -107,6 +107,9 @@
     <Compile Update="UI\WindowFinderOverlayForm.cs">
       <DependentUpon>WindowFinder.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Native\OverlayWindowView.xaml.cs">
+      <DependentUpon>OverlayWindowView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\Styles.tabcontrol.xaml">
@@ -126,6 +129,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <MauiXaml Include="Native\OverlayWindowView.styles.xaml" />
     <MauiXaml Include="Themes\Styles.datagrid.xaml" />
     <MauiXaml Include="Themes\Styles.mahapps.xaml" />
     <MauiXaml Include="UI\WindowButtonCommands.xaml" />

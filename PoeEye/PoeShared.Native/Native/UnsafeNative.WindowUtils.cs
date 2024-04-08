@@ -338,6 +338,16 @@ public partial class UnsafeNative
             Log.Warn($"Failed to SetWindowPos({handle.ToHexadecimal()}), error: {error}");
         }
     }
+
+    public static void ShowInactive(IntPtr handle)
+    {
+        Log.Debug($"[{handle.ToHexadecimal()}] Showing window inactive");
+        Win32ErrorCode error;
+        if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        {
+            Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
+        }
+    }
     
     public static void ShowInactiveTopmost(IntPtr handle)
     {

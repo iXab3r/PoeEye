@@ -79,7 +79,7 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
     {
         Log.Debug("Window initialized");
         Log.Debug("Initializing native window handle");
-        new WindowInteropHelper(this).EnsureHandle(); //EnsureHandle leads to SourceInitialized
+       // new WindowInteropHelper(this).EnsureHandle(); //EnsureHandle leads to SourceInitialized
         Log.Debug("Native window initialized");
     }
 
@@ -98,7 +98,7 @@ public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactive
     {
         base.OnSourceInitialized(e);
 
-        WindowHandle = new WindowInteropHelper(this).Handle; // should be already available here
+        WindowHandle = new WindowInteropHelper(this).EnsureHandle(); // should be already available here
         if (WindowHandle == IntPtr.Zero)
         {
             throw new InvalidStateException("Window handle must be initialized at this point");

@@ -47,6 +47,11 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
 
     public IDisposable RegisterChild(IOverlayViewModel viewModel)
     {
+        return RegisterChild<OverlayWindowView>(viewModel);
+    }
+    
+    public IDisposable RegisterChild<TWindow>(IOverlayViewModel viewModel) where TWindow : OverlayWindowView, new()
+    {
         if (!overlayScheduler.IsOnScheduler())
         {
             Log.Debug($"Invoking registration on {overlayScheduler}");
@@ -71,7 +76,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
         }.AddTo(childAnchors);
         
         logger.Debug($"Initialized window container: {windowContainer}");
-        var window = new OverlayWindowView
+        var window = new TWindow()
         {
             Visibility = Visibility.Collapsed,
             ShowInTaskbar = false,

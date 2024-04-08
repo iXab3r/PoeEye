@@ -4,9 +4,9 @@ using PropertyBinder;
 
 namespace PoeShared.Native;
 
-internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewModel>
+public class OverlayWindowContainer<T> : WindowContainerBase<T>, IOverlayWindowContainer<T> where T : IOverlayViewModel
 {
-    private static readonly Binder<OverlayWindowContainer> Binder = new();
+    private static readonly Binder<OverlayWindowContainer<T>> Binder = new();
 
     static OverlayWindowContainer()
     {
@@ -32,12 +32,18 @@ internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewM
             .Else(x => false)
             .To(x => x.IsFocusable);
     }
-
+    
     public OverlayWindowContainer(IFluentLog logger) : base(logger)
     {
         Binder.Attach(this).AddTo(Anchors);
     }
-
+    
+    public new IOverlayViewModel Content
+    {
+        get => base.Content;
+        set => base.Content = (T) value;
+    }
+    
     protected override void FormatToString(ToStringBuilder builder)
     {
         base.FormatToString(builder);
@@ -46,5 +52,12 @@ internal sealed class OverlayWindowContainer : WindowContainerBase<IOverlayViewM
         {
             builder.AppendParameter(nameof(Content.OverlayMode), content.OverlayMode);
         }
+    }
+}
+
+public sealed class OverlayWindowContainer : OverlayWindowContainer<IOverlayViewModel>
+{
+    public OverlayWindowContainer(IFluentLog logger) : base(logger)
+    {
     }
 }

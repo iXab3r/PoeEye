@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Reactive;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
@@ -27,7 +28,7 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     string Id { [NotNull] get; }
 
     string Title { [CanBeNull] get; }
-
+    
     IWindowViewController WindowController { [CanBeNull] get; }
 
     IObservable<KeyEventArgs> WhenKeyUp { get; }
@@ -43,5 +44,5 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     
     double? TargetAspectRatio { get; set; }
     
-    internal void SetOverlayWindow([NotNull] IWindowViewController owner);
+    public void SetOverlayWindow([NotNull] IWindowViewController owner);
 }

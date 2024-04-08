@@ -24,6 +24,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/RegionSelector/Views/SelectionAdornerView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Profiler/PerformanceProfilerView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Dialogs/Views/InputMessageBoxView.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Native/OverlayWindowView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Thumb.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
