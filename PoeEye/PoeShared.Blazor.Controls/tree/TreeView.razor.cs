@@ -286,6 +286,14 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         }
     }
 
+    private async Task HandleContextMenu(MouseEventArgs args)
+    {
+        if (OnContextMenu.HasDelegate)
+        {
+            await OnContextMenu.InvokeAsync(new TreeViewEventArgs<TItem>(this, null, args));
+        }
+    }
+
     internal void UpdateBindData()
     {
         if (SelectedNodesDictionary.Count == 0)

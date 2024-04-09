@@ -8,7 +8,7 @@
           title="@SelfNode.Title" 
           @onclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))" 
           @ondblclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnDblClick))" 
-          @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
+          @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:stopPropagation="@TreeComponent.OnContextMenu.HasDelegate" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
           @ondragover:preventDefault @ondragover="@OnDragOver" 
           @ondragleave="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave))" 
           @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter))"
