@@ -16,14 +16,14 @@ internal sealed class FluentLogBuilder : IFluentLog
         
     public IMetrics Metrics => App.Metrics.Metrics.Instance ?? throw new InvalidOperationException("Metrics are not initialized yet");
 
-    public bool IsDebugEnabled =>  logWriter.IsDebugEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Debug;
+    public bool IsDebugEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Debug || logWriter.IsDebugEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Debug;
 
-    public bool IsInfoEnabled =>  logWriter.IsInfoEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Info;
+    public bool IsInfoEnabled =>  Data.MinLogLevelOverride is <= FluentLogLevel.Info || logWriter.IsInfoEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Info;
 
-    public bool IsWarnEnabled => logWriter.IsWarnEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Warn;
+    public bool IsWarnEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Warn || logWriter.IsWarnEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Warn;
 
-    public bool IsErrorEnabled => logWriter.IsErrorEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Error;
-
+    public bool IsErrorEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Error || logWriter.IsErrorEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Error;
+    
     public LogData Data { get; set; }
         
     public void Debug(string message, Exception exception)

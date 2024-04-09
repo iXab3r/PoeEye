@@ -62,6 +62,8 @@ internal record struct LogData
     public int LineNumber { get; set; }
 
     public int? MaxLineLength { get; set; }
+    
+    public FluentLogLevel? MinLogLevelOverride { get; set; }
 
     /// <summary>
     ///     Returns a <see cref="System.String" /> that represents this instance.

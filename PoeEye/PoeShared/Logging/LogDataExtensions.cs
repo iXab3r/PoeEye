@@ -15,6 +15,14 @@ internal static class LogDataExtensions
         };
     }
     
+    public static LogData WithMinLogLevelOverride(this LogData logData, FluentLogLevel? value)
+    {
+        return logData with
+        {
+            MinLogLevelOverride = value
+        };
+    }
+    
     public static LogData WithPrefix(this LogData logData, Func<string> prefixSupplier, bool brackets = true)
     {
         return logData.WithPrefixProvider(() =>

@@ -127,6 +127,11 @@ public static class FluentLogExtensions
         return log.WithLogData(log.Data.WithMaxLineLength(value));
     }
 
+    public static IFluentLog WithMinLogLevelOverride(this IFluentLog log, FluentLogLevel? value)
+    {
+        return log.WithLogData(log.Data.WithMinLogLevelOverride(value));
+    }
+    
     public static IFluentLog WithSuffix(this IFluentLog log, Func<string> suffixSupplier)
     {
         return log.WithLogData(log.Data.WithSuffix(suffixSupplier, brackets: true));

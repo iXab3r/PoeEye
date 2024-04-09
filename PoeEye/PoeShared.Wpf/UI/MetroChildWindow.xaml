@@ -34,7 +34,7 @@
     </Window.Resources>
     
     <native:ReactiveMetroWindow.LeftWindowCommands>
-        <mah:WindowCommands ShowSeparators="True" Margin="3,0,0,0">
+        <mah:WindowCommands ShowSeparators="False" Margin="3,0,0,0">
             <ToggleButton Margin="4,2,7,2"
                           Style="{StaticResource FlatToggleButton}"
                           Width="20"
