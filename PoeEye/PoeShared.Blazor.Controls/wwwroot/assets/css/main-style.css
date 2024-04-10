@@ -46,6 +46,29 @@ video {
     text-overflow: ellipsis;
 }
 
+.strikeout-danger::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 2px solid; 
+    border-color: var(--bs-danger);
+    z-index: 1;
+}
+
+.strikeout-warning::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 2px;
+    border-top: 2px solid;
+    border-color: var(--bs-warning);
+    z-index: 1;
+}
+
 .image-style-align-left{
     float: left;
     margin: 10px;

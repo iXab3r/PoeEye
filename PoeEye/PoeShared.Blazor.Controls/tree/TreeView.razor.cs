@@ -418,11 +418,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
                         parameters.IsParameterChanged(nameof(ExpandedKeys), ExpandedKeys);
 
         await base.SetParametersAsync(parameters);
-
-        if (isChanged)
-        {
-            UpdateState();
-        }
     }
 
     public TreeViewNode<TItem> GetNode(string key)
@@ -544,9 +539,11 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     {
         foreach (var node in allNodes)
         {
-            node.SetSingleNodeChecked(CheckedKeys?.Contains(node.Key) == true);
-            node.Selected = SelectedKeys?.Contains(node.Key) == true;
-            node.Expanded = ExpandedKeys?.Contains(node.Key) == true;
+            var isSelected = SelectedKeys?.Contains(node.Key) == true;
+            if (node.Selected != isSelected)
+            {
+                node.SetSelected(isSelected);
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AntDesign;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Controls;
 
@@ -31,17 +32,13 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         NodeId = Interlocked.Increment(ref nextNodeId);
     }
 
-    [CascadingParameter(Name = "Tree")]
-    public TreeView<TItem> TreeComponent { get; set; }
+    [CascadingParameter(Name = "Tree")] public TreeView<TItem> TreeComponent { get; set; }
 
-    [CascadingParameter(Name = "Node")]
-    public TreeViewNode<TItem> ParentNode { get; set; }
+    [CascadingParameter(Name = "Node")] public TreeViewNode<TItem> ParentNode { get; set; }
 
-    [Parameter]
-    public RenderFragment Nodes { get; set; }
+    [Parameter] public RenderFragment Nodes { get; set; }
 
-    [Parameter] 
-    public RenderFragment ChildContent { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
 
     [Parameter]
     public string Key
@@ -80,8 +77,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
     }
 
-    [Parameter]
-    public bool Loading { get; set; }
+    [Parameter] public bool Loading { get; set; }
 
     [Parameter]
     public bool IsLeaf
@@ -107,11 +103,9 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
     }
 
-    [Parameter]
-    public bool Expanded { get; set; }
+    [Parameter] public bool Expanded { get; set; }
 
-    [Parameter]
-    public bool Checked { get; set; }
+    [Parameter] public bool Checked { get; set; }
 
     [Parameter] public bool Indeterminate { get; set; }
 
@@ -155,7 +149,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     [Parameter] public RenderFragment TitleTemplate { get; set; }
 
     [Parameter] public TItem DataItem { get; set; }
-    
+
     internal bool RealDisplay
     {
         get
@@ -178,7 +172,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             return ParentNode.RealDisplay;
         }
     }
-    
+
     internal bool DragTarget
     {
         get => dragTarget;
@@ -188,7 +182,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             {
                 return;
             }
-            
+
             dragTarget = value;
             StateHasChanged();
         }
@@ -205,19 +199,18 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     internal bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
 
     internal long NodeId { get; private set; }
-    
+
     internal bool IsTargetBottom { get; private set; }
 
     private bool IsTargetContainer { get; set; }
-    
+
     private bool SwitcherOpen => Expanded && !IsLeaf;
 
     private bool SwitcherClose => !Expanded && !IsLeaf;
-    
+
     public bool Matched { get; set; }
 
-    [Parameter] 
-    public bool Hidden { get; set; }
+    [Parameter] public bool Hidden { get; set; }
 
     private IList<TItem> ChildDataItems
     {
@@ -386,7 +379,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             .If("ant-tree-treenode-leaf-last", () => IsLastNode);
     }
 
-    public async Task Expand(bool expanded)
+    public void SetExpanded(bool expanded)
     {
         if (Expanded == expanded)
         {
@@ -394,7 +387,11 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
 
         Expanded = expanded;
+    }
 
+    public async Task Expand(bool expanded)
+    {
+        SetExpanded(expanded);
         await TreeComponent?.OnNodeExpand(this, Expanded, new MouseEventArgs());
     }
 
@@ -456,6 +453,11 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
     public void SetSingleNodeChecked(bool check)
     {
+        if (check == Checked)
+        {
+            return;
+        }
+
         if (Disabled)
         {
             return;
@@ -840,7 +842,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         {
             Disabled = TreeComponent.DisabledExpression(this);
         }
-        
+
         if (TreeComponent.ExpandedKeys != null)
         {
             Expand(TreeComponent.ExpandedKeys.Any(k => k == Key));
@@ -853,5 +855,20 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
 
         base.OnInitialized();
+    }
+
+    public override string ToString()
+    {
+        var sb = new ToStringBuilder(this);
+        sb.AppendParameter(nameof(Key), Key);
+        if (Selected)
+        {
+            sb.AppendParameter(nameof(Selected), Selected);
+        }
+        if (Expanded)
+        {
+            sb.AppendParameter(nameof(Expanded), Expanded);
+        }
+        return sb.ToString();
     }
 }
