@@ -54,6 +54,7 @@ video {
     right: 0;
     border-top: 2px solid; 
     border-color: var(--bs-danger);
+    pointer-events: none;
     z-index: 1;
 }
 
@@ -66,6 +67,7 @@ video {
     border-top: 2px;
     border-top: 2px solid;
     border-color: var(--bs-warning);
+    pointer-events: none;
     z-index: 1;
 }
 
