@@ -26,9 +26,18 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
     {
         const int logsToInclude = 7;
         const int logsToAttach = 5;
-        FlushAppenders();
         
         Log.Debug("Preparing log files for report...");
+
+        try
+        {
+            FlushAppenders();
+        }
+        catch (Exception e)
+        {
+            Log.Warn("Failed to flush appenders", e);
+        }
+        
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var logFilesToInclude = new DirectoryInfo(logFilesRoot)
             .GetFiles("*.log", SearchOption.AllDirectories)
@@ -88,13 +97,20 @@ internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProv
                 continue;
             }
 
-            if (appender.Flush(0))
+            try
             {
-                Log.Debug($"Flushed appender {new { appender.Name, appender.File }}");
+                if (appender.Flush(0))
+                {
+                    Log.Debug($"Flushed appender {new {appender.Name, appender.File}}");
+                }
+                else
+                {
+                    Log.Debug($"Failed to flush appender {new {appender.Name, appender.File}}");
+                }
             }
-            else
+            catch (Exception e)
             {
-                Log.Debug($"Failed to flush appender {new { appender.Name, appender.File }}");
+                Log.Warn($"Failed to flush appender {appender}", e);
             }
         }
     }
