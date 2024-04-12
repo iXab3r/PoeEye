@@ -24,7 +24,7 @@
     </CascadingValue>
 }
 <CascadingValue Value="this" Name="Node">
-    @if (DataItem != null)
+    @if (DataItem != null && ChildContent == null && Nodes == null)
     {
         foreach (var item in ChildDataItems)
         {
