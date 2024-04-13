@@ -49,6 +49,7 @@ public static class AwesomeIcons
     public const string ErrorIcon = "\uf06a";
     public const string ExpandedDirectory = "\uf115";
     public const string Exclamation = "\uf06a";
+    public const string ExpeditedSsl = "\uf23e";
     public const string File = "\uf016";
     public const string FileText = "\uf0f6";
     public const string FileImage = "\uf1c5";

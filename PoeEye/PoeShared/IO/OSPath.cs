@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace PoeShared.IO;
 
@@ -59,6 +60,26 @@ public record OSPath : IComparable
     public string AsUnixPath => ToUnixPath(FullPath);
     
     public static implicit operator OSPath(string path) => new(path);
+
+    public static bool Equals([NotNull] string path, [NotNull] string otherPath)
+    {
+        if (path == null)
+        {
+            throw new ArgumentNullException(nameof(path));
+        }
+
+        if (otherPath == null)
+        {
+            throw new ArgumentNullException(nameof(otherPath));
+        }
+
+        if (string.IsNullOrEmpty(path) && string.IsNullOrEmpty(otherPath))
+        {
+            return true;
+        }
+
+        return new OSPath(path).Equals(new OSPath(otherPath));
+    }
 
     public OSPath Combine(string other)
     {
