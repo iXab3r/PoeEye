@@ -35,8 +35,6 @@ public interface ITreeViewItemViewModel : IDisposableReactiveObject, ICanBeSelec
         
     Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen { get; set; }
     
-    Func<ITreeViewItemViewModel, IObservable<Unit>> RefreshWhen { get; set; }
-    
     IReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
     
     /// <summary>
