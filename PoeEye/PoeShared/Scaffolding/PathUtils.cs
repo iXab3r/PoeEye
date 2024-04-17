@@ -417,7 +417,7 @@ public static class PathUtils
     /// </example>
     public static OSPath GenerateValidName(OSPath baseName, Predicate<OSPath> pathValidator)
     {
-        return GenerateValidName(baseName.FullPath, (candidateName, idx) => $"{candidateName} ({idx})", x => pathValidator(new OSPath(x)));
+        return GenerateValidName(baseName.FullName, (candidateName, idx) => $"{candidateName} ({idx})", x => pathValidator(new OSPath(x)));
     }
 
     /// <summary>

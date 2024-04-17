@@ -21,43 +21,43 @@ public record OSPath : IComparable
 
     private OSPath(string fullPath, bool isWindows)
     {
-        FullPath = ToPlatformSpecificPath(fullPath, isWindows);
+        FullName = ToPlatformSpecificPath(fullPath, isWindows);
     }
 
     /// <summary>
     /// Gets the platform-specific full path.
     /// </summary>
-    public string FullPath { get; }
+    public string FullName { get; }
 
     /// <summary>
     /// Gets the file name component of the path.
     /// </summary>
-    public string FileName => Path.GetFileName(FullPath);
+    public string Name => Path.GetFileName(FullName);
 
     /// <summary>
     /// Gets the directory name component of the path.
     /// </summary>
-    public string DirectoryName => Path.GetDirectoryName(FullPath);
+    public string Directory => Path.GetDirectoryName(FullName);
 
     /// <summary>
     /// Gets a value indicating whether the file denoted by this path exists.
     /// </summary>
-    public bool Exists => File.Exists(FullPath);
+    public bool Exists => File.Exists(FullName);
 
     /// <summary>
     /// Gets the depth of the path, calculated as the number of directory levels in the path.
     /// </summary>
-    public int Depth => PathUtils.GetDepth(FullPath);
+    public int Depth => PathUtils.GetDepth(FullName);
 
     /// <summary>
     /// Gets the Windows-style path representation.
     /// </summary>
-    public string AsWindowsPath => ToWindowsPath(FullPath);
+    public string AsWindowsPath => ToWindowsPath(FullName);
 
     /// <summary>
     /// Gets the Unix-style path representation.
     /// </summary>
-    public string AsUnixPath => ToUnixPath(FullPath);
+    public string AsUnixPath => ToUnixPath(FullName);
     
     public static implicit operator OSPath(string path) => new(path);
 
@@ -88,7 +88,7 @@ public record OSPath : IComparable
     
     public OSPath Combine(OSPath other)
     {
-        return new OSPath(Path.Combine(FullPath, other.FullPath));
+        return new OSPath(Path.Combine(FullName, other.FullName));
     }
 
     public virtual bool Equals(OSPath other)
@@ -103,12 +103,12 @@ public record OSPath : IComparable
             return true;
         }
 
-        return string.Equals(FullPath, other.FullPath, PathUtils.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+        return string.Equals(FullName, other.FullName, PathUtils.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
     }
 
     public override int GetHashCode()
     {
-        return (FullPath != null ? FullPath.GetHashCode() : 0);
+        return (FullName != null ? FullName.GetHashCode() : 0);
     }
 
     public int CompareTo(object obj)
@@ -116,7 +116,7 @@ public record OSPath : IComparable
         return obj switch
         {
             null => 1,
-            OSPath otherPath => string.Compare(FullPath, otherPath.FullPath, PathUtils.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal),
+            OSPath otherPath => string.Compare(FullName, otherPath.FullName, PathUtils.IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal),
             _ => throw new ArgumentException("Object is not an OSPath")
         };
     }

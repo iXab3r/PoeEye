@@ -38,7 +38,7 @@ internal class OSPathConverterFixtureTests : FixtureBase
 
         //Then
         result.PathAsString.ShouldBe("abc");
-        result.Path.FullPath.ShouldBe("test");
+        result.Path.FullName.ShouldBe("test");
     }
 
     public record TestClass
