@@ -297,6 +297,7 @@ textarea,
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
+    font-size: 1em;
 }
 
 .ant-tree-switcher{

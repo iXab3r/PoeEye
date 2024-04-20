@@ -70,6 +70,7 @@ public static class AwesomeIcons
     public const string ListUlIcon = "\uf0ca";
     public const string MousePointer = "\uf245";
     public const string Padlock = "\uf023";
+    public const string PadlockOpen = "\uf3c1";
     public const string PlayOutlined = "\uf01d";
     public const string PlusCircle = "\uf055";
     public const string Paste = "\uF0EA";
@@ -90,6 +91,8 @@ public static class AwesomeIcons
     public const string SearchPlus = "\uf00e";
     public const string SignIn = "\uf090";
     public const string SignOut = "\uf08b";
+    public const string ShieldHalved = "\uf3ed";
+    public const string Shield = "\uf132";
     public const string SortAmountAsc = "\uf160";
     public const string SortAmountDesc = "\uf161";
     public const string SortNumericAsc = "\uf162";
@@ -110,6 +113,7 @@ public static class AwesomeIcons
     public const string User = "\uf007";
     public const string UserCircle = "\uf2bd";
     public const string UserSecret = "\uf21b";
+    public const string UserShield = "\uf505";
     public const string Zoom = "\uf002";
 
     public static string ToHtml(string input)
