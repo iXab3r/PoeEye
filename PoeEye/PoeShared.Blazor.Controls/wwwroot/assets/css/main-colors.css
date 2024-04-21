@@ -1,0 +1,113 @@
+﻿:root {
+    --eye-Primary50: #eceff1;
+    --eye-Primary50Foreground: #000000DD;
+    --eye-Primary100: #cfd8dc;
+    --eye-Primary100Foreground: #000000DD;
+    --eye-Primary200: #b0bec5;
+    --eye-Primary200Foreground: #000000DD;
+    --eye-Primary300: #90a4ae;
+    --eye-Primary300Foreground: #000000DD;
+    --eye-Primary400: #78909c;
+    --eye-Primary400Foreground: #FFFFFFFF;
+    --eye-Primary500: #607d8b;
+    --eye-Primary500Foreground: #FFFFFFDD;
+    --eye-Primary600: #546e7a;
+    --eye-Primary600Foreground: #FFFFFFDD;
+    --eye-Primary700: #455a64;
+    --eye-Primary700Foreground: #FFFFFFDD;
+    --eye-Primary800: #37474f;
+    --eye-Primary800Foreground: #FFFFFFDD;
+    --eye-Primary900: #263238;
+    --eye-Primary900Foreground: #FFFFFFDD;
+
+    --eye-Accent100: #82b1ff;
+    --eye-Accent100Foreground: #000000DD;
+    --eye-Accent200: #448aff;
+    --eye-Accent200Foreground: #FFFFFFFF;
+    --eye-Accent400: #2979ff;
+    --eye-Accent400Foreground: #FFFFFFDD;
+    --eye-Accent700: #2962ff;
+    --eye-Accent700Foreground: #FFFFFFDD;
+
+    --eye-PrimaryHueLightBrush: var(--eye-Primary200);
+    --eye-PrimaryHueLightForegroundBrush: var(--eye-Primary200Foreground);
+    --eye-PrimaryHueMidBrush: var(--eye-Primary500);
+    --eye-PrimaryHueMidForegroundBrush: var(--eye-Primary500Foreground);
+    --eye-PrimaryHueDarkBrush: var(--eye-Primary500Foreground);
+    --eye-PrimaryHueDarkForegroundBrush: var(--eye-Primary700Foreground);
+    --eye-SecondaryHueMidBrush: var(--eye-Accent700);
+    --eye-SecondaryHueMidForegroundBrush: var(--eye-Accent700Foreground);
+
+    --eye-MaterialDesignValidationErrorColor: #CF6679;
+    --eye-MaterialDesignBackground: #000000;
+    --eye-MaterialDesignPaper: #303030;
+    --eye-MaterialDesignPaperDark: #252525;
+    --eye-MaterialDesignCardBackground: #424242;
+    --eye-MaterialDesignToolBarBackground: #212121;
+    --eye-MaterialDesignBody: #FFFFFFDD;
+    --eye-MaterialDesignBodyLight: #FFFFFF89;
+    --eye-MaterialDesignColumnHeader: #FFFFFFBC;
+    --eye-MaterialDesignCheckBoxOff: #FFFFFF89;
+    --eye-MaterialDesignCheckBoxDisabled: #647076;
+    --eye-MaterialDesignTextBoxBorder: #FFFFFF89;
+    --eye-MaterialDesignDivider: #FFFFFF1F;
+    --eye-MaterialDesignSelection: #757575;
+    --eye-MaterialDesignToolForeground: #616161;
+    --eye-MaterialDesignToolBackground: #e0e0e0;
+    --eye-MaterialDesignFlatButtonClick: #75757519;
+    --eye-MaterialDesignFlatButtonRipple: #B6B6B6;
+    --eye-MaterialDesignToolTipBackground: #eeeeee;
+    --eye-MaterialDesignChipBackground: #2E3C43;
+    --eye-MaterialDesignSnackbarBackground: #CDCDCD;
+    --eye-MaterialDesignSnackbarMouseOver: #B9B9BD;
+    --eye-MaterialDesignSnackbarRipple: #494949;
+    --eye-MaterialDesignTextFieldBoxBackground: #FFFFFF1A;
+    --eye-MaterialDesignTextFieldBoxHoverBackground: #FFFFFF1F;
+    --eye-MaterialDesignTextFieldBoxDisabledBackground: #FFFFFF0D;
+    --eye-MaterialDesignTextAreaBorder: #FFFFFFBC;
+    --eye-MaterialDesignTextAreaInactiveBorder: #FFFFFF29;
+    --eye-MaterialDesignDataGridRowHoverBackground: #FFFFFF14;
+    --eye-MahAccentBrush: rgba(17, 113, 188, 0.56);
+
+    --eye-font-family: system-ui, -apple-system, Roboto, "Segoe UI", "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    --eye-PoeShallow: #11FFFFFF;
+    --eye-PoeFontColor: #FFFEEAC5;
+    --eye-PoeBgColor: #AA030303;
+    --eye-PoeSemiTransparentBgColor: #88030303;
+    --eye-PoeSemiTransparentFontColor: #88FEEAC5;
+
+    --eye-PoeItemElementalStatColor: #FF8CACBC;
+    --eye-PoeItemPhysicalStatColor: #FFFFFB8C;
+
+    --eye-PoeItemDexStatColor: #FF29BA55;
+    --eye-PoeItemStrStatColor: #FFE16043;
+    --eye-PoeItemIntStatColor: #FF4479A9;
+
+    --eye-PoeItemRarityNormalColor: White;
+    --eye-PoeItemRarityMagicColor: #5050EB;
+    --eye-PoeItemRarityRareColor: #A39E1B;
+    --eye-PoeItemRarityUniqueColor: #AF6025;
+    --eye-PoeItemRarityRelicColor: #82AD6A;
+
+    --eye-PositiveColor: LimeGreen;
+    --eye-WarningColor: Orange;
+    --eye-NegativeColor: IndianRed;
+    --eye-NeutralColor: Yellow;
+
+    --eye-OverlayWindowBorderColorKey: #1A6A73;
+    --eye-OverlayWindowTitleBackgroundColorKey: #343E3D;
+    --eye-OverlayWindowBackgroundColorKey: #292C2A;
+    --eye-OverlayWindowTextColorKey: #EEC64C;
+    --eye-PopupWindowBackgroundColorKey: #FF424242;
+
+    --eye-MouseOverAccentColorKey: #80d8ff;
+    --eye-ButtonTextAccentColorKey: #EEC64C;
+    --eye-TransparentColorKey: #00000000;
+    --eye-OverlayBorderColorKey: #1A6A73;
+    --eye-OverlayTitleBackgroundColorKey: #343E3D;
+    --eye-OverlayTitleColorKey: #EEC64C;
+    --eye-OverlayAlternateBackgroundColorKey: #303030;
+    --eye-OverlayBackgroundColorKey: #292C2A;
+    --eye-OverlayForegroundColorKey: White;
+}

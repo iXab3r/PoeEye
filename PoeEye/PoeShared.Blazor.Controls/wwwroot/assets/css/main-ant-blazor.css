@@ -27,6 +27,10 @@
     --bs-badge-color: white;
 }
 
+.card {
+    background-color: rgba(69, 88, 113, 0.5);
+}
+
 .ant-divider {
     background-color: var(--bs-border-color);
 }
