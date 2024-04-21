@@ -21,6 +21,8 @@ public static class AwesomeIcons
     public const string ArrowCircleDown = "\uf0ab";
     public const string ArrowCircleOutlinedDown = "\uf01a";
     public const string AuraHasOverlay = "\uf03e";
+    public const string Ban = "\uf05e";
+    public const string Book = "\uf02d";
     public const string OnEnterActions = "\uf090";
     public const string WhileActiveActions = "\uf021";
     public const string OnExitActions = "\uf08b";
@@ -112,6 +114,7 @@ public static class AwesomeIcons
     public const string Youtube = "\uf167";
     public const string User = "\uf007";
     public const string UserCircle = "\uf2bd";
+    public const string Users = "\uf0c0";
     public const string UserSecret = "\uf21b";
     public const string UserShield = "\uf505";
     public const string Zoom = "\uf002";
