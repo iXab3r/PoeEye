@@ -23,6 +23,7 @@ public static class AwesomeIcons
     public const string AuraHasOverlay = "\uf03e";
     public const string Ban = "\uf05e";
     public const string Book = "\uf02d";
+    public const string Bullhorn = "\uf0a1";
     public const string OnEnterActions = "\uf090";
     public const string WhileActiveActions = "\uf021";
     public const string OnExitActions = "\uf08b";
@@ -48,6 +49,8 @@ public static class AwesomeIcons
     public const string Download = "\uf019";
     public const string Eyedropper = "\uf1fb";
     public const string EditIcon = "\uf044";
+    public const string Envelope = "\uf0e0";
+    public const string EnvelopeOpen = "\uf2b6";
     public const string ErrorIcon = "\uf06a";
     public const string ExpandedDirectory = "\uf115";
     public const string Exclamation = "\uf06a";
