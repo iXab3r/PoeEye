@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using DynamicData;
 
 namespace PoeShared.Blazor.Scaffolding;
 
@@ -15,6 +16,11 @@ public sealed class ReactiveTrackerList : List<IObservable<string>>
     public void Add(params IObservable<string>[] sources)
     {
         AddRange(sources);
+    }
+    
+    public void Add<TOut>(IObservable<IChangeSet<TOut>> changeSetObservable)
+    {
+        Add(changeSetObservable.Select(x =>  new{ x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes }));
     }
     
     public void Add<T>(IObservable<T> source)

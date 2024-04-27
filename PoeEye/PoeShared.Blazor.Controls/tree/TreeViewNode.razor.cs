@@ -16,7 +16,8 @@ namespace PoeShared.Blazor.Controls;
 
 public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 {
-    private static long nextNodeId;
+    private readonly ClassMapper classMapper = new();
+    
     private bool disableCheckbox;
     private bool disabled;
     private bool dragTarget;
@@ -25,11 +26,10 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     private string key;
     private bool selected;
     private string title;
-    private readonly ClassMapper classMapper = new();
 
     public TreeViewNode()
     {
-        NodeId = Interlocked.Increment(ref nextNodeId);
+        NodeId = TreeViewHelper.GetNextNodeId();
     }
 
     [CascadingParameter(Name = "Tree")] public TreeView<TItem> TreeComponent { get; set; }
@@ -105,16 +105,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
     [Parameter] public bool Expanded { get; set; }
 
-    [Parameter] public bool Checked { get; set; }
-
     [Parameter] public bool Indeterminate { get; set; }
-
-    [Parameter]
-    public bool DisableCheckbox
-    {
-        get { return disableCheckbox || (TreeComponent?.DisableCheckKeys?.Any(k => k == Key) ?? false); }
-        set => disableCheckbox = value;
-    }
 
     [Parameter] public bool Draggable { get; set; }
 
@@ -309,18 +300,13 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         selected = value;
         if (value)
         {
-            if (!(TreeComponent.Multiple && TreeComponent.IsCtrlKeyDown))
-            {
-                TreeComponent.DeselectAll();
-            }
-
             TreeComponent.SelectedNodeAdd(this);
         }
         else
         {
             TreeComponent.SelectedNodeRemove(this);
         }
-
+        
         StateHasChanged();
     }
 
@@ -368,7 +354,6 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             .If("ant-tree-treenode-disabled", () => Disabled)
             .If("ant-tree-treenode-switcher-open", () => SwitcherOpen)
             .If("ant-tree-treenode-switcher-close", () => SwitcherClose)
-            .If("ant-tree-treenode-checkbox-checked", () => Checked)
             .If("ant-tree-treenode-checkbox-indeterminate", () => Indeterminate)
             .If("ant-tree-treenode-selected", () => Selected)
             .If("ant-tree-treenode-loading", () => Loading)
@@ -392,7 +377,11 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     public async Task Expand(bool expanded)
     {
         SetExpanded(expanded);
-        await TreeComponent?.OnNodeExpand(this, Expanded, new MouseEventArgs());
+        var tree = TreeComponent;
+        if (tree != null)
+        {
+            await tree.OnNodeExpand(this, Expanded, new MouseEventArgs());
+        }
     }
 
     internal async Task ExpandAll()
@@ -415,260 +404,16 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     {
         Expanded = !Expanded;
 
-        await TreeComponent?.OnNodeExpand(this, Expanded, args);
+        var tree = TreeComponent;
+        if (tree != null)
+        {
+            await tree.OnNodeExpand(this, Expanded, args);
+        }
     }
 
     internal void SetLoading(bool loading)
     {
         Loading = loading;
-    }
-
-    internal void OpenPropagation(bool unhide = false)
-    {
-        Expand(true);
-        if (unhide)
-        {
-            Hidden = false;
-        }
-
-        if (ParentNode != null)
-        {
-            ParentNode.OpenPropagation(unhide);
-        }
-    }
-
-    private async void OnCheckBoxClick(MouseEventArgs args)
-    {
-        if (DisableCheckbox)
-        {
-            return;
-        }
-
-        SetChecked(!Checked);
-        if (TreeComponent.OnCheck.HasDelegate)
-        {
-            await TreeComponent.OnCheck.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, this, args));
-        }
-    }
-
-    public void SetSingleNodeChecked(bool check)
-    {
-        if (check == Checked)
-        {
-            return;
-        }
-
-        if (Disabled)
-        {
-            return;
-        }
-
-        Checked = check;
-        StateHasChanged();
-    }
-
-    public void SetChecked(bool check)
-    {
-        if (Disabled)
-        {
-            return;
-        }
-
-        if (TreeComponent.CheckStrictly)
-        {
-            Checked = check;
-        }
-        else
-        {
-            SetChildChecked(this, check);
-            if (ParentNode != null)
-            {
-                ParentNode.UpdateCheckState();
-            }
-        }
-
-        TreeComponent.AddOrRemoveCheckNode(this);
-        StateHasChanged();
-    }
-
-    public void SetCheckedDefault(bool check)
-    {
-        if (TreeComponent.CheckStrictly)
-        {
-            Checked = check;
-        }
-        else
-        {
-            SetChildCheckedDefault(this, check);
-            if (ParentNode != null)
-            {
-                ParentNode.UpdateCheckStateDefault();
-            }
-        }
-
-        StateHasChanged();
-    }
-
-    private void SetChildChecked(TreeViewNode<TItem> subnode, bool check)
-    {
-        if (Disabled)
-        {
-            return;
-        }
-
-        Checked = DisableCheckbox ? false : check;
-        Indeterminate = false;
-        TreeComponent.AddOrRemoveCheckNode(this);
-        if (subnode.HasChildNodes)
-        {
-            foreach (var child in subnode.ChildNodes)
-            {
-                child?.SetChildChecked(child, check);
-            }
-        }
-    }
-
-    private void SetChildCheckedDefault(TreeViewNode<TItem> subnode, bool check)
-    {
-        Checked = check;
-        Indeterminate = false;
-        TreeComponent.AddOrRemoveCheckNode(this);
-        if (subnode.HasChildNodes)
-        {
-            foreach (var child in subnode.ChildNodes)
-            {
-                child?.SetChildCheckedDefault(child, check);
-            }
-        }
-    }
-
-    private void UpdateCheckState(bool? halfChecked = null)
-    {
-        if (halfChecked == true)
-        {
-            //If the child node is indeterminate, the parent node must is indeterminate.
-            Checked = false;
-            Indeterminate = true;
-        }
-        else if (HasChildNodes && !DisableCheckbox)
-        {
-            //Determines the selection status of the current node
-            var hasChecked = false;
-            var hasUnchecked = false;
-
-            foreach (var item in ChildNodes)
-            {
-                if (!item.DisableCheckbox && !item.Disabled)
-                {
-                    if (item.Indeterminate)
-                    {
-                        hasChecked = true;
-                        hasUnchecked = true;
-                        break;
-                    }
-
-                    if (item.Checked)
-                    {
-                        hasChecked = true;
-                    }
-                    else if (!item.Checked)
-                    {
-                        hasUnchecked = true;
-                    }
-                }
-            }
-
-            if (hasChecked && !hasUnchecked)
-            {
-                Checked = true;
-                Indeterminate = false;
-            }
-            else if (!hasChecked && hasUnchecked)
-            {
-                Checked = false;
-                Indeterminate = false;
-            }
-            else if (hasChecked && hasUnchecked)
-            {
-                Checked = false;
-                Indeterminate = true;
-            }
-        }
-
-        TreeComponent.AddOrRemoveCheckNode(this);
-
-        if (ParentNode != null)
-        {
-            ParentNode.UpdateCheckState(Indeterminate);
-        }
-
-        if (ParentNode == null)
-        {
-            StateHasChanged();
-        }
-    }
-
-    private void UpdateCheckStateDefault(bool? halfChecked = null)
-    {
-        if (halfChecked == true)
-        {
-            //If the child node is indeterminate, the parent node must is indeterminate.
-            Checked = false;
-            Indeterminate = true;
-        }
-        else if (HasChildNodes && !DisableCheckbox)
-        {
-            //Determines the selection status of the current node
-            var hasChecked = false;
-            var hasUnchecked = false;
-
-            foreach (var item in ChildNodes)
-            {
-                if (item.Indeterminate)
-                {
-                    hasChecked = true;
-                    hasUnchecked = true;
-                    break;
-                }
-
-                if (item.Checked)
-                {
-                    hasChecked = true;
-                }
-                else if (!item.Checked)
-                {
-                    hasUnchecked = true;
-                }
-            }
-
-            if (hasChecked && !hasUnchecked)
-            {
-                Checked = true;
-                Indeterminate = false;
-            }
-            else if (!hasChecked && hasUnchecked)
-            {
-                Checked = false;
-                Indeterminate = false;
-            }
-            else if (hasChecked && hasUnchecked)
-            {
-                Checked = false;
-                Indeterminate = true;
-            }
-        }
-
-        TreeComponent.AddOrRemoveCheckNode(this);
-
-        if (ParentNode != null)
-        {
-            ParentNode.UpdateCheckStateDefault(Indeterminate);
-        }
-
-        if (ParentNode == null)
-        {
-            StateHasChanged();
-        }
     }
 
     public IList<TItem> GetParentChildDataItems()
@@ -686,22 +431,22 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         ChildDataItems.Add(dataItem);
     }
 
-    public void AddNextNode(TItem dataItem)
+    public async Task AddNextNode(TItem dataItem)
     {
         var parentChildDataItems = GetParentChildDataItems();
         var index = parentChildDataItems.IndexOf(DataItem);
         parentChildDataItems.Insert(index + 1, dataItem);
 
-        AddNodeAndSelect(dataItem);
+        await AddNodeAndSelect(dataItem);
     }
 
-    public void AddPreviousNode(TItem dataItem)
+    public async Task AddPreviousNode(TItem dataItem)
     {
         var parentChildDataItems = GetParentChildDataItems();
         var index = parentChildDataItems.IndexOf(DataItem);
         parentChildDataItems.Insert(index, dataItem);
 
-        AddNodeAndSelect(dataItem);
+        await AddNodeAndSelect(dataItem);
     }
 
     public void Remove()
@@ -774,17 +519,17 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         parentChildDataItems.Insert(index + 1, DataItem);
     }
 
-    private void AddNodeAndSelect(TItem dataItem)
+    private async Task AddNodeAndSelect(TItem dataItem)
     {
         var tn = ChildNodes.FirstOrDefault(treeNode => treeNode.DataItem.Equals(dataItem));
         if (tn != null)
         {
-            Expand(true);
+            await Expand(true);
             tn.SetSelected(true);
         }
     }
 
-    internal void DragMoveInto(TreeViewNode<TItem> treeNode)
+    internal async Task DragMoveInto(TreeViewNode<TItem> treeNode)
     {
         if (TreeComponent.DataSource == null || !TreeComponent.DataSource.Any())
         {
@@ -800,10 +545,10 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
         treeNode.AddChildNode(DataItem);
         treeNode.IsLeaf = false;
-        treeNode.Expand(true);
+        await treeNode.Expand(true);
     }
 
-    internal void DragMoveDown(TreeViewNode<TItem> treeNode)
+    internal async Task DragMoveDown(TreeViewNode<TItem> treeNode)
     {
         if (TreeComponent.DataSource == null || !TreeComponent.DataSource.Any())
         {
@@ -816,12 +561,13 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
 
         Remove();
-        treeNode.AddNextNode(DataItem);
+        await treeNode.AddNextNode(DataItem);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        SetTreeViewNodeClassMapper();
+        await base.OnInitializedAsync();
+
         if (ParentNode != null)
         {
             ParentNode.AddNode(this);
@@ -833,11 +579,6 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
         TreeComponent.AddNode(this);
 
-        if (Checked)
-        {
-            SetChecked(true);
-        }
-
         if (TreeComponent.DisabledExpression != null)
         {
             Disabled = TreeComponent.DisabledExpression(this);
@@ -845,16 +586,11 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
         if (TreeComponent.ExpandedKeys != null)
         {
-            Expand(TreeComponent.ExpandedKeys.Any(k => k == Key));
+            await Expand(TreeComponent.ExpandedKeys.Any(k => k == Key));
         }
 
-        if (TreeComponent.Selectable && TreeComponent.SelectedKeys != null)
-        {
-            Selected = TreeComponent.SelectedKeys.Any(k => k == Key);
-            SetChecked(Selected);
-        }
-
-        base.OnInitialized();
+        Selected = !string.IsNullOrEmpty(TreeComponent.SelectedKey) && string.Equals(Key, TreeComponent.SelectedKey);
+        SetTreeViewNodeClassMapper();
     }
 
     public override string ToString()

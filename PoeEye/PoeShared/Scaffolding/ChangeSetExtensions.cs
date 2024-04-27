@@ -17,7 +17,7 @@ public static class ChangeSetExtensions
         return cache.Connect().RemoveKey().AsObservableList();
     }
 
-    [Obsolete("Contains some bug, do not use with further testing")]
+    [Obsolete("Contains some bug, do not use without further testing")]
     public static IObservable<IChangeSet<TObject>> Flatten<TObject>(this IObservable<IChangeSet<TObject>> source, Func<TObject, IObservable<IChangeSet<TObject>>> childrenAccessor)
     {
         return source.TransformMany(node =>

@@ -51,12 +51,6 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
         }
         
         SelfNode.SetSelected(true);
-        /*if (TreeComponent.OnClick.HasDelegate && args.Button == 0)
-        {
-            await TreeComponent.OnClick.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode, args));
-        }
-        */
-        TreeComponent.UpdateBindData();
     }
 
     private async Task OnDblClick(MouseEventArgs args)
@@ -75,10 +69,10 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
         }
     }
 
-    private void OnDragStart(DragEventArgs e)
+    private async Task OnDragStart(DragEventArgs e)
     {
         TreeComponent.DragItem = SelfNode;
-        SelfNode.Expand(false);
+        await SelfNode.Expand(false);
         
         /*if (TreeComponent.OnDragStart.HasDelegate)
         {
@@ -116,7 +110,7 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
     ///     Can be treated as a child if the target is moved to the right beyond the OffsetX distance
     /// </summary>
     /// <param name="e"></param>
-    private void OnDragOver(DragEventArgs e)
+    private async Task OnDragOver(DragEventArgs e)
     {
         if (TreeComponent.DragItem == SelfNode)
         {
@@ -127,7 +121,7 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
         {
             SelfNode.SetTargetBottom();
             SelfNode.SetParentTargetContainer();
-            SelfNode.Expand(true);
+            await SelfNode.Expand(true);
         }
         else
         {
@@ -136,7 +130,7 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
         }
     }
 
-    private void OnDrop(DragEventArgs e)
+    private async Task OnDrop(DragEventArgs e)
     {
         SelfNode.DragTarget = false;
         SelfNode.SetParentTargetContainer();
@@ -151,7 +145,7 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
         if (TreeComponent.OnDrop.HasDelegate)
         {
-            TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem, e, SelfNode.IsTargetBottom) {TargetNode = SelfNode});
+            await TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem, e, SelfNode.IsTargetBottom) {TargetNode = SelfNode});
         }
     }
 
