@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeShared.Services;
 using Unity;
 
 namespace PoeShared.Caching;
@@ -22,6 +24,11 @@ public static class CachingRegistrations
     
     public static void AddCommonService(this IServiceCollection services, IUnityContainer container)
     {
+        services.AddSingleton(sp => container.Resolve<IUniqueIdGenerator>());
+        services.AddSingleton(sp => container.Resolve<IClock>());
+        services.AddSingleton(sp => container.Resolve<IConfigSerializer>());
+        services.AddSingleton(sp => container.Resolve<IAppArguments>());
+        
         services.AddSingleton(container);
         services.AddTransient(typeof(IFactory<>), typeof(Factory<>));
     }

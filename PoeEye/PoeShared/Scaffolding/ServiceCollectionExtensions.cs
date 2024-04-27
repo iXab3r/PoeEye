@@ -36,13 +36,19 @@ public static class ServiceCollectionExtensions
 
         TryAdd(collection, typeof(TServiceType), typeof(TServiceImplementation), lifetime);
     }
+    
+    public static void AddHostedServiceOfType<T>(this IServiceCollection services) where T : class
+    {
+        services.AddFactory<T>();
+        services.AddHostedService<ServiceHosting<T>>();
+    }
 
     public static void AddHostedService<TService, TImplementation>(this IServiceCollection services)
         where TService : class, IHostedService
         where TImplementation : class, TService
     {
         services.AddSingleton<TService, TImplementation>();
-        services.AddHostedService<TService>(sp => sp.GetService<TService>());
+        services.AddHostedService<TService>(sp => sp.GetRequiredService<TService>());
     }
 
     public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
@@ -56,7 +62,7 @@ public static class ServiceCollectionExtensions
     public static void AddFactory<TService>(this IServiceCollection services)
         where TService : class
     {
-        services.AddSingleton<Func<TService>>(x => x.GetService<TService>);
+        services.AddSingleton<Func<TService>>(x => x.GetRequiredService<TService>);
         services.AddSingleton<IFactory<TService>, Factory<TService>>();
     }
 
