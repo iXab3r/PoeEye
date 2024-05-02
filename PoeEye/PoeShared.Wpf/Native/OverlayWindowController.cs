@@ -21,7 +21,7 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
 
     private readonly IScheduler overlayScheduler;
 
-    private readonly ISourceList<OverlayWindowView> windows = new SourceListEx<OverlayWindowView>();
+    private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
 
     public OverlayWindowController(IScheduler overlayScheduler)
     {

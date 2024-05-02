@@ -17,7 +17,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
     private readonly IConfigSerializer configSerializer;
 
     private readonly SourceCache<IPoeEyeConfig, string> loadedConfigsByType = new(ConfigProviderUtils.GetConfigName);
-    private readonly SourceListEx<IConfigProviderStrategy> strategies = new();
+    private readonly SourceList<IConfigProviderStrategy> strategies = new();
     private readonly NamedLock fileLock = new("ConfigLock");
     private string loadedConfigurationFile;
 

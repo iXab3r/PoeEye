@@ -8,7 +8,7 @@ internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCl
 {
     private static readonly IFluentLog Log = typeof(FolderCleanerService).PrepareLogger("FolderCleaner");
 
-    private readonly SourceListEx<DirectoryInfo> directoriesSource = new SourceListEx<DirectoryInfo>();
+    private readonly SourceList<DirectoryInfo> directoriesSource = new();
 
     public FolderCleanerService(IClock clock)
     {
