@@ -31,6 +31,10 @@ video {
     grid-auto-flow: row;
 }
 
+.flex-flow-wrap {
+    flex-flow: wrap;
+}
+
 .fa-fixed {
     padding-right: 3px;
 }
