@@ -1,4 +1,5 @@
 export * from './blazorUtils.input'
+export * from './blazorUtils.loader'
 
 import swal from 'sweetalert';
 import log from 'loglevel';

@@ -80,6 +80,11 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// Scrolls to the bottom of an element matching specified selector using jQuery.
     /// </summary>
     Task ScrollToBottom(string elementSelector);
+    
+    /// <summary>
+    /// Loads a JavaScript file dynamically and returns a promise that completes when the script loads.
+    /// </summary>
+    Task LoadScript(string scriptPath);
 
     Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default);
 
