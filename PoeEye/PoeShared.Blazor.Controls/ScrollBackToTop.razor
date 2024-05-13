@@ -1,0 +1,29 @@
+﻿@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+<button @onclick="@HandleBackToTopClick" id="backToTop" class="back-to-top">
+    <i class="arrow"></i><i class="arrow"></i>
+</button>
+
+@code {
+    public static readonly string JsFilePath = "./_content/PoeShared.Blazor.Controls/ScrollBackToTop.razor.js";
+    private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+
+    public ScrollBackToTop()
+    {
+        moduleTask = new Lazy<Task<IJSObjectReference>>(() => 
+            JsRuntime.InvokeAsync<IJSObjectReference>("import", JsFilePath).AsTask());
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        var module = await moduleTask.Value;
+        await module.InvokeVoidAsync("initializeBackToTop");
+    }
+
+    private async Task HandleBackToTopClick()
+    {
+        await JsRuntime.InvokeVoidAsync("scrollTo", 0, 0);
+    }
+}
