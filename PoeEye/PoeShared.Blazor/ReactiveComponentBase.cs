@@ -108,12 +108,12 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     /// <summary>
     /// Indicates whether the component is loaded. Set after the first OnParametersSet call.
     /// </summary>
-    public bool IsLoaded { get; private set; }
+    public bool IsComponentLoaded { get; private set; }
     
     /// <summary>
     /// Indicates whether the component is rendered. Set after the first OnAfterRender call.
     /// </summary>
-    public bool IsRendered { get; private set; }
+    public bool IsComponentRendered { get; private set; }
     
     /// <summary>
     /// Controls rendering process - if set, StateHasChanged will be called only when there is at least one change detected
@@ -199,7 +199,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         if (firstRender)
         {
             await OnAfterFirstRenderAsync();
-            IsRendered = true;
+            IsComponentRendered = true;
         }
     }
 
@@ -225,7 +225,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        IsLoaded = true;
+        IsComponentLoaded = true;
     }
 
     /// <inheritdoc />
