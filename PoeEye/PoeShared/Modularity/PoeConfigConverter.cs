@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -241,15 +242,30 @@ internal sealed class PoeConfigConverter : JsonConverter
     {
         using var tokenReader = new JTokenReader(token);
         skipNext = true;
-        return serializer.Deserialize(tokenReader, type);
+        try
+        {
+            return serializer.Deserialize(tokenReader, type);
+        }
+        catch (Exception e)
+        {
+            throw new SerializationException($"Failed to deserialize token to type {type}: {token.ToString().TakeMidChars(128)}", e);
+        }
     }
 
     private JToken SerializeToToken(JsonSerializer serializer, object valueToSerialize)
     {
         using var tokenWriter = new JTokenWriter();
         skipNext = true;
-        serializer.Serialize(tokenWriter, valueToSerialize);
-        return tokenWriter.Token;
+        
+        try
+        {
+            serializer.Serialize(tokenWriter, valueToSerialize);
+            return tokenWriter.Token;
+        }
+        catch (Exception e)
+        {
+            throw new SerializationException($"Failed to serialize value: {valueToSerialize}", e);
+        }
     }
 
     private static object GetMetadataValue(PoeConfigMetadata metadata)

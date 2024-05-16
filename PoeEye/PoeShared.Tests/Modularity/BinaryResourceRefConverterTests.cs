@@ -371,7 +371,7 @@ public class BinaryResourceRefConverterTests : FixtureBase
             Hash = "someSHA1",
             Data = Convert.FromBase64String("VGhpcyBpcyBzb21lIGRhdGE="), // Sample base64 data
             FileName = "sample.txt",
-            ContentType = new ContentType("text/plain"),
+            ContentType = new MimeContentType("text/plain"),
             ContentLength = 123,
             LastModified = DateTimeOffset.Parse("2021-01-01T12:00:00Z")
         };

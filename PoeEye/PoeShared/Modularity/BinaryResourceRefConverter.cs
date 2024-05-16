@@ -19,7 +19,7 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                 byte[] data = null;
                 int? contentLength = null;
                 DateTimeOffset? lastModified = null;
-                ContentType contentType = null;
+                MimeContentType? contentType = null;
 
                 while (reader.Read())
                 {
@@ -55,7 +55,7 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                             }
                             case nameof(BinaryResourceRef.ContentType):
                             {
-                                contentType = new ContentType(reader.ReadAsString());
+                                contentType = new MimeContentType(reader.ReadAsString());
                                 break;
                             }
                             case nameof(BinaryResourceRef.Data):

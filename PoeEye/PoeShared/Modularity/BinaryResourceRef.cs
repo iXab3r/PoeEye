@@ -37,7 +37,7 @@ public sealed record BinaryResourceRef : IHasValidation
     /// <summary>
     /// Gets the MIME type of the binary resource.
     /// </summary>
-    public ContentType ContentType { get; init; }
+    public MimeContentType? ContentType { get; init; }
     
     /// <summary>
     /// Gets the file name of the binary resource, if applicable.

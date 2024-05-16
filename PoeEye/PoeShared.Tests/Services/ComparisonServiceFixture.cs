@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Numerics;
 using PoeShared.Modularity;
 using PoeShared.Services;
@@ -8,7 +9,7 @@ using PoeShared.Tests.Helpers;
 namespace PoeShared.Tests.Services;
 
 [TestFixture]
-internal class ComparisonServiceFixtureTests : FixtureBase
+internal class ComparisonServiceFixture : FixtureBase
 {
     [Test]
     public void ShouldCreate()
@@ -34,6 +35,21 @@ internal class ComparisonServiceFixtureTests : FixtureBase
 
         //Then
         result.AreEqual.ShouldBe(expectedEquality);
+    }
+
+    [Test]
+    public void ShouldThrowOnContentType()
+    {
+        //Given
+        var instance = CreateInstance();
+        var contentType1 = new ContentType(WellKnownContentTypes.Avi.MediaType);
+        var contentType2 = new ContentType(WellKnownContentTypes.BinaryBgr24.MediaType);
+
+        //When
+        var action = () => instance.Compare(contentType1, contentType2);
+
+        //Then
+
     }
 
     public static IEnumerable<TestCaseData> ShouldCompareCases()

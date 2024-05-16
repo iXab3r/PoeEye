@@ -1,4 +1,4 @@
-using System.Net.Mime;
+using PoeShared.Modularity;
 
 namespace PoeShared.Services;
 
@@ -395,7 +395,7 @@ public sealed class MimeContentTypeProvider : LazyReactiveObject<MimeContentType
     /// <summary>Given a file path, determine the MIME type</summary>
     /// <param name="path">A file path</param>
     /// <returns>MIME type</returns>
-    public ContentType GetContentTypeOrDefault(string path)
+    public MimeContentType? GetContentTypeOrDefault(string path)
     {
         if (!TryGetContentType(path, out var contentType))
         {
@@ -409,7 +409,7 @@ public sealed class MimeContentTypeProvider : LazyReactiveObject<MimeContentType
     /// <param name="path">A file path</param>
     /// <param name="contentType">The resulting MIME type</param>
     /// <returns>True if MIME type could be determined</returns>
-    public bool TryGetContentType(string path, out ContentType contentType)
+    public bool TryGetContentType(string path, out MimeContentType? contentType)
     {
         var extension = GetExtension(path);
         if (extension == null)
@@ -424,7 +424,7 @@ public sealed class MimeContentTypeProvider : LazyReactiveObject<MimeContentType
             return false;
         }
 
-        contentType = new ContentType(contentTypeString);
+        contentType = new MimeContentType(contentTypeString);
         return true;
     }
 
