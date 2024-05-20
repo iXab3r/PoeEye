@@ -39,6 +39,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommandWrapper
 
     private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)
     {
+#if WINDOWS // this code makes sense only for Windows / WPF
         var actualScheduler = DispatcherScheduler.Current;
         if (actualScheduler != null && actualScheduler.Dispatcher.Thread == scheduler.Dispatcher.Thread)
         {
@@ -50,6 +51,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommandWrapper
         {
             Debugger.Break();
         }
+#endif
     }
 
     public static CommandWrapper FromDelegateCommand(DelegateCommandBase command)
