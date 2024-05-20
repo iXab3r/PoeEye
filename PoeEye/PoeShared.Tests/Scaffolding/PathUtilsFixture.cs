@@ -3,6 +3,7 @@ using AutoFixture;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Meziantou.Framework;
 using PoeShared.Scaffolding;
 using Shouldly;
@@ -301,7 +302,7 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("anotherExample.json", "anotherExample")]
     [TestCase("noExtension", "noExtension")]
     [TestCase(".hiddenFile", "")]
-    [TestCase("complex.file.name.txt", "complex")]
+    [TestCase("complex.file.name.txt", "complex.file.name")]
     [TestCase("a", "a")]
     [TestCase("", "")]
     [TestCase(null, null)]
@@ -309,7 +310,39 @@ public class PathUtilsFixture : FixtureBase
     {
         // Given
         // When
-        var fileName = PathUtils.GetFileNameWithoutExtension(path);
+        var fileName = Path.GetFileNameWithoutExtension(path);
+
+        // Then
+        fileName.ShouldBe(expected);
+    }
+    
+    [Test]
+    [TestCase("example.txt", "example", new string[] { ".txt" })]
+    [TestCase("example.archive.log", "example.archive", new string[] { ".log" })]
+    [TestCase("example.tar.gz", "example", new string[] { ".gz", ".tar" })]
+    [TestCase("example.tar.gz", "example.tar", new string[] { ".gz" })]
+    [TestCase("example.tar.gz", "example.tar.gz", new string[] { ".zip" })]
+    [TestCase("example.", "example", new string[] { "." })]
+    [TestCase("example..", "example", new string[] { "." })]
+    [TestCase("example.test.json", "example.test", new string[] { ".json" })]
+    [TestCase("example.test.json", "example", new string[] { ".json", ".test" })]
+    [TestCase("example.tar.gz.backup", "example.tar.gz", new string[] { ".backup" })]
+    [TestCase("example.tar.gz.backup", "example.tar", new string[] { ".backup", ".gz" })]
+    [TestCase("example.tar.gz.backup", "example", new string[] { ".backup", ".gz", ".tar" })]
+    [TestCase("example", "example", new string[] { ".txt", ".log" })]
+    [TestCase("archive.tar.gz", "archive", new string[] { ".tar", ".gz" })]
+    [TestCase("archive.tar.gz.zip", "archive.tar.gz", new string[] { ".zip" })]
+    [TestCase("archive.tar.gz.zip", "archive.tar", new string[] { ".zip", ".gz" })]
+    [TestCase("file.with.many.dots.ext", "file.with.many.dots", new string[] { ".ext" })]
+    [TestCase("file.with.many.dots.ext", "file.with.many", new string[] { ".ext", ".dots" })]
+    [TestCase("file..double.dots..ext", "file..double.dots.", new string[] { ".ext" })]
+    [TestCase("", "", new string[] { ".txt" })]
+    [TestCase(null, null, new string[] { ".txt" })]
+    public void ShouldRemoveExtensions(string path, string expected, params string[] extensions)
+    {
+        // Given
+        // When
+        var fileName = PathUtils.RemoveExtensions(path, extensions.ToHashSet());
 
         // Then
         fileName.ShouldBe(expected);

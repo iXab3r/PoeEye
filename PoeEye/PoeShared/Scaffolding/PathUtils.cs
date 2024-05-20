@@ -146,45 +146,54 @@ public static class PathUtils
     }
 
     /// <summary>
-    /// Gets the file name from the specified path string without the extension.
+    /// Removes known extensions from the given file path until an unknown extension is encountered.
     /// </summary>
-    /// <param name="path">The file path.</param>
-    /// <returns>The file name without the extension, or null if the path is null.</returns>
-    public static string GetFileNameWithoutExtension(string path)
+    /// <param name="path">The file path from which to remove extensions.</param>
+    /// <param name="knownExtensions">A set of known extensions that should be removed from the path.</param>
+    /// <returns>
+    /// The file path without the known extensions. If no known extensions are found, the original path is returned.
+    /// </returns>
+    /// <remarks>
+    /// This method iteratively removes the extensions from the end of the file path as long as the extensions are present in the provided set of known extensions.
+    /// If an extension is encountered that is not in the set of known extensions, the method stops and returns the current path.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// ISet<string> knownExtensions = new HashSet<string> { ".txt", ".log" };
+    /// string path = "example.archive.log";
+    /// string result = RemoveExtensions(path, knownExtensions);
+    /// // result is "example.archive"
+    /// </code>
+    /// </example>
+    public static string RemoveExtensions(string path, ISet<string> knownExtensions)
     {
-        if (path == null)
-        {
-            return null;
-        }
-
-        var result = GetFileNameWithoutExtension(path.AsSpan());
-        if (path.Length == result.Length)
+        if (string.IsNullOrEmpty(path))
         {
             return path;
         }
+        
+        var currentPath = path;
+        
+        while (true)
+        {
+            var isMatch = false;
+            foreach (var extension in knownExtensions)
+            {
+                if (currentPath.EndsWith(extension))
+                {
+                    currentPath = currentPath.Substring(0, currentPath.Length - extension.Length);
+                    isMatch = true;
+                    break;
+                }
+            }
 
-        return result.ToString();
-    }
+            if (!isMatch)
+            {
+                break;
+            }
+        }
 
-    /// <summary>
-    /// Returns the file name without the extension from a ReadOnlySpan<char> representing the path.
-    /// This method is useful for span-based parsing to avoid string allocations.
-    /// </summary>
-    /// <param name="path">The file path as a ReadOnlySpan<char>.</param>
-    /// <returns>A ReadOnlySpan<char> containing the file name without the extension.</returns>
-    /// <remarks>
-    /// This method operates on a ReadOnlySpan<char> to allow for more efficient memory usage
-    /// when working with substrings. If there is no extension in the path, the method returns
-    /// the file name as-is. If the path is empty or consists only of directory separators,
-    /// an empty ReadOnlySpan<char> is returned.
-    /// </remarks>
-    public static ReadOnlySpan<char> GetFileNameWithoutExtension(ReadOnlySpan<char> path)
-    {
-        var fileName = Path.GetFileName(path);
-        var firstPeriod = fileName.IndexOf('.');
-        return firstPeriod < 0
-            ? fileName
-            : fileName.Slice(0, firstPeriod);
+        return currentPath;
     }
 
     /// <summary>
