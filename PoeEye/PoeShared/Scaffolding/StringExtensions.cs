@@ -33,14 +33,15 @@ public static class StringExtensions
         return str[..left] + "..." + str[^right..] + suffix;
     }
     
-    public static string TakeChars(this string str, int maxChars)
+    public static string TakeChars(this string str, int maxChars, bool addSuffix = false)
     {
         if (str == null || str.Length <= maxChars)
         {
             return str;
         }
 
-        return str[..maxChars] + $"... ({maxChars}+{str.Length - maxChars} chars)";
+        var suffix = addSuffix ? $" ({maxChars}+{str.Length - maxChars} chars)" : string.Empty;
+        return str[..maxChars] + $"..." + suffix;
     }
 
     public static string JoinStrings(this IEnumerable<string> obj, char separator)
