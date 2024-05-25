@@ -55,10 +55,10 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             }, Log.HandleUiException)
             .AddTo(Anchors);
             
-        Log.Debug($"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
+        Log.Info($"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
         RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
         LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
-        Log.Debug($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
+        Log.Info($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
         Binder.Attach(this).AddTo(Anchors);
     }
 

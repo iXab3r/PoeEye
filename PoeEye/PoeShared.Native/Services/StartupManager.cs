@@ -32,17 +32,17 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
         try
         {
             manager = new StartupHelper.StartupManager(
-                args.ExecutablePath,
+                Environment.ProcessPath,
                 args.UniqueAppName, 
                 RegistrationScope.Local,
                 true,
                 StartupProviders.Task,
                 args.AutostartFlag ?? appArguments.AutostartFlag);
-            Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
+            Log.Info($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
                 
             if (IsElevated)
             {
-                Log.Warn($"Application has Admin privileges, initializing startup manager");
+                Log.Info($"Application has Admin privileges, initializing startup manager");
                 Reregister();
             }
             else
@@ -106,7 +106,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
         EnsureManagerIsReady();
         if (manager.IsRegistered)
         {
-            Log.Debug($"Reregistering application startup");
+            Log.Debug($"Re-registering application startup");
             Unregister();
             Register();
         }
