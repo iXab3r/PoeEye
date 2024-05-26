@@ -91,6 +91,12 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         var module = await GetModuleAsync();
         await module.InvokeVoidAsync("loadScript", scriptPath);
     }
+    
+    public async Task LoadCss(string cssPath)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("loadCss", cssPath);
+    }
 
     public async Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default)
     {

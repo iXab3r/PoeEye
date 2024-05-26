@@ -129,7 +129,6 @@ td.ant-table-column-sort {
 
 input,
 textarea,
-.CodeMirror,
 .editor-preview {
     background: var(--bs-body-bg);
     color: inherit;

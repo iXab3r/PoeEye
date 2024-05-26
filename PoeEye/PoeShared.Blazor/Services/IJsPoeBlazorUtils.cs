@@ -85,6 +85,11 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// Loads a JavaScript file dynamically and returns a promise that completes when the script loads.
     /// </summary>
     Task LoadScript(string scriptPath);
+    
+    /// <summary>
+    /// Loads CSS file dynamically
+    /// </summary>
+    Task LoadCss(string cssPath);
 
     Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default);
 
