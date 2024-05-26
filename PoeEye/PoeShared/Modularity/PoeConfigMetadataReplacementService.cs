@@ -78,11 +78,12 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             .StartWith(metadata);
     }
 
-    public PoeConfigMetadata ReplaceIfNeeded(PoeConfigMetadata metadata)
+    public bool TryGetReplacement(PoeConfigMetadata metadata, out PoeConfigMetadata replacementMetadata)
     {
         if (string.IsNullOrWhiteSpace(metadata.TypeName))
         {
-            return metadata;
+            replacementMetadata = default;
+            return false;
         }
 
         using var @lock = substitutionsLock.Enter();
@@ -91,7 +92,8 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
         
         if (!replacementsBySourceType.TryGetValue(metadata.TypeName, out var resolvedMetadata))
         {
-            return metadata;
+            replacementMetadata = default;
+            return false;
         }
 
         var replacement = metadata with
@@ -99,8 +101,8 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             AssemblyName = resolvedMetadata.TargetMetadata.AssemblyName,
             TypeName = resolvedMetadata.TargetMetadata.TypeName
         };
-        Log.Debug($"Replacing legacy metadata: {metadata} => {replacement}");
-        return replacement;
+        replacementMetadata = replacement;
+        return true;
     }
 
     private void EnsureQueueIsProcessed()

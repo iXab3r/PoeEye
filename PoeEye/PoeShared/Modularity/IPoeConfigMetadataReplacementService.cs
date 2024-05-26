@@ -5,11 +5,12 @@ internal interface IPoeConfigMetadataReplacementService : IPoeConfigMetadataRepl
     bool AutomaticallyLoadReplacements { get; set; }
 
     /// <summary>
-    /// Replaces metadata(matched by type name) if replacement is registered
+    /// Looks up replacement metadata metadata, matched by type name
     /// </summary>
     /// <param name="metadata"></param>
-    /// <returns></returns>
-    PoeConfigMetadata ReplaceIfNeeded(PoeConfigMetadata metadata);
+    /// <param name="replacementMetadata"></param>
+    /// <returns>True if replacement was found</returns>
+    bool TryGetReplacement(PoeConfigMetadata metadata, out PoeConfigMetadata replacementMetadata);
 
     /// <summary>
     ///

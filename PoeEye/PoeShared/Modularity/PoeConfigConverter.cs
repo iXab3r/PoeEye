@@ -144,15 +144,20 @@ internal sealed class PoeConfigConverter : JsonConverter
             ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
             : serializer.Deserialize<PoeConfigMetadata>(reader);
         
-        var result = replacementService.ReplaceIfNeeded(metadata);
-        if (result == null)
+        if (!replacementService.TryGetReplacement(metadata, out var replacementMetadata))
+        {
+            Log.Debug($"Replacing legacy metadata: {metadata} => {replacementMetadata}");
+            return metadata;
+        }
+        
+        if (replacementMetadata == null)
         {
             throw new PoeConfigException($"Replacement service returned null for metadata: {metadata}")
             {
                 Metadata = metadata,
             };
         }
-        return result;
+        return replacementMetadata;
     }
 
     private object DeserializeMetadataValue(PoeConfigMetadata metadata, JsonSerializer serializer, Type resolvedValueType)

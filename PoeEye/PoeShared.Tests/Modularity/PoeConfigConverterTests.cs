@@ -15,11 +15,18 @@ public class PoeConfigConverterTests : FixtureBase
     private Mock<IPoeConfigMetadataReplacementService> replacementService;
     private PoeConfigConverter configConverter;
 
+    private delegate void TryGetReplacementDelegate(PoeConfigMetadata input, out PoeConfigMetadata output);
+
     protected override void SetUp()
     {
         migrationService = new Mock<IPoeConfigConverterMigrationService>();
         replacementService = new Mock<IPoeConfigMetadataReplacementService>();
-        replacementService.Setup(x => x.ReplaceIfNeeded(It.IsAny<PoeConfigMetadata>())).Returns((PoeConfigMetadata y) => y);
+
+        PoeConfigMetadata replacementMetadata;
+        replacementService
+            .Setup(x => x.TryGetReplacement(It.IsAny<PoeConfigMetadata>(), out replacementMetadata))
+            .Returns((PoeConfigMetadata _, PoeConfigMetadata _) => false);
+        
         configConverter = new PoeConfigConverter(replacementService.Object, migrationService.Object);
     }
 
@@ -279,7 +286,13 @@ public class PoeConfigConverterTests : FixtureBase
             Version = 1
         };
         var destinationMetadata = new PoeConfigMetadata();
-        replacementService.Setup(x => x.ReplaceIfNeeded(It.Is<PoeConfigMetadata>(y => y.TypeName == sourceMetadata.TypeName))).Returns(destinationMetadata);
+        
+        PoeConfigMetadata replacementMetadata;
+        replacementService
+            .Setup(x => x.TryGetReplacement(It.Is<PoeConfigMetadata>(y => y.TypeName == sourceMetadata.TypeName), out replacementMetadata))
+            .Callback(new TryGetReplacementDelegate((PoeConfigMetadata input, out PoeConfigMetadata output) => { output = destinationMetadata; }))
+            .Returns((PoeConfigMetadata _, PoeConfigMetadata _) => true);
+        
         var serializedMetadata = instance.Serialize(sourceMetadata);
 
         //When
@@ -312,7 +325,11 @@ public class PoeConfigConverterTests : FixtureBase
         var sourceMetadata = new SampleConfig();
         var serializedMetadata = instance.Serialize(sourceMetadata);
 
-        replacementService.Setup(x => x.ReplaceIfNeeded(It.IsAny<PoeConfigMetadata>())).Returns(default(PoeConfigMetadata));
+        PoeConfigMetadata replacementMetadata;
+        replacementService
+            .Setup(x => x.TryGetReplacement(It.IsAny<PoeConfigMetadata>(), out replacementMetadata))
+            .Callback(new TryGetReplacementDelegate((PoeConfigMetadata input, out PoeConfigMetadata output) => { output = default; }))
+            .Returns((PoeConfigMetadata _, PoeConfigMetadata _) => true);
 
         //When
         var action = () =>  instance.Deserialize<PoeConfigMetadata>(serializedMetadata);
