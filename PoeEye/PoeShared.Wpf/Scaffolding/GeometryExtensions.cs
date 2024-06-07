@@ -465,6 +465,16 @@ public static class GeometryExtensions
             Y = (int) source.Y
         };
     }
+    
+    public static WpfPoint ToWpfPoint(this PointF point)
+    {
+        return new WpfPoint(point.X, point.Y);
+    }
+    
+    public static PointF ToPointF(this WpfPoint point)
+    {
+        return new PointF((float)point.X, (float)point.Y);
+    }
 
     public static Rect ToWpfRectangle(this Rectangle sourceSize)
     {
