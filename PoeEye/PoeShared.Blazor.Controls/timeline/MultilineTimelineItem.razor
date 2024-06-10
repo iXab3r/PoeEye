@@ -1,0 +1,35 @@
+@namespace PoeShared.Blazor.Controls
+@using DynamicData
+@inherits PoeShared.Blazor.BlazorReactiveComponent<MultilineTimelineEntry>
+
+<ReactiveSection Trackers="@(new() {DataContext.TextLines, DataContext.WhenAnyValue(x => x.IsBusy, x => x.Text, x => x.ProgressPercent, x => x.IsHtml)})">
+    @if (DataContext.ProgressPercent != null)
+    {
+        <ProgressBar Value="@(DataContext.ProgressPercent ?? 0)" Class="align-self-center mx-2" Style="width: 50px;position: absolute;left: -90px;"/>
+    }
+
+    @{
+        var textLines = new List<string>();
+        if (!string.IsNullOrEmpty(DataContext.Text))
+        {
+            textLines.Add(DataContext.Text);
+        }
+
+        textLines.AddRange(DataContext.TextLines.Items);
+    }
+    <div class="d-grid-auto-flow-row">
+        @for (int i = 0; i < textLines.Count; i++)
+        {
+            var text = textLines[i];
+            var suffix = DataContext.IsBusy && i == textLines.Count - 1 ? "..." : string.Empty;
+            @if (DataContext.IsHtml)
+            {
+                <div>@((MarkupString) (text ?? string.Empty))</div>
+            }
+            else
+            {
+                <div>@text@suffix</div>
+            }
+        }
+    </div>
+</ReactiveSection>

@@ -506,3 +506,13 @@ pre code.hljs{
     background-color: rgba(0, 123, 255, 0.2); /* More noticeable background on click */
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125); /* Optional: subtle inset shadow for depth */
 }
+
+.progress-bar.indeterminate {
+    position: relative;
+    animation: progress-indeterminate 3s linear infinite;
+}
+
+@keyframes progress-indeterminate {
+    from { left: -25%; width: 25%; }
+    to { left: 100%; width: 25%;}
+}
