@@ -12,5 +12,5 @@ public interface ICommandWrapper : ICommand
    
     IObservable<object> WhenExecuted { get; }
    
-    Task ExecuteAsync(object parameter);
+    Task ExecuteAsync(object parameter = default);
 }
