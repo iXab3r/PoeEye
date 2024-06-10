@@ -1,4 +1,5 @@
 using System.IO;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
 
 namespace PoeShared.Tests.Blazor.Wpf.Scaffolding;

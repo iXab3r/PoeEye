@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Blazor.Wpf.Scaffolding;
+namespace PoeShared.Blazor.Scaffolding;
 
 public static class LocalFilesExtensions
 {

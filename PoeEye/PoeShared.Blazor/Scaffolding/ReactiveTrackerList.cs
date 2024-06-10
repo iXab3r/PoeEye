@@ -18,6 +18,11 @@ public sealed class ReactiveTrackerList : List<IObservable<string>>
         AddRange(sources);
     }
     
+    public void Add<TOut>(IObservableList<TOut> observableList)
+    {
+        Add(observableList.Connect());
+    }
+    
     public void Add<TOut>(IObservable<IChangeSet<TOut>> changeSetObservable)
     {
         Add(changeSetObservable.Select(x =>  new{ x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes }));
