@@ -24,6 +24,13 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         nodesByKey = nodesById
             .Connect()
             .ChangeKey(x => x.Key)
+            .OnItemAdded(item =>
+            {
+                if (ShowExpandedByDefault != null)
+                {
+                    item.SetExpanded(ShowExpandedByDefault.Value);
+                }
+            })
             .AsObservableCache()
             .AddTo(Anchors);
 
@@ -43,6 +50,9 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     [Parameter]
     public bool ShowExpand { get; set; } = true;
+    
+    [Parameter]
+    public bool? ShowExpandedByDefault { get; set; } 
 
     [Parameter]
     public bool ShowIcon { get; set; }
