@@ -6,9 +6,6 @@ namespace PoeShared.Modularity;
 
 /// <summary>
 /// Represents a reference to a binary resource, which can be either stored as binary data or referenced via a URI.
-/// <remarks>
-/// Important! Do not change to "record" as it will change comparison semantics(e.g. Data will be compared by value) 
-/// </remarks>
 /// </summary>
 public sealed record BinaryResourceRef : IHasValidation
 {
@@ -20,7 +17,18 @@ public sealed record BinaryResourceRef : IHasValidation
     public string Uri { get; init; }
     
     /// <summary>
-    /// Gets the xxHash hash of the binary data for integrity verification.
+    /// Gets the cipher suite - a combination of encryption, key exchange, and HMAC algorithms, null if not applicable (e.g. data is not encrypted)
+    /// </summary>
+    public string CipherSuite { get; init; } 
+    
+    /// <summary>
+    /// Gets the salt(optional), used in combination with password for decryption purposes
+    /// </summary>
+    public string CipherKeySalt { get; init; } 
+    
+    /// <summary>
+    /// Gets the hash of the binary data for integrity verification. If CipherSuite is not set, you can assume it is xxHash.
+    /// Hash is calculated on raw(decrypted) data and can be used for validation purposes.
     /// </summary>
     public string Hash { get; init; } 
     
@@ -60,6 +68,8 @@ public sealed record BinaryResourceRef : IHasValidation
     /// </summary>
     [JsonIgnore]
     public bool HasMetadata => !string.IsNullOrEmpty(Uri) || 
+                               !string.IsNullOrEmpty(CipherSuite) || 
+                               !string.IsNullOrEmpty(CipherKeySalt) || 
                                !string.IsNullOrEmpty(Hash) || 
                                !string.IsNullOrEmpty(FileName) || 
                                ContentType != null || 
@@ -70,6 +80,12 @@ public sealed record BinaryResourceRef : IHasValidation
     /// </summary>
     [JsonIgnore]
     public bool IsValid => !string.IsNullOrEmpty(Uri) || Data != null;
+    
+    /// <summary>
+    /// Gets a value indicating whether the resource is encrypted
+    /// </summary>
+    [JsonIgnore]
+    public bool IsEncrypted => !string.IsNullOrEmpty(CipherKeySalt) || !string.IsNullOrEmpty(CipherSuite);
 
     public sealed override string ToString()
     {
@@ -79,6 +95,8 @@ public sealed record BinaryResourceRef : IHasValidation
         {
             builder.AppendParameter(nameof(Data), ByteSizeLib.ByteSize.FromBytes(Data.LongLength));
         }
+        builder.AppendParameterIfNotDefault(nameof(CipherSuite), CipherSuite);
+        builder.AppendParameterIfNotDefault(nameof(CipherKeySalt), CipherKeySalt);
         builder.AppendParameterIfNotDefault(nameof(Hash), Hash);
         builder.AppendParameterIfNotDefault(nameof(FileName), FileName);
         builder.AppendParameterIfNotDefault(nameof(ContentType), ContentType);

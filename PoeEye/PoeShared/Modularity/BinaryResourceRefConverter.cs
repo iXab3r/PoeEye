@@ -16,6 +16,8 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                 string hash = null;
                 string uri = null;
                 string fileName = null;
+                string cipherSuite = null;
+                string cipherKeySalt = null;
                 byte[] data = null;
                 int? contentLength = null;
                 DateTimeOffset? lastModified = null;
@@ -33,6 +35,16 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                                 uri = reader.ReadAsString();
                                 break;
                             }
+                            case nameof(BinaryResourceRef.CipherSuite):
+                            {
+                                cipherSuite = reader.ReadAsString();
+                                break;
+                            }  
+                            case nameof(BinaryResourceRef.CipherKeySalt):
+                            {
+                                cipherKeySalt = reader.ReadAsString();
+                                break;
+                            } 
                             case nameof(BinaryResourceRef.Hash):
                             {
                                 hash = reader.ReadAsString();
@@ -75,6 +87,8 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                 {
                     Uri = uri,
                     Data = data,
+                    CipherSuite = cipherSuite,
+                    CipherKeySalt = cipherKeySalt,
                     Hash = hash,
                     ContentType = contentType,
                     ContentLength = contentLength,
@@ -84,6 +98,7 @@ public sealed class BinaryResourceRefConverter : JsonConverter
             }
             case JsonToken.String:
             {
+                //non-encrypted raw data array
                 var base64Data = reader.Value.ToString();
                 var data = string.IsNullOrEmpty(base64Data)
                     ? null
@@ -111,6 +126,18 @@ public sealed class BinaryResourceRefConverter : JsonConverter
             {
                 writer.WritePropertyName(nameof(binaryData.Uri));
                 writer.WriteValue(binaryData.Uri);
+            }
+            
+            if (!string.IsNullOrEmpty(binaryData.CipherSuite))
+            {
+                writer.WritePropertyName(nameof(binaryData.CipherSuite));
+                writer.WriteValue(binaryData.CipherSuite);
+            }
+            
+            if (!string.IsNullOrEmpty(binaryData.CipherKeySalt))
+            {
+                writer.WritePropertyName(nameof(binaryData.CipherKeySalt));
+                writer.WriteValue(binaryData.CipherKeySalt);
             }
 
             if (!string.IsNullOrEmpty(binaryData.FileName))
