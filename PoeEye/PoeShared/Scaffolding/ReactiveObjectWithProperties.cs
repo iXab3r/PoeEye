@@ -6,8 +6,5 @@ public abstract class ReactiveObjectWithProperties<TProperties> : DisposableReac
 {
     protected ReactiveObjectWithProperties(TProperties properties)
     {
-        InitialProperties = properties;
     }
-
-    protected TProperties InitialProperties { get; }
 }
