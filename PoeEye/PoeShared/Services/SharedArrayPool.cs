@@ -40,16 +40,16 @@ public sealed class SharedArrayPool<T> : LazyReactiveObject<SharedArrayPool<T>>,
     {
         if (minimumLength > LargeArraySize)
         {
-            Log.Debug($"Renting from large object pool {minimumLength}");
+            Log.Debug($"Renting from large object pool, length: {minimumLength}");
             var result = largeObjectPool.Rent(minimumLength);
-            Log.Debug($"Rented from large object {result.Length} (expected {minimumLength}");
+            Log.Debug($"Rented from large object, length: {result.Length} (expected {minimumLength}");
             return result;
         }
         else
         {
-            Log.Debug($"Renting from pool {minimumLength}");
+            Log.Debug($"Renting from pool, length: {minimumLength}");
             var result = sharedPool.Rent(minimumLength);
-            Log.Debug($"Rented from pool {result.Length} (expected {minimumLength}");
+            Log.Debug($"Rented from pool, length: {result.Length} (expected {minimumLength}");
             return result;
         }
        
@@ -57,15 +57,20 @@ public sealed class SharedArrayPool<T> : LazyReactiveObject<SharedArrayPool<T>>,
 
     public void Return(T[] array)
     {
+        Return(array, clearArray: false);
+    }
+
+    public void Return(T[] array, bool clearArray)
+    {
         if (array.Length >= LargeArraySize)
         {
-            Log.Debug($"Returning to large object pool {array.Length}");
-            sharedPool.Return(array, clearArray: false);
+            Log.Debug($"Returning to large object pool, length: {array.Length}");
+            largeObjectPool.Return(array, clearArray: clearArray);
         }
         else
         {
-            Log.Debug($"Returning to pool {array.Length}");
-            sharedPool.Return(array, clearArray: false);
+            Log.Debug($"Returning to pool, length: {array.Length}");
+            sharedPool.Return(array, clearArray: clearArray);
         }
     }
 }
