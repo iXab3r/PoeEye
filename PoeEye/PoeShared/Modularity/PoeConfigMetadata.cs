@@ -48,7 +48,7 @@ public record PoeConfigMetadata : IPoeEyeConfig
     }
 }
 
-public sealed record PoeConfigMetadata<T> : PoeConfigMetadata where T : IPoeEyeConfig
+public sealed record PoeConfigMetadata<T> : PoeConfigMetadata where T : class
 {
     public PoeConfigMetadata() : base(typeof(T))
     {

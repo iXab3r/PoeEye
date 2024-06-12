@@ -158,7 +158,7 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
         
     public T DeserializeOrDefault<T>(
         PoeConfigMetadata<T> metadata, 
-        Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : IPoeEyeConfig
+        Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : class
     {
         var log = Log.WithSuffix(metadata);
         if (metadata.Value == null)

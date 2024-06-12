@@ -6,7 +6,7 @@ public sealed record MetadataReplacement
             
     public PoeConfigMetadata TargetMetadata { get; set; }
 
-    public static MetadataReplacement ForType<T>(string sourceTypeName) where T : IPoeEyeConfig
+    public static MetadataReplacement ForType<T>(string sourceTypeName) where T : class, IPoeEyeConfig
     {
         return new MetadataReplacement()
         {

@@ -313,14 +313,12 @@ internal sealed class PoeConfigConverter : JsonConverter
         return PropertyBinder.Binder.ExpressionCompiler.Compile(lambda);
     }
         
-    private static TConfig GetMetadataTypedValue<TConfig>(PoeConfigMetadata<TConfig> metadata)
-        where TConfig : IPoeEyeConfig
+    private static TConfig GetMetadataTypedValue<TConfig>(PoeConfigMetadata<TConfig> metadata) where TConfig : class
     {
         return metadata.Value;
     }
 
-    private static void SetMetadataTypedValue<TConfig>(PoeConfigMetadata<TConfig> metadata, TConfig value)
-        where TConfig : IPoeEyeConfig
+    private static void SetMetadataTypedValue<TConfig>(PoeConfigMetadata<TConfig> metadata, TConfig value) where TConfig : class
     {
         metadata.Value = value;
     }

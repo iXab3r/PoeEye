@@ -22,7 +22,7 @@ public interface IConfigSerializer
 
     T DeserializeOrDefault<T>(
         PoeConfigMetadata<T> metadata,
-        Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : IPoeEyeConfig;
+        Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : class;
 
     T[] DeserializeSingleOrList<T>(string serializedData);
 
