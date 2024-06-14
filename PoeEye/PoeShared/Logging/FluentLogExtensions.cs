@@ -87,6 +87,14 @@ public static class FluentLogExtensions
         log.Info(message);
 #endif
     }
+    
+    public static IFluentLog WithLogAction(this IFluentLog log, Action<(FluentLogLevel Level, string Message, string Prefix, string Suffix, Exception Exception)> messageConsumer)
+    {
+        return WithConsumer(log, logData =>
+        {
+            messageConsumer((logData.LogLevel, logData.Message, logData.PrefixProvider?.Invoke(), logData.SuffixProvider?.Invoke(), logData.Exception));
+        });
+    }
 
     public static IFluentLog WithAction(this IFluentLog log, Action<(FluentLogLevel Level, string Message)> messageConsumer)
     {

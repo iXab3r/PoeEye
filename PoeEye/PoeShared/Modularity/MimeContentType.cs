@@ -8,8 +8,9 @@ namespace PoeShared.Modularity;
 /// </summary>
 public readonly struct MimeContentType
 {
-    public MimeContentType(string value) : this(new ContentType(value))
+    public MimeContentType(string value)
     {
+        MediaType = value;
     }
 
     public MimeContentType(ContentType contentType)
