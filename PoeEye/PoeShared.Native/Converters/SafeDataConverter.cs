@@ -46,44 +46,53 @@ public sealed class SafeDataConverter : JsonConverter
         {
             return null;
         }
-        if (StringUtils.IsGzip(rawValue))
-        {
-            rawValue = StringUtils.DecompressStringFromGZip(rawValue, true);
 
-            var deserializedBytes = (byte[])DeserializeFromString(serializer, rawValue, typeof(byte[]));
-            if (deserializedBytes == null || deserializedBytes.Length == 0)
+        try
+        {
+            if (StringUtils.IsGzip(rawValue))
+            {
+                rawValue = StringUtils.DecompressStringFromGZip(rawValue, true);
+
+                var deserializedBytes = (byte[])DeserializeFromString(serializer, rawValue, typeof(byte[]));
+                if (deserializedBytes == null || deserializedBytes.Length == 0)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    var decodedBytes = ProtectedData.Unprotect(deserializedBytes, AdditionalEntropy, DataProtectionScope.LocalMachine);
+                    rawValue = Encoding.Default.GetString(decodedBytes);
+                }
+                catch (CryptographicException e)
+                {
+                    Log.Warn($"Failed to decrypt array of size {deserializedBytes.Length} with entropy into type {objectType}", e);
+                }
+            }
+
+            if (rawValue == null)
             {
                 return null;
             }
 
-            try
+            if (typeof(string) == objectType)
             {
-                var decodedBytes = ProtectedData.Unprotect(deserializedBytes, AdditionalEntropy, DataProtectionScope.LocalMachine);
-                rawValue = Encoding.Default.GetString(decodedBytes);
+                return rawValue;
             }
-            catch (CryptographicException e)
-            {
-                Log.Warn($"Failed to decrypt array of size {deserializedBytes.Length} with entropy into type {objectType}", e);
-            }
-        }
 
-        if (rawValue == null)
+            if (typeof(SecureString) == objectType)
+            {
+                return rawValue.ToSecuredString();
+            }
+        
+            var result = DeserializeFromString(serializer, rawValue, objectType);
+            return result;
+        }
+        catch (Exception e)
         {
+            Log.Warn($"Exception when when tried to read safe data into type {objectType}", e);
             return null;
         }
-
-        if (typeof(string) == objectType)
-        {
-            return rawValue;
-        }
-
-        if (typeof(SecureString) == objectType)
-        {
-            return rawValue.ToSecuredString();
-        }
-        
-        var result = DeserializeFromString(serializer, rawValue, objectType);
-        return result;
     }
 
     public override bool CanConvert(Type objectType)

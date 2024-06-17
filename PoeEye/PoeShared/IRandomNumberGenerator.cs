@@ -9,7 +9,12 @@ public interface IRandomNumberGenerator
     int Next(int max);
 
     double NextDouble();
-        
+
+    public TimeSpan NextTimeSpan(TimeSpan minDelay, TimeSpan maxDelay)
+    {
+        return GenerateDelay(minDelay, maxDelay);
+    }
+    
     public TimeSpan GenerateDelay(TimeSpan minDelay, TimeSpan maxDelay)
     {
         var minDelayMs = (int)minDelay.TotalMilliseconds;
