@@ -52,8 +52,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
             .SubscribeSafe(() =>
             {
                 Log.Debug($"Window is deactivated, reactivating {nameof(Topmost)} style");
-                owner.Topmost = false;
-                owner.Topmost = true;
+                UnsafeNative.MakeTopmost(owner.WindowHandle);
             }, Log.HandleUiException)
             .AddTo(Anchors);
 

@@ -132,14 +132,10 @@ public partial class UnsafeNative
 
         Log.Debug($"Activating window, title: '{window.Title}' {new Point(window.Left, window.Top)}, isActive: {window.IsActive}, state: {window.WindowState}, topmost: {window.Topmost}, style:{window.WindowStyle}");
 
-        if (window.Topmost)
-        {
-            window.Topmost = false;
-            window.Topmost = true;
-        }
-            
         var windowHelper = new WindowInteropHelper(window);
         var windowHandle = new WindowHandle(windowHelper.EnsureHandle());
+        
+        MakeTopmost(windowHandle.Handle);
 
         Log.Debug($"Showing window, hWnd: {windowHandle}, windowState: {window.WindowState}");
         window.Show();

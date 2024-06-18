@@ -49,6 +49,9 @@ public partial class UnsafeNative
     [DllImport("dwmapi.dll")]
     private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out bool pvAttribute, int cbAttribute);
     
+    [DllImport("dwmapi.dll")]
+    private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out int pvAttribute, int cbAttribute);
+    
     [DllImport("dwmapi.dll", PreserveSig = false)]
     public static extern bool DwmIsCompositionEnabled();
     
@@ -60,6 +63,23 @@ public partial class UnsafeNative
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsZoomed(IntPtr hWnd);
+    
+    public static bool IsWindowCloaked(IntPtr hwnd)
+    {
+        if (!IsDWMEnabled())
+        {
+            return false;
+        }
+
+        var result = DwmGetWindowAttribute(hwnd, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED, out int cloaked, sizeof(int));
+        if (!result.Succeeded)
+        {
+            Log.Warn($"Failed to DwmGetWindowAttribute({DwmApi.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED}) by HWND {hwnd.ToHexadecimal()}, error: {result}");
+            throw new Win32Exception();
+        }
+        
+        return cloaked != 0;
+    }
 
     public static WinRect GetTitleBarRect(IntPtr hwnd)
     {
@@ -159,7 +179,7 @@ public partial class UnsafeNative
 
         return new Rectangle(result.left, result.top, result.right - result.left, result.bottom - result.top);
     }
-
+    
     public static bool DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE flags)
     {
         var result = DwmGetWindowAttribute(hwnd, flags, out bool resultValue, Marshal.SizeOf<bool>());
@@ -227,6 +247,18 @@ public partial class UnsafeNative
         return true;
     }
 
+    public static void MakeTopmost(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero)
+        {
+            return;
+        }
+        if (!User32.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE))
+        {
+            Log.Warn($"Failed to MakeTopmost Window by HWND {hwnd.ToHexadecimal()}");
+        }
+    }
+
     public static void HideSystemMenu(IntPtr hwnd)
     {
         Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
@@ -267,6 +299,24 @@ public partial class UnsafeNative
         newStyle |= User32.SetWindowLongFlags.WS_EX_TOOLWINDOW;
         newStyle |= User32.SetWindowLongFlags.WS_EX_TRANSPARENT;
         if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
+        {
+            Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
+            return false;
+        }
+
+        return true;
+    }
+    
+    public static bool SetWindowPopup(IntPtr hwnd)
+    {
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
+        Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to appear as Popup");
+
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var newStyle = existingStyle;
+        newStyle |= User32.SetWindowLongFlags.WS_POPUP;
+        if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
         {
             Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
             return false;

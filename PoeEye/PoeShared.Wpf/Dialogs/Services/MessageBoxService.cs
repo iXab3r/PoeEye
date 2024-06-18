@@ -201,8 +201,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
         window.WhenLoaded().Subscribe(() =>
         {
             // there is a problem with child windows being obstructed by parent window despite the fact that Owner is set
-            window.Topmost = true;
-            window.Topmost = false;
+            UnsafeNative.MakeTopmost(window.WindowHandle);
         }).AddTo(windowAnchors);
         var result = window.ShowDialog();
         log.Info($"Window was closed, result: {result}");
