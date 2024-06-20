@@ -516,3 +516,7 @@ pre code.hljs{
     from { left: -25%; width: 25%; }
     to { left: 100%; width: 25%;}
 }
+
+.hide-focus-outline:focus-visible {
+    outline: 0;
+}
