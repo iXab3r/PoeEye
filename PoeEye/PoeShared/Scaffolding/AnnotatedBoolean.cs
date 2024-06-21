@@ -28,6 +28,14 @@ public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBool
         Value = value;
         Annotation = annotationSupplier(value);
     }
+    
+    /// <summary>
+    /// Initializes a new instance of the AnnotatedBoolean struct with the specified value and annotation.
+    /// </summary>
+    /// <param name="value">The boolean value.</param>
+    public AnnotatedBoolean(bool value) : this(value, annotation: null)
+    {
+    }
 
     /// <summary>
     /// Gets the boolean value.
@@ -43,10 +51,10 @@ public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBool
     public static bool operator false(AnnotatedBoolean x) => x.Value == false;
          
     public static AnnotatedBoolean operator &(AnnotatedBoolean a, AnnotatedBoolean b)
-        => new AnnotatedBoolean(a.Value & b.Value, $"{a.Value}({a.Annotation}) && {b.Value}({b.Annotation})");
+        => new AnnotatedBoolean(a.Value & b.Value, $"{a} & {b}");
         
     public static AnnotatedBoolean operator |(AnnotatedBoolean a, AnnotatedBoolean b)
-        => new AnnotatedBoolean(a.Value | b.Value, $"{a.Value}({a.Annotation}) && {b.Value}({b.Annotation})");
+        => new AnnotatedBoolean(a.Value | b.Value, $"{a} | {b}");
 
     public bool Equals(AnnotatedBoolean other)
     {
@@ -160,6 +168,13 @@ public readonly struct AnnotatedBoolean : IConvertible, IEquatable<AnnotatedBool
 
     public override string ToString()
     {
-        return $"{Value}: '{Annotation}'";
+        if (!string.IsNullOrEmpty(Annotation))
+        {
+            return $"{Value}: '{Annotation}'";
+        }
+        else
+        {
+            return Value.ToString();
+        }
     }
 }
