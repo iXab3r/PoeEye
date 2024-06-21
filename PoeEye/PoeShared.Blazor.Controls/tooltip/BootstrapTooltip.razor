@@ -1,0 +1,14 @@
+﻿@namespace PoeShared.Blazor.Controls
+@inherits BlazorReactiveComponent
+@inject Microsoft.JSInterop.IJSRuntime jsRuntime
+
+<div id="@($"bootstrap-tooltip-{ComponentId}")"
+     data-bs-toggle="tooltip"
+     @attributes=AllOtherAttributes>
+    @ChildContent
+</div>
+
+@code{
+
+
+}

@@ -64,7 +64,23 @@
     </ItemGroup>
 
     <ItemGroup>
+      <TypeScriptCompile Include="wwwroot\ts\BootstrapTooltip.ts" />
       <TypeScriptCompile Include="wwwroot\ts\placeholder.ts" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="tooltip\BootstrapTooltip.razor.css">
+        <DependentUpon>BootstrapTooltip.razor</DependentUpon>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="tooltip\BootstrapTooltip.razor.cs">
+        <DependentUpon>BootstrapTooltip.razor</DependentUpon>
+      </Compile>
+      <Compile Update="tooltip\BootstrapTooltipTrigger.cs">
+        <DependentUpon>BootstrapTooltip.razor</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <Target Name="NPMInstall" AfterTargets="PreBuildEvent">
