@@ -34,6 +34,7 @@ public class TimerExFixture
 
     [Test]
     [TestCaseSource(nameof(ShouldProcessOneAfterAnotherCases))]
+    [Timeout(5000)]
     public void ShouldProcessOneAfterAnother(Func<IObservable<long>> replacementFunc)
     {
         //Given
