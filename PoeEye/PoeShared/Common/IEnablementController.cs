@@ -6,7 +6,7 @@ namespace PoeShared.Common;
 
 public interface IEnablementController : IDisposableReactiveObject
 {
-    AnnotatedBoolean IsEnabled { get; }
+    AnnotatedBoolean IsEnabledState { get; }
 
     IDisposable Disable(string reason = default);
 }

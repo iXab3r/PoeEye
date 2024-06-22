@@ -18,7 +18,7 @@ public static class EnablementControllerExtensions
     {
         var condition = parentControllerSource
             .Select(controller => controller != null
-                ? controller.WhenAnyValue(x => x.IsEnabled).Select(x => new AnnotatedBoolean(x.Value, $"{parentName} -> {x.Annotation}"))
+                ? controller.WhenAnyValue(x => x.IsEnabledState).Select(x => new AnnotatedBoolean(x.Value, $"{parentName} -> {x.Annotation}"))
                 : Observable.Return(new AnnotatedBoolean(true, $"{parentName} -> not set")))
             .Switch();
 
