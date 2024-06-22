@@ -2,7 +2,8 @@
                               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                               xmlns:viewModels="clr-namespace:PoeShared.Squirrel.Updater"
                               xmlns:st="http://schemas.spicytaco.io/"
-                              xmlns:eye="http://coderush.net/poeeye/">
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:themes="clr-namespace:PoeShared.Themes;assembly=PoeShared.Wpf">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
@@ -43,7 +44,11 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock Text="Automatically download updates: " HorizontalAlignment="Right" />
+            
+            <st:StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Style="{StaticResource IconTextBlock}" Text="{x:Static themes:AwesomeIcons.Download}" />
+                <TextBlock Text="Automatically download updates: " HorizontalAlignment="Right" />
+            </st:StackPanel>
             <CheckBox IsChecked="{Binding AutomaticallyDownloadUpdates}"
                       ToolTip="The program will download updates as soon as they become available. You still can decide whether to apply an update or not." />
             <!-- Temporarily disabled - should be re-enabled only after supporting portable builds 
