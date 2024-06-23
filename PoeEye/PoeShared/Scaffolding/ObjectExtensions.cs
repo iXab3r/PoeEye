@@ -5,6 +5,7 @@ using CommandLine;
 using DynamicData;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
+using Polly;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
@@ -280,6 +281,34 @@ public static class ObjectExtensions
     {
         var propertyPath = Reflection.ExpressionToPropertyNames(valueAccessor.Body);
         return new PropertyAccessor<TValue>(source, propertyPath);
+    }
+    
+    public static Task<T1> WaitForAsync<TObject, T1>(
+        this TObject instance, 
+        Func<TObject, T1> extractor,
+        Predicate<T1> condition,
+        TimeSpan timeout,
+        int retries = 5)
+    {
+        var retryTimeout = timeout / retries;
+        if (retryTimeout <= TimeSpan.Zero)
+        {
+            throw new ArgumentException($"Failed to calculate retry timeout, provided Timeout: {timeout}, retries: {retries}");
+        }
+        
+        return Policy<T1>
+            .Handle<Exception>()
+            .OrResult(x =>
+            {
+                var success = condition(x);
+                return success;
+            })
+            .WaitAndRetryAsync(retries, i => retryTimeout)
+            .ExecuteAsync(async () =>
+            {
+                var value = extractor(instance);
+                return value;
+            }); 
     }
     
     private static string DumpToTableInternal(

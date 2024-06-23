@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Threading.Tasks;
 using DynamicData;
 using JetBrains.Annotations;
+using Polly;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
@@ -95,7 +96,8 @@ public static class NotifyPropertyChangedExtensions
             Reflection.ExpressionToPropertyNames(ex4.Body),
             Reflection.ExpressionToPropertyNames(ex5.Body));
     }
-
+    
+    
     public static void WaitForValue<TObject, T1>(
         this TObject instance, 
         Expression<Func<TObject, T1>> ex1,
@@ -104,36 +106,6 @@ public static class NotifyPropertyChangedExtensions
         where TObject : INotifyPropertyChanged
     {
         WaitForValueAsync(instance, ex1, condition, timeout).Wait();
-    }
-    
-    public static Task<T1> WaitForAsync<TObject, T1>(
-        this TObject instance, 
-        Func<TObject, T1> extractor,
-        Predicate<T1> condition,
-        TimeSpan timeout)
-        where TObject : INotifyPropertyChanged
-    {
-        var source = Observable.Timer(DateTimeOffset.Now, timeout / 5).Select(_ => extractor.Invoke(instance));
-        if (timeout <= TimeSpan.Zero)
-        {
-            return source
-                .Select(x => condition(x) == false ? throw new TimeoutException($"Value {x} does not satisfy condition") : x)
-                .Take(1)
-                .ToTask();
-        }
-
-        var reactiveResult = source.Where(x => condition(x)).Take(1);
-        if (timeout < TimeSpan.MaxValue)
-        {
-            var timeoutSource = Observable
-                .Return(default(T1))
-                .Delay(timeout)
-                .Select(_ => Observable.Throw<T1>(new TimeoutException($"Value did not satisfy condition in {timeout}")))
-                .Switch();
-            reactiveResult = reactiveResult.Amb(timeoutSource);
-        }
-
-        return reactiveResult.ToTask();
     }
         
     public static Task<T1> WaitForValueAsync<TObject, T1>(
