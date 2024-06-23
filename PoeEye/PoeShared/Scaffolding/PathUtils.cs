@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System.Text;
+using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Meziantou.Framework;
 using PoeShared.IO;
 
@@ -7,6 +9,7 @@ namespace PoeShared.Scaffolding;
 public static class PathUtils
 {
     private static readonly Func<string, string> PathConverter;
+    private static readonly Regex GenerateNameRegex = new("(?<fileName>.*?)(?<suffix> - Copy \\((?<idx>\\d+)\\))?(?<ext>\\.[\\.\\w]+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     static PathUtils()
     {
@@ -361,12 +364,14 @@ public static class PathUtils
     ///     A function to check the validity of a path, which returns true when valid and false
     ///     otherwise.
     /// </param>
+    /// <param name="startIdx">Start index that will be used for mutations</param>
     /// <returns>A valid path based on the baseName.</returns>
     /// <exception cref="ArgumentException">Thrown when no folder path is specified or invalid new folder path is provided.</exception>
     public static string GenerateValidName(
         string baseName,
         Func<string, int, string> mutation,
-        Predicate<string> pathValidator)
+        Predicate<string> pathValidator,
+        int startIdx = 1)
     {
         if (string.IsNullOrEmpty(baseName))
         {
@@ -379,13 +384,24 @@ public static class PathUtils
         {
             throw new ArgumentException($"Invalid new folder path: {baseName}");
         }
-
         var folderPath = Path.GetDirectoryName(baseName) ?? string.Empty;
-        var idx = 1;
-        while (true)
+        return GenerateValidName((idx) =>
         {
             var tempName = idx == 1 ? candidateName : mutation(candidateName, idx);
             var fullPath = Path.Combine(folderPath, tempName + extension);
+            return fullPath;
+        }, pathValidator, startIdx);
+    }
+
+    public static string GenerateValidName(
+        Func<int, string> generator,
+        Predicate<string> pathValidator,
+        int startIdx = 1)
+    {
+        var idx = startIdx;
+        while (true)
+        {
+            var fullPath = generator(idx);
             if (!pathValidator(fullPath))
             {
                 idx++;
@@ -400,7 +416,7 @@ public static class PathUtils
     /// <summary>
     ///     Creates a valid path name by appending a number to a base path name.
     /// </summary>
-    /// <param name="baseName">The base path.</param>
+    /// <param name="filePath">The base path.</param>
     /// <param name="pathValidator">A function to validate a path, which returns true when valid and false otherwise.</param>
     /// <returns>A valid path converted from the base path.</returns>
     /// <example>
@@ -408,9 +424,40 @@ public static class PathUtils
     /// GenerateValidName("C:\\temp", path => !Directory.Exists(path)); //Returns "C:\\temp (1)" if "C:\\temp" exists
     /// </code>
     /// </example>
-    public static string GenerateValidName(string baseName, Predicate<string> pathValidator)
+    public static string GenerateValidName(string filePath, Predicate<string> pathValidator)
     {
-        return GenerateValidName(baseName, (candidateName, idx) => $"{candidateName} ({idx})", pathValidator);
+        var folderPath = Path.GetDirectoryName(filePath) ?? string.Empty;
+        var fileName = Path.GetFileName(filePath);
+        
+        var match = GenerateNameRegex.Match(fileName);
+        if (!match.Success)
+        {
+            throw new NotSupportedException($"File name is not supported: {fileName}");
+        }
+        var startIdx = match.Success && match.Groups["idx"].Success && int.TryParse(match.Groups["idx"].Value, out var baseIdx)
+            ? baseIdx
+            : 1;
+        
+        return GenerateValidName((idx) =>
+        {
+            var candidateNameBuilder = new StringBuilder();
+            
+            candidateNameBuilder.Append(match.Groups["fileName"].Value);
+            
+            if (idx > 1)
+            {
+                candidateNameBuilder.Append(" - Copy");
+                candidateNameBuilder.Append($" ({idx})");
+            }
+
+            if (match.Groups["ext"].Success)
+            {
+                candidateNameBuilder.Append(match.Groups["ext"].Value);
+            }
+
+            var candidateName = candidateNameBuilder.ToString();
+            return Path.Combine(folderPath, candidateName);
+        }, pathValidator, startIdx);
     }
     
     /// <summary>
