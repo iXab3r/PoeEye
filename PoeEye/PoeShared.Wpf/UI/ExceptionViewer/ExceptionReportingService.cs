@@ -32,6 +32,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
     private readonly IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory;
     private readonly IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer;
     private readonly SourceListEx<IExceptionReportItemProvider> reportItemProviders = new();
+    private readonly SourceListEx<IExceptionInterceptor> exceptionInterceptors = new();
     private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
     private IExceptionReportHandler reportHandler;
 
@@ -97,6 +98,17 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         {
             Log.Debug($"Removing report item provider: {reportItemProvider}");
             reportItemProviders.Remove(reportItemProvider);
+        });
+    }
+
+    public IDisposable AddExceptionInterceptor(IExceptionInterceptor exceptionInterceptor)
+    {
+        Log.Debug($"Registering new exception interceptor: {exceptionInterceptor}");
+        exceptionInterceptors.Add(exceptionInterceptor);
+        return Disposable.Create(() =>
+        {
+            Log.Debug($"Removing exception interceptor: {exceptionInterceptor}");
+            exceptionInterceptors.Remove(exceptionInterceptor);
         });
     }
 
@@ -166,11 +178,24 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
                 e.SetObserved();
                 return;
             }
-            
-            
         }
 
-        ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
+        if (!e.Observed)
+        {
+            foreach (var exceptionInterceptor in exceptionInterceptors.Items)
+            {
+                exceptionInterceptor.Handle(e);
+                if (e.Observed)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (!e.Observed)
+        {
+            ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
+        }
     }
 
     private void ReportCrash(Exception exception, string developerMessage = "")
