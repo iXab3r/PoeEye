@@ -83,4 +83,25 @@ public static class DictionaryExtensions
         value = dictionaryIndexer[key];
         return true;
     }
+
+    public static void EditDiff<TKey>(
+        this IDictionary<TKey, TKey> dictionary,
+        IEnumerable<TKey> newItems)
+    {
+        var itemsToProcess = newItems.ToArray();
+        var newKeys = itemsToProcess.ToHashSet();
+
+        // Remove items not present in newItems
+        var keysToRemove = dictionary.Keys.Where(k => !newKeys.Contains(k)).ToArray();
+        foreach (var key in keysToRemove)
+        {
+            dictionary.Remove(key);
+        }
+
+        // Add or update items from newItems
+        foreach (var item in itemsToProcess)
+        {
+            dictionary[item] = item;
+        }
+    }
 }
