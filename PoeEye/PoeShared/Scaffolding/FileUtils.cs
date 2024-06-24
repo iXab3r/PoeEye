@@ -1,4 +1,6 @@
+using System.Text.RegularExpressions;
 using ByteSizeLib;
+using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding;
 

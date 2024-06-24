@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Meziantou.Framework;
@@ -10,6 +11,11 @@ public static class PathUtils
 {
     private static readonly Func<string, string> PathConverter;
     private static readonly Regex GenerateNameRegex = new("(?<fileName>.*?)(?<suffix> - Copy \\((?<idx>\\d+)\\))?(?<ext>\\.[\\.\\w]+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    
+    private static readonly ImmutableHashSet<char> InvalidChars = Path.GetInvalidFileNameChars().Concat(Path.GetInvalidPathChars()).ToImmutableHashSet();
+    private static readonly ImmutableHashSet<char> FileNameReplacementChars = InvalidChars
+        .Add(Path.AltDirectorySeparatorChar)
+        .Add(Path.DirectorySeparatorChar);
 
     static PathUtils()
     {
@@ -25,6 +31,57 @@ public static class PathUtils
 
     public static bool IsWindows { get; }
     public static bool IsLinux { get; }
+
+
+
+    /// <summary>
+    /// Sanitizes a filename by replacing invalid characters with a specified replacement string.
+    /// </summary>
+    /// <param name="input">The original filename to sanitize. This cannot be null.</param>
+    /// <param name="replacement">The string to replace invalid characters with. Defaults to "_".</param>
+    /// <returns>A sanitized version of the filename where all invalid characters are replaced by the specified replacement string.</returns>
+    /// <remarks>
+    /// This method uses the <c>FileNameParser.Replace</c> method to process the input name, assuming this method is defined to handle the replacement of characters that are not allowed in file names. 
+    /// The method should ensure that the returned file name does not contain characters that would be invalid in a file system context, such as <c>: \ / | ? *</c> among others.
+    /// <para>
+    /// Example:
+    /// <code>
+    /// string safeFileName = MakeValidFileName("example?filename<>.txt");
+    /// // safeFileName would be "example_filename__.txt" if the invalid characters "?" and "<>" are replaced by "_".
+    /// </code>
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="input"/> parameter is null.</exception>
+    public static string MakeValidFileName([NotNull] string input, [NotNull] char? replacement = '_')
+    {
+        var sb = new StringBuilder(input.Length);
+        var changed = false;
+        foreach (var c in input)
+        {
+            if (FileNameReplacementChars.Contains(c)) {
+                changed = true;
+                var repl = c switch
+                {
+                    _ => replacement ?? '\0'
+                };
+
+                if (repl != '\0')
+                {
+                    sb.Append(repl);
+                }
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        if (sb.Length == 0)
+        {
+            return "_";
+        }
+        return changed ? sb.ToString() : input;
+    }
 
     /// <summary>
     ///     Gets the root directory for the common paths provided

@@ -359,4 +359,20 @@ public class PathUtilsFixture : FixtureBase
         // Then
         fileName.ShouldBe(expected);
     }
+
+    [Test]
+    [TestCase("", "_")]
+    [TestCase("abc", "abc")]
+    [TestCase("AbC", "AbC")]
+    [TestCase("Ab/", "Ab_")]
+    public void ShouldMakeValidFileName(string input, string expected)
+    {
+        //Given
+        //When
+        var result = PathUtils.MakeValidFileName(input);
+
+
+        //Then
+        result.ShouldBe(expected);
+    }
 }
