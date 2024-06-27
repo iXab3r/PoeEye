@@ -45,7 +45,7 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
     /// </para>
     /// </summary>
     [Parameter]
-    public BootstrapTooltipPlacement Placement { get; set; } = BootstrapTooltipPlacement.Top;
+    public BootstrapTooltipPlacement Placement { get; set; } = BootstrapTooltipPlacement.Auto;
 
     /// <summary>
     /// Sets the bootstrap custom class property
