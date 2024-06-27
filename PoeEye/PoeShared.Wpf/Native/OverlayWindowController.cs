@@ -177,24 +177,37 @@ public class OverlayWindowController : DisposableReactiveObject, IOverlayWindowC
     {
         if (IsVisible && viewModel.IsVisible)
         {
-            if (overlayWindow.Visibility != Visibility.Visible)
+            try
             {
-                logger.Debug($"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
-                overlayWindow.Visibility = Visibility.Visible;
-            }
+                if (overlayWindow.Visibility != Visibility.Visible)
+                {
+                    logger.Debug($"Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
+                    overlayWindow.Visibility = Visibility.Visible;
+                }
 
-            var currentRect = UnsafeNative.GetWindowRect(overlayWindow.WindowHandle);
-            logger.Debug($"Showing overlay {overlayWindow}, native bounds: {currentRect}");
-            UnsafeNative.ShowInactiveTopmost(overlayWindow.WindowHandle);
+                var currentRect = UnsafeNative.GetWindowRect(overlayWindow.WindowHandle);
+                logger.Debug($"Showing overlay {overlayWindow}, native bounds: {currentRect}");
+                UnsafeNative.ShowInactiveTopmost(overlayWindow.WindowHandle);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Failed to show overlay", e);
+            }
         } else if (overlayWindow.WindowHandle == IntPtr.Zero)
         {
             logger.Debug($"Overlay is not initialized yet");
         }
         else
         {
-            logger.Debug($"Hiding overlay");
-
-            UnsafeNative.HideWindow(overlayWindow.WindowHandle);
+            try
+            {
+                logger.Debug($"Hiding overlay");
+                UnsafeNative.HideWindow(overlayWindow.WindowHandle);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("Failed to hide overlay", e);
+            }
         }
     }
 
