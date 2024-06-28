@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -10,9 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using DynamicData;
-using GongSolutions.Wpf.DragDrop.Utilities;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -20,26 +17,18 @@ using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileProviders.Physical;
-using Microsoft.Extensions.Logging;
-using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Scaffolding;
-using PoeShared.Blazor.Services;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
-using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PoeShared.UI;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
-using Unity.Lifetime;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -68,7 +57,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     private readonly SerialDisposable activeViewAnchors;
     private readonly WebViewServiceProvider webViewServiceProvider;
     private readonly JSComponentConfigurationStoreAccessor jsComponentConfigurationStoreAccessor;
-    private readonly DispatcherScheduler uiScheduler = DispatcherScheduler.Current;
 
     static BlazorContentControl()
     {
@@ -94,8 +82,8 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         */
         WebView.Services = webViewServiceProvider;
 
-        ReloadCommand = CommandWrapper.Create<object>(ReloadExecuted);
-        OpenDevTools = CommandWrapper.Create(() => WebView?.WebView.CoreWebView2.OpenDevToolsWindow());
+        ReloadCommand = BlazorCommandWrapper.Create<object>(ReloadExecuted);
+        OpenDevToolsCommand = BlazorCommandWrapper.Create(OpenDevTools);
 
         var serviceCollection = new ServiceCollection
         {
@@ -236,31 +224,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         Binder.Attach(this).AddTo(Anchors);
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
-     
-    }
-
-    private async Task ReloadExecuted(object arg)
-    {
-        if (arg is false)
-        {
-            return;
-        }
-        if (UnhandledException != null)
-        {
-            Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
-            UnhandledException = null;
-        }
-
-        var webView = WebView?.WebView;
-        if (webView != null)
-        {
-            await webView.EnsureCoreWebView2Async();
-            webView.Reload();
-        }
-    }
-
     public Type ViewType
     {
         get => (Type) GetValue(ViewTypeProperty);
@@ -303,9 +266,49 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public string UnhandledExceptionMessage { get; [UsedImplicitly] private set; }
 
-    public ICommand ReloadCommand { get; }
+    public ICommandWrapper ReloadCommand { get; }
 
-    public ICommand OpenDevTools { get; }
+    public ICommandWrapper OpenDevToolsCommand { get; }
+
+    public async Task OpenDevTools()
+    {
+        var webView = WebView?.WebView;
+        if (webView == null)
+        {
+            return;
+        }
+        
+        await webView.EnsureCoreWebView2Async();
+        webView.CoreWebView2.OpenDevToolsWindow();
+    }
+
+    public async Task Reload()
+    {
+        if (UnhandledException != null)
+        {
+            Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
+            UnhandledException = null;
+        }
+
+        var webView = WebView?.WebView;
+        if (webView == null)
+        {
+            return;
+        }
+        
+        await webView.EnsureCoreWebView2Async();
+        webView.Reload();
+    }
+
+    private async Task ReloadExecuted(object arg)
+    {
+        if (arg is false)
+        {
+            return;
+        }
+
+        await Reload();
+    }
     
     private static string FormatExceptionMessage(Exception exception)
     {

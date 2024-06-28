@@ -16,6 +16,6 @@ public interface IBlazorContentControl : IDisposableReactiveObject
     BlazorWebViewEx WebView { get; }
 
     Exception UnhandledException { get; }
-    ICommand ReloadCommand { get; }
-    ICommand OpenDevTools { get; }
+    ICommandWrapper ReloadCommand { get; }
+    ICommandWrapper OpenDevToolsCommand { get; }
 }
