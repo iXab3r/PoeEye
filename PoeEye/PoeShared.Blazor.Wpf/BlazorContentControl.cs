@@ -84,6 +84,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         ReloadCommand = BlazorCommandWrapper.Create<object>(ReloadExecuted);
         OpenDevToolsCommand = BlazorCommandWrapper.Create(OpenDevTools);
+        ZoomInCommand = BlazorCommandWrapper.Create(ZoomIn);
+        ZoomOutCommand = BlazorCommandWrapper.Create(ZoomOut);
+        ResetZoomCommand = BlazorCommandWrapper.Create(ResetZoom);
 
         var serviceCollection = new ServiceCollection
         {
@@ -269,7 +272,43 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public ICommandWrapper ReloadCommand { get; }
 
     public ICommandWrapper OpenDevToolsCommand { get; }
+    public ICommandWrapper ZoomInCommand { get; }
+    public ICommandWrapper ZoomOutCommand { get; }
+    public ICommandWrapper ResetZoomCommand { get; }
+    
+    public async Task ZoomIn()
+    {
+        var webView = WebView?.WebView;
+        if (webView == null)
+        {
+            return;
+        }
 
+        webView.ZoomFactor += 0.1;
+    }
+    
+    public async Task ZoomOut()
+    {
+        var webView = WebView?.WebView;
+        if (webView == null)
+        {
+            return;
+        }
+
+        webView.ZoomFactor -= 0.1;
+    }
+    
+    public async Task ResetZoom()
+    {
+        var webView = WebView?.WebView;
+        if (webView == null)
+        {
+            return;
+        }
+
+        webView.ZoomFactor = 1;
+    }
+    
     public async Task OpenDevTools()
     {
         var webView = WebView?.WebView;
