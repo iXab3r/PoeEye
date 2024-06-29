@@ -18,13 +18,14 @@ public static class ExceptionExtensions
 
         return new AggregateException(exceptions);
     }
-    
-    public static string CutOffStackTrace(this Exception ex, Predicate<string> cutoffCondition)
+
+    public static bool TryCutOffStackTrace(this Exception ex, Predicate<string> cutoffCondition, out string formattedStackTrace)
     {
         var stackTrace = ex.StackTrace;
         if (string.IsNullOrWhiteSpace(stackTrace))
         {
-            return stackTrace;
+            formattedStackTrace = default;
+            return false;
         }
         
         var lines = stackTrace.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -36,10 +37,17 @@ public static class ExceptionExtensions
             result.AppendLine(line);
             if (cutoffCondition(line))
             {
-                return result.ToString();
+                formattedStackTrace = result.ToString().Trim('\n','\r');
+                return true;
             }
         }
 
-        return result.ToString();
+        formattedStackTrace = default;
+        return false;
+    }
+    
+    public static string CutOffStackTrace(this Exception ex, Predicate<string> cutoffCondition)
+    {
+        return TryCutOffStackTrace(ex, cutoffCondition, out var stackTrace) ? stackTrace : ex.StackTrace;
     }
 }

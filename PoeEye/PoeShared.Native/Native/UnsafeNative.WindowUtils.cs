@@ -253,7 +253,8 @@ public partial class UnsafeNative
         {
             return;
         }
-        if (!User32.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE))
+        if (!User32.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, 
+                User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_SHOWWINDOW))
         {
             Log.Warn($"Failed to MakeTopmost Window by HWND {hwnd.ToHexadecimal()}");
         }
@@ -285,6 +286,18 @@ public partial class UnsafeNative
         {
             Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
         }
+    }
+
+    public static bool IsTopmost(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero)
+        {
+            return false;
+        }
+        
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+        var isTopmost = existingStyle.HasFlag(User32.SetWindowLongFlags.WS_EX_TOPMOST);
+        return isTopmost;
     }
 
     public static bool SetWindowExTransparent(IntPtr hwnd)
