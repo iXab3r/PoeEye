@@ -10,6 +10,7 @@ public static class UiConstants
     public static readonly TimeSpan ArtificialVeryShortDelay = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan ArtificialDelay = TimeSpan.FromMilliseconds(1000);
     public static readonly TimeSpan UiThrottlingDelay = TimeSpan.FromMilliseconds(250);
+    public static readonly TimeSpan UiThrottlingLongDelay = TimeSpan.FromMilliseconds(1000);
     public static readonly TimeSpan UiThrottlingShortDelay = TimeSpan.FromMilliseconds(0);
     public static readonly TimeSpan UiAnimationDelay = TimeSpan.FromMilliseconds(1000 / 60f);
     public static readonly TimeSpan Day = TimeSpan.FromDays(1);
