@@ -510,6 +510,14 @@ h1, h2, h3, h4, h5, h6{
     color: inherit;
 }
 
+.ant-modal-confirm-body .ant-modal-confirm-title {
+    color: inherit;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-content {
+    color: inherit;
+}
+
 .ant-modal-header{
     --bs-bg-opacity: 1;
     background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity));
