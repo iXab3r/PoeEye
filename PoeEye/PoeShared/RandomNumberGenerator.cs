@@ -4,6 +4,10 @@ namespace PoeShared;
 
 internal sealed class RandomNumberGenerator : IRandomNumberGenerator
 {
+    private static readonly Lazy<RandomNumberGenerator> InstanceSupplier = new();
+
+    public static IRandomNumberGenerator Instance => InstanceSupplier.Value;
+
     private readonly ThreadSafeRandom rng = new();
 
     public int Next(int min, int max)

@@ -33,4 +33,10 @@ public readonly record struct RandomTimeSpan
     /// When set to true, the actual delay will be a random value between <see cref="Min"/> and <see cref="Max"/>.
     /// </summary>
     public bool Randomize { get; init; }
+
+    /// <summary>
+    /// Returns next random timespan
+    /// </summary>
+    /// <returns></returns>
+    public TimeSpan Next() => Randomize ? RandomNumberGenerator.Instance.NextTimeSpan(Min, Max) : Min;
 }

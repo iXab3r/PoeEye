@@ -29,4 +29,10 @@ public readonly record struct RandomInteger
     public bool Randomize { get; init; }
     
     public static implicit operator RandomInteger(int min) => new(min);
+    
+    /// <summary>
+    /// Returns next random timespan
+    /// </summary>
+    /// <returns></returns>
+    public int Next() => Randomize ? RandomNumberGenerator.Instance.Next(Min, Max) : Min;
 }
