@@ -39,13 +39,22 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <returns>A task representing the asynchronous operation.</returns>
     Task SelectAllTextInElementById(string elementId);
 
-
     /// <summary>
     /// Selects all text within an HTML element identified by its ID.
     /// </summary>
     /// <param name="elementRef"></param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task SelectAllTextInElement(ElementReference elementRef);
+
+    /// <summary>
+    /// Selects text range within an HTML element identified by its ID.
+    /// </summary>
+    /// <param name="elementRef"></param>
+    /// <param name="end">The offset into the text field for the end of the selection.</param>
+    /// <param name="direction">The direction in which the selection is performed.</param>
+    /// <param name="start">The offset into the text field for the start of the selection.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task SelectTextRangeInElement(ElementReference elementRef, int? start = default, int? end = default, JsSelectionRangeDirection direction = JsSelectionRangeDirection.Forward);
 
     /// <summary>
     /// Sets focus on the element with the provided id.

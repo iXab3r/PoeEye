@@ -101,6 +101,30 @@ export function selectAllTextInElement(targetElement: HTMLElement): void {
 }
 
 /**
+ * Selects text range in an HTML input element with the specified ID.
+ * @throws An error if the element is not found, is not an input element, or if text selection fails.
+ * @param targetElement
+ * @param start The offset into the text field for the start of the selection.
+ * @param end The offset into the text field for the end of the selection.
+ * @param direction The direction in which the selection is performed.
+ */
+export function selectTextRangeInElement(targetElement: HTMLElement, start: number | null, end: number | null, direction?: "forward" | "backward" | "none"): void {
+    if (!targetElement) {
+        logAndThrow(`Element not specified`);
+    }
+
+    if (!(targetElement instanceof HTMLInputElement)) {
+        logAndThrow(`Element '${targetElement}' is not an input element`);
+    }
+
+    try {
+        targetElement.setSelectionRange(start, end, direction);
+    } catch (error) {
+        logAndThrow(`Error selecting text in element ${targetElement}`, error);
+    }
+}
+
+/**
  * Simulates a click event on an HTML element with the specified ID.
  * @param elementId The ID of the element to click.
  * @throws An error if the element is not found, is not an HTMLElement, or does not support the 'click' method.
