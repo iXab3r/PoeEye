@@ -4,6 +4,15 @@ namespace PoeShared.Scaffolding;
 
 public static class ExceptionExtensions
 {
+    public static bool IsCancellation(this Exception exception)
+    {
+        return exception switch
+        {
+            OperationCanceledException or AggregateException {InnerExceptions: [OperationCanceledException]} => true,
+            _ => false
+        };
+    }
+    
     public static Exception ToExceptionOrDefault(this Exception[] exceptions)
     {
         if (!exceptions.Any())

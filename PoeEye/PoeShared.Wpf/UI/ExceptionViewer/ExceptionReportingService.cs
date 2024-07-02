@@ -156,6 +156,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         {
             if (e.Exception.InnerException?.GetType().Name is "RpcException" or
                 "Http2ConnectionException" or
+                nameof(OperationCanceledException) or
                 nameof(TaskCanceledException) or
                 nameof(TimeoutException) or
                 nameof(IOException))
