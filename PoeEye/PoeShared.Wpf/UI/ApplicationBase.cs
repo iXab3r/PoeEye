@@ -29,6 +29,11 @@ public abstract class ApplicationBase : Application
 {
     private readonly IAppArguments appArguments;
 
+    static ApplicationBase()
+    {
+        Launcher.Program.HandleStartup();
+    }
+
     protected ApplicationBase() : this(new ApplicationStartupProperties())
     {
     }

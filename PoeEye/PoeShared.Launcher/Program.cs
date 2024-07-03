@@ -16,12 +16,16 @@ public static class Program
     
     public static void Main(string[] args)
     {
-        Console.WriteLine($"EyeAuras Launcher");
         HandleStartup();
     }
     
     public static void HandleStartup()
     {
+        #if DEBUG
+            SharedLog.Instance.AddConsoleAppender();
+            Log.Info("Launcher is running in debug mode");
+        #endif
+        
         var result = ParseArguments();
         if (result is not Parsed<LauncherArguments>)
         {
@@ -45,7 +49,7 @@ public static class Program
             handler.AddHandler(nameof(LauncherMethod.Version), HandleVersion);
             handler.AddHandler<RestartAppArguments>(nameof(LauncherMethod.RestartApp), HandleRestart);
             handler.AddHandler<SwapAppArguments>(nameof(LauncherMethod.SwapApp), HandleSwapApp);
-            if (handler.TryHandle(args))
+            if (!handler.TryHandle(args))
             {
                 return;
             }
@@ -57,14 +61,6 @@ public static class Program
         {
             Log.Error("Operation failed", e);
             throw;
-        }
-        finally
-        {
-            if (!args.IsSilent)
-            {
-                Log.Debug("Press any key to close this window...");
-                Console.ReadKey();
-            }
         }
     }
 
@@ -84,7 +80,7 @@ public static class Program
             WaitForProcessExit(args.ProcessIdToWait.Value, timeout);
         }
 
-        StartProcess(args.ExecutablePath, args.Arguments);
+        StartProcess(args.ExecutablePath, args.Arguments, args.Verb);
     }
     
     private static void HandleSwapApp(SwapAppArguments args)
@@ -124,17 +120,25 @@ public static class Program
         Log.Info($"Copying out own executable from {ownExecutablePath} to {args.ExecutablePath}");
         File.Copy(ownExecutablePath, args.ExecutablePath);
 
-        StartProcess(args.ExecutablePath, args.Arguments);
+        StartProcess(args.ExecutablePath, args.Arguments, args.Verb);
     }
 
-    private static void StartProcess(string executablePath, string arguments)
+    private static void StartProcess(string executablePath, string arguments, string verb)
     {
         if (string.IsNullOrEmpty(executablePath))
         {
             throw new ArgumentException(nameof(executablePath), $"Executable path must be specified");
         }
         Log.Info($"Spawning new process @ '{executablePath}' (exists: {File.Exists(executablePath)}), args: '{arguments}'");
-        var newProcess = Process.Start(executablePath, arguments);
+        
+        var startInfo = new ProcessStartInfo()
+        {
+            UseShellExecute = true,
+            Arguments = arguments ?? string.Empty,
+            FileName = executablePath,
+            Verb = verb ?? string.Empty
+        };
+        var newProcess = Process.Start(startInfo);
         if (newProcess == null)
         {
             throw new ApplicationException($"Failed to spawn new process @ '{executablePath}' with args '{arguments}'");

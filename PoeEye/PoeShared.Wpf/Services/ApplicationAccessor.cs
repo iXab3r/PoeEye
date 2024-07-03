@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using PInvoke;
@@ -238,12 +239,19 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
     public void RestartAsAdmin()
     {
-        RestartAsAdminUsingPowershell();
+        RestartAsAdminUsingLauncher();
     }
 
     public void ReplaceExecutable(string processPath, string arguments = default)
     {
         RestartUsingLauncher(processPath, arguments, verb: default, LauncherMethod.SwapApp);
+    }
+    
+    private void RestartAsAdminUsingLauncher()
+    {
+        Log.Info("Restarting current process with admin privileges using launcher");
+        var arguments = StripBooleanArgumentFromCmdLine(appArguments.StartupArgs, "adminMode");
+        RestartUsingLauncher(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas", LauncherMethod.RestartApp);
     }
 
     private void RestartUsingLauncher(
@@ -290,10 +298,11 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             throw new ArgumentException("Failed to resolve executable path");
         }
         var argumentsBuilder = new StringBuilder();
-        argumentsBuilder.Append($" --method {method}");
+        argumentsBuilder.Append($" --launcherMethod {method}");
         argumentsBuilder.Append($" --processId {Environment.ProcessId} --timeoutMs 60000");
         argumentsBuilder.Append($" --exePath=\"{processPath}\"");
         argumentsBuilder.Append($" --exeArguments=\"{arguments}\"");
+        argumentsBuilder.Append($" --exeVerb=\"{verb}\"");
         var startInfo = new ProcessStartInfo()
         {
             UseShellExecute = true,
@@ -314,7 +323,15 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     private void RestartAsAdminUsingPowershell()
     {
         Log.Info("Restarting current process with admin privileges");
-        RestartAsUsingPowershell(Environment.ProcessPath, $"{appArguments.StartupArgs} --adminMode true", verb: "runas");
+        var arguments = StripBooleanArgumentFromCmdLine(appArguments.StartupArgs, "adminMode");
+        RestartAsUsingPowershell(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas");
+    }
+
+    private string StripBooleanArgumentFromCmdLine(string arguments, string argName)
+    {
+        var regex = new Regex($"--?{argName}\\s+(true|false)?", RegexOptions.IgnoreCase);
+        var replacement = regex.Replace(arguments, string.Empty);
+        return replacement;
     }
 
     private void RestartAsUsingPowershell(string processPath, string arguments, string verb)

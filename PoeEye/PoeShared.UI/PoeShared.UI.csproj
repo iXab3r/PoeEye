@@ -17,6 +17,10 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <UseWPF>true</UseWPF>
+        <PublishTrimmed>false</PublishTrimmed>
+        <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <SelfContained>true</SelfContained>
     </PropertyGroup>
     
     <ItemGroup>
