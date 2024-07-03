@@ -17,7 +17,7 @@ using Squirrel.Shell;
 
 namespace PoeShared.Squirrel.Core;
 
-public sealed partial class PoeUpdateManager : DisposableReactiveObject
+public sealed partial class PoeUpdateManager : DisposableReactiveObject, IPoeUpdateManager
 {
     private static readonly IFluentLog Log = typeof(PoeUpdateManager).PrepareLogger();
 

@@ -41,6 +41,8 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     
     void ReportIsLoaded();
 
+    void ReplaceExecutable(string processPath, string arguments = default);
+    
     void RestartAs(string processPath, string arguments = default, string verb = default);
 
     void RestartAsAdmin();

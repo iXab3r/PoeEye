@@ -29,7 +29,7 @@ internal class ApplyReleasesImpl : IEnableLogger
     {
         this.rootAppDirectory = rootAppDirectory;
     }
-
+    
     public async Task<string> ApplyReleases(
         IPoeUpdateInfo updateInfo,
         bool silentInstall, 

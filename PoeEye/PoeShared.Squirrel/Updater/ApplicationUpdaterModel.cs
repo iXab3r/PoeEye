@@ -13,6 +13,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Services;
 using PoeShared.Squirrel.Core;
+using Polly;
 using PropertyBinder;
 using ReactiveUI;
 using Squirrel;
@@ -40,11 +41,36 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     {
         this.applicationAccessor = applicationAccessor;
         this.appArguments = appArguments;
+        
+        
+        var appDomainDir = new DirectoryInfo(appArguments.AppDomainDirectory); // %localappdata%/XXX OR something/XXX
+        var envLocalAppData = appArguments.EnvironmentLocalAppData; // %localappdata%
+        var localAppData = envLocalAppData.GetSubdirectory(this.appArguments.AppName);
+        IsInstalledIntoLocalAppData = localAppData.IsParentOf(appDomainDir);
+        Log.Info($"Application startup info: { new { Environment.ProcessPath, IsInstalledIntoLocalAppData } }");
 
-        MostRecentVersionAppFolder = new DirectoryInfo(appArguments.AppDomainDirectory);
-        AppRootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
-        RootDirectory = AppRootDirectory.Parent;
-            
+        MostRecentVersionAppFolder = appDomainDir;
+        RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
+
+        if (IsInstalledIntoLocalAppData)
+        {
+            AppRootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
+            RootDirectory = AppRootDirectory.Parent;
+            LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
+        }
+        else
+        {
+            AppRootDirectory = appDomainDir;
+            RootDirectory = appDomainDir;
+            LauncherExecutable = RunningExecutable;
+        }
+        Log.Info($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
+
+        if (IsInstalledIntoLocalAppData == false)
+        {
+            CleanupUpdateRelatedFiles(appDomainDir);
+        }
+
         updateSourceProvider
             .WhenAnyValue(x => x.UpdateSource)
             .WithPrevious()
@@ -55,11 +81,47 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             }, Log.HandleUiException)
             .AddTo(Anchors);
             
-        Log.Info($"Initializing ApplicationName, process path: {Environment.ProcessPath}, appArguments executable: {appArguments.ApplicationExecutableName}");
-        RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
-        LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
-        Log.Info($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
         Binder.Attach(this).AddTo(Anchors);
+    }
+
+    private static void CleanupUpdateRelatedFiles(DirectoryInfo appDomainDir)
+    {
+        Log.Info($"Doing cleanup of update-related files inside {appDomainDir}");
+        var foldersToRemove = new Queue<DirectoryInfo>(appDomainDir.GetDirectories()
+            .Where(x => x.Name.StartsWith("app-", StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, "packages")));
+            
+        if (foldersToRemove.Any())
+        {
+            Log.Info($"Following folders will be removed:\n\t{foldersToRemove.Select(x => x.FullName).DumpToTable()}");
+            while (foldersToRemove.TryDequeue(out var folder))
+            {
+                Policy.Handle<Exception>(ex =>
+                {
+                    Log.Warn($"Exception occured when attempted to remove folder {folder}", ex);
+                    return true;
+                }).WaitAndRetry(new[]
+                {
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(3),
+                }).Execute(() =>
+                {
+                    if (Directory.Exists(folder.FullName))
+                    {
+                        Log.Info($"Removing folder @ {folder.FullName}");
+                        folder.Delete(recursive: true);
+                    }
+                    else
+                    {
+                        Log.Warn($"Folder has already been removed @ {folder.FullName}");
+                    }
+                }); 
+            }
+        }
+        else
+        {
+            Log.Info("Nothing to cleanup");
+        }
     }
 
     public DirectoryInfo RootDirectory { get; }
@@ -75,6 +137,8 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     public UpdateSourceInfo UpdateSource { get; private set; }
 
     public bool IgnoreDeltaUpdates { get; set; }
+    
+    public bool IsInstalledIntoLocalAppData { get; }
 
     public Version LatestAppliedVersion { get; private set; }
 
@@ -155,6 +219,11 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             throw new ApplicationException("Expected non-empty new version folder path");
         }
 
+        if (IsInstalledIntoLocalAppData == false)
+        {
+            SwapAndRestart(new DirectoryInfo(newVersionFolder));
+        }
+
         MostRecentVersionAppFolder = new DirectoryInfo(newVersionFolder);
         LatestAppliedVersion = lastAppliedRelease.Version.Version;
         LatestUpdate = null;
@@ -214,6 +283,27 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         applicationAccessor.RestartAs(executable.FullName, appArguments.StartupArgs);
     }
 
+    private void SwapAndRestart(DirectoryInfo newVersionFolder)
+    {
+        using var unused = CreateIsBusyAnchor();
+        
+        Log.Info($"Completing portable-version update cycle, new version folder @ {newVersionFolder}");
+        var executables = newVersionFolder.GetFiles("*.exe", SearchOption.TopDirectoryOnly);
+        if (!executables.Any())
+        {
+            throw new InvalidOperationException($"Failed to find any executables @ {newVersionFolder.FullName}");
+        }
+
+        if (executables.Length > 1)
+        {
+            throw new InvalidOperationException($"Too many executables(count: {executables.Length}) @ {newVersionFolder.FullName}");
+        }
+
+        var executable = executables.Single();
+        Log.Debug($"Swapping application @ '{executable.FullName}', args: {appArguments.StartupArgs} ...");
+        applicationAccessor.ReplaceExecutable(executable.FullName, appArguments.StartupArgs);
+    }
+
     private async Task<IPoeUpdateManager> CreateManager()
     {
         var manager = new ResilientUpdateManager(
@@ -240,6 +330,11 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         {
             Log.Debug($"Using GitHub source: {UpdateSource.Dump()}");
 
+            if (IsInstalledIntoLocalAppData == false)
+            {
+                throw new NotSupportedException("Non-local app-data installation is not supported by github update manager");
+            }
+
             var mgr = await PoeUpdateManager.GitHubUpdateManager(
                 updateUrl,
                 downloader,
@@ -250,12 +345,21 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         else
         {
             Log.Debug($"Using BasicHTTP source: {UpdateSource.Dump()}");
-            var mgr = new PoeUpdateManager(
-                updateUrl, 
-                downloader,
-                appArguments.AppName, 
-                RootDirectory.FullName);
-            return mgr;
+
+            if (IsInstalledIntoLocalAppData)
+            {
+                var mgr = new PoeUpdateManager(
+                    updateUrl, 
+                    downloader,
+                    appArguments.AppName, 
+                    RootDirectory.FullName);
+                return mgr;
+            }
+            else
+            {
+                var mgr = new PortableUpdateManager(updateUrl, downloader, RootDirectory);
+                return mgr;
+            }
         }
     }
 

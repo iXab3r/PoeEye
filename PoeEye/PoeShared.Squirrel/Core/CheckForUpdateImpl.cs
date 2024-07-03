@@ -27,17 +27,62 @@ internal class CheckForUpdateImpl : IEnableLogger
         this.urlDownloader = urlDownloader;
         this.rootAppDirectory = rootAppDirectory;
     }
-        
+    
+    public async Task<IPoeUpdateInfo> CheckForUpdate(
+        IReadOnlyList<IReleaseEntry> localReleases,
+        string updateUrlOrPath,
+        bool ignoreDeltaUpdates,
+        Action<int> progressCallback)
+    {
+        progressCallback ??= _ => { };
+
+        var latestLocalRelease = localReleases.Any()
+            ? localReleases.MaxBy(x => x.Version)
+            : default;
+
+        // Fetch the remote RELEASES file, whether it's a local dir or an
+        string releaseFile;
+        if (Utility.IsHttpUrl(updateUrlOrPath))
+        {
+            Log.Debug($"Loading releases from remote path {updateUrlOrPath}");
+            releaseFile = await LoadRemoteReleasesFromUrl(updateUrlOrPath, urlDownloader, latestLocalRelease);
+        }
+        else
+        {
+            Log.Debug($"Loading releases from local path {updateUrlOrPath}");
+            releaseFile = await LoadRemoteReleasesFromFile(updateUrlOrPath);
+        }
+        progressCallback(33);
+
+        var parsedReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, userToken: null).ToArray();
+        progressCallback(55);
+
+        if (!parsedReleases.Any())
+        {
+            throw new Exception("Remote release File is empty or corrupted");
+        }
+
+        if (Log.IsDebugEnabled)
+        {
+            const int maxReleasesToLog = 5;
+            Log.Debug(parsedReleases.Length > maxReleasesToLog
+                ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.Select(x => new { x.PackageName, x.Filename, x.Filesize, x.Version }).OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToString()}"
+                : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.Select(x => new { x.PackageName, x.Filename, x.Filesize, x.Version }).DumpToString()}");
+        }
+            
+        var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);
+
+        progressCallback(100);
+        return result;
+    }
+
     public async Task<IPoeUpdateInfo> CheckForUpdate(
         string localReleaseFile,
         string updateUrlOrPath,
         bool ignoreDeltaUpdates = false,
         Action<int> progressCallback = null)
     {
-        progressCallback ??= _ => { };
-
         IReadOnlyList<IReleaseEntry> localReleases;
-        var stagingId = GetOrCreateStagedUserId();
 
         bool shouldInitialize;
         try
@@ -66,47 +111,10 @@ internal class CheckForUpdateImpl : IEnableLogger
             await InitializeClientAppDirectory();
         }
 
-        var latestLocalRelease = localReleases.Any()
-            ? localReleases.MaxBy(x => x.Version)
-            : default;
-
-        // Fetch the remote RELEASES file, whether it's a local dir or an
-        string releaseFile;
-        if (Utility.IsHttpUrl(updateUrlOrPath))
-        {
-            Log.Debug($"Loading releases from remote path {updateUrlOrPath}");
-            releaseFile = await LoadRemoteReleases(updateUrlOrPath, urlDownloader, latestLocalRelease);
-        }
-        else
-        {
-            Log.Debug($"Loading releases from local path {updateUrlOrPath}");
-            releaseFile = await LoadLocalReleases(updateUrlOrPath);
-        }
-        progressCallback(33);
-
-        var parsedReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, stagingId).ToArray();
-        progressCallback(55);
-
-        if (!parsedReleases.Any())
-        {
-            throw new Exception("Remote release File is empty or corrupted");
-        }
-
-        if (Log.IsDebugEnabled)
-        {
-            const int maxReleasesToLog = 5;
-            Log.Debug(parsedReleases.Length > maxReleasesToLog
-                ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToString()}"
-                : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.DumpToString()}");
-        }
-            
-        var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);
-
-        progressCallback(100);
-        return result;
+        return await CheckForUpdate(localReleases, updateUrlOrPath, ignoreDeltaUpdates, progressCallback);
     }
 
-    private static async Task<string> LoadRemoteReleases(
+    private static async Task<string> LoadRemoteReleasesFromUrl(
         string updateUrlOrPath, 
         IFileDownloader urlDownloader,
         IReleaseEntry latestLocalRelease)
@@ -159,7 +167,7 @@ internal class CheckForUpdateImpl : IEnableLogger
         }
     }
             
-    private static async Task<string> LoadLocalReleases(string updateUrlOrPath)
+    private static async Task<string> LoadRemoteReleasesFromFile(string updateUrlOrPath)
     {
         Log.Info($"Reading RELEASES file from {updateUrlOrPath}");
 

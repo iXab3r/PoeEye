@@ -12,7 +12,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Squirrel.Core;
 
-public sealed partial class PoeUpdateManager : IPoeUpdateManager
+partial class PoeUpdateManager
 {
     public static async Task<IPoeUpdateManager> GitHubUpdateManager(
         string repoUrl,

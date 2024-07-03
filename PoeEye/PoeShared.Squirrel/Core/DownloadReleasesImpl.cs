@@ -23,7 +23,10 @@ internal class DownloadReleasesImpl : IEnableLogger
     {
         this.urlDownloader = urlDownloader;
         this.rootAppDirectory = rootAppDirectory;
+        PackagesPath = Path.Combine(this.rootAppDirectory, "packages");
     }
+    
+    public string PackagesPath { get; }
 
     public async Task<bool> VerifyReleases(
         IReadOnlyCollection<IReleaseEntry> releasesToDownload,
@@ -57,7 +60,7 @@ internal class DownloadReleasesImpl : IEnableLogger
     {
         progress ??= (_ => { });
 
-        var packagesDirectory = Path.Combine(rootAppDirectory, "packages");
+        Directory.CreateDirectory(PackagesPath);
 
         double current = 0;
         var toIncrement = 100.0 / releasesToDownload.Count;
@@ -69,7 +72,7 @@ internal class DownloadReleasesImpl : IEnableLogger
             await releasesToDownload.ForEachAsync(
                 async x =>
                 {
-                    var targetFile = new FileInfo(Path.Combine(packagesDirectory, x.Filename));
+                    var targetFile = new FileInfo(Path.Combine(PackagesPath, x.Filename));
                     
                     if (!ValidateChecksum(x))
                     {
@@ -108,7 +111,7 @@ internal class DownloadReleasesImpl : IEnableLogger
             await releasesToDownload.ForEachAsync(
                 x =>
                 {
-                    var targetFile = new FileInfo(Path.Combine(packagesDirectory, x.Filename));
+                    var targetFile = new FileInfo(Path.Combine(PackagesPath, x.Filename));
 
                     if (!ValidateChecksum(x))
                     {

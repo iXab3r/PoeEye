@@ -28,10 +28,7 @@ public interface IApplicationUpdaterModel : IDisposableReactiveObject
     ///   Entry-point of Squirrel app, usually it's located inside folder %LOCALAPPDATA%\appName and has the same name as main executable
     /// </summary>
     FileInfo LauncherExecutable { get; }
-        
-    /// <summary>
-    ///     Checks whether update exist and if so, downloads it
-    /// </summary>
+
     Task CheckForUpdates();
 
     Task<bool> VerifyRelease(IPoeUpdateInfo updateInfo);

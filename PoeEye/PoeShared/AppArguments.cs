@@ -124,7 +124,7 @@ public class AppArguments : AppOptions, IAppArguments
 
         if (DataFolder != null)
         {
-            LocalAppDataDirectory = DataFolder;
+            LocalAppDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
             SharedAppDataDirectory = DataFolder;
             AppDataDirectory = Path.Combine(DataFolder, Profile);
         }

@@ -2,23 +2,19 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
-using Microsoft.Win32.TaskScheduler;
 using PInvoke;
+using PoeShared.Launcher;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Native;
-using PoeShared.Prism;
 using ReactiveUI;
-using Unity;
 
 namespace PoeShared.Services;
 
@@ -237,6 +233,25 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
     public void RestartAs(string processPath, string arguments = default, string verb = default)
     {
+        RestartAsUsingPowershell(processPath, arguments, verb);
+    }
+
+    public void RestartAsAdmin()
+    {
+        RestartAsAdminUsingPowershell();
+    }
+
+    public void ReplaceExecutable(string processPath, string arguments = default)
+    {
+        RestartUsingLauncher(processPath, arguments, verb: default, LauncherMethod.SwapApp);
+    }
+
+    private void RestartUsingLauncher(
+        string processPath, 
+        string arguments, 
+        string verb, 
+        LauncherMethod method)
+    {
         Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
 
         if (arguments != null && arguments.Contains('-'))
@@ -248,7 +263,74 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             }
 
             Log.Info($"Supplied arguments contain '-', compressing args: {arguments}");
-            RestartAs(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb);
+            RestartUsingLauncher(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb, method);
+            return;
+        }
+
+        ReportTermination(0); // report termination to release locks, resources, etc
+
+        var launcherPath = method switch
+        {
+            LauncherMethod.SwapApp => processPath,
+            LauncherMethod.RestartApp => Environment.ProcessPath,
+            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported restart method: {method}")
+        };
+        if (string.IsNullOrEmpty(launcherPath))
+        {
+            throw new ArgumentException("Failed to resolve launcher path");
+        }
+        var exePath = method switch
+        {
+            LauncherMethod.SwapApp => Environment.ProcessPath,
+            LauncherMethod.RestartApp => processPath,
+            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported restart method: {method}")
+        };
+        if (string.IsNullOrEmpty(exePath))
+        {
+            throw new ArgumentException("Failed to resolve executable path");
+        }
+        var argumentsBuilder = new StringBuilder();
+        argumentsBuilder.Append($" --method {method}");
+        argumentsBuilder.Append($" --processId {Environment.ProcessId} --timeoutMs 60000");
+        argumentsBuilder.Append($" --exePath=\"{processPath}\"");
+        argumentsBuilder.Append($" --exeArguments=\"{arguments}\"");
+        var startInfo = new ProcessStartInfo()
+        {
+            UseShellExecute = true,
+            Arguments = argumentsBuilder.ToString(),
+            FileName = launcherPath,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            Verb = verb ?? string.Empty
+        };
+        var startInfoString = new {startInfo.FileName, startInfo.Arguments, startInfo.Verb, startInfo.UseShellExecute};
+        var newProcess = Process.Start(startInfo) ?? throw new InvalidStateException($"Failed to start new process using args: {startInfoString}");
+        Log.Info($"Spawned new process: {newProcess.Id}, args: {startInfoString}");
+        Log.Info($"New process state: {new {newProcess.Id, newProcess.HasExited}}");
+
+        Exit();
+        throw new InvalidOperationException("Should never hit this line");
+    }
+    
+    private void RestartAsAdminUsingPowershell()
+    {
+        Log.Info("Restarting current process with admin privileges");
+        RestartAsUsingPowershell(Environment.ProcessPath, $"{appArguments.StartupArgs} --adminMode true", verb: "runas");
+    }
+
+    private void RestartAsUsingPowershell(string processPath, string arguments, string verb)
+    {
+        Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
+
+        if (arguments != null && arguments.Contains('-'))
+        {
+            const string safeModeArgument = "--safeMode";
+            if (!arguments.Contains(safeModeArgument) && safeModeService.IsInSafeMode)
+            {
+                arguments += $" {safeModeArgument} true"; //enforce safe-mode
+            }
+
+            Log.Info($"Supplied arguments contain '-', compressing args: {arguments}");
+            RestartAsUsingPowershell(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb);
             return;
         }
 
@@ -272,11 +354,5 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
         Exit();
         throw new InvalidOperationException("Should never hit this line");
-    }
-
-    public void RestartAsAdmin()
-    {
-        Log.Info("Restarting current process with admin privileges");
-        RestartAs(Environment.ProcessPath, $"{appArguments.StartupArgs} --adminMode true", verb: "runas");
     }
 }
