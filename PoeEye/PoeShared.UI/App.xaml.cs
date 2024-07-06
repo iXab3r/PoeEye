@@ -25,8 +25,7 @@ public partial class App : ApplicationBase
         Container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
         Container.AddNewExtensionIfNotExists<BlazorWebRegistrations>();
 
-        Container
-            .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();
+        Container.RegisterSingleton<IConfigProvider, IConfigProviderFromFile>();
             
         var window = new MainWindow();
         Container.RegisterOverlayController();

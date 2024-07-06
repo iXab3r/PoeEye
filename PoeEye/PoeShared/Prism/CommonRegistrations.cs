@@ -20,6 +20,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
     {
         Container
             .RegisterSingleton<IClock, Clock>()
+            .RegisterSingleton<IConfigProviderFromFile, ConfigProviderFromFile>()
             .RegisterSingleton<IComparisonService, ComparisonService>()
             .RegisterSingleton<IConfigSerializer>(x =>
             {

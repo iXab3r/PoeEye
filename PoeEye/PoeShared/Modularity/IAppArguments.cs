@@ -9,15 +9,30 @@ public interface IAppConfig
     string AppTitle { [NotNull] get; }
         
     Version Version { get; }
-        
-    string AppDataDirectory { [CanBeNull] get; }
-    
+
+    /// <summary>
+    /// Equivalent of AppDomain.CurrentDomain.BaseDirectory
+    /// </summary>
     string AppDomainDirectory { [CanBeNull] get; }
+
+    /// <summary>
+    /// "Profile" subfolder in RoamingAppDataDirectory
+    /// </summary>
+    string AppDataDirectory { [CanBeNull] get; }
+
+    /// <summary>
+    /// "AppName" subfolder either in %appdata% (roaming) or "data" folder
+    /// </summary>
+    string RoamingAppDataDirectory { [CanBeNull] get; }
     
-    string SharedAppDataDirectory { [CanBeNull] get; }
-    
+    /// <summary>
+    /// "AppName" subfolder in %localappdata% or appdomain if "data" folder is specified
+    /// </summary>
     string LocalAppDataDirectory { [CanBeNull] get; }
     
+    /// <summary>
+    /// Current process Id, equivalent of Environment.ProcessId, but for older frameworks
+    /// </summary>
     int ProcessId { get; }
 
     string ApplicationExecutableName { [CanBeNull] get; }

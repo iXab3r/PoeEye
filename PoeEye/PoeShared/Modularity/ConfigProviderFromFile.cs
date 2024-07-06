@@ -7,7 +7,7 @@ using PoeShared.Services;
 
 namespace PoeShared.Modularity;
 
-public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigProvider
+public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigProviderFromFile
 {
     private static readonly IFluentLog Log = typeof(ConfigProviderFromFile).PrepareLogger();
 
@@ -31,12 +31,12 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         var candidates = new[]
             {
                 AppDomain.CurrentDomain.BaseDirectory,
-                appArguments.SharedAppDataDirectory
+                appArguments.RoamingAppDataDirectory
             }
             .Select(x => Path.Combine(x, appArguments.Profile, ConfigFileName))
             .Select(x => new {Path = x, Exists = File.Exists(x)})
             .ToArray();
-        Log.Debug($"Configuration matrix, configuration file name: {ConfigFileName}:\n\t{candidates.DumpToString()}");
+        Log.Info($"Configuration matrix, configuration file name: {ConfigFileName}:\n\t{candidates.DumpToTable()}");
         var existingFilePath = candidates.FirstOrDefault(x => x.Exists);
         if (existingFilePath != null)
         {
@@ -47,11 +47,6 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
         {
             ConfigFilePath = candidates.Last().Path;
             Log.Info($"Configuration file not found, using path {ConfigFilePath}");
-        }
-
-        if (string.IsNullOrEmpty(ConfigFilePath))
-        {
-            throw new ApplicationException($"Failed to get configuration file path");
         }
     }
     
@@ -302,7 +297,7 @@ public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigPr
             return;
         }
 
-        var configFile = new FileInfo(Path.Combine(appArguments.SharedAppDataDirectory, configName));
+        var configFile = new FileInfo(Path.Combine(appArguments.RoamingAppDataDirectory, configName));
         if (!configFile.Exists)
         {
             Log.Info($"Legacy config file {configFile.FullName} does not exist");

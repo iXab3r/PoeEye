@@ -14,7 +14,7 @@ public sealed class ConfigMigrator
     public void Migrate(IConfigProvider source, IConfigProvider target)
     {
         Log.Info($"Migrating configuration from {source} to {target}");
-        if (source is ConfigProviderFromFile fromFile)
+        if (source is IConfigProviderFromFile fromFile)
         {
             Log.Info($"Reloading single-file config");
             fromFile.Reload();
@@ -28,7 +28,7 @@ public sealed class ConfigMigrator
             Log.Info($"Saved configuration {poeEyeConfig.GetType()}");
         }
         
-        if (source is ConfigProviderFromFile fromFileConfig)
+        if (source is IConfigProviderFromFile fromFileConfig)
         {
             var filesToRemove = new[]
             {

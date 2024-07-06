@@ -64,7 +64,7 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string AppDataDirectory { get; }
     
-    public string SharedAppDataDirectory { get; }
+    public string RoamingAppDataDirectory { get; }
 
     public string LocalAppDataDirectory { get; }
 
@@ -125,15 +125,14 @@ public class AppArguments : AppOptions, IAppArguments
         if (DataFolder != null)
         {
             LocalAppDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            SharedAppDataDirectory = DataFolder;
-            AppDataDirectory = Path.Combine(DataFolder, Profile);
+            RoamingAppDataDirectory = DataFolder;
         }
         else
         {
             LocalAppDataDirectory = Path.Combine(EnvironmentLocalAppData.FullName, AppName);
-            SharedAppDataDirectory = Path.Combine(EnvironmentAppData.FullName, AppName);
-            AppDataDirectory = Path.Combine(SharedAppDataDirectory, Profile);
+            RoamingAppDataDirectory = Path.Combine(EnvironmentAppData.FullName, AppName);
         }
+        AppDataDirectory = Path.Combine(RoamingAppDataDirectory, Profile);
         
         if (!parsed)
         {
@@ -205,14 +204,15 @@ public class AppArguments : AppOptions, IAppArguments
             AutostartFlag,
             AppSupportMail,
             AppDomainDirectory,
-            AppDataDirectory,
+            RoamingAppDataDirectory,
             LocalAppDataDirectory,
+            AppDataDirectory,
             ShowUpdater,
             StartupArgs,
             IsSafeMode,
             IsAdminMode,
-            ApplicationPath = ApplicationExecutablePath,
-            ApplicationName = ApplicationExecutableName
+            ApplicationExecutablePath,
+            ApplicationExecutableName
         }.Dump());
     }
 }

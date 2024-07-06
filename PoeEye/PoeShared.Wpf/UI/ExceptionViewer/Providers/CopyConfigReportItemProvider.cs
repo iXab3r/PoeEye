@@ -37,7 +37,7 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
         try
         {
             var configProvider = configProviderFactory.Create();
-            if (configProvider is not ConfigProviderFromFile configProviderFromFile)
+            if (configProvider is not IConfigProviderFromFile configProviderFromFile)
             {
                 return;
             }
@@ -66,7 +66,7 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
         try
         {
             var configProvider = configProviderFactory.Create();
-            if (configProvider is ConfigProviderFromFile configProviderFromFile)
+            if (configProvider is IConfigProviderFromFile configProviderFromFile)
             {
                 TryToCopyExistingConfig(configProviderFromFile, outputDirectory, reportItems);
             } 
@@ -82,7 +82,7 @@ internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
     }
 
     private static void TryToCopyExistingConfig(
-        ConfigProviderFromFile configProvider,
+        IConfigProviderFromFile configProvider,
         DirectoryInfo outputDirectory, 
         IList<ExceptionReportItem> reportItems)
     {

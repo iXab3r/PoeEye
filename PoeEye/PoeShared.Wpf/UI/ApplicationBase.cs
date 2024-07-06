@@ -118,7 +118,7 @@ public abstract class ApplicationBase : Application
 
             Log.Debug("Initializing housekeeping");
             var cleanupService = Container.Resolve<IFolderCleanerService>();
-            cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.SharedAppDataDirectory, "logs"))).AddTo(Anchors);
+            cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.RoamingAppDataDirectory, "logs"))).AddTo(Anchors);
             cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
             cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
             cleanupService.FileTimeToLive = TimeSpan.FromDays(14);

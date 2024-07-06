@@ -23,7 +23,7 @@ internal class FileSoundLibrarySource : SoundLibrarySourceBase, IFileSoundLibrar
     {
         knownDirectories = new[]
             {
-                Path.Combine(appArguments.SharedAppDataDirectory, "Resources", "Notifications"),
+                Path.Combine(appArguments.RoamingAppDataDirectory, "Resources", "Notifications"),
                 Path.Combine(appArguments.AppDomainDirectory, "Resources", "Notifications"),
             }
             .Distinct()
