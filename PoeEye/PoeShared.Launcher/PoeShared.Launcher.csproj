@@ -5,14 +5,6 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <OutputType>WinExe</OutputType>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <PublishTrimmed>false</PublishTrimmed>
-        <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
-        <PublishReadyToRun>false</PublishReadyToRun>
-        <SelfContained>true</SelfContained>
     </PropertyGroup>
 
     <ItemGroup>
