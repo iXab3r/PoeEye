@@ -44,4 +44,14 @@ public static class GeometryExtensions
         var bottomRight = Vector2.Transform(new Vector2(bounds.Right, bounds.Bottom), transformationMatrix);
         return WinRectangleF.FromLTRB((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
     }
+    
+    /// <summary>
+    /// Determine the center of a Rectangle.
+    /// </summary>
+    /// <param name="value">The rectangle to perform the calculation against.</param>
+    /// <returns>The point of the center of the rectangle.</returns>
+    public static WinPointF Center(this WinRectangleF value)
+    {
+        return new(value.X + value.Width / 2.0f, value.Y + value.Height / 2.0f);
+    }
 }
