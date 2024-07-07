@@ -21,8 +21,8 @@ public sealed class CircularSourceList<T> : DisposableReactiveObject, IObservabl
     {
         innerList.Edit(list =>
         {
-            var itemsToRemove = list.Count - capacity;
-            if (itemsToRemove > 0)
+            var itemsToRemove = list.Count + 1 - capacity;
+            if (itemsToRemove > 0 && list.Count > 0)
             {
                 list.RemoveRange(0, itemsToRemove);
             }

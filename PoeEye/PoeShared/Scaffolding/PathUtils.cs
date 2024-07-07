@@ -483,6 +483,23 @@ public static class PathUtils
     /// </example>
     public static string GenerateValidName(string filePath, Predicate<string> pathValidator)
     {
+        return GenerateValidName(filePath, pathValidator, idx => $" - Copy ({idx})");
+    }
+
+    /// <summary>
+    ///     Creates a valid path name by appending a number to a base path name.
+    /// </summary>
+    /// <param name="filePath">The base path.</param>
+    /// <param name="pathValidator">A function to validate a path, which returns true when valid and false otherwise.</param>
+    /// <param name="suffixGenerator">A function which will be used to generate post-name suffix</param>
+    /// <returns>A valid path converted from the base path.</returns>
+    /// <example>
+    ///     <code>
+    /// GenerateValidName("C:\\temp", path => !Directory.Exists(path)); //Returns "C:\\temp (1)" if "C:\\temp" exists
+    /// </code>
+    /// </example>
+    public static string GenerateValidName(string filePath, Predicate<string> pathValidator, Func<int, string> suffixGenerator)
+    {
         var folderPath = Path.GetDirectoryName(filePath) ?? string.Empty;
         var fileName = Path.GetFileName(filePath);
         
@@ -503,8 +520,8 @@ public static class PathUtils
             
             if (idx > 1)
             {
-                candidateNameBuilder.Append(" - Copy");
-                candidateNameBuilder.Append($" ({idx})");
+                var suffix = suffixGenerator(idx);
+                candidateNameBuilder.Append(suffix);
             }
 
             if (match.Groups["ext"].Success)
