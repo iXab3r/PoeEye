@@ -66,7 +66,6 @@
     <Resource Include="Resources\mainIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PoeShared.Launcher\PoeShared.Launcher.csproj" />
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     <ProjectReference Include="..\WindowsHook\WindowsHook.csproj" />
   </ItemGroup>

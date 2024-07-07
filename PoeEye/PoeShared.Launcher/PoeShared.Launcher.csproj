@@ -16,10 +16,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All" ExcludeAssets="runtime"/>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     </ItemGroup>
 </Project>

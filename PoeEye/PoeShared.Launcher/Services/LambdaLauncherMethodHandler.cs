@@ -3,7 +3,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Launcher.Services;
 
-internal sealed class LambdaLauncherMethodHandler : DisposableReactiveObject, ILauncherMethodHandler
+internal sealed class LambdaLauncherMethodHandler : ILauncherMethodHandler
 {
     private readonly Action<LauncherArguments> handler;
 
@@ -18,11 +18,5 @@ internal sealed class LambdaLauncherMethodHandler : DisposableReactiveObject, IL
     public void Handle(LauncherArguments arguments)
     {
         handler(arguments);
-    }
-
-    protected override void FormatToString(ToStringBuilder builder)
-    {
-        base.FormatToString(builder);
-        builder.AppendParameter(nameof(Method), Method);
     }
 }

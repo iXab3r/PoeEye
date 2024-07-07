@@ -58,6 +58,7 @@
   <ItemGroup>
     <ProjectReference Include="..\gong-wpf-dragdrop\src\GongSolutions.WPF.DragDrop\GongSolutions.WPF.DragDrop.csproj" />
     <ProjectReference Include="..\MaterialDesignInXamlToolkit\MaterialDesignThemes.Wpf\MaterialDesignThemes.Wpf.csproj" />
+    <ProjectReference Include="..\PoeShared.Launcher\PoeShared.Launcher.csproj" />
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
   </ItemGroup>
