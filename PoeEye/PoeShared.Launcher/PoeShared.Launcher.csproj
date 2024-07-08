@@ -10,4 +10,8 @@
     <ItemGroup>
       <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
+    </ItemGroup>
 </Project>
