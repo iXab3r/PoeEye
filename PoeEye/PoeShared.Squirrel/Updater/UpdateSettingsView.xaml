@@ -9,8 +9,7 @@
     </eye:SharedResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:UpdateSettingsViewModel}">
-        <st:AutoGrid Columns="240, *" RowHeight="40" ChildMargin="5" x:Name="UpdateSettingsRoot"
-                     IsEnabled="{Binding HasDataFolder, Converter={StaticResource NotConverter}}">
+        <st:AutoGrid Columns="240, *" RowHeight="40" ChildMargin="5" x:Name="UpdateSettingsRoot">
             <TextBlock Text="Check for updates: " HorizontalAlignment="Right"/>
             <CheckBox IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}" />
             <TextBlock Text="Updates channel: " HorizontalAlignment="Right"/>

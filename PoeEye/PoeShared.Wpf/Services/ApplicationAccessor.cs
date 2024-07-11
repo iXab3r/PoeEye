@@ -301,8 +301,14 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         argumentsBuilder.Append($" --launcherMethod {method}");
         argumentsBuilder.Append($" --processId {Environment.ProcessId} --timeoutMs 60000");
         argumentsBuilder.Append($" --exePath=\"{processPath}\"");
-        argumentsBuilder.Append($" --exeArguments=\"{arguments}\"");
-        argumentsBuilder.Append($" --exeVerb=\"{verb}\"");
+        if (!string.IsNullOrEmpty(arguments))
+        {
+            argumentsBuilder.Append($" --exeArguments=\"{arguments}\"");
+        }
+        if (!string.IsNullOrEmpty(verb))
+        {
+            argumentsBuilder.Append($" --exeVerb=\"{verb}\"");
+        }
         var startInfo = new ProcessStartInfo()
         {
             UseShellExecute = true,
@@ -312,6 +318,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             Verb = verb ?? string.Empty
         };
         var startInfoString = new {startInfo.FileName, startInfo.Arguments, startInfo.Verb, startInfo.UseShellExecute};
+        Log.Info($"Spawning new process, exe: {startInfo.FileName}, args: {startInfo.Arguments}");
         var newProcess = Process.Start(startInfo) ?? throw new InvalidStateException($"Failed to start new process using args: {startInfoString}");
         Log.Info($"Spawned new process: {newProcess.Id}, args: {startInfoString}");
         Log.Info($"New process state: {new {newProcess.Id, newProcess.HasExited}}");
