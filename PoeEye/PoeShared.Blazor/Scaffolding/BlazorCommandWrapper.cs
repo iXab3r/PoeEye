@@ -114,8 +114,6 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         schedulerThreadId = Environment.CurrentManagedThreadId;
         InnerCommand = command;
         WpfCommand.CanExecuteChanged += InnerCommandOnCanExecuteChanged;
-
-        Disposable.Create(() => Log.Debug($"Command disposed")).AddTo(Anchors);
     }
 
     private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)

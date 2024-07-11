@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PoeShared.Blazor.Scaffolding;
 
 namespace PoeShared.Blazor.Controls;
 
@@ -74,7 +75,7 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
     /// Delay showing and hiding the tooltip (ms)—doesn’t apply to manual trigger type. If a number is supplied, delay is applied to both hide/show.   
     /// </summary>
     [Parameter]
-    public int Delay { get; set; } = 0;
+    public int Delay { get; set; } = 500;
 
     [Parameter] public string Container { get; set; } = string.Empty;
     [Parameter] public string Selector { get; set; } = string.Empty;
@@ -102,7 +103,7 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
             var module = await GetModuleAsync();
 
             await module.InvokeVoidAsync("destroy", ComponentId.ToString());
-            await module.DisposeAsync();
+            await module.DisposeJsSafeAsync();
         }
         catch (Exception e)
         {
