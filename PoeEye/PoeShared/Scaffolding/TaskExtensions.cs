@@ -7,7 +7,7 @@ namespace PoeShared.Scaffolding;
 public static class TaskExtensions
 {
     public const int SleepWarningThresholdMs = 20;
-    public const int SleepLowPrecisionThresholdMs = 12;
+    public const int SleepLowPrecisionThresholdMs = 15;
 
     private static readonly IFluentLog Log = typeof(TaskExtensions).PrepareLogger();
     private static readonly int MinWaitHandleTimeoutInMs = 50;
@@ -17,27 +17,27 @@ public static class TaskExtensions
         Sleep(cancellationToken, timeout, null);
     }
 
-    public static void Sleep(this CancellationToken cancellationToken, int millisecondsTimeout)
+    public static void Sleep(this CancellationToken cancellationToken, double millisecondsTimeout)
     {
         Sleep(cancellationToken, millisecondsTimeout, null);
     }
 
     public static void Sleep(TimeSpan timeout)
     {
-        Sleep((int)timeout.TotalMilliseconds);
+        Sleep(timeout.TotalMilliseconds);
     }
     
-    public static void Sleep(int millisecondsTimeout)
+    public static void Sleep(double millisecondsTimeout)
     {
         Sleep(CancellationToken.None, millisecondsTimeout, null);
     }
        
-    public static void Sleep(int millisecondsTimeout, IFluentLog log)
+    public static void Sleep(double millisecondsTimeout, IFluentLog log)
     {
         Sleep(CancellationToken.None, millisecondsTimeout, log);
     }
     
-    public static void Sleep(this CancellationToken cancellationToken, int millisecondsTimeout, IFluentLog log)
+    public static void Sleep(this CancellationToken cancellationToken, double millisecondsTimeout, IFluentLog log)
     {
         var sw = ValueStopwatch.StartNew();
         var isLogging = log?.IsDebugEnabled ?? false;
@@ -50,7 +50,7 @@ public static class TaskExtensions
                 log.Debug($"Sleeping for {millisecondsTimeout}ms using combined wait");
             }
 
-            var sleepDuration = millisecondsTimeout - SleepLowPrecisionThresholdMs;
+            var sleepDuration = (int)(millisecondsTimeout - SleepLowPrecisionThresholdMs);
             if (sleepDuration > 0)
             {
                 Thread.Sleep(sleepDuration);
@@ -69,7 +69,7 @@ public static class TaskExtensions
             {
                 log.Debug($"Sleeping for {millisecondsTimeout}ms using wait handle");
             }
-            cancelled = cancellationToken.WaitHandle.WaitOne(millisecondsTimeout);
+            cancelled = cancellationToken.WaitHandle.WaitOne((int)millisecondsTimeout);
         }
         
         if (cancelled)
