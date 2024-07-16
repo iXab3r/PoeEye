@@ -16,6 +16,18 @@ video {
     padding: 0 0.25rem;
 }
 
+.justify-self-left {
+    justify-self: left;
+}
+
+.justify-self-center {
+    justify-self: center;
+}
+
+.justify-self-right {
+    justify-self: right;
+}
+
 .d-grid-center{
     display: grid;
     place-items: center;

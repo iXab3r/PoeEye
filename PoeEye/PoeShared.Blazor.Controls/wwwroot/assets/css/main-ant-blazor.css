@@ -51,6 +51,11 @@
     color: var(--eye-MaterialDesignBody);
 }
 
+.ant-radio-disabled + span {
+    color: inherit;
+    opacity: 0.6;
+}
+
 .ant-table {
     background: transparent;
 }
