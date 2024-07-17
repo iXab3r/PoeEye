@@ -19,6 +19,11 @@ public sealed record Cached<T>
 
     public T Value { get; private set; }
 
+    public T Refresh(T value)
+    {
+        return Refresh(() => value);
+    }
+    
     public T Refresh(Func<T> valueFactory)
     {
         var currentMilliseconds = stopwatch.ElapsedMilliseconds;

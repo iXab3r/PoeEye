@@ -17,6 +17,11 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
     /// Gets the overall progress percentage, calculated as the average of all tracked tasks' progress.
     /// </summary>
     public int ProgressPercent { get; private set; }
+
+    public void Reset()
+    {
+        progressByTask.Clear();
+    }
         
     /// <summary>
     /// Updates the progress of a specified task and recalculates the overall progress percentage.
