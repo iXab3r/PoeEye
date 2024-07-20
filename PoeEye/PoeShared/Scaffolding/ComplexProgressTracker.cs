@@ -7,7 +7,8 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
 {
     private static readonly IFluentLog Log = typeof(ComplexProgressTracker).PrepareLogger();
 
-    private readonly IDictionary<string, int> progressByTask = new Dictionary<string, int>();
+    private readonly ConcurrentDictionary<string, ProgressReporter> progressByTask = new();
+    
     public ComplexProgressTracker()
     {
             
@@ -17,10 +18,17 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
     /// Gets the overall progress percentage, calculated as the average of all tracked tasks' progress.
     /// </summary>
     public int ProgressPercent { get; private set; }
+    
+    /// <summary>
+    /// Last reported task name
+    /// </summary>
+    public string TaskName { get; private set; }
 
     public void Reset()
     {
         progressByTask.Clear();
+        ProgressPercent = 0;
+        TaskName = default;
     }
         
     /// <summary>
@@ -28,11 +36,51 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
     /// </summary>
     /// <param name="progressPercent">The progress percentage of the task.</param>
     /// <param name="taskName">The name of the task being updated.</param>
-    public void Update(int progressPercent, string taskName)
+    public void Update(double progressPercent, string taskName)
     {
-        progressByTask[taskName] = progressPercent;
-        var totalProgress = (int)progressByTask.Values.Average();
-        Log.Debug($"{taskName} is in progress: {progressPercent}%");
+        var reporter = GetOrAdd(taskName);
+        reporter.Update(progressPercent);
+    }
+
+    private void Update(ProgressReporter reporter)
+    {
+        var totalWeight = progressByTask.Values.Sum(x => x.Weight);
+        var weightedProgressSum = progressByTask.Values
+            .Sum(x => x.ProgressPercent * x.Weight);
+        var totalProgress = totalWeight > 0 ? (int)(weightedProgressSum / totalWeight) : 0;
+
+        Log.Debug($"{reporter.TaskName} reported progress: {reporter.ProgressPercent}%, total: {totalProgress}%");
+        TaskName = reporter.TaskName;
         ProgressPercent = totalProgress;
+    }
+
+    public IProgressReporter GetOrAdd(string taskName, double weight = 1)
+    {
+        return progressByTask.GetOrAdd(taskName, name => new ProgressReporter(this, name, weight));
+    }
+
+    private sealed class ProgressReporter : IProgressReporter
+    {
+        private readonly ComplexProgressTracker progressTracker;
+        
+        public ProgressReporter(ComplexProgressTracker progressTracker, string taskName, double weight)
+        {
+            TaskName = taskName;
+            Weight = weight;
+            this.progressTracker = progressTracker;
+            Update(0);
+        }
+
+        public string TaskName { get; }
+        
+        public double Weight { get; }
+        
+        public double ProgressPercent { get; private set; }
+
+        public void Update(double progressPercent)
+        {
+            ProgressPercent = progressPercent;
+            progressTracker.Update(this);
+        }
     }
 }
