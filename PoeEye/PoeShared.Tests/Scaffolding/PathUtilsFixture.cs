@@ -22,6 +22,7 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("a", "a\\b\\c", "a\\c\\d")]
     [TestCase("a\\b", "a\\b")]
     [TestCase("a\\b", "a\\b", "a\\b\\c")]
+    [TestCase("a/b", "a/b", "a/b/c")]
     public void ShouldGetLongestCommonPath(string expected, params string[] paths)
     {
         //Given
@@ -48,6 +49,10 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("a", "a\\b\\c", "a\\c\\d")]
     [TestCase("a", "a\\b")]
     [TestCase("a", "a\\b", "a\\b\\c")]
+    [TestCase("a", "a", "a\\b", "a\\b\\c")]
+    [TestCase("a", "a", "a/b", "a/b/c")]
+    [TestCase("a", "a", "a\\b", "a\\b\\c")]
+    [TestCase("a", "a\\b", "a\\b\\c", "a\\b\\c\\d")]
     public void ShouldGetRootPath(string expected, params string[] paths)
     {
         //Given
