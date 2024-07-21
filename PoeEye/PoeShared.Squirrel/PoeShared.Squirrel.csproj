@@ -35,7 +35,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PoeShared.Squirrel.Shared\PoeShared.Squirrel.Shared.csproj" />
+    <ProjectReference Include="..\PoeShared.Squirrel.Metadata\PoeShared.Squirrel.Metadata.csproj" />
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
     <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />

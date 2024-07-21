@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using NuGet;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
-using PoeShared.Squirrel.Scaffolding;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Readers;
 using Splat;
@@ -79,7 +78,7 @@ public class ReleasePackage : IEnableLogger, IReleasePackage
 
                         try
                         {
-                            Utility.Retry(
+                            Scaffolding.Utility.Retry(
                                 () =>
                                 {
                                     if (reader.Entry.IsDirectory)

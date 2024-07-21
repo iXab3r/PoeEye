@@ -97,7 +97,7 @@ public partial class UnsafeNative
         return downscaledFrame.X < bounds.X ||
                downscaledFrame.Y < bounds.Y ||
                !bounds.Contains(downscaledFrame);
-    }
+    }   
 
         
     public static bool IsOutOfBounds(Point point, Rect bounds)
