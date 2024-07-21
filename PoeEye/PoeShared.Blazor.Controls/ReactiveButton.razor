@@ -13,7 +13,7 @@
 }
 else
 {
-    <button class="@Class" style="@Style" id="@Id" type="button" @onclick="Execute" disabled="@(IsBusy || !IsEnabled)">
+    <button class="@Class" style="@Style" id="@Id" type="@HtmlType" @onclick="Execute" disabled="@(IsBusy || !IsEnabled)">
         @ChildContent
         @if (ShowIsBusyIcon && IsBusy)
         {
@@ -57,6 +57,9 @@ else
     [Parameter]
     public bool HideIfDisabled { get; set; }
 
+    [Parameter]
+    public string HtmlType { get; set; } = "button";
+
     public bool IsBusy { get; private set; }
 
     public string Error { get; private set; }
@@ -78,10 +81,6 @@ else
     
     private async Task Execute()
     {
-        if (CommandEx == null)
-        {
-            throw new InvalidOperationException("Command is not specified");
-        }
         if (IsBusy)
         {
             throw new InvalidOperationException("Command is already executing");
@@ -92,7 +91,11 @@ else
         var sw = Stopwatch.StartNew();
         try
         {
-            await CommandEx.ExecuteAsync(CommandParameter);
+            var cmd = CommandEx;
+            if (cmd != null)
+            {
+                await cmd.ExecuteAsync(CommandParameter);
+            }
         }
         catch (Exception)
         {

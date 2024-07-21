@@ -12,7 +12,7 @@ public static class JsObjectsExtensions
         {
             reference.Dispose();
         }
-        catch (JSException)
+        catch (Exception e) when (e.IsJSException())
         {
             // During disposal ignore such errors because there is a chance that browser context is already disposed
         }
@@ -24,7 +24,7 @@ public static class JsObjectsExtensions
         {
             disposable.Dispose();
         }
-        catch (JSException)
+        catch (Exception e) when (e.IsJSException())
         {
             // During disposal ignore such errors because there is a chance that browser context is already disposed
         }
@@ -36,7 +36,7 @@ public static class JsObjectsExtensions
         {
             await disposable.DisposeAsync();
         }
-        catch (JSException)
+        catch (Exception e) when (e.IsJSException())
         {
             // During disposal ignore such errors because there is a chance that browser context is already disposed
         }

@@ -118,12 +118,13 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
 
     private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)
     {
+#if WINDOWS // this code makes sense only for Windows / WPF
         if (Environment.CurrentManagedThreadId == schedulerThreadId)
         {
             return;
         }
-
         Log.Error($"CanExecute is executed on an invalid thread, expected thread: {schedulerThreadId}, actual: {Thread.CurrentThread} id: {Environment.CurrentManagedThreadId}");
+#endif
     }
         
     public IObservable<Exception> ThrownExceptions => thrownExceptions;
