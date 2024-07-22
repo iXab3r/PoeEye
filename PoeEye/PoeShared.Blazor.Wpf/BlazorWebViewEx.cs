@@ -87,6 +87,10 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.WebView.LostFocus += WebViewOnLostFocus;
         e.WebView.NavigationCompleted += WebViewOnNavigationCompleted;
         e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
+        e.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false; //disables Ctrl+F, Ctrl+P, etc. DOES NOT DISABLE Ctrl+A/C/V
+        e.WebView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; 
+        e.WebView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false; 
+        e.WebView.PreviewKeyDown += WebViewOnPreviewKeyDown;
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
         Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
         foreach (var rootDirectory in drives)
@@ -107,6 +111,11 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
             }
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
         }
+    }
+
+    private void WebViewOnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        //can intercept/handle keys here via WebView2 CoreWebView2Controller_AcceleratorKeyPressed
     }
 
     private void WebViewOnNavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
