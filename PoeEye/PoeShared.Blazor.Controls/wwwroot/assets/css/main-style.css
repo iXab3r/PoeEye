@@ -51,6 +51,12 @@ video {
     padding-right: 3px;
 }
 
+.spinner-border-lg {
+    --bs-spinner-width: 5rem;
+    --bs-spinner-height: 5rem;
+    --bs-spinner-border-width: 0.5em;
+}
+
 .shadowed {
     -webkit-box-shadow: 5px 5px 15px 5px #000000;
     box-shadow: 5px 5px 15px 5px #000000;
