@@ -36,7 +36,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             })
             .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
             .RegisterSingleton<IAppArguments, AppArguments>()
-            .RegisterFactory<IRandomNumberGenerator>(_ => RandomNumberGenerator.Instance)
+            .RegisterSingleton<IRandomNumberGenerator>(_ => RandomNumberGenerator.Instance)
             .RegisterSingleton<IPoeConfigConverterMigrationService, PoeConfigConverterMigrationService>()
             .RegisterSingleton<PoeConfigMetadataReplacementService>(typeof(IPoeConfigMetadataReplacementRepository), typeof(IPoeConfigMetadataReplacementService))
             .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()

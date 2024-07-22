@@ -1,4 +1,5 @@
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using Unity;
 using Unity.Lifetime;
 
@@ -9,7 +10,7 @@ public static class UnityContainerExtensions
     public static IUnityContainer RegisterWindowTracker<T>(this IUnityContainer instance, string dependencyName) 
         where T : IWindowTrackerMatcher
     {
-        return instance.RegisterFactory<IWindowTracker>(
+        return instance.RegisterSingleton<IWindowTracker>(
             dependencyName,
             unity =>
             {
@@ -18,6 +19,6 @@ public static class UnityContainerExtensions
                 var result = factory.Create(windowTrackerMatcher);
                 result.Name = $"{dependencyName} (Lazy'{windowTrackerMatcher}')";
                 return result;
-            }, new ContainerControlledLifetimeManager());
+            });
     }
 }

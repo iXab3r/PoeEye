@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Wpf.Installer;
+using PoeShared.Scaffolding;
 using Unity;
 using Unity.Extension;
 
@@ -15,6 +16,6 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
             .RegisterType<IWebViewInstallerWindow, WebViewInstallerWindow>();
         
         Container.RegisterSingleton<IWebViewInstallerDisplayer, WebViewInstallerDisplayer>();
-        Container.RegisterFactory<IWebViewAccessor>(x => WebViewAccessor.Instance);
+        Container.RegisterSingleton<IWebViewAccessor>(x => WebViewAccessor.Instance);
     }
 }

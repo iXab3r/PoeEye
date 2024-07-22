@@ -12,7 +12,7 @@ public sealed class BlazorWebRegistrations : UnityContainerExtension
 {
     protected override void Initialize()
     {
-        Container.RegisterFactory<IServiceCollection>(x => UnityServiceCollection.Instance);
+        Container.RegisterSingleton<IServiceCollection>(x => UnityServiceCollection.Instance);
         UnityServiceCollection.Instance.AddSingleton<IUnityContainer>(Container);
         
         Container.RegisterSingleton<BlazorViewRepository>(typeof(IBlazorViewRepository), typeof(IBlazorViewRegistrator));

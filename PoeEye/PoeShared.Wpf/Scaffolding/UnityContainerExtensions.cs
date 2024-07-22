@@ -1,4 +1,5 @@
 using PoeShared.Native;
+using PoeShared.Scaffolding;
 using Unity;
 using Unity.Lifetime;
 using Unity.Resolution;
@@ -13,12 +14,11 @@ public static class UnityContainerExtensions
         string windowTrackerDependencyName)
     {
         instance
-            .RegisterFactory<IOverlayWindowController>(
+            .RegisterSingleton<IOverlayWindowController>(
                 dependencyName,
                 unity => unity.Resolve<TrackedOverlayWindowController>(
                     new DependencyOverride<IWindowTracker>(
-                        unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
-                new ContainerControlledLifetimeManager());
+                        unity.Resolve<IWindowTracker>(windowTrackerDependencyName))));
 
         return instance;
     }
@@ -28,11 +28,10 @@ public static class UnityContainerExtensions
         string windowTrackerDependencyName)
     {
         instance
-            .RegisterFactory<IOverlayWindowController>(
+            .RegisterSingleton<IOverlayWindowController>(
                 unity => unity.Resolve<TrackedOverlayWindowController>(
                     new DependencyOverride<IWindowTracker>(
-                        unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
-                new ContainerControlledLifetimeManager());
+                        unity.Resolve<IWindowTracker>(windowTrackerDependencyName))));
 
         return instance;
     }
