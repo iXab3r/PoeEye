@@ -87,7 +87,9 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.WebView.LostFocus += WebViewOnLostFocus;
         e.WebView.NavigationCompleted += WebViewOnNavigationCompleted;
         e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
+        #if !DEBUG
         e.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false; //disables Ctrl+F, Ctrl+P, etc. DOES NOT DISABLE Ctrl+A/C/V
+        #endif
         e.WebView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; 
         e.WebView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false; 
         e.WebView.PreviewKeyDown += WebViewOnPreviewKeyDown;
