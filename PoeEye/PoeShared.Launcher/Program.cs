@@ -21,11 +21,6 @@ public static class Program
     
     public static void HandleStartup()
     {
-        #if DEBUG
-            SharedLog.Instance.AddConsoleAppender();
-            Log.Info("Launcher is running in debug mode");
-        #endif
-        
         var result = ParseArguments();
         if (result is not Parsed<LauncherArguments>)
         {
@@ -45,6 +40,9 @@ public static class Program
     {
         try
         {
+            SharedLog.Instance.AddLocalLogFileAppender();
+            Log.Info("Launcher is running in debug mode");
+            
             var handler = new LauncherServiceHandler();
             handler.AddHandler(nameof(LauncherMethod.Version), HandleVersion);
             handler.AddHandler<RestartAppArguments>(nameof(LauncherMethod.RestartApp), HandleRestart);

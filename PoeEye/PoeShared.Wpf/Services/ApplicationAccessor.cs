@@ -147,9 +147,32 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     public IObservable<Unit> WhenLoaded => this.WhenAnyValue(x => x.IsLoaded).Where(x => x).Take(1).ToUnit();
 
     public bool IsExiting { get; private set; }
+    
+    public void RestartAs(string processPath, string arguments = default, string verb = default)
+    {
+        SharedLog.Instance.SwitchImmediateFlush(true);
+
+        RestartAsUsingPowershell(processPath, arguments, verb);
+    }
+
+    public void RestartAsAdmin()
+    {
+        SharedLog.Instance.SwitchImmediateFlush(true);
+
+        RestartAsAdminUsingLauncher();
+    }
+
+    public void ReplaceExecutable(string processPath, string arguments = default)
+    {
+        SharedLog.Instance.SwitchImmediateFlush(true);
+
+        RestartUsingLauncher(processPath, arguments, verb: default, LauncherMethod.SwapApp);
+    }
 
     public void Terminate(int exitCode)
     {
+        SharedLog.Instance.SwitchImmediateFlush(true);
+        
         ReportTermination(exitCode);
 
         using var processHandle = Kernel32.GetCurrentProcess();
@@ -168,6 +191,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
     public void Exit()
     {
+        SharedLog.Instance.SwitchImmediateFlush(true);
+
         Log.Info($"Attempting to gracefully shutdown application, IsExiting: {IsExiting}");
         lock (application)
         {
@@ -232,21 +257,6 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Terminate(0); // using this instead of App.Shutdown() to avoid async issues
     }
 
-    public void RestartAs(string processPath, string arguments = default, string verb = default)
-    {
-        RestartAsUsingPowershell(processPath, arguments, verb);
-    }
-
-    public void RestartAsAdmin()
-    {
-        RestartAsAdminUsingLauncher();
-    }
-
-    public void ReplaceExecutable(string processPath, string arguments = default)
-    {
-        RestartUsingLauncher(processPath, arguments, verb: default, LauncherMethod.SwapApp);
-    }
-    
     private void RestartAsAdminUsingLauncher()
     {
         Log.Info("Restarting current process with admin privileges using launcher");
@@ -261,6 +271,10 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         LauncherMethod method)
     {
         Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
+        if (string.IsNullOrEmpty(processPath))
+        {
+            throw new ArgumentException("Failed to resolve executable path");
+        }
 
         if (arguments != null && arguments.Contains('-'))
         {
@@ -274,7 +288,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             RestartUsingLauncher(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb, method);
             return;
         }
-
+        
         ReportTermination(0); // report termination to release locks, resources, etc
 
         var launcherPath = method switch
@@ -287,20 +301,11 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         {
             throw new ArgumentException("Failed to resolve launcher path");
         }
-        var exePath = method switch
-        {
-            LauncherMethod.SwapApp => Environment.ProcessPath,
-            LauncherMethod.RestartApp => processPath,
-            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported restart method: {method}")
-        };
-        if (string.IsNullOrEmpty(exePath))
-        {
-            throw new ArgumentException("Failed to resolve executable path");
-        }
+     
         var argumentsBuilder = new StringBuilder();
         argumentsBuilder.Append($" --launcherMethod {method}");
         argumentsBuilder.Append($" --processId {Environment.ProcessId} --timeoutMs 60000");
-        argumentsBuilder.Append($" --exePath=\"{processPath}\"");
+        argumentsBuilder.Append($" --exePath=\"{Environment.ProcessPath}\"");
         if (!string.IsNullOrEmpty(arguments))
         {
             argumentsBuilder.Append($" --exeArguments=\"{arguments}\"");
@@ -317,6 +322,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             WindowStyle = ProcessWindowStyle.Hidden,
             Verb = verb ?? string.Empty
         };
+        
+        
         var startInfoString = new {startInfo.FileName, startInfo.Arguments, startInfo.Verb, startInfo.UseShellExecute};
         Log.Info($"Spawning new process, exe: {startInfo.FileName}, args: {startInfo.Arguments}");
         var newProcess = Process.Start(startInfo) ?? throw new InvalidStateException($"Failed to start new process using args: {startInfoString}");

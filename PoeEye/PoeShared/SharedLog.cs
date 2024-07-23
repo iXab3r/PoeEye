@@ -106,6 +106,12 @@ public class SharedLog : DisposableReactiveObject
             appender.ImmediateFlush = immediateFlush;
             updatedAppenders.Add(appender);
         }
+
+        if (!updatedAppenders.Any())
+        {
+            return;
+        }
+
         repository.RaiseConfigurationChanged(EventArgs.Empty);
         Log.Warn($"ImmediateFlush switched to {immediateFlush} for {updatedAppenders.Count} appender(s):\n\t{updatedAppenders.Select(x => new { x.Name, x.File, x.Threshold, x.LockingModel }).DumpToTable()}");
     }
@@ -157,6 +163,29 @@ public class SharedLog : DisposableReactiveObject
             }
         };
         return AddAppender(consoleAppender);
+    }
+    
+    public IDisposable AddLocalLogFileAppender()
+    {
+        var fileAppender = new RollingFileAppender()
+        {
+            Threshold = Level.All,
+            StaticLogFileName = true,  // Set to true if you don't need the filename to change dynamically
+            File = "logs/app.log",
+            ImmediateFlush = true,
+            AppendToFile = true,
+            MaxFileSize = 1024 * 1024 * 100, // 100 MB
+            RollingStyle = RollingFileAppender.RollingMode.Size,
+            MaxSizeRollBackups = 10,  // Maximum number of backup files to keep
+            Layout = new PatternLayout()
+            {
+                ConversionPattern = "%date [%thread] %-5level %logger - %message%newline"
+            }
+        };
+        ((PatternLayout)fileAppender.Layout).ActivateOptions();
+        fileAppender.ActivateOptions();
+        
+        return AddAppender(fileAppender);
     }
         
     private sealed class Log4NetTraceListener : System.Diagnostics.TraceListener
