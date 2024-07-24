@@ -33,8 +33,6 @@ public interface ITreeViewItemViewModel : IDisposableReactiveObject, ICanBeSelec
         
     IComparer<ITreeViewItemViewModel> SortComparer { get; set; }
         
-    Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen { get; set; }
-    
     IReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
     
     /// <summary>
