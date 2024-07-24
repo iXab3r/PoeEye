@@ -142,7 +142,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
             Log.Debug($"Report sent to {Config.ReportHandler}: {result}");
             SentReportId = result;
             Status = $"Report sent";
-            await messageBoxService.ShowMessage("Report sent successfully", $"Your report has Id {result}. Feel free to send this Id via Discord or by any other means if you consider this bug important, this will speed up processing process");
+            await messageBoxService.ShowMessage("Report sent successfully", $"Your report has Id {result}");
         }
         catch (Exception ex)
         {
