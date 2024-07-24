@@ -63,44 +63,26 @@ public class ReleasePackage : IEnableLogger, IReleasePackage
                         var fullTargetDir = Path.GetDirectoryName(fullTargetFile);
                         Directory.CreateDirectory(fullTargetDir);
 
-                        var failureIsOkay = false;
                         if (!reader.Entry.IsDirectory && decoded.Contains("_ExecutionStub.exe"))
                         {
                             // NB: On upgrade, many of these stubs will be in-use, nbd tho.
-                            failureIsOkay = true;
-
-                            fullTargetFile = Path.Combine(
-                                rootPackageFolder,
-                                Path.GetFileName(decoded).Replace("_ExecutionStub.exe", ".exe"));
-
-                            LogHost.Default.Info($"Rigging execution stub for {decoded} to {fullTargetFile}");
+                            LogHost.Default.Info($"Skipping execution stub {decoded}");
+                            continue;
                         }
-
-                        try
-                        {
-                            Scaffolding.Utility.Retry(
-                                () =>
-                                {
-                                    if (reader.Entry.IsDirectory)
-                                    {
-                                        Directory.CreateDirectory(fullTargetFile);
-                                    }
-                                    else
-                                    {
-                                        reader.WriteEntryToFile(fullTargetFile);
-                                    }
-                                },
-                                5);
-                        }
-                        catch (Exception e)
-                        {
-                            if (!failureIsOkay)
+                        
+                        Scaffolding.Utility.Retry(
+                            () =>
                             {
-                                throw;
-                            }
-
-                            Log.Warn("Can't write execution stub, probably in use", e);
-                        }
+                                if (reader.Entry.IsDirectory)
+                                {
+                                    Directory.CreateDirectory(fullTargetFile);
+                                }
+                                else
+                                {
+                                    reader.WriteEntryToFile(fullTargetFile);
+                                }
+                            },
+                            5);
                     }
                 }
             });
