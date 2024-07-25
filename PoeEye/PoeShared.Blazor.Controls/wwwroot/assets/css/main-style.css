@@ -57,6 +57,31 @@ video {
     --bs-spinner-border-width: 0.5em;
 }
 
+.text-small {
+    font-size: 0.75em;
+}
+
+@media (min-width: 576px) {
+    .container-xs {
+        max-width: 540px;
+    }
+}
+@media (min-width: 768px) {
+    .container-xs {
+        max-width: 720px;
+    }
+}
+@media (min-width: 992px) {
+    .container-xs {
+        max-width: 960px;
+    }
+}
+@media (min-width: 1200px) {
+    .container-xs {
+        max-width: 1140px;
+    }
+}
+
 .shadowed {
     -webkit-box-shadow: 5px 5px 15px 5px #000000;
     box-shadow: 5px 5px 15px 5px #000000;
@@ -91,6 +116,12 @@ video {
     border-color: var(--bs-warning);
     pointer-events: none;
     z-index: 1;
+}
+
+.hr-gradient {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--eye-Accent100), rgba(0, 0, 0, 0));
 }
 
 .image-style-align-left{
