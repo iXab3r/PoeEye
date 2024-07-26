@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -25,6 +28,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     private static long globalIdx;
 
     private readonly Lazy<IFluentLog> logSupplier;
+    private ImmutableQueue<Func<Task>> afterRenderCallQueue = ImmutableQueue<Func<Task>>.Empty;
     private long refreshRequestCount;
     private long refreshCount;
     private long renderCount;
@@ -50,6 +54,8 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
             })
             .SubscribeAsync(async reason => await Refresh(reason))
             .AddTo(Anchors);
+
+        Disposable.Create(() => afterRenderCallQueue = afterRenderCallQueue.Clear()).AddTo(Anchors);
     }
     
     /// <summary>
@@ -135,6 +141,15 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         Dispose();
         GC.SuppressFinalize(this);
     }
+
+    protected void AddAfterRenderTask(Func<Task> taskSupplier)
+    {
+        if (Anchors.IsDisposed)
+        {
+            return;
+        }
+        afterRenderCallQueue = afterRenderCallQueue.Enqueue(taskSupplier);
+    }
     
     /// <summary>
     /// Prepares the logger for this component.
@@ -200,6 +215,22 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         {
             await OnAfterFirstRenderAsync();
             IsComponentRendered = true;
+        }
+
+        if (afterRenderCallQueue.Any())
+        {
+            var toExecute = afterRenderCallQueue;
+            afterRenderCallQueue = ImmutableQueue<Func<Task>>.Empty;
+            
+            foreach (var afterRenderTask in toExecute)
+            {
+                if (Anchors.IsDisposed)
+                {
+                    break;
+                }
+
+                await afterRenderTask();
+            }
         }
     }
 

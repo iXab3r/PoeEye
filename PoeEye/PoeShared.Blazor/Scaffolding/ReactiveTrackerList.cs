@@ -1,21 +1,29 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using DynamicData;
 
 namespace PoeShared.Blazor.Scaffolding;
 
-public sealed class ReactiveTrackerList : List<IObservable<string>>
+public sealed class ReactiveTrackerList : ConcurrentBag<IObservable<string>>
 {
     public ReactiveTrackerList(params IObservable<string>[] sources)
     {
         Add(sources);
     }
     
+    public void Add<T>(IObservable<T> source)
+    {
+        base.Add(source.Select(x => x?.ToString()));
+    }
 
     public void Add(params IObservable<string>[] sources)
     {
-        AddRange(sources);
+        foreach (var src in sources)
+        {
+            Add<string>(src);
+        }
     }
     
     public void Add<TOut>(IObservableList<TOut> observableList)
@@ -26,11 +34,6 @@ public sealed class ReactiveTrackerList : List<IObservable<string>>
     public void Add<TOut>(IObservable<IChangeSet<TOut>> changeSetObservable)
     {
         Add(changeSetObservable.Select(x =>  new{ x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes }));
-    }
-    
-    public void Add<T>(IObservable<T> source)
-    {
-        base.Add(source.Select(x => x?.ToString()));
     }
     
     public void Add<T, T1>(IObservable<T> source1, IObservable<T1> source2)

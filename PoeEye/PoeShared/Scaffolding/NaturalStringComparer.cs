@@ -7,6 +7,10 @@ namespace PoeShared.Scaffolding;
 /// </summary>
 public class NaturalStringComparer : IComparer<string>
 {
+    private static readonly Lazy<NaturalStringComparer> InstanceSupplier = new();
+
+    public static NaturalStringComparer Instance => InstanceSupplier.Value;
+    
     /// <summary>
     /// The comparer for sequences of objects.
     /// </summary>

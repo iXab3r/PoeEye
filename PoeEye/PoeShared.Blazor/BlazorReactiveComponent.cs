@@ -15,7 +15,7 @@ public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
 public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponent where TContext : class
 {
     private static readonly Binder<BlazorReactiveComponent<TContext>> Binder = new();
-
+    
     static BlazorReactiveComponent()
     {
     }

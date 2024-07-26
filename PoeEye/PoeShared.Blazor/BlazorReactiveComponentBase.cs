@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using PoeShared.Blazor.Internals;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 
@@ -24,6 +26,8 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     private readonly Subject<object> whenChanged = new();
     private readonly ReactiveChangeDetector changeDetector = new();
     
+    
+    
     /// <summary>
     /// Static constructor to initialize the binder for the component.
     /// </summary>
@@ -38,6 +42,8 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     /// </summary>
     protected BlazorReactiveComponentBase()
     {
+        ChangeTrackers = new ReactiveTrackerList();
+        
         this.WhenAnyProperty(x => x.DataContext)
             .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
             .AddTo(Anchors);
@@ -82,6 +88,8 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     /// Observable sequence that signals when a property of the component changes.
     /// </summary>
     public IObservable<object> WhenChanged => whenChanged;
+    
+    protected ReactiveTrackerList ChangeTrackers { get; } 
     
     /// <summary>
     /// Tracks changes in the specified context using a selector expression.
