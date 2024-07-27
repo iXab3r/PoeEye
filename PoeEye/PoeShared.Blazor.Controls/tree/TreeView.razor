@@ -3,7 +3,8 @@
 @typeparam TItem
 
 <div class="@($"{classMapper.Class} {Class}")" style="@Style" @ref="Ref"
-     @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(HandleContextMenu))" @oncontextmenu:preventDefault="@OnContextMenu.HasDelegate">
+     @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(HandleContextMenu))" 
+     @oncontextmenu:preventDefault="@OnContextMenu.HasDelegate">
     <div class="ant-tree-list">
         <div class="ant-tree-list-holder-inner">
             <CascadingValue Value="this" Name="Tree" IsFixed="@true">

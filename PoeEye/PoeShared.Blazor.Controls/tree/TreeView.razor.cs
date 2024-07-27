@@ -8,7 +8,6 @@ using DynamicData;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.Blazor.Controls;
 
@@ -33,19 +32,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             })
             .AsObservableCache()
             .AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.SelectedKey)
-            .SubscribeAsync(async x =>
-            {
-                UpdateSelectionState(x);
-                if (SelectedKeyChanged.HasDelegate)
-                {
-                    await SelectedKeyChanged.InvokeAsync(x);
-                }
-            })
-            .AddTo(Anchors);
-        
-
     }
 
     [Parameter]
@@ -78,12 +64,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     [Parameter]
     public bool Selectable { get; set; } = true;
-
-    [Parameter]
-    public string SelectedKey { get; set; }
-
-    [Parameter]
-    public EventCallback<string> SelectedKeyChanged { get; set; }
 
     [Parameter]
     public IEnumerable<TItem> DataSource { get; set; }
@@ -150,6 +130,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     [Parameter] public EventCallback<(string[] ExpandedKeys, TreeViewNode<TItem> Node, bool Expanded)> OnExpand { get; set; }
 
     [Parameter] public bool AutoExpandParent { get; set; }
+
+    public IObservableCache<TreeViewNode<TItem>, long> NodesById => nodesById;
     
     internal bool IsCtrlKeyDown { get; set; }
     
@@ -159,78 +141,22 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     [Inject] private IDomEventListener DomEventListener { get; set; }
 
-    public void DeselectAll()
-    {
-        foreach (var item in ChildNodes)
-        {
-            item.SetSelected(false);
-        }
-    }
-
-    public void SelectAll()
-    {
-        foreach (var item in ChildNodes)
-        {
-            item.SetSelected(true);
-        }
-    }
-
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         await base.SetParametersAsync(parameters);
     }
 
-    public TreeViewNode<TItem> GetNode(string key)
+    public IEnumerable<TreeViewNode<TItem>> EnumerateChildren()
     {
-        return nodesById.Items.FirstOrDefault(x => x.Key == key);
-    }
-
-    public TreeViewNode<TItem> FindFirstOrDefaultNode(Func<TreeViewNode<TItem>, bool> predicate, bool recursive = true)
-    {
-        foreach (var child in ChildNodes)
+        foreach (var childNode in ChildNodes)
         {
-            if (predicate != null && predicate.Invoke(child))
+            foreach (var node in childNode.EnumerateChildrenAndSelf())
             {
-                return child;
-            }
-
-            if (recursive)
-            {
-                var find = child.FindFirstOrDefaultNode(predicate, recursive);
-                if (find != null)
-                {
-                    return find;
-                }
+                yield return node;
             }
         }
-
-        return null;
     }
 
-    public void ExpandAll(Func<TreeViewNode<TItem>, bool> predicate = null, bool recursive = true)
-    {
-        if (predicate != null)
-        {
-            _ = FindFirstOrDefaultNode(predicate, recursive).ExpandAll();
-        }
-        else
-        {
-            ChildNodes.ForEach(node => _ = node.ExpandAll());
-        }
-    }
-
-    public void CollapseAll(Func<TreeViewNode<TItem>, bool> predicate = null, bool recursive = true)
-    {
-        if (predicate != null)
-        {
-            _ = FindFirstOrDefaultNode(predicate, recursive).CollapseAll();
-        }
-        else
-        {
-            ChildNodes.ForEach(node => _ = node.CollapseAll());
-        }
-    }
-    
     public override ValueTask DisposeAsync()
     {
         DomEventListener?.Dispose();
@@ -246,26 +172,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     internal void AddNode(TreeViewNode<TItem> treeNode)
     {
         nodesById.AddOrUpdate(treeNode);
-    }
-
-    internal void SelectedNodeAdd(TreeViewNode<TItem> treeNode)
-    {
-        if (string.Equals(treeNode.Key, SelectedKey))
-        {
-            return;
-        }
-        
-        SelectedKey = treeNode.Key;
-    }
-
-    internal void SelectedNodeRemove(TreeViewNode<TItem> treeNode)
-    {
-        if (!string.Equals(treeNode.Key, SelectedKey))
-        {
-            return;
-        }
-
-        SelectedKey = default;
     }
 
     internal async Task OnNodeExpand(TreeViewNode<TItem> node, bool expanded, MouseEventArgs args)
@@ -286,7 +192,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             node.ParentNode?.Expand(true);
         }
     }
-    
+
     protected override void OnInitialized()
     {
         SetClassMapper();
@@ -335,17 +241,5 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     private void HandleCtrlKeyPress(KeyboardEventArgs eventArgs)
     {
         IsCtrlKeyDown = eventArgs.CtrlKey || eventArgs.MetaKey;
-    }
-
-    private void UpdateSelectionState(string selectedKey)
-    {
-        foreach (var node in nodesById.Items)
-        {
-            var isSelected = !string.IsNullOrEmpty(selectedKey) && string.Equals(selectedKey, node.Key);
-            if (isSelected != node.Selected)
-            {
-                node.SetSelected(isSelected);
-            }
-        }
     }
 }

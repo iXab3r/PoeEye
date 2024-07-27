@@ -28,7 +28,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     private static long globalIdx;
 
     private readonly Lazy<IFluentLog> logSupplier;
-    private ImmutableQueue<Func<Task>> afterRenderCallQueue = ImmutableQueue<Func<Task>>.Empty;
+    private ImmutableQueue<DispatcherTask> afterRenderCallQueue = ImmutableQueue<DispatcherTask>.Empty;
     private long refreshRequestCount;
     private long refreshCount;
     private long renderCount;
@@ -142,15 +142,24 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         GC.SuppressFinalize(this);
     }
 
-    protected void AddAfterRenderTask(Func<Task> taskSupplier)
+    protected IDisposable AddAfterRenderValueTask(Func<ValueTask> taskSupplier)
     {
         if (Anchors.IsDisposed)
         {
-            return;
+            return Disposable.Empty;
         }
-        afterRenderCallQueue = afterRenderCallQueue.Enqueue(taskSupplier);
+
+        var newTask = new DispatcherTask(taskSupplier);
+        afterRenderCallQueue = afterRenderCallQueue.Enqueue(newTask);
+        return newTask;
     }
-    
+
+    protected IDisposable AddAfterRenderTask(Func<Task> taskSupplier)
+    {
+        Func<ValueTask> valueTaskSupplier = async () => await taskSupplier();
+        return AddAfterRenderValueTask(valueTaskSupplier);
+    }
+
     /// <summary>
     /// Prepares the logger for this component.
     /// </summary>
@@ -220,7 +229,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         if (afterRenderCallQueue.Any())
         {
             var toExecute = afterRenderCallQueue;
-            afterRenderCallQueue = ImmutableQueue<Func<Task>>.Empty;
+            afterRenderCallQueue = ImmutableQueue<DispatcherTask>.Empty;
             
             foreach (var afterRenderTask in toExecute)
             {
@@ -228,8 +237,8 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
                 {
                     break;
                 }
-
-                await afterRenderTask();
+                
+                await afterRenderTask.Run();
             }
         }
     }
@@ -310,5 +319,40 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         backingField = newValue;
         RaisePropertyChanged(propertyName);
         return newValue;
+    }
+
+    private readonly struct DispatcherTask : IDisposable
+    {
+        private readonly Func<ValueTask> taskSupplier;
+        private readonly CompositeDisposable anchor = new();
+
+        public DispatcherTask(Func<ValueTask> taskSupplier)
+        {
+            this.taskSupplier = taskSupplier;
+        }
+
+        public async ValueTask Run()
+        {
+            if (anchor.IsDisposed)
+            {
+                return;
+            }
+
+            var taskToRun = taskSupplier();
+
+            try
+            {
+                await taskToRun;
+            }
+            finally
+            {
+                Dispose();
+            }
+        }
+        
+        public void Dispose()
+        {
+            anchor.Dispose();
+        }
     }
 }

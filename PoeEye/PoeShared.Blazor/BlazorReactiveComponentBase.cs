@@ -120,7 +120,14 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     {
         changeDetector.TrackState(source);
     }
-    
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        ChangeTrackers.Merge().Subscribe(WhenRefresh).AddTo(Anchors);
+    }
+
     /// <summary>
     /// Represents a safe wrapper around the IJSRuntime to ensure proper usage within the component.
     /// </summary>

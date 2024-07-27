@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AntDesign;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -49,8 +47,22 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
         {
             return;
         }
+
+        foreach (var node in TreeComponent.NodesById.Items)
+        {
+            if (!node.Selected)
+            {
+                continue;
+            }
+
+            await node.SelectedChanged.InvokeAsync(false);
+        }
+        await SelfNode.SelectedChanged.InvokeAsync(true);
         
-        SelfNode.SetSelected(true);
+        if (TreeComponent.OnClick.HasDelegate && args.Button == 0)
+        {
+            await TreeComponent.OnClick.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode, args));
+        }
     }
 
     private async Task OnDblClick(MouseEventArgs args)
@@ -73,21 +85,12 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
     {
         TreeComponent.DragItem = SelfNode;
         await SelfNode.Expand(false);
-        
-        /*if (TreeComponent.OnDragStart.HasDelegate)
-        {
-            TreeComponent.OnDragStart.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode));
-        }*/
     }
 
     private void OnDragLeave(DragEventArgs e)
     {
         SelfNode.DragTarget = false;
         SelfNode.SetParentTargetContainer();
-        /*if (TreeComponent.OnDragLeave.HasDelegate)
-        {
-            TreeComponent.OnDragLeave.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode));
-        }*/
     }
 
     private void OnDragEnter(DragEventArgs e)
@@ -99,11 +102,6 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
         SelfNode.DragTarget = true;
         dragTargetClientX = e.ClientX;
-
-     /*   if (TreeComponent.OnDragEnter.HasDelegate)
-        {
-            TreeComponent.OnDragEnter.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, SelfNode));
-        }*/
     }
 
     /// <summary>

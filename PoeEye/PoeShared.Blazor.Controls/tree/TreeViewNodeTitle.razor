@@ -9,7 +9,7 @@
           @onclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))" 
           @ondblclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnDblClick))" 
           @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:stopPropagation="@TreeComponent.OnContextMenu.HasDelegate" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
-          @ondragover:preventDefault @ondragover="@OnDragOver" 
+          @ondragover="@OnDragOver" @ondragover:preventDefault
           @ondragleave="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave))" 
           @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter))"
           @ondrop="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDrop))" @ondrop:preventDefault
@@ -19,7 +19,7 @@
           aria-grabbed="true">
         @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
         {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") @(SelfNode.Loading ? "ant-tree-icon_loading" : "")">
+            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
                 <span class="ant-tree-iconEle ant-tree-icon__customize">
                     @TreeComponent.TitleIconTemplate(SelfNode)
                 </span>
@@ -27,7 +27,7 @@
         }
         else if (string.IsNullOrWhiteSpace(SelfNode.Icon) == false && TreeComponent.ShowIcon)
         {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") @(SelfNode.Loading ? "ant-tree-icon_loading" : "")">
+            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
                 <span class="ant-tree-iconEle ant-tree-icon__customize">
                     @if (string.IsNullOrWhiteSpace(SelfNode.Icon) == false)
                     {
@@ -68,7 +68,7 @@ else
           @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="TreeComponent.OnContextMenu.HasDelegate">
         @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
         {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") @(SelfNode.Loading ? "ant-tree-icon_loading" : "")">
+            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
                 <span class="ant-tree-iconEle ant-tree-icon__customize">
                     @TreeComponent.TitleIconTemplate(SelfNode)
                 </span>
@@ -76,7 +76,7 @@ else
         }
         else if ((!string.IsNullOrWhiteSpace(SelfNode.Icon) || SelfNode.IconTemplate != null) && TreeComponent.ShowIcon)
         {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") @(SelfNode.Loading ? "ant-tree-icon_loading" : "")">
+            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
                 <span class="ant-tree-iconEle ant-tree-icon__customize">
                     @if (SelfNode.IconTemplate != null)
                     {
