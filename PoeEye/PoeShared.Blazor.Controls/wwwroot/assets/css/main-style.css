@@ -61,6 +61,14 @@ video {
     font-size: 0.75em;
 }
 
+.text-lg {
+    font-size: 1.25em;
+}
+
+.text-lg-2x {
+    font-size: 2em;
+}
+
 @media (min-width: 576px) {
     .container-xs {
         max-width: 540px;
