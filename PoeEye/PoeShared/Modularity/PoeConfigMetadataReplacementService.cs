@@ -80,7 +80,7 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
     public bool TryGetReplacement(PoeConfigMetadata metadata, out PoeConfigMetadata replacementMetadata)
     {
-        if (string.IsNullOrWhiteSpace(metadata.TypeName))
+        if (metadata == null || string.IsNullOrWhiteSpace(metadata.TypeName))
         {
             replacementMetadata = default;
             return false;
@@ -96,10 +96,11 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
             return false;
         }
 
+        var targetMetadata = resolvedMetadata.TargetMetadata;
         var replacement = metadata with
         {
-            AssemblyName = resolvedMetadata.TargetMetadata.AssemblyName,
-            TypeName = resolvedMetadata.TargetMetadata.TypeName
+            AssemblyName = targetMetadata.AssemblyName,
+            TypeName = targetMetadata.TypeName
         };
         replacementMetadata = replacement;
         return true;
@@ -153,8 +154,8 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
     public PoeConfigMetadata AddMetadataReplacement(string sourceTypeName, Type targetType)
     {
         using var @lock = substitutionsLock.Enter();
-        var metadata = new PoeConfigMetadata(targetType);
-        AddMetadataReplacement(new MetadataReplacement {SourceTypeName = sourceTypeName, TargetMetadata = metadata});
-        return metadata;
+        var metadataReplacement = MetadataReplacement.ForType(sourceTypeName, targetType);
+        AddMetadataReplacement(metadataReplacement);
+        return metadataReplacement.TargetMetadata;
     }
 }

@@ -140,24 +140,48 @@ internal sealed class PoeConfigConverter : JsonConverter
 
     private PoeConfigMetadata DeserializeMetadata(JsonReader reader, Type serializedType, JsonSerializer serializer)
     {
-        var metadata = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType)
-            ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
-            : serializer.Deserialize<PoeConfigMetadata>(reader);
-        
-        if (!replacementService.TryGetReplacement(metadata, out var replacementMetadata))
+        PoeConfigMetadata metadata;
+        try
         {
-            Log.Debug($"Replacing legacy metadata: {metadata} => {replacementMetadata}");
-            return metadata;
+            metadata = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType)
+                ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
+                : serializer.Deserialize<PoeConfigMetadata>(reader);
         }
-        
-        if (replacementMetadata == null)
+        catch (Exception e)
         {
-            throw new PoeConfigException($"Replacement service returned null for metadata: {metadata}")
+            throw new PoeConfigException($"Failed to deserialize metadata from JSON, serialized type: {serializer}", e);
+        }
+
+        if (metadata == null)
+        {
+            Log.Warn($"Failed to deserialized metadata from JSON - got null instead of type {serializedType}");
+            return null;
+        }
+
+        try
+        {
+            if (!replacementService.TryGetReplacement(metadata, out var replacementMetadata))
             {
-                Metadata = metadata,
+                Log.Debug($"Replacing legacy metadata: {metadata} => {replacementMetadata}");
+                return metadata;
+            }
+            
+            if (replacementMetadata == null)
+            {
+                throw new PoeConfigException($"Replacement service returned null for metadata: {metadata}")
+                {
+                    Metadata = metadata,
+                };
+            }
+            return replacementMetadata;
+        }
+        catch (Exception e)
+        {
+            throw new PoeConfigException($"Failed to retrieve replacement instead of {metadata}", e)
+            {
+                Metadata = metadata
             };
         }
-        return replacementMetadata;
     }
 
     private object DeserializeMetadataValue(PoeConfigMetadata metadata, JsonSerializer serializer, Type resolvedValueType)
