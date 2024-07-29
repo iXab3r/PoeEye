@@ -55,9 +55,12 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
                 continue;
             }
 
+            node.Selected = false;
             await node.SelectedChanged.InvokeAsync(false);
         }
+        
         await SelfNode.SelectedChanged.InvokeAsync(true);
+        SelfNode.Selected = true;
         
         if (TreeComponent.OnClick.HasDelegate && args.Button == 0)
         {
