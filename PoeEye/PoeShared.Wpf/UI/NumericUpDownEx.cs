@@ -65,6 +65,15 @@ public class NumericUpDownEx : NumericUpDown
         }
     }
 
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            e.Handled = true;
+        }
+        base.OnPreviewKeyDown(e);
+    }
+
     private void TextBoxOnMouseUp(object sender, MouseButtonEventArgs e)
     {
         if (sender is not FrameworkElement uiElement)
