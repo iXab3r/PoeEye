@@ -23,6 +23,9 @@ public partial class ReactiveButton
         this.isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         Class = "btn btn-outline-secondary";
         
+        TrackChanges(this, x => x.IsBusy);
+        TrackChanges(this, x => x.Error);
+        
         this.WhenAnyValue<ReactiveButton, ICommandWrapper>(x => x.CommandEx)
             .Select(command => command != null ? command.WhenAnyValue(x => x.Error) : Observable.Return<string>(null))
             .Switch()

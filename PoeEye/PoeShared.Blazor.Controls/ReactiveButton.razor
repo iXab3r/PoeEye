@@ -2,11 +2,6 @@
 @inherits PoeShared.Blazor.BlazorReactiveComponent
 @inject INotificationService notificationService
 
-@{
-    Track(this, x => x.IsBusy);
-    Track(this, x => x.Error);
-}
-
 @if (HideIfDisabled && !IsEnabled)
 {
     // show nothing by default

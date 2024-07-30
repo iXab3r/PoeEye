@@ -13,6 +13,7 @@ using PoeShared.Blazor.Internals;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 using PropertyBinder;
+using ReactiveUI;
 
 namespace PoeShared.Blazor;
 
@@ -99,6 +100,21 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     /// <param name="context">The context to track changes in.</param>
     /// <param name="selector">The expression used to select the property to track.</param>
     /// <returns>The value of the property selected by the provided expression.</returns>
+    public void TrackChanges<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
+    {
+        ChangeTrackers.Add(context.WhenAnyValue(selector));
+    }
+    
+    
+    
+    /// <summary>
+    /// Tracks changes in the specified context using a selector expression.
+    /// </summary>
+    /// <typeparam name="TExpressionContext">The type of the context to track changes in.</typeparam>
+    /// <typeparam name="TOut">The type of the output from the selector expression.</typeparam>
+    /// <param name="context">The context to track changes in.</param>
+    /// <param name="selector">The expression used to select the property to track.</param>
+    /// <returns>The value of the property selected by the provided expression.</returns>
     public TOut Track<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
     {
         try
@@ -125,6 +141,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     {
         base.OnInitialized();
 
+        ChangeTrackers.Seal();
         ChangeTrackers.Merge().Subscribe(WhenRefresh).AddTo(Anchors);
     }
 
