@@ -38,7 +38,15 @@ public static class PropertyRuleBuilderExtensions
         }
         else
         {
-            dispatcherScheduler.Dispatcher.Invoke(() => action(context));
+            try
+            {
+                dispatcherScheduler.Dispatcher.Invoke(() => action(context));
+            }
+            catch (OperationCanceledException)
+            {
+                //if dispatcher is being shutdown, Invoke will throw
+                //considering binding is hard-wired to the scheduler, it makes sense to swallow this
+            }
         }
     }
 }
