@@ -20,7 +20,7 @@ internal sealed class BufferedItemsProcessor : DisposableReactiveObject, IBuffer
         this.scheduler = scheduler;
         timeoutEvent = new AutoResetEvent(false);
         requests = Channel.CreateUnbounded<Request>();
-        processingTask = new WorkerTask(HandleRequests).AddTo(Anchors);
+        processingTask = new WorkerTask(HandleRequests){ Name = "BIP Task" }.AddTo(Anchors);
     }
 
     public TimeSpan BufferPeriod { get; set; } = TimeSpan.Zero;

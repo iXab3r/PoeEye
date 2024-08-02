@@ -1,4 +1,7 @@
-﻿namespace PoeShared.Scaffolding;
+﻿using PropertyBinder;
+using ReactiveUI;
+
+namespace PoeShared.Scaffolding;
 
 public class WorkerTask : DisposableReactiveObject
 {
@@ -10,18 +13,48 @@ public class WorkerTask : DisposableReactiveObject
         Func<CancellationToken, Task> actionSupplier,
         bool autoStart = true)
     {
-        Log = GetType().PrepareLogger();
+        Log = GetType().PrepareLogger().WithSuffix(ToString);
         Log.Info($"Initializing new worker task");
+
         consumerTokenSource = new CancellationTokenSource();
-        consumerTask = new Task(() => DoWork(Log, consumerTokenSource.Token, actionSupplier));
+        consumerTask = new Task(() => DoWork(Log, actionSupplier, consumerTokenSource.Token));
+
+        Log.Info($"Worker task: {(consumerTask.Id)}");
+
+        this.WhenAnyValue(x => x.Name)
+            .WithPrevious()
+            .Subscribe(x =>
+            {
+                if (string.IsNullOrEmpty(x.Current))
+                {
+                    if (string.IsNullOrEmpty(x.Previous))
+                    {
+                    }
+                    else
+                    {
+                        Log.Info($"Worker task name is reset");
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(x.Previous))
+                    {
+                        Log.Info($"Worker task name is set to {x.Current}");
+                    }
+                    else
+                    {
+                        Log.Info($"Worker task name changed to {x.Current}");
+                    }
+                }
+            })
+            .AddTo(Anchors);
+
         if (autoStart)
         {
             Log.Info($"Auto-starting the task");
             Start();
         }
     }
-    
-    private IFluentLog Log { get; }
 
     public WorkerTask(
         Action<CancellationToken> action,
@@ -32,8 +65,12 @@ public class WorkerTask : DisposableReactiveObject
     }, autoStart)
     {
     }
-    
+
+    public string Name { get; set; }
+
     public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
+
+    private IFluentLog Log { get; }
 
     public void Start()
     {
@@ -60,14 +97,14 @@ public class WorkerTask : DisposableReactiveObject
 
             if (TerminationTimeout > TimeSpan.Zero && !consumerTask.Wait(TerminationTimeout))
             {
-                throw new InvalidStateException($"Failed to terminate task in {TerminationTimeout}");
+                throw new InvalidStateException($"Failed to terminate the task in {TerminationTimeout}: {this}");
             }
+
             Log.Debug($"Disposed and started processing successfully");
         }).AddTo(Anchors);
     }
-    
-    
-    private static void DoWork(IFluentLog log, CancellationToken cancellationToken, Func<CancellationToken, Task> consumerSupplier)
+
+    private static void DoWork(IFluentLog log, Func<CancellationToken, Task> consumerSupplier, CancellationToken cancellationToken)
     {
         try
         {
@@ -90,5 +127,12 @@ public class WorkerTask : DisposableReactiveObject
         {
             log.Debug("Task is terminating");
         }
+    }
+
+    protected override void FormatToString(ToStringBuilder builder)
+    {
+        base.FormatToString(builder);
+        builder.AppendParameterIfNotDefault(nameof(Name), Name);
+        builder.AppendParameterIfNotDefault("TaskId", consumerTask.Id);
     }
 }
