@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using ByteSizeLib;
 using JetBrains.Profiler.SelfApi;
-using PoeShared.Dialogs.Services;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -14,7 +13,6 @@ namespace PoeShared.Profiler;
 internal sealed class PerformanceProfiler : DisposableReactiveObjectWithLogger, IProfilerService
 {
     private readonly IUniqueIdGenerator idGenerator;
-    private readonly IMessageBoxService messageBoxService;
     private static readonly Binder<PerformanceProfiler> Binder = new();
 
     static PerformanceProfiler()
@@ -24,11 +22,9 @@ internal sealed class PerformanceProfiler : DisposableReactiveObjectWithLogger, 
     public PerformanceProfiler(
         IExceptionReportingService exceptionReportingService,
         TraceSnapshotReportProvider traceSnapshotReportProvider,
-        IUniqueIdGenerator idGenerator,
-        IMessageBoxService messageBoxService)
+        IUniqueIdGenerator idGenerator)
     {
         this.idGenerator = idGenerator;
-        this.messageBoxService = messageBoxService;
         TracesFolder = traceSnapshotReportProvider.TracesFolder;
 
         Log.Info($"Registering traces report provider");
@@ -63,7 +59,15 @@ internal sealed class PerformanceProfiler : DisposableReactiveObjectWithLogger, 
             var snapshotFilePath = DotMemory.GetSnapshotOnce(config);
             Log.Info($"Memory profiler returned: {snapshotFilePath}");
             var snapshotFile = new FileInfo(snapshotFilePath);
-            Log.Info($"Detached memory profiler, snapshot: {snapshotFilePath} (exists: {snapshotFile.Exists}, size: {new ByteSize(snapshotFile.Length)})");
+            if (!snapshotFile.Exists)
+            {
+                Log.Warn($"Detached memory profiler, snapshot: {snapshotFilePath} - does not exist");
+                throw new FileNotFoundException($"Snapshot operation failed - memory dump file was not created");
+            }
+            else
+            {
+                Log.Info($"Detached memory profiler, snapshot: {snapshotFilePath} (exists: {snapshotFile.Exists}, size: {new ByteSize(snapshotFile.Length)})");
+            }
         });
     }
 
