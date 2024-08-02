@@ -133,7 +133,7 @@ internal sealed class MessageBoxService : DisposableReactiveObjectWithLogger, IM
     {
         if (!IsOnUiThread)
         {
-            return await Observable.FromAsync(() => ShowMessageBox(messageBox)).SubscribeOn(uiScheduler);
+            return await Observables.FromAsyncSafe(() => ShowMessageBox(messageBox)).SubscribeOn(uiScheduler);
         }
         
         using var windowAnchors = new CompositeDisposable();

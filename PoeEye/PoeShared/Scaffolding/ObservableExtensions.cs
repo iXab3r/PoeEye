@@ -73,32 +73,32 @@ public static class ObservableExtensions
     
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, CancellationToken, Task> supplier, Action<Exception> onError)
     {
-        return observable.Select(x => Observable.FromAsync(token => supplier(x, token)).Take(1)).Concat().Subscribe(() => { }, onError);
+        return observable.Select(x => Observables.FromAsyncSafe(token => supplier(x, token)).Take(1)).Concat().Subscribe(() => { }, onError);
     }
     
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> supplier, Action<Exception> onError)
     {
-        return observable.Select(x => Observable.FromAsync(_ => supplier(x)).Take(1)).Concat().Subscribe(() => { }, onError);
+        return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat().Subscribe(() => { }, onError);
     }
     
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, CancellationToken, Task<T1>> supplier)
     {
-        return observable.Select(x => Observable.FromAsync((token) => supplier(x, token)).Take(1)).Concat();
+        return observable.Select(x => Observables.FromAsyncSafe((token) => supplier(x, token)).Take(1)).Concat();
     }
     
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier)
     {
-        return observable.Select(x => Observable.FromAsync(_ => supplier(x)).Take(1)).Concat();
+        return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat();
     }
     
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier, IScheduler scheduler)
     {
-        return observable.Select(x => Observable.FromAsync(_ => supplier(x), scheduler).Take(1)).Concat();
+        return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat();
     }
     
     public static IObservable<Unit> SelectAsync<T>(this IObservable<T> observable, Func<T, Task> supplier, IScheduler scheduler)
     {
-        return observable.Select(x => Observable.FromAsync(_ => supplier(x), scheduler).Take(1)).Concat();
+        return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat();
     }
     
     public static IObservable<T> RetryWithBackOff<T>(

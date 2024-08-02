@@ -1,9 +1,11 @@
 ﻿using System.Reactive;
+using System.Reactive.Concurrency;
+using JetBrains.Annotations;
 using PoeShared.Services;
 
 namespace PoeShared.Scaffolding;
 
-public static class Observables
+public static partial class Observables
 {
 #if NET5_0_OR_GREATER
     public static IObservable<Unit> PeriodicAsync(
