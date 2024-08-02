@@ -168,7 +168,7 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("a - Copy (3)", "a - Copy (4)", "a - Copy (3)")]
     [TestCase("a - Copy (3) ", "a - Copy (3)  - Copy (2)", "a - Copy (3) ")]
     [TestCase("Test2\\TG Window is active - Copy (2)", "Test2\\TG Window is active - Copy (3)", "Test2\\TG Window is active - Copy (2)")]
-    [TestCase("Test2\\TG Window is active - Copy (2)", "Test2\\TG Window is active - Copy (4)", "Test2\\TG Window is active - Copy (2)","Test2\\TG Window is active - Copy (3)")]
+    [TestCase("Test2\\TG Window is active - Copy (2)", "Test2\\TG Window is active - Copy (4)", "Test2\\TG Window is active - Copy (2)", "Test2\\TG Window is active - Copy (3)")]
     [TestCase("Test2 - Copy (2)\\TG Window is active - Copy (2)", "Test2 - Copy (2)\\TG Window is active - Copy (3)", "Test2 - Copy (2)\\TG Window is active - Copy (2)")]
     public void ShouldGenerateValidName(string candidate, string expected, params string[] existing)
     {
@@ -332,29 +332,29 @@ public class PathUtilsFixture : FixtureBase
         // Then
         fileName.ShouldBe(expected);
     }
-    
+
     [Test]
-    [TestCase("example.txt", "example", new string[] { ".txt" })]
-    [TestCase("example.archive.log", "example.archive", new string[] { ".log" })]
-    [TestCase("example.tar.gz", "example", new string[] { ".gz", ".tar" })]
-    [TestCase("example.tar.gz", "example.tar", new string[] { ".gz" })]
-    [TestCase("example.tar.gz", "example.tar.gz", new string[] { ".zip" })]
-    [TestCase("example.", "example", new string[] { "." })]
-    [TestCase("example..", "example", new string[] { "." })]
-    [TestCase("example.test.json", "example.test", new string[] { ".json" })]
-    [TestCase("example.test.json", "example", new string[] { ".json", ".test" })]
-    [TestCase("example.tar.gz.backup", "example.tar.gz", new string[] { ".backup" })]
-    [TestCase("example.tar.gz.backup", "example.tar", new string[] { ".backup", ".gz" })]
-    [TestCase("example.tar.gz.backup", "example", new string[] { ".backup", ".gz", ".tar" })]
-    [TestCase("example", "example", new string[] { ".txt", ".log" })]
-    [TestCase("archive.tar.gz", "archive", new string[] { ".tar", ".gz" })]
-    [TestCase("archive.tar.gz.zip", "archive.tar.gz", new string[] { ".zip" })]
-    [TestCase("archive.tar.gz.zip", "archive.tar", new string[] { ".zip", ".gz" })]
-    [TestCase("file.with.many.dots.ext", "file.with.many.dots", new string[] { ".ext" })]
-    [TestCase("file.with.many.dots.ext", "file.with.many", new string[] { ".ext", ".dots" })]
-    [TestCase("file..double.dots..ext", "file..double.dots.", new string[] { ".ext" })]
-    [TestCase("", "", new string[] { ".txt" })]
-    [TestCase(null, null, new string[] { ".txt" })]
+    [TestCase("example.txt", "example", new string[] {".txt"})]
+    [TestCase("example.archive.log", "example.archive", new string[] {".log"})]
+    [TestCase("example.tar.gz", "example", new string[] {".gz", ".tar"})]
+    [TestCase("example.tar.gz", "example.tar", new string[] {".gz"})]
+    [TestCase("example.tar.gz", "example.tar.gz", new string[] {".zip"})]
+    [TestCase("example.", "example", new string[] {"."})]
+    [TestCase("example..", "example", new string[] {"."})]
+    [TestCase("example.test.json", "example.test", new string[] {".json"})]
+    [TestCase("example.test.json", "example", new string[] {".json", ".test"})]
+    [TestCase("example.tar.gz.backup", "example.tar.gz", new string[] {".backup"})]
+    [TestCase("example.tar.gz.backup", "example.tar", new string[] {".backup", ".gz"})]
+    [TestCase("example.tar.gz.backup", "example", new string[] {".backup", ".gz", ".tar"})]
+    [TestCase("example", "example", new string[] {".txt", ".log"})]
+    [TestCase("archive.tar.gz", "archive", new string[] {".tar", ".gz"})]
+    [TestCase("archive.tar.gz.zip", "archive.tar.gz", new string[] {".zip"})]
+    [TestCase("archive.tar.gz.zip", "archive.tar", new string[] {".zip", ".gz"})]
+    [TestCase("file.with.many.dots.ext", "file.with.many.dots", new string[] {".ext"})]
+    [TestCase("file.with.many.dots.ext", "file.with.many", new string[] {".ext", ".dots"})]
+    [TestCase("file..double.dots..ext", "file..double.dots.", new string[] {".ext"})]
+    [TestCase("", "", new string[] {".txt"})]
+    [TestCase(null, null, new string[] {".txt"})]
     public void ShouldRemoveExtensions(string path, string expected, params string[] extensions)
     {
         // Given
@@ -376,6 +376,79 @@ public class PathUtilsFixture : FixtureBase
         //When
         var result = PathUtils.MakeValidFileName(input);
 
+
+        //Then
+        result.ShouldBe(expected);
+    }
+
+    [Test]
+    [TestCase("", true)] // Empty string, should be valid
+    [TestCase("validfilename.txt", true)] // Standard valid file name
+    [TestCase("valid_filename.txt", true)] // Valid file name with an underscore
+    [TestCase("file name with spaces.txt", true)] // Valid file name with spaces
+    [TestCase("filename_with-dashes-and_underscores.txt", true)] // Valid file name with dashes and underscores
+    [TestCase("filename_with.periods.txt", true)] // Valid file name with periods
+    [TestCase("filename_with$special@chars!.txt", true)] // Valid file name with some special characters
+    [TestCase("file\tname.txt", false)] // Tab character, should be invalid
+    [TestCase("file\nname.txt", false)] // Newline character, should be invalid
+    [TestCase("filename?.txt", false)] // Question mark, should be invalid
+    [TestCase("filename*.txt", false)] // Asterisk, should be invalid
+    [TestCase("filename<.txt", false)] // Less than sign, should be invalid
+    [TestCase("filename>.txt", false)] // Greater than sign, should be invalid
+    [TestCase("filename:.txt", false)] // Colon, should be invalid
+    [TestCase("filename\".txt", false)] // Double quote, should be invalid
+    [TestCase("filename|.txt", false)] // Pipe, should be invalid
+    [TestCase("filename/.txt", false)] // Forward slash, should be invalid
+    [TestCase("filename\\.txt", false)] // Backslash, should be invalid
+    [TestCase("filename?.txt", false)] // Question mark, should be invalid
+    [TestCase("CON", false)] // Reserved name, should be invalid
+    [TestCase("CON.txt", true)] // Reserved name with extension, should be valid
+    [TestCase("PRN", false)] // Reserved name, should be invalid
+    [TestCase("AUX", false)] // Reserved name, should be invalid
+    [TestCase("NUL", false)] // Reserved name, should be invalid
+    [TestCase("COM1", false)] // Reserved name, should be invalid
+    [TestCase("LPT1", false)] // Reserved name, should be invalid
+    [TestCase("..", false)] // Relative path traversal, should be invalid
+    [TestCase(".hiddenfile", true)] // Hidden file starting with a dot, should be valid
+    [TestCase("trailingdot.", true)] // Trailing dot, should be valid
+    [TestCase(".leadingdot", true)] // Leading dot, should be valid
+    [TestCase("filename_with_null_char.txt\0", false)] // Null character, should be invalid
+    [TestCase("filename_with_special_chars<>:\"/\\|?*.txt", false)] // Multiple invalid characters
+    [TestCase("filename_with_multiple_spaces.txt", true)] // Multiple spaces within the file name, should be valid
+    public void ShouldIsValidWindowsFileName(string input, bool expected)
+    {
+        //Given
+        //When
+        var result = PathUtils.IsValidWindowsFileName(input);
+
+        //Then
+        result.Value.ShouldBe(expected);
+    }
+    
+    [Test]
+    [TestCase("", false)]  // Empty string, not a reserved name
+    [TestCase("CON", true)]  // "CON" is a reserved name
+    [TestCase("PRN", true)]  // "PRN" is a reserved name
+    [TestCase("AUX", true)]  // "AUX" is a reserved name
+    [TestCase("NUL", true)]  // "NUL" is a reserved name
+    [TestCase("COM1", true)]  // "COM1" is a reserved name
+    [TestCase("COM1.txt", false)]  
+    [TestCase("COM9", true)]  // "COM9" is a reserved name
+    [TestCase("LPT1", true)]  // "LPT1" is a reserved name
+    [TestCase("LPT9", true)]  // "LPT9" is a reserved name
+    [TestCase("CON.txt", false)]  // "CON.txt" is not a reserved name
+    [TestCase("myfile", false)]  // "myfile" is not a reserved name
+    [TestCase("MyFile", false)]  // "MyFile" (different case) is not a reserved name
+    [TestCase("COM10", false)]  // "COM10" is not a reserved name
+    [TestCase("LPT10", false)]  // "LPT10" is not a reserved name
+    [TestCase("NUL1", false)]  // "NUL1" is not a reserved name
+    [TestCase("com1", true)]  // "com1" (case-insensitive check) is a reserved name
+    [TestCase("prn", true)]  // "prn" (case-insensitive check) is a reserved name
+    public void ShouldIsReserved(string input, bool expected)
+    {
+        //Given
+        //When
+        var result = PathUtils.IsReserved(input);
 
         //Then
         result.ShouldBe(expected);

@@ -18,6 +18,20 @@ public static class PathUtils
         .Add(Path.DirectorySeparatorChar);
 
     private static readonly char[] DirectorySeparators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
+    private static readonly ImmutableHashSet<string> InvalidFileNameParts;
+
+    private static readonly ImmutableHashSet<string> ReservedFileNames = ImmutableHashSet<string>.Empty
+        .WithComparer(StringComparer.OrdinalIgnoreCase)
+        .Union(new[]
+        {
+            "CON",
+            "PRN",
+            "AUX",
+            "NUL",
+            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+        });
+
 
     static PathUtils()
     {
@@ -29,12 +43,22 @@ public static class PathUtils
         IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 #endif
         PathConverter = IsWindows ? x => x?.ToLower() : x => x;
+        
+        var invalidFileNameChars =  Path.GetInvalidFileNameChars();
+        InvalidFileNameParts = invalidFileNameChars
+            .ToImmutableHashSet()
+            .Add(Path.PathSeparator)
+            .Add(Path.VolumeSeparatorChar)
+            .Add(Path.PathSeparator)
+            .Add(Path.AltDirectorySeparatorChar)
+            .Select(x => x.ToString())
+            .ToImmutableHashSet()
+            .Add("..");
     }
 
     public static bool IsWindows { get; }
+
     public static bool IsLinux { get; }
-
-
 
     /// <summary>
     /// Sanitizes a filename by replacing invalid characters with a specified replacement string.
@@ -663,5 +687,71 @@ public static class PathUtils
         }
 
         return result.JoinStrings(Path.DirectorySeparatorChar);
+    }
+
+    /// <summary>
+    /// Checks if a given file name is a reserved name in Windows.
+    /// </summary>
+    /// <param name="fileName">The file name to check.</param>
+    /// <returns>
+    /// <c>true</c> if the file name is reserved by the Windows operating system (e.g., "CON", "PRN", "AUX", etc.);
+    /// otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// Windows reserves certain file names that cannot be used as regular file or directory names. This method
+    /// checks if the provided file name is one of those reserved names. The check is case-insensitive.
+    /// </remarks>
+    public static bool IsReserved(string fileName)
+    {
+        return ReservedFileNames.Contains(fileName);
+    }
+    
+    /// <summary>
+    /// Strips invalid characters from a given file name.
+    /// </summary>
+    /// <param name="fileName">The file name from which to remove invalid characters.</param>
+    /// <returns>A string with all invalid file name characters removed.</returns>
+    public static string StripInvalidFileNameCharacters(string fileName)
+    {
+        var result = new StringBuilder(fileName);
+
+        foreach (var namePart in InvalidFileNameParts)
+        {
+            result.Replace(namePart, string.Empty);
+        }
+        
+        return result.ToString();
+    }
+    
+    /// <summary>
+    /// Checks if a given file name is valid according to Windows file name rules.
+    /// </summary>
+    /// <param name="fileName">The file name to validate.</param>
+    /// <returns>An <see cref="AnnotatedBoolean"/> indicating whether the file name is valid and, if not, 
+    /// which invalid character or part is present in the file name.</returns>
+    public static AnnotatedBoolean IsValidWindowsFileName([NotNull] string fileName)
+    {
+        if (fileName == null)
+        {
+            throw new ArgumentNullException(nameof(fileName));
+        }
+
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return new AnnotatedBoolean(true);
+        }
+
+        if (IsReserved(fileName))
+        {
+            return new AnnotatedBoolean(false, $"\"{fileName}\" is reserved for system needs");
+        }
+
+        var invalidPart = InvalidFileNameParts.FirstOrDefault(fileName.Contains);
+        if (invalidPart != null)
+        {
+            return new AnnotatedBoolean(false, $"\"{fileName}\" contains invalid file name char '{invalidPart}'");
+        }
+        
+        return new AnnotatedBoolean(true);
     }
 }
