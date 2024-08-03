@@ -62,175 +62,177 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type native:OverlayWindowView}">
-                    <Grid>
-                        <Border>
-                            <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+                    <AdornerDecorator>
+                        <Grid>
+                            <Border>
+                                <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
 
-                                <!-- Header -->
-                                <Grid Grid.Row="0" Height="36" Visibility="{Binding Content.EnableHeader, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
-                                    <Border
-                                        wpf:EnableDragHelper.EnableDrag="True"
-                                        Background="{StaticResource OverlayWindowTitleBackgroundBrushKey}"
-                                        BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
-                                        BorderThickness="1"
-                                        Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                                        Margin="3,3,3,8">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Command="{Binding Content.LockWindowCommand}" Width="30" Height="30" FontFamily="{StaticResource FontAwesome}"
-                                                    Style="{StaticResource OverlayCloseButtonStyle}">
-                                                <Button.Triggers>
-                                                    <EventTrigger RoutedEvent="Mouse.MouseEnter">
-                                                        <EventTrigger.EnterActions>
-                                                            <BeginStoryboard>
-                                                                <Storyboard>
-                                                                    <DoubleAnimation
-                                                                        Storyboard.TargetName="TradeMonitorBackground"
-                                                                        Storyboard.TargetProperty="Opacity"
-                                                                        From="1"
-                                                                        To="0.1"
-                                                                        Duration="0:0:1" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </EventTrigger.EnterActions>
-                                                    </EventTrigger>
-                                                    <EventTrigger RoutedEvent="Mouse.MouseLeave">
-                                                        <EventTrigger.EnterActions>
-                                                            <BeginStoryboard>
-                                                                <Storyboard>
-                                                                    <DoubleAnimation
-                                                                        Storyboard.TargetName="TradeMonitorBackground"
-                                                                        Storyboard.TargetProperty="Opacity"
-                                                                        To="1"
-                                                                        Duration="0:0:1" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </EventTrigger.EnterActions>
-                                                    </EventTrigger>
-                                                </Button.Triggers>
-                                            </Button>
-                                            <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
-                                                       Text="{Binding Content.Title}"
-                                                       Foreground="{StaticResource OverlayTitleBrushKey}"
-                                                       HorizontalAlignment="Center"
-                                                       FontWeight="Bold" />
-                                        </StackPanel>
+                                    <!-- Header -->
+                                    <Grid Grid.Row="0" Height="36" Visibility="{Binding Content.EnableHeader, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                                        <Border
+                                            wpf:EnableDragHelper.EnableDrag="True"
+                                            Background="{StaticResource OverlayWindowTitleBackgroundBrushKey}"
+                                            BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
+                                            BorderThickness="1"
+                                            Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
+                                            Margin="3,3,3,8">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Command="{Binding Content.LockWindowCommand}" Width="30" Height="30" FontFamily="{StaticResource FontAwesome}"
+                                                        Style="{StaticResource OverlayCloseButtonStyle}">
+                                                    <Button.Triggers>
+                                                        <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                                                            <EventTrigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation
+                                                                            Storyboard.TargetName="TradeMonitorBackground"
+                                                                            Storyboard.TargetProperty="Opacity"
+                                                                            From="1"
+                                                                            To="0.1"
+                                                                            Duration="0:0:1" />
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </EventTrigger.EnterActions>
+                                                        </EventTrigger>
+                                                        <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                                                            <EventTrigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation
+                                                                            Storyboard.TargetName="TradeMonitorBackground"
+                                                                            Storyboard.TargetProperty="Opacity"
+                                                                            To="1"
+                                                                            Duration="0:0:1" />
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </EventTrigger.EnterActions>
+                                                        </EventTrigger>
+                                                    </Button.Triggers>
+                                                </Button>
+                                                <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
+                                                           Text="{Binding Content.Title}"
+                                                           Foreground="{StaticResource OverlayTitleBrushKey}"
+                                                           HorizontalAlignment="Center"
+                                                           FontWeight="Bold" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+
+                                    <Border Grid.Row="1"
+                                            x:Name="WindowBorder"
+                                            BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
+                                            BorderThickness="1">
+                                        <Border.Visibility>
+                                            <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToHiddenConverter}">
+                                                <Binding Path="Content.IsLocked" Converter="{StaticResource NotConverter}" />
+                                                <Binding Path="Content.ShowResizeThumbs" />
+                                            </MultiBinding>
+                                        </Border.Visibility>
                                     </Border>
+
+                                    <!-- Body -->
+                                    <native:ContentControlEx Grid.Row="1"
+                                                             Focusable="{Binding IsFocusable}" IsTabStop="False"
+                                                             Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
+                                                             Content="{Binding Content}"
+                                                             ContentTemplate="{Binding ContentTemplate}" />
                                 </Grid>
+                            </Border>
 
-                                <Border Grid.Row="1"
-                                        x:Name="WindowBorder"
-                                        BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
-                                        BorderThickness="1">
-                                    <Border.Visibility>
-                                        <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToHiddenConverter}">
-                                            <Binding Path="Content.IsLocked" Converter="{StaticResource NotConverter}" />
-                                            <Binding Path="Content.ShowResizeThumbs" />
-                                        </MultiBinding>
-                                    </Border.Visibility>
-                                </Border>
+                            <Border
+                                Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                                BorderThickness="3"
+                                IsHitTestVisible="False"
+                                BorderBrush="GreenYellow"
+                                Background="#aa000000">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="{x:Type TextBlock}"
+                                               BasedOn="{StaticResource {x:Type TextBlock}}">
+                                            <Setter Property="Foreground" Value="Red" />
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <TextBlock Foreground="Yellow"
+                                               Text="{Binding Content.Title, TargetNullValue='Title is not set'}"
+                                               FontSize="14" />
+                                    <TextBlock Foreground="Yellow"
+                                               Text="{Binding Content, Converter={StaticResource ObjectToTypeConverter}}"
+                                               FontSize="14" />
+                                    <TextBlock
+                                        Margin="5,0"
+                                        Text="{Binding Content.IsLocked, StringFormat='IsLocked: {0}'}" />
 
-                                <!-- Body -->
-                                <native:ContentControlEx Grid.Row="1"
-                                                         Focusable="{Binding IsFocusable}" IsTabStop="False"
-                                                         Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
-                                                         Content="{Binding Content}"
-                                                         ContentTemplate="{Binding ContentTemplate}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.NativeBounds.X, StringFormat='X: {0:F0}'}" />
+
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.NativeBounds.Y, StringFormat='Y: {0:F0}'}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.NativeBounds.Width, StringFormat='Width: {0:F0}'}" />
+
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.NativeBounds.Height, StringFormat='Height: {0:F0}'}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.MinSize.Width, StringFormat='MinWidth: {0:F0}'}" />
+
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.MinSize.Height, StringFormat='MinHeight: {0:F0}'}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.MaxSize.Width, StringFormat='MaxWidth: {0:F0}'}" />
+
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding Content.MaxSize.Height, StringFormat='MaxHeight: {0:F0}'}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="5,0"
+                                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=SizeToContent, StringFormat='SizeToContent: {0}'}" />
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Border>
+
+                            <Grid Visibility="{Binding ElementName=WindowBorder, Path=Visibility}">
+                                <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}"
+                                       IsHitTestVisible="False"
+                                       Width="{Binding ResizeThumbSize}"
+                                       Height="{Binding ResizeThumbSize}" />
+                                <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"
+                                       Width="{Binding ResizeThumbSize}"
+                                       Height="{Binding ResizeThumbSize}" />
+                                <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"
+                                       Width="{Binding ResizeThumbSize}"
+                                       Height="{Binding ResizeThumbSize}" />
+                                <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"
+                                       Width="{Binding ResizeThumbSize}"
+                                       Height="{Binding ResizeThumbSize}" />
                             </Grid>
-                        </Border>
-
-                        <Border
-                            Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                            BorderThickness="3"
-                            IsHitTestVisible="False"
-                            BorderBrush="GreenYellow"
-                            Background="#aa000000">
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel.Resources>
-                                    <Style TargetType="{x:Type TextBlock}"
-                                           BasedOn="{StaticResource {x:Type TextBlock}}">
-                                        <Setter Property="Foreground" Value="Red" />
-                                        <Setter Property="FontWeight" Value="Bold" />
-                                    </Style>
-                                </StackPanel.Resources>
-                                <TextBlock Foreground="Yellow"
-                                           Text="{Binding Content.Title, TargetNullValue='Title is not set'}"
-                                           FontSize="14" />
-                                <TextBlock Foreground="Yellow"
-                                           Text="{Binding Content, Converter={StaticResource ObjectToTypeConverter}}"
-                                           FontSize="14" />
-                                <TextBlock
-                                    Margin="5,0"
-                                    Text="{Binding Content.IsLocked, StringFormat='IsLocked: {0}'}" />
-
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.NativeBounds.X, StringFormat='X: {0:F0}'}" />
-
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.NativeBounds.Y, StringFormat='Y: {0:F0}'}" />
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.NativeBounds.Width, StringFormat='Width: {0:F0}'}" />
-
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.NativeBounds.Height, StringFormat='Height: {0:F0}'}" />
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.MinSize.Width, StringFormat='MinWidth: {0:F0}'}" />
-
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.MinSize.Height, StringFormat='MinHeight: {0:F0}'}" />
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.MaxSize.Width, StringFormat='MaxWidth: {0:F0}'}" />
-
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding Content.MaxSize.Height, StringFormat='MaxHeight: {0:F0}'}" />
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock
-                                        Margin="5,0"
-                                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=SizeToContent, StringFormat='SizeToContent: {0}'}" />
-                                </StackPanel>
-
-                            </StackPanel>
-                        </Border>
-
-                        <Grid Visibility="{Binding ElementName=WindowBorder, Path=Visibility}">
-                            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}"
-                                   IsHitTestVisible="False"
-                                   Width="{Binding ResizeThumbSize}"
-                                   Height="{Binding ResizeThumbSize}" />
-                            <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"
-                                   Width="{Binding ResizeThumbSize}"
-                                   Height="{Binding ResizeThumbSize}" />
-                            <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"
-                                   Width="{Binding ResizeThumbSize}"
-                                   Height="{Binding ResizeThumbSize}" />
-                            <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"
-                                   Width="{Binding ResizeThumbSize}"
-                                   Height="{Binding ResizeThumbSize}" />
                         </Grid>
-                    </Grid>
+                    </AdornerDecorator>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
