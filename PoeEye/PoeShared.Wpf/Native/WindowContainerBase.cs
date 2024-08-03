@@ -19,22 +19,22 @@ public abstract class WindowContainerBase<T> : DisposableReactiveObject where T 
         Binder
             .BindIf(x => x.Content != null && x.Content.Dpi.IsEmpty == false, x => (double)x.Content.MinSize.Width / x.Content.Dpi.X)
             .Else(x => 0d)
-            .To(x => x.MinWidth);
+            .To((x,v) => x.MinWidth = v);
 
         Binder
             .BindIf(x => x.Content != null && x.Content.Dpi.IsEmpty == false, x => (double)x.Content.MaxSize.Width / x.Content.Dpi.X)
             .Else(x => double.NaN)
-            .To(x => x.MaxWidth);
+            .To((x,v) => x.MaxWidth = v);
 
         Binder
             .BindIf(x => x.Content != null && x.Content.Dpi.IsEmpty == false, x => (double)x.Content.MinSize.Height / x.Content.Dpi.Y)
             .Else(x => 0d)
-            .To(x => x.MinHeight);
+            .To((x,v) => x.MinHeight = v);
 
         Binder
             .BindIf(x => x.Content != null && x.Content.Dpi.IsEmpty == false, x => (double)x.Content.MaxSize.Height / x.Content.Dpi.Y)
             .Else(x => double.NaN)
-            .To(x => x.MaxHeight);
+            .To((x,v) => x.MaxHeight = v);
 
         Binder
             .Bind(x => CalculateThumbSize(x.NativeBounds))

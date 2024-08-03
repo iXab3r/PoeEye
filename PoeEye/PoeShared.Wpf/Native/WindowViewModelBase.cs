@@ -25,7 +25,6 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     private static readonly Binder<WindowViewModelBase> Binder = new();
     private static long GlobalWindowId;
 
-    private readonly ObservableAsPropertyHelper<PointF> dpi;
     private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
     private readonly Dispatcher uiDispatcher;
 
@@ -35,6 +34,13 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
         Binder.BindIf(x => x.WindowController != null, x => x.TargetAspectRatio).To((x, v) => x.WindowController.Window.TargetAspectRatio = v);
         Binder.BindIf(x => x.WindowController != null, x => x.SizeToContent).To((x, v) => x.WindowController.Window.SizeToContent = v);
+        Binder.BindIf(x => x.WindowController != null && x.WindowController.Window != null, x => x.WindowController.Window.Dpi)
+            .Else(x => new PointF(1, 1))
+            .To((x, v) =>
+            {
+                x.Log.Debug($"DPI updated to {x}");
+                x.Dpi = v;
+            });
     }
 
     protected WindowViewModelBase()
@@ -61,13 +67,6 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             Log.Debug("Window has been loaded, changing status");
             IsLoaded = true;
         }, Log.HandleUiException).AddTo(Anchors);
-
-
-        dpi = this.WhenAnyValue(x => x.WindowController).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.WhenAnyValue(y => y.Window.Dpi))
-            .Switch()
-            .Do(x => Log.Debug($"DPI updated to {x}"))
-            .ToProperty(this, x => x.Dpi)
-            .AddTo(Anchors);
 
         WhenKeyDown = this.WhenAnyValue(x => x.WindowController).SwitchIfNotDefault(x => x.WhenKeyDown);
         WhenKeyUp = this.WhenAnyValue(x => x.WindowController).SwitchIfNotDefault(x => x.WhenKeyUp);
@@ -132,13 +131,13 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     public bool IsVisible { get; set; } = true;
 
-    public PointF Dpi => dpi.Value;
+    public PointF Dpi { get; private set; }
 
-    public Rectangle NativeBounds { get; set; }
+    public WinRect NativeBounds { get; set; }
 
-    public Size MinSize { get; set; } = new Size(0, 0);
+    public WinSize MinSize { get; set; } = new Size(0, 0);
 
-    public Size MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
+    public WinSize MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
 
     public bool IsLoaded { get; private set; }
 
@@ -150,7 +149,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     public string Title { get; protected set; }
 
-    public Size DefaultSize { get; set; }
+    public WinSize DefaultSize { get; set; }
 
     public string OverlayDescription => $"{(WindowController == null ? "NOWINDOW" : WindowController)}";
 
