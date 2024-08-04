@@ -21,11 +21,23 @@ public sealed class OperationTimer : IDisposable
         previousOperationTimestamp = sw.Elapsed;
     }
 
-    public void LogOperation(Action<TimeSpan> action)
+    public TimeSpan MeasureStep()
     {
         var timestamp = sw.Elapsed;
-        action(timestamp - previousOperationTimestamp);
+        var operationTime = timestamp - previousOperationTimestamp;
         previousOperationTimestamp = timestamp;
+        return operationTime;
+    }
+
+    public void Step()
+    {
+        MeasureStep();
+    }
+    
+    public void Step(Action<TimeSpan> action)
+    {
+        var operationTime = MeasureStep();
+        action(operationTime);
     }
 
     public TimeSpan Elapsed => sw.Elapsed;
