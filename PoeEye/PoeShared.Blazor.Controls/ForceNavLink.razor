@@ -1,0 +1,17 @@
+﻿<NavLink href="@(Href)" @onclick="@(Navigate)">
+    @ChildContent
+</NavLink>
+
+@code {
+
+    [Parameter] public string Href { get; set; }
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    [Inject] private NavigationManager NavigationManager { get; init; }
+
+    private async Task Navigate()
+    {
+        NavigationManager.NavigateTo(Href, forceLoad: true);
+    }
+}
