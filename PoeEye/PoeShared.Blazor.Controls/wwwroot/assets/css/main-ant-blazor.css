@@ -548,3 +548,11 @@ h1, h2, h3, h4, h5, h6{
     --bs-border-opacity: 1;
     border-color: rgba(var( --eye-Accent100), var(--bs-border-opacity)) !important;
 }
+
+.ant-segmented-item:hover, .ant-segmented-item:focus {
+    color: inherit;
+}
+
+.ant-segmented {
+    color: inherit;
+}
