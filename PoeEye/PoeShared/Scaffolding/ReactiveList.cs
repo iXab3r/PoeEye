@@ -17,13 +17,12 @@ public interface IReadOnlyReactiveList<T>
 public interface IReadOnlyReactiveSet<T>
 {
     IObservable<T> WhenAdded { get; }
-    IImmutableSet<T> Items { get; }
+    ImmutableHashSet<T> Items { get; }
 }
 
 public class ReactiveSet<T> : DisposableReactiveObject, IReadOnlyReactiveSet<T>
 {
     private readonly ReplaySubject<T> whenAdded = new();
-    private ImmutableHashSet<T> items;
 
     public ReactiveSet() : this(EqualityComparer<T>.Default)
     {
@@ -31,15 +30,11 @@ public class ReactiveSet<T> : DisposableReactiveObject, IReadOnlyReactiveSet<T>
 
     public ReactiveSet(IEqualityComparer<T> comparer)
     {
-        items = ImmutableHashSet.Create(comparer);
-        whenAdded.Subscribe(x =>
-        {
-            items = items.Add(x);
-            Items = items;
-        }).AddTo(Anchors);
+        Items = ImmutableHashSet.Create(comparer);
+        whenAdded.Subscribe(x => Items = Items.Add(x)).AddTo(Anchors);
     }
-    
-    public IImmutableSet<T> Items { get; private set; } 
+
+    public ImmutableHashSet<T> Items { get; private set; }
 
     public IObservable<T> WhenAdded => whenAdded;
 
@@ -55,10 +50,11 @@ public class ReactiveList<T> : DisposableReactiveObject, IReactiveList<T>
 
     public ReactiveList()
     {
+        Items = ImmutableArray<T>.Empty;
         whenAdded.Subscribe(x => Items = Items.Add(x)).AddTo(Anchors);
     }
-    
-    public ImmutableArray<T> Items { get; private set; } = ImmutableArray<T>.Empty;
+
+    public ImmutableArray<T> Items { get; private set; }
 
     public IObservable<T> WhenAdded => whenAdded;
 
