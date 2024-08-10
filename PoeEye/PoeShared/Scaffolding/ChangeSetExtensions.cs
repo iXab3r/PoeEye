@@ -199,6 +199,11 @@ public static class ChangeSetExtensions
         return new SourceCacheEx<T, TKey>(source);
     }
 
+    public static bool ContainsKey<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
+    {
+        return instance.Lookup(key).HasValue;
+    }
+    
     public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
     {
         if (instance.TryGetValue(key, out var value))

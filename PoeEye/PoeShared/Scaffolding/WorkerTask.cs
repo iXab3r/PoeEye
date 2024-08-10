@@ -133,6 +133,6 @@ public class WorkerTask : DisposableReactiveObject
     {
         base.FormatToString(builder);
         builder.AppendParameterIfNotDefault(nameof(Name), Name);
-        builder.AppendParameterIfNotDefault("TaskId", consumerTask.Id);
+        builder.AppendParameterIfNotDefault("TaskId", consumerTask != null ? consumerTask.Id.ToString() : "?");
     }
 }

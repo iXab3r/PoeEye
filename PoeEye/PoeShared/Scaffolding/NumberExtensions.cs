@@ -6,6 +6,11 @@ public static class NumberExtensions
     {
         return $"0x{value:x8}";
     }
+    
+    public static string ToHexadecimal(this ulong value)
+    {
+        return $"0x{value:x8}";
+    }
         
     public static string ToHexadecimal(this int value)
     {
