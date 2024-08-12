@@ -111,7 +111,7 @@ internal sealed class NaiveMemoryCache<TKey, TValue> : DisposableReactiveObject,
         } 
 
         var keyLock = locksByKey.GetOrAdd(key, k => new KeySemaphore(k));
-        keyLock.Wait();
+        keyLock.WaitForSemaphore();
             
         try
         {
@@ -132,7 +132,7 @@ internal sealed class NaiveMemoryCache<TKey, TValue> : DisposableReactiveObject,
         }
         finally
         {
-            keyLock.Release();
+            keyLock.ReleaseSemaphore();
         }
     }
 
@@ -173,12 +173,12 @@ internal sealed class NaiveMemoryCache<TKey, TValue> : DisposableReactiveObject,
             this.key = key;
         }
 
-        public void Wait()
+        public void WaitForSemaphore()
         {
             semaphoreSlim.Wait();
         }
             
-        public void Release()
+        public void ReleaseSemaphore()
         {
             semaphoreSlim.Release();
         }
