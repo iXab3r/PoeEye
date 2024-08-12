@@ -208,7 +208,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
                     {
                         Log.Debug($"Reloading existing page, view type: {state}");
-                        WebView.WebView.Reload();
+                        await Reload();
                     }
                     else
                     {
