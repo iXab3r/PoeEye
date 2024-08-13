@@ -10,17 +10,21 @@ public sealed class ToStringBuilder
 
     private readonly StringBuilder primaryPartBuilder = new();
     private readonly StringBuilder paramsPartBuilder = new();
-    private readonly object owner;
+    private readonly string ownerName;
     private string paramsSeparator = ", ";
-    
-    public ToStringBuilder([NotNull] object owner)
+
+    public ToStringBuilder([NotNull] string ownerName)
     {
-        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.ownerName = ownerName;
+    }
+    
+    public ToStringBuilder([NotNull] object owner) : this (owner.GetType().Name)
+    {
     }
 
     public ToStringBuilder WithParamsSeparator(string paramsSeparator)
     {
-        var result = new ToStringBuilder(owner)
+        var result = new ToStringBuilder(ownerName)
         {
             paramsSeparator = paramsSeparator
         };
@@ -83,7 +87,7 @@ public sealed class ToStringBuilder
             }
             else
             {
-                result.Append(owner.GetType().Name);
+                result.Append(ownerName);
             }
             
             result.Append($"{{ {paramsPartBuilder} }}");

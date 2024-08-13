@@ -23,6 +23,31 @@ public static class ChangeSetExtensions
         parent.AddOrUpdate(element);
         return element;
     }
+    
+    public static string DumpToString<T>(this IChangeSet<T> changeSet)
+    {
+        var result = new ToStringBuilder($"ChangeSet<{typeof(T)}>");
+        result.AppendParameterIfNotDefault(nameof(changeSet.TotalChanges), changeSet.TotalChanges);
+        result.AppendParameterIfNotDefault(nameof(changeSet.Replaced), changeSet.Replaced);
+        result.AppendParameterIfNotDefault(nameof(changeSet.Adds), changeSet.Adds);
+        result.AppendParameterIfNotDefault(nameof(changeSet.Refreshes), changeSet.Refreshes);
+        result.AppendParameterIfNotDefault(nameof(changeSet.Removes), changeSet.Removes);
+        var changeIdx = 1;
+        foreach (var change in changeSet)
+        {
+            var chgBuilder = new ToStringBuilder($"{nameof(change.Type)}={change.Type} {nameof(change.Reason)}={change.Reason}");
+            chgBuilder.AppendParameter("ItemReason", change.Item.Reason);
+            chgBuilder.AppendParameter("ItemPreviousIndex", change.Item.PreviousIndex);
+            chgBuilder.AppendParameter("ItemCurrentIndex", change.Item.CurrentIndex);
+            chgBuilder.AppendParameter("ItemPrevious", change.Item.Previous);
+            chgBuilder.AppendParameter("ItemCurrent", change.Item.Current);
+            
+            result.AppendParameter($"Chg#{changeIdx}", chgBuilder.ToString());
+            changeIdx++;
+        }
+
+        return result.ToString();
+    }
 
     public static IObservable<IChangeSet<T>> BindToCollectionVirtualized<T>(
         this IObservable<IChangeSet<T>> source,
