@@ -41,6 +41,7 @@ public static class AwesomeIcons
     public const string CloudUpload = "\uf0ee";
     public const string CogIcon = "\uf013";
     public const string Copy = "\uF0C5";
+    public const string Clone = "\uf24d";
     public const string CollapsedDirectory = "\uf114";
     public const string CheckboxSquareChecked = "\uf046";
     public const string CheckboxSquareEmpty = "\uf096";
