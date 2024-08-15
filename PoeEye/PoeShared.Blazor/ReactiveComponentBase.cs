@@ -52,7 +52,11 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
                 Interlocked.Increment(ref refreshCount);
                 Interlocked.Increment(ref unrenderedChangeCount);
             })
-            .SubscribeAsync(async reason => await Refresh(reason), ex => Log.Error("Component encountered an error and will no longer be refreshed", ex))
+            .SubscribeAsync(async reason => await Refresh(reason), ex =>
+            {
+                Log.Error("Component encountered an error and will no longer be refreshed", ex);
+                throw ex;
+            })
             .AddTo(Anchors);
 
         Disposable.Create(() => afterRenderCallQueue = afterRenderCallQueue.Clear()).AddTo(Anchors);

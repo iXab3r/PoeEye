@@ -581,3 +581,11 @@ pre code.hljs{
 .pagination > .page-item > .page-link {
     padding: 0 0.25rem 0 0.25rem;
 }
+
+.tooltip {
+    opacity: 1;
+}
+
+.tooltip.show {
+    opacity: 1;
+}

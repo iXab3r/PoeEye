@@ -16,6 +16,8 @@ public abstract class TimelineEntry : DisposableReactiveObject
     public string Text { get; set; }
 
     public SourceListEx<FileInfo> Images { get; } = new();
+    
+    public string PrefixIcon { get; init; }
 
     public IDisposable Rent()
     {
