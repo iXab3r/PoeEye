@@ -2,23 +2,30 @@
 @using System.Globalization
 @inherits PoeShared.Blazor.BlazorReactiveComponent<TimelineEntry>
 
-<ReactiveSection Trackers="@(new() {DataContext.WhenAnyValue(x => x.IsBusy, x => x.Timestamp)})">
-    <TimelineItem Class="@Track(x => x.IsBusy ? "ant-timeline-item-pending" : "")"
-                  Label="@Track(x => x.Timestamp == null ? "" : x.Timestamp.Value.ToString("HH:mm:ss", CultureInfo.InvariantCulture))">
-        <div>
-            <BlazorContentPresenter Content="@DataContext"/>
-        </div>
+<TimelineItem Class="@(DataContext.IsBusy ? "ant-timeline-item-pending" : "")"
+              Label="@(DataContext.Timestamp == null ? "" : DataContext.Timestamp.Value.ToString("HH:mm:ss", CultureInfo.InvariantCulture))">
+    <div>
+        <BlazorContentPresenter Content="@DataContext"/>
+    </div>
 
-        <ReactiveSection Trackers="@(new() {DataContext.Images})">
-            @if (DataContext.Images.Count > 0)
+    <ReactiveSection Trackers="@(new() {DataContext.Images})">
+        @if (DataContext.Images.Count > 0)
+        {
+        <div class="d-flex">
+            @foreach (var imageData in DataContext.Images.Items)
             {
-                <div class="d-flex">
-                    @foreach (var imageData in DataContext.Images.Items)
-                    {
-                        <Image Src="@imageData.ToLocalFileUri().AbsoluteUri" Height="64" Class="mx-1"/>
-                    }
-                </div>
+            <Image Src="@imageData.ToLocalFileUri().AbsoluteUri" Height="64" Class="mx-1"/>
             }
-        </ReactiveSection>
-    </TimelineItem>
-</ReactiveSection>
+        </div>
+        }
+    </ReactiveSection>
+</TimelineItem>
+
+@code {
+    public ReactiveTimelineItemWrapper()
+    {
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.IsBusy));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.Timestamp));
+    }
+
+}

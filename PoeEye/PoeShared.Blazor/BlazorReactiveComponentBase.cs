@@ -27,8 +27,6 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     private readonly Subject<object> whenChanged = new();
     private readonly ReactiveChangeDetector changeDetector = new();
     
-    
-    
     /// <summary>
     /// Static constructor to initialize the binder for the component.
     /// </summary>
@@ -50,7 +48,6 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
             .AddTo(Anchors);
         changeDetector.WhenChanged
             .Subscribe(x => whenChanged.OnNext(x)).AddTo(Anchors);
-        WhenChanged.Subscribe(WhenRefresh).AddTo(Anchors);
 
         Binder.Attach(this).AddTo(Anchors);
     }
@@ -112,22 +109,16 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
         }
     }
 
-    public void TrackCollection<T, TKey>(IObservableCache<T, TKey> source)
-    {
-        changeDetector.TrackState(source);
-    }
-
-    public void TrackCollection<T>(IObservableList<T> source)
-    {
-        changeDetector.TrackState(source);
-    }
-
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
+        // Never tracking via ChangeTrackers and ReactiveSection
         ChangeTrackers.Seal();
-        ChangeTrackers.Merge().Subscribe(WhenRefresh).AddTo(Anchors);
+        ChangeTrackers.Merge().Subscribe(x => WhenRefresh.OnNext(x)).AddTo(Anchors);
+        
+        // Legacy-style tracking via Track()
+        WhenChanged.Subscribe(x => WhenRefresh.OnNext(x)).AddTo(Anchors);
     }
 
     /// <summary>
