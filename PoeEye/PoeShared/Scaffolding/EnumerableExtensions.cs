@@ -59,6 +59,37 @@ public static class EnumerableExtensions
     {
         return Intersperse(items, _ => separator);
     }
+    
+    /// <summary>
+    /// Returns a specified percentage of elements from the start of an IList<T>.
+    /// </summary>
+    /// <param name="list">The list from which to pick elements.</param>
+    /// <param name="percentage">The percentage of elements to return.</param>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
+    /// <returns>A list containing the specified percentage of elements from the start of the original list.</returns>
+    public static IReadOnlyList<T> PickPercentage<T>(this IList<T> list, double percentage)
+    {
+        if (list == null)
+        {
+            throw new ArgumentNullException(nameof(list));
+        }
+        if (percentage is < 0 or > 100)
+        {
+            throw new ArgumentOutOfRangeException(nameof(percentage), $"Percentage must be between 0 and 100, but was {percentage}");
+        }
+
+        // Calculate the number of elements to return
+        var elementsToReturn = (int)Math.Round(list.Count * (percentage / 100.0));
+
+        // Return the specified percentage from the start of the list
+        var resultList = new List<T>();
+        for (var i = 0; i < elementsToReturn; i++)
+        {
+            resultList.Add(list[i]);
+        }
+
+        return resultList;
+    }
 
     public static T PickRandom<T>(this IEnumerable<T> enumerable)
     {
@@ -71,11 +102,11 @@ public static class EnumerableExtensions
     
     public static IEnumerable<T> Randomize<T>(this IEnumerable<T> source)
     {
-        T[] elements = source.ToArray();
-        for (int i = elements.Length - 1; i >= 0; i--)
+        var elements = source.ToArray();
+        for (var i = elements.Length - 1; i >= 0; i--)
         {
             // Swap element "i" with a random earlier element including itself
-            int swapIndex = Rng.Next(i + 1);
+            var swapIndex = Rng.Next(i + 1);
             yield return elements[swapIndex];
             elements[swapIndex] = elements[i];
         }
