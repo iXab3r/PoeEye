@@ -589,3 +589,16 @@ pre code.hljs{
 .tooltip.show {
     opacity: 1;
 }
+
+.ant-slider {
+    color: inherit;
+}
+
+.ant-slider-mark-text{
+    color: inherit;
+    opacity: 0.8;
+}
+
+.ant-slider-mark-text-active {
+    color: inherit;
+}

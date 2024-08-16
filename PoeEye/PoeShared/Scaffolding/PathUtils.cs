@@ -414,7 +414,7 @@ public static class PathUtils
     /// IsParentDir("C:\\temp\\file", "C:\\temp"); //Returns true
     /// </code>
     /// </example>
-    public static bool IsParentDir(string candidatePath, string parentDir)
+    public static bool IsParentDir(string parentDir, string candidatePath)
     {
         if (candidatePath == parentDir || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
         {
