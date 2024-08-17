@@ -13,4 +13,14 @@ public interface IProgressReporter
     /// </summary>
     /// <param name="progressPercent">The progress percentage of the task.</param>
     void Update(double progressPercent);
+
+    void Update(int current, int total)
+    {
+        this.Update(((double)current / total) * 100);
+    }
+    
+    void Update(long current, long total)
+    {
+        this.Update(((double)current / total) * 100);
+    }
 }

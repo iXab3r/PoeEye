@@ -35,7 +35,19 @@ public sealed class ReactiveTrackerList : ConcurrentBag<IObservable<string>>, IC
         base.Add(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
+    public void Add<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
+    {
+        EnsureNotSealed();
+        base.Add(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+    }
+    
     public void Add<T>(IObservable<IObservableList<T>> observableListSource)
+    {
+        EnsureNotSealed();
+        base.Add(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+    }
+    
+    public void Add<T>(IObservable<ISourceList<T>> observableListSource)
     {
         EnsureNotSealed();
         base.Add(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));

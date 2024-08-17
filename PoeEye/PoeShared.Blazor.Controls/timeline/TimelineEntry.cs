@@ -24,4 +24,10 @@ public abstract class TimelineEntry : DisposableReactiveObject
         IsBusy = true;
         return Disposable.Create(() => IsBusy = false);
     }
+
+    protected void AppendTextLine(string text)
+    {
+        var existing = Text;
+        Text = string.IsNullOrEmpty(existing) ? text : existing + Environment.NewLine + text;
+    }
 }
