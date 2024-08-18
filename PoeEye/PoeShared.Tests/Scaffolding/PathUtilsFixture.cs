@@ -136,17 +136,17 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("b", "a\\b\\c", false)]
     [TestCase("a", "abc\\bcd\\c", false)]
     [TestCase("alpha", "alpha\\beta\\Aura #3", true)]
-    public void ShouldCheckParent(string folderPath, string fullPath, bool expected)
+    public void ShouldCheckParent(string parentPath, string candidatePath, bool expected)
     {
         //Given
         //When
-        var result = PathUtils.IsParentDir(folderPath, fullPath);
+        var result = PathUtils.IsParentDir(parentPath,  candidatePath);
 
         //Then
         result.ShouldBe(expected);
-        if (!string.IsNullOrEmpty(folderPath) && !string.IsNullOrEmpty(fullPath))
+        if (!string.IsNullOrEmpty(parentPath) && !string.IsNullOrEmpty(candidatePath))
         {
-            new DirectoryInfo(folderPath).IsParentOf(new DirectoryInfo(fullPath)).ShouldBe(expected);
+            new DirectoryInfo(parentPath).IsParentOf(new DirectoryInfo(candidatePath)).ShouldBe(expected);
         }
     }
 

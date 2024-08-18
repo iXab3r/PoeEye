@@ -416,14 +416,14 @@ public static class PathUtils
     /// </example>
     public static bool IsParentDir(string parentDir, string candidatePath)
     {
-        if (candidatePath == parentDir || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
+        if (string.Equals(candidatePath, parentDir) || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
         {
             return false;
         }
 
-        var path1 = FullPath.FromPath(PathConverter(candidatePath));
-        var path2 = FullPath.FromPath(PathConverter(parentDir));
-        return path2.IsChildOf(path1);
+        var parentPath = FullPath.FromPath(PathConverter(parentDir));
+        var childPath = FullPath.FromPath(PathConverter(candidatePath));
+        return childPath.IsChildOf(parentPath);
     }
 
     /// <summary>
