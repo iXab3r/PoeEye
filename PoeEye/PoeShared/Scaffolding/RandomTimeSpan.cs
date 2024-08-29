@@ -17,6 +17,10 @@ public readonly record struct RandomTimeSpan
         Max = max;
         Randomize = true;
     }
+    
+    public RandomTimeSpan(double minMs, double maxMs) : this(TimeSpan.FromMilliseconds(minMs), TimeSpan.FromMilliseconds(maxMs))
+    {
+    }
 
     /// <summary>
     /// Gets or sets the fixed delay duration. This is the default delay used if randomization is not enabled.
