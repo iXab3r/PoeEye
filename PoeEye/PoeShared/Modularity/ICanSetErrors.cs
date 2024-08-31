@@ -35,6 +35,15 @@ public interface ICanSetErrors : IHasErrors
     IDisposable ReportMany<T>(IObservableList<T> sources) where T : IHasErrors;
 
     /// <summary>
+    /// Subscribes to multiple error sources and reports their errors.
+    /// </summary>
+    /// <typeparam name="T">The type of error sources, must implement <see cref="IHasErrors"/>.</typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <param name="sources">The error sources to subscribe to.</param>
+    /// <returns>A subscription that can be disposed to stop reporting errors from the sources.</returns>
+    IDisposable ReportMany<T, TKey>(IObservableCache<T, TKey> sources) where T : IHasErrors;
+
+    /// <summary>
     /// Reports that last operation was successful, clearing LastError
     /// </summary>
     void ReportSuccess();

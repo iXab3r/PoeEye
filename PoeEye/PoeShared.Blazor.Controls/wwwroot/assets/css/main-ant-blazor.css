@@ -78,6 +78,15 @@
     line-height: inherit;
 }
 
+.ant-tabs-top > .ant-tabs-nav::before, .ant-tabs-bottom > .ant-tabs-nav::before, .ant-tabs-top > div > .ant-tabs-nav::before, .ant-tabs-bottom > div > .ant-tabs-nav::before {
+    position: absolute;
+    right: 0;
+    left: 0;
+    border-bottom: 1px solid #f0f0f0;
+    content: '';
+    opacity: 0.25;
+}
+
 .ant-form-item {
     color: var(--eye-MaterialDesignBody);
 }
