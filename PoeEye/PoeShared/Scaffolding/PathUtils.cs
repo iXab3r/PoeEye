@@ -437,31 +437,31 @@ public static class PathUtils
     /// <summary>
     ///     Determines if a given path is a subdirectory of another path.
     /// </summary>
-    /// <param name="candidatePath">The path to test for subdirectory status.</param>
     /// <param name="parentDir">The parent directory path.</param>
+    /// <param name="candidatePath">The path to test for subdirectory status.</param>
     /// <returns>A boolean representing whether the path is a subdirectory of the parent directory.</returns>
     /// <example>
     ///     <code>
     /// IsSubDir("C:\\Program Files\\Common Files", "C:\\Program Files"); //Returns true
     /// </code>
     /// </example>
-    public static bool IsSubDir(string candidatePath, string parentDir)
+    public static bool IsSubDir(string parentDir, string candidatePath)
     {
-        if (candidatePath == parentDir || string.IsNullOrEmpty(candidatePath) || string.IsNullOrEmpty(parentDir))
+        if (parentDir == candidatePath || string.IsNullOrEmpty(parentDir) || string.IsNullOrEmpty(candidatePath))
         {
             return false;
         }
 
-        var separatorIdx = parentDir.IndexOf(Path.DirectorySeparatorChar);
+        var separatorIdx = candidatePath.IndexOf(Path.DirectorySeparatorChar);
         var subfolderIdx = separatorIdx + 1;
-        if (separatorIdx <= 0 || subfolderIdx == parentDir.Length)
+        if (separatorIdx <= 0 || subfolderIdx == candidatePath.Length)
         {
             // provided path does not have subdirectories
             return false;
         }
 
-        var subPath = parentDir[subfolderIdx..];
-        var path1 = FullPath.FromPath(PathConverter(candidatePath));
+        var subPath = candidatePath[subfolderIdx..];
+        var path1 = FullPath.FromPath(PathConverter(parentDir));
         var path2 = FullPath.FromPath(PathConverter(subPath));
         return path1 == path2 || path2.IsChildOf(path1);
     }
@@ -469,28 +469,28 @@ public static class PathUtils
     /// <summary>
     ///     Checks if a given path is a directory or a subdirectory of another.
     /// </summary>
-    /// <param name="candidate">Potential subdirectory path.</param>
     /// <param name="parentDir">Parent directory path.</param>
+    /// <param name="candidatePath">Potential subdirectory path.</param>
     /// <returns>Boolean value indicating whether the candidate is a subdirectory of parentDir, or is the same as parentDir.</returns>
     /// <example>
     ///     <code>
     /// IsDirOrSubDir("C:\\temp", "C:\\"); //Returns true
     /// </code>
     /// </example>
-    public static bool IsDirOrSubDir(string candidate, string parentDir)
+    public static bool IsDirOrSubDir(string parentDir, string candidatePath)
     {
-        if (candidate == parentDir)
+        if (parentDir == candidatePath)
         {
             return true;
         }
 
-        if (string.IsNullOrEmpty(candidate) || string.IsNullOrEmpty(parentDir))
+        if (string.IsNullOrEmpty(parentDir) || string.IsNullOrEmpty(candidatePath))
         {
             return false;
         }
 
-        var path1 = FullPath.FromPath(PathConverter(candidate));
-        var path2 = FullPath.FromPath(PathConverter(parentDir));
+        var path1 = FullPath.FromPath(PathConverter(parentDir));
+        var path2 = FullPath.FromPath(PathConverter(candidatePath));
         return path2.IsChildOf(path1);
     }
 
