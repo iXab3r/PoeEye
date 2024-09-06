@@ -101,7 +101,7 @@ public static class TaskExtensions
     
     public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout, IFluentLog log)
     {
-        Sleep(cancellationToken, (int)timeout.TotalMilliseconds, log);
+        Sleep(cancellationToken, timeout.TotalMilliseconds, log);
     }
     
     /// <summary>
