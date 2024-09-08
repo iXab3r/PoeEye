@@ -30,7 +30,8 @@ export function destroy(id: string): void {
                 tooltip.dispose();
             }
         } else {
-            console.error(`Element with ID ${identifier} not found.`);
+            //most probably the element has already been removed thus we do not really need to do anything
+            //FIXME Potential memory leak? 
         }
     } catch (e) {
         console.error(`Error from Tooltip Destroy: ${(e as Error).message}`);
