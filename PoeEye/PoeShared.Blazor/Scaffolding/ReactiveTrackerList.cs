@@ -77,7 +77,7 @@ public sealed class ReactiveTrackerList : ConcurrentBag<IObservable<string>>, IC
     public void Add<TOut>(IObservable<IChangeSet<TOut>> changeSetObservable)
     {
         EnsureNotSealed();
-        Add(changeSetObservable.Select(x =>  new{ x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes }));
+        Add(changeSetObservable.Select(x =>  new{ x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes, x.Moves }));
     }
     
     public void Add<T, T1>(IObservable<T> source1, IObservable<T1> source2)

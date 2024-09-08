@@ -45,6 +45,16 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <param name="elementRef"></param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task SelectAllTextInElement(ElementReference elementRef);
+    
+    /// <summary>
+    /// Scrolls the specified HTML element into view.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element to scroll into view.</param>
+    /// <param name="behavior">Defines the transition animation. Can be 'auto' or 'smooth'.</param>
+    /// <param name="block">Defines vertical alignment. Can be 'start', 'center', 'end', or 'nearest'.</param>
+    /// <param name="inline">Defines horizontal alignment. Can be 'start', 'center', 'end', or 'nearest'.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task ScrollElementIntoView(ElementReference elementRef, string behavior = "smooth", string block = "nearest", string inline = "nearest");
 
     /// <summary>
     /// Selects text range within an HTML element identified by its ID.

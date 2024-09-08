@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
 using AntDesign;
@@ -7,6 +8,7 @@ using AntDesign.JsInterop;
 using DynamicData;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Blazor.Services;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -17,6 +19,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     private readonly SourceCache<TreeViewNode<TItem>, long> nodesById = new(x => x.NodeId);
 
     private readonly ClassMapper classMapper = new();
+
+    private TreeViewNode<TItem> lastSelectedItem;
 
     public TreeView()
     {
@@ -30,6 +34,14 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
                     item.SetExpanded(ShowExpandedByDefault.Value);
                 }
             })
+            .OnItemRemoved(x =>
+            {
+                if (ReferenceEquals(lastSelectedItem, x))
+                {
+                    //reset selection of removed item
+                    lastSelectedItem = null;
+                }
+            })
             .AsObservableCache()
             .AddTo(Anchors);
         
@@ -37,6 +49,11 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             .Connect()
             .AutoRefreshOnObservable(x => x.WhenAnyValue(y => y.Selected))
             .Filter(x => x.Selected)
+            .OnItemAdded(x =>
+            {
+                //remember last selected item as it may be of use for subsequent operations
+                lastSelectedItem = x;
+            })
             .AsObservableCache()
             .AddTo(Anchors);
     }
@@ -67,8 +84,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     [Parameter] public RenderFragment ChildContent { get; set; }
 
     [Parameter]
-    public bool Selectable { get; set; } = true;
-
+    public TreeViewSelectionMode SelectionMode { get; set; } = TreeViewSelectionMode.SingleItem;
+    
     [Parameter]
     public IEnumerable<TItem> DataSource { get; set; }
 
@@ -141,13 +158,18 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     public IObservableCache<TreeViewNode<TItem>, string> NodesByKey { get; }
 
-    internal bool IsCtrlKeyDown { get; set; }
+    internal bool IsCtrlKeyDown { get; private set; }
+    
+    internal bool IsShiftKeyDown { get; private set; }
     
     internal TreeViewNode<TItem> DragItem { get; set; }
     
     internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
 
     [Inject] private IDomEventListener DomEventListener { get; set; }
+    
+    [Inject]
+    public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -182,6 +204,11 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         nodesById.AddOrUpdate(treeNode);
     }
 
+    internal void RemoveNode(TreeViewNode<TItem> treeNode)
+    {
+        nodesById.Remove(treeNode);
+    }
+    
     internal async Task OnNodeExpand(TreeViewNode<TItem> node, bool expanded, MouseEventArgs args)
     {
         var expandedKeys = nodesById.Items.Where(x => x.Expanded).Select(x => x.Key).ToArray();
@@ -211,33 +238,59 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     {
         if (firstRender)
         {
-            DomEventListener.AddShared<KeyboardEventArgs>("document", "keydown", OnKeyDown);
-            DomEventListener.AddShared<KeyboardEventArgs>("document", "keyup", OnKeyUp);
+            DomEventListener.AddShared<KeyboardEventArgs>("document", "keydown", DocumentOnKeyDown);
+            DomEventListener.AddShared<KeyboardEventArgs>("document", "keyup", DocumentOnKeyUp);
         }
 
         base.OnAfterRender(firstRender);
     }
 
-    protected virtual void OnKeyDown(KeyboardEventArgs eventArgs)
+    protected void DocumentOnKeyDown(KeyboardEventArgs eventArgs)
     {
         HandleCtrlKeyPress(eventArgs);
     }
 
-    protected virtual void OnKeyUp(KeyboardEventArgs eventArgs)
+    protected void DocumentOnKeyUp(KeyboardEventArgs eventArgs)
     {
         HandleCtrlKeyPress(eventArgs);
+    }
+
+    internal Task AddToSelection(params TreeViewNode<TItem>[] selectedNodes)
+    {
+        return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: true);
+    }
+    
+    internal Task SetSelection(params TreeViewNode<TItem>[] selectedNodes)
+    {
+        return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: false);
+    }
+    
+    internal async Task SetSelection(HashSet<TreeViewNode<TItem>> selectedNodes, bool preserveSelection = false)
+    {
+        var existingSelection = preserveSelection ? SelectedItemsById.Items.ToHashSet() : new HashSet<TreeViewNode<TItem>>();
+        foreach (var node in NodesById.Items)
+        {
+            var shouldBeSelected = selectedNodes.Contains(node) || existingSelection.Contains(node);
+
+            if (shouldBeSelected == node.Selected)
+            {
+                continue;
+            }
+
+            node.Selected = shouldBeSelected;
+            await node.SelectedChanged.InvokeAsync(shouldBeSelected);
+        }
     }
     
     private void SetClassMapper()
     {
         classMapper
             .Add("ant-tree")
-            .Add("drop-target")
-            .Add("drop-container")
+            .Add("outline-none")
             .If("ant-tree-icon-hide", () => ShowIcon)
             .If("ant-tree-block-node", () => BlockNode)
             .If("draggable-tree", () => Draggable)
-            .If("ant-tree-unselectable", () => !Selectable);
+            .If("ant-tree-unselectable", () => SelectionMode == TreeViewSelectionMode.Disabled);
     }
 
     private async Task HandleContextMenu(MouseEventArgs args)
@@ -251,6 +304,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     private void HandleCtrlKeyPress(KeyboardEventArgs eventArgs)
     {
         IsCtrlKeyDown = eventArgs.CtrlKey || eventArgs.MetaKey;
+        IsShiftKeyDown = eventArgs.ShiftKey;
     }
     
     private async Task HandleOnDrop(DragEventArgs e)
@@ -266,5 +320,92 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     private async Task HandleDragOver(DragEventArgs e)
     {
         
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs eventArgs)
+    {
+        switch (SelectionMode)
+        {
+            case TreeViewSelectionMode.SingleItem or TreeViewSelectionMode.MultipleItems:
+            {
+                switch (eventArgs.Code)
+                {
+                    case "ArrowUp":
+                    case "ArrowDown":
+                    case "Escape":
+                        break;
+                    default:
+                        return;
+                }
+                
+                if (lastSelectedItem == null)
+                {
+                    //require origin item
+                    return;
+                }
+                
+                var allNodes = NodesById
+                    .Items
+                    .OrderBy(x => x.TreeLevel)
+                    .ThenBy(x => x.NodeIndex)
+                    .ToList();
+
+                var originIndex = allNodes.IndexOf(lastSelectedItem);
+                if (originIndex < 0)
+                {
+                    return;
+                }
+                
+                if (eventArgs.Code == "ArrowUp")
+                {
+                    var previousNode = allNodes.ElementAtOrDefault(originIndex - 1);
+                    if (previousNode != null)
+                    {
+                        if (eventArgs.ShiftKey && SelectionMode is TreeViewSelectionMode.MultipleItems)
+                        {
+                            await AddToSelection(previousNode);
+                        }
+                        else
+                        {
+                            await SetSelection(previousNode);
+                        }
+
+                        await ScrollElementIntoViewSafe(previousNode);
+                    }
+                } else if (eventArgs.Code == "ArrowDown")
+                {
+                    var nextNode = allNodes.ElementAtOrDefault(originIndex + 1);
+                    if (nextNode != null)
+                    {
+                        if (eventArgs.ShiftKey && SelectionMode is TreeViewSelectionMode.MultipleItems)
+                        {
+                            await AddToSelection(nextNode);
+                        }
+                        else
+                        {
+                            await SetSelection(nextNode);
+                        }
+
+                        await ScrollElementIntoViewSafe(nextNode);
+                    }
+                } else if (eventArgs.Code == "Escape")
+                {
+                    await SetSelection();
+                }
+                break;
+            }
+        }
+    }
+
+    private async Task ScrollElementIntoViewSafe(TreeViewNode<TItem> node)
+    {
+        try
+        {
+            await JsPoeBlazorUtils.ScrollElementIntoView(node.ElementRef);
+        }
+        catch (Exception e)
+        {
+            //there is a chance that element is already removed at this point
+        }
     }
 }

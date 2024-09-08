@@ -125,6 +125,26 @@ export function selectTextRangeInElement(targetElement: HTMLElement, start: numb
 }
 
 /**
+ * Scrolls the specified HTML element into view.
+ * @throws An error if the element is not found or the scroll operation fails.
+ * @param targetElement The HTML element to scroll into view.
+ * @param behavior Defines the transition animation. Can be 'auto' or 'smooth'.
+ * @param block Defines vertical alignment. Can be 'start', 'center', 'end', or 'nearest'.
+ * @param inline Defines horizontal alignment. Can be 'start', 'center', 'end', or 'nearest'.
+ */
+export function scrollElementIntoView(targetElement: HTMLElement, behavior: "auto" | "smooth" = "smooth", block: "start" | "center" | "end" | "nearest" = "nearest", inline: "start" | "center" | "end" | "nearest" = "nearest"): void {
+    if (!targetElement) {
+        logAndThrow(`Element not specified`);
+    }
+
+    try {
+        targetElement.scrollIntoView({ behavior: behavior, block: block, inline: inline });
+    } catch (error) {
+        logAndThrow(`Error scrolling element into view`, error);
+    }
+}
+
+/**
  * Simulates a click event on an HTML element with the specified ID.
  * @param elementId The ID of the element to click.
  * @throws An error if the element is not found, is not an HTMLElement, or does not support the 'click' method.

@@ -112,7 +112,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     [Parameter] public TItem DataItem { get; set; }
     
     [Parameter] public bool Hidden { get; set; }
-
+    
     public bool IsLeaf { get; private set; } = true;
     
     public bool IsSwitcherOpen { get; private set; }
@@ -342,6 +342,16 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
         Remove();
         await treeNode.AddNextNode(DataItem);
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (TreeComponent != null)
+        {
+            TreeComponent.RemoveNode(this);
+        }
+        
+        await base.DisposeAsync();
     }
 
     protected override async Task OnInitializedAsync()

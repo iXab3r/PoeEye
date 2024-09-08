@@ -57,6 +57,12 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         await module.InvokeVoidAsync("selectAllTextInElement", elementRef);
     }
 
+    public async Task ScrollElementIntoView(ElementReference elementRef, string behavior = "smooth", string block = "nearest", string inline = "nearest")
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("scrollElementIntoView", elementRef, behavior, block, inline);
+    }
+
     public async Task SelectTextRangeInElement(ElementReference elementRef, int? start = default, int? end = default, JsSelectionRangeDirection direction = JsSelectionRangeDirection.Forward)
     {
         var module = await GetModuleAsync();

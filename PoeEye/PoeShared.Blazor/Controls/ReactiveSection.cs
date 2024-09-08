@@ -23,6 +23,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
             .Select(x => x <= TimeSpan.Zero ? refreshRequestSource : refreshRequestSource.Sample(x))
             .Switch()
             .SubscribeAsync(x => Refresh(x))
+            //.Subscribe(x => WhenRefresh.OnNext(x)) //FIXME More valid way to do refreshes, but extremely slows down everything - should be investigated
             .AddTo(Anchors);
     }
     

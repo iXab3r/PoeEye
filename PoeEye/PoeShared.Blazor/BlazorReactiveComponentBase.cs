@@ -80,7 +80,7 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     [Parameter]
     public string Style { get; set; }
     
-    public ElementReference Ref { get; set; }
+    public ElementReference ElementRef { get; protected set; }
     
     /// <summary>
     /// Observable sequence that signals when a property of the component changes.

@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AntDesign;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Blazor.Services;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
@@ -47,6 +51,9 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
     public bool Draggable { get; private set; }
     
     public bool Droppable { get; private set; }
+    
+    [Inject]
+    public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
 
     private void SetTitleClassMapper()
     {
@@ -66,24 +73,70 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
     private async Task OnClick(MouseEventArgs args)
     {
-        if (SelfNode.Selected)
-        {
-            return;
-        }
 
-        foreach (var node in TreeComponent.NodesById.Items)
+        switch (TreeComponent.SelectionMode)
         {
-            if (!node.Selected)
+            case TreeViewSelectionMode.Disabled:
             {
-                continue;
+                await TreeComponent.SetSelection(new HashSet<TreeViewNode<TItem>>());
+                break;
             }
+            case TreeViewSelectionMode.SingleItem:
+            {
+                await TreeComponent.SetSelection(new HashSet<TreeViewNode<TItem>>(){ SelfNode });
+                break;
+            }
+            case TreeViewSelectionMode.MultipleItems:
+            {
+                var selectedNodes = TreeComponent
+                    .NodesById
+                    .Items
+                    .Where(x => x.Selected)
+                    .ToHashSet();
+                if (TreeComponent.IsShiftKeyDown && selectedNodes.Any())
+                {
+                    var allNodes = TreeComponent.NodesById
+                        .Items
+                        .OrderBy(x => x.TreeLevel)
+                        .ThenBy(x => x.NodeIndex)
+                        .ToList();
 
-            node.Selected = false;
-            await node.SelectedChanged.InvokeAsync(false);
+                    // Find the index of the currently clicked node and the first selected node in the list
+                    var clickedNodeIndex = allNodes.IndexOf(SelfNode);
+                    var firstSelectedNodeIndex = allNodes.IndexOf(selectedNodes.First());
+
+                    // Determine the range of nodes to select based on the positions of the clicked and the first selected nodes
+                    var rangeStart = Math.Min(clickedNodeIndex, firstSelectedNodeIndex);
+                    var rangeEnd = Math.Max(clickedNodeIndex, firstSelectedNodeIndex);
+
+                    var rangeSelection = new HashSet<TreeViewNode<TItem>>();
+                    for (var i = rangeStart; i <= rangeEnd; i++)
+                    {
+                        rangeSelection.Add(allNodes[i]);
+                    }
+
+                    if (TreeComponent.IsCtrlKeyDown)
+                    {
+                        rangeSelection.UnionWith(selectedNodes);
+                    }
+
+                    await TreeComponent.SetSelection(rangeSelection);
+                }
+                else if (TreeComponent.IsCtrlKeyDown)
+                {
+                    selectedNodes.Add(SelfNode);
+                    await TreeComponent.SetSelection(selectedNodes);
+                }
+                else
+                {
+                    await TreeComponent.SetSelection(new HashSet<TreeViewNode<TItem>>(){ SelfNode });
+                }
+                
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        
-        await SelfNode.SelectedChanged.InvokeAsync(true);
-        SelfNode.Selected = true;
         
         if (TreeComponent.OnClick.HasDelegate && args.Button == 0)
         {

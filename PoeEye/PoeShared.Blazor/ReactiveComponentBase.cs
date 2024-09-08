@@ -34,6 +34,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     private long renderCount;
     private long shouldRenderCount;
     private long unrenderedChangeCount;
+    private long skippedRenderCount;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReactiveComponentBase"/> class.
@@ -107,6 +108,13 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     /// </summary>
     [Parameter]
     public string Name { get; set; }
+    
+    /// <summary>
+    /// Controls rendering process - if set, StateHasChanged will be called only when there is at least one change detected
+    /// either by ChangeDetector or manually
+    /// </summary>
+    [Parameter]
+    public bool RenderOnlyWhenChanged { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -124,12 +132,6 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     /// Indicates whether the component is rendered. Set after the first OnAfterRender call.
     /// </summary>
     public bool IsComponentRendered { get; private set; }
-    
-    /// <summary>
-    /// Controls rendering process - if set, StateHasChanged will be called only when there is at least one change detected
-    /// either by ChangeDetector or manually
-    /// </summary>
-    public bool RenderOnlyWhenChanged { get; set; }
     
     /// <summary>
     /// Disposes of the resources used by this component.
@@ -185,17 +187,20 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     {
         Interlocked.Increment(ref shouldRenderCount);
 
-        bool shouldRender;
-        if (RenderOnlyWhenChanged)
+        if (RenderOnlyWhenChanged == false)
         {
-            shouldRender = unrenderedChangeCount > 0;
-        }
-        else
-        {
-            shouldRender = base.ShouldRender();
+            //fallback to default behaviour
+            return base.ShouldRender();
         }
 
-        return shouldRender;
+        if (unrenderedChangeCount > 0)
+        {
+            return base.ShouldRender();
+        }
+
+        //skip this render cycle as there are no changes detected
+        Interlocked.Increment(ref skippedRenderCount);
+        return false;
     }
     
     /// <inheritdoc />

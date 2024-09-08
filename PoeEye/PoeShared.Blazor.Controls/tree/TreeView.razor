@@ -2,13 +2,17 @@
 @inherits BlazorReactiveComponent
 @typeparam TItem
 
-<div class="@($"{classMapper.Class} {Class}")" style="@Style" @ref="Ref" id="@Id"
+<div class="@($"{classMapper.Class} {Class}")" tabindex="0" style="@Style" @ref="@ElementRef" id="@Id"
      @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(HandleContextMenu))" 
      @oncontextmenu:preventDefault="@OnContextMenu.HasDelegate"
+
+     @onkeydown="EventUtil.AsNonRenderingEventHandler<KeyboardEventArgs>(HandleKeyDown)"
+     @onkeydown:stopPropagation="false" @onkeydown:preventDefault
+     
      @ondrop="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleOnDrop))" @ondrop:preventDefault
      @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragEnter))"
-     @ondragover="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragOver))" 
-     >
+     @ondragover="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragOver))"
+>
     <div class="ant-tree-list">
         <div class="ant-tree-list-holder-inner">
             <CascadingValue Value="this" Name="Tree" IsFixed="@true">
