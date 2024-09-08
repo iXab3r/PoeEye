@@ -2,14 +2,39 @@
 using AntDesign;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Scaffolding;
+using PropertyBinder;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Controls;
 
 public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 {
+    private static readonly Binder<TreeViewNodeTitle<TItem>> Binder = new();
+
     private const double OffSetx = 25;
 
     private double dragTargetClientX = 0;
+    
+    static TreeViewNodeTitle()
+    {
+        Binder.BindIf(x => x.TreeComponent != null && x.SelfNode != null, x => x.TreeComponent.Draggable && !x.SelfNode.Disabled && x.SelfNode.Draggable)
+            .To(x => x.Draggable);
+        
+        Binder.BindIf(x => x.TreeComponent != null && x.SelfNode != null, x => x.TreeComponent.Draggable && !x.SelfNode.Disabled && x.SelfNode.Droppable)
+            .To(x => x.Droppable);
+    }
+
+    public TreeViewNodeTitle()
+    {
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.Draggable));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.Droppable));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.Selected));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen));
+        
+        Binder.Attach(this).AddTo(Anchors);
+    }
 
     [CascadingParameter(Name = "Tree")]
     public TreeView<TItem> TreeComponent { get; set; }
@@ -17,21 +42,19 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
     [CascadingParameter(Name = "SelfNode")]
     public TreeViewNode<TItem> SelfNode { get; set; }
 
-    private bool Draggable => TreeComponent.Draggable && !SelfNode.Disabled;
-
-    private bool IsSwitcherOpen => SelfNode.Expanded && !SelfNode.IsLeaf;
-
-    private bool IsSwitcherClose => !SelfNode.Expanded && !SelfNode.IsLeaf;
-
     protected ClassMapper TitleClassMapper { get; } = new();
+    
+    public bool Draggable { get; private set; }
+    
+    public bool Droppable { get; private set; }
 
     private void SetTitleClassMapper()
     {
         TitleClassMapper
             .Add("ant-tree-node-content-wrapper")
             .If("draggable", () => Draggable)
-            .If("ant-tree-node-content-wrapper-open", () => IsSwitcherOpen)
-            .If("ant-tree-node-content-wrapper-close", () => IsSwitcherClose)
+            .If("ant-tree-node-content-wrapper-open", () => SelfNode.IsSwitcherOpen)
+            .If("ant-tree-node-content-wrapper-close", () => SelfNode.IsSwitcherClose)
             .If("ant-tree-node-selected", () => SelfNode.Selected);
     }
 
@@ -92,8 +115,8 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
     private void OnDragLeave(DragEventArgs e)
     {
-        SelfNode.DragTarget = false;
-        SelfNode.SetParentTargetContainer();
+        SelfNode.SetDragTarget(false);
+        SelfNode.SetParentTargetContainer(false);
     }
 
     private void OnDragEnter(DragEventArgs e)
@@ -103,7 +126,7 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
             return;
         }
 
-        SelfNode.DragTarget = true;
+        SelfNode.SetDragTarget(true);
         dragTargetClientX = e.ClientX;
     }
 
@@ -120,11 +143,15 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
         if (e.ClientX - dragTargetClientX > OffSetx)
         {
-            SelfNode.SetTargetBottom();
-            SelfNode.SetParentTargetContainer();
-            await SelfNode.Expand(true);
+            if (SelfNode.Expanded == false && SelfNode.IsLeaf == false)
+            {
+                await SelfNode.Expand(true);
+            }
+            
+            SelfNode.SetTargetBottom(false);
+            SelfNode.SetParentTargetContainer(false);
         }
-        else
+        else if (SelfNode.Droppable)
         {
             SelfNode.SetTargetBottom(true);
             SelfNode.SetParentTargetContainer(true);
@@ -133,15 +160,20 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
     private async Task OnDrop(DragEventArgs e)
     {
-        SelfNode.DragTarget = false;
-        SelfNode.SetParentTargetContainer();
-        if (SelfNode.IsTargetBottom)
+        SelfNode.SetDragTarget(false);
+        SelfNode.SetParentTargetContainer(false);
+
+        var dragItem = TreeComponent.DragItem;
+        if (dragItem != null)
         {
-            TreeComponent.DragItem.DragMoveDown(SelfNode);
-        }
-        else
-        {
-            TreeComponent.DragItem.DragMoveInto(SelfNode);
+            if (SelfNode.IsTargetBottom)
+            {
+                await dragItem.DragMoveDown(SelfNode);
+            }
+            else
+            {
+                await dragItem.DragMoveInto(SelfNode);
+            }
         }
 
         if (TreeComponent.OnDrop.HasDelegate)

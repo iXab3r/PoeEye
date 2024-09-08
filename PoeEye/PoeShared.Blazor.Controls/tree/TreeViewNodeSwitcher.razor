@@ -3,26 +3,12 @@
 @typeparam TItem
 
 <span class="@ClassMapper.Class" @onclick="OnClick">
-    <!-- node has its own switcher icon -->
-    @if (SelfNode?.SwitcherIconTemplate != null || SelfNode?.SwitcherIcon != null)
+    @if (SelfNode?.IsLeaf == false && TreeComponent?.ShowExpand == true)
     {
-        if (SelfNode.SwitcherIconTemplate != null)
-        {
-            <span class="ant-tree-switcher-icon">
-                @SelfNode.SwitcherIconTemplate(SelfNode)
-            </span>
-        }
-        else if (SelfNode.SwitcherIcon != null)
-        {
-            <Icon Type="@SelfNode.SwitcherIcon" Class="ant-tree-switcher-icon"/>
-        }
+        <Icon Type="caret-down" Theme="outline" Class="ant-tree-switcher-icon"/>
     }
     else
     {
-        if (!SelfNode.IsLeaf)
-        {
-            <!-- node is not leaf and not show line, then show the default arrow icon -->
-            <Icon Type="caret-down" Theme="outline" Class="ant-tree-switcher-icon"/>
-        }
+        <Icon Type="caret-down" Theme="outline" Class="ant-tree-switcher-icon invisible"/>
     }
 </span>

@@ -5,7 +5,10 @@
 <span class="ant-tree-indent" aria-hidden="true">
     @for (var i = TreeLevel; i > 0; i--)
     {
-        if (TreeComponent.IndentTemplate != null)
+        if (TreeComponent.IndentWithLevelTemplate != null)
+        {
+            @TreeComponent.IndentWithLevelTemplate((SelfNode, i));
+        } else if (TreeComponent.IndentTemplate != null)
         {
             @TreeComponent.IndentTemplate(SelfNode)
         }

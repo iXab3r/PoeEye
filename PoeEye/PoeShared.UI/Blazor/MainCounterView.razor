@@ -1,4 +1,5 @@
 ﻿@using PoeShared.Blazor.Wpf.Services
+@using ReactiveUI
 @inherits PoeShared.Blazor.BlazorReactiveComponent<PoeShared.UI.Blazor.MainCounterViewModel>
 @inject IBlazorControlLocationTracker LocationTracker
 
@@ -15,11 +16,11 @@
     }
 </HeadContent>
 
-<ReactiveSection Trackers="@(new() { this.Listen(x => x.RefreshRequestCount), DataContext.Listen(x => x.Count) })">
+<ReactiveSection Trackers="@(new() { this.WhenAnyValue(x => x.RefreshRequestCount), DataContext.WhenAnyValue(x => x.Count) })">
     <div>Reactive @DataContext.Count</div>
 </ReactiveSection>
 
-<ReactiveSection Trackers="@(new() { LocationTracker.Listen(x => x.BoundsOnScreen) })">
+<ReactiveSection Trackers="@(new() { LocationTracker.WhenAnyValue(x => x.BoundsOnScreen) })">
     <div>@LocationTracker.BoundsOnScreen</div>
 </ReactiveSection>
 

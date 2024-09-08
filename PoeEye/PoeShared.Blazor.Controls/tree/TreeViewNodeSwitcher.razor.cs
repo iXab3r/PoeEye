@@ -2,37 +2,48 @@
 using AntDesign;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Scaffolding;
+using PropertyBinder;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Controls;
 
 public partial class TreeViewNodeSwitcher<TItem> : BlazorReactiveComponent
 {
+    private static readonly Binder<TreeViewNodeSwitcher<TItem>> Binder = new();
+
+    static TreeViewNodeSwitcher()
+    {
+    }
+
+    public TreeViewNodeSwitcher()
+    {
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsLeaf));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.TreeComponent.ShowExpand));
+        
+        Binder.Attach(this).AddTo(Anchors);
+    }
+
     [CascadingParameter(Name = "Tree")]
     public TreeView<TItem> TreeComponent { get; set; }
 
     [CascadingParameter(Name = "SelfNode")]
     public TreeViewNode<TItem> SelfNode { get; set; }
 
-    private bool IsSwitcherOpen => SelfNode.Expanded && !SelfNode.IsLeaf;
-
-    private bool IsSwitcherClose => !SelfNode.Expanded && !SelfNode.IsLeaf;
-
+    [Parameter] public EventCallback<MouseEventArgs> OnSwitcherClick { get; set; }
+    
+    
     protected ClassMapper ClassMapper { get; } = new();
 
-    [Parameter] public EventCallback<MouseEventArgs> OnSwitcherClick { get; set; }
-
-    private void SetClassMap()
+    protected override void OnInitialized()
     {
         ClassMapper
             .Add("ant-tree-switcher")
             .If("ant-tree-switcher-noop", () => SelfNode.IsLeaf)
-            .If("ant-tree-switcher_open", () => IsSwitcherOpen)
-            .If("ant-tree-switcher_close", () => IsSwitcherClose);
-    }
-
-    protected override void OnInitialized()
-    {
-        SetClassMap();
+            .If("ant-tree-switcher_open", () => SelfNode.IsSwitcherOpen)
+            .If("ant-tree-switcher_close", () => SelfNode.IsSwitcherClose);
         base.OnInitialized();
     }
 

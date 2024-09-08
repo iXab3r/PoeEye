@@ -2,110 +2,64 @@
 @inherits BlazorReactiveComponent
 @typeparam TItem
 
-@if (Draggable)
-{
-    <span class="@TitleClassMapper.Class" 
-          title="@SelfNode.Title" 
-          @onclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))" 
-          @ondblclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnDblClick))" 
-          @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:stopPropagation="@TreeComponent.OnContextMenu.HasDelegate" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
-          @ondragover="@OnDragOver" @ondragover:preventDefault
-          @ondragleave="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave))" 
-          @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter))"
-          @ondrop="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDrop))" @ondrop:preventDefault
-          @ondragstart="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragStart))" 
-          @ondragend="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnd))" 
-          draggable="true"
-          aria-grabbed="true">
-        @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
-        {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
-                <span class="ant-tree-iconEle ant-tree-icon__customize">
-                    @TreeComponent.TitleIconTemplate(SelfNode)
-                </span>
+<span class="@TitleClassMapper.Class"
+      title="@SelfNode.Title"
+      @onclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))"
+      @ondblclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnDblClick))"
+      @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:stopPropagation="@TreeComponent.OnContextMenu.HasDelegate" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
+
+      @ondragstart="@(Draggable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragStart) : default)"
+      @ondrop="@(Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDrop) : default)" @ondrop:preventDefault
+
+      @ondragleave="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave) : default)"
+      @ondragenter="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter) : default)"
+      @ondragend="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnd) : default)"
+      
+      @ondragover="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragOver) : default)" @ondragover:preventDefault
+
+      aria-dropeffect="@(SelfNode.Droppable ? "move" : "none")"
+      draggable="@(Draggable ? "true" : "false")"
+      aria-grabbed="true">
+    @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
+    {
+        <span class="ant-tree-iconEle @(SelfNode.IsSwitcherOpen ? "ant-tree-icon__open" : "") @(SelfNode.IsSwitcherClose ? "ant-tree-icon__close" : "") ">
+            <span class="ant-tree-iconEle ant-tree-icon__customize">
+                @TreeComponent.TitleIconTemplate(SelfNode)
             </span>
-        }
-        else if (string.IsNullOrWhiteSpace(SelfNode.Icon) == false && TreeComponent.ShowIcon)
-        {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
-                <span class="ant-tree-iconEle ant-tree-icon__customize">
-                    @if (string.IsNullOrWhiteSpace(SelfNode.Icon) == false)
-                    {
-                        <Icon Type="@SelfNode.Icon" Theme="outline"/>
-                    }
-                </span>
-            </span>
-        }
-        @if (TreeComponent.TitleTemplate != null)
-        {
-            @TreeComponent.TitleTemplate(SelfNode)
-        }
-        else
-        {
-            <span class="ant-tree-title" style="pointer-events: none;">
-                @if (SelfNode.TitleTemplate != null)
+        </span>
+    }
+    else if (string.IsNullOrWhiteSpace(SelfNode.Icon) == false && TreeComponent.ShowIcon)
+    {
+        <span class="ant-tree-iconEle @(SelfNode.IsSwitcherOpen ? "ant-tree-icon__open" : "") @(SelfNode.IsSwitcherClose ? "ant-tree-icon__close" : "") ">
+            <span class="ant-tree-iconEle ant-tree-icon__customize">
+                @if (string.IsNullOrWhiteSpace(SelfNode.Icon) == false)
                 {
-                    @SelfNode.TitleTemplate
-                }
-                else
-                {
-                    @SelfNode.Title
+                    <Icon Type="@SelfNode.Icon" Theme="outline"/>
                 }
             </span>
-        }
-        @if (SelfNode.DragTarget)
-        {
-            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.IsTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
-        }
-    </span>
-}
-else
-{
-    <span class="@TitleClassMapper.Class" 
-          title="@SelfNode.Title" 
-          @onclick="@OnClick" 
-          @ondblclick="@OnDblClick"
-          @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="TreeComponent.OnContextMenu.HasDelegate">
-        @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
-        {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
-                <span class="ant-tree-iconEle ant-tree-icon__customize">
-                    @TreeComponent.TitleIconTemplate(SelfNode)
-                </span>
-            </span>
-        }
-        else if ((!string.IsNullOrWhiteSpace(SelfNode.Icon) || SelfNode.IconTemplate != null) && TreeComponent.ShowIcon)
-        {
-            <span class="ant-tree-iconEle @(IsSwitcherOpen ? "ant-tree-icon__open" : "") @(IsSwitcherClose ? "ant-tree-icon__close" : "") ">
-                <span class="ant-tree-iconEle ant-tree-icon__customize">
-                    @if (SelfNode.IconTemplate != null)
-                    {
-                        @SelfNode.IconTemplate(SelfNode)
-                    }
-                    else if (!string.IsNullOrWhiteSpace(SelfNode.Icon))
-                    {
-                        <Icon Type="@SelfNode.Icon" Theme="outline"/>
-                    }
-                </span>
-            </span>
-        }
-        @if (TreeComponent.TitleTemplate != null)
-        {
-            @TreeComponent.TitleTemplate(SelfNode)
-        }
-        else if (SelfNode.TitleTemplate != null)
-        {
-            @SelfNode.TitleTemplate
-        }
-        else
-        {
-            <span class="ant-tree-title">
+        </span>
+    }
+    @if (TreeComponent.TitleTemplate != null)
+    {
+        @TreeComponent.TitleTemplate(SelfNode)
+    }
+    else
+    {
+        <span class="ant-tree-title" style="pointer-events: none;">
+            @if (SelfNode.TitleTemplate != null)
+            {
+                @SelfNode.TitleTemplate
+            }
+            else
+            {
                 @SelfNode.Title
-            </span>
-        }
-        @if (SelfNode.DragTarget)
+            }
+        </span>
+    }
+    <ReactiveSection Trackers="@(new() {this.WhenAnyValue(x => x.SelfNode.IsDragTarget)})">
+        @if (SelfNode.IsDragTarget)
         {
             <div class="ant-tree-drop-indicator" style="left:@(SelfNode.IsTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
         }
-    </span>
-}
+    </ReactiveSection>
+</span>

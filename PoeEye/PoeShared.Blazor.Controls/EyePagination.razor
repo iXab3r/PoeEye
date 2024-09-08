@@ -2,7 +2,7 @@
 @using PropertyBinder
 @typeparam TItem
 
-<ReactiveSection Trackers="@(new() {this.Listen(x => x.ItemsSource)})">
+<ReactiveSection Trackers="@(new() {this.WhenAnyValue(x => x.ItemsSource)})">
     @if (ItemsSource != null)
     {
         <div class="@Class">

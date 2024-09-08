@@ -6,27 +6,39 @@ using AntDesign;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using PoeShared.Scaffolding;
+using PropertyBinder;
 using ReactiveUI;
 
 namespace PoeShared.Blazor.Controls;
 
 public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 {
+    private static readonly Binder<TreeViewNode<TItem>> Binder = new();
+
     private readonly ClassMapper classMapper = new();
     
     private bool disableCheckbox;
     private bool disabled;
-    private bool dragTarget;
     private string icon;
-    private bool isLeaf = true;
     private string key;
     private string title;
+
+    static TreeViewNode()
+    {
+        Binder.Bind(x => x.Expanded && !x.IsLeaf)
+            .To(x => x.IsSwitcherOpen);
+        
+        Binder.Bind(x => !x.Expanded && !x.IsLeaf)
+            .To(x => x.IsSwitcherClose);
+    }
 
     public TreeViewNode()
     {
         NodeId = TreeViewHelper.GetNextNodeId();
         
         ChangeTrackers.Add(this.WhenAnyValue(x => x.Selected));
+        
+        Binder.Attach(this).AddTo(Anchors);
     }
 
     [CascadingParameter(Name = "Tree")] public TreeView<TItem> TreeComponent { get; set; }
@@ -63,35 +75,13 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     
     [Parameter] public EventCallback<bool> SelectedChanged { get; set; }
 
-    [Parameter]
-    public bool IsLeaf
-    {
-        get
-        {
-            if (TreeComponent.IsLeafExpression != null)
-            {
-                return TreeComponent.IsLeafExpression(this);
-            }
-
-            return isLeaf;
-        }
-        set
-        {
-            if (isLeaf == value)
-            {
-                return;
-            }
-
-            isLeaf = value;
-            StateHasChanged();
-        }
-    }
-
     [Parameter] public bool Expanded { get; set; }
 
     [Parameter] public bool Indeterminate { get; set; }
 
     [Parameter] public bool Draggable { get; set; }
+
+    [Parameter] public bool Droppable { get; set; } = true;
 
     [Parameter]
     public string Icon
@@ -101,10 +91,6 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     }
 
     [Parameter] public RenderFragment<TreeViewNode<TItem>> IconTemplate { get; set; }
-
-    [Parameter] public string SwitcherIcon { get; set; }
-
-    [Parameter] public RenderFragment<TreeViewNode<TItem>> SwitcherIconTemplate { get; set; }
 
     [Parameter]
     public string Title
@@ -124,8 +110,36 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     [Parameter] public RenderFragment TitleTemplate { get; set; }
 
     [Parameter] public TItem DataItem { get; set; }
+    
+    [Parameter] public bool Hidden { get; set; }
 
-    internal bool RealDisplay
+    public bool IsLeaf { get; private set; } = true;
+    
+    public bool IsSwitcherOpen { get; private set; }
+
+    public bool IsSwitcherClose { get; private set; }
+
+    public bool IsDragTarget
+    {
+        get;
+        private set;
+    }
+
+    public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
+
+    public bool IsTargetBottom { get; private set; }
+
+    public bool IsTargetContainer { get; private set; }
+    
+    public bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
+
+    internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
+    
+    internal int NodeIndex { get; set; }
+
+    internal long NodeId { get; private set; }
+    
+    private bool RealDisplay
     {
         get
         {
@@ -148,40 +162,9 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
     }
 
-    internal bool DragTarget
-    {
-        get => dragTarget;
-        set
-        {
-            if (dragTarget == value)
-            {
-                return;
-            }
-
-            dragTarget = value;
-            StateHasChanged();
-        }
-    }
-
-    internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
-
-    public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
-
-    internal int NodeIndex { get; set; }
-
-    internal bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
-
-    internal long NodeId { get; private set; }
-
-    internal bool IsTargetBottom { get; private set; }
-
-    private bool IsTargetContainer { get; set; }
-
     private bool SwitcherOpen => Expanded && !IsLeaf;
 
     private bool SwitcherClose => !Expanded && !IsLeaf;
-
-    [Parameter] public bool Hidden { get; set; }
 
     private IList<TItem> ChildDataItems
     {
@@ -291,7 +274,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         IsLeaf = false;
     }
 
-    internal void SetTargetBottom(bool value = false)
+    internal void SetTargetBottom(bool value)
     {
         if (IsTargetBottom == value)
         {
@@ -299,10 +282,19 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
 
         IsTargetBottom = value;
-        StateHasChanged();
+    }
+    
+    internal void SetDragTarget(bool value)
+    {
+        if (IsDragTarget == value)
+        {
+            return;
+        }
+
+        IsDragTarget = value;
     }
 
-    internal void SetParentTargetContainer(bool value = false)
+    internal void SetParentTargetContainer(bool value)
     {
         if (ParentNode == null)
         {
@@ -315,7 +307,6 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         }
 
         ParentNode.IsTargetContainer = value;
-        ParentNode.StateHasChanged();
     }
 
     internal async Task DragMoveInto(TreeViewNode<TItem> treeNode)
@@ -395,9 +386,9 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             .If("ant-tree-treenode-switcher-close", () => SwitcherClose)
             .If("ant-tree-treenode-checkbox-indeterminate", () => Indeterminate)
             .If("ant-tree-treenode-selected", () => Selected)
-            .If("drop-target", () => DragTarget)
-            .If("drag-over-gap-bottom", () => DragTarget && IsTargetBottom)
-            .If("drag-over", () => DragTarget && !IsTargetBottom)
+            .If("drop-target", () => IsDragTarget)
+            .If("drag-over-gap-bottom", () => IsDragTarget && IsTargetBottom)
+            .If("drag-over", () => IsDragTarget && !IsTargetBottom)
             .If("drop-container", () => IsTargetContainer)
             .If("ant-tree-treenode-leaf-last", () => IsLastNode);
     }

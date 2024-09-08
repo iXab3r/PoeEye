@@ -280,6 +280,14 @@ textarea,
     font-weight: 500;
 }
 
+.ant-radio-button-wrapper:focus-within {
+    box-shadow: inherit;
+}
+
+.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):focus-within {
+    box-shadow: inherit;
+}
+
 .ant-select-multiple .ant-select-selection-item-remove{
     font-size: 12px;
     margin: 0 4px;

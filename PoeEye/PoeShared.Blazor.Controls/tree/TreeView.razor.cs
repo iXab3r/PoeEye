@@ -8,19 +8,19 @@ using DynamicData;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Controls;
 
 public partial class TreeView<TItem> : BlazorReactiveComponent
 {
     private readonly SourceCache<TreeViewNode<TItem>, long> nodesById = new(x => x.NodeId);
-    private readonly IObservableCache<TreeViewNode<TItem>, string> nodesByKey;
-    
+
     private readonly ClassMapper classMapper = new();
 
     public TreeView()
     {
-        nodesByKey = nodesById
+        NodesByKey = nodesById
             .Connect()
             .ChangeKey(x => x.Key)
             .OnItemAdded(item =>
@@ -30,6 +30,13 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
                     item.SetExpanded(ShowExpandedByDefault.Value);
                 }
             })
+            .AsObservableCache()
+            .AddTo(Anchors);
+        
+        SelectedItemsById = nodesById
+            .Connect()
+            .AutoRefreshOnObservable(x => x.WhenAnyValue(y => y.Selected))
+            .Filter(x => x.Selected)
             .AsObservableCache()
             .AddTo(Anchors);
     }
@@ -51,9 +58,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     [Parameter]
     public bool Disabled { get; set; }
-
-    [Parameter]
-    public bool ShowLeafIcon { get; set; }
 
     [Parameter]
     public string SwitcherIcon { get; set; }
@@ -78,9 +82,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     public Func<TreeViewNode<TItem>, string> IconExpression { get; set; }
 
     [Parameter]
-    public Func<TreeViewNode<TItem>, bool> IsLeafExpression { get; set; }
-
-    [Parameter]
     public Func<TreeViewNode<TItem>, IEnumerable<TItem>> ChildrenExpression { get; set; }
 
     [Parameter]
@@ -98,6 +99,9 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     [Parameter]
     public RenderFragment<TreeViewNode<TItem>> IndentTemplate { get; set; }
 
+    [Parameter]
+    public RenderFragment<(TreeViewNode<TItem> Node, int IndentLevel)> IndentWithLevelTemplate { get; set; }
+    
     [Parameter]
     public RenderFragment<TreeViewNode<TItem>> TitleTemplate { get; set; }
 
@@ -133,6 +137,10 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     public IObservableCache<TreeViewNode<TItem>, long> NodesById => nodesById;
     
+    public IObservableCache<TreeViewNode<TItem>, long> SelectedItemsById { get; }
+
+    public IObservableCache<TreeViewNode<TItem>, string> NodesByKey { get; }
+
     internal bool IsCtrlKeyDown { get; set; }
     
     internal TreeViewNode<TItem> DragItem { get; set; }
@@ -224,6 +232,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     {
         classMapper
             .Add("ant-tree")
+            .Add("drop-target")
+            .Add("drop-container")
             .If("ant-tree-icon-hide", () => ShowIcon)
             .If("ant-tree-block-node", () => BlockNode)
             .If("draggable-tree", () => Draggable)
@@ -241,5 +251,20 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     private void HandleCtrlKeyPress(KeyboardEventArgs eventArgs)
     {
         IsCtrlKeyDown = eventArgs.CtrlKey || eventArgs.MetaKey;
+    }
+    
+    private async Task HandleOnDrop(DragEventArgs e)
+    {
+      
+    }
+    
+    private async Task HandleDragEnter(DragEventArgs e)
+    {
+        
+    }
+
+    private async Task HandleDragOver(DragEventArgs e)
+    {
+        
     }
 }
