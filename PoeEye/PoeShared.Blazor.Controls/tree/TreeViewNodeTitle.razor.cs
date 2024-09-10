@@ -124,7 +124,14 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
                 }
                 else if (TreeComponent.IsCtrlKeyDown)
                 {
-                    selectedNodes.Add(SelfNode);
+                    if (selectedNodes.Contains(SelfNode))
+                    {
+                        selectedNodes.Add(SelfNode);
+                    }
+                    else
+                    {
+                        selectedNodes.Remove(SelfNode);
+                    }
                     await TreeComponent.SetSelection(selectedNodes);
                 }
                 else

@@ -1,0 +1,30 @@
+﻿<input type="number"
+       class="form-control"
+       min="@Min"
+       max="@Max"
+       step="@Step"
+       value="@Value"
+       oninput="@((ChangeEventArgs x) => ValueChanged.InvokeAsync(Parse(x.Value)))">
+
+@code {
+    
+       [Parameter]
+       public double? Min { get; set; }
+       
+       [Parameter]
+       public double? Max { get; set; }
+       
+       [Parameter]
+       public double? Step { get; set; }
+       
+       [Parameter] public double Value { get; set; }
+
+       [Parameter] public EventCallback<double> ValueChanged { get; set; }
+       
+       private static double Parse(object value)
+       {
+              return value is not string valueAsString || string.IsNullOrEmpty(valueAsString)
+                     ? default
+                     : Convert.ToDouble(valueAsString);
+       }
+}
