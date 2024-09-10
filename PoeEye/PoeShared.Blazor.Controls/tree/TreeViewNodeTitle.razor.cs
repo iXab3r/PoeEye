@@ -126,11 +126,11 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
                 {
                     if (selectedNodes.Contains(SelfNode))
                     {
-                        selectedNodes.Add(SelfNode);
+                        selectedNodes.Remove(SelfNode);
                     }
                     else
                     {
-                        selectedNodes.Remove(SelfNode);
+                        selectedNodes.Add(SelfNode);
                     }
                     await TreeComponent.SetSelection(selectedNodes);
                 }
