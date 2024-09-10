@@ -7,7 +7,7 @@
      @oncontextmenu:preventDefault="@OnContextMenu.HasDelegate"
 
      @onkeydown="EventUtil.AsNonRenderingEventHandler<KeyboardEventArgs>(HandleKeyDown)"
-     @onkeydown:stopPropagation="false" @onkeydown:preventDefault
+     @onkeydown:stopPropagation="false" 
      
      @ondrop="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleOnDrop))" @ondrop:preventDefault
      @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragEnter))"
