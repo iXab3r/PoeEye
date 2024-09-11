@@ -1,0 +1,23 @@
+﻿/* make scroller scrollable */
+.scroller {
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+/* disable all generic anchoring behavior */
+.scroller * {
+    overflow-anchor: none;
+}
+
+/* make body slightly to long for its parent
+   so it can be scrolled to the bottom even it
+   is empty */
+.scroller .scroller-body {
+    min-height: 101%;
+}
+
+/* enable anchoring for our anchor at the bottom */
+.scroller .scroller-anchor {
+    overflow-anchor: auto;
+    height: 1px;
+}
