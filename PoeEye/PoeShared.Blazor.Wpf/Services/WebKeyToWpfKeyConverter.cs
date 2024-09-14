@@ -1,9 +1,12 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
+using Microsoft.AspNetCore.Components.Web;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
 using KeyboardEventArgs = Microsoft.AspNetCore.Components.Web.KeyboardEventArgs;
+using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs;
 
 namespace PoeShared.Blazor.Wpf.Services;
 
@@ -11,6 +14,27 @@ public sealed class WebKeyToWpfKeyConverter : LazyReactiveObject<WebKeyToWpfKeyC
 {
     private static readonly IFluentLog Log = typeof(WebKeyToWpfKeyConverter).PrepareLogger();
 
+    public HotkeyGesture Convert(WheelEventArgs args)
+    {
+        var modifiers = FromJsEvent(args);
+        var wheel = args.DeltaY switch
+        {
+            < 0 => MouseWheelAction.WheelUp,
+            > 0 => MouseWheelAction.WheelDown,
+            _ => MouseWheelAction.None
+        };
+        var gesture = new HotkeyGesture(wheel, modifiers);
+        return gesture;
+    }
+    
+    public HotkeyGesture Convert(MouseEventArgs args)
+    {
+        var modifiers = FromJsEvent(args);
+        var button = FromJsButton(args.Button);
+        var gesture = new HotkeyGesture(button, modifiers);
+        return gesture;
+    }
+    
     public HotkeyGesture Convert(KeyboardEventArgs args)
     {
         var modifiers = ModifierKeys.None;
@@ -58,7 +82,46 @@ public sealed class WebKeyToWpfKeyConverter : LazyReactiveObject<WebKeyToWpfKeyC
         var gesture = new HotkeyGesture(key, modifiers);
         return gesture;
     }
-    
+
+    private static ModifierKeys FromJsEvent(MouseEventArgs args)
+    {
+        var modifiers = ModifierKeys.None;
+        if (args.CtrlKey)
+        {
+            modifiers |= ModifierKeys.Control;
+        }
+
+        if (args.AltKey)
+        {
+            modifiers |= ModifierKeys.Alt;
+        }
+
+        if (args.ShiftKey)
+        {
+            modifiers |= ModifierKeys.Shift;
+        }
+
+        if (args.MetaKey)
+        {
+            modifiers |= ModifierKeys.Windows;
+        }
+
+        return modifiers;
+    }
+
+    private static MouseButton FromJsButton(long button)
+    {
+        return button switch
+        {
+            0 => MouseButton.Left,   // Left button
+            1 => MouseButton.Middle, // Middle button
+            2 => MouseButton.Right,  // Right button
+            3 => MouseButton.XButton1, // Additional button (back)
+            4 => MouseButton.XButton2, // Additional button (forward)
+            _ => throw new ArgumentOutOfRangeException(nameof(button), $"Unknown button value: {button}")
+        };
+    }
+
     private static Key FromJsKeyCode(string jsKeyCode)
     {
         var result = jsKeyCode switch
@@ -116,6 +179,18 @@ public sealed class WebKeyToWpfKeyConverter : LazyReactiveObject<WebKeyToWpfKeyC
             "F10" => Key.F10,
             "F11" => Key.F11,
             "F12" => Key.F12,
+            "F13" => Key.F13,
+            "F14" => Key.F14,
+            "F15" => Key.F15,
+            "F16" => Key.F16,
+            "F17" => Key.F17,
+            "F18" => Key.F18,
+            "F19" => Key.F19,
+            "F20" => Key.F20,
+            "F21" => Key.F21,
+            "F22" => Key.F22,
+            "F23" => Key.F23,
+            "F24" => Key.F24,
 
             // Special keys
             "Escape" => Key.Escape,

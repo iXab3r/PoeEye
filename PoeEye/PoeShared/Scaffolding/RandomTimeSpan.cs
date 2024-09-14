@@ -38,6 +38,8 @@ public readonly record struct RandomTimeSpan
     /// </summary>
     public bool Randomize { get; init; }
 
+    public bool IsEmpty() => Min == default && Max == default;
+
     /// <summary>
     /// Returns next random timespan
     /// </summary>

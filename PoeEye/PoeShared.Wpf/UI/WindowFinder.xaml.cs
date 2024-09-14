@@ -2,11 +2,16 @@ using System;
 using System.Collections.Concurrent;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using PInvoke;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
+using PoeShared.Services;
+using ReactiveUI;
 using Cursor = System.Windows.Input.Cursor;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -28,6 +33,8 @@ public partial class WindowFinder
     
     private readonly SerialDisposable activeSearchAnchors;
     private readonly ConcurrentDictionary<IntPtr, IntPtr> parentByWindow = new();
+    private readonly Subject<WindowFinderMatch> matches = new();
+    private readonly SharedResourceRentController isBusyLatch = new();
     
     private Cursor crosshairCursor;
     private WpfPoint startPoint;
@@ -55,6 +62,29 @@ public partial class WindowFinder
     {
         get => (bool) GetValue(MinimizeActiveWindowProperty);
         set => SetValue(MinimizeActiveWindowProperty, value);
+    }
+    
+    public async Task<WindowFinderMatch> Pick()
+    {
+        WpfPoint screenPos = Mouse.GetPosition(Application.Current.MainWindow);
+        WpfPoint relativePos = this.PointFromScreen(screenPos);
+        startPoint = relativePos;
+        if (!CaptureMouse())
+        {
+            throw new InvalidOperationException("Failed to capture mouse focus");
+        }
+
+        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationSubscription = isBusyLatch
+            .IsRented
+            .WithPrevious()
+            .Where(x => x.Previous.Value == true && x.Current.Value == false)
+            .Subscribe(x =>
+            {
+                cancellationTokenSource.Cancel();
+            });
+        var result = await Task.Run(async () => await matches.Take(1), cancellationTokenSource.Token);
+        return result;
     }
     
     protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -101,6 +131,7 @@ public partial class WindowFinder
             CursorLocation = UnsafeNative.GetCursorPosition(),
         };
         PickCommand?.Execute(match);
+        matches.OnNext(match);
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -142,7 +173,7 @@ public partial class WindowFinder
         UpdateCursor();
     }
 
-    private void StartSearch()
+    private CompositeDisposable StartSearch()
     {
         var foregroundWindow = UnsafeNative.GetForegroundWindow();
         CaptureMouse();
@@ -169,6 +200,7 @@ public partial class WindowFinder
         }
 
         var searchAnchors = new CompositeDisposable().AssignTo(activeSearchAnchors);
+        searchAnchors.Add(isBusyLatch.Rent("Selection started"));
         Observable
             .FromEventPattern<MouseEventHandler, MouseEventArgs>(
                 h => MouseMove += h,
@@ -196,6 +228,7 @@ public partial class WindowFinder
         });
         
         UpdateCursor();
+        return searchAnchors;
     }
 
     private void StopSearch()
