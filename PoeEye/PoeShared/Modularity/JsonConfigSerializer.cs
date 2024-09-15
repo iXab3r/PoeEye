@@ -12,8 +12,17 @@ namespace PoeShared.Modularity;
 
 internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger, IConfigSerializer
 {
+    private static readonly int MaxDepth = 1024;
+    private static readonly int MaxCharsToLog = 1024;
+
     private readonly SourceListEx<JsonConverter> converters = new();
-    private readonly int MaxCharsToLog = 1024;
+    
+    /// <summary>
+    /// By default, Newtonsoft JSON throws an exception when deserializing structures with a depth of 64 or more
+    /// https://github.com/JamesNK/Newtonsoft.Json/releases/tag/13.0.1
+    /// Seems to be related to DoS attack mitigation, see ALEPH-2018004 - DOS vulnerability #2457 for details.
+    /// Also there was/is (as of Sep 24) a bug in the lib around this behavior https://github.com/JamesNK/Newtonsoft.Json/issues/2858
+    /// </summary>
 
     private JsonSerializerSettings jsonSerializerSettings;
     private JsonSerializer jsonSerializer;
@@ -136,8 +145,9 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
             TypeNameHandling = TypeNameHandling.Auto,
             Error = HandleSerializerError,
             NullValueHandling = NullValueHandling.Ignore,
-            
+            MaxDepth = MaxDepth, // by default it is 64 and not enough for deeply nested structures like BTs
         };
+        
         newSettings.ContractResolver = new PoeSharedContractResolver();
         converters.Items.ForEach(newSettings.Converters.Add);
 
@@ -198,7 +208,8 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     {
         return new JsonTextReader(reader)
         {
-            ArrayPool = SharedArrayPool<char>.Instance
+            ArrayPool = SharedArrayPool<char>.Instance,
+            MaxDepth = MaxDepth
         };
     }
     

@@ -171,6 +171,22 @@ public class PoeConfigConverterTests : FixtureBase
         result.ShouldNotBeNull();
         result.ShouldBeAssignableTo<IPoeEyeConfig>();
     }
+    
+    [Test]
+    public void ShouldLoadDeepNestedConfig()
+    {
+        //Given
+        var instance = CreateInstance();
+        var deserializedValue = instance.Deserialize<IPoeEyeConfig>(PrepareSerialized("DeepSampleConfig.json"));
+
+        //When
+        var secondarySerializedValue = instance.Serialize(deserializedValue);
+        var result = instance.Deserialize<IPoeEyeConfig>(secondarySerializedValue);
+
+        //Then
+        result.ShouldNotBeNull();
+        result.ShouldBeAssignableTo<IPoeEyeConfig>();
+    }
 
     [Test]
     public void ShouldLoadVersionedTypes()

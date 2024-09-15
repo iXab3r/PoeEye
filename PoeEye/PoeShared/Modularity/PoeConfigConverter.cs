@@ -270,6 +270,7 @@ internal sealed class PoeConfigConverter : JsonConverter
     private object DeserializeFromToken(JToken token, JsonSerializer serializer, Type type)
     {
         using var tokenReader = new JTokenReader(token);
+        InheritProperties(tokenReader, serializer);
         skipNext = true;
         try
         {
@@ -284,8 +285,9 @@ internal sealed class PoeConfigConverter : JsonConverter
     private JToken SerializeToToken(JsonSerializer serializer, object valueToSerialize)
     {
         using var tokenWriter = new JTokenWriter();
+        InheritProperties(tokenWriter, serializer);
+
         skipNext = true;
-        
         try
         {
             serializer.Serialize(tokenWriter, valueToSerialize);
@@ -297,6 +299,16 @@ internal sealed class PoeConfigConverter : JsonConverter
         }
     }
 
+    private static void InheritProperties(JsonReader reader, JsonSerializer serializer)
+    {
+        reader.MaxDepth = serializer.MaxDepth; 
+    }
+    
+    private static void InheritProperties(JsonWriter writer, JsonSerializer serializer)
+    {
+        writer.Formatting = serializer.Formatting;
+    }
+    
     private static object GetMetadataValue(PoeConfigMetadata metadata)
     {
         var metadataType = metadata.GetType().GetGenericArguments().Single();

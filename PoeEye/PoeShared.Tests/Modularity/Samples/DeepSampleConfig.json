@@ -1,0 +1,1517 @@
+﻿{
+  "AssemblyName": "EyeAuras.UI.Metadata",
+  "TypeName": "EyeAuras.UI.Core.Models.AuraBehaviorTreeProperties",
+  "Version": 1,
+  "ConfigValue": {
+    "IsLoaded": true,
+    "TreeRoot": {
+      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+      "TypeName": "EyeAuras.BehaviorTree.BTRootNodeProperties",
+      "Version": 2,
+      "ConfigValue": {
+        "MainTreeId": "BTBehaviorTree-20240908203802G1KxPgxKh0AX",
+        "SelectedTreeId": "BTBehaviorTree-20240908203802G1KxPgxKh0AX",
+        "TickPeriod": {
+          "AssemblyName": "EyeAuras.Shared.Metadata",
+          "TypeName": "EyeAuras.Shared.Model.TimePeriodProperties",
+          "Version": 1,
+          "ConfigValue": {
+            "Min": "00:00:00.2500000",
+            "Max": "00:00:00",
+            "Randomize": false,
+            "Version": 1
+          }
+        },
+        "EnablingCondition": {
+          "AssemblyName": "EyeAuras.Shared.Metadata",
+          "TypeName": "EyeAuras.Shared.Modularity.AuraEvaluatorProperties",
+          "Version": 1,
+          "ConfigValue": {
+            "Conditions": [
+              {
+                "AuraId": "20240617181130z91nTIzni40a",
+                "IsActive": true,
+                "IsLoaded": true
+              }
+            ],
+            "OperationMode": "All",
+            "Version": 1,
+            "Bindings": []
+          }
+        },
+        "ScriptReferences": {
+          "AssemblyName": "EyeAuras.Shared.Metadata",
+          "TypeName": "EyeAuras.Shared.Modularity.AuraEvaluatorProperties",
+          "Version": 1,
+          "ConfigValue": {
+            "Conditions": [],
+            "OperationMode": "All",
+            "Version": 1,
+            "Bindings": []
+          }
+        },
+        "RecentlyOpenedTreeIds": [
+          "BTBehaviorTree-20240908203802G1KxPgxKh0AX",
+          "BTBehaviorTree-202409101307513b3ysGaA8sRT"
+        ],
+        "TreeKind": "Macro",
+        "DisplayMode": "TreeView",
+        "ExecutionMode": "Once",
+        "ExceptionHandlingStrategy": "IgnoreAndContinue",
+        "Version": 2,
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0
+        },
+        "IsEnabled": false,
+        "Children": [
+          {
+            "AssemblyName": "EyeAuras.BehaviorTree",
+            "TypeName": "EyeAuras.BehaviorTree.Nodes.ControlFlow.BehaviorTreeNodeProperties",
+            "Version": 1,
+            "ConfigValue": {
+              "IsShared": false,
+              "Version": 1,
+              "Name": "My Macro",
+              "Position": {
+                "X": 19.285364,
+                "Y": -3.1554627
+              },
+              "IsEnabled": false,
+              "Children": [
+                {
+                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                  "Version": 1,
+                  "ConfigValue": {
+                    "Version": 1,
+                    "Position": {
+                      "X": 20.0,
+                      "Y": 120.0
+                    },
+                    "IsEnabled": true,
+                    "Children": [
+                      {
+                        "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                        "Version": 1,
+                        "ConfigValue": {
+                          "Version": 1,
+                          "Position": {
+                            "X": 1820.0,
+                            "Y": 255.0
+                          },
+                          "IsEnabled": true,
+                          "Children": [
+                            {
+                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                              "Version": 1,
+                              "ConfigValue": {
+                                "Version": 1,
+                                "Position": {
+                                  "X": 1820.0,
+                                  "Y": 390.0
+                                },
+                                "IsEnabled": true,
+                                "Children": [],
+                                "Id": "BTMacroIfThenElse-20240908204045yBEs6z2ENjYY-20240908204045yfIul1NUn06D",
+                                "Bindings": []
+                              }
+                            },
+                            {
+                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                              "Version": 1,
+                              "ConfigValue": {
+                                "Version": 1,
+                                "Position": {
+                                  "X": 2180.0,
+                                  "Y": 390.0
+                                },
+                                "IsEnabled": true,
+                                "Children": [
+                                  {
+                                    "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                    "Version": 1,
+                                    "ConfigValue": {
+                                      "Version": 1,
+                                      "Position": {
+                                        "X": 2900.0,
+                                        "Y": 525.0
+                                      },
+                                      "IsEnabled": true,
+                                      "Children": [
+                                        {
+                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                          "Version": 1,
+                                          "ConfigValue": {
+                                            "Version": 1,
+                                            "Position": {
+                                              "X": 2900.0,
+                                              "Y": 660.0
+                                            },
+                                            "IsEnabled": true,
+                                            "Children": [
+                                              {
+                                                "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                "Version": 1,
+                                                "ConfigValue": {
+                                                  "Version": 1,
+                                                  "Position": {
+                                                    "X": 2900.0,
+                                                    "Y": 795.0
+                                                  },
+                                                  "IsEnabled": true,
+                                                  "Children": [
+                                                    {
+                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                      "Version": 1,
+                                                      "ConfigValue": {
+                                                        "Version": 1,
+                                                        "Position": {
+                                                          "X": 2900.0,
+                                                          "Y": 930.0
+                                                        },
+                                                        "IsEnabled": true,
+                                                        "Children": [
+                                                          {
+                                                            "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                            "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                            "Version": 1,
+                                                            "ConfigValue": {
+                                                              "Version": 1,
+                                                              "Position": {
+                                                                "X": 2900.0,
+                                                                "Y": 1065.0
+                                                              },
+                                                              "IsEnabled": true,
+                                                              "Children": [
+                                                                {
+                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                  "Version": 1,
+                                                                  "ConfigValue": {
+                                                                    "Version": 1,
+                                                                    "Position": {
+                                                                      "X": 2900.0,
+                                                                      "Y": 1200.0
+                                                                    },
+                                                                    "IsEnabled": true,
+                                                                    "Children": [
+                                                                      {
+                                                                        "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                        "Version": 1,
+                                                                        "ConfigValue": {
+                                                                          "Version": 1,
+                                                                          "Position": {
+                                                                            "X": 2900.0,
+                                                                            "Y": 1335.0
+                                                                          },
+                                                                          "IsEnabled": true,
+                                                                          "Children": [
+                                                                            {
+                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                              "Version": 1,
+                                                                              "ConfigValue": {
+                                                                                "Version": 1,
+                                                                                "Position": {
+                                                                                  "X": 2900.0,
+                                                                                  "Y": 1470.0
+                                                                                },
+                                                                                "IsEnabled": true,
+                                                                                "Children": [
+                                                                                  {
+                                                                                    "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                    "Version": 1,
+                                                                                    "ConfigValue": {
+                                                                                      "Version": 1,
+                                                                                      "Position": {
+                                                                                        "X": 2900.0,
+                                                                                        "Y": 1605.0
+                                                                                      },
+                                                                                      "IsEnabled": true,
+                                                                                      "Children": [
+                                                                                        {
+                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                          "Version": 1,
+                                                                                          "ConfigValue": {
+                                                                                            "Version": 1,
+                                                                                            "Position": {
+                                                                                              "X": 2900.0,
+                                                                                              "Y": 1740.0
+                                                                                            },
+                                                                                            "IsEnabled": true,
+                                                                                            "Children": [
+                                                                                              {
+                                                                                                "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                "Version": 1,
+                                                                                                "ConfigValue": {
+                                                                                                  "Version": 1,
+                                                                                                  "Position": {
+                                                                                                    "X": 2900.0,
+                                                                                                    "Y": 1875.0
+                                                                                                  },
+                                                                                                  "IsEnabled": true,
+                                                                                                  "Children": [
+                                                                                                    {
+                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                      "Version": 1,
+                                                                                                      "ConfigValue": {
+                                                                                                        "Version": 1,
+                                                                                                        "Position": {
+                                                                                                          "X": 2900.0,
+                                                                                                          "Y": 2010.0
+                                                                                                        },
+                                                                                                        "IsEnabled": true,
+                                                                                                        "Children": [
+                                                                                                          {
+                                                                                                            "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                            "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                            "Version": 1,
+                                                                                                            "ConfigValue": {
+                                                                                                              "Version": 1,
+                                                                                                              "Position": {
+                                                                                                                "X": 2900.0,
+                                                                                                                "Y": 2145.0
+                                                                                                              },
+                                                                                                              "IsEnabled": true,
+                                                                                                              "Children": [
+                                                                                                                {
+                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                  "Version": 1,
+                                                                                                                  "ConfigValue": {
+                                                                                                                    "Version": 1,
+                                                                                                                    "Position": {
+                                                                                                                      "X": 2900.0,
+                                                                                                                      "Y": 2280.0
+                                                                                                                    },
+                                                                                                                    "IsEnabled": true,
+                                                                                                                    "Children": [
+                                                                                                                      {
+                                                                                                                        "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                        "Version": 1,
+                                                                                                                        "ConfigValue": {
+                                                                                                                          "Version": 1,
+                                                                                                                          "Position": {
+                                                                                                                            "X": 2900.0,
+                                                                                                                            "Y": 2415.0
+                                                                                                                          },
+                                                                                                                          "IsEnabled": true,
+                                                                                                                          "Children": [
+                                                                                                                            {
+                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                              "Version": 1,
+                                                                                                                              "ConfigValue": {
+                                                                                                                                "Version": 1,
+                                                                                                                                "Position": {
+                                                                                                                                  "X": 2900.0,
+                                                                                                                                  "Y": 2550.0
+                                                                                                                                },
+                                                                                                                                "IsEnabled": true,
+                                                                                                                                "Children": [
+                                                                                                                                  {
+                                                                                                                                    "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                    "Version": 1,
+                                                                                                                                    "ConfigValue": {
+                                                                                                                                      "Version": 1,
+                                                                                                                                      "Position": {
+                                                                                                                                        "X": 2900.0,
+                                                                                                                                        "Y": 2685.0
+                                                                                                                                      },
+                                                                                                                                      "IsEnabled": true,
+                                                                                                                                      "Children": [
+                                                                                                                                        {
+                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                          "Version": 1,
+                                                                                                                                          "ConfigValue": {
+                                                                                                                                            "Version": 1,
+                                                                                                                                            "Position": {
+                                                                                                                                              "X": 2900.0,
+                                                                                                                                              "Y": 2820.0
+                                                                                                                                            },
+                                                                                                                                            "IsEnabled": true,
+                                                                                                                                            "Children": [
+                                                                                                                                              {
+                                                                                                                                                "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                "Version": 1,
+                                                                                                                                                "ConfigValue": {
+                                                                                                                                                  "Version": 1,
+                                                                                                                                                  "Position": {
+                                                                                                                                                    "X": 2900.0,
+                                                                                                                                                    "Y": 2955.0
+                                                                                                                                                  },
+                                                                                                                                                  "IsEnabled": true,
+                                                                                                                                                  "Children": [
+                                                                                                                                                    {
+                                                                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                      "Version": 1,
+                                                                                                                                                      "ConfigValue": {
+                                                                                                                                                        "Version": 1,
+                                                                                                                                                        "Position": {
+                                                                                                                                                          "X": 2900.0,
+                                                                                                                                                          "Y": 3090.0
+                                                                                                                                                        },
+                                                                                                                                                        "IsEnabled": true,
+                                                                                                                                                        "Children": [
+                                                                                                                                                          {
+                                                                                                                                                            "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                            "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                            "Version": 1,
+                                                                                                                                                            "ConfigValue": {
+                                                                                                                                                              "Version": 1,
+                                                                                                                                                              "Position": {
+                                                                                                                                                                "X": 2900.0,
+                                                                                                                                                                "Y": 3225.0
+                                                                                                                                                              },
+                                                                                                                                                              "IsEnabled": true,
+                                                                                                                                                              "Children": [
+                                                                                                                                                                {
+                                                                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                  "ConfigValue": {
+                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                    "Position": {
+                                                                                                                                                                      "X": 2900.0,
+                                                                                                                                                                      "Y": 3360.0
+                                                                                                                                                                    },
+                                                                                                                                                                    "IsEnabled": true,
+                                                                                                                                                                    "Children": [
+                                                                                                                                                                      {
+                                                                                                                                                                        "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                                        "Version": 1,
+                                                                                                                                                                        "ConfigValue": {
+                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                          "Position": {
+                                                                                                                                                                            "X": 2900.0,
+                                                                                                                                                                            "Y": 3495.0
+                                                                                                                                                                          },
+                                                                                                                                                                          "IsEnabled": true,
+                                                                                                                                                                          "Children": [
+                                                                                                                                                                            {
+                                                                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                              "ConfigValue": {
+                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                "Position": {
+                                                                                                                                                                                  "X": 2900.0,
+                                                                                                                                                                                  "Y": 3630.0
+                                                                                                                                                                                },
+                                                                                                                                                                                "IsEnabled": true,
+                                                                                                                                                                                "Children": [
+                                                                                                                                                                                  {
+                                                                                                                                                                                    "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                                    "ConfigValue": {
+                                                                                                                                                                                      "Version": 1,
+                                                                                                                                                                                      "Position": {
+                                                                                                                                                                                        "X": 2900.0,
+                                                                                                                                                                                        "Y": 3765.0
+                                                                                                                                                                                      },
+                                                                                                                                                                                      "IsEnabled": true,
+                                                                                                                                                                                      "Children": [
+                                                                                                                                                                                        {
+                                                                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                          "ConfigValue": {
+                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                            "Position": {
+                                                                                                                                                                                              "X": 2900.0,
+                                                                                                                                                                                              "Y": 3900.0
+                                                                                                                                                                                            },
+                                                                                                                                                                                            "IsEnabled": true,
+                                                                                                                                                                                            "Children": [
+                                                                                                                                                                                              {
+                                                                                                                                                                                                "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                                "ConfigValue": {
+                                                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                                                  "Position": {
+                                                                                                                                                                                                    "X": 2900.0,
+                                                                                                                                                                                                    "Y": 4035.0
+                                                                                                                                                                                                  },
+                                                                                                                                                                                                  "IsEnabled": true,
+                                                                                                                                                                                                  "Children": [
+                                                                                                                                                                                                    {
+                                                                                                                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                      "Version": 1,
+                                                                                                                                                                                                      "ConfigValue": {
+                                                                                                                                                                                                        "Version": 1,
+                                                                                                                                                                                                        "Position": {
+                                                                                                                                                                                                          "X": 2900.0,
+                                                                                                                                                                                                          "Y": 4170.0
+                                                                                                                                                                                                        },
+                                                                                                                                                                                                        "IsEnabled": true,
+                                                                                                                                                                                                        "Children": [
+                                                                                                                                                                                                          {
+                                                                                                                                                                                                            "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                            "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                                            "ConfigValue": {
+                                                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                                                              "Position": {
+                                                                                                                                                                                                                "X": 2900.0,
+                                                                                                                                                                                                                "Y": 4305.0
+                                                                                                                                                                                                              },
+                                                                                                                                                                                                              "IsEnabled": true,
+                                                                                                                                                                                                              "Children": [
+                                                                                                                                                                                                                {
+                                                                                                                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                                                                  "ConfigValue": {
+                                                                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                                                                    "Position": {
+                                                                                                                                                                                                                      "X": 2900.0,
+                                                                                                                                                                                                                      "Y": 4440.0
+                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                    "IsEnabled": true,
+                                                                                                                                                                                                                    "Children": [
+                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                        "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                                                                                        "Version": 1,
+                                                                                                                                                                                                                        "ConfigValue": {
+                                                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                                                          "Position": {
+                                                                                                                                                                                                                            "X": 2900.0,
+                                                                                                                                                                                                                            "Y": 4575.0
+                                                                                                                                                                                                                          },
+                                                                                                                                                                                                                          "IsEnabled": true,
+                                                                                                                                                                                                                          "Children": [
+                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                                                                              "ConfigValue": {
+                                                                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                                                                "Position": {
+                                                                                                                                                                                                                                  "X": 2900.0,
+                                                                                                                                                                                                                                  "Y": 4710.0
+                                                                                                                                                                                                                                },
+                                                                                                                                                                                                                                "IsEnabled": true,
+                                                                                                                                                                                                                                "Children": [
+                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                    "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                                                                                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                                                                                    "ConfigValue": {
+                                                                                                                                                                                                                                      "Version": 1,
+                                                                                                                                                                                                                                      "Position": {
+                                                                                                                                                                                                                                        "X": 2900.0,
+                                                                                                                                                                                                                                        "Y": 4845.0
+                                                                                                                                                                                                                                      },
+                                                                                                                                                                                                                                      "IsEnabled": true,
+                                                                                                                                                                                                                                      "Children": [
+                                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                                                                          "ConfigValue": {
+                                                                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                                                                            "Position": {
+                                                                                                                                                                                                                                              "X": 2900.0,
+                                                                                                                                                                                                                                              "Y": 4980.0
+                                                                                                                                                                                                                                            },
+                                                                                                                                                                                                                                            "IsEnabled": true,
+                                                                                                                                                                                                                                            "Children": [],
+                                                                                                                                                                                                                                            "Id": "BTMacroIfThenElse-202409150826233uPpwInrsxD1-20240915082623p6mRArYC716L",
+                                                                                                                                                                                                                                            "Bindings": []
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                        },
+                                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                                                                          "ConfigValue": {
+                                                                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                                                                            "Position": {
+                                                                                                                                                                                                                                              "X": 3260.0,
+                                                                                                                                                                                                                                              "Y": 4980.0
+                                                                                                                                                                                                                                            },
+                                                                                                                                                                                                                                            "IsEnabled": true,
+                                                                                                                                                                                                                                            "Children": [],
+                                                                                                                                                                                                                                            "Id": "BTMacroIfThenElse-202409150826233uPpwInrsxD1-20240915082623JjIrukKUpfRr",
+                                                                                                                                                                                                                                            "Bindings": []
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                        },
+                                                                                                                                                                                                                                        {
+                                                                                                                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                                                                          "ConfigValue": {
+                                                                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                                                                            "Position": {
+                                                                                                                                                                                                                                              "X": 3620.0,
+                                                                                                                                                                                                                                              "Y": 4980.0
+                                                                                                                                                                                                                                            },
+                                                                                                                                                                                                                                            "IsEnabled": true,
+                                                                                                                                                                                                                                            "Children": [],
+                                                                                                                                                                                                                                            "Id": "BTMacroIfThenElse-202409150826233uPpwInrsxD1-20240915082623YD8ZkIfDJsuo",
+                                                                                                                                                                                                                                            "Bindings": []
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                      ],
+                                                                                                                                                                                                                                      "Id": "BTMacroIfThenElse-202409150826233uPpwInrsxD1",
+                                                                                                                                                                                                                                      "Bindings": []
+                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                ],
+                                                                                                                                                                                                                                "Id": "BTMacroIfThenElse-20240915082621LzdNCCFrqdlI-20240915082621R0CMnG3KVmGZ",
+                                                                                                                                                                                                                                "Bindings": []
+                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                            },
+                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                                                                              "ConfigValue": {
+                                                                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                                                                "Position": {
+                                                                                                                                                                                                                                  "X": 3260.0,
+                                                                                                                                                                                                                                  "Y": 4710.0
+                                                                                                                                                                                                                                },
+                                                                                                                                                                                                                                "IsEnabled": true,
+                                                                                                                                                                                                                                "Children": [],
+                                                                                                                                                                                                                                "Id": "BTMacroIfThenElse-20240915082621LzdNCCFrqdlI-20240915082621YoIHCaV6jX3z",
+                                                                                                                                                                                                                                "Bindings": []
+                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                            },
+                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                                                                              "ConfigValue": {
+                                                                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                                                                "Position": {
+                                                                                                                                                                                                                                  "X": 3620.0,
+                                                                                                                                                                                                                                  "Y": 4710.0
+                                                                                                                                                                                                                                },
+                                                                                                                                                                                                                                "IsEnabled": true,
+                                                                                                                                                                                                                                "Children": [],
+                                                                                                                                                                                                                                "Id": "BTMacroIfThenElse-20240915082621LzdNCCFrqdlI-20240915082621DCcinWSCtDzU",
+                                                                                                                                                                                                                                "Bindings": []
+                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                          ],
+                                                                                                                                                                                                                          "Id": "BTMacroIfThenElse-20240915082621LzdNCCFrqdlI",
+                                                                                                                                                                                                                          "Bindings": []
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                    ],
+                                                                                                                                                                                                                    "Id": "BTMacroIfThenElse-20240915082619pQfLZAqegDmv-202409150826197V4TBh2S4tDB",
+                                                                                                                                                                                                                    "Bindings": []
+                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                },
+                                                                                                                                                                                                                {
+                                                                                                                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                                                                  "ConfigValue": {
+                                                                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                                                                    "Position": {
+                                                                                                                                                                                                                      "X": 3260.0,
+                                                                                                                                                                                                                      "Y": 4440.0
+                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                    "IsEnabled": true,
+                                                                                                                                                                                                                    "Children": [],
+                                                                                                                                                                                                                    "Id": "BTMacroIfThenElse-20240915082619pQfLZAqegDmv-20240915082619UrPxJxviBP0i",
+                                                                                                                                                                                                                    "Bindings": []
+                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                },
+                                                                                                                                                                                                                {
+                                                                                                                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                                                                  "ConfigValue": {
+                                                                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                                                                    "Position": {
+                                                                                                                                                                                                                      "X": 3620.0,
+                                                                                                                                                                                                                      "Y": 4440.0
+                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                    "IsEnabled": true,
+                                                                                                                                                                                                                    "Children": [],
+                                                                                                                                                                                                                    "Id": "BTMacroIfThenElse-20240915082619pQfLZAqegDmv-202409150826198tcKdaQx6L9s",
+                                                                                                                                                                                                                    "Bindings": []
+                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                }
+                                                                                                                                                                                                              ],
+                                                                                                                                                                                                              "Id": "BTMacroIfThenElse-20240915082619pQfLZAqegDmv",
+                                                                                                                                                                                                              "Bindings": []
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                          }
+                                                                                                                                                                                                        ],
+                                                                                                                                                                                                        "Id": "BTMacroIfThenElse-202409150826124tSJx9HUe5Oy-20240915082612ljp9JlXXGA2L",
+                                                                                                                                                                                                        "Bindings": []
+                                                                                                                                                                                                      }
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    {
+                                                                                                                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                      "Version": 1,
+                                                                                                                                                                                                      "ConfigValue": {
+                                                                                                                                                                                                        "Version": 1,
+                                                                                                                                                                                                        "Position": {
+                                                                                                                                                                                                          "X": 3260.0,
+                                                                                                                                                                                                          "Y": 4170.0
+                                                                                                                                                                                                        },
+                                                                                                                                                                                                        "IsEnabled": true,
+                                                                                                                                                                                                        "Children": [],
+                                                                                                                                                                                                        "Id": "BTMacroIfThenElse-202409150826124tSJx9HUe5Oy-20240915082612cVsRXBPvCnbY",
+                                                                                                                                                                                                        "Bindings": []
+                                                                                                                                                                                                      }
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    {
+                                                                                                                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                                      "Version": 1,
+                                                                                                                                                                                                      "ConfigValue": {
+                                                                                                                                                                                                        "Version": 1,
+                                                                                                                                                                                                        "Position": {
+                                                                                                                                                                                                          "X": 3620.0,
+                                                                                                                                                                                                          "Y": 4170.0
+                                                                                                                                                                                                        },
+                                                                                                                                                                                                        "IsEnabled": true,
+                                                                                                                                                                                                        "Children": [],
+                                                                                                                                                                                                        "Id": "BTMacroIfThenElse-202409150826124tSJx9HUe5Oy-20240915082612aQUlTfIPXy1y",
+                                                                                                                                                                                                        "Bindings": []
+                                                                                                                                                                                                      }
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                  ],
+                                                                                                                                                                                                  "Id": "BTMacroIfThenElse-202409150826124tSJx9HUe5Oy",
+                                                                                                                                                                                                  "Bindings": []
+                                                                                                                                                                                                }
+                                                                                                                                                                                              }
+                                                                                                                                                                                            ],
+                                                                                                                                                                                            "Id": "BTMacroIfThenElse-20240915082610IwzHusnM5sco-20240915082610Q44cjhmtqXlo",
+                                                                                                                                                                                            "Bindings": []
+                                                                                                                                                                                          }
+                                                                                                                                                                                        },
+                                                                                                                                                                                        {
+                                                                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                          "ConfigValue": {
+                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                            "Position": {
+                                                                                                                                                                                              "X": 3260.0,
+                                                                                                                                                                                              "Y": 3900.0
+                                                                                                                                                                                            },
+                                                                                                                                                                                            "IsEnabled": true,
+                                                                                                                                                                                            "Children": [],
+                                                                                                                                                                                            "Id": "BTMacroIfThenElse-20240915082610IwzHusnM5sco-20240915082610ozLIBCL3IVcU",
+                                                                                                                                                                                            "Bindings": []
+                                                                                                                                                                                          }
+                                                                                                                                                                                        },
+                                                                                                                                                                                        {
+                                                                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                                          "Version": 1,
+                                                                                                                                                                                          "ConfigValue": {
+                                                                                                                                                                                            "Version": 1,
+                                                                                                                                                                                            "Position": {
+                                                                                                                                                                                              "X": 3620.0,
+                                                                                                                                                                                              "Y": 3900.0
+                                                                                                                                                                                            },
+                                                                                                                                                                                            "IsEnabled": true,
+                                                                                                                                                                                            "Children": [],
+                                                                                                                                                                                            "Id": "BTMacroIfThenElse-20240915082610IwzHusnM5sco-20240915082610Z17UptO3O3Ht",
+                                                                                                                                                                                            "Bindings": []
+                                                                                                                                                                                          }
+                                                                                                                                                                                        }
+                                                                                                                                                                                      ],
+                                                                                                                                                                                      "Id": "BTMacroIfThenElse-20240915082610IwzHusnM5sco",
+                                                                                                                                                                                      "Bindings": []
+                                                                                                                                                                                    }
+                                                                                                                                                                                  }
+                                                                                                                                                                                ],
+                                                                                                                                                                                "Id": "BTMacroIfThenElse-20240915082608jSvMzkUTU6XV-20240915082608wZf8DGjzLEbk",
+                                                                                                                                                                                "Bindings": []
+                                                                                                                                                                              }
+                                                                                                                                                                            },
+                                                                                                                                                                            {
+                                                                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                              "ConfigValue": {
+                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                "Position": {
+                                                                                                                                                                                  "X": 3260.0,
+                                                                                                                                                                                  "Y": 3630.0
+                                                                                                                                                                                },
+                                                                                                                                                                                "IsEnabled": true,
+                                                                                                                                                                                "Children": [],
+                                                                                                                                                                                "Id": "BTMacroIfThenElse-20240915082608jSvMzkUTU6XV-20240915082608C344ydjuVwsK",
+                                                                                                                                                                                "Bindings": []
+                                                                                                                                                                              }
+                                                                                                                                                                            },
+                                                                                                                                                                            {
+                                                                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                              "Version": 1,
+                                                                                                                                                                              "ConfigValue": {
+                                                                                                                                                                                "Version": 1,
+                                                                                                                                                                                "Position": {
+                                                                                                                                                                                  "X": 3620.0,
+                                                                                                                                                                                  "Y": 3630.0
+                                                                                                                                                                                },
+                                                                                                                                                                                "IsEnabled": true,
+                                                                                                                                                                                "Children": [],
+                                                                                                                                                                                "Id": "BTMacroIfThenElse-20240915082608jSvMzkUTU6XV-20240915082608hhT3AMMDi7uu",
+                                                                                                                                                                                "Bindings": []
+                                                                                                                                                                              }
+                                                                                                                                                                            }
+                                                                                                                                                                          ],
+                                                                                                                                                                          "Id": "BTMacroIfThenElse-20240915082608jSvMzkUTU6XV",
+                                                                                                                                                                          "Bindings": []
+                                                                                                                                                                        }
+                                                                                                                                                                      }
+                                                                                                                                                                    ],
+                                                                                                                                                                    "Id": "BTMacroIfThenElse-20240915082606RP2w73ORd4JU-20240915082606loYdKm5AUyEi",
+                                                                                                                                                                    "Bindings": []
+                                                                                                                                                                  }
+                                                                                                                                                                },
+                                                                                                                                                                {
+                                                                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                  "ConfigValue": {
+                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                    "Position": {
+                                                                                                                                                                      "X": 3260.0,
+                                                                                                                                                                      "Y": 3360.0
+                                                                                                                                                                    },
+                                                                                                                                                                    "IsEnabled": true,
+                                                                                                                                                                    "Children": [],
+                                                                                                                                                                    "Id": "BTMacroIfThenElse-20240915082606RP2w73ORd4JU-20240915082606bY3F5QLfpUCz",
+                                                                                                                                                                    "Bindings": []
+                                                                                                                                                                  }
+                                                                                                                                                                },
+                                                                                                                                                                {
+                                                                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                                  "Version": 1,
+                                                                                                                                                                  "ConfigValue": {
+                                                                                                                                                                    "Version": 1,
+                                                                                                                                                                    "Position": {
+                                                                                                                                                                      "X": 3620.0,
+                                                                                                                                                                      "Y": 3360.0
+                                                                                                                                                                    },
+                                                                                                                                                                    "IsEnabled": true,
+                                                                                                                                                                    "Children": [],
+                                                                                                                                                                    "Id": "BTMacroIfThenElse-20240915082606RP2w73ORd4JU-20240915082606HMShckt5fmCf",
+                                                                                                                                                                    "Bindings": []
+                                                                                                                                                                  }
+                                                                                                                                                                }
+                                                                                                                                                              ],
+                                                                                                                                                              "Id": "BTMacroIfThenElse-20240915082606RP2w73ORd4JU",
+                                                                                                                                                              "Bindings": []
+                                                                                                                                                            }
+                                                                                                                                                          }
+                                                                                                                                                        ],
+                                                                                                                                                        "Id": "BTMacroIfThenElse-20240915082603YXQuJe3P2bP0-20240915082603mp0q24pLlyYI",
+                                                                                                                                                        "Bindings": []
+                                                                                                                                                      }
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                      "Version": 1,
+                                                                                                                                                      "ConfigValue": {
+                                                                                                                                                        "Version": 1,
+                                                                                                                                                        "Position": {
+                                                                                                                                                          "X": 3260.0,
+                                                                                                                                                          "Y": 3090.0
+                                                                                                                                                        },
+                                                                                                                                                        "IsEnabled": true,
+                                                                                                                                                        "Children": [],
+                                                                                                                                                        "Id": "BTMacroIfThenElse-20240915082603YXQuJe3P2bP0-202409150826031LkRg7RbHuNc",
+                                                                                                                                                        "Bindings": []
+                                                                                                                                                      }
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                                      "Version": 1,
+                                                                                                                                                      "ConfigValue": {
+                                                                                                                                                        "Version": 1,
+                                                                                                                                                        "Position": {
+                                                                                                                                                          "X": 3620.0,
+                                                                                                                                                          "Y": 3090.0
+                                                                                                                                                        },
+                                                                                                                                                        "IsEnabled": true,
+                                                                                                                                                        "Children": [],
+                                                                                                                                                        "Id": "BTMacroIfThenElse-20240915082603YXQuJe3P2bP0-20240915082603KsoGGZOA80j3",
+                                                                                                                                                        "Bindings": []
+                                                                                                                                                      }
+                                                                                                                                                    }
+                                                                                                                                                  ],
+                                                                                                                                                  "Id": "BTMacroIfThenElse-20240915082603YXQuJe3P2bP0",
+                                                                                                                                                  "Bindings": []
+                                                                                                                                                }
+                                                                                                                                              }
+                                                                                                                                            ],
+                                                                                                                                            "Id": "BTMacroIfThenElse-20240915082601kXuh1QhiPqqy-20240915082601afuMK9xKzhwy",
+                                                                                                                                            "Bindings": []
+                                                                                                                                          }
+                                                                                                                                        },
+                                                                                                                                        {
+                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                          "Version": 1,
+                                                                                                                                          "ConfigValue": {
+                                                                                                                                            "Version": 1,
+                                                                                                                                            "Position": {
+                                                                                                                                              "X": 3260.0,
+                                                                                                                                              "Y": 2820.0
+                                                                                                                                            },
+                                                                                                                                            "IsEnabled": true,
+                                                                                                                                            "Children": [],
+                                                                                                                                            "Id": "BTMacroIfThenElse-20240915082601kXuh1QhiPqqy-20240915082601R4B4xP5E4W0e",
+                                                                                                                                            "Bindings": []
+                                                                                                                                          }
+                                                                                                                                        },
+                                                                                                                                        {
+                                                                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                                          "Version": 1,
+                                                                                                                                          "ConfigValue": {
+                                                                                                                                            "Version": 1,
+                                                                                                                                            "Position": {
+                                                                                                                                              "X": 3620.0,
+                                                                                                                                              "Y": 2820.0
+                                                                                                                                            },
+                                                                                                                                            "IsEnabled": true,
+                                                                                                                                            "Children": [],
+                                                                                                                                            "Id": "BTMacroIfThenElse-20240915082601kXuh1QhiPqqy-20240915082601C1uWjCt8lGvh",
+                                                                                                                                            "Bindings": []
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      ],
+                                                                                                                                      "Id": "BTMacroIfThenElse-20240915082601kXuh1QhiPqqy",
+                                                                                                                                      "Bindings": []
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                ],
+                                                                                                                                "Id": "BTMacroIfThenElse-20240915082558LcLxeFzXanCn-20240915082558SRppm4EWGhhy",
+                                                                                                                                "Bindings": []
+                                                                                                                              }
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                              "Version": 1,
+                                                                                                                              "ConfigValue": {
+                                                                                                                                "Version": 1,
+                                                                                                                                "Position": {
+                                                                                                                                  "X": 3260.0,
+                                                                                                                                  "Y": 2550.0
+                                                                                                                                },
+                                                                                                                                "IsEnabled": true,
+                                                                                                                                "Children": [],
+                                                                                                                                "Id": "BTMacroIfThenElse-20240915082558LcLxeFzXanCn-20240915082558EzpF1yAY58mv",
+                                                                                                                                "Bindings": []
+                                                                                                                              }
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                              "Version": 1,
+                                                                                                                              "ConfigValue": {
+                                                                                                                                "Version": 1,
+                                                                                                                                "Position": {
+                                                                                                                                  "X": 3620.0,
+                                                                                                                                  "Y": 2550.0
+                                                                                                                                },
+                                                                                                                                "IsEnabled": true,
+                                                                                                                                "Children": [],
+                                                                                                                                "Id": "BTMacroIfThenElse-20240915082558LcLxeFzXanCn-20240915082558sR014AGYYA1X",
+                                                                                                                                "Bindings": []
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          ],
+                                                                                                                          "Id": "BTMacroIfThenElse-20240915082558LcLxeFzXanCn",
+                                                                                                                          "Bindings": []
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    ],
+                                                                                                                    "Id": "BTMacroIfThenElse-202409150825569VIJuwZAgO95-20240915082556lLxIsXPIZEIM",
+                                                                                                                    "Bindings": []
+                                                                                                                  }
+                                                                                                                },
+                                                                                                                {
+                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                  "Version": 1,
+                                                                                                                  "ConfigValue": {
+                                                                                                                    "Version": 1,
+                                                                                                                    "Position": {
+                                                                                                                      "X": 3260.0,
+                                                                                                                      "Y": 2280.0
+                                                                                                                    },
+                                                                                                                    "IsEnabled": true,
+                                                                                                                    "Children": [],
+                                                                                                                    "Id": "BTMacroIfThenElse-202409150825569VIJuwZAgO95-20240915082556Bts2msYfIQjK",
+                                                                                                                    "Bindings": []
+                                                                                                                  }
+                                                                                                                },
+                                                                                                                {
+                                                                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                                  "Version": 1,
+                                                                                                                  "ConfigValue": {
+                                                                                                                    "Version": 1,
+                                                                                                                    "Position": {
+                                                                                                                      "X": 3620.0,
+                                                                                                                      "Y": 2280.0
+                                                                                                                    },
+                                                                                                                    "IsEnabled": true,
+                                                                                                                    "Children": [],
+                                                                                                                    "Id": "BTMacroIfThenElse-202409150825569VIJuwZAgO95-202409150825564JZhhTzsjIJD",
+                                                                                                                    "Bindings": []
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              ],
+                                                                                                              "Id": "BTMacroIfThenElse-202409150825569VIJuwZAgO95",
+                                                                                                              "Bindings": []
+                                                                                                            }
+                                                                                                          }
+                                                                                                        ],
+                                                                                                        "Id": "BTMacroIfThenElse-20240915082552WBltb7kL35IO-20240915082552ubb7inijc5OH",
+                                                                                                        "Bindings": []
+                                                                                                      }
+                                                                                                    },
+                                                                                                    {
+                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                      "Version": 1,
+                                                                                                      "ConfigValue": {
+                                                                                                        "Version": 1,
+                                                                                                        "Position": {
+                                                                                                          "X": 3260.0,
+                                                                                                          "Y": 2010.0
+                                                                                                        },
+                                                                                                        "IsEnabled": true,
+                                                                                                        "Children": [],
+                                                                                                        "Id": "BTMacroIfThenElse-20240915082552WBltb7kL35IO-202409150825527VabiXbgpeIF",
+                                                                                                        "Bindings": []
+                                                                                                      }
+                                                                                                    },
+                                                                                                    {
+                                                                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                                      "Version": 1,
+                                                                                                      "ConfigValue": {
+                                                                                                        "Version": 1,
+                                                                                                        "Position": {
+                                                                                                          "X": 3620.0,
+                                                                                                          "Y": 2010.0
+                                                                                                        },
+                                                                                                        "IsEnabled": true,
+                                                                                                        "Children": [],
+                                                                                                        "Id": "BTMacroIfThenElse-20240915082552WBltb7kL35IO-20240915082552S9ANmslJQCXY",
+                                                                                                        "Bindings": []
+                                                                                                      }
+                                                                                                    }
+                                                                                                  ],
+                                                                                                  "Id": "BTMacroIfThenElse-20240915082552WBltb7kL35IO",
+                                                                                                  "Bindings": []
+                                                                                                }
+                                                                                              }
+                                                                                            ],
+                                                                                            "Id": "BTMacroIfThenElse-20240915082547YL5sabLNgEZX-20240915082547SLChWhWJlCOt",
+                                                                                            "Bindings": []
+                                                                                          }
+                                                                                        },
+                                                                                        {
+                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                          "Version": 1,
+                                                                                          "ConfigValue": {
+                                                                                            "Version": 1,
+                                                                                            "Position": {
+                                                                                              "X": 3260.0,
+                                                                                              "Y": 1740.0
+                                                                                            },
+                                                                                            "IsEnabled": true,
+                                                                                            "Children": [],
+                                                                                            "Id": "BTMacroIfThenElse-20240915082547YL5sabLNgEZX-20240915082547maPgABCzHJY1",
+                                                                                            "Bindings": []
+                                                                                          }
+                                                                                        },
+                                                                                        {
+                                                                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                                          "Version": 1,
+                                                                                          "ConfigValue": {
+                                                                                            "Version": 1,
+                                                                                            "Position": {
+                                                                                              "X": 3620.0,
+                                                                                              "Y": 1740.0
+                                                                                            },
+                                                                                            "IsEnabled": true,
+                                                                                            "Children": [],
+                                                                                            "Id": "BTMacroIfThenElse-20240915082547YL5sabLNgEZX-20240915082547WLQavydbDauV",
+                                                                                            "Bindings": []
+                                                                                          }
+                                                                                        }
+                                                                                      ],
+                                                                                      "Id": "BTMacroIfThenElse-20240915082547YL5sabLNgEZX",
+                                                                                      "Bindings": []
+                                                                                    }
+                                                                                  }
+                                                                                ],
+                                                                                "Id": "BTMacroIfThenElse-20240915082530IEc5HCCHuKXw-20240915082530p5TOVsRMyKRy",
+                                                                                "Bindings": []
+                                                                              }
+                                                                            },
+                                                                            {
+                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                              "Version": 1,
+                                                                              "ConfigValue": {
+                                                                                "Version": 1,
+                                                                                "Position": {
+                                                                                  "X": 3260.0,
+                                                                                  "Y": 1470.0
+                                                                                },
+                                                                                "IsEnabled": true,
+                                                                                "Children": [],
+                                                                                "Id": "BTMacroIfThenElse-20240915082530IEc5HCCHuKXw-2024091508253069SFrkNoRaOE",
+                                                                                "Bindings": []
+                                                                              }
+                                                                            },
+                                                                            {
+                                                                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                              "Version": 1,
+                                                                              "ConfigValue": {
+                                                                                "Version": 1,
+                                                                                "Position": {
+                                                                                  "X": 3620.0,
+                                                                                  "Y": 1470.0
+                                                                                },
+                                                                                "IsEnabled": true,
+                                                                                "Children": [],
+                                                                                "Id": "BTMacroIfThenElse-20240915082530IEc5HCCHuKXw-20240915082530Oqw5i0F5j8Lb",
+                                                                                "Bindings": []
+                                                                              }
+                                                                            }
+                                                                          ],
+                                                                          "Id": "BTMacroIfThenElse-20240915082530IEc5HCCHuKXw",
+                                                                          "Bindings": []
+                                                                        }
+                                                                      }
+                                                                    ],
+                                                                    "Id": "BTMacroIfThenElse-20240915082528GzpcQCAOKmoV-20240915082528JEawi3SkuAnt",
+                                                                    "Bindings": []
+                                                                  }
+                                                                },
+                                                                {
+                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                  "Version": 1,
+                                                                  "ConfigValue": {
+                                                                    "Version": 1,
+                                                                    "Position": {
+                                                                      "X": 3260.0,
+                                                                      "Y": 1200.0
+                                                                    },
+                                                                    "IsEnabled": true,
+                                                                    "Children": [],
+                                                                    "Id": "BTMacroIfThenElse-20240915082528GzpcQCAOKmoV-20240915082528nBZMlbg69uNB",
+                                                                    "Bindings": []
+                                                                  }
+                                                                },
+                                                                {
+                                                                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                                  "Version": 1,
+                                                                  "ConfigValue": {
+                                                                    "Version": 1,
+                                                                    "Position": {
+                                                                      "X": 3620.0,
+                                                                      "Y": 1200.0
+                                                                    },
+                                                                    "IsEnabled": true,
+                                                                    "Children": [],
+                                                                    "Id": "BTMacroIfThenElse-20240915082528GzpcQCAOKmoV-20240915082528xpmnPiFqFK62",
+                                                                    "Bindings": []
+                                                                  }
+                                                                }
+                                                              ],
+                                                              "Id": "BTMacroIfThenElse-20240915082528GzpcQCAOKmoV",
+                                                              "Bindings": []
+                                                            }
+                                                          }
+                                                        ],
+                                                        "Id": "BTMacroIfThenElse-20240915082525NYvLL9seiC9o-20240915082525nD20uB6l1eTs",
+                                                        "Bindings": []
+                                                      }
+                                                    },
+                                                    {
+                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                      "Version": 1,
+                                                      "ConfigValue": {
+                                                        "Version": 1,
+                                                        "Position": {
+                                                          "X": 3260.0,
+                                                          "Y": 930.0
+                                                        },
+                                                        "IsEnabled": true,
+                                                        "Children": [],
+                                                        "Id": "BTMacroIfThenElse-20240915082525NYvLL9seiC9o-20240915082525JfkRnCE2MAdT",
+                                                        "Bindings": []
+                                                      }
+                                                    },
+                                                    {
+                                                      "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                                      "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                                      "Version": 1,
+                                                      "ConfigValue": {
+                                                        "Version": 1,
+                                                        "Position": {
+                                                          "X": 3620.0,
+                                                          "Y": 930.0
+                                                        },
+                                                        "IsEnabled": true,
+                                                        "Children": [],
+                                                        "Id": "BTMacroIfThenElse-20240915082525NYvLL9seiC9o-20240915082525V8AUnVOmrSnC",
+                                                        "Bindings": []
+                                                      }
+                                                    }
+                                                  ],
+                                                  "Id": "BTMacroIfThenElse-20240915082525NYvLL9seiC9o",
+                                                  "Bindings": []
+                                                }
+                                              }
+                                            ],
+                                            "Id": "BTMacroIfThenElse-20240911204935f1WPD8syv9o6-20240911204935QBXhr8RjlswV",
+                                            "Bindings": []
+                                          }
+                                        },
+                                        {
+                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                          "Version": 1,
+                                          "ConfigValue": {
+                                            "Version": 1,
+                                            "Position": {
+                                              "X": 3260.0,
+                                              "Y": 660.0
+                                            },
+                                            "IsEnabled": true,
+                                            "Children": [],
+                                            "Id": "BTMacroIfThenElse-20240911204935f1WPD8syv9o6-20240911204935iXLKteitidgr",
+                                            "Bindings": []
+                                          }
+                                        },
+                                        {
+                                          "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                                          "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                                          "Version": 1,
+                                          "ConfigValue": {
+                                            "Version": 1,
+                                            "Position": {
+                                              "X": 3620.0,
+                                              "Y": 660.0
+                                            },
+                                            "IsEnabled": true,
+                                            "Children": [],
+                                            "Id": "BTMacroIfThenElse-20240911204935f1WPD8syv9o6-202409112049350NOHeA9ieGK5",
+                                            "Bindings": []
+                                          }
+                                        }
+                                      ],
+                                      "Id": "BTMacroIfThenElse-20240911204935f1WPD8syv9o6",
+                                      "Bindings": []
+                                    }
+                                  }
+                                ],
+                                "Id": "BTMacroIfThenElse-20240908204045yBEs6z2ENjYY-20240908204045vNfKtTF0ZYTd",
+                                "Bindings": []
+                              }
+                            },
+                            {
+                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                              "Version": 1,
+                              "ConfigValue": {
+                                "Version": 1,
+                                "Position": {
+                                  "X": 2540.0,
+                                  "Y": 390.0
+                                },
+                                "IsEnabled": true,
+                                "Children": [],
+                                "Id": "BTMacroIfThenElse-20240908204045yBEs6z2ENjYY-20240908204045mCiguYPVYff6",
+                                "Bindings": []
+                              }
+                            }
+                          ],
+                          "Id": "BTMacroIfThenElse-20240908204045yBEs6z2ENjYY",
+                          "Bindings": []
+                        }
+                      }
+                    ],
+                    "Id": "BTBehaviorTree-20240908203802G1KxPgxKh0AX-20240908203802sngFD1S6Aq9x",
+                    "Bindings": []
+                  }
+                }
+              ],
+              "Id": "BTBehaviorTree-20240908203802G1KxPgxKh0AX",
+              "Bindings": []
+            }
+          },
+          {
+            "AssemblyName": "EyeAuras.BehaviorTree",
+            "TypeName": "EyeAuras.BehaviorTree.Nodes.ControlFlow.BehaviorTreeNodeProperties",
+            "Version": 1,
+            "ConfigValue": {
+              "IsShared": false,
+              "Version": 1,
+              "Name": "Behavior Tree (2)",
+              "Position": {
+                "X": 22.800049,
+                "Y": -39.600006
+              },
+              "IsEnabled": false,
+              "Children": [
+                {
+                  "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                  "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                  "Version": 1,
+                  "ConfigValue": {
+                    "Version": 1,
+                    "Position": {
+                      "X": 21.825012,
+                      "Y": 134.5
+                    },
+                    "IsEnabled": true,
+                    "Children": [
+                      {
+                        "AssemblyName": "EyeAuras.BehaviorTree",
+                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Conditions.AuraIsActiveNodeProperties",
+                        "Version": 1,
+                        "ConfigValue": {
+                          "EvaluatorProperties": {
+                            "AssemblyName": "EyeAuras.Shared.Metadata",
+                            "TypeName": "EyeAuras.Shared.Modularity.AuraEvaluatorProperties",
+                            "Version": 1,
+                            "ConfigValue": {
+                              "Conditions": [],
+                              "OperationMode": "All",
+                              "Version": 1,
+                              "Bindings": []
+                            }
+                          },
+                          "Version": 1,
+                          "Position": {
+                            "X": 21.825012,
+                            "Y": 269.5
+                          },
+                          "IsEnabled": true,
+                          "Children": [],
+                          "Id": "BTAuraIsActive-20240910130937EmEfnywXdoDs",
+                          "Bindings": []
+                        }
+                      },
+                      {
+                        "AssemblyName": "EyeAuras.BehaviorTree",
+                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Conditions.ExecuteScriptNodeProperties",
+                        "Version": 1,
+                        "ConfigValue": {
+                          "ProjectProperties": {
+                            "AssemblyName": "EyeAuras.Scripting.Metadata",
+                            "TypeName": "EyeAuras.Scripting.Projects.EyeProjectProperties",
+                            "Version": 1,
+                            "ConfigValue": {
+                              "SdkVersion": "0.0.0.0",
+                              "PackageReferences": [],
+                              "Files": [
+                                {
+                                  "Name": "Script.csx",
+                                  "Path": "",
+                                  "Revision": 0,
+                                  "Content": "// any condition\r\nLog.Info(\"Hello, world!\");\r\n1 + 1 == 2\r\n// or you can return NodeStatus/true/false\r\n// return NodeStatus.Success"
+                                }
+                              ],
+                              "Version": 1
+                            }
+                          },
+                          "Version": 1,
+                          "Position": {
+                            "X": 381.825,
+                            "Y": 269.5
+                          },
+                          "IsEnabled": true,
+                          "Children": [],
+                          "Id": "BTExecuteScript-20240910130939XqyZVSuPNPV7",
+                          "Bindings": []
+                        }
+                      },
+                      {
+                        "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                        "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroIfThenElseNodeProperties",
+                        "Version": 1,
+                        "ConfigValue": {
+                          "Version": 1,
+                          "Position": {
+                            "X": 741.825,
+                            "Y": 269.5
+                          },
+                          "IsEnabled": true,
+                          "Children": [
+                            {
+                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                              "Version": 1,
+                              "ConfigValue": {
+                                "Version": 1,
+                                "Position": {
+                                  "X": 741.825,
+                                  "Y": 404.5
+                                },
+                                "IsEnabled": true,
+                                "Children": [
+                                  {
+                                    "AssemblyName": "EyeAuras.BehaviorTree",
+                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Conditions.FixedStatusNodeProperties",
+                                    "Version": 1,
+                                    "ConfigValue": {
+                                      "Status": 0,
+                                      "Version": 1,
+                                      "Position": {
+                                        "X": 741.825,
+                                        "Y": 539.5
+                                      },
+                                      "IsEnabled": true,
+                                      "Children": [],
+                                      "Id": "BTFixedStatus-202409101309429h4bO4NlXQHX",
+                                      "Bindings": []
+                                    }
+                                  }
+                                ],
+                                "Id": "BTMacroIfThenElse-20240910130940lxlKllSMLJC9-202409101309406A1HDP1gdcBL",
+                                "Bindings": []
+                              }
+                            },
+                            {
+                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                              "Version": 1,
+                              "ConfigValue": {
+                                "Version": 1,
+                                "Position": {
+                                  "X": 1101.825,
+                                  "Y": 404.5
+                                },
+                                "IsEnabled": true,
+                                "Children": [
+                                  {
+                                    "AssemblyName": "EyeAuras.BehaviorTree",
+                                    "TypeName": "EyeAuras.BehaviorTree.Nodes.Conditions.ExecuteScriptNodeProperties",
+                                    "Version": 1,
+                                    "ConfigValue": {
+                                      "ProjectProperties": {
+                                        "AssemblyName": "EyeAuras.Scripting.Metadata",
+                                        "TypeName": "EyeAuras.Scripting.Projects.EyeProjectProperties",
+                                        "Version": 1,
+                                        "ConfigValue": {
+                                          "SdkVersion": "0.0.0.0",
+                                          "PackageReferences": [],
+                                          "Files": [
+                                            {
+                                              "Name": "Script.csx",
+                                              "Path": "",
+                                              "Revision": 0,
+                                              "Content": "// any condition\r\nLog.Info(\"Hello, world!\");\r\n1 + 1 == 2\r\n// or you can return NodeStatus/true/false\r\n// return NodeStatus.Success"
+                                            }
+                                          ],
+                                          "Version": 1
+                                        }
+                                      },
+                                      "Version": 1,
+                                      "Position": {
+                                        "X": 1101.825,
+                                        "Y": 539.5
+                                      },
+                                      "IsEnabled": true,
+                                      "Children": [],
+                                      "Id": "BTExecuteScript-20240910130943KeDPNhLXelZP",
+                                      "Bindings": []
+                                    }
+                                  }
+                                ],
+                                "Id": "BTMacroIfThenElse-20240910130940lxlKllSMLJC9-20240910130940gQX9sBRGfPxi",
+                                "Bindings": []
+                              }
+                            },
+                            {
+                              "AssemblyName": "EyeAuras.BehaviorTree.Metadata",
+                              "TypeName": "EyeAuras.BehaviorTree.Nodes.Macro.MacroBlockNodeProperties",
+                              "Version": 1,
+                              "ConfigValue": {
+                                "Version": 1,
+                                "Position": {
+                                  "X": 1461.825,
+                                  "Y": 404.5
+                                },
+                                "IsEnabled": true,
+                                "Children": [],
+                                "Id": "BTMacroIfThenElse-20240910130940lxlKllSMLJC9-20240910130940VNi5nvrhiqKq",
+                                "Bindings": []
+                              }
+                            }
+                          ],
+                          "Id": "BTMacroIfThenElse-20240910130940lxlKllSMLJC9",
+                          "Bindings": []
+                        }
+                      }
+                    ],
+                    "Id": "BTMacroBlock-20240910130931TtyQrFi8jwDK",
+                    "Bindings": []
+                  }
+                }
+              ],
+              "Id": "BTBehaviorTree-202409101307513b3ysGaA8sRT",
+              "Bindings": []
+            }
+          }
+        ],
+        "Bindings": []
+      }
+    },
+    "Version": 1,
+    "Name": "New macro (3)",
+    "Path": "",
+    "CreatedAt": "2024-09-08T20:38:02.4701053Z",
+    "Id": "BT202409082038024HdQ9UegFA1w",
+    "Bindings": []
+  }
+}
