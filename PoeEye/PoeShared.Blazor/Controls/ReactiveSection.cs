@@ -22,6 +22,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
         this.WhenAnyValue(x => x.DebounceTime)
             .Select(x => x <= TimeSpan.Zero ? refreshRequestSource : refreshRequestSource.Sample(x))
             .Switch()
+            .Where(x => IsComponentRendered) //skip all request before until we've been rendered at least once
             .SubscribeAsync(x => Refresh(x))
             //.Subscribe(x => WhenRefresh.OnNext(x)) //FIXME More valid way to do refreshes, but extremely slows down everything - should be investigated
             .AddTo(Anchors);
@@ -36,7 +37,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
     [Parameter(CaptureUnmatchedValues = true)] public IEnumerable<KeyValuePair<string, object>> AdditionalAttributes { get; set; }
     
     [Parameter] public TimeSpan DebounceTime { get; set; } = TimeSpan.Zero;
-    
+
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
         base.BuildRenderTree(builder);
