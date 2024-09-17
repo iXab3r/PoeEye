@@ -22,7 +22,21 @@ public sealed class ReactiveSection : BlazorReactiveComponent
         this.WhenAnyValue(x => x.DebounceTime)
             .Select(x => x <= TimeSpan.Zero ? refreshRequestSource : refreshRequestSource.Sample(x))
             .Switch()
-            .Where(x => IsComponentRendered) //skip all request before until we've been rendered at least once
+            /*
+             There is a potential for performance improvement - current system re-renders tracker changes right after the first render
+             which is a waste of resources. 
+             Brute-force approach to just skip events until render wont work as in many cases subscription is happening 
+             inside OnAfterFirstRenderAsync, meaning any changes done there would be lost. 
+             Brute-brute-force way of solving this would be to just always render the component at least twice.
+             
+             Need to put some thought into improving design of this
+             
+             This is a bad idea:
+                //skip all request before until we've been rendered at least once
+                .Where(x => IsComponentRendered) 
+                //in many cases there is some logic in OnAfterFirstRenderAsync
+                .StartWith("ReactiveSection - re-render to handle first-render changes") 
+            */
             .SubscribeAsync(x => Refresh(x))
             //.Subscribe(x => WhenRefresh.OnNext(x)) //FIXME More valid way to do refreshes, but extremely slows down everything - should be investigated
             .AddTo(Anchors);
