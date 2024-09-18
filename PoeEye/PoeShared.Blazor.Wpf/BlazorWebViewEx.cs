@@ -145,7 +145,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     public override IFileProvider CreateFileProvider(string contentRootDir)
     {
         var contentRoot = new DirectoryInfo(contentRootDir);
-        Log.Info($"Initializing content provider @ {contentRoot}");
+        Log.Debug($"Initializing content provider @ {contentRoot}");
         var staticFilesProvider = StaticFilesProvidersByPath.GetOrAdd(contentRoot.FullName, _ => new CachingFileProvider(contentRoot));
         return new CompositeFileProvider(FileProvider, staticFilesProvider);
     }
