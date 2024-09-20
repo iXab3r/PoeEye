@@ -105,6 +105,10 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
             await module.InvokeVoidSafeAsync("destroy", ComponentId.ToString());
             await module.DisposeJsSafeAsync();
         }
+        catch (Exception e) when (e is OperationCanceledException)
+        {
+            //could happen during refreshes/reloads
+        }
         catch (Exception e) when (e is InvalidOperationException)
         {
             //in pre-rendering mode, disposal is a bit tricky 
