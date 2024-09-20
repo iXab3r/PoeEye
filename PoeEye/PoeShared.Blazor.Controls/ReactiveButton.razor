@@ -9,13 +9,9 @@
 else
 {
     <button class="@Class" style="@Style" id="@Id" type="@HtmlType" @onclick="Execute" disabled="@(IsBusy || !IsEnabled)"
-
             @onclick:stopPropagation="true"
-            @onclick:preventDefault
             @onmousedown:stopPropagation="true"
-            @onmousedown:preventDefault
-            @onmouseup:stopPropagation="true"
-            @onmouseup:preventDefault>
+            @onmouseup:stopPropagation="true">
         @ChildContent
         @if (ShowIsBusyIcon && IsBusy)
         {
