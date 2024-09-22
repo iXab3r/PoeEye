@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace PoeShared.UI;
+﻿namespace PoeShared.Reporting;
 
 public sealed record ExceptionReportItem
 {

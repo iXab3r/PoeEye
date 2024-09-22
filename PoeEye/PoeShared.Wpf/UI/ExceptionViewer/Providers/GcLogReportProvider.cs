@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Providers;
 
-internal sealed class GcLogReportProvider : DisposableReactiveObject, IExceptionReportItemProvider
+internal sealed class GcLogReportProvider : DisposableReactiveObject, IErrorReportItemProvider
 {
     private static readonly IFluentLog Log = typeof(GcLogReportProvider).PrepareLogger();
 

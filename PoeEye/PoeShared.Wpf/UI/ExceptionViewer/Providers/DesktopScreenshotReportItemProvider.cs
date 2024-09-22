@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using PoeShared.Native;
+using PoeShared.Reporting;
 
 namespace PoeShared.UI.Providers;
 
-internal sealed class DesktopScreenshotReportItemProvider : IExceptionReportItemProvider
+internal sealed class DesktopScreenshotReportItemProvider : IErrorReportItemProvider
 {
     public IEnumerable<ExceptionReportItem> Prepare(DirectoryInfo outputDirectory)
     {

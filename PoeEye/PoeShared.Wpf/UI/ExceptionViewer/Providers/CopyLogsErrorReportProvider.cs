@@ -8,16 +8,17 @@ using log4net.Appender;
 using log4net.Repository.Hierarchy;
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Providers;
 
-internal sealed class CopyLogsExceptionReportProvider : IExceptionReportItemProvider
+internal sealed class CopyLogsErrorReportProvider : IErrorReportItemProvider
 {
-    private static readonly IFluentLog Log = typeof(CopyLogsExceptionReportProvider).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(CopyLogsErrorReportProvider).PrepareLogger();
     private readonly IAppArguments appArguments;
 
-    public CopyLogsExceptionReportProvider(IAppArguments appArguments)
+    public CopyLogsErrorReportProvider(IAppArguments appArguments)
     {
         this.appArguments = appArguments;
     }

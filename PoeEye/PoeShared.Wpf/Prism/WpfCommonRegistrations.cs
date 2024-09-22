@@ -16,6 +16,7 @@ using PoeShared.Notifications.ViewModels;
 using PoeShared.Profiler;
 using PoeShared.RegionSelector;
 using PoeShared.RegionSelector.Services;
+using PoeShared.Reporting;
 using PoeShared.Services;
 using PoeShared.UI;
 using PoeShared.UI.Evaluators;
@@ -37,7 +38,7 @@ public sealed class WpfCommonRegistrations : UnityContainerExtension
 
         Container
             .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
-            .RegisterSingleton<IExceptionReportingService, ExceptionReportingService>()
+            .RegisterSingleton<IErrorReportingService, ErrorReportingService>()
             .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
             .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
             .RegisterSingleton<SafeModeService>(typeof(ISafeModeService))

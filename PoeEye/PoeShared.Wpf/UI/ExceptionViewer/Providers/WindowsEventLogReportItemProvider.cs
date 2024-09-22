@@ -5,12 +5,13 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
 using PoeShared.Logging;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Providers;
 
 [SupportedOSPlatform("windows")]
-internal sealed class WindowsEventLogReportItemProvider : IExceptionReportItemProvider
+internal sealed class WindowsEventLogReportItemProvider : IErrorReportItemProvider
 {
     private static readonly IFluentLog Log = typeof(WindowsEventLogReportItemProvider).PrepareLogger();
 

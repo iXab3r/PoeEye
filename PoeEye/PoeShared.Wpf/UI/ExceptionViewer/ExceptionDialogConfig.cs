@@ -1,5 +1,6 @@
 using System;
 using JetBrains.Annotations;
+using PoeShared.Reporting;
 
 namespace PoeShared.UI;
 
@@ -13,11 +14,11 @@ public sealed record ExceptionDialogConfig
         
     public Exception Exception { get; init; }
         
-    public IExceptionReportHandler ReportHandler { get; init; }
+    public IErrorReportHandler ReportHandler { get; init; }
     
     public ExceptionReportItem[] ReportItems { get; init; }
         
-    public IExceptionReportItemProvider[] ItemProviders { get; init; }
+    public IErrorReportItemProvider[] ItemProviders { get; init; }
 
     public bool IsValid => !string.IsNullOrEmpty(Title) && !string.IsNullOrEmpty(AppName);
 }

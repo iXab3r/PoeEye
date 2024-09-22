@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Threading.Tasks;
 using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using Unity;
@@ -12,7 +13,7 @@ namespace PoeShared.UI;
 internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMonitorViewModel
 {
     private static readonly Binder<ErrorMonitorViewModel> Binder = new();
-    private readonly IExceptionReportingService exceptionReportingService;
+    private readonly IErrorReportingService errorReportingService;
 
     static ErrorMonitorViewModel()
     {
@@ -20,10 +21,10 @@ internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMo
 
     public ErrorMonitorViewModel(
         IAppArguments appArguments, 
-        IExceptionReportingService exceptionReportingService,
+        IErrorReportingService errorReportingService,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
     {
-        this.exceptionReportingService = exceptionReportingService;
+        this.errorReportingService = errorReportingService;
         ReportProblemCommand = CommandWrapper.Create(ReportProblemCommandExecuted);
         ThrowExceptionCommand = appArguments.IsDebugMode ? CommandWrapper.Create(() => uiScheduler.Schedule(() => throw new ApplicationException("Exception thrown on UI scheduler"))) : default;
             
@@ -36,6 +37,6 @@ internal sealed class ErrorMonitorViewModel : DisposableReactiveObject, IErrorMo
 
     private async Task ReportProblemCommandExecuted()
     {
-        await Task.Run(() => exceptionReportingService.ReportProblem());
+        await Task.Run(() => errorReportingService.ReportProblem());
     }
 }

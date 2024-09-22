@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace PoeShared.UI;
+﻿namespace PoeShared.Reporting;
 
 public interface IExceptionInterceptor
 {

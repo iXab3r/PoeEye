@@ -1,4 +1,5 @@
 ﻿using DynamicData;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;

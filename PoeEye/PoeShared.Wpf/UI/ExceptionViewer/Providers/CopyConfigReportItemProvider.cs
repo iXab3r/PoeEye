@@ -4,11 +4,12 @@ using System.IO;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Providers;
 
-internal sealed class CopyConfigReportItemProvider: IExceptionReportItemProvider
+internal sealed class CopyConfigReportItemProvider: IErrorReportItemProvider
 {
     private static readonly IFluentLog Log = typeof(CopyConfigReportItemProvider).PrepareLogger();
     private readonly IAppArguments appArguments;

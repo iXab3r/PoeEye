@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI;
 
 namespace PoeShared.Profiler;
 
-internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IExceptionReportItemProvider
+internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IErrorReportItemProvider
 {
     private static readonly string TracesFolderName = "traces";
     private static readonly IFluentLog Log = typeof(TraceSnapshotReportProvider).PrepareLogger();

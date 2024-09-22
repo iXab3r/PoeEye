@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;

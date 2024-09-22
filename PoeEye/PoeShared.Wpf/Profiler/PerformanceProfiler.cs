@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using ByteSizeLib;
 using JetBrains.Profiler.SelfApi;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -20,7 +21,7 @@ internal sealed class PerformanceProfiler : DisposableReactiveObjectWithLogger, 
     }
 
     public PerformanceProfiler(
-        IExceptionReportingService exceptionReportingService,
+        IErrorReportingService errorReportingService,
         TraceSnapshotReportProvider traceSnapshotReportProvider,
         IUniqueIdGenerator idGenerator)
     {
@@ -28,7 +29,7 @@ internal sealed class PerformanceProfiler : DisposableReactiveObjectWithLogger, 
         TracesFolder = traceSnapshotReportProvider.TracesFolder;
 
         Log.Info($"Registering traces report provider");
-        exceptionReportingService.AddReportItemProvider(traceSnapshotReportProvider);
+        errorReportingService.AddReportItemProvider(traceSnapshotReportProvider);
 
         Binder.Attach(this).AddTo(Anchors);
     }

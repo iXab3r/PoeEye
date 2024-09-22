@@ -16,6 +16,7 @@ using Microsoft.JSInterop;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI.Providers;
@@ -23,27 +24,27 @@ using PropertyBinder;
 
 namespace PoeShared.UI;
 
-internal sealed class ExceptionReportingService : DisposableReactiveObject, IExceptionReportingService
+internal sealed class ErrorReportingService : DisposableReactiveObject, IErrorReportingService
 {
-    private static readonly IFluentLog Log = typeof(ExceptionReportingService).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(ErrorReportingService).PrepareLogger();
     private readonly IAppArguments appArguments;
     private readonly IClock clock;
     private readonly IApplicationAccessor applicationAccessor;
     private readonly IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory;
     private readonly IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer;
-    private readonly SourceListEx<IExceptionReportItemProvider> reportItemProviders = new();
+    private readonly SourceListEx<IErrorReportItemProvider> reportItemProviders = new();
     private readonly SourceListEx<IExceptionInterceptor> exceptionInterceptors = new();
     private readonly NamedLock exceptionReportGate = new NamedLock("ExceptionReport");
-    private IExceptionReportHandler reportHandler;
+    private IErrorReportHandler reportHandler;
 
-    public ExceptionReportingService(
+    public ErrorReportingService(
         IClock clock,
         IApplicationAccessor applicationAccessor,
         IFolderCleanerService cleanupService,
         IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory,
         IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer,
         IFactory<MetricsReportProvider> metricsProviderFactory,
-        IFactory<CopyLogsExceptionReportProvider> copyLogsProviderFactory,
+        IFactory<CopyLogsErrorReportProvider> copyLogsProviderFactory,
         IFactory<AppScreenshotReportItemProvider> appScreenshotReportProviderFactory,
         IFactory<DesktopScreenshotReportItemProvider> screenshotReportProviderFactory,
         IFactory<CopyConfigReportItemProvider> configReportProviderFactory,
@@ -79,7 +80,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         AddReportItemProvider(screenshotReportProviderFactory.Create()).AddTo(Anchors);
     }
 
-    public void SetReportConsumer(IExceptionReportHandler reportHandler)
+    public void SetReportConsumer(IErrorReportHandler reportHandler)
     {
         if (this.reportHandler != null)
         {
@@ -90,7 +91,7 @@ internal sealed class ExceptionReportingService : DisposableReactiveObject, IExc
         this.reportHandler = reportHandler;
     }
 
-    public IDisposable AddReportItemProvider(IExceptionReportItemProvider reportItemProvider)
+    public IDisposable AddReportItemProvider(IErrorReportItemProvider reportItemProvider)
     {
         Log.Debug($"Registering new report item provider: {reportItemProvider}");
         reportItemProviders.Add(reportItemProvider);

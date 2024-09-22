@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Providers;
 
-internal sealed class MetricsReportProvider : IExceptionReportItemProvider
+internal sealed class MetricsReportProvider : IErrorReportItemProvider
 {
     private static readonly IFluentLog Log = typeof(MetricsReportProvider).PrepareLogger();
 

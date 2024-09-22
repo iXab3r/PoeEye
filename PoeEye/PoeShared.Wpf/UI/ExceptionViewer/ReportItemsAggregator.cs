@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 using Unity;
 

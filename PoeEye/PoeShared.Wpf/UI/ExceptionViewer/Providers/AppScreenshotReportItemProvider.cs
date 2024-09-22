@@ -4,12 +4,13 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using PoeShared.Native;
+using PoeShared.Reporting;
 using PoeShared.Scaffolding;
 using PoeShared.WindowSeekers;
 
 namespace PoeShared.UI.Providers;
 
-internal sealed class AppScreenshotReportItemProvider : IExceptionReportItemProvider
+internal sealed class AppScreenshotReportItemProvider : IErrorReportItemProvider
 {
     private readonly IWindowSeeker windowSeeker;
 

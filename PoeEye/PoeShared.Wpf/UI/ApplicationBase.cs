@@ -18,6 +18,7 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Logging;
+using PoeShared.Reporting;
 using PoeShared.Services;
 using ReactiveUI;
 using Unity;
@@ -94,7 +95,7 @@ public abstract class ApplicationBase : Application
                 InitializeLoggingFromFile();
             }
             
-            var erService = Container.Resolve<IExceptionReportingService>();
+            var erService = Container.Resolve<IErrorReportingService>();
             Log.Debug($"Error reporting service: {erService}");
 
             var metrics = Container.Resolve<IMetricsRoot>();
