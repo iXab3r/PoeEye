@@ -91,7 +91,7 @@ public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeVie
 
     public IReadOnlyObservableCollection<ITreeViewItemViewModel> Children { get; }
     public IObservableList<ITreeViewItemViewModel> ChildrenList { get; }
-    public Func<ITreeViewItemViewModel, IObservable<bool>> Filter { get; set; }
+    public Func<ITreeViewItemViewModel, IObservable<AnnotatedBoolean>> Filter { get; set; }
 
     public bool IsSelected { get; set; }
 

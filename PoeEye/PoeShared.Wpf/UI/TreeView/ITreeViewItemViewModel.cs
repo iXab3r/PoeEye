@@ -41,7 +41,7 @@ public interface ITreeViewItemViewModel : IDisposableReactiveObject, ICanBeSelec
     /// <returns></returns>
     IObservableList<ITreeViewItemViewModel> ChildrenList { [NotNull] get; }
     
-    Func<ITreeViewItemViewModel, IObservable<bool>> Filter { get; set; }
+    Func<ITreeViewItemViewModel, IObservable<AnnotatedBoolean>> Filter { get; set; }
 }
     
 public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel
