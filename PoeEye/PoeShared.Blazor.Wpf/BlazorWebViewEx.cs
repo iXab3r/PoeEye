@@ -93,6 +93,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.WebView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; 
         e.WebView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false; 
         e.WebView.PreviewKeyDown += WebViewOnPreviewKeyDown;
+        
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
         Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
         foreach (var rootDirectory in drives)

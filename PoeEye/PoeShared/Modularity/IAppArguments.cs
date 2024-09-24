@@ -19,6 +19,11 @@ public interface IAppConfig
     /// "Profile" subfolder in RoamingAppDataDirectory
     /// </summary>
     string AppDataDirectory { [CanBeNull] get; }
+    
+    /// <summary>
+    /// "Temp" subfolder in AppDataDirectory
+    /// </summary>
+    string TempDirectory { [CanBeNull] get; }
 
     /// <summary>
     /// "AppName" subfolder either in %appdata% (roaming) or "data" folder

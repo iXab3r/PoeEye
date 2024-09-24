@@ -64,6 +64,8 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string AppDataDirectory { get; }
     
+    public string TempDirectory { get; }
+    
     public string RoamingAppDataDirectory { get; }
 
     public string LocalAppDataDirectory { get; }
@@ -133,6 +135,7 @@ public class AppArguments : AppOptions, IAppArguments
             RoamingAppDataDirectory = Path.Combine(EnvironmentAppData.FullName, AppName);
         }
         AppDataDirectory = Path.Combine(RoamingAppDataDirectory, Profile);
+        TempDirectory = Path.Combine(AppDataDirectory, "Temp");
         
         if (!parsed)
         {
@@ -207,6 +210,7 @@ public class AppArguments : AppOptions, IAppArguments
             RoamingAppDataDirectory,
             LocalAppDataDirectory,
             AppDataDirectory,
+            TempDirectory,
             ShowUpdater,
             StartupArgs,
             IsSafeMode,

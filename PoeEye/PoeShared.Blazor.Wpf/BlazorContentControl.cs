@@ -13,6 +13,7 @@ using DynamicData;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -22,6 +23,7 @@ using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -75,6 +77,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         WebView = new BlazorWebViewEx().AddTo(Anchors);
         WebView.UnhandledException += OnUnhandledException;
+        WebView.BlazorWebViewInitializing += BlazorWebViewInitializing;
 
         /*
         Assigning Services will trigger initialization of WebView.
@@ -250,7 +253,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
         set => SetValue(AdditionalFilesProperty, value);
     }
-    
+
     public bool EnableHotkeys
     {
         get => (bool) GetValue(EnableHotkeysProperty);
@@ -272,10 +275,13 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     public ICommandWrapper ReloadCommand { get; }
 
     public ICommandWrapper OpenDevToolsCommand { get; }
+
     public ICommandWrapper ZoomInCommand { get; }
+
     public ICommandWrapper ZoomOutCommand { get; }
+
     public ICommandWrapper ResetZoomCommand { get; }
-    
+
     public async Task ZoomIn()
     {
         var webView = WebView?.WebView;
@@ -286,7 +292,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         webView.ZoomFactor += 0.1;
     }
-    
+
     public async Task ZoomOut()
     {
         var webView = WebView?.WebView;
@@ -297,7 +303,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         webView.ZoomFactor -= 0.1;
     }
-    
+
     public async Task ResetZoom()
     {
         var webView = WebView?.WebView;
@@ -308,7 +314,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         webView.ZoomFactor = 1;
     }
-    
+
     public async Task OpenDevTools()
     {
         var webView = WebView?.WebView;
@@ -348,7 +354,13 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
         await Reload();
     }
-    
+
+    private void BlazorWebViewInitializing(object sender, BlazorWebViewInitializingEventArgs e)
+    {
+        var appArguments = webViewServiceProvider.ServiceProvider.GetRequiredService<IAppArguments>();
+        e.UserDataFolder = appArguments.TempDirectory;
+    }
+
     private static string FormatExceptionMessage(Exception exception)
     {
         return $"{exception.GetType().Name}: {exception.Message} @ {exception.StackTrace}";
