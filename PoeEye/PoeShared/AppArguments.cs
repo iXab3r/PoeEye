@@ -135,7 +135,7 @@ public class AppArguments : AppOptions, IAppArguments
             RoamingAppDataDirectory = Path.Combine(EnvironmentAppData.FullName, AppName);
         }
         AppDataDirectory = Path.Combine(RoamingAppDataDirectory, Profile);
-        TempDirectory = Path.Combine(AppDataDirectory, "Temp");
+        TempDirectory = Path.Combine(AppDataDirectory, "temp");
         
         if (!parsed)
         {
