@@ -1,4 +1,6 @@
-﻿namespace PoeShared.Services;
+﻿using System.ComponentModel;
+
+namespace PoeShared.Services;
 
 /// <summary>
 /// Manages the rental status of a shared resource, allowing multiple reasons for the resource to be rented.
@@ -15,7 +17,7 @@
 /// // The resource is no longer rented for Task A.
 /// </code>
 /// </example>
-public interface ISharedResourceRentController : IDisposableReactiveObject
+public interface ISharedResourceRentController : INotifyPropertyChanged
 {
     /// <summary>
     /// Provides the current rental status of the resource.

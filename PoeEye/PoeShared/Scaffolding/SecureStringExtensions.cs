@@ -65,7 +65,8 @@ public static class SecureStringExtensions
         {
             result.AppendChar(c);
         }
-
+        
+        result.MakeReadOnly();
         return result;
     }
 }
