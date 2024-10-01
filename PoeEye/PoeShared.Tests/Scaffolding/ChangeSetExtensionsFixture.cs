@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -10,7 +11,7 @@ using PoeShared.Tests.Helpers;
 namespace PoeShared.Tests.Scaffolding;
 
 [TestFixture]
-public class ChangeSetExtensionsFixture : FixtureBase
+public partial class ChangeSetExtensionsFixture : FixtureBase
 {
     [Test]
     public void ShouldPopulateFromListWhenAdded()
@@ -582,9 +583,10 @@ public class ChangeSetExtensionsFixture : FixtureBase
     }
 
 
-    public class TestNode
+    private sealed class TestNode
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public SourceList<TestNode> Children { get; } = new SourceList<TestNode>();
+        public SourceCache<TestNode, string> ChildrenCache { get; } = new(x => x.Id);
     }
 }

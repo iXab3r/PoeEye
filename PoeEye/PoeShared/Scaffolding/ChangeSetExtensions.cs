@@ -7,6 +7,7 @@ using DynamicData.Aggregation;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using JetBrains.Annotations;
+using PoeShared.DynamicData.Operators.Internal;
 
 namespace PoeShared.Scaffolding;
 
@@ -30,6 +31,14 @@ public static class ChangeSetExtensions
             var firstItem = new Change<TObject>(ListChangeReason.Add, node);
             return flattenChildren.StartWith(new ChangeSet<TObject>(new[] {firstItem})).AsObservableList();
         });
+    }
+
+    public static IObservable<IChangeSet<TObject, TKey>> Flatten<TObject, TKey>(
+        this IObservable<IChangeSet<TObject, TKey>> source,
+        Func<TObject, IObservable<IChangeSet<TObject, TKey>>> childrenAccessor,
+        Func<TObject, TKey> keySelector)
+    {
+        return new FlattenCacheChangeSets().Run(source, childrenAccessor, keySelector);
     }
 
     /// <summary>
@@ -203,7 +212,7 @@ public static class ChangeSetExtensions
     {
         return instance.Lookup(key).HasValue;
     }
-    
+
     public static T GetOrDefault<T, TKey>(this IObservableCache<T, TKey> instance, TKey key)
     {
         if (instance.TryGetValue(key, out var value))
