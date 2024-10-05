@@ -1,6 +1,31 @@
-﻿@inherits InputText
+﻿@using PoeShared.Blazor.Services
+@inherits InputText
 
-<input @attributes="AdditionalAttributes" 
-       class="@CssClass" 
-       @bind="CurrentValueAsString" 
-       @bind:event="oninput" />
+<input @attributes="AdditionalAttributes"
+       @ref="@elementRef"
+       class="@CssClass"
+       @bind="CurrentValueAsString"
+       @bind:event="oninput"/>
+
+@code{
+    private ElementReference? elementRef;
+    
+    [Parameter] public bool FocusOnFirstRender { get; set; }
+
+    [Inject]
+    protected IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && FocusOnFirstRender)
+        {
+            if (elementRef != null)
+            {
+                await elementRef.Value.FocusAsync();
+                await JsPoeBlazorUtils.SelectAllTextInElement(elementRef.Value);
+            }
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

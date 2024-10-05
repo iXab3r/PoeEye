@@ -182,7 +182,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     var additionalFiles = repositoryAdditionalFiles.Concat(controlAdditionalFiles).ToArray();
                     if (additionalFiles.Any())
                     {
-                        Log.Debug($"Loading additional files: {additionalFiles.Select(x => x.Name).DumpToString()}");
+                        Log.Debug($"Loading additional files({additionalFiles.Length}):\n\t{additionalFiles.Select(x => x.Name).DumpToTable()}");
                         foreach (var file in additionalFiles)
                         {
                             if (file is RefFileInfo)
