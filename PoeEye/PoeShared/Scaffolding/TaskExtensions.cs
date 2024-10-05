@@ -1,104 +1,65 @@
-using System.Configuration;
-using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using PoeShared.Services;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
 
 public static class TaskExtensions
 {
-    public const int SleepWarningThresholdMs = 20;
-    public const int SleepLowPrecisionThresholdMs = 15;
+    private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    private static readonly IFluentLog Log = typeof(TaskExtensions).PrepareLogger();
-    private static readonly int MinWaitHandleTimeoutInMs = 50;
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout)
     {
         Sleep(cancellationToken, timeout, null);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(this CancellationToken cancellationToken, double millisecondsTimeout)
     {
         Sleep(cancellationToken, millisecondsTimeout, null);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(TimeSpan timeout)
     {
         Sleep(timeout.TotalMilliseconds);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(double millisecondsTimeout)
     {
         Sleep(CancellationToken.None, millisecondsTimeout, null);
     }
        
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(double millisecondsTimeout, IFluentLog log)
     {
         Sleep(CancellationToken.None, millisecondsTimeout, log);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(this CancellationToken cancellationToken, double millisecondsTimeout, IFluentLog log)
     {
         var sw = ValueStopwatch.StartNew();
         var isLogging = log?.IsDebugEnabled ?? false;
-        bool cancelled;
-        
-        if (millisecondsTimeout < MinWaitHandleTimeoutInMs)
-        {
-            if (isLogging)
-            {
-                log.Debug($"Sleeping for {millisecondsTimeout}ms using combined wait");
-            }
 
-            var sleepDuration = (int)(millisecondsTimeout - SleepLowPrecisionThresholdMs);
-            if (sleepDuration > 0)
-            {
-                Thread.Sleep(sleepDuration);
-            }
-            
-            while (!cancellationToken.IsCancellationRequested && sw.ElapsedMilliseconds < millisecondsTimeout)
-            {
-                Thread.Yield();
-            }
-
-            cancelled = cancellationToken.IsCancellationRequested;
-        }
-        else
+        var provider = SleepController.Instance.Provider;
+        if (isLogging)
         {
-            if (isLogging)
-            {
-                log.Debug($"Sleeping for {millisecondsTimeout}ms using wait handle");
-            }
-            cancelled = cancellationToken.WaitHandle.WaitOne((int)millisecondsTimeout);
+            log.Debug($"Sleeping for {millisecondsTimeout}ms using combined wait, provider: {provider}");
         }
         
-        if (cancelled)
+        provider.Sleep(millisecondsTimeout, cancellationToken);
+
+        if (isLogging && cancellationToken.IsCancellationRequested)
         {
-            if (isLogging)
-            {
-                log.Debug($"Sleep for {millisecondsTimeout} was interrupted after {sw.ElapsedMilliseconds}ms");
-            }
-        }
-        else
-        {
-            var elapsedMilliseconds = sw.ElapsedMilliseconds;
-            if (elapsedMilliseconds > SleepWarningThresholdMs && elapsedMilliseconds > millisecondsTimeout * 2)
-            {
-                if (isLogging)
-                {
-                    log.Debug($"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms which is much longer than expected");
-                }
-            }
-            else
-            {
-                if (isLogging)
-                {
-                    log.Debug($"Sleep for {millisecondsTimeout}ms has completed after {sw.ElapsedMilliseconds}ms");
-                }
-            }
+            log.Debug($"Sleep for {millisecondsTimeout} was interrupted after {sw.ElapsedMilliseconds}ms, provider: {{provider}}");
         }
     }
-    
+   
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Sleep(this CancellationToken cancellationToken, TimeSpan timeout, IFluentLog log)
     {
         Sleep(cancellationToken, timeout.TotalMilliseconds, log);
