@@ -155,7 +155,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var unused = CreateIsBusyAnchor();
         using var mgr = await CreateManager();
         using var progressTracker = new ComplexProgressTracker();
-        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = (int)x);
 
         Log.Debug($"Verifying update files {updateInfo}");
         var verificationResult = await mgr.VerifyReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "VerifyRelease"));
@@ -170,7 +170,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var unused = CreateIsBusyAnchor();
         using var mgr = await CreateManager();
         using var progressTracker = new ComplexProgressTracker();
-        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = (int)x);
 
         Log.Debug($"Downloading release, update {updateInfo}");
         var downloadedReleases = await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "DownloadRelease"));
@@ -186,7 +186,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var unused = CreateIsBusyAnchor();
         using var mgr = await CreateManager();
         using var progressTracker = new ComplexProgressTracker();
-        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = x);
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = (int)x);
         
         Log.Debug("Downloading releases...");
 

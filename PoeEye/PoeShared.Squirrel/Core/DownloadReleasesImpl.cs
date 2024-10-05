@@ -34,7 +34,7 @@ internal class DownloadReleasesImpl : IEnableLogger
     {
         progress ??= _ => { };
         using var progressTracker = new ComplexProgressTracker();
-        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => progress(x));
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => progress((int)x));
 
         return await releasesToDownload.ToAsyncEnumerable()
             .AllAsync(x =>

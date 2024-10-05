@@ -44,6 +44,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
             .RegisterSingleton<IFileSystem, FileSystem>()
             .RegisterSingleton<IAssemblyTracker>(x => IAssemblyTracker.Instance)
+            .RegisterSingleton<ISleepController>(x => SleepController.Instance)
             .RegisterSingleton<ICsharpExpressionParser>(x => CsharpExpressionParser.Instance)
             .RegisterSingleton<IMemoryPool>(x => MemoryPool.Shared);
             

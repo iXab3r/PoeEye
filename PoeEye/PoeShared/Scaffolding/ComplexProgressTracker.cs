@@ -17,7 +17,7 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
     /// <summary>
     /// Gets the overall progress percentage, calculated as the average of all tracked tasks' progress.
     /// </summary>
-    public int ProgressPercent { get; private set; }
+    public double ProgressPercent { get; private set; }
     
     /// <summary>
     /// Last reported task name
@@ -47,7 +47,7 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
         var totalWeight = progressByTask.Values.Sum(x => x.Weight);
         var weightedProgressSum = progressByTask.Values
             .Sum(x => x.ProgressPercent * x.Weight);
-        var totalProgress = totalWeight > 0 ? (int)(weightedProgressSum / totalWeight) : 0;
+        var totalProgress = totalWeight > 0 ? weightedProgressSum / totalWeight : 0;
 
         Log.Debug($"{reporter.TaskName} reported progress: {reporter.ProgressPercent}%, total: {totalProgress}%");
         TaskName = reporter.TaskName;
