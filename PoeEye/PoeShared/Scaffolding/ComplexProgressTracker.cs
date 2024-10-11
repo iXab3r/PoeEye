@@ -1,3 +1,5 @@
+using ReactiveUI;
+
 namespace PoeShared.Scaffolding;
 
 /// <summary>
@@ -13,7 +15,14 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
     {
             
     }
-        
+
+    public ComplexProgressTracker(IProgressReporter progressReporter)
+    {
+        this.WhenAnyValue(x => x.ProgressPercent)
+            .Subscribe(x => progressReporter.Update(x))
+            .AddTo(Anchors);
+    }
+
     /// <summary>
     /// Gets the overall progress percentage, calculated as the average of all tracked tasks' progress.
     /// </summary>
@@ -59,7 +68,7 @@ public sealed class ComplexProgressTracker : DisposableReactiveObject
         return progressByTask.GetOrAdd(taskName, name => new ProgressReporter(this, name, weight));
     }
 
-    private sealed class ProgressReporter : IProgressReporter
+    private sealed class ProgressReporter : DisposableReactiveObject, IProgressReporter
     {
         private readonly ComplexProgressTracker progressTracker;
         

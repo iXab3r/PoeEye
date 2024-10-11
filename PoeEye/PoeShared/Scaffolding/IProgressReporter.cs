@@ -1,7 +1,11 @@
-﻿namespace PoeShared.Scaffolding;
+﻿using System.ComponentModel;
 
-public interface IProgressReporter
+namespace PoeShared.Scaffolding;
+
+public interface IProgressReporter : INotifyPropertyChanged
 {
+    
+    
     string TaskName { get; }
     
     double Weight { get; }
