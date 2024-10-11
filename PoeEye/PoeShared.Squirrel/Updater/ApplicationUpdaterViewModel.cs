@@ -13,6 +13,7 @@ using ByteSizeLib;
 using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
+using PoeShared.Dialogs.Services;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -36,6 +37,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     private readonly IScheduler uiScheduler;
     private readonly IFactory<IUpdaterWindowDisplayer> updateWindowDisplayer;
     private readonly IApplicationUpdaterModel updaterModel;
+    private readonly IMessageBoxService messageBoxService;
     private readonly ISharedResourceLatch isBusyLatch;
 
     static ApplicationUpdaterViewModel()
@@ -50,6 +52,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         IApplicationUpdaterModel updaterModel,
         IApplicationAccessor applicationAccessor,
         IConfigProvider<UpdateSettingsConfig> configProvider,
+        IMessageBoxService messageBoxService,
         [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
         [Dependency(WellKnownSchedulers.UIIdle)] IScheduler uiIdleScheduler,
         [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
@@ -62,6 +65,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
         this.updateWindowDisplayer = updateWindowDisplayer;
         this.updaterModel = updaterModel;
+        this.messageBoxService = messageBoxService;
         this.uiScheduler = uiScheduler;
         this.isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
 
@@ -347,13 +351,26 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             Log.Debug("Already in progress");
             return;
         }
-
+        
         SetStatus($"Preparing to update to v{LatestVersion}...");
 
         var latestUpdate = LatestUpdate;
         if (latestUpdate == null)
         {
             throw new InvalidOperationException("Latest update must be specified");
+        }
+
+        var currentVersion = LatestAppliedVersion;
+        var targetVersion = LatestVersion;
+        var isDowngrade = currentVersion > targetVersion;
+        Log.Info($"Validating update: {currentVersion} => {targetVersion} (downgrade: {isDowngrade})");
+        if (isDowngrade)
+        {
+            if (await messageBoxService.ShowConfirmation("Version downgrade",
+                    $"Are you sure you want to update to v{targetVersion} as your current version is newer {currentVersion}?{Environment.NewLine}This may bring compatibility problems and is not recommended.") == false)
+            {
+                return;
+            }   
         }
 
         var sw = Stopwatch.StartNew();
