@@ -171,7 +171,7 @@ public class SharedLog : DisposableReactiveObject
         {
             Threshold = Level.All,
             StaticLogFileName = true,  // Set to true if you don't need the filename to change dynamically
-            File = "logs/app.log",
+            File = "data/launch-logs/app.log",
             ImmediateFlush = true,
             AppendToFile = true,
             MaxFileSize = 1024 * 1024 * 100, // 100 MB

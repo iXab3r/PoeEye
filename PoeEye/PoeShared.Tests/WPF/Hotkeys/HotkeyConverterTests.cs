@@ -92,6 +92,7 @@ public class HotkeyConverterTests : FixtureBase
     [TestCase(Key.Z, ModifierKeys.None, "Z")]
     [TestCase(Key.Clear, ModifierKeys.None, "Clear")]
     [TestCase(Key.A, ModifierKeys.Control, "CONTROL+A")]
+    [TestCase(Key.W, ModifierKeys.Shift, "SHIFT+W")]
     [TestCase(Key.A, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows, "ALT+CONTROL+SHIFT+WINDOWS+A")]
     public void ShouldSerializeKeyboard(Key key, ModifierKeys modifierKeys, string expected)
     {
@@ -155,6 +156,7 @@ public class HotkeyConverterTests : FixtureBase
     [TestCase("Num 0", Key.NumPad0, ModifierKeys.None)]
     [TestCase("Num 1", Key.NumPad1, ModifierKeys.None)]
     [TestCase("Num 9", Key.NumPad9, ModifierKeys.None)]
+    [TestCase("SHIFT+W", Key.W, ModifierKeys.Shift)]
     [TestCase("Ctrl+Shift+Num *", Key.Multiply, ModifierKeys.Control | ModifierKeys.Shift)]
     [TestCase("Shift+Ctrl+Num *", Key.Multiply, ModifierKeys.Control | ModifierKeys.Shift)]
     [TestCase("Ctrl+Shift+Num +", Key.Add, ModifierKeys.Control | ModifierKeys.Shift)]

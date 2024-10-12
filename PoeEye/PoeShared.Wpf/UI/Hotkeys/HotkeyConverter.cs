@@ -50,21 +50,28 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
             .GetValues(typeof(ModifierKeys))
             .OfType<ModifierKeys>()
             .Select(x => new {ModifierKey = x, Name = x.ToString()})
+            .Concat(new[] {new {ModifierKey = ModifierKeys.Shift, Name = "SHIFT"}})
+            .Concat(new[] {new {ModifierKey = ModifierKeys.Alt, Name = "ALT"}})
             .Concat(new[] {new {ModifierKey = ModifierKeys.Control, Name = "CTRL"}})
+            .Concat(new[] {new {ModifierKey = ModifierKeys.Control, Name = "CONTROL"}})
+            .Concat(new[] {new {ModifierKey = ModifierKeys.Windows, Name = "WINDOWS"}})
             .Concat(new[] {new {ModifierKey = ModifierKeys.Windows, Name = "WIN"}})
+            .Select(x => x with { Name = x.Name.ToUpper() })
+            .DistinctBy(x => x.Name)
             .ToArray();
 
         allModifiers
             .ToVariations()
-            .ForEach(x =>
+            .ForEach(kvp =>
             {
-                if (!x.Select(x => x.ModifierKey).IsUnique())
+                if (!kvp.Select(x => x.ModifierKey).IsUnique())
                 {
                     return;
                 }
 
-                var modifier = x.Aggregate(ModifierKeys.None, (x, newKey) => x | newKey.ModifierKey);
-                var modifiersName = x.Where(y => y.ModifierKey != ModifierKeys.None).Select(x => x.Name.ToUpper()).JoinStrings(HotkeyGesture.ModifiersDelimiter);
+                var modifier = kvp.Aggregate(ModifierKeys.None, (x, newKey) => x | newKey.ModifierKey);
+                var modifiersName = kvp.Where(y => y.ModifierKey != ModifierKeys.None).Select(x => x.Name.ToUpper()).JoinStrings(HotkeyGesture.ModifiersDelimiter);
+                
                 if (!knownModifiers.ContainsKey(modifier))
                 {
                     knownModifiers[modifier] = modifiersName;
@@ -228,8 +235,16 @@ internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHo
             hotkeyPartRaw = source;
         }
 
-        var modifiers = string.IsNullOrEmpty(modifiersPartRaw) ? ModifierKeys.None : knownModifiersByName[modifiersPartRaw];
 
+        ModifierKeys modifiers;
+        if (string.IsNullOrEmpty(modifiersPartRaw))
+        {
+            modifiers = ModifierKeys.None;
+        } else if (!knownModifiersByName.TryGetValue(modifiersPartRaw, out modifiers))
+        {
+            throw new ArgumentException($"Unknown modifier: {modifiersPartRaw}, key: {hotkeyPartRaw}, source string: {source}");
+        }
+        
         if (mouseKeysByName.TryGetValue(hotkeyPartRaw, out var mouseKey))
         {
             return new HotkeyGesture(mouseKey, modifiers);
