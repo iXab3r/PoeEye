@@ -16,7 +16,7 @@
     else
     {
         <div class="progress position-relative">
-            <div class="progress-bar" style="width: @(Percent)%">
+            <div class="progress-bar" style="width: @(Percent.ToString(System.Globalization.CultureInfo.InvariantCulture))%">
             </div>
             <div class="position-absolute w-100 text-center" style="top: 50%; transform: translateY(-50%);">
                 @if (ChildContent != null)

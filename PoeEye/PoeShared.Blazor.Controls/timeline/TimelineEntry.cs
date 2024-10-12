@@ -11,7 +11,7 @@ public abstract class TimelineEntry : DisposableReactiveObject
     
     public bool IsBusy { get; set; }
     
-    public int? ProgressPercent { get; set; }
+    public double? ProgressPercent { get; set; }
     
     public string Text { get; set; }
 
