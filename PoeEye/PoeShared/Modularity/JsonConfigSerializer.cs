@@ -1,7 +1,4 @@
-using System.Buffers;
 using System.Reactive;
-using System.Reactive.Subjects;
-using System.Runtime.Serialization;
 using DynamicData;
 using Newtonsoft.Json;
 using PoeShared.Services;
@@ -28,8 +25,12 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
     private JsonSerializer jsonSerializer;
 
+    private readonly ISharedResourceLatch disablePooling;
+    
     public JsonConfigSerializer([OptionalDependency] params JsonConverter[] defaultConverters)
     {
+        disablePooling = new SharedResourceLatch().AddTo(Anchors);
+        
         if (defaultConverters != null)
         {
             converters.AddRange(defaultConverters);
@@ -41,6 +42,11 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
             .StartWith(Unit.Default)
             .Subscribe(ReinitializeSerializerSettings)
             .AddTo(Anchors);
+    }
+
+    public IDisposable DisablePooling()
+    {
+        return disablePooling.Rent();
     }
 
     public void RegisterConverter(JsonConverter converter)
@@ -221,39 +227,59 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
         return metadata.Value;
     }
 
-    private static JsonTextReader CreateReader(TextReader reader)
+    private JsonTextReader CreateReader(TextReader reader)
+    {
+        return CreateReader(reader, ResolveArrayPool());
+    }
+    
+    private JsonTextWriter CreateWriter(TextWriter writer)
+    {
+        return CreateWriter(writer, ResolveArrayPool());
+    }
+
+    private IArrayPool<char> ResolveArrayPool()
+    {
+        return disablePooling.IsBusy ? FakeArrayPool<char>.Instance : SharedArrayPool<char>.Instance;
+    }
+
+    private static JsonTextReader CreateReader(TextReader reader, IArrayPool<char> arrayPool)
     {
         return new JsonTextReader(reader)
         {
-            ArrayPool = SharedArrayPool<char>.Instance,
+            ArrayPool = arrayPool,
             MaxDepth = MaxDepth
         };
     }
 
-    private static JsonTextWriter CreateWriter(TextWriter writer)
+    private static JsonTextWriter CreateWriter(TextWriter writer, IArrayPool<char> arrayPool)
     {
         return new JsonTextWriter(writer)
         {
-            ArrayPool = SharedArrayPool<char>.Instance
+            ArrayPool = arrayPool
         };
     }
 
-    public class FakeArrayPool<T> : LazyReactiveObject<FakeArrayPool<T>>, IArrayPool<T>
+    private sealed class FakeArrayPool<T> : LazyReactiveObject<FakeArrayPool<T>>, IArrayPool<T>
     {
         private static readonly IFluentLog Log = typeof(FakeArrayPool<T>).PrepareLogger();
 
         public T[] Rent(int minimumLength)
         {
-            Log.Info($"Renting array, min length: {minimumLength}");
+            Log.Debug($"Renting array, min length: {minimumLength}");
             var result = new T[minimumLength];
-            Log.Info($"Array rented, requested: {minimumLength}, got: {result.Length}");
+            Log.Debug($"Array rented, requested: {minimumLength}, got: {result.Length}");
             return result;
         }
 
         public void Return(T[] array)
         {
-            Log.Info($"Returning array, length: {array.Length}");
-            Log.Info($"Returned array, length: {array.Length}");
+            if (array == null)
+            {
+                return;
+            }
+            
+            Log.Debug($"Returning array, length: {array.Length}");
+            Log.Debug($"Returned array, length: {array.Length}");
         }
     }
 }

@@ -6,6 +6,8 @@ namespace PoeShared.Modularity;
 
 public interface IConfigSerializer
 {
+    IDisposable DisablePooling();
+    
     void RegisterConverter([NotNull] JsonConverter converter);
         
     string Serialize(object data);
