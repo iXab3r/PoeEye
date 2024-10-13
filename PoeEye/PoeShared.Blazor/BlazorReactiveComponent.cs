@@ -52,16 +52,19 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
         Binder.Attach(this).AddTo(Anchors);
     }
 
+    [Obsolete("Replaced with ReactiveSections")]
     public void TrackState<TExpressionContext, TOut>(TExpressionContext context, Expression<Func<TExpressionContext, TOut>> selector) where TExpressionContext : class
     {
         Track(context, selector);
     }
     
+    [Obsolete("Replaced with ReactiveSections")]
     public void TrackState<TOut>(Expression<Func<TContext, TOut>> selector)
     {
         Track(selector);
     }
 
+    [Obsolete("Replaced with ReactiveSections")]
     public TOut Track<TOut>(Expression<Func<TContext, TOut>> selector)
     {
         return Track(DataContext, selector);
