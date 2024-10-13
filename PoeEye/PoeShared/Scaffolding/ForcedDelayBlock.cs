@@ -10,7 +10,11 @@ public sealed class ForcedDelayBlock : IDisposable, IAsyncDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="ForcedDelayBlock"/> class.
     /// </summary>
-    /// <param name="minTime">The minimum time duration the block should take.</param>
+    /// <param name="delayMs">The minimum time duration the block should take, in milliseconds.</param>
+    public ForcedDelayBlock(double delayMs) : this(TimeSpan.FromMilliseconds(delayMs))
+    {
+    }
+
     public ForcedDelayBlock(TimeSpan minTime)
     {
         MinTime = minTime;
@@ -29,7 +33,7 @@ public sealed class ForcedDelayBlock : IDisposable, IAsyncDisposable
 
     /// <summary>
     /// Ensures the block of code takes at least the specified minimum time to execute. 
-    /// If the code finishes earlier, the remaining time is spent sleeping.
+    /// If the code finishes earlier, the remaining time is spent sleeping using high-precision synchronous sleep.
     /// </summary>
     public void Dispose()
     {
@@ -41,13 +45,17 @@ public sealed class ForcedDelayBlock : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Asynchronously ensures the block of code takes at least the specified minimum time to execute. 
+    /// If the code finishes earlier, the remaining time is spent asynchronously using a high-precision sleep method.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         var elapsed = stopwatch.Elapsed;
         var timeToSleep = MinTime - elapsed;
         if (timeToSleep > TimeSpan.Zero)
         {
-            await Task.Delay(timeToSleep);
+            await Task.Run(() => TaskExtensions.Sleep(timeToSleep));
         }
     }
 }
