@@ -1,0 +1,36 @@
+﻿.split-container {
+    --splitter-bar-size: 4px;
+    display: flex;
+}
+
+.split-container.splitter-orientation-vertical {
+    flex-direction: row;
+}
+
+.split-container.splitter-orientation-horizontal {
+    flex-direction: column;
+}
+
+.split-container .pane-of-split-container {
+    position: relative;
+    overflow: auto;
+}
+
+.splitter-bar {
+    user-select: none;
+}
+
+.splitter-orientation-vertical > .splitter-bar {
+    min-width: var(--splitter-bar-size);
+    cursor: w-resize;
+}
+
+.splitter-orientation-horizontal > .splitter-bar {
+    min-height: var(--splitter-bar-size);
+    cursor: n-resize;
+}
+
+.splitter-orientation-vertical .splitter-bar{
+    border-left: 1px solid #80d8ff;
+    border-right: 1px solid #80d8ff;
+}

@@ -9,6 +9,7 @@
         <LangVersion>latest</LangVersion>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <OutputType>Library</OutputType>
+        <Nullable>enable</Nullable>
         <EnableDefaultContentItems>true<!-- Important for Blazor Scoped CSS --></EnableDefaultContentItems>
     </PropertyGroup>
 
@@ -19,7 +20,6 @@
 
     <ItemGroup>
         <PackageReference Include="BlazorComponentUtilities" Version="1.8.0" />
-        <PackageReference Include="Toolbelt.Blazor.SplitContainer" Version="1.1.2.1" />
         <PackageReference Include="AntDesign" Version="0.18.1" />
         <PackageReference Include="FluentValidation" Version="9.5.1" />
         <PackageReference Include="Microsoft.AspNetCore.Components.CustomElements" Version="8.0.0" />
@@ -66,6 +66,7 @@
     <ItemGroup>
       <TypeScriptCompile Include="wwwroot\ts\BootstrapTooltip.ts" />
       <TypeScriptCompile Include="wwwroot\ts\placeholder.ts" />
+      <TypeScriptCompile Include="wwwroot\ts\SplitContainer.ts" />
     </ItemGroup>
 
     <ItemGroup>
