@@ -8,7 +8,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Scaffolding;
 
-public sealed class ReactiveTrackerList : ConcurrentBag<IObservable<string>>, ICanBeSealed
+public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, ICanBeSealed
 {
     private readonly AtomicFlag isSealed = new();
     
@@ -20,49 +20,49 @@ public sealed class ReactiveTrackerList : ConcurrentBag<IObservable<string>>, IC
     public void Add<T>(IObservable<T> source)
     {
         EnsureNotSealed();
-        base.Add(source.Select(x => x?.ToString()));
+        base.Enqueue(source.Select(x => x?.ToString()));
     }
     
     public void Add<T>(IObservable<IReadOnlyObservableCollection<T>> observableCollectionSource)
     {
         EnsureNotSealed();
-        base.Add(observableCollectionSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        base.Enqueue(observableCollectionSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T, TKey>(IObservable<IHierarchicalSourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        base.Add(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        base.Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T, TKey>(IObservable<IObservableCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        base.Add(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        base.Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        base.Add(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        base.Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T>(IObservable<IObservableList<T>> observableListSource)
     {
         EnsureNotSealed();
-        base.Add(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        base.Enqueue(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T>(IObservable<ISourceList<T>> observableListSource)
     {
         EnsureNotSealed();
-        base.Add(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        base.Enqueue(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
         
     public void Add<T>(IReadOnlyObservableCollection<T> observableCollection)
     {
         EnsureNotSealed();
-        base.Add(observableCollection.Connect().Select(x => x?.ToString()));
+        base.Enqueue(observableCollection.Connect().Select(x => x?.ToString()));
     }
     
     public void Add(params IObservable<string>[] sources)

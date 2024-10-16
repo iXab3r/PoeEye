@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -20,7 +19,7 @@ public sealed class BlazorCommandWrapper
     private static readonly IFluentLog Log = typeof(BlazorCommandWrapper).PrepareLogger();
 
     [ThreadStatic] private static IScheduler currentScheduler;
-    public static IScheduler CurrentScheduler => currentScheduler ??= CreateSynchronizationContextScheduler();
+    private static IScheduler CurrentScheduler => currentScheduler ??= CreateSynchronizationContextScheduler();
 
     private static IScheduler CreateSynchronizationContextScheduler()
     {
@@ -101,19 +100,22 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
 
 #if DEBUG
     // ReSharper disable once UnusedMember.Local Needed for debugging
-    private readonly StackTrace createdFrom = new();
+    private string createdFrom = new StackTrace().ToString();
 #endif
 
     public BlazorCommandWrapper(ReactiveCommand<TParam, TResult> command)
     {
         command.ThrownExceptions.SubscribeSafe(HandleException, Log.HandleUiException).AddTo(Anchors);
-
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         isBusyLatch.WhenAnyValue(x => x.IsBusy).SubscribeSafe(x => IsBusy = x, Log.HandleUiException).AddTo(Anchors);
         
         schedulerThreadId = Environment.CurrentManagedThreadId;
-        InnerCommand = command;
-        WpfCommand.CanExecuteChanged += InnerCommandOnCanExecuteChanged;
+        InnerCommand = command.AddTo(Anchors);
+        Observable.FromEventPattern(
+                handler => WpfCommand.CanExecuteChanged += handler,
+                handler => WpfCommand.CanExecuteChanged -= handler)
+            .Subscribe(_ => InnerCommandOnCanExecuteChanged(WpfCommand, EventArgs.Empty))
+            .AddTo(Anchors); 
     }
 
     private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)
