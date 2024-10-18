@@ -103,14 +103,14 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
     private string createdFrom = new StackTrace().ToString();
 #endif
 
-    public BlazorCommandWrapper(ReactiveCommand<TParam, TResult> command)
+    internal BlazorCommandWrapper(ReactiveCommand<TParam, TResult> command)
     {
         command.ThrownExceptions.SubscribeSafe(HandleException, Log.HandleUiException).AddTo(Anchors);
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         isBusyLatch.WhenAnyValue(x => x.IsBusy).SubscribeSafe(x => IsBusy = x, Log.HandleUiException).AddTo(Anchors);
         
         schedulerThreadId = Environment.CurrentManagedThreadId;
-        InnerCommand = command.AddTo(Anchors);
+        InnerCommand = command;//.AddTo(Anchors); Update to https://github.com/reactiveui/ReactiveUI/commit/d24e69f2dd47729045507d7f16ad0bb418c6925e
         Observable.FromEventPattern(
                 handler => WpfCommand.CanExecuteChanged += handler,
                 handler => WpfCommand.CanExecuteChanged -= handler)
@@ -188,7 +188,7 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         }
     }
 
-    public Task ExecuteAsync(object parameter)
+    public Task ExecuteAsync(object parameter = null)
     {
         return ExecuteAsync(parameter is TParam param ? param : default);
     }
