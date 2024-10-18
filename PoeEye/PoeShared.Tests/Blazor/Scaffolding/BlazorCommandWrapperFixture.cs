@@ -11,6 +11,7 @@ namespace PoeShared.Tests.Blazor.Scaffolding;
 public class BlazorCommandWrapperFixture : FixtureBase
 {
     [Test]
+    [Ignore("Disabled for now - re-test in ReactiveUI 18.5+")]
     public void ShouldNotThrowWhenDisposed()
     {
         //Given
@@ -30,6 +31,7 @@ public class BlazorCommandWrapperFixture : FixtureBase
     
     [Test]
     [Timeout(1000)]
+    [Ignore("Disabled for now - re-test in ReactiveUI 18.5+")]
     public void ShouldNotThrowWhenDisposedDuringAction()
     {
         //Given
