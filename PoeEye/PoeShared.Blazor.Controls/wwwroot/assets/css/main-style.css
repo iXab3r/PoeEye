@@ -28,6 +28,18 @@ video {
     justify-self: right;
 }
 
+.text-shadow-0 {
+    text-shadow: 0 0 0 #000;
+}
+
+.text-shadow-1 {
+    text-shadow: 1px 1px 0 #000;
+}
+
+.text-shadow-2 {
+    text-shadow: 2px 2px 0 #000;
+}
+
 .d-grid-center{
     display: grid;
     place-items: center;
