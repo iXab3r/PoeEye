@@ -7,6 +7,7 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
+using log4net.Repository;
 using log4net.Repository.Hierarchy;
 using PoeShared.Modularity;
 
@@ -128,12 +129,9 @@ public class SharedLog : DisposableReactiveObject
             Trace.Listeners.Remove(listener);
         });
     }
-        
-    public IDisposable AddAppender(IAppender appender)
-    {
-        Guard.ArgumentNotNull(appender, nameof(appender));
 
-        var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
+    public IDisposable AddAppender(IAppender appender, Hierarchy repository)
+    {
         var root = repository.Root;
         Log.Debug($"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
         root.AddAppender(appender);
@@ -150,6 +148,13 @@ public class SharedLog : DisposableReactiveObject
             root.RemoveAppender(appender);
             repository.RaiseConfigurationChanged(EventArgs.Empty);
         });
+    }
+    
+    public IDisposable AddAppender(IAppender appender)
+    {
+        Guard.ArgumentNotNull(appender, nameof(appender));
+        var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
+        return AddAppender(appender, repository);
     }
 
     public IDisposable AddConsoleAppender()

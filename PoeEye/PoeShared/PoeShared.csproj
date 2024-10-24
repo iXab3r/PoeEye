@@ -9,7 +9,6 @@
         <PackageReference Include="App.Metrics" Version="4.2.0" />
         <PackageReference Include="App.Metrics.App.All" Version="4.2.0" />
         <PackageReference Include="App.Metrics.Reporting.TextFile" Version="4.2.0" />
-        <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
         <PackageReference Include="BidirectionalMap" Version="1.0.0" />
         <PackageReference Include="ByteSize" Version="2.1.1" />
         <PackageReference Include="Castle.Core" Version="5.1.0" />

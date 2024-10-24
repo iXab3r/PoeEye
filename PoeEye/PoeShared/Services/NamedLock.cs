@@ -32,7 +32,7 @@ public sealed class NamedLock
     {
         
 #if DEBUG
-        var acquireStackTrace = RecordStackTraces ? new EnhancedStackTrace(new StackTrace()) : default(StackTrace);
+        var acquireStackTrace = RecordStackTraces ? new StackTrace() : default;
         LogIfEnabled(() => $"Acquiring lock{PrepareStackLog(acquireStackTrace)}");
 #endif
         
@@ -54,7 +54,7 @@ public sealed class NamedLock
         return Disposable.Create(() =>
         {
 #if DEBUG
-            var releaseStackTrace = RecordStackTraces ? new EnhancedStackTrace(new StackTrace()) : default(StackTrace);
+            var releaseStackTrace = RecordStackTraces ? new StackTrace() : default;
             LogIfEnabled(() => $"Releasing lock{PrepareStackLog(releaseStackTrace)}");
 #endif
             
