@@ -31,6 +31,8 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     
     IWindowViewController WindowController { [CanBeNull] get; }
 
+    IObservable<Unit> WhenLoaded { get; }
+    IObservable<Unit> WhenClosed { get; }
     IObservable<KeyEventArgs> WhenKeyUp { get; }
     IObservable<KeyEventArgs> WhenKeyDown { get; }
     IObservable<KeyEventArgs> WhenPreviewKeyDown { get; }
@@ -44,5 +46,5 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     
     double? TargetAspectRatio { get; set; }
     
-    public void SetOverlayWindow([NotNull] IWindowViewController owner);
+    public void SetOverlayWindow([NotNull] IWindowViewController controller);
 }

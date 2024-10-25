@@ -26,6 +26,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     private static long GlobalWindowId;
 
     private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
+    private readonly ISubject<Unit> whenClosed = new ReplaySubject<Unit>(1);
     private readonly Dispatcher uiDispatcher;
 
     static WindowViewModelBase()
@@ -55,6 +56,13 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
             .Select(x => x.WhenLoaded)
             .Switch()
             .SubscribeSafe(whenLoaded)
+            .AddTo(Anchors); 
+        
+        this.WhenValueChanged(x => x.WindowController, false)
+            .Take(1)
+            .Select(x => x.WhenClosed)
+            .Switch()
+            .SubscribeSafe(whenClosed)
             .AddTo(Anchors);
         whenLoaded.SubscribeSafe(_ =>
         {
@@ -115,7 +123,9 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
 
     protected IFluentLog Log { get; }
 
-    protected IObservable<Unit> WhenLoaded => whenLoaded;
+    public IObservable<Unit> WhenLoaded => whenLoaded;
+    
+    public IObservable<Unit> WhenClosed => whenClosed;
 
     public IWindowViewController WindowController { get; private set; }
 
@@ -167,17 +177,17 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         builder.AppendParameter(nameof(NativeBounds), NativeBounds);
     }
 
-    public void SetOverlayWindow(IWindowViewController owner)
+    public void SetOverlayWindow(IWindowViewController controller)
     {
-        Guard.ArgumentNotNull(owner, nameof(owner));
+        Guard.ArgumentNotNull(controller, nameof(controller));
 
         if (WindowController != null)
         {
-            Log.Info($"Re-assigning overlay window: {WindowController} => {owner}");
+            Log.Info($"Re-assigning overlay window: {WindowController} => {controller}");
         }
         else
         {
-            Log.Info($"Assigning overlay window: {owner}");
+            Log.Info($"Assigning overlay window: {controller}");
         }
 
         Log.Info($"Syncing window parameters with view model");
@@ -190,8 +200,8 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         {
             initialBounds = new Rectangle(WinPoint.Empty, DefaultSize.IsNotEmptyArea() ? DefaultSize : MinSize);
         }
-        owner.Window.NativeBounds = initialBounds;
-        WindowController = owner;
+        controller.Window.NativeBounds = initialBounds;
+        WindowController = controller;
         Log.Info($"Overlay window is assigned: {WindowController}");
     }
 
