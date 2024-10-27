@@ -104,6 +104,7 @@ public static class AwesomeIcons
     public const string SortNumericAsc = "\uf162";
     public const string SortNumericDesc = "\uf163";
     public const string Space = " ";
+    public const string Spinner = "\uf110";
     public const string StopOutlined = "\uf28e";
     public const string Stop = "\uf28d";
     public const string Tachometer = "\uf0e4";

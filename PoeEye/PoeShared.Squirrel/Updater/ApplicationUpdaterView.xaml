@@ -14,7 +14,7 @@
 
     <DataTemplate DataType="{x:Type updater1:ApplicationUpdaterViewModel}">
         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+            <ProgressBar Style="{StaticResource FastCircularProgressBar}"
                          Value="0"
                          Width="40" Height="40"
                          HorizontalAlignment="Center" VerticalAlignment="Center"

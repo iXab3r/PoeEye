@@ -15,7 +15,7 @@
             <ProgressBar IsIndeterminate="True"
                          x:Name="ProfilerProgressBar"
                          
-                         Style="{StaticResource MaterialDesignCircularProgressBar}"
+                         Style="{StaticResource FastCircularProgressBar}"
                          Width="24" Height="24">
                 <ProgressBar.Visibility>
                     <MultiBinding Converter="{StaticResource MultiBooleanAnyTrueToVisibleFalseToHiddenConverter}">

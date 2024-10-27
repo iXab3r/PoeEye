@@ -116,7 +116,7 @@
         </Grid>
 
         <st:StackPanel Grid.Row="3" Orientation="Horizontal" MarginBetweenChildren="5" Margin="5">
-            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+            <ProgressBar Style="{StaticResource FastCircularProgressBar}"
                          Value="0"
                          Width="22"
                          st:StackPanel.Fill="Auto"

@@ -34,7 +34,7 @@
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
                         <ProgressBar x:Name="ProgressBar"
-                                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                     Style="{StaticResource FastCircularProgressBar}"
                                      Minimum="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Minimum)}"
                                      Maximum="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Maximum)}"
                                      Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.IndicatorForeground)}"
@@ -290,7 +290,7 @@
                 </Button.Content>
             </Button>
 
-            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+            <ProgressBar Style="{StaticResource FastCircularProgressBar}"
                          Value="0"
                          HorizontalAlignment="Right" VerticalAlignment="Center"
                          Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
