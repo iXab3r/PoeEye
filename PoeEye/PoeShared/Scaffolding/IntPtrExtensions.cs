@@ -10,11 +10,11 @@ public static class IntPtrExtensions
 
     public static ushort LoWord(this IntPtr value)
     {
-        return unchecked((ushort)((uint)value & ushort.MaxValue));
+        return (ushort)(value.ToInt64() & 0xFFFF);
     }
-    
+
     public static ushort HiWord(this IntPtr value)
     {
-        return unchecked((ushort)((uint)value >> 16));
+        return (ushort)((value.ToInt64() >> 16) & 0xFFFF);
     }
 }

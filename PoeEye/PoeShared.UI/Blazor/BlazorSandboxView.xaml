@@ -21,6 +21,9 @@
                 <RadioButton
                     IsChecked="{Binding Path=ViewType, Converter={StaticResource EqualToNullConverter}, ConverterParameter={x:Static blazor:ViewTypeEnum.Slow}}"
                     Content="Slow" />
+                
+                <eye:ButtonEx Content="Show Window" Command="{Binding ShowWindow}"/>
+                <eye:ButtonEx Content="Show Dialog Window" Command="{Binding ShowDialogWindow}"/>
             </st:StackPanel>
             <GroupBox  st:StackPanel.Fill="Fill">
                 <GroupBox.Header>

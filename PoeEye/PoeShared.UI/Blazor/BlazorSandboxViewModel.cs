@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using DynamicData;
 using PoeShared.Blazor.Wpf;
@@ -6,6 +8,7 @@ using PoeShared.Blazor.Wpf.Installer;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
+using Unity;
 
 namespace PoeShared.UI.Blazor;
 
@@ -33,11 +36,36 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
         MainCounter = mainCounter.AddTo(Anchors);
 
         ShowInstaller = CommandWrapper.Create(() => webViewInstallerDisplayer.ShowDialog(new WebViewInstallerArgs()));
+        ShowWindow = CommandWrapper.Create(() =>
+        {
+            var wnd =  new BlazorWindow<MainCounterView>();
+            wnd.Content = new MainCounterViewModel();
+            wnd.Title = "Test";
+            wnd.Height = 300;
+            wnd.Width = 200;
+            wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            wnd.Show();
+        });
+        ShowDialogWindow = CommandWrapper.Create(async () =>
+        {
+            var wnd =  new BlazorWindow<MainCounterView>();
+            wnd.Content = new MainCounterViewModel();
+            wnd.Title = "Test blocking";
+            wnd.Height = 400;
+            wnd.Width = 200;
+            wnd.Left = 100;
+            wnd.Top = 100;
+            await Task.Run(() => wnd.ShowDialog());
+        });
 
         Binder.Attach(this).AddTo(Anchors);
     }
 
     public ICommand ShowInstaller { get; }
+    
+    public ICommand ShowWindow { get; }
+    
+    public ICommand ShowDialogWindow { get; }
 
     public Type MainCounterViewType { get; private set; }
 

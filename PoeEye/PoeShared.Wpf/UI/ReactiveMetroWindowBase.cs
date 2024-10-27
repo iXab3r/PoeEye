@@ -20,7 +20,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.UI;
 
-public abstract class ReactiveMetroWindowBase : MetroWindow, IDisposableReactiveObject
+public class ReactiveMetroWindowBase : MetroWindow, IDisposableReactiveObject
 {
     private static long GlobalWindowId;
 
