@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -20,13 +21,15 @@ using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
 using ReactiveUI;
+using Unity;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.Blazor.Wpf;
 
-public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
+internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
 {
+    private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
     private readonly Lazy<NativeWindow> windowSupplier;
 
     private readonly long windowId = BlazorWindowCounter.GetNext();
@@ -46,11 +49,15 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly IScheduler uiScheduler;
     private readonly ManualResetEventSlim isClosed = new(false);
+    private readonly IUnityContainer childContainer;
 
-    public BlazorWindow()
+    public BlazorWindow(IUnityContainer unityContainer)
     {
         Log.AddSuffix($"BWnd#{windowId}");
         Log.Debug("New window is created");
+        childContainer = unityContainer.CreateChildContainer().AddTo(Anchors);
+        childContainer.RegisterSingleton<IBlazorWindowController>(_ => this);
+        
         uiScheduler = SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
@@ -84,7 +91,7 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
         {
             try
             {
-                var content = Content;
+                var content = ViewDataContext;
                 if (content is not IDisposable disposable)
                 {
                     return;
@@ -180,7 +187,9 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
 
     }
 
-    public object Content { get; set; }
+    public Type ViewType { get; set; }
+    
+    public object ViewDataContext { get; set; }
 
     public WindowStartupLocation WindowStartupLocation { get; set; }
 
@@ -199,6 +208,8 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
     public bool IsDebugMode { get; set; }
 
     public double Opacity { get; set; } = 1;
+
+    public Color BackgroundColor { get; set; } = DefaultBackgroundColor;
 
     public string Title
     {
@@ -429,12 +440,29 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
                     {
                         Log.Debug($"Updating {nameof(ShowTitleBar)}: {window.ShowTitleBar} => {command.ShowTitleBar}");
                         window.ShowTitleBar = command.ShowTitleBar;
+                        window.ShowMinButton = command.ShowTitleBar;
+                        window.ShowMaxRestoreButton = command.ShowTitleBar;
+                        window.ShowCloseButton = command.ShowTitleBar;
+                        window.ShowSystemMenu = command.ShowTitleBar;
+                        window.ShowSystemMenuOnRightClick = command.ShowTitleBar;
                         break;
                     }
                     case SetWindowPadding command:
                     {
                         Log.Debug($"Updating {nameof(Padding)} to {command.Padding}");
                         window.ContentControl.Margin = command.Padding;
+                        break;
+                    }
+                    case SetViewDataContext command:
+                    {
+                        Log.Debug($"Updating {nameof(ViewDataContext)} to {command.ViewDataContext}");
+                        window.ContentControl.Content = command.ViewDataContext;
+                        break;
+                    } 
+                    case SetViewType command:
+                    {
+                        Log.Debug($"Updating {nameof(ViewType)} to {command.ViewType}");
+                        window.ContentControl.ViewType = command.ViewType;
                         break;
                     }
                     case SetResizeMode command:
@@ -466,6 +494,14 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
                     {
                         Log.Debug($"Updating {nameof(Opacity)} to {command.Opacity}");
                         window.Opacity = command.Opacity;
+                        break;
+                    }
+                    case SetBackgroundColor command:
+                    {
+                        Log.Debug($"Updating {nameof(BackgroundColor)} to {command.BackgroundColor}");
+                        var color = new SolidColorBrush(command.BackgroundColor);
+                        color.Freeze();
+                        window.Background = color;
                         break;
                     }
                     case SetTopmostCommand command:
@@ -510,7 +546,7 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
         }
     }
 
-    private static IObservable<IWindowEvent> SubscribeToWindow(NativeWindow window, BlazorWindow<T> blazorWindow)
+    private static IObservable<IWindowEvent> SubscribeToWindow(NativeWindow window, BlazorWindow blazorWindow)
     {
         return Observable.Create<IWindowEvent>(observer =>
         {
@@ -621,9 +657,21 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetWindowTitleCommand(x.Value)))
                 .AddTo(anchors);
+            
+            blazorWindow.WhenAnyValue(x => x.ViewType)
+                .Subscribe(x => observer.OnNext(new SetViewType(x)))
+                .AddTo(anchors);
+            
+            blazorWindow.WhenAnyValue(x => x.ViewDataContext)
+                .Subscribe(x => observer.OnNext(new SetViewDataContext(x)))
+                .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
                 .Subscribe(x => observer.OnNext(new SetWindowPadding(x)))
+                .AddTo(anchors);
+            
+            blazorWindow.WhenAnyValue(x => x.BackgroundColor)
+                .Subscribe(x => observer.OnNext(new SetBackgroundColor(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.ResizeMode)
@@ -917,6 +965,10 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
     private sealed record SetIsClickThrough(bool IsClickThrough) : IWindowCommand;
 
     private sealed record SetOpacity(double Opacity) : IWindowCommand;
+    
+    private sealed record SetBackgroundColor(Color BackgroundColor) : IWindowCommand;
+    private sealed record SetViewType(Type ViewType) : IWindowCommand;
+    private sealed record SetViewDataContext(object ViewDataContext) : IWindowCommand;
 
     private sealed record WindowTitleChangedEvent(string Title) : IWindowEvent;
 
@@ -937,7 +989,7 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
         private readonly BehaviorSubject<PropertyState<TValue>> stateSubject;
 
         public PropertyValueHolder(
-            BlazorWindow<T> owner, 
+            BlazorWindow owner, 
             string propertyToRaise)
         {
             PropertyToRaise = propertyToRaise;
@@ -984,15 +1036,14 @@ public class BlazorWindow<T> : DisposableReactiveObjectWithLogger, IBlazorWindow
 
     private sealed class NativeWindow : ReactiveMetroWindowBase
     {
-        private readonly BlazorWindow<T> owner;
+        private readonly BlazorWindow owner;
 
-        public NativeWindow(BlazorWindow<T> owner)
+        public NativeWindow(BlazorWindow owner)
         {
             this.owner = owner;
             ContentControl = new BlazorContentControl()
             {
-                Content = this.owner,
-                ViewType = typeof(BlazorWindowContent<T>)
+                Container = this.owner.childContainer
             }.AddTo(Anchors);
             Content = ContentControl;
         }

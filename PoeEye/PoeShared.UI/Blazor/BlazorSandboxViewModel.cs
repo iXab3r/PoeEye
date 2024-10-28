@@ -5,6 +5,7 @@ using System.Windows.Input;
 using DynamicData;
 using PoeShared.Blazor.Wpf;
 using PoeShared.Blazor.Wpf.Installer;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
@@ -30,7 +31,8 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
     public BlazorSandboxViewModel(
         IWebViewInstallerDisplayer webViewInstallerDisplayer,
         IWebViewAccessor webViewAccessor,
-        MainCounterViewModel mainCounter)
+        MainCounterViewModel mainCounter,
+        IFactory<IBlazorWindow> blazorWindowFactory)
     {
         WebViewAccessor = webViewAccessor;
         MainCounter = mainCounter.AddTo(Anchors);
@@ -38,8 +40,9 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
         ShowInstaller = CommandWrapper.Create(() => webViewInstallerDisplayer.ShowDialog(new WebViewInstallerArgs()));
         ShowWindow = CommandWrapper.Create(() =>
         {
-            var wnd =  new BlazorWindow<MainCounterView>();
-            wnd.Content = new MainCounterViewModel();
+            var wnd = blazorWindowFactory.Create();
+            wnd.ViewType = typeof(MainCounterView);
+            wnd.ViewDataContext = new MainCounterViewModel();
             wnd.Title = "Test";
             wnd.Height = 300;
             wnd.Width = 200;
@@ -48,8 +51,9 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
         });
         ShowDialogWindow = CommandWrapper.Create(async () =>
         {
-            var wnd =  new BlazorWindow<MainCounterView>();
-            wnd.Content = new MainCounterViewModel();
+            var wnd = blazorWindowFactory.Create();
+            wnd.ViewType = typeof(MainCounterView);
+            wnd.ViewDataContext = new MainCounterViewModel();
             wnd.Title = "Test blocking";
             wnd.Height = 400;
             wnd.Width = 200;
@@ -62,13 +66,12 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
     }
 
     public ICommand ShowInstaller { get; }
-    
+
     public ICommand ShowWindow { get; }
-    
+
     public ICommand ShowDialogWindow { get; }
 
     public Type MainCounterViewType { get; private set; }
 
     public ViewTypeEnum ViewType { get; set; }
-
 }

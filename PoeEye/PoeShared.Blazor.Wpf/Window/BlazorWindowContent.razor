@@ -1,17 +1,11 @@
 ﻿@namespace PoeShared.Blazor.Wpf
-@typeparam T
-@using System.Reactive.Linq
-@using System.Windows
 @using System.Windows.Input
-@using BlazorComponentUtilities
 @using PoeShared.Blazor.Scaffolding
 @using PoeShared.Scaffolding
 @using ReactiveUI
 @using PoeShared.Blazor
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
-@inherits BlazorReactiveComponent<BlazorWindow<T>>
+@inherits BlazorReactiveComponent<IBlazorWindow>
 
 @if (DataContext.Anchors.IsDisposed)
 {
@@ -222,7 +216,7 @@
 }
 else
 {
-    <BlazorContentPresenter Content="@(DataContext.Content)" ViewType="@(typeof(T))"></BlazorContentPresenter>
+    <BlazorContentPresenter Content="@(DataContext.ViewDataContext)" ViewType="@(DataContext.ViewType)"></BlazorContentPresenter>
 }
 
 @code {
