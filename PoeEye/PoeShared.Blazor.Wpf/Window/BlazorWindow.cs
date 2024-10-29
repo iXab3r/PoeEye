@@ -993,13 +993,20 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             string propertyToRaise)
         {
             PropertyToRaise = propertyToRaise;
-            stateSubject = new BehaviorSubject<PropertyState<TValue>>(default).AddTo(Anchors);
-            stateSubject.Where(x => x.UpdateSource is TrackedPropertyUpdateSource.Internal)
+            stateSubject = new BehaviorSubject<PropertyState<TValue>>(default)
+                .AddTo(Anchors);
+            
+            stateSubject
+                .Subscribe(x => State = x)
+                .AddTo(Anchors);
+            
+            stateSubject
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.Internal)
                 .Subscribe(x => owner.RaisePropertyChanged(PropertyToRaise))
                 .AddTo(Anchors);
         }
 
-        public PropertyState<TValue> State => stateSubject.Value;
+        public PropertyState<TValue> State { get; private set; }
 
         public string PropertyToRaise { get; }
 
