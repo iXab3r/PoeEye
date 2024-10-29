@@ -324,6 +324,10 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     private async Task HandleKeyDown(KeyboardEventArgs eventArgs)
     {
+        if (eventArgs.Repeat)
+        {
+            return;
+        }
         switch (SelectionMode)
         {
             case TreeViewSelectionMode.SingleItem or TreeViewSelectionMode.MultipleItems:
