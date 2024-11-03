@@ -68,6 +68,10 @@ public class WorkerTask : DisposableReactiveObject
 
     public string Name { get; set; }
 
+    /// <summary>
+    /// When disposed, WT will give some time for child task(if running) to complete. Blocking wait!
+    /// Will throw an exception otherwise. If set to 0 will skip the check and return momentarily
+    /// </summary>
     public TimeSpan TerminationTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
     private IFluentLog Log { get; }
