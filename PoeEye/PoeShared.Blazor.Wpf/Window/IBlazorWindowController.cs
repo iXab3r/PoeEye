@@ -18,14 +18,9 @@ public interface IBlazorWindowController
     ResizeMode ResizeMode { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the title bar is visible.
+    /// Gets or sets a value indicating whether the title bar is visible and how it is displayed. 
     /// </summary>
-    bool ShowTitleBar { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the icon is shown in the title bar.
-    /// </summary>
-    bool ShowIconOnTitleBar { get; set; }
+    TitleBarDisplayMode TitleBarDisplayMode { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the window should appear in the taskbar.

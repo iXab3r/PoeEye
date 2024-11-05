@@ -7,7 +7,7 @@ namespace PoeShared.Blazor.Wpf;
 /// <summary>
 /// Defines the contract for a Blazor window with configurable UI properties, event-driven lifecycle, and window state operations.
 /// </summary>
-public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObject
+public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObject, IBlazorWindowNativeController
 {
     /// <summary>
     /// Gets or sets type of View which will be displayed within the window.

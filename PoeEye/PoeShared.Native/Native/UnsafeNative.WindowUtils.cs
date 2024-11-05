@@ -236,9 +236,9 @@ public partial class UnsafeNative
 
     public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)
     {
-        Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window bounds: {rect}");
+        Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window rect: {rect}");
         Win32ErrorCode error;
-        if (!User32.SetWindowPos(hwnd, User32.SpecialWindowHandles.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        if (!User32.SetWindowPos(hwnd, IntPtr.Zero, rect.X, rect.Y, rect.Width, rect.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_NOZORDER) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
         {
             Log.Warn($"Failed to SetWindowPos({hwnd.ToHexadecimal()}, {User32.SpecialWindowHandles.HWND_TOPMOST}), error: {error}");
             return false;
@@ -247,11 +247,12 @@ public partial class UnsafeNative
         return true;
     }
     
+    
     public static bool SetWindowPos(IntPtr hwnd, Point location)
     {
         Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window location: {location}");
         Win32ErrorCode error;
-        if (!User32.SetWindowPos(hwnd, IntPtr.Zero, location.X, location.Y, 0, 0, User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOZORDER) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        if (!User32.SetWindowPos(hwnd, IntPtr.Zero, location.X, location.Y, 0, 0, User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOSIZE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
         {
             Log.Warn($"Failed to SetWindowPos({hwnd.ToHexadecimal()}, {location}), error: {error}");
             return false;
@@ -264,7 +265,7 @@ public partial class UnsafeNative
     {
         Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window size: {size}");
         Win32ErrorCode error;
-        if (!User32.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, size.Width, size.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOZORDER) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        if (!User32.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, size.Width, size.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOMOVE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
         {
             Log.Warn($"Failed to SetWindowPos({hwnd.ToHexadecimal()}, {size}), error: {error}");
             return false;

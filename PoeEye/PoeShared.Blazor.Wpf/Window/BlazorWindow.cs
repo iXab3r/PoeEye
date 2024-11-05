@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -22,12 +23,13 @@ using PoeShared.Scaffolding;
 using PoeShared.UI;
 using ReactiveUI;
 using Unity;
+using Color = System.Windows.Media.Color;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
+internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow, IBlazorWindowNativeController
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
     private readonly Lazy<NativeWindow> windowSupplier;
@@ -195,13 +197,11 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
 
-    public bool ShowTitleBar { get; set; } = true;
-
-    public bool ShowIconOnTitleBar { get; set; } = false;
+    public TitleBarDisplayMode TitleBarDisplayMode { get; set; }
 
     public bool ShowInTaskbar { get; set; } = true;
 
-    public Thickness Padding { get; set; } = new(5);
+    public Thickness Padding { get; set; } = new(2);
 
     public bool IsClickThrough { get; set; }
 
@@ -328,6 +328,33 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         EnqueueUpdate(new CloseCommand());
     }
 
+    public IntPtr GetWindowHandle()
+    {
+        EnsureNotDisposed();
+        return GetOrCreate().WindowHandle;
+    }
+
+    public void SetWindowRect(Rectangle rect)
+    {
+        EnsureNotDisposed();
+        Log.Debug($"Setting window rect to {rect}");
+        EnqueueUpdate(new SetWindowRectCommand(rect));
+    }
+
+    public void SetWindowSize(Size windowSize)
+    {
+        EnsureNotDisposed();
+        Log.Debug($"Resizing window to {windowSize}");
+        EnqueueUpdate(new SetWindowSizeCommand(windowSize));
+    }
+
+    public void SetWindowPos(Point windowPos)
+    {
+        EnsureNotDisposed();
+        Log.Debug($"Moving window to {windowPos}");
+        EnqueueUpdate(new SetWindowPosCommand(windowPos));
+    }
+
     private void EnqueueUpdate(IWindowEvent windowEvent)
     {
         eventQueue.Add(windowEvent);
@@ -430,6 +457,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         UnsafeNative.SetWindowPos(window.WindowHandle, command.Location);
                         break;
                     }
+                    case SetWindowRectCommand command:
+                    {
+                        Log.Debug($"Setting window rect to {command.Rect}");
+                        UnsafeNative.SetWindowRect(window.WindowHandle, command.Rect);
+                        break;
+                    }
                     case SetWindowSizeCommand command:
                     {
                         Log.Debug($"Setting window size to {command.Size}");
@@ -438,13 +471,19 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     }
                     case SetShowTitleBarCommand command:
                     {
-                        Log.Debug($"Updating {nameof(ShowTitleBar)}: {window.ShowTitleBar} => {command.ShowTitleBar}");
-                        window.ShowTitleBar = command.ShowTitleBar;
-                        window.ShowMinButton = command.ShowTitleBar;
-                        window.ShowMaxRestoreButton = command.ShowTitleBar;
-                        window.ShowCloseButton = command.ShowTitleBar;
-                        window.ShowSystemMenu = command.ShowTitleBar;
-                        window.ShowSystemMenuOnRightClick = command.ShowTitleBar;
+                        Log.Debug($"Updating {nameof(TitleBarDisplayMode)} to {command.TitleBarDisplayMode}");
+
+                        var displayMode = command.TitleBarDisplayMode == TitleBarDisplayMode.Default
+                            ? TitleBarDisplayMode.System
+                            : command.TitleBarDisplayMode;
+
+                        var showSystemBar = displayMode is TitleBarDisplayMode.System;
+                        window.ShowTitleBar = showSystemBar;
+                        window.ShowMinButton = showSystemBar;
+                        window.ShowMaxRestoreButton = showSystemBar;
+                        window.ShowCloseButton = showSystemBar;
+                        window.ShowSystemMenu = showSystemBar;
+                        window.ShowSystemMenuOnRightClick = showSystemBar;
                         break;
                     }
                     case SetWindowPadding command:
@@ -453,28 +492,10 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         window.ContentControl.Margin = command.Padding;
                         break;
                     }
-                    case SetViewDataContext command:
-                    {
-                        Log.Debug($"Updating {nameof(ViewDataContext)} to {command.ViewDataContext}");
-                        window.ContentControl.Content = command.ViewDataContext;
-                        break;
-                    } 
-                    case SetViewType command:
-                    {
-                        Log.Debug($"Updating {nameof(ViewType)} to {command.ViewType}");
-                        window.ContentControl.ViewType = command.ViewType;
-                        break;
-                    }
                     case SetResizeMode command:
                     {
                         Log.Debug($"Updating {nameof(ResizeMode)} to {command.ResizeMode}");
                         window.ResizeMode = command.ResizeMode;
-                        break;
-                    }
-                    case SetShowIconOnTitleBarCommand command:
-                    {
-                        Log.Debug($"Updating {nameof(ShowIconOnTitleBar)} to {command.ShowIconOnTitleBar}");
-                        window.ShowIconOnTitleBar = command.ShowIconOnTitleBar;
                         break;
                     }
                     case SetShowInTaskbar command:
@@ -657,14 +678,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetWindowTitleCommand(x.Value)))
                 .AddTo(anchors);
-            
-            blazorWindow.WhenAnyValue(x => x.ViewType)
-                .Subscribe(x => observer.OnNext(new SetViewType(x)))
-                .AddTo(anchors);
-            
-            blazorWindow.WhenAnyValue(x => x.ViewDataContext)
-                .Subscribe(x => observer.OnNext(new SetViewDataContext(x)))
-                .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
                 .Subscribe(x => observer.OnNext(new SetWindowPadding(x)))
@@ -690,12 +703,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => observer.OnNext(new SetOpacity(x)))
                 .AddTo(anchors);
 
-            blazorWindow.WhenAnyValue(x => x.ShowTitleBar)
+            blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode)
                 .Subscribe(x => { observer.OnNext(new SetShowTitleBarCommand(x)); })
-                .AddTo(anchors);
-
-            blazorWindow.WhenAnyValue(x => x.ShowIconOnTitleBar)
-                .Subscribe(x => { observer.OnNext(new SetShowIconOnTitleBarCommand(x)); })
                 .AddTo(anchors);
 
             // events propagation
@@ -945,7 +954,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record DisposeWindowCommand : IWindowCommand;
 
     private sealed record SetWindowTitleCommand(string Title) : IWindowCommand;
-
+    private sealed record SetWindowRectCommand(Rectangle Rect) : IWindowCommand;
     private sealed record SetWindowPosCommand(Point Location) : IWindowCommand;
 
     private sealed record SetWindowSizeCommand(Size Size) : IWindowCommand;
@@ -956,9 +965,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed record SetResizeMode(ResizeMode ResizeMode) : IWindowCommand;
 
-    private sealed record SetShowTitleBarCommand(bool ShowTitleBar) : IWindowCommand;
-
-    private sealed record SetShowIconOnTitleBarCommand(bool ShowIconOnTitleBar) : IWindowCommand;
+    private sealed record SetShowTitleBarCommand(TitleBarDisplayMode TitleBarDisplayMode) : IWindowCommand;
 
     private sealed record SetShowInTaskbar(bool ShowInTaskbar) : IWindowCommand;
 
@@ -967,8 +974,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record SetOpacity(double Opacity) : IWindowCommand;
     
     private sealed record SetBackgroundColor(Color BackgroundColor) : IWindowCommand;
-    private sealed record SetViewType(Type ViewType) : IWindowCommand;
-    private sealed record SetViewDataContext(object ViewDataContext) : IWindowCommand;
 
     private sealed record WindowTitleChangedEvent(string Title) : IWindowEvent;
 
@@ -1050,7 +1055,9 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             this.owner = owner;
             ContentControl = new BlazorContentControl()
             {
-                Container = this.owner.childContainer
+                Container = this.owner.childContainer,
+                ViewType = typeof(BlazorWindowContent),
+                Content = owner
             }.AddTo(Anchors);
             Content = ContentControl;
         }
