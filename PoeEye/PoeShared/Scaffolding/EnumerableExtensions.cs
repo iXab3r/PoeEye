@@ -162,6 +162,31 @@ public static class EnumerableExtensions
     {
         return new ReadOnlyObservableCollection<T>(enumerable.ToObservableCollection());
     }
+    
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<T, TKey, TValue>(this IEnumerable<T> enumerable,
+        Func<T, TKey> keyExtractor,
+        Func<T, TValue> valueExtractor)
+    {
+        var result = new ConcurrentDictionary<TKey, TValue>();
+        foreach (var item in enumerable)
+        {
+            result[keyExtractor(item)] = valueExtractor(item);
+        }
+        return result;
+    }
+    
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<T, TKey, TValue>(this IEnumerable<T> enumerable,
+        Func<T, TKey> keyExtractor,
+        Func<T, TValue> valueExtractor,
+        IEqualityComparer<TKey> comparer)
+    {
+        var result = new ConcurrentDictionary<TKey, TValue>(comparer);
+        foreach (var item in enumerable)
+        {
+            result[keyExtractor(item)] = valueExtractor(item);
+        }
+        return result;
+    }
         
     public static IDictionary<TKey, TValue> ToDictionaryWithReplacement<T, TKey, TValue>(this IEnumerable<T> enumerable,
         Func<T, TKey> keyExtractor,
