@@ -134,6 +134,11 @@ public static class FluentLogExtensions
     {
         return log.WithLogData(log.Data.WithMaxLineLength(value));
     }
+    
+    public static IFluentLog WithoutMaxLineLength(this IFluentLog log)
+    {
+        return log.WithLogData(log.Data.WithMaxLineLength(int.MaxValue));
+    }
 
     public static IFluentLog WithMinLogLevelOverride(this IFluentLog log, FluentLogLevel? value)
     {
