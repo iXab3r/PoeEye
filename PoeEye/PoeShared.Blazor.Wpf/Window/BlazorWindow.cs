@@ -835,7 +835,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             WindowStartupLocation = WindowStartupLocation,
         };
 
-        return window;
+        return window.AddTo(Anchors);
     }
 
     private IntPtr WindowHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
