@@ -89,25 +89,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             }
         }).AddTo(Anchors);
 
-        Disposable.Create(() =>
-        {
-            try
-            {
-                var content = ViewDataContext;
-                if (content is not IDisposable disposable)
-                {
-                    return;
-                }
-
-                Log.Debug($"Disposing content: {disposable}");
-                disposable.Dispose();
-            }
-            catch (Exception e)
-            {
-                Log.Warn("Failed to dispose window content", e);
-            }
-        }).AddTo(Anchors);
-
         windowLeft = new PropertyValueHolder<int>(this, nameof(Left)).AddTo(Anchors);
         windowTop = new PropertyValueHolder<int>(this, nameof(Top)).AddTo(Anchors);
         windowWidth = new PropertyValueHolder<int>(this, nameof(Width)).AddTo(Anchors);
@@ -187,6 +168,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Publish()
                 .RefCount();
 
+        WhenClosed.Subscribe(() =>
+        {
+            if (Anchors.IsDisposed)
+            {
+                return;
+            }
+
+            Log.Debug("Got Closed signal, disposing");
+            Dispose();
+        }).AddTo(Anchors);
     }
 
     public Type ViewType { get; set; }
@@ -852,7 +843,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             {
                 case User32.WindowMessage.WM_GETICON:
                 {
-                    Log.Debug("WM_GETICON received, returning window icon");
                     handled = true;
                     break;
                 }
@@ -1060,6 +1050,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 Content = owner
             }.AddTo(Anchors);
             Content = ContentControl;
+            Anchors.Add(() => Log.Debug("Disposed native window"));
         }
 
         public BlazorContentControl ContentControl { get; }

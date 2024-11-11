@@ -1,5 +1,6 @@
 ﻿@namespace PoeShared.Blazor.Wpf
 @using System.Windows.Input
+@using JetBrains.Annotations
 @using PoeShared.Blazor.Scaffolding
 @using PoeShared.Scaffolding
 @using ReactiveUI
@@ -64,6 +65,11 @@ else if (DataContext.IsDebugMode)
         <td>Commands</td>
         <td>
             <span class="d-flex gap-1">
+                <button class="btn btn-eye-link p-0 m-0 px-1 rounded-0"
+                        @onclick="@(() =>  BlazorContentControlAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
+                    DevTools
+                </button>
+                <span class="vr"></span>
                 <button class="btn btn-eye-link p-0 m-0 px-1 rounded-0"
                         @onclick="@(() => DataContext.Hide())">
                     Hide
@@ -244,7 +250,11 @@ else if (DataContext.IsDebugMode)
 }
 else
 {
-    <BlazorContentPresenter Content="@(DataContext.ViewDataContext)" ViewType="@(DataContext.ViewType)"></BlazorContentPresenter>
+    <BlazorContentPresenter 
+        @ref="@ContentPresenter"
+        
+        Content="@(DataContext.ViewDataContext)" 
+        ViewType="@(DataContext.ViewType)"></BlazorContentPresenter>
 }
 </div>
 </div>
@@ -259,12 +269,27 @@ else
 
     public BlazorWindowContent()
     {
+        Anchors.Add(() => ContentPresenter = null);
+
         ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.IsDebugMode));
+        
+        this.WhenAnyValue(x => x.ContentPresenter)
+            .WithPrevious()
+            .Subscribe(x =>
+            {
+                if (x.Previous is IDisposable disposableView)
+                {
+                    disposableView.Dispose();
+                }
+            })
+            .AddTo(Anchors);
     }
 
     [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
 
     public BlazorContentControl ContentControl => BlazorContentControlAccessor.Control;
+    
+    public BlazorContentPresenter ContentPresenter { get; private set; }
 
     protected override void OnInitialized()
     {

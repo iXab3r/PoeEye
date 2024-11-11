@@ -129,6 +129,8 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 Log.Debug($"Reloading control, new content type: {state.viewType}");
 
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
+                Disposable.Create(() => Log.Debug("Content is being disposed")).AddTo(contentAnchors);
+
                 WebView.FileProvider.FilesByName.Clear();
 
                 if (UnhandledException != null)
@@ -151,12 +153,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                         {
                             ViewType = state.viewType,
                         }.AddTo(contentAnchors);
-                        
+
                         this.WhenAnyValue(contentControl => contentControl.Content)
-                            .Subscribe(content =>
-                            {
-                                contentPresenter.Content = content;
-                            })
+                            .Subscribe(content => { contentPresenter.Content = content; })
                             .AddTo(contentAnchors);
                         return contentPresenter;
                     });
@@ -167,13 +166,13 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
                     childServiceCollection.Add(unityServiceDescriptors);
-                    
+
                     var childServiceProvider = childServiceCollection.BuildServiceProvider();
-                    
+
                     var clock = childServiceProvider.GetRequiredService<IClock>();
                     var scoped = childServiceProvider.CreateScope();
                     var scopedClock = scoped.ServiceProvider.GetRequiredService<IClock>();
-                    
+
                     webViewServiceProvider.ServiceProvider = childServiceProvider;
 
                     var blazorContentRepository = childServiceProvider.GetRequiredService<IBlazorContentRepository>();
@@ -202,6 +201,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                         {
                             continue;
                         }
+
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
 
@@ -223,6 +223,10 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 {
                     Log.Error($"Failed to initialize view using {state}");
                     UnhandledException = e;
+                }
+                finally
+                {
+                    Disposable.Create(() => Log.Debug("Content has been disposed")).AddTo(contentAnchors);
                 }
             })
             .AddTo(Anchors);
