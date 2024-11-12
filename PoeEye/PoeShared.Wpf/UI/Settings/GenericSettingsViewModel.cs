@@ -38,24 +38,25 @@ internal sealed class GenericSettingsViewModel : WindowViewModelBase, IGenericSe
     private readonly IUnityContainer container;
     private readonly ConcurrentDictionary<Type, MethodInfo> reloadConfigByType = new();
     private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new();
+    private readonly IScheduler uiScheduler;
 
     private readonly ISourceCache<ISettingsViewModel, Type> moduleSettings = new SourceCache<ISettingsViewModel, Type>(x => x.GetType());
         
     public GenericSettingsViewModel(
         [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
-        [NotNull] IUnityContainer container,
-        [Dependency(WellKnownSchedulers.RedirectToUI)] IScheduler uiScheduler)
+        [NotNull] IUnityContainer container)
     {
         Guard.ArgumentNotNull(modulesEnumerator, nameof(modulesEnumerator));
         Guard.ArgumentNotNull(container, nameof(container));
+        uiScheduler = DispatcherScheduler.Current;
         this.modulesEnumerator = modulesEnumerator;
         this.container = container;
         DefaultSize = new WinSize(650, 500);
         MinSize = new WinSize(400, 200);
         Title = "SETTINGS";
         ShowInTaskbar = true;
-        CloseCommand = CommandWrapper.Create(Close);
-        SaveCommand = CommandWrapper.Create(SaveExecuted);
+        CloseCommand = CommandWrapper.Create(Close).AddTo(Anchors);
+        SaveCommand = CommandWrapper.Create(SaveExecuted).AddTo(Anchors);
 
         moduleSettings
             .Connect()
