@@ -41,6 +41,11 @@ public interface IBlazorWindowController
     /// Gets or sets a value indicating whether the window is in debug mode.
     /// </summary>
     bool IsDebugMode { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the window is visible
+    /// </summary>
+    bool IsVisible { get; set; }
 
     /// <summary>
     /// Gets or sets the opacity of the window.

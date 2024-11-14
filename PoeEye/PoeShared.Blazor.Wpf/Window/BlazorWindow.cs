@@ -29,7 +29,7 @@ using Size = System.Drawing.Size;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow, IBlazorWindowNativeController
+internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
     private readonly Lazy<NativeWindow> windowSupplier;
@@ -47,29 +47,30 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private readonly PropertyValueHolder<int> windowMaxWidth;
     private readonly PropertyValueHolder<int> windowMaxHeight;
     private readonly PropertyValueHolder<bool> windowTopmost;
+    private readonly PropertyValueHolder<bool> windowVisible;
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly IScheduler uiScheduler;
     private readonly ManualResetEventSlim isClosed = new(false);
     private readonly IUnityContainer childContainer;
 
-    public BlazorWindow(IUnityContainer unityContainer)
+    public BlazorWindow(IUnityContainer unityContainer, [OptionalDependency] IScheduler uiScheduler = default)
     {
         Log.AddSuffix($"BWnd#{windowId}");
         Log.Debug("New window is created");
         childContainer = unityContainer.CreateChildContainer().AddTo(Anchors);
         childContainer.RegisterSingleton<IBlazorWindowController>(_ => this);
-        
-        uiScheduler = SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
+
+        this.uiScheduler = uiScheduler ?? SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
-        
+
         Disposable.Create(() =>
         {
             try
             {
                 isClosed.Set();
-                
+
                 if (!windowSupplier.IsValueCreated)
                 {
                     return;
@@ -99,6 +100,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         windowMaxWidth = new PropertyValueHolder<int>(this, nameof(MaxWidth)).AddTo(Anchors);
         windowMaxHeight = new PropertyValueHolder<int>(this, nameof(MaxHeight)).AddTo(Anchors);
         windowTopmost = new PropertyValueHolder<bool>(this, nameof(Topmost)).AddTo(Anchors);
+        windowVisible = new PropertyValueHolder<bool>(this, nameof(IsVisible)).AddTo(Anchors);
 
         Width = 300;
         Height = 200;
@@ -181,7 +183,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     }
 
     public Type ViewType { get; set; }
-    
+
     public object ViewDataContext { get; set; }
 
     public WindowStartupLocation WindowStartupLocation { get; set; }
@@ -201,6 +203,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     public double Opacity { get; set; } = 1;
 
     public Color BackgroundColor { get; set; } = DefaultBackgroundColor;
+
+    public bool IsVisible
+    {
+        get => windowVisible.State.Value;
+        set => windowVisible.SetValue(value, TrackedPropertyUpdateSource.External);
+    }
 
     public string Title
     {
@@ -395,14 +403,14 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     Log.Debug($"Window is not created - ignoring disposal request");
                     continue;
                 }
-                
+
                 var window = GetOrCreate();
                 if (window.Anchors.IsDisposed)
                 {
                     Log.Debug($"Window already disposed - ignoring disposal request");
                     continue;
                 }
-                
+
                 Log.Debug($"Disposing the window: {new {window}}");
                 window.Close();
                 window.Dispose();
@@ -414,7 +422,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     Log.Debug($"Ignoring command - already disposed, command: {windowEvent}");
                     continue;
                 }
-                
+
                 var window = GetOrCreate();
                 switch (windowEvent)
                 {
@@ -522,6 +530,19 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         window.Topmost = command.Topmost;
                         break;
                     }
+                    case SetVisibleCommand command:
+                    {
+                        Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
+                        if (command.IsVisible)
+                        {
+                            UnsafeNative.ShowWindow(window.WindowHandle, User32.WindowShowStyle.SW_SHOW);
+                        }
+                        else
+                        {
+                            UnsafeNative.ShowWindow(window.WindowHandle, User32.WindowShowStyle.SW_HIDE);
+                        }
+                        break;
+                    }
                     default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
                 }
             }
@@ -532,9 +553,14 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     Log.Debug($"Ignoring event notification - already disposed: {windowEvent}");
                     continue;
                 }
-                
+
                 switch (windowEvent)
                 {
+                    case IsVisibleChangedEvent args:
+                    {
+                        windowVisible.SetValue(args.IsVisible, TrackedPropertyUpdateSource.Internal);
+                        break;
+                    }
                     case WindowSizeChangedEvent args:
                     {
                         windowWidth.SetValue(args.Size.Width, TrackedPropertyUpdateSource.Internal);
@@ -589,7 +615,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                             throw new InvalidOperationException("CompositionTarget must be initialized at this point");
                         }
 
-                        UpdateWindowBounds(scaleX: compositionTarget.TransformToDevice.M11, compositionTarget.TransformToDevice.M22);
+                        UpdateWindowBounds(scaleX: 1 / compositionTarget.TransformToDevice.M11, 1 / compositionTarget.TransformToDevice.M22);
 
                         source.AddHook(blazorWindow.WindowHook);
                         Disposable.Create(() =>
@@ -664,6 +690,13 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => observer.OnNext(new SetTopmostCommand(x.Value)))
                 .AddTo(anchors);
 
+            blazorWindow.windowVisible
+                .Listen()
+                .Skip(1)
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
+                .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
+                .AddTo(anchors);
+
             blazorWindow.windowTitle
                 .Listen()
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
@@ -673,7 +706,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             blazorWindow.WhenAnyValue(x => x.Padding)
                 .Subscribe(x => observer.OnNext(new SetWindowPadding(x)))
                 .AddTo(anchors);
-            
+
             blazorWindow.WhenAnyValue(x => x.BackgroundColor)
                 .Subscribe(x => observer.OnNext(new SetBackgroundColor(x)))
                 .AddTo(anchors);
@@ -786,7 +819,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     return;
                 }
 
-                UpdateWindowBounds(scaleX: dpiX / 96d, scaleY: dpiY / 96d);
+                UpdateWindowBounds(scaleX: 96d / dpiX, scaleY: 96d / dpiY);
             }
             catch (Exception e)
             {
@@ -841,6 +874,10 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             var msg = (User32.WindowMessage) msgRaw;
             switch (msg)
             {
+                case User32.WindowMessage.WM_SHOWWINDOW:
+                    var isVisible = wParam != IntPtr.Zero;
+                    EnqueueUpdate(new IsVisibleChangedEvent(isVisible));
+                    break;
                 case User32.WindowMessage.WM_GETICON:
                 {
                     handled = true;
@@ -944,12 +981,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record DisposeWindowCommand : IWindowCommand;
 
     private sealed record SetWindowTitleCommand(string Title) : IWindowCommand;
+
     private sealed record SetWindowRectCommand(Rectangle Rect) : IWindowCommand;
+
     private sealed record SetWindowPosCommand(Point Location) : IWindowCommand;
 
     private sealed record SetWindowSizeCommand(Size Size) : IWindowCommand;
 
     private sealed record SetTopmostCommand(bool Topmost) : IWindowCommand;
+
+    private sealed record SetVisibleCommand(bool IsVisible) : IWindowCommand;
 
     private sealed record SetWindowPadding(Thickness Padding) : IWindowCommand;
 
@@ -962,8 +1003,10 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record SetIsClickThrough(bool IsClickThrough) : IWindowCommand;
 
     private sealed record SetOpacity(double Opacity) : IWindowCommand;
-    
+
     private sealed record SetBackgroundColor(Color BackgroundColor) : IWindowCommand;
+
+    private sealed record IsVisibleChangedEvent(bool IsVisible) : IWindowEvent;
 
     private sealed record WindowTitleChangedEvent(string Title) : IWindowEvent;
 
@@ -984,17 +1027,17 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         private readonly BehaviorSubject<PropertyState<TValue>> stateSubject;
 
         public PropertyValueHolder(
-            BlazorWindow owner, 
+            BlazorWindow owner,
             string propertyToRaise)
         {
             PropertyToRaise = propertyToRaise;
             stateSubject = new BehaviorSubject<PropertyState<TValue>>(default)
                 .AddTo(Anchors);
-            
+
             stateSubject
                 .Subscribe(x => State = x)
                 .AddTo(Anchors);
-            
+
             stateSubject
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.Internal)
                 .Subscribe(x => owner.RaisePropertyChanged(PropertyToRaise))
@@ -1051,6 +1094,21 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             }.AddTo(Anchors);
             Content = ContentControl;
             Anchors.Add(() => Log.Debug("Disposed native window"));
+        }
+
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            base.OnLocationChanged(e);
+        }
+
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+        }
+
+        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+        {
+            base.OnDpiChanged(oldDpi, newDpi);
         }
 
         public BlazorContentControl ContentControl { get; }
