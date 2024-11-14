@@ -48,6 +48,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private readonly PropertyValueHolder<int> windowMaxHeight;
     private readonly PropertyValueHolder<bool> windowTopmost;
     private readonly PropertyValueHolder<bool> windowVisible;
+    private readonly PropertyValueHolder<bool> showInTaskbar;
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly IScheduler uiScheduler;
@@ -101,6 +102,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         windowMaxHeight = new PropertyValueHolder<int>(this, nameof(MaxHeight)).AddTo(Anchors);
         windowTopmost = new PropertyValueHolder<bool>(this, nameof(Topmost)).AddTo(Anchors);
         windowVisible = new PropertyValueHolder<bool>(this, nameof(IsVisible)).AddTo(Anchors);
+        showInTaskbar = new PropertyValueHolder<bool>(this, nameof(ShowInTaskbar)).AddTo(Anchors);
 
         Width = 300;
         Height = 200;
@@ -192,7 +194,11 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     public TitleBarDisplayMode TitleBarDisplayMode { get; set; }
 
-    public bool ShowInTaskbar { get; set; } = true;
+    public bool ShowInTaskbar
+    {
+        get => showInTaskbar.State.Value;
+        set => showInTaskbar.SetValue(value, TrackedPropertyUpdateSource.External);
+    }
 
     public Thickness Padding { get; set; } = new(2);
 
@@ -533,14 +539,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     case SetVisibleCommand command:
                     {
                         Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
-                        if (command.IsVisible)
-                        {
-                            UnsafeNative.ShowWindow(window.WindowHandle, User32.WindowShowStyle.SW_SHOW);
-                        }
-                        else
-                        {
-                            UnsafeNative.ShowWindow(window.WindowHandle, User32.WindowShowStyle.SW_HIDE);
-                        }
+                        UnsafeNative.ShowWindow(window.WindowHandle, command.IsVisible ? User32.WindowShowStyle.SW_SHOW : User32.WindowShowStyle.SW_HIDE);
                         break;
                     }
                     default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
@@ -595,6 +594,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             //we have to "guess" current DPI, then, when SourceInitialized will be called, it will be re-calculated again
             //best-case scenario - DPI won't change and there will be no blinking at all
             window.Topmost = blazorWindow.Topmost;
+            window.ShowInTaskbar = blazorWindow.ShowInTaskbar;
             UpdateWindowBoundsFromMonitor();
 
             Observable
@@ -699,8 +699,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
             blazorWindow.windowTitle
                 .Listen()
+                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetWindowTitleCommand(x.Value)))
+                .AddTo(anchors);
+            
+            blazorWindow.showInTaskbar
+                .Listen()
+                .Skip(1)
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
+                .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x.Value)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
@@ -713,10 +721,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
             blazorWindow.WhenAnyValue(x => x.ResizeMode)
                 .Subscribe(x => observer.OnNext(new SetResizeMode(x)))
-                .AddTo(anchors);
-
-            blazorWindow.WhenAnyValue(x => x.ShowInTaskbar)
-                .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.IsClickThrough)
@@ -851,7 +855,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private NativeWindow CreateWindow()
     {
-        EnsureNotDisposed();
         uiScheduler.EnsureOnScheduler();
 
         var window = new NativeWindow(this)
@@ -859,7 +862,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             WindowStartupLocation = WindowStartupLocation,
         };
 
-        return window.AddTo(Anchors);
+        //do not add window to Anchors! It must be disposed by DisposeWindow command
+        return window;
     }
 
     private IntPtr WindowHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -1094,21 +1098,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             }.AddTo(Anchors);
             Content = ContentControl;
             Anchors.Add(() => Log.Debug("Disposed native window"));
-        }
-
-        protected override void OnLocationChanged(EventArgs e)
-        {
-            base.OnLocationChanged(e);
-        }
-
-        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
-        {
-            base.OnRenderSizeChanged(sizeInfo);
-        }
-
-        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
-        {
-            base.OnDpiChanged(oldDpi, newDpi);
         }
 
         public BlazorContentControl ContentControl { get; }
