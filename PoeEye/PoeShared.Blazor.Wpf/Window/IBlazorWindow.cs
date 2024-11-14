@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Windows;
+using Microsoft.Extensions.FileProviders;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf;
@@ -18,6 +20,11 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
     /// Gets or sets the data context which will be assigned to View.
     /// </summary>
     object ViewDataContext { get; set; }
+    
+    /// <summary>
+    /// Gets or sets list of additional files which will be included into browser
+    /// </summary>
+    ImmutableArray<IFileInfo> AdditionalFiles { get; set; }
 
     /// <summary>
     /// Gets or sets the startup location of the window.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reactive.Concurrency;
@@ -15,6 +16,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Microsoft.Extensions.FileProviders;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -275,6 +277,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         get => windowMaxHeight.State.Value;
         set => windowMaxHeight.SetValue(value, TrackedPropertyUpdateSource.External);
     }
+    
+    public ImmutableArray<IFileInfo> AdditionalFiles { get; set; }
 
     public IObservable<KeyEventArgs> WhenKeyDown { get; }
     public IObservable<KeyEventArgs> WhenKeyUp { get; }
@@ -1094,6 +1098,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             {
                 Container = this.owner.childContainer,
                 ViewType = typeof(BlazorWindowContent),
+                AdditionalFiles = owner.AdditionalFiles,
                 Content = owner
             }.AddTo(Anchors);
             Content = ContentControl;

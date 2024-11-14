@@ -8,7 +8,7 @@ namespace PoeShared.Blazor.Wpf;
 public sealed class InMemoryFileInfo : IFileInfo
 {
     private readonly byte[] fileBytes;
-
+    
     public InMemoryFileInfo(string fileName, byte[] fileBytes, DateTimeOffset lastModified)
     {
         Name = fileName;
@@ -26,8 +26,11 @@ public sealed class InMemoryFileInfo : IFileInfo
     public bool IsDirectory => false;
     
     public DateTimeOffset LastModified { get; }
+    
     public long Length => fileBytes.Length;
+    
     public string Name { get; }
+    
     public string PhysicalPath => null;
 
     public override string ToString()
