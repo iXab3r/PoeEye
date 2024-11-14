@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 // ReSharper disable RedundantOverriddenMember Some extra code in this class is expected to help with debugging/hooking/IL rewriting
 namespace PoeShared.Blazor;
@@ -44,15 +45,22 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         ComponentId = new ReactiveComponentId($"reactive-{Interlocked.Increment(ref globalIdx)}");
 
         logSupplier = new Lazy<IFluentLog>(PrepareLogger);
-        
-        WhenRefresh
-            .Do(x => Interlocked.Increment(ref refreshRequestCount))
-            .Sample(RefreshPeriod) //FIXME UI throttling
+
+        var refreshSource = this.WhenAnyValue(x => x.RefreshPeriod)
+            .Select(x =>
+            {
+                var rawSource = WhenRefresh
+                    .Do(_ => Interlocked.Increment(ref refreshRequestCount));
+                return x <= TimeSpan.Zero ? rawSource : rawSource.Sample(x);
+            })
+            .Switch()
             .Do(reason =>
             {
                 Interlocked.Increment(ref refreshCount);
                 Interlocked.Increment(ref unrenderedChangeCount);
-            })
+            });
+        
+        refreshSource
             .SubscribeAsync(async reason => await Refresh(reason), ex =>
             {
                 Log.Error("Component encountered an error and will no longer be refreshed", ex);
