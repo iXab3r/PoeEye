@@ -140,5 +140,9 @@ public record OSPath : IComparable
         }
         return isWindows ? ToWindowsPath(path) : ToUnixPath(path);
     }
-    
+
+    public override string ToString()
+    {
+        return FullName;
+    }
 }
