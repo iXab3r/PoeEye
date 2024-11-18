@@ -15,4 +15,9 @@ public static class SchedulerExtensions
     {
         return Observable.Start(action, scheduler).Wait();
     }
+    
+    public static async Task<T> RunAsync<T>(this IScheduler scheduler, Func<T> action)
+    {
+        return await Observable.Start(action, scheduler);
+    }
 }
