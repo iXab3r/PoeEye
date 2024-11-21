@@ -203,14 +203,23 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     }
 
     public Thickness Padding { get; set; } = new(2);
+    public Thickness BorderThickness { get; set; }
 
     public bool IsClickThrough { get; set; }
 
     public bool IsDebugMode { get; set; }
 
+    public bool ShowCloseButton { get; set; }
+
+    public bool ShowMinButton { get; set; }
+
+    public bool ShowMaxButton { get; set; }
+
     public double Opacity { get; set; } = 1;
 
     public Color BackgroundColor { get; set; } = DefaultBackgroundColor;
+
+    public Color BorderColor { get; set; }
 
     public bool IsVisible
     {
@@ -277,8 +286,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         get => windowMaxHeight.State.Value;
         set => windowMaxHeight.SetValue(value, TrackedPropertyUpdateSource.External);
     }
-    
-    public ImmutableArray<IFileInfo> AdditionalFiles { get; set; }
+
+    public ImmutableArray<IFileInfo> AdditionalFiles { get; set; } = ImmutableArray<IFileInfo>.Empty;
 
     public IObservable<KeyEventArgs> WhenKeyDown { get; }
     public IObservable<KeyEventArgs> WhenKeyUp { get; }
@@ -337,6 +346,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         EnqueueUpdate(new CloseCommand());
     }
 
+    public void EnsureCreated()
+    {
+        EnsureNotDisposed();
+        EnqueueUpdate(new EnsureWindowCreated());
+    }
+
     public IntPtr GetWindowHandle()
     {
         EnsureNotDisposed();
@@ -381,7 +396,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         if (!windowSupplier.IsValueCreated)
         {
             window = windowSupplier.Value;
-            SubscribeToWindow(window, this)
+            SubscribeToWindow(Log, window, this)
                 .Subscribe(x => { EnqueueUpdate(x); })
                 .AddTo(Anchors);
 
@@ -421,7 +436,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     continue;
                 }
 
-                Log.Debug($"Disposing the window: {new {window}}");
+                Log.Debug($"Disposing the window: {new { window }}");
                 window.Close();
                 window.Dispose();
             }
@@ -436,21 +451,40 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 var window = GetOrCreate();
                 switch (windowEvent)
                 {
+                    case EnsureWindowCreated command:
+                    {
+                        Log.Debug($"Ensured that window is created");
+                        break;
+                    }
+                    case SetVisibleCommand command:
+                    {
+                        Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
+                        if (command.IsVisible)
+                        {
+                            window.Show();
+                        }
+                        else
+                        {
+                            window.Hide();
+                        }
+
+                        break;
+                    }
                     case ShowCommand:
                     {
-                        Log.Debug($"Showing the window: {new {window.WindowState}}");
+                        Log.Debug($"Showing the window: {new { window.WindowState }}");
                         window.Show();
                         break;
                     }
                     case HideCommand:
                     {
-                        Log.Debug($"Hiding the window: {new {window.WindowState}}");
+                        Log.Debug($"Hiding the window: {new { window.WindowState }}");
                         window.Hide();
                         break;
                     }
                     case CloseCommand:
                     {
-                        Log.Debug($"Closing the window: {new {window.WindowState}}");
+                        Log.Debug($"Closing the window: {new { window.WindowState }}");
                         window.Close();
                         break;
                     }
@@ -488,11 +522,11 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
                         var showSystemBar = displayMode is TitleBarDisplayMode.System;
                         window.ShowTitleBar = showSystemBar;
-                        window.ShowMinButton = showSystemBar;
-                        window.ShowMaxRestoreButton = showSystemBar;
-                        window.ShowCloseButton = showSystemBar;
                         window.ShowSystemMenu = showSystemBar;
                         window.ShowSystemMenuOnRightClick = showSystemBar;
+                        window.ShowMinButton = showSystemBar && command.ShowMinButton;
+                        window.ShowMaxRestoreButton = showSystemBar && command.ShowMaxButton;
+                        window.ShowCloseButton = showSystemBar && command.ShowCloseButton;
                         break;
                     }
                     case SetWindowPadding command:
@@ -534,16 +568,24 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         window.Background = color;
                         break;
                     }
+                    case SetBorderColor command:
+                    {
+                        Log.Debug($"Updating {nameof(BorderColor)} to {command.BorderColor}");
+                        var color = new SolidColorBrush(command.BorderColor);
+                        color.Freeze();
+                        window.BorderBrush = color;
+                        break;
+                    }
+                    case SetBorderThickness command:
+                    {
+                        Log.Debug($"Updating {nameof(BorderThickness)} to {command.BorderThickness}");
+                        window.BorderThickness = command.BorderThickness;
+                        break;
+                    }
                     case SetTopmostCommand command:
                     {
                         Log.Debug($"Updating {nameof(Topmost)} to {command.Topmost}");
                         window.Topmost = command.Topmost;
-                        break;
-                    }
-                    case SetVisibleCommand command:
-                    {
-                        Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
-                        UnsafeNative.ShowWindow(window.WindowHandle, command.IsVisible ? User32.WindowShowStyle.SW_SHOW : User32.WindowShowStyle.SW_HIDE);
                         break;
                     }
                     default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
@@ -587,7 +629,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         }
     }
 
-    private static IObservable<IWindowEvent> SubscribeToWindow(NativeWindow window, BlazorWindow blazorWindow)
+    private static IObservable<IWindowEvent> SubscribeToWindow(IFluentLog log, NativeWindow window, BlazorWindow blazorWindow)
     {
         return Observable.Create<IWindowEvent>(observer =>
         {
@@ -599,7 +641,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             //best-case scenario - DPI won't change and there will be no blinking at all
             window.Topmost = blazorWindow.Topmost;
             window.ShowInTaskbar = blazorWindow.ShowInTaskbar;
-            UpdateWindowBoundsFromMonitor();
+            UpdateWindowBoundsFromMonitor(IntPtr.Zero);
 
             Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => window.SourceInitialized += h, h => window.SourceInitialized -= h)
@@ -607,19 +649,33 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 {
                     try
                     {
-                        var source = (HwndSource) PresentationSource.FromVisual(window);
-                        if (source == null)
+                        var windowHandle = window.WindowHandle;
+                        if (windowHandle == IntPtr.Zero)
                         {
                             throw new InvalidOperationException("HwndSource must be initialized at this point");
                         }
 
-                        var compositionTarget = source.CompositionTarget;
-                        if (compositionTarget == null)
-                        {
-                            throw new InvalidOperationException("CompositionTarget must be initialized at this point");
-                        }
+                        UpdateWindowBoundsFromMonitor(windowHandle);
+                    }
+                    catch (Exception e)
+                    {
+                        blazorWindow.Log.Warn("Failed to reposition window on SourceInitialized", e);
+                        throw;
+                    }
+                })
+                .AddTo(anchors);
 
-                        UpdateWindowBounds(scaleX: 1 / compositionTarget.TransformToDevice.M11, 1 / compositionTarget.TransformToDevice.M22);
+            Observable
+                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
+                .Subscribe(() =>
+                {
+                    try
+                    {
+                        var source = (HwndSource)PresentationSource.FromVisual(window);
+                        if (source == null)
+                        {
+                            throw new InvalidOperationException("HwndSource must be initialized at this point");
+                        }
 
                         source.AddHook(blazorWindow.WindowHook);
                         Disposable.Create(() =>
@@ -689,30 +745,26 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
             blazorWindow.windowTopmost
                 .Listen()
-                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetTopmostCommand(x.Value)))
                 .AddTo(anchors);
 
-            blazorWindow.windowVisible
-                .Listen()
-                .Skip(1)
-                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
-                .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
-                .AddTo(anchors);
-
             blazorWindow.windowTitle
                 .Listen()
-                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetWindowTitleCommand(x.Value)))
                 .AddTo(anchors);
-            
+
             blazorWindow.showInTaskbar
                 .Listen()
-                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x.Value)))
+                .AddTo(anchors);
+
+            blazorWindow.windowVisible
+                .Listen()
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
+                .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
@@ -721,6 +773,14 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
             blazorWindow.WhenAnyValue(x => x.BackgroundColor)
                 .Subscribe(x => observer.OnNext(new SetBackgroundColor(x)))
+                .AddTo(anchors);
+
+            blazorWindow.WhenAnyValue(x => x.BorderColor)
+                .Subscribe(x => observer.OnNext(new SetBorderColor(x)))
+                .AddTo(anchors);
+
+            blazorWindow.WhenAnyValue(x => x.BorderThickness)
+                .Subscribe(x => observer.OnNext(new SetBorderThickness(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.ResizeMode)
@@ -735,8 +795,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => observer.OnNext(new SetOpacity(x)))
                 .AddTo(anchors);
 
-            blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode)
-                .Subscribe(x => { observer.OnNext(new SetShowTitleBarCommand(x)); })
+
+            Observable.CombineLatest(
+                    blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode),
+                    blazorWindow.WhenAnyValue(x => x.ShowCloseButton), 
+                    blazorWindow.WhenAnyValue(x => x.ShowMinButton),
+                    blazorWindow.WhenAnyValue(x => x.ShowMaxButton),
+                    (titleBarDisplayMode, showCloseButton, showMinButton, showMaxButton) => 
+                        new SetShowTitleBarCommand(titleBarDisplayMode, ShowCloseButton: showCloseButton, ShowMinButton: showMinButton, ShowMaxButton: showMaxButton)
+                )
+                .Subscribe(x => { observer.OnNext(x); })
                 .AddTo(anchors);
 
             // events propagation
@@ -798,10 +866,25 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => blazorWindow.Deactivated?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
 
+            var interop = new WindowInteropHelper(window);
+            var windowHandle = interop.EnsureHandle();
+            if (windowHandle == IntPtr.Zero)
+            {
+                throw new InvalidStateException("Failed to get created window handle");
+            }
+
+            if (window.WindowHandle == IntPtr.Zero)
+            {
+                throw new InvalidStateException("Created window handle is zero");
+            }
+
+            log.AddSuffix($"Wnd {windowHandle.ToHexadecimal()}");
+            log.Debug($"Created new window");
+
             return anchors;
         });
 
-        void UpdateWindowBoundsFromMonitor()
+        void UpdateWindowBoundsFromMonitor(IntPtr hwnd)
         {
             try
             {
@@ -812,7 +895,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     return;
                 }
 
-                var desktopMonitor = User32.MonitorFromWindow(IntPtr.Zero, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+                var desktopMonitor = User32.MonitorFromWindow(hwnd, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
                 if (desktopMonitor == IntPtr.Zero)
                 {
                     blazorWindow.Log.Warn($"Failed to set initial window position - could not find desktop monitor");
@@ -879,7 +962,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
         try
         {
-            var msg = (User32.WindowMessage) msgRaw;
+            var msg = (User32.WindowMessage)msgRaw;
             switch (msg)
             {
                 case User32.WindowMessage.WM_SHOWWINDOW:
@@ -984,6 +1067,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed record HideCommand : IWindowCommand;
 
+    private sealed record EnsureWindowCreated : IWindowCommand;
+
     private sealed record CloseCommand : IWindowCommand;
 
     private sealed record DisposeWindowCommand : IWindowCommand;
@@ -1004,7 +1089,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed record SetResizeMode(ResizeMode ResizeMode) : IWindowCommand;
 
-    private sealed record SetShowTitleBarCommand(TitleBarDisplayMode TitleBarDisplayMode) : IWindowCommand;
+    private sealed record SetShowTitleBarCommand(TitleBarDisplayMode TitleBarDisplayMode, bool ShowCloseButton, bool ShowMinButton, bool ShowMaxButton) : IWindowCommand;
 
     private sealed record SetShowInTaskbar(bool ShowInTaskbar) : IWindowCommand;
 
@@ -1013,6 +1098,10 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record SetOpacity(double Opacity) : IWindowCommand;
 
     private sealed record SetBackgroundColor(Color BackgroundColor) : IWindowCommand;
+
+    private sealed record SetBorderColor(Color BorderColor) : IWindowCommand;
+
+    private sealed record SetBorderThickness(Thickness BorderThickness) : IWindowCommand;
 
     private sealed record IsVisibleChangedEvent(bool IsVisible) : IWindowEvent;
 

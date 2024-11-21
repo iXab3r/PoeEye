@@ -96,13 +96,13 @@ public class ReactiveMetroWindowBase : MetroWindow, IDisposableReactiveObject
 
     protected override void OnSourceInitialized(EventArgs e)
     {
-        base.OnSourceInitialized(e);
-
         WindowHandle = new WindowInteropHelper(this).EnsureHandle(); // should be already available here
         if (WindowHandle == IntPtr.Zero)
         {
             throw new InvalidStateException("Window handle must be initialized at this point");
         }
+        
+        base.OnSourceInitialized(e);
 
         var behaviors = Interaction.GetBehaviors(this);
         Log.Debug($"Default behaviors: {behaviors.DumpToString()}");

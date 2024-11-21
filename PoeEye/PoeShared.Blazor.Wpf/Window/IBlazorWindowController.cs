@@ -61,6 +61,21 @@ public interface IBlazorWindowController
     /// Gets or sets a value indicating whether the window should remain on top of other windows.
     /// </summary>
     bool Topmost { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the window should have close button.
+    /// </summary>
+    bool ShowCloseButton { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the window should have minimize button.
+    /// </summary>
+    bool ShowMinButton { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the window should have maximize button.
+    /// </summary>
+    bool ShowMaxButton { get; set; }
 
     /// <summary>
     /// Gets or sets the horizontal position of the window.
@@ -106,6 +121,16 @@ public interface IBlazorWindowController
     /// Gets or sets background color of the window. Can use transparent to hide bg entirely.
     /// </summary>
     Color BackgroundColor { get; set; }
+    
+    /// <summary>
+    /// Gets or sets border color of the window. 
+    /// </summary>
+    Color BorderColor { get; set; }
+    
+    /// <summary>
+    /// Gets or sets border thickness of the window. 
+    /// </summary>
+    Thickness BorderThickness { get; set; }
 
     /// <summary>
     /// Observable sequence for when a key is pressed while the window has focus.
@@ -216,4 +241,9 @@ public interface IBlazorWindowController
     /// Closes the window, releasing all associated resources.
     /// </summary>
     void Close();
+
+    /// <summary>
+    /// Ensures that window is created by this time
+    /// </summary>
+    void EnsureCreated();
 }
