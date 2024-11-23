@@ -106,8 +106,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         windowVisible = new PropertyValueHolder<bool>(this, nameof(IsVisible)).AddTo(Anchors);
         showInTaskbar = new PropertyValueHolder<bool>(this, nameof(ShowInTaskbar)).AddTo(Anchors);
 
+        ShowInTaskbar = true;
         Width = 300;
         Height = 200;
+        ShowMinButton = true;
+        ShowMaxButton = true;
+        ShowCloseButton = true;
 
         WhenKeyDown =
             Observable
@@ -806,6 +810,10 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             
             blazorWindow.WhenAnyValue(x => x.AdditionalFileProvider)
                 .Subscribe(x => observer.OnNext(new SetBlazorFileProvider(x)))
+                .AddTo(anchors);  
+            
+            blazorWindow.WhenAnyValue(x => x.AdditionalFiles)
+                .Subscribe(x => observer.OnNext(new SetBlazorAdditionalFiles(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
