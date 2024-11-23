@@ -22,6 +22,7 @@ using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using ReactiveUI;
 using Unity;
@@ -33,6 +34,7 @@ namespace PoeShared.Blazor.Wpf;
 
 internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
 {
+    private readonly IUnityContainer unityContainer;
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
     private readonly Lazy<NativeWindow> windowSupplier;
 
@@ -55,14 +57,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly IScheduler uiScheduler;
     private readonly ManualResetEventSlim isClosed = new(false);
-    private readonly IUnityContainer childContainer;
 
     public BlazorWindow(IUnityContainer unityContainer, [OptionalDependency] IScheduler uiScheduler = default)
     {
         Log.AddSuffix($"BWnd#{windowId}");
         Log.Debug("New window is created");
-        childContainer = unityContainer.CreateChildContainer().AddTo(Anchors);
-        childContainer.RegisterSingleton<IBlazorWindowController>(_ => this);
+        this.unityContainer = unityContainer;
 
         this.uiScheduler = uiScheduler ?? SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
@@ -190,6 +190,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     public object ViewDataContext { get; set; }
 
+    public IUnityContainer Container { get; set; }
+
     public WindowStartupLocation WindowStartupLocation { get; set; }
 
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
@@ -288,6 +290,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     }
 
     public ImmutableArray<IFileInfo> AdditionalFiles { get; set; } = ImmutableArray<IFileInfo>.Empty;
+    
+    public IFileProvider AdditionalFileProvider { get; set; }
 
     public IObservable<KeyEventArgs> WhenKeyDown { get; }
     public IObservable<KeyEventArgs> WhenKeyUp { get; }
@@ -308,6 +312,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     public event EventHandler Deactivated;
     public event EventHandler Loaded;
     public event EventHandler Closed;
+    
+    public void ShowDevTools()
+    {
+        Log.Debug("Enqueueing ShowDevTools command");
+        EnqueueUpdate(new ShowDevToolsCommand());
+    }
 
     public void Hide()
     {
@@ -481,6 +491,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         Log.Debug($"Hiding the window: {new { window.WindowState }}");
                         window.Hide();
                         break;
+                    } 
+                    case ShowDevToolsCommand:
+                    {
+                        Log.Debug($"Showing dev tools");
+                        window.ContentControl.OpenDevTools().AndForget();
+                        break;
                     }
                     case CloseCommand:
                     {
@@ -588,6 +604,24 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         window.Topmost = command.Topmost;
                         break;
                     }
+                    case SetBlazorUnityContainer command:
+                    {
+                        Log.Debug($"Updating {nameof(Container)} to {command.ChildContainer}");
+                        window.ContentControl.Container = command.ChildContainer;
+                        break;
+                    }
+                    case SetBlazorFileProvider command:
+                    {
+                        Log.Debug($"Updating {nameof(AdditionalFileProvider)} to {command.FileProvider}");
+                        window.ContentControl.AdditionalFileProvider = command.FileProvider;
+                        break;
+                    } 
+                    case SetBlazorAdditionalFiles command:
+                    {
+                        Log.Debug($"Updating {nameof(AdditionalFiles)} to {command.AdditionalFiles}");
+                        window.ContentControl.AdditionalFiles = command.AdditionalFiles;
+                        break;
+                    }
                     default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
                 }
             }
@@ -665,8 +699,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 })
                 .AddTo(anchors);
 
-            Observable
-                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
+            window.WhenLoaded()
                 .Subscribe(() =>
                 {
                     try
@@ -766,6 +799,14 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
                 .AddTo(anchors);
+            
+            blazorWindow.WhenAnyValue(x => x.Container)
+                .Subscribe(x => observer.OnNext(new SetBlazorUnityContainer(x)))
+                .AddTo(anchors);
+            
+            blazorWindow.WhenAnyValue(x => x.AdditionalFileProvider)
+                .Subscribe(x => observer.OnNext(new SetBlazorFileProvider(x)))
+                .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
                 .Subscribe(x => observer.OnNext(new SetWindowPadding(x)))
@@ -787,21 +828,26 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => observer.OnNext(new SetResizeMode(x)))
                 .AddTo(anchors);
 
-            blazorWindow.WhenAnyValue(x => x.IsClickThrough)
-                .Subscribe(x => observer.OnNext(new SetIsClickThrough(x)))
-                .AddTo(anchors);
+            window.WhenLoaded()
+                .Subscribe(() =>
+                {
+                    //to avoid System.InvalidOperationException: Transparent mode requires AllowsTransparency to be set to True
+                    blazorWindow.WhenAnyValue(x => x.IsClickThrough)
+                        .Subscribe(x => observer.OnNext(new SetIsClickThrough(x)))
+                        .AddTo(anchors);
 
-            blazorWindow.WhenAnyValue(x => x.Opacity)
-                .Subscribe(x => observer.OnNext(new SetOpacity(x)))
+                    blazorWindow.WhenAnyValue(x => x.Opacity)
+                        .Subscribe(x => observer.OnNext(new SetOpacity(x)))
+                        .AddTo(anchors);
+                })
                 .AddTo(anchors);
-
 
             Observable.CombineLatest(
                     blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode),
-                    blazorWindow.WhenAnyValue(x => x.ShowCloseButton), 
+                    blazorWindow.WhenAnyValue(x => x.ShowCloseButton),
                     blazorWindow.WhenAnyValue(x => x.ShowMinButton),
                     blazorWindow.WhenAnyValue(x => x.ShowMaxButton),
-                    (titleBarDisplayMode, showCloseButton, showMinButton, showMaxButton) => 
+                    (titleBarDisplayMode, showCloseButton, showMinButton, showMaxButton) =>
                         new SetShowTitleBarCommand(titleBarDisplayMode, ShowCloseButton: showCloseButton, ShowMinButton: showMinButton, ShowMaxButton: showMaxButton)
                 )
                 .Subscribe(x => { observer.OnNext(x); })
@@ -1066,6 +1112,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record ShowCommand : IWindowCommand;
 
     private sealed record HideCommand : IWindowCommand;
+    
+    private sealed record ShowDevToolsCommand : IWindowCommand;
 
     private sealed record EnsureWindowCreated : IWindowCommand;
 
@@ -1102,6 +1150,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record SetBorderColor(Color BorderColor) : IWindowCommand;
 
     private sealed record SetBorderThickness(Thickness BorderThickness) : IWindowCommand;
+    
+    private sealed record SetBlazorUnityContainer(IUnityContainer ChildContainer) : IWindowCommand;
+    
+    private sealed record SetBlazorFileProvider(IFileProvider FileProvider) : IWindowCommand;
+    
+    private sealed record SetBlazorAdditionalFiles(ImmutableArray<IFileInfo> AdditionalFiles) : IWindowCommand;
 
     private sealed record IsVisibleChangedEvent(bool IsVisible) : IWindowEvent;
 
@@ -1183,17 +1237,38 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         public NativeWindow(BlazorWindow owner)
         {
             this.owner = owner;
+
+            owner
+                .WhenAnyValue(x => x.Container)
+                .Select(x => x ?? owner.unityContainer)
+                .Subscribe(x => ParentContainer = x)
+                .AddTo(Anchors);
+            
+            this.WhenAnyValue(x => x.ParentContainer)
+                .Subscribe(parentContainer =>
+                {
+                    var childContainer = parentContainer.CreateChildContainer().AddTo(Anchors);
+                    childContainer.RegisterSingleton<IBlazorWindowController>(_ => this);
+                    ChildContainer = childContainer;
+                })
+                .AddTo(Anchors);
+            
             ContentControl = new BlazorContentControl()
             {
-                Container = this.owner.childContainer,
+                Container = ChildContainer,
                 ViewType = typeof(BlazorWindowContent),
-                AdditionalFiles = owner.AdditionalFiles,
                 Content = owner
             }.AddTo(Anchors);
             Content = ContentControl;
+            AllowsTransparency = true;
+            
             Anchors.Add(() => Log.Debug("Disposed native window"));
         }
 
         public BlazorContentControl ContentControl { get; }
+
+        public IUnityContainer ChildContainer { get; private set; }
+        
+        public IUnityContainer ParentContainer { get; private set; }
     }
 }

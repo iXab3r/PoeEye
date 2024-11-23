@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -30,6 +30,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 
     protected CompositeDisposable Anchors { get; } = new();
     private WebView2Ex webView2Ex;
+    private readonly ProxyFileProvider proxyFileProvider = new();
 
     public BlazorWebViewEx()
     {
@@ -49,6 +50,12 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         
         this.BlazorWebViewInitializing += OnBlazorWebViewInitializing;
         this.BlazorWebViewInitialized += OnBlazorWebViewInitialized;
+    }
+        
+    public IFileProvider FileProvider
+    {
+        get => proxyFileProvider.FileProvider;
+        set => proxyFileProvider.FileProvider = value;
     }
 
     public override void OnApplyTemplate()
@@ -140,15 +147,12 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.State = CoreWebView2PermissionState.Allow;
     }
 
-
-    public InMemoryFileProvider FileProvider { get; } = new();
-
     public override IFileProvider CreateFileProvider(string contentRootDir)
     {
         var contentRoot = new DirectoryInfo(contentRootDir);
         Log.Debug($"Initializing content provider @ {contentRoot}");
         var staticFilesProvider = StaticFilesProvidersByPath.GetOrAdd(contentRoot.FullName, _ => new CachingFileProvider(contentRoot));
-        return new CompositeFileProvider(FileProvider, staticFilesProvider);
+        return new CompositeFileProvider(proxyFileProvider, staticFilesProvider);
     }
 
     public async Task<BitmapSource> TakeScreenshotAsBitmapSource()

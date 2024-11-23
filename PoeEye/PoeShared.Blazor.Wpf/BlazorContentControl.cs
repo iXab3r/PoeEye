@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,6 +47,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public static readonly DependencyProperty AdditionalFilesProperty = DependencyProperty.Register(
         nameof(AdditionalFiles), typeof(IEnumerable<IFileInfo>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<IFileInfo>)));
+    
+    public static readonly DependencyProperty AdditionalFileProviderProperty = DependencyProperty.Register(
+        nameof(AdditionalFileProvider), typeof(IFileProvider), typeof(BlazorContentControl), new PropertyMetadata(default(IFileProvider)));
 
     public static readonly DependencyProperty EnableHotkeysProperty = DependencyProperty.Register(
         nameof(EnableHotkeys), typeof(bool), typeof(BlazorContentControl), new PropertyMetadata(true));
@@ -119,8 +122,11 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         var unityContainerSource = this.WhenAnyValue(x => x.Container)
             .Select(x => x ?? UnityServiceCollection.Instance.BuildServiceProvider().GetService<IUnityContainer>());
 
-        this.WhenAnyValue(x => x.ViewType)
-            .CombineLatest(unityContainerSource, (viewType, container) => new {viewType, container})
+        Observable.CombineLatest(
+                this.WhenAnyValue(x => x.ViewType), 
+                this.WhenAnyValue(x => x.AdditionalFileProvider), 
+                unityContainerSource, 
+                (viewType, additionalFileProvider, container) => new {viewType, additionalFileProvider, container})
             .ObserveOnDispatcher()
             .SubscribeAsync(async state =>
             {
@@ -131,7 +137,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 Disposable.Create(() => Log.Debug("Content is being disposed")).AddTo(contentAnchors);
 
-                WebView.FileProvider.FilesByName.Clear();
+                var inMemoryFileProvider = new InMemoryFileProvider();
+                var proxyFileProvider = new ProxyFileProvider(){ FileProvider = state.additionalFileProvider };
+                WebView.FileProvider = new CompositeFileProvider(inMemoryFileProvider, proxyFileProvider);
 
                 if (UnhandledException != null)
                 {
@@ -189,7 +197,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                                 continue;
                             }
 
-                            WebView.FileProvider.FilesByName.AddOrUpdate(file);
+                            inMemoryFileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
 
@@ -206,7 +214,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     }
 
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
-                    WebView.FileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
+                    inMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
                     if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
                     {
@@ -256,6 +264,12 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     {
         get => (IEnumerable<IFileInfo>) GetValue(AdditionalFilesProperty);
         set => SetValue(AdditionalFilesProperty, value);
+    }
+
+    public IFileProvider AdditionalFileProvider
+    {
+        get => (IFileProvider)GetValue(AdditionalFileProviderProperty);
+        set => SetValue(AdditionalFileProviderProperty, value);
     }
 
     public bool EnableHotkeys
