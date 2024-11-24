@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using App.Metrics;
 using DynamicData;
 using PoeShared.Logging;
 using PoeShared.Prism;

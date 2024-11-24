@@ -1,6 +1,4 @@
-﻿using App.Metrics;
-
-namespace PoeShared.Logging;
+﻿namespace PoeShared.Logging;
 
 internal sealed class FluentLogBuilder : IFluentLog
 {
@@ -14,8 +12,6 @@ internal sealed class FluentLogBuilder : IFluentLog
 
     ILogWriter IFluentLog.Writer => logWriter;
         
-    public IMetrics Metrics => App.Metrics.Metrics.Instance ?? throw new InvalidOperationException("Metrics are not initialized yet");
-
     public bool IsDebugEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Debug || logWriter.IsDebugEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Debug;
 
     public bool IsInfoEnabled =>  Data.MinLogLevelOverride is <= FluentLogLevel.Info || logWriter.IsInfoEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Info;

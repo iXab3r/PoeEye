@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.PlatformServices;
 using Microsoft.Extensions.Internal;
 
 namespace PoeShared.Blazor.Services;

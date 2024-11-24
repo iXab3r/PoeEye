@@ -1,13 +1,11 @@
 using System;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using App.Metrics;
-using JetBrains.Annotations;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
 using PropertyBinder;

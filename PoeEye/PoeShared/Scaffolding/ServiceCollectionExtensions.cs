@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using PoeShared.Caching;
-using PoeShared.Modularity;
 using PoeShared.Prism;
 
 namespace PoeShared.Scaffolding;

@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Primitives;
 
 namespace PoeShared.Scaffolding;
 

@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Windows;
-using App.Metrics;
 using CommandLine;
 using PInvoke;
 using PoeShared.Modularity;
@@ -98,9 +97,6 @@ public abstract class ApplicationBase : Application
             var erService = Container.Resolve<IErrorReportingService>();
             Log.Debug($"Error reporting service: {erService}");
 
-            var metrics = Container.Resolve<IMetricsRoot>();
-            Log.Debug($"UI Metrics: {metrics}");
-            
             var applicationAccessor = Container.Resolve<IApplicationAccessor>();
             Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
             applicationAccessor.WhenExit.Subscribe(OnExit).AddTo(Anchors);

@@ -1,4 +1,5 @@
-﻿using DynamicData;
+﻿using System.Reactive.PlatformServices;
+using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Services;
@@ -23,6 +24,6 @@ public sealed class BlazorWebRegistrations : UnityContainerExtension
         
         UnityServiceCollection.Instance.AddBlazorUtils(Container);
 
-        Container.RegisterSingleton<Microsoft.Extensions.Internal.ISystemClock, MicrosoftExtensionsSystemClock>();
+        Container.RegisterSingleton<ISystemClock, MicrosoftExtensionsSystemClock>();
     }
 }

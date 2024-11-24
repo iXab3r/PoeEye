@@ -1,6 +1,4 @@
-﻿using App.Metrics;
-
-namespace PoeShared.Logging;
+﻿namespace PoeShared.Logging;
 
 /// <summary>
 ///     A fluent <see langword="interface" /> to build log messages.
@@ -11,8 +9,6 @@ public interface IFluentLog
         
     internal ILogWriter Writer { get; }
         
-    IMetrics Metrics { get; }
-
     bool IsDebugEnabled { get; }
 
     bool IsInfoEnabled { get; }

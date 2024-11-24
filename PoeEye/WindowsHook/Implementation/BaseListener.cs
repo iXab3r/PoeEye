@@ -4,9 +4,6 @@
 
 using System;
 using System.Reactive.Disposables;
-using App.Metrics;
-using App.Metrics.Counter;
-using App.Metrics.Timer;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using WindowsHook.WinApi;

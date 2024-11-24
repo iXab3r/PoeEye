@@ -1,14 +1,11 @@
 ﻿using System.IO.Abstractions;
-using App.Metrics;
 using Microsoft.Extensions.Logging;
 using PoeShared.Bindings;
 using PoeShared.Caching;
-using PoeShared.Evaluators;
 using PoeShared.Modularity;
 using PoeShared.Services;
 using Unity;
 using Unity.Extension;
-using Unity.Lifetime;
 
 namespace PoeShared.Prism;
 
@@ -48,15 +45,6 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<ICsharpExpressionParser>(x => CsharpExpressionParser.Instance)
             .RegisterSingleton<IMemoryPool>(x => MemoryPool.Shared);
             
-        Container
-            .RegisterSingleton<IMetricsRoot>(x =>
-            {
-                var appArguments = x.Resolve<IAppArguments>();
-                MetricsService.Instance.Initialize(appArguments);
-                return MetricsService.Instance.Metrics;
-            })
-            .RegisterSingleton<IMetrics>(x => x.Resolve<IMetricsRoot>());
-
         Container
             .RegisterType(typeof(IFactory<,,,,,>), typeof(Factory<,,,,,>))
             .RegisterType(typeof(IFactory<,,,,>), typeof(Factory<,,,,>))

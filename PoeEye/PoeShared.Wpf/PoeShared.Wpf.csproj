@@ -15,7 +15,6 @@
     <NoWarn>CA1416;NU1701;CS0649;CS0414;CS1998;UA306_A;UA306_A4;UA306_A2;CS1591;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="App.Metrics" Version="4.2.0" />
     <PackageReference Include="AutoCompleteTextBox" Version="1.2.3" />
     <PackageReference Include="BidirectionalMap" Version="1.0.0" />
     <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0">

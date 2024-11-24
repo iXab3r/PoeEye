@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.ObjectModel;
-using System.Reactive.Subjects;
 using System.Reflection;
 using AutoFixture;
-using Microsoft.AspNetCore.Mvc;
 using PoeShared.Blazor;
 using PoeShared.Blazor.Services;
 using PoeShared.Services;
