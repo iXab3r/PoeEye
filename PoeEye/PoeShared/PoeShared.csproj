@@ -40,9 +40,6 @@
         <PackageReference Include="System.Reactive" Version="6.0.1" />
         <PackageReference Include="CompareNETObjects" Version="4.83.0" />
         <PackageReference Include="System.Threading.Channels" Version="8.0.0" />
-        <PackageReference Include="TestableIO.System.IO.Abstractions" Version="19.2.26" />
-        <PackageReference Include="TestableIO.System.IO.Abstractions.Extensions" Version="1.0.42" />
-        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.26" />
         <PackageReference Include="Unity" Version="5.11.5" />
         <PackageReference Include="Unity.Abstractions" Version="5.11.5" />
         <PackageReference Include="Unity.Container" Version="5.11.5" />

@@ -1,5 +1,4 @@
-﻿using System.IO.Abstractions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PoeShared.Bindings;
 using PoeShared.Caching;
 using PoeShared.Modularity;
@@ -39,7 +38,6 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
             .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
-            .RegisterSingleton<IFileSystem, FileSystem>()
             .RegisterSingleton<IAssemblyTracker>(x => IAssemblyTracker.Instance)
             .RegisterSingleton<ISleepController>(x => SleepController.Instance)
             .RegisterSingleton<ICsharpExpressionParser>(x => CsharpExpressionParser.Instance)

@@ -1,9 +1,7 @@
 using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Threading.Tasks;
-using DynamicData;
 using JetBrains.Annotations;
-using Polly;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding;
