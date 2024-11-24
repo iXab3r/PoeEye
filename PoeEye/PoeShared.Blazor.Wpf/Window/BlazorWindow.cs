@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -23,6 +24,7 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.Services;
 using PoeShared.UI;
 using ReactiveUI;
 using Unity;
@@ -34,8 +36,9 @@ namespace PoeShared.Blazor.Wpf;
 
 internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
 {
-    private readonly IUnityContainer unityContainer;
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
+
+    private readonly IUnityContainer unityContainer;
     private readonly Lazy<NativeWindow> windowSupplier;
 
     private readonly long windowId = BlazorWindowCounter.GetNext();
@@ -58,7 +61,9 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private readonly IScheduler uiScheduler;
     private readonly ManualResetEventSlim isClosed = new(false);
 
-    public BlazorWindow(IUnityContainer unityContainer, [OptionalDependency] IScheduler uiScheduler = default)
+    public BlazorWindow(
+        IUnityContainer unityContainer, 
+        [OptionalDependency] IScheduler uiScheduler = default)
     {
         Log.AddSuffix($"BWnd#{windowId}");
         Log.Debug("New window is created");
@@ -945,14 +950,14 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 if (!UnsafeNative.IsWindows10OrGreater())
                 {
                     // SHCore is supported only on Win8.1+, it's safer to fallback to Win10
-                    blazorWindow.Log.Warn($"Failed to set initial window position - OS is not supported");
+                    log.Warn($"Failed to set initial window position - OS is not supported");
                     return;
                 }
 
                 var desktopMonitor = User32.MonitorFromWindow(hwnd, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
                 if (desktopMonitor == IntPtr.Zero)
                 {
-                    blazorWindow.Log.Warn($"Failed to set initial window position - could not find desktop monitor");
+                    log.Warn($"Failed to set initial window position - could not find desktop monitor");
                     return;
                 }
 
@@ -960,19 +965,20 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     SHCore.GetDpiForMonitor(desktopMonitor, MONITOR_DPI_TYPE.MDT_DEFAULT, out var dpiX, out var dpiY);
                 if (dpiResult.Failed)
                 {
-                    blazorWindow.Log.Warn($"Failed to GetDpiForMonitor and set initial window position, hrResult: {dpiResult}");
+                    log.Warn($"Failed to GetDpiForMonitor and set initial window position, hrResult: {dpiResult}");
                     return;
                 }
 
-                UpdateWindowBounds(scaleX: 96d / dpiX, scaleY: 96d / dpiY);
+                SetWindowStartupLocation(hwnd, blazorWindow.WindowStartupLocation);
+                AssignWindowBounds(scaleX: 96d / dpiX, scaleY: 96d / dpiY);
             }
             catch (Exception e)
             {
-                blazorWindow.Log.Warn("Failed to set initial window position", e);
+                log.Warn("Failed to set initial window position", e);
             }
         }
 
-        void UpdateWindowBounds(double scaleX, double scaleY)
+        void AssignWindowBounds(double scaleX, double scaleY)
         {
             var desiredWidth = blazorWindow.Width * scaleX;
             if (!double.IsFinite(window.Width) || Math.Abs(desiredWidth - window.Width) > 0.5)
@@ -986,10 +992,89 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 window.Height = desiredHeight;
             }
 
-            if (blazorWindow.WindowStartupLocation is WindowStartupLocation.Manual)
+            var desiredLeft = blazorWindow.Left * scaleX;
+            if (!double.IsFinite(window.Left) || Math.Abs(desiredLeft -  window.Left) > 0.5)
             {
-                window.Left = blazorWindow.Left * scaleX;
-                window.Top = blazorWindow.Top * scaleY;
+                window.Left = desiredLeft;
+            }
+            
+            var desiredTop = blazorWindow.Top * scaleY;
+            if (!double.IsFinite(window.Top) || Math.Abs(desiredTop -  window.Top) > 0.5)
+            {
+                window.Top = desiredTop;
+            }
+        }
+
+        void CenterWindowWithin(Rectangle monitorBounds)
+        {
+            var left = monitorBounds.X + (monitorBounds.Width - blazorWindow.Width) / 2;
+            if (left != blazorWindow.Left)
+            {
+                blazorWindow.Left = left;
+            }
+            var top = monitorBounds.Y + (monitorBounds.Height - blazorWindow.Height) / 2;
+            if (top != blazorWindow.Top)
+            {
+                blazorWindow.Top = top;
+            }
+        }
+        
+        void SetWindowStartupLocation(IntPtr hwnd, WindowStartupLocation startupLocation)
+        {
+            switch (startupLocation)
+            {
+                case WindowStartupLocation.CenterScreen:
+                {
+                    var desktopMonitor = User32.MonitorFromWindow(hwnd, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+                    if (desktopMonitor == IntPtr.Zero)
+                    {
+                        blazorWindow.Log.Warn($"Failed to set initial window size - could not find desktop monitor");
+                        break;
+                    }
+
+                    if (!User32.GetWindowRect(desktopMonitor, out var monitorRect))
+                    {
+                        log.Warn($"Failed to set initial window size - could not get rect of desktop monitor {desktopMonitor.ToHexadecimal()}");
+                        break;
+                    }
+
+                    var monitorBounds = Rectangle.FromLTRB(monitorRect.left, monitorRect.top, monitorRect.right, monitorRect.bottom);
+                    log.Debug($"Centering window within monitor {monitorBounds}");
+                    CenterWindowWithin(monitorBounds);
+                    break;
+                }
+                case WindowStartupLocation.CenterOwner:
+                {
+                    IntPtr owner;
+                    try
+                    {
+                        var currentProcess = Process.GetCurrentProcess();
+                        owner = currentProcess.MainWindowHandle;
+                    }
+                    catch (Exception e)
+                    {
+                        log.Warn("Failed to find main window of the current process", e);
+                        owner = IntPtr.Zero;
+                    }
+
+                    if (owner == IntPtr.Zero)
+                    {
+                        log.Warn("Owner handle is not set, centering within screen");
+                        SetWindowStartupLocation(hwnd, WindowStartupLocation.CenterScreen);
+                        break;
+                    }
+                    
+                    if (!User32.GetWindowRect(owner, out var windowRect))
+                    {
+                        log.Warn($"Failed to set initial window size - could not get rect of owner window {owner.ToHexadecimal()}");
+                        break;
+                    }
+                    
+                    var windowBounds = Rectangle.FromLTRB(windowRect.left, windowRect.top, windowRect.right, windowRect.bottom);
+                    log.Debug($"Centering window within window bounds {windowBounds}");
+                    CenterWindowWithin(windowBounds);
+                    break;
+                }
             }
         }
     }

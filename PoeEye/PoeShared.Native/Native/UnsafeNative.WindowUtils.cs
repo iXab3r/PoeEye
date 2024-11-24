@@ -63,6 +63,25 @@ public partial class UnsafeNative
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool IsZoomed(IntPtr hWnd);
+
+    public static WinRect GetProcessWindowRect(int processId)
+    {
+        var process = Process.GetProcessById(processId);
+        var windowHandle = process.MainWindowHandle;
+
+        if (windowHandle == IntPtr.Zero)
+        {
+            throw new ArgumentException($"Process {process} does not have main window handle");
+        }
+        
+        if (!User32.GetWindowRect(windowHandle, out var windowRect))
+        {
+            var error = Kernel32.GetLastError();
+            throw new Win32Exception(error, $"Failed to get window {windowHandle.ToHexadecimal()} rect for process {process}");
+        }
+
+        return WinRect.FromLTRB(windowRect.left, windowRect.top, windowRect.right, windowRect.bottom);
+    }
     
     public static bool IsWindowCloaked(IntPtr hwnd)
     {
