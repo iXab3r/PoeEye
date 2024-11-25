@@ -336,7 +336,7 @@ else
             })
             .AddTo(Anchors);
 
-        nativeWindowHandle = ((IBlazorWindowNativeController) DataContext).GetWindowHandle();
+        nativeWindowHandle = DataContext.GetWindowHandle();
     }
 
     private void StartDrag(MouseEventArgs e)

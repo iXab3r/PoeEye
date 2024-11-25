@@ -62,6 +62,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
     private readonly SerialDisposable activeViewAnchors;
     private readonly WebViewServiceProvider webViewServiceProvider;
     private readonly JSComponentConfigurationStoreAccessor jsComponentConfigurationStoreAccessor;
+    private readonly DispatcherScheduler uiScheduler;
 
     static BlazorContentControl()
     {
@@ -77,6 +78,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         activeContentAnchors = new SerialDisposable().AddTo(Anchors);
         activeViewAnchors = new SerialDisposable().AddTo(Anchors);
         webViewServiceProvider = new WebViewServiceProvider().AddTo(Anchors);
+        uiScheduler = DispatcherScheduler.Current;
 
         WebView = new BlazorWebViewEx().AddTo(Anchors);
         WebView.UnhandledException += OnUnhandledException;
@@ -127,7 +129,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 this.WhenAnyValue(x => x.AdditionalFileProvider), 
                 unityContainerSource, 
                 (viewType, additionalFileProvider, container) => new {viewType, additionalFileProvider, container})
-            .ObserveOnDispatcher()
+            .ObserveOn(uiScheduler)
             .SubscribeAsync(async state =>
             {
                 using var rent = isBusyLatch.Rent();

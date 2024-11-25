@@ -365,16 +365,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         EnqueueUpdate(new CloseCommand());
     }
 
-    public void EnsureCreated()
-    {
-        EnsureNotDisposed();
-        EnqueueUpdate(new EnsureWindowCreated());
-    }
-
     public IntPtr GetWindowHandle()
     {
         EnsureNotDisposed();
-        return GetOrCreate().WindowHandle;
+        if (!windowSupplier.IsValueCreated)
+        {
+            throw new InvalidOperationException("Window is not created yet");
+        }
+
+        var window = windowSupplier.Value;
+        return window.WindowHandle;
     }
 
     public void SetWindowRect(Rectangle rect)
@@ -470,11 +470,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 var window = GetOrCreate();
                 switch (windowEvent)
                 {
-                    case EnsureWindowCreated command:
-                    {
-                        Log.Debug($"Ensured that window is created");
-                        break;
-                    }
                     case SetVisibleCommand command:
                     {
                         Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
@@ -1207,8 +1202,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record HideCommand : IWindowCommand;
     
     private sealed record ShowDevToolsCommand : IWindowCommand;
-
-    private sealed record EnsureWindowCreated : IWindowCommand;
 
     private sealed record CloseCommand : IWindowCommand;
 

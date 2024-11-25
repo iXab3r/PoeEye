@@ -241,9 +241,4 @@ public interface IBlazorWindowController
     /// Closes the window, releasing all associated resources.
     /// </summary>
     void Close();
-
-    /// <summary>
-    /// Ensures that window is created by this time
-    /// </summary>
-    void EnsureCreated();
 }
