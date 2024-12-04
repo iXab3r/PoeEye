@@ -24,6 +24,9 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 {
     private static readonly Binder<BlazorReactiveComponentBase> Binder = new();
 
+    /// <summary>
+    /// Observable sequence that signals when a property of the component changes.
+    /// </summary>
     private readonly Subject<object> whenChanged = new();
     private readonly ReactiveChangeDetector changeDetector = new();
     
@@ -42,13 +45,6 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     protected BlazorReactiveComponentBase()
     {
         ChangeTrackers = new ReactiveTrackerList();
-        
-        this.WhenAnyProperty(x => x.DataContext)
-            .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
-            .AddTo(Anchors);
-        changeDetector.WhenChanged
-            .Subscribe(x => whenChanged.OnNext(x)).AddTo(Anchors);
-
         Binder.Attach(this).AddTo(Anchors);
     }
     
@@ -82,11 +78,6 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     
     public ElementReference ElementRef { get; protected set; }
     
-    /// <summary>
-    /// Observable sequence that signals when a property of the component changes.
-    /// </summary>
-    public IObservable<object> WhenChanged => whenChanged;
-    
     protected ReactiveTrackerList ChangeTrackers { get; } 
     
     /// <summary>
@@ -112,13 +103,20 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        // Never tracking via ChangeTrackers and ReactiveSection
-        ChangeTrackers.Seal();
-        ChangeTrackers.Merge().Subscribe(x => WhenRefresh.OnNext(x)).AddTo(Anchors);
         
-        // Legacy-style tracking via Track()
-        WhenChanged.Subscribe(x => WhenRefresh.OnNext(x)).AddTo(Anchors);
+        this.WhenAnyProperty(x => x.DataContext)
+            .Subscribe(x => whenChanged.OnNext("DataContext has changed"))
+            .AddTo(Anchors);
+        
+        changeDetector
+            .WhenChanged
+            .Subscribe(x => whenChanged.OnNext(x))
+            .AddTo(Anchors);
+
+        ChangeTrackers.Seal();
+        ChangeTrackers.Merge().Subscribe(x => whenChanged.OnNext(x)).AddTo(Anchors);
+        
+        whenChanged.Subscribe(x => WhenRefresh.OnNext(x)).AddTo(Anchors);
     }
 
     /// <summary>

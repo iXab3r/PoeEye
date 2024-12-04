@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AntDesign;
@@ -16,7 +15,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     private static readonly Binder<TreeViewNode<TItem>> Binder = new();
 
     private readonly ClassMapper classMapper = new();
-    
+
     private bool disableCheckbox;
     private bool disabled;
     private string icon;
@@ -27,7 +26,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     {
         Binder.Bind(x => x.Expanded && !x.IsLeaf)
             .To(x => x.IsSwitcherOpen);
-        
+
         Binder.Bind(x => !x.Expanded && !x.IsLeaf)
             .To(x => x.IsSwitcherClose);
     }
@@ -35,19 +34,21 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     public TreeViewNode()
     {
         NodeId = TreeViewHelper.GetNextNodeId();
-        
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.Selected));
-        
+
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.IsVisible));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.IsTargetBottom));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.IsTargetContainer));
+
         Binder.Attach(this).AddTo(Anchors);
     }
 
     [CascadingParameter(Name = "Tree")] public TreeView<TItem> TreeComponent { get; set; }
 
-    [CascadingParameter(Name = "Node")] public TreeViewNode<TItem> ParentNode { get; set; }
+    [CascadingParameter(Name = "Node")] public TreeViewNode<TItem>? ParentNode { get; set; }
 
-    [Parameter] public RenderFragment Nodes { get; set; }
+    [Parameter] public RenderFragment? Nodes { get; set; }
 
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public string Key
@@ -72,7 +73,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     }
 
     [Parameter] public bool Selected { get; set; }
-    
+
     [Parameter] public EventCallback<bool> SelectedChanged { get; set; }
 
     [Parameter] public bool Expanded { get; set; }
@@ -110,36 +111,32 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     [Parameter] public RenderFragment TitleTemplate { get; set; }
 
     [Parameter] public TItem DataItem { get; set; }
-    
+
     [Parameter] public bool Hidden { get; set; }
-    
+
     public bool IsLeaf { get; private set; } = true;
-    
+
     public bool IsSwitcherOpen { get; private set; }
 
     public bool IsSwitcherClose { get; private set; }
 
-    public bool IsDragTarget
-    {
-        get;
-        private set;
-    }
+    public bool IsDragTarget { get; private set; }
 
     public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
 
     public bool IsTargetBottom { get; private set; }
 
     public bool IsTargetContainer { get; private set; }
-    
+
     public bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
 
     internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
-    
+
     internal int NodeIndex { get; set; }
 
     internal long NodeId { get; private set; }
-    
-    private bool RealDisplay
+
+    private bool IsVisible
     {
         get
         {
@@ -158,7 +155,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
                 return false;
             }
 
-            return ParentNode.RealDisplay;
+            return ParentNode.IsVisible;
         }
     }
 
@@ -203,14 +200,10 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     public async Task Expand(bool expanded)
     {
         SetExpanded(expanded);
-        var tree = TreeComponent;
-        if (tree != null)
-        {
-            await tree.OnNodeExpand(this, Expanded, new MouseEventArgs());
-        }
+        await TreeComponent.OnNodeExpand(this, Expanded, new MouseEventArgs());
     }
-    
-    
+
+
     public IList<TItem> GetParentChildDataItems()
     {
         if (ParentNode != null)
@@ -240,8 +233,8 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         var parentChildDataItems = GetParentChildDataItems();
         parentChildDataItems.Remove(DataItem);
     }
-    
-    
+
+
     public override string ToString()
     {
         var sb = new ToStringBuilder(this);
@@ -250,17 +243,19 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         {
             sb.AppendParameter(nameof(Selected), Selected);
         }
+
         if (Expanded)
         {
             sb.AppendParameter(nameof(Expanded), Expanded);
         }
+
         return sb.ToString();
     }
-    
+
     public IEnumerable<TreeViewNode<TItem>> EnumerateChildrenAndSelf()
     {
         yield return this;
-        
+
         foreach (var childNode in ChildNodes)
         {
             yield return childNode;
@@ -283,7 +278,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
         IsTargetBottom = value;
     }
-    
+
     internal void SetDragTarget(bool value)
     {
         if (IsDragTarget == value)
@@ -346,11 +341,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
     public override async ValueTask DisposeAsync()
     {
-        if (TreeComponent != null)
-        {
-            TreeComponent.RemoveNode(this);
-        }
-        
+        TreeComponent.RemoveNode(this);
         await base.DisposeAsync();
     }
 

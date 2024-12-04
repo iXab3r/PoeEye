@@ -2,6 +2,10 @@
 @inherits BlazorReactiveComponent
 @typeparam TItem
 
+@{
+
+}
+
 <span class="@ClassMapper.Class" @onclick="OnClick">
     @if (SelfNode?.IsLeaf == false && TreeComponent?.ShowExpand == true)
     {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reactive.Linq;
 using DynamicData;
 using PoeShared.Common;
@@ -20,49 +19,49 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     public void Add<T>(IObservable<T> source)
     {
         EnsureNotSealed();
-        base.Enqueue(source.Select(x => x?.ToString()));
+        Enqueue(source.Select(x => x?.ToString()));
     }
     
     public void Add<T>(IObservable<IReadOnlyObservableCollection<T>> observableCollectionSource)
     {
         EnsureNotSealed();
-        base.Enqueue(observableCollectionSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCollectionSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T, TKey>(IObservable<IHierarchicalSourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        base.Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T, TKey>(IObservable<IObservableCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        base.Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        base.Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T>(IObservable<IObservableList<T>> observableListSource)
     {
         EnsureNotSealed();
-        base.Enqueue(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
     
     public void Add<T>(IObservable<ISourceList<T>> observableListSource)
     {
         EnsureNotSealed();
-        base.Enqueue(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableListSource.Select(x => x != null ? x.ToObservableChangeSet() : new SourceList<T>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
         
     public void Add<T>(IReadOnlyObservableCollection<T> observableCollection)
     {
         EnsureNotSealed();
-        base.Enqueue(observableCollection.Connect().Select(x => x?.ToString()));
+        Enqueue(observableCollection.Connect().Select(x => x?.ToString()));
     }
     
     public void Add(params IObservable<string>[] sources)
@@ -197,7 +196,6 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     {
         if (!isSealed.Set())
         {
-            return;
         }
     }
 

@@ -2,31 +2,33 @@
 @inherits BlazorReactiveComponent
 @typeparam TItem
 
+@{
 
-<ReactiveSection Trackers="@(new() {this.WhenAnyValue(x => x.RealDisplay, x => x.IsTargetContainer, x => x.IsTargetBottom)})">
-    @if (RealDisplay)
-    {
-        <CascadingValue Value="this" Name="SelfNode">
-            <div @key="NodeId" 
-                 @ref="@ElementRef"
-                 class="@classMapper.Class" style="@Style">
+}
 
-                <TreeViewIndent TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
+@if (IsVisible)
+{
+    <CascadingValue Value="@this" Name="SelfNode">
+        <div @key="NodeId"
+             @ref="@ElementRef"
+             class="@classMapper.Class" 
+             style="@Style">
 
-                <TreeViewNodeSwitcher OnSwitcherClick="@OnSwitcherClick" TItem="TItem"></TreeViewNodeSwitcher>
+            <TreeViewIndent TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
 
-                <TreeViewNodeTitle TItem="TItem"></TreeViewNodeTitle>
-            </div>
-        </CascadingValue>
-    }
-</ReactiveSection>
+            <TreeViewNodeSwitcher OnSwitcherClick="@OnSwitcherClick" TItem="TItem"></TreeViewNodeSwitcher>
 
-<CascadingValue Value="this" Name="Node">
+            <TreeViewNodeTitle TItem="TItem"></TreeViewNodeTitle>
+        </div>
+    </CascadingValue>
+}
+
+<CascadingValue Value="@this" Name="Node">
     @if (DataItem != null && ChildContent == null && Nodes == null)
     {
         foreach (var item in ChildDataItems)
         {
-            <TreeViewNode DataItem="@item" @key="item.GetHashCode()"></TreeViewNode>
+            <TreeViewNode DataItem="@item" @key="@($"TreeViewNode-{item?.GetHashCode()}")"></TreeViewNode>
         }
     }
     else if (ChildContent != null)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
 using AntDesign;
@@ -20,7 +19,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     private readonly ClassMapper classMapper = new();
 
-    private TreeViewNode<TItem> lastSelectedItem;
+    private TreeViewNode<TItem>? lastSelectedItem;
 
     public TreeView()
     {
@@ -44,7 +43,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             })
             .AsObservableCache()
             .AddTo(Anchors);
-        
+
         SelectedItemsById = nodesById
             .Connect()
             .AutoRefreshOnObservable(x => x.WhenAnyValue(y => y.Selected))
@@ -58,118 +57,89 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             .AddTo(Anchors);
     }
 
-    [Parameter]
-    public bool ShowExpand { get; set; } = true;
+    [Parameter] public bool ShowExpand { get; set; } = true;
+
+    [Parameter] public bool? ShowExpandedByDefault { get; set; }
+
+    [Parameter] public bool ShowIcon { get; set; }
+
+    [Parameter] public bool BlockNode { get; set; }
+
+    [Parameter] public bool Draggable { get; set; }
+
+    [Parameter] public bool Disabled { get; set; }
     
-    [Parameter]
-    public bool? ShowExpandedByDefault { get; set; } 
+    [Parameter] public bool AutoExpandParent { get; set; }
 
-    [Parameter]
-    public bool ShowIcon { get; set; }
+    [Parameter] public string? SwitcherIcon { get; set; }
 
-    [Parameter]
-    public bool BlockNode { get; set; }
+    [Parameter] public RenderFragment? Nodes { get; set; }
 
-    [Parameter]
-    public bool Draggable { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    [Parameter]
-    public bool Disabled { get; set; }
+    [Parameter] public TreeViewSelectionMode SelectionMode { get; set; } = TreeViewSelectionMode.SingleItem;
 
-    [Parameter]
-    public string SwitcherIcon { get; set; }
+    [Parameter] public IEnumerable<TItem>? DataSource { get; set; }
 
-    [Parameter] public RenderFragment Nodes { get; set; }
+    [Parameter] public string[]? ExpandedKeys { get; set; }
 
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public Func<TreeViewNode<TItem>, string>? TitleExpression { get; set; }
 
-    [Parameter]
-    public TreeViewSelectionMode SelectionMode { get; set; } = TreeViewSelectionMode.SingleItem;
-    
-    [Parameter]
-    public IEnumerable<TItem> DataSource { get; set; }
+    [Parameter] public Func<TreeViewNode<TItem>, string>? KeyExpression { get; set; }
 
-    [Parameter]
-    public Func<TreeViewNode<TItem>, string> TitleExpression { get; set; }
+    [Parameter] public Func<TreeViewNode<TItem>, string>? IconExpression { get; set; }
 
-    [Parameter]
-    public Func<TreeViewNode<TItem>, string> KeyExpression { get; set; }
+    [Parameter] public Func<TreeViewNode<TItem>, IEnumerable<TItem>>? ChildrenExpression { get; set; }
 
-    [Parameter]
-    public Func<TreeViewNode<TItem>, string> IconExpression { get; set; }
+    [Parameter] public Func<TreeViewNode<TItem>, bool>? DisabledExpression { get; set; }
 
-    [Parameter]
-    public Func<TreeViewNode<TItem>, IEnumerable<TItem>> ChildrenExpression { get; set; }
+    [Parameter] public RenderFragment<TreeViewNode<TItem>>? IndentTemplate { get; set; }
 
-    [Parameter]
-    public Func<TreeViewNode<TItem>, bool> DisabledExpression { get; set; }
+    [Parameter] public RenderFragment<(TreeViewNode<TItem> Node, int IndentLevel)>? IndentWithLevelTemplate { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnClick { get; set; }
+    [Parameter] public RenderFragment<TreeViewNode<TItem>>? TitleTemplate { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnDblClick { get; set; }
+    [Parameter] public RenderFragment<TreeViewNode<TItem>>? TitleIconTemplate { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnContextMenu { get; set; }
+    [Parameter] public RenderFragment<TreeViewNode<TItem>>? SwitcherIconTemplate { get; set; }
 
-    [Parameter]
-    public RenderFragment<TreeViewNode<TItem>> IndentTemplate { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnClick { get; set; }
 
-    [Parameter]
-    public RenderFragment<(TreeViewNode<TItem> Node, int IndentLevel)> IndentWithLevelTemplate { get; set; }
-    
-    [Parameter]
-    public RenderFragment<TreeViewNode<TItem>> TitleTemplate { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnDblClick { get; set; }
 
-    [Parameter]
-    public RenderFragment<TreeViewNode<TItem>> TitleIconTemplate { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnContextMenu { get; set; }
 
-    [Parameter]
-    public RenderFragment<TreeViewNode<TItem>> SwitcherIconTemplate { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnDragStart { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnDragStart { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnDragEnter { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnDragEnter { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnDragLeave { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnDragLeave { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnDrop { get; set; }
 
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnDrop { get; set; }
-
-    [Parameter]
-    public EventCallback<TreeViewEventArgs<TItem>> OnDragEnd { get; set; }
-
-    [Parameter]
-    public string[] ExpandedKeys { get; set; }
+    [Parameter] public EventCallback<TreeViewEventArgs<TItem>> OnDragEnd { get; set; }
 
     [Parameter] public EventCallback<string[]> ExpandedKeysChanged { get; set; }
 
     [Parameter] public EventCallback<(string[] ExpandedKeys, TreeViewNode<TItem> Node, bool Expanded)> OnExpand { get; set; }
 
-    [Parameter] public bool AutoExpandParent { get; set; }
-
     public IObservableCache<TreeViewNode<TItem>, long> NodesById => nodesById;
-    
+
     public IObservableCache<TreeViewNode<TItem>, long> SelectedItemsById { get; }
 
     public IObservableCache<TreeViewNode<TItem>, string> NodesByKey { get; }
 
     internal bool IsCtrlKeyDown { get; private set; }
-    
+
     internal bool IsShiftKeyDown { get; private set; }
-    
-    internal TreeViewNode<TItem> DragItem { get; set; }
-    
+
+    internal TreeViewNode<TItem>? DragItem { get; set; }
+
     internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
 
-    [Inject] private IDomEventListener DomEventListener { get; set; }
-    
-    [Inject]
-    public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
+    [Inject] private IDomEventListener DomEventListener { get; init; } = null!;
+
+    [Inject] private IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; } = null!;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -189,6 +159,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     public override ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         DomEventListener?.Dispose();
         return base.DisposeAsync();
     }
@@ -208,7 +179,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     {
         nodesById.Remove(treeNode);
     }
-    
+
     internal async Task OnNodeExpand(TreeViewNode<TItem> node, bool expanded, MouseEventArgs args)
     {
         var expandedKeys = nodesById.Items.Where(x => x.Expanded).Select(x => x.Key).ToArray();
@@ -259,12 +230,12 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     {
         return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: true);
     }
-    
+
     internal Task SetSelection(params TreeViewNode<TItem>[] selectedNodes)
     {
         return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: false);
     }
-    
+
     internal async Task SetSelection(HashSet<TreeViewNode<TItem>> selectedNodes, bool preserveSelection = false)
     {
         var existingSelection = preserveSelection ? SelectedItemsById.Items.ToHashSet() : new HashSet<TreeViewNode<TItem>>();
@@ -281,7 +252,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             await node.SelectedChanged.InvokeAsync(shouldBeSelected);
         }
     }
-    
+
     private void SetClassMapper()
     {
         classMapper
@@ -306,20 +277,17 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         IsCtrlKeyDown = eventArgs.CtrlKey || eventArgs.MetaKey;
         IsShiftKeyDown = eventArgs.ShiftKey;
     }
-    
+
     private async Task HandleOnDrop(DragEventArgs e)
     {
-      
     }
-    
+
     private async Task HandleDragEnter(DragEventArgs e)
     {
-        
     }
 
     private async Task HandleDragOver(DragEventArgs e)
     {
-        
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs eventArgs)
@@ -328,6 +296,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         {
             return;
         }
+
         switch (SelectionMode)
         {
             case TreeViewSelectionMode.SingleItem or TreeViewSelectionMode.MultipleItems:
@@ -341,13 +310,13 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
                     default:
                         return;
                 }
-                
+
                 if (lastSelectedItem == null)
                 {
                     //require origin item
                     return;
                 }
-                
+
                 var allNodes = NodesById
                     .Items
                     .OrderBy(x => x.TreeLevel)
@@ -359,7 +328,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
                 {
                     return;
                 }
-                
+
                 if (eventArgs.Code == "ArrowUp")
                 {
                     var previousNode = allNodes.ElementAtOrDefault(originIndex - 1);
@@ -376,7 +345,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
                         await ScrollElementIntoViewSafe(previousNode);
                     }
-                } else if (eventArgs.Code == "ArrowDown")
+                }
+                else if (eventArgs.Code == "ArrowDown")
                 {
                     var nextNode = allNodes.ElementAtOrDefault(originIndex + 1);
                     if (nextNode != null)
@@ -392,10 +362,12 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
                         await ScrollElementIntoViewSafe(nextNode);
                     }
-                } else if (eventArgs.Code == "Escape")
+                }
+                else if (eventArgs.Code == "Escape")
                 {
                     await SetSelection();
                 }
+
                 break;
             }
         }
@@ -407,7 +379,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         {
             await JsPoeBlazorUtils.ScrollElementIntoView(node.ElementRef);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             //there is a chance that element is already removed at this point
         }

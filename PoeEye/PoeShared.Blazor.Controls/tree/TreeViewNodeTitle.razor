@@ -2,6 +2,10 @@
 @inherits BlazorReactiveComponent
 @typeparam TItem
 
+@{
+    
+}
+
 <span class="@TitleClassMapper.Class"
       title="@SelfNode.Title"
       @onclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))"
