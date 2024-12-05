@@ -81,8 +81,31 @@ public partial class UnsafeNative
         MaxProcessInfoClass
     }
     
+    private const uint LOAD_LIBRARY_SEARCH_DEFAULT_DIRS = 0x00001000;
+    
     [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
     static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
+    
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    private static extern bool SetDefaultDllDirectories(uint directoryFlags);
+    
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr AddDllDirectory(string directory);
+    
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool RemoveDllDirectory(IntPtr lpCookie);
+
+    public static void SetDefaultDllDirectories()
+    {
+        if (SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS))
+        {
+            Log.Info("DLLs will be searched for in all possible directories.");
+            return;
+        }
+
+        Log.Warn("Failed to set default DLL directories.");
+        throw new Win32Exception(Kernel32.GetLastError(), "Failed to set default DLL directories.");
+    }
 
     public static void CreateHardLink(string lpFileName, string lpExistingFileName)
     {
