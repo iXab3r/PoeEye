@@ -672,6 +672,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         return Observable.Create<IWindowEvent>(observer =>
         {
             var anchors = new CompositeDisposable();
+            Disposable.Create(() => log.Debug("Window subscription is being disposed")).AddTo(anchors);
 
             //SetupInitialState in Window is called BEFORE that SourceInitialized
             //so to set up proper initial size and position (for the very first frame)
@@ -934,6 +935,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
             log.AddSuffix($"Wnd {windowHandle.ToHexadecimal()}");
             log.Debug($"Created new window");
+
+            Disposable.Create(() => log.Debug("Window subscription has been disposed")).AddTo(anchors);
 
             return anchors;
         });
