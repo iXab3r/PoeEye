@@ -62,7 +62,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private readonly ManualResetEventSlim isClosed = new(false);
 
     public BlazorWindow(
-        IUnityContainer unityContainer, 
+        IUnityContainer unityContainer,
         [OptionalDependency] IScheduler uiScheduler = default)
     {
         Log.AddSuffix($"BWnd#{windowId}");
@@ -299,7 +299,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     }
 
     public ImmutableArray<IFileInfo> AdditionalFiles { get; set; } = ImmutableArray<IFileInfo>.Empty;
-    
+
     public IFileProvider AdditionalFileProvider { get; set; }
 
     public IObservable<KeyEventArgs> WhenKeyDown { get; }
@@ -321,7 +321,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     public event EventHandler Deactivated;
     public event EventHandler Loaded;
     public event EventHandler Closed;
-    
+
     public void ShowDevTools()
     {
         Log.Debug("Enqueueing ShowDevTools command");
@@ -429,6 +429,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         return window;
     }
 
+
     private void HandleUpdate()
     {
         uiScheduler.EnsureOnScheduler();
@@ -440,229 +441,241 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
         while (eventQueue.TryTake(out var windowEvent))
         {
-            if (windowEvent is DisposeWindowCommand)
+            HandleEvent(windowEvent);
+        }
+    }
+
+    private void HandleEvent(IWindowEvent windowEvent)
+    {
+        if (windowEvent is DisposeWindowCommand)
+        {
+            if (!windowSupplier.IsValueCreated)
             {
-                if (!windowSupplier.IsValueCreated)
-                {
-                    Log.Debug($"Window is not created - ignoring disposal request");
-                    continue;
-                }
-
-                var window = GetOrCreate();
-                if (window.Anchors.IsDisposed)
-                {
-                    Log.Debug($"Window already disposed - ignoring disposal request");
-                    continue;
-                }
-
-                Log.Debug($"Disposing the window: {new { window }}");
-                window.Close();
-                window.Dispose();
+                Log.Debug($"Window is not created - ignoring disposal request");
+                return;
             }
-            else if (windowEvent is IWindowCommand)
+
+            var window = GetOrCreate();
+            if (window.Anchors.IsDisposed)
             {
-                if (Anchors.IsDisposed)
-                {
-                    Log.Debug($"Ignoring command - already disposed, command: {windowEvent}");
-                    continue;
-                }
+                Log.Debug($"Window already disposed - ignoring disposal request");
+                return;
+            }
 
-                var window = GetOrCreate();
-                switch (windowEvent)
-                {
-                    case SetVisibleCommand command:
-                    {
-                        Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
-                        if (command.IsVisible)
-                        {
-                            window.Show();
-                        }
-                        else
-                        {
-                            window.Hide();
-                        }
+            Log.Debug($"Disposing the window: {new {window}}");
+            window.Close();
+            window.Dispose();
+        }
+        else if (windowEvent is IWindowCommand)
+        {
+            if (Anchors.IsDisposed)
+            {
+                Log.Debug($"Ignoring command - already disposed, command: {windowEvent}");
+                return;
+            }
 
-                        break;
-                    }
-                    case ShowCommand:
+            var window = GetOrCreate();
+            switch (windowEvent)
+            {
+                case SetVisibleCommand command:
+                {
+                    Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
+                    if (command.IsVisible)
                     {
-                        Log.Debug($"Showing the window: {new { window.WindowState }}");
                         window.Show();
-                        break;
                     }
-                    case HideCommand:
+                    else
                     {
-                        Log.Debug($"Hiding the window: {new { window.WindowState }}");
                         window.Hide();
-                        break;
-                    } 
-                    case ShowDevToolsCommand:
-                    {
-                        Log.Debug($"Showing dev tools");
-                        window.ContentControl.OpenDevTools().AndForget();
-                        break;
                     }
-                    case CloseCommand:
-                    {
-                        Log.Debug($"Closing the window: {new { window.WindowState }}");
-                        window.Close();
-                        break;
-                    }
-                    case SetWindowTitleCommand command:
-                    {
-                        Log.Debug($"Updating {nameof(window.Title)} to {command.Title}");
-                        window.Title = command.Title;
-                        break;
-                    }
-                    case SetWindowPosCommand command:
-                    {
-                        Log.Debug($"Setting window position to {command.Location}");
-                        UnsafeNative.SetWindowPos(window.WindowHandle, command.Location);
-                        break;
-                    }
-                    case SetWindowRectCommand command:
-                    {
-                        Log.Debug($"Setting window rect to {command.Rect}");
-                        UnsafeNative.SetWindowRect(window.WindowHandle, command.Rect);
-                        break;
-                    }
-                    case SetWindowSizeCommand command:
-                    {
-                        Log.Debug($"Setting window size to {command.Size}");
-                        UnsafeNative.SetWindowSize(window.WindowHandle, command.Size);
-                        break;
-                    }
-                    case SetShowTitleBarCommand command:
-                    {
-                        Log.Debug($"Updating {nameof(TitleBarDisplayMode)} to {command.TitleBarDisplayMode}");
 
-                        var displayMode = command.TitleBarDisplayMode == TitleBarDisplayMode.Default
-                            ? TitleBarDisplayMode.System
-                            : command.TitleBarDisplayMode;
-
-                        var showSystemBar = displayMode is TitleBarDisplayMode.System;
-                        window.ShowTitleBar = showSystemBar;
-                        window.ShowSystemMenu = showSystemBar;
-                        window.ShowSystemMenuOnRightClick = showSystemBar;
-                        window.ShowMinButton = showSystemBar && command.ShowMinButton;
-                        window.ShowMaxRestoreButton = showSystemBar && command.ShowMaxButton;
-                        window.ShowCloseButton = showSystemBar && command.ShowCloseButton;
-                        break;
-                    }
-                    case SetWindowPadding command:
-                    {
-                        Log.Debug($"Updating {nameof(Padding)} to {command.Padding}");
-                        window.ContentControl.Margin = command.Padding;
-                        break;
-                    }
-                    case SetResizeMode command:
-                    {
-                        Log.Debug($"Updating {nameof(ResizeMode)} to {command.ResizeMode}");
-                        window.ResizeMode = command.ResizeMode;
-                        break;
-                    }
-                    case SetShowInTaskbar command:
-                    {
-                        Log.Debug($"Updating {nameof(ShowInTaskbar)} to {command.ShowInTaskbar}");
-                        window.ShowInTaskbar = command.ShowInTaskbar;
-                        break;
-                    }
-                    case SetIsClickThrough command:
-                    {
-                        var overlayMode = command.IsClickThrough ? OverlayMode.Transparent : OverlayMode.Layered;
-                        Log.Debug($"Updating OverlayMode to {overlayMode}");
-                        window.SetOverlayMode(overlayMode);
-                        break;
-                    }
-                    case SetOpacity command:
-                    {
-                        Log.Debug($"Updating {nameof(Opacity)} to {command.Opacity}");
-                        window.Opacity = command.Opacity;
-                        break;
-                    }
-                    case SetBackgroundColor command:
-                    {
-                        Log.Debug($"Updating {nameof(BackgroundColor)} to {command.BackgroundColor}");
-                        var color = new SolidColorBrush(command.BackgroundColor);
-                        color.Freeze();
-                        window.Background = color;
-                        break;
-                    }
-                    case SetBorderColor command:
-                    {
-                        Log.Debug($"Updating {nameof(BorderColor)} to {command.BorderColor}");
-                        var color = new SolidColorBrush(command.BorderColor);
-                        color.Freeze();
-                        window.BorderBrush = color;
-                        break;
-                    }
-                    case SetBorderThickness command:
-                    {
-                        Log.Debug($"Updating {nameof(BorderThickness)} to {command.BorderThickness}");
-                        window.BorderThickness = command.BorderThickness;
-                        break;
-                    }
-                    case SetTopmostCommand command:
-                    {
-                        Log.Debug($"Updating {nameof(Topmost)} to {command.Topmost}");
-                        window.Topmost = command.Topmost;
-                        break;
-                    }
-                    case SetBlazorUnityContainer command:
-                    {
-                        Log.Debug($"Updating {nameof(Container)} to {command.ChildContainer}");
-                        window.ContentControl.Container = command.ChildContainer;
-                        break;
-                    }
-                    case SetBlazorFileProvider command:
-                    {
-                        Log.Debug($"Updating {nameof(AdditionalFileProvider)} to {command.FileProvider}");
-                        window.ContentControl.AdditionalFileProvider = command.FileProvider;
-                        break;
-                    } 
-                    case SetBlazorAdditionalFiles command:
-                    {
-                        Log.Debug($"Updating {nameof(AdditionalFiles)} to {command.AdditionalFiles}");
-                        window.ContentControl.AdditionalFiles = command.AdditionalFiles;
-                        break;
-                    }
-                    default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
+                    break;
                 }
+                case ShowCommand:
+                {
+                    Log.Debug($"Showing the window: {new {window.WindowState}}");
+                    window.Show();
+                    break;
+                }
+                case HideCommand:
+                {
+                    Log.Debug($"Hiding the window: {new {window.WindowState}}");
+                    window.Hide();
+                    break;
+                }
+                case ShowDevToolsCommand:
+                {
+                    Log.Debug($"Showing dev tools");
+                    window.ContentControl.OpenDevTools().AndForget();
+                    break;
+                }
+                case CloseCommand:
+                {
+                    Log.Debug($"Closing the window: {new {window.WindowState}}");
+                    window.Close();
+                    break;
+                }
+                case SetWindowTitleCommand command:
+                {
+                    Log.Debug($"Updating {nameof(window.Title)} to {command.Title}");
+                    window.Title = command.Title ?? string.Empty;
+                    break;
+                }
+                case SetWindowPosCommand command:
+                {
+                    Log.Debug($"Setting window position to {command.Location}");
+                    UnsafeNative.SetWindowPos(window.WindowHandle, command.Location);
+                    break;
+                }
+                case SetWindowRectCommand command:
+                {
+                    Log.Debug($"Setting window rect to {command.Rect}");
+                    UnsafeNative.SetWindowRect(window.WindowHandle, command.Rect);
+                    break;
+                }
+                case SetWindowSizeCommand command:
+                {
+                    Log.Debug($"Setting window size to {command.Size}");
+                    UnsafeNative.SetWindowSize(window.WindowHandle, command.Size);
+                    break;
+                }
+                case SetShowTitleBarCommand command:
+                {
+                    Log.Debug($"Updating {nameof(TitleBarDisplayMode)} to {command.TitleBarDisplayMode}");
+
+                    var displayMode = command.TitleBarDisplayMode == TitleBarDisplayMode.Default
+                        ? TitleBarDisplayMode.System
+                        : command.TitleBarDisplayMode;
+
+                    var showSystemBar = displayMode is TitleBarDisplayMode.System;
+                    window.ShowTitleBar = showSystemBar;
+                    window.ShowSystemMenu = showSystemBar;
+                    window.ShowSystemMenuOnRightClick = showSystemBar;
+                    window.ShowMinButton = showSystemBar && command.ShowMinButton;
+                    window.ShowMaxRestoreButton = showSystemBar && command.ShowMaxButton;
+                    window.ShowCloseButton = showSystemBar && command.ShowCloseButton;
+                    break;
+                }
+                case SetWindowPadding command:
+                {
+                    Log.Debug($"Updating {nameof(Padding)} to {command.Padding}");
+                    //min padding must be at least 1px to accomodate for WPF rounding
+                    //otherwise browser content gets cropped in some cases
+                    window.ContentControl.Margin = new Thickness(
+                            left: Math.Max(command.Padding.Left, 1),
+                            top: Math.Max(command.Padding.Top, 1),
+                            right: Math.Max(command.Padding.Right, 1),
+                            bottom: Math.Max(command.Padding.Bottom, 1)
+                        );
+                    break;
+                }
+                case SetResizeMode command:
+                {
+                    Log.Debug($"Updating {nameof(ResizeMode)} to {command.ResizeMode}");
+                    window.ResizeMode = command.ResizeMode;
+                    break;
+                }
+                case SetShowInTaskbar command:
+                {
+                    Log.Debug($"Updating {nameof(ShowInTaskbar)} to {command.ShowInTaskbar}");
+                    window.ShowInTaskbar = command.ShowInTaskbar;
+                    break;
+                }
+                case SetIsClickThrough command:
+                {
+                    var overlayMode = command.IsClickThrough ? OverlayMode.Transparent : OverlayMode.Layered;
+                    Log.Debug($"Updating OverlayMode to {overlayMode}");
+                    window.SetOverlayMode(overlayMode);
+                    break;
+                }
+                case SetOpacity command:
+                {
+                    Log.Debug($"Updating {nameof(Opacity)} to {command.Opacity}");
+                    window.Opacity = command.Opacity;
+                    break;
+                }
+                case SetBackgroundColor command:
+                {
+                    Log.Debug($"Updating {nameof(BackgroundColor)} to {command.BackgroundColor}");
+                    var color = new SolidColorBrush(command.BackgroundColor);
+                    color.Freeze();
+                    window.Background = color;
+                    break;
+                }
+                case SetBorderColor command:
+                {
+                    Log.Debug($"Updating {nameof(BorderColor)} to {command.BorderColor}");
+                    var color = new SolidColorBrush(command.BorderColor);
+                    color.Freeze();
+                    window.BorderBrush = color;
+                    break;
+                }
+                case SetBorderThickness command:
+                {
+                    Log.Debug($"Updating {nameof(BorderThickness)} to {command.BorderThickness}");
+                    window.BorderThickness = command.BorderThickness;
+                    break;
+                }
+                case SetTopmostCommand command:
+                {
+                    Log.Debug($"Updating {nameof(Topmost)} to {command.Topmost}");
+                    window.Topmost = command.Topmost;
+                    break;
+                }
+                case SetBlazorUnityContainer command:
+                {
+                    Log.Debug($"Updating {nameof(Container)} to {command.ChildContainer}");
+                    window.Container = command.ChildContainer;
+                    break;
+                }
+                case SetBlazorFileProvider command:
+                {
+                    Log.Debug($"Updating {nameof(AdditionalFileProvider)} to {command.FileProvider}");
+                    window.ContentControl.AdditionalFileProvider = command.FileProvider;
+                    break;
+                }
+                case SetBlazorAdditionalFiles command:
+                {
+                    Log.Debug($"Updating {nameof(AdditionalFiles)} to {command.AdditionalFiles}");
+                    window.ContentControl.AdditionalFiles = command.AdditionalFiles;
+                    break;
+                }
+                default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
             }
-            else
+        }
+        else
+        {
+            if (Anchors.IsDisposed)
             {
-                if (Anchors.IsDisposed)
-                {
-                    Log.Debug($"Ignoring event notification - already disposed: {windowEvent}");
-                    continue;
-                }
+                Log.Debug($"Ignoring event notification - already disposed: {windowEvent}");
+                return;
+            }
 
-                switch (windowEvent)
+            switch (windowEvent)
+            {
+                case IsVisibleChangedEvent args:
                 {
-                    case IsVisibleChangedEvent args:
-                    {
-                        windowVisible.SetValue(args.IsVisible, TrackedPropertyUpdateSource.Internal);
-                        break;
-                    }
-                    case WindowSizeChangedEvent args:
-                    {
-                        windowWidth.SetValue(args.Size.Width, TrackedPropertyUpdateSource.Internal);
-                        windowHeight.SetValue(args.Size.Height, TrackedPropertyUpdateSource.Internal);
-                        break;
-                    }
-                    case WindowPosChangedEvent args:
-                    {
-                        windowLeft.SetValue(args.Location.X, TrackedPropertyUpdateSource.Internal);
-                        windowTop.SetValue(args.Location.Y, TrackedPropertyUpdateSource.Internal);
-                        break;
-                    }
-                    case WindowTitleChangedEvent titleChangedEvent:
-                    {
-                        windowTitle.SetValue(titleChangedEvent.Title, TrackedPropertyUpdateSource.Internal);
-                        break;
-                    }
-                    default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
+                    windowVisible.SetValue(args.IsVisible, TrackedPropertyUpdateSource.Internal);
+                    break;
                 }
+                case WindowSizeChangedEvent args:
+                {
+                    windowWidth.SetValue(args.Size.Width, TrackedPropertyUpdateSource.Internal);
+                    windowHeight.SetValue(args.Size.Height, TrackedPropertyUpdateSource.Internal);
+                    break;
+                }
+                case WindowPosChangedEvent args:
+                {
+                    windowLeft.SetValue(args.Location.X, TrackedPropertyUpdateSource.Internal);
+                    windowTop.SetValue(args.Location.Y, TrackedPropertyUpdateSource.Internal);
+                    break;
+                }
+                case WindowTitleChangedEvent titleChangedEvent:
+                {
+                    windowTitle.SetValue(titleChangedEvent.Title, TrackedPropertyUpdateSource.Internal);
+                    break;
+                }
+                default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
             }
         }
     }
@@ -678,8 +691,22 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             //so to set up proper initial size and position (for the very first frame)
             //we have to "guess" current DPI, then, when SourceInitialized will be called, it will be re-calculated again
             //best-case scenario - DPI won't change and there will be no blinking at all
-            window.Topmost = blazorWindow.Topmost;
-            window.ShowInTaskbar = blazorWindow.ShowInTaskbar;
+            blazorWindow.HandleEvent(new SetShowInTaskbar(blazorWindow.ShowInTaskbar));
+            blazorWindow.HandleEvent(new SetTopmostCommand(blazorWindow.Topmost));
+            blazorWindow.HandleEvent(new SetBackgroundColor(blazorWindow.BackgroundColor));
+            blazorWindow.HandleEvent(new SetBorderThickness(blazorWindow.BorderThickness));
+            blazorWindow.HandleEvent(new SetBorderColor(blazorWindow.BorderColor));
+            blazorWindow.HandleEvent(new SetWindowPadding(blazorWindow.Padding));
+            blazorWindow.HandleEvent(new SetResizeMode(blazorWindow.ResizeMode));
+            blazorWindow.HandleEvent(new SetWindowTitleCommand(blazorWindow.Title));
+            blazorWindow.HandleEvent(new SetShowTitleBarCommand(
+                blazorWindow.TitleBarDisplayMode, 
+                ShowCloseButton: blazorWindow.ShowCloseButton, 
+                ShowMinButton: blazorWindow.ShowCloseButton, 
+                ShowMaxButton: blazorWindow.ShowMaxButton));
+            blazorWindow.HandleEvent(new SetBlazorAdditionalFiles(blazorWindow.AdditionalFiles));
+            blazorWindow.HandleEvent(new SetBlazorFileProvider(blazorWindow.AdditionalFileProvider));
+            blazorWindow.HandleEvent(new SetBlazorUnityContainer(blazorWindow.Container));
             UpdateWindowBoundsFromMonitor(IntPtr.Zero);
 
             Observable
@@ -709,7 +736,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 {
                     try
                     {
-                        var source = (HwndSource)PresentationSource.FromVisual(window);
+                        var source = (HwndSource) PresentationSource.FromVisual(window);
                         if (source == null)
                         {
                             throw new InvalidOperationException("HwndSource must be initialized at this point");
@@ -783,18 +810,21 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
             blazorWindow.windowTopmost
                 .Listen()
+                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetTopmostCommand(x.Value)))
                 .AddTo(anchors);
 
             blazorWindow.windowTitle
                 .Listen()
+                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetWindowTitleCommand(x.Value)))
                 .AddTo(anchors);
 
             blazorWindow.showInTaskbar
                 .Listen()
+                .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x.Value)))
                 .AddTo(anchors);
@@ -804,36 +834,29 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
                 .AddTo(anchors);
-            
-            blazorWindow.WhenAnyValue(x => x.Container)
-                .Subscribe(x => observer.OnNext(new SetBlazorUnityContainer(x)))
-                .AddTo(anchors);
-            
-            blazorWindow.WhenAnyValue(x => x.AdditionalFileProvider)
-                .Subscribe(x => observer.OnNext(new SetBlazorFileProvider(x)))
-                .AddTo(anchors);  
-            
-            blazorWindow.WhenAnyValue(x => x.AdditionalFiles)
-                .Subscribe(x => observer.OnNext(new SetBlazorAdditionalFiles(x)))
-                .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.Padding)
+                .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetWindowPadding(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.BackgroundColor)
+                .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetBackgroundColor(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.BorderColor)
+                .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetBorderColor(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.BorderThickness)
+                .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetBorderThickness(x)))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.ResizeMode)
+                .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetResizeMode(x)))
                 .AddTo(anchors);
 
@@ -859,7 +882,24 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     (titleBarDisplayMode, showCloseButton, showMinButton, showMaxButton) =>
                         new SetShowTitleBarCommand(titleBarDisplayMode, ShowCloseButton: showCloseButton, ShowMinButton: showMinButton, ShowMaxButton: showMaxButton)
                 )
+                .Skip(1)
                 .Subscribe(x => { observer.OnNext(x); })
+                .AddTo(anchors);
+            
+            // blazor-related events
+            blazorWindow.WhenAnyValue(x => x.Container)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetBlazorUnityContainer(x)))
+                .AddTo(anchors);
+
+            blazorWindow.WhenAnyValue(x => x.AdditionalFileProvider)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetBlazorFileProvider(x)))
+                .AddTo(anchors);
+
+            blazorWindow.WhenAnyValue(x => x.AdditionalFiles)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetBlazorAdditionalFiles(x)))
                 .AddTo(anchors);
 
             // events propagation
@@ -991,13 +1031,13 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             }
 
             var desiredLeft = blazorWindow.Left * scaleX;
-            if (!double.IsFinite(window.Left) || Math.Abs(desiredLeft -  window.Left) > 0.5)
+            if (!double.IsFinite(window.Left) || Math.Abs(desiredLeft - window.Left) > 0.5)
             {
                 window.Left = desiredLeft;
             }
-            
+
             var desiredTop = blazorWindow.Top * scaleY;
-            if (!double.IsFinite(window.Top) || Math.Abs(desiredTop -  window.Top) > 0.5)
+            if (!double.IsFinite(window.Top) || Math.Abs(desiredTop - window.Top) > 0.5)
             {
                 window.Top = desiredTop;
             }
@@ -1010,13 +1050,14 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             {
                 blazorWindow.Left = left;
             }
+
             var top = monitorBounds.Y + (monitorBounds.Height - blazorWindow.Height) / 2;
             if (top != blazorWindow.Top)
             {
                 blazorWindow.Top = top;
             }
         }
-        
+
         void SetWindowStartupLocation(IntPtr hwnd, WindowStartupLocation startupLocation)
         {
             switch (startupLocation)
@@ -1061,13 +1102,13 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         SetWindowStartupLocation(hwnd, WindowStartupLocation.CenterScreen);
                         break;
                     }
-                    
+
                     if (!User32.GetWindowRect(owner, out var windowRect))
                     {
                         log.Warn($"Failed to set initial window size - could not get rect of owner window {owner.ToHexadecimal()}");
                         break;
                     }
-                    
+
                     var windowBounds = Rectangle.FromLTRB(windowRect.left, windowRect.top, windowRect.right, windowRect.bottom);
                     log.Debug($"Centering window within window bounds {windowBounds}");
                     CenterWindowWithin(windowBounds);
@@ -1099,7 +1140,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
         try
         {
-            var msg = (User32.WindowMessage)msgRaw;
+            var msg = (User32.WindowMessage) msgRaw;
             switch (msg)
             {
                 case User32.WindowMessage.WM_SHOWWINDOW:
@@ -1203,7 +1244,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record ShowCommand : IWindowCommand;
 
     private sealed record HideCommand : IWindowCommand;
-    
+
     private sealed record ShowDevToolsCommand : IWindowCommand;
 
     private sealed record CloseCommand : IWindowCommand;
@@ -1239,11 +1280,11 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record SetBorderColor(Color BorderColor) : IWindowCommand;
 
     private sealed record SetBorderThickness(Thickness BorderThickness) : IWindowCommand;
-    
+
     private sealed record SetBlazorUnityContainer(IUnityContainer ChildContainer) : IWindowCommand;
-    
+
     private sealed record SetBlazorFileProvider(IFileProvider FileProvider) : IWindowCommand;
-    
+
     private sealed record SetBlazorAdditionalFiles(ImmutableArray<IFileInfo> AdditionalFiles) : IWindowCommand;
 
     private sealed record IsVisibleChangedEvent(bool IsVisible) : IWindowEvent;
@@ -1299,7 +1340,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             {
                 return State;
             }
-            
+
             var currentState = State;
             if (currentState.UpdateSource == updateSource && EqualityComparer<TValue>.Default.Equals(value, currentState.Value))
             {
@@ -1326,43 +1367,41 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed class NativeWindow : ReactiveMetroWindowBase
     {
-        private readonly BlazorWindow owner;
-
         public NativeWindow(BlazorWindow owner)
         {
-            this.owner = owner;
-
-            owner
-                .WhenAnyValue(x => x.Container)
+            this.WhenAnyValue(x => x.Container)
                 .Select(x => x ?? owner.unityContainer)
-                .Subscribe(x => ParentContainer = x)
-                .AddTo(Anchors);
-            
-            this.WhenAnyValue(x => x.ParentContainer)
                 .Subscribe(parentContainer =>
                 {
                     var childContainer = parentContainer.CreateChildContainer().AddTo(Anchors);
-                    childContainer.RegisterSingleton<IBlazorWindowController>(_ => this);
+                    childContainer.RegisterSingleton<IBlazorWindowController>(_ => owner);
                     ChildContainer = childContainer;
                 })
                 .AddTo(Anchors);
-            
+
             ContentControl = new BlazorContentControl()
             {
                 Container = ChildContainer,
                 ViewType = typeof(BlazorWindowContent),
                 Content = owner
             }.AddTo(Anchors);
+            this.WhenAnyValue(x => x.ChildContainer)
+                .Subscribe(x =>
+                {
+                    ContentControl.Container = x;
+                })
+                .AddTo(Anchors);
+            
             Content = ContentControl;
             AllowsTransparency = true;
-            
+
             Anchors.Add(() => Log.Debug("Disposed native window"));
         }
 
         public BlazorContentControl ContentControl { get; }
 
+        public IUnityContainer Container { get; set; }
+
         public IUnityContainer ChildContainer { get; private set; }
-        
-        public IUnityContainer ParentContainer { get; private set; }
     }
 }
