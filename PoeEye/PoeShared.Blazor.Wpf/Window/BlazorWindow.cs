@@ -1290,11 +1290,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
         public IObservable<PropertyState<TValue>> Listen()
         {
-            return stateSubject;
+            return Anchors.IsDisposed ? Observable.Return(State) : stateSubject;
         }
 
         public PropertyState<TValue> SetValue(TValue value, TrackedPropertyUpdateSource updateSource)
         {
+            if (Anchors.IsDisposed)
+            {
+                return State;
+            }
+            
             var currentState = State;
             if (currentState.UpdateSource == updateSource && EqualityComparer<TValue>.Default.Equals(value, currentState.Value))
             {
