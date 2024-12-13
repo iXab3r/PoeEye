@@ -56,6 +56,10 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
 
     public void Serialize(object data, FileInfo file)
     {
+        if (!string.IsNullOrEmpty(file.DirectoryName) && !Directory.Exists(file.DirectoryName))
+        {
+            Directory.CreateDirectory(file.DirectoryName);
+        }
         using var writer = new StreamWriter(file.FullName);
         Serialize(data, writer);
     }
