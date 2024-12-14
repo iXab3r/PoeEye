@@ -30,6 +30,11 @@
     cursor: n-resize;
 }
 
+.splitter-orientation-horizontal .splitter-bar{
+    border-top: 1px solid #80d8ff;
+    border-bottom: 1px solid #80d8ff;
+}
+
 .splitter-orientation-vertical .splitter-bar{
     border-left: 1px solid #80d8ff;
     border-right: 1px solid #80d8ff;
