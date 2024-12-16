@@ -135,7 +135,14 @@
         
         thisRef = DotNetObjectReference.Create(this);
         var module = await GetModuleAsync();
-        handler = await module.InvokeAsync<IJSObjectReference>("attach", thisRef, ElementRef);
+        try
+        {
+            handler = await module.InvokeAsync<IJSObjectReference>("attach", thisRef, ElementRef);
+        }
+        catch (Exception e) when (e.IsJSException())
+        {
+            // During disposal ignore such errors because there is a chance that browser context is already disposed
+        }
     }
 
     private string GetPaneStyle(int? paneSize, int? minPaneSize)
