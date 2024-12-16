@@ -55,10 +55,12 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
             wnd.ViewType = typeof(MainCounterView);
             wnd.ViewDataContext = new MainCounterViewModel();
             wnd.Title = "Test blocking";
-            wnd.Height = 400;
-            wnd.Width = 200;
-            wnd.Left = 100;
-            wnd.Top = 100;
+            wnd.Height = 600;
+            wnd.Width = 800;
+            wnd.Padding = new Thickness(0);
+            wnd.BorderThickness = new Thickness(5);
+            wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            wnd.TitleBarDisplayMode = TitleBarDisplayMode.Custom;
             await Task.Run(() => wnd.ShowDialog());
         });
 

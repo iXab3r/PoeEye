@@ -131,6 +131,11 @@ public interface IBlazorWindowController
     /// Gets or sets border thickness of the window. 
     /// </summary>
     Thickness BorderThickness { get; set; }
+    
+    /// <summary>
+    /// Gets or sets state of the window - minimized/maximized/normal. 
+    /// </summary>
+    WindowState WindowState { get; set; }
 
     /// <summary>
     /// Observable sequence for when a key is pressed while the window has focus.
@@ -221,6 +226,21 @@ public interface IBlazorWindowController
     /// Occurs when the window is closed.
     /// </summary>
     event EventHandler Closed;
+    
+    /// <summary>
+    /// Minimizes the window
+    /// </summary>
+    void Minimize();
+    
+    /// <summary>
+    /// Maximizes the window
+    /// </summary>
+    void Maximize();
+    
+    /// <summary>
+    /// Restores the window from Maximized state to Normal
+    /// </summary>
+    void Restore();
 
     /// <summary>
     /// Hides the window, making it invisible without closing it.
@@ -241,4 +261,32 @@ public interface IBlazorWindowController
     /// Closes the window, releasing all associated resources.
     /// </summary>
     void Close();
+
+    /// <summary>
+    /// Enables the ability to drag the current window using the mouse.
+    /// </summary>
+    /// <remarks>
+    /// - When this method is called, the window captures the mouse input.
+    /// - As the mouse moves, the window's position updates, effectively dragging the window.
+    /// - The drag operation stops when:
+    ///   1. The left mouse button is released.
+    ///   2. The returned <see cref="IDisposable"/> is disposed.
+    /// 
+    /// This method is useful for implementing custom window dragging behavior, such as for frameless windows or 
+    /// custom title bars that do not use the default window drag functionality.
+    /// </remarks>
+    /// <returns>
+    /// An <see cref="IDisposable"/> instance that can be used to programmatically stop the dragging operation. 
+    /// Disposing this object will immediately stop the drag operation and release mouse capture.
+    /// </returns>
+    /// <example>
+    /// Example usage:
+    /// <code>
+    /// var dragDisposable = window.EnableDragMove();
+    /// // Dragging will continue until:
+    /// // 1. The left mouse button is released.
+    /// // 2. dragDisposable.Dispose() is called.
+    /// </code>
+    /// </example>
+    IDisposable EnableDragMove();
 }

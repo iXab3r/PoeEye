@@ -56,10 +56,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private readonly PropertyValueHolder<bool> windowTopmost;
     private readonly PropertyValueHolder<bool> windowVisible;
     private readonly PropertyValueHolder<bool> showInTaskbar;
+    private readonly PropertyValueHolder<WindowState> windowState;
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly IScheduler uiScheduler;
     private readonly ManualResetEventSlim isClosed = new(false);
+    private readonly SerialDisposable dragAnchor;
 
     public BlazorWindow(
         IUnityContainer unityContainer,
@@ -72,6 +74,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         this.uiScheduler = uiScheduler ?? SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
+        dragAnchor = new SerialDisposable().AddTo(Anchors);
 
         Disposable.Create(() =>
         {
@@ -110,6 +113,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         windowTopmost = new PropertyValueHolder<bool>(this, nameof(Topmost)).AddTo(Anchors);
         windowVisible = new PropertyValueHolder<bool>(this, nameof(IsVisible)).AddTo(Anchors);
         showInTaskbar = new PropertyValueHolder<bool>(this, nameof(ShowInTaskbar)).AddTo(Anchors);
+        windowState = new PropertyValueHolder<WindowState>(this, nameof(WindowState)).AddTo(Anchors);
 
         ShowInTaskbar = true;
         Width = 300;
@@ -213,9 +217,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         set => showInTaskbar.SetValue(value, TrackedPropertyUpdateSource.External);
     }
 
+    public WindowState WindowState 
+    {
+        get => windowState.State.Value;
+        set => windowState.SetValue(value, TrackedPropertyUpdateSource.External);
+    }
+    
     public Thickness Padding { get; set; } = new(2);
+    
     public Thickness BorderThickness { get; set; }
-
+    
     public bool IsClickThrough { get; set; }
 
     public bool IsDebugMode { get; set; }
@@ -328,6 +339,24 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         EnqueueUpdate(new ShowDevToolsCommand());
     }
 
+    public void Minimize()
+    {
+        Log.Debug("Enqueueing Minimize command");
+        EnqueueUpdate(new MinimizeCommand());
+    }
+
+    public void Maximize()
+    {
+        Log.Debug("Enqueueing Maximize command");
+        EnqueueUpdate(new MaximizeCommand());
+    }
+
+    public void Restore()
+    {
+        Log.Debug("Enqueueing Restore command");
+        EnqueueUpdate(new RestoreCommand());
+    }
+    
     public void Hide()
     {
         Log.Debug("Enqueueing Hide command");
@@ -363,6 +392,15 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
         EnsureNotDisposed();
         Log.Debug("Closing the window");
         EnqueueUpdate(new CloseCommand());
+    }
+
+    public IDisposable EnableDragMove()
+    {
+        EnsureNotDisposed();
+        Log.Debug("Starts dragging the window");
+        var anchor = new CompositeDisposable();
+        EnqueueUpdate(new StartDragCommand(anchor));
+        return anchor;
     }
 
     public IntPtr GetWindowHandle()
@@ -508,6 +546,24 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     Log.Debug($"Showing dev tools");
                     window.ContentControl.OpenDevTools().AndForget();
                     break;
+                } 
+                case MinimizeCommand:
+                {
+                    Log.Debug($"Minimizing the window, current state: {{window.WindowState}}");
+                    window.WindowState = WindowState.Minimized;
+                    break;
+                }
+                case MaximizeCommand:
+                {
+                    Log.Debug($"Maximizing the window, current state: {{window.WindowState}}");
+                    window.WindowState = WindowState.Maximized;
+                    break;
+                } 
+                case RestoreCommand:
+                {
+                    Log.Debug($"Restoring the window, current state: {window.WindowState}");
+                    window.WindowState = WindowState.Normal;
+                    break;
                 }
                 case CloseCommand:
                 {
@@ -521,6 +577,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     window.Title = command.Title ?? string.Empty;
                     break;
                 }
+                case SetWindowState command:
+                {
+                    Log.Debug($"Updating {nameof(window.WindowState)} to {command.WindowState}");
+                    window.WindowState = command.WindowState;
+                    break;
+                }
                 case SetWindowPosCommand command:
                 {
                     Log.Debug($"Setting window position to {command.Location}");
@@ -531,6 +593,13 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 {
                     Log.Debug($"Setting window rect to {command.Rect}");
                     UnsafeNative.SetWindowRect(window.WindowHandle, command.Rect);
+                    break;
+                }
+                case StartDragCommand command:
+                {
+                    Log.Debug($"Starting dragging the window");
+                    dragAnchor.Disposable = null;
+                    dragAnchor.Disposable = new WindowMouseDragController(this, window.ContentControl).AddTo(command.Anchor);
                     break;
                 }
                 case SetWindowSizeCommand command:
@@ -561,12 +630,20 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     Log.Debug($"Updating {nameof(Padding)} to {command.Padding}");
                     //min padding must be at least 1px to accomodate for WPF rounding
                     //otherwise browser content gets cropped in some cases
-                    window.ContentControl.Margin = new Thickness(
+                    if (command.TitleBarDisplayMode is TitleBarDisplayMode.Custom)
+                    {
+                        window.ContentControl.Margin = new Thickness(0);
+                    }
+                    else
+                    {
+                        window.ContentControl.Margin = new Thickness(
                             left: Math.Max(command.Padding.Left, 1),
                             top: Math.Max(command.Padding.Top, 1),
                             right: Math.Max(command.Padding.Right, 1),
                             bottom: Math.Max(command.Padding.Bottom, 1)
                         );
+                    }
+
                     break;
                 }
                 case SetResizeMode command:
@@ -613,7 +690,15 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 case SetBorderThickness command:
                 {
                     Log.Debug($"Updating {nameof(BorderThickness)} to {command.BorderThickness}");
-                    window.BorderThickness = command.BorderThickness;
+                    if (command.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.None)
+                    {
+                        window.BorderThickness = new Thickness(0);
+                    }
+                    else
+                    {
+                        window.BorderThickness = command.BorderThickness;
+                    }
+
                     break;
                 }
                 case SetTopmostCommand command:
@@ -675,6 +760,11 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     windowTitle.SetValue(titleChangedEvent.Title, TrackedPropertyUpdateSource.Internal);
                     break;
                 }
+                case WindowStateChangedEvent args:
+                {
+                    windowState.SetValue(args.WindowState, TrackedPropertyUpdateSource.Internal);
+                    break;
+                }
                 default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
             }
         }
@@ -694,15 +784,16 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
             blazorWindow.HandleEvent(new SetShowInTaskbar(blazorWindow.ShowInTaskbar));
             blazorWindow.HandleEvent(new SetTopmostCommand(blazorWindow.Topmost));
             blazorWindow.HandleEvent(new SetBackgroundColor(blazorWindow.BackgroundColor));
-            blazorWindow.HandleEvent(new SetBorderThickness(blazorWindow.BorderThickness));
+            blazorWindow.HandleEvent(new SetBorderThickness(blazorWindow.TitleBarDisplayMode, blazorWindow.BorderThickness));
             blazorWindow.HandleEvent(new SetBorderColor(blazorWindow.BorderColor));
-            blazorWindow.HandleEvent(new SetWindowPadding(blazorWindow.Padding));
+            blazorWindow.HandleEvent(new SetWindowPadding(blazorWindow.TitleBarDisplayMode, blazorWindow.Padding));
             blazorWindow.HandleEvent(new SetResizeMode(blazorWindow.ResizeMode));
             blazorWindow.HandleEvent(new SetWindowTitleCommand(blazorWindow.Title));
+            blazorWindow.HandleEvent(new SetWindowState(blazorWindow.WindowState));
             blazorWindow.HandleEvent(new SetShowTitleBarCommand(
-                blazorWindow.TitleBarDisplayMode, 
-                ShowCloseButton: blazorWindow.ShowCloseButton, 
-                ShowMinButton: blazorWindow.ShowCloseButton, 
+                blazorWindow.TitleBarDisplayMode,
+                ShowCloseButton: blazorWindow.ShowCloseButton,
+                ShowMinButton: blazorWindow.ShowCloseButton,
                 ShowMaxButton: blazorWindow.ShowMaxButton));
             blazorWindow.HandleEvent(new SetBlazorAdditionalFiles(blazorWindow.AdditionalFiles));
             blazorWindow.HandleEvent(new SetBlazorFileProvider(blazorWindow.AdditionalFileProvider));
@@ -761,6 +852,13 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                         throw;
                     }
                 })
+                .AddTo(anchors);
+            
+            //these events are internally using WPF window subsystem and probably should be moved to WindowHook
+            Observable
+                .FromEventPattern<EventHandler, EventArgs>(h => window.StateChanged += h, h => window.StateChanged -= h)
+                .Select(x => window.WindowState)
+                .Subscribe(x => observer.OnNext(new WindowStateChangedEvent(x)))
                 .AddTo(anchors);
 
             //size/location-related events are handled in a special way - to avoid blinking, they are set BEFORE form is loaded
@@ -835,9 +933,13 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
                 .AddTo(anchors);
 
-            blazorWindow.WhenAnyValue(x => x.Padding)
+            Observable.CombineLatest(
+                    blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode),
+                    blazorWindow.WhenAnyValue(x => x.Padding),
+                    (titleBarDisplayMode, borderThickness) =>
+                        new SetWindowPadding(titleBarDisplayMode, borderThickness))
                 .Skip(1)
-                .Subscribe(x => observer.OnNext(new SetWindowPadding(x)))
+                .Subscribe(x => observer.OnNext(x))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.BackgroundColor)
@@ -850,14 +952,23 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Subscribe(x => observer.OnNext(new SetBorderColor(x)))
                 .AddTo(anchors);
 
-            blazorWindow.WhenAnyValue(x => x.BorderThickness)
+            Observable.CombineLatest(
+                    blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode),
+                    blazorWindow.WhenAnyValue(x => x.BorderThickness),
+                    (titleBarDisplayMode, borderThickness) =>
+                        new SetBorderThickness(titleBarDisplayMode, borderThickness))
                 .Skip(1)
-                .Subscribe(x => observer.OnNext(new SetBorderThickness(x)))
+                .Subscribe(x => observer.OnNext(x))
                 .AddTo(anchors);
 
             blazorWindow.WhenAnyValue(x => x.ResizeMode)
                 .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetResizeMode(x)))
+                .AddTo(anchors);
+            
+            blazorWindow.WhenAnyValue(x => x.WindowState)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetWindowState(x)))
                 .AddTo(anchors);
 
             window.WhenLoaded()
@@ -885,7 +996,7 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .Skip(1)
                 .Subscribe(x => { observer.OnNext(x); })
                 .AddTo(anchors);
-            
+
             // blazor-related events
             blazorWindow.WhenAnyValue(x => x.Container)
                 .Skip(1)
@@ -903,12 +1014,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 .AddTo(anchors);
 
             // events propagation
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.ContentControl.WebView.KeyDown += h, h => window.ContentControl.WebView.KeyDown -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.KeyDown?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.ContentControl.WebView.KeyUp += h, h => window.ContentControl.WebView.KeyUp -= h)
                 .Select(x => x.EventArgs)
@@ -1249,11 +1354,21 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed record CloseCommand : IWindowCommand;
 
+    private sealed record MinimizeCommand : IWindowCommand;
+
+    private sealed record MaximizeCommand : IWindowCommand;
+    
+    private sealed record RestoreCommand : IWindowCommand;
+
     private sealed record DisposeWindowCommand : IWindowCommand;
 
+    private sealed record SetWindowState(WindowState WindowState) : IWindowCommand;
+    
     private sealed record SetWindowTitleCommand(string Title) : IWindowCommand;
 
     private sealed record SetWindowRectCommand(Rectangle Rect) : IWindowCommand;
+    
+    private sealed record StartDragCommand(CompositeDisposable Anchor) : IWindowCommand;
 
     private sealed record SetWindowPosCommand(Point Location) : IWindowCommand;
 
@@ -1263,7 +1378,9 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed record SetVisibleCommand(bool IsVisible) : IWindowCommand;
 
-    private sealed record SetWindowPadding(Thickness Padding) : IWindowCommand;
+    private sealed record SetWindowPadding(TitleBarDisplayMode TitleBarDisplayMode, Thickness Padding) : IWindowCommand;
+
+    private sealed record SetBorderThickness(TitleBarDisplayMode TitleBarDisplayMode, Thickness BorderThickness) : IWindowCommand;
 
     private sealed record SetResizeMode(ResizeMode ResizeMode) : IWindowCommand;
 
@@ -1279,8 +1396,6 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
 
     private sealed record SetBorderColor(Color BorderColor) : IWindowCommand;
 
-    private sealed record SetBorderThickness(Thickness BorderThickness) : IWindowCommand;
-
     private sealed record SetBlazorUnityContainer(IUnityContainer ChildContainer) : IWindowCommand;
 
     private sealed record SetBlazorFileProvider(IFileProvider FileProvider) : IWindowCommand;
@@ -1294,6 +1409,8 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     private sealed record WindowPosChangedEvent(Point Location) : IWindowEvent;
 
     private sealed record WindowSizeChangedEvent(Size Size) : IWindowEvent;
+    
+    private sealed record WindowStateChangedEvent(WindowState WindowState) : IWindowEvent;
 
     private interface IWindowCommand : IWindowEvent
     {
@@ -1386,12 +1503,9 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                 Content = owner
             }.AddTo(Anchors);
             this.WhenAnyValue(x => x.ChildContainer)
-                .Subscribe(x =>
-                {
-                    ContentControl.Container = x;
-                })
+                .Subscribe(x => { ContentControl.Container = x; })
                 .AddTo(Anchors);
-            
+
             Content = ContentControl;
             AllowsTransparency = true;
 

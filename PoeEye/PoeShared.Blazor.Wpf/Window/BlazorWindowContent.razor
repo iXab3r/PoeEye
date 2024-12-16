@@ -1,5 +1,10 @@
 ﻿@namespace PoeShared.Blazor.Wpf
+@using System.Globalization
+@using System.Numerics
+@using System.Reactive.Disposables
+@using System.Windows
 @using System.Windows.Input
+@using BlazorComponentUtilities
 @using JetBrains.Annotations
 @using PoeShared.Blazor.Scaffolding
 @using PoeShared.Scaffolding
@@ -19,11 +24,53 @@
 <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
     @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom)
     {
-        <div class="w-100 bg-secondary-subtle border p-1"
-             @onmousedown="StartDrag">
-            <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
-                @DataContext.Title
-            </ReactiveSection>
+        <div class="d-flex w-100 bg-secondary-subtle text-white text-uppercase font-play align-items-center"
+             @ref="@TitleRef">
+            <span class="p-1 py-2 w-100"
+                  style="user-select: none;"
+                  @ondblclick="ToggleWindowState"
+                  @onmousedown="HandleMouseDown">
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
+                    @DataContext.Title
+                </ReactiveSection>
+            </span>
+            <span class="flex-grow-1"></span>
+            <span class="d-flex gap-1 h-100">
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton)))">
+                    @if (DataContext.ShowMinButton)
+                    {
+                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                                @onclick="@(() => DataContext.Minimize())">
+                            <i class="fa-regular fa-window-minimize"></i>
+                        </button>
+                    }
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton, x => x.WindowState)))">
+                    @if (DataContext.WindowState != WindowState.Maximized)
+                    {
+                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                                @onclick="@(() => DataContext.WindowState = WindowState.Maximized)">
+                            <i class="fa-regular fa-window-maximize"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                                @onclick="@(() => DataContext.WindowState = WindowState.Normal)">
+                            <i class="fa-regular fa-window-restore"></i>
+                        </button>
+                    }
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowCloseButton)))">
+                    @if (DataContext.ShowCloseButton)
+                    {
+                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                                @onclick="@(() => DataContext.Close())">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    }
+                </ReactiveSection>
+            </span>
         </div>
     }
     else
@@ -31,6 +78,66 @@
         <div></div>
     }
 </ReactiveSection>
+
+<ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
+
+    @{
+        var borderZIndex = 65535;
+        var borderThickness = DataContext.BorderThickness;
+        var borderColor = DataContext.BorderColor;
+        var borderColorAsHex = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
+
+        var topBorderStyle = new CssBuilder()
+            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: n-resize;");
+
+        var rightBorderStyle = new CssBuilder()
+            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"width: {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"right: 0;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: w-resize;");
+
+        var bottomBorderStyle = new CssBuilder()
+            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"bottom: 0;")
+            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: n-resize;");
+
+        var leftBorderStyle = new CssBuilder()
+            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"width: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: w-resize;");
+    }
+    <div class="position-fixed"
+         style="@topBorderStyle">
+    </div>
+
+    <div class="position-fixed"
+         style="@rightBorderStyle">
+    </div>
+
+    <div class="position-fixed"
+         style="@bottomBorderStyle">
+    </div>
+
+    <div class="position-fixed"
+         style="@leftBorderStyle">
+    </div>
+
+
+</ReactiveSection>
+
 
 <div class="overflow-auto">
 @if (DataContext.Anchors.IsDisposed)
@@ -67,6 +174,10 @@ else if (DataContext.IsDebugMode)
         </td>
         <td>
             <span class="d-flex gap-1">
+                <span class="p-1 py-2 border border-1"
+                      @onmousedown="StartDrag">
+                    Drag
+                </span>
                 <button class="btn btn-secondary p-0 m-0 px-3"
                         @onclick="@(() => BlazorContentControlAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
                     DevTools
@@ -217,6 +328,74 @@ else if (DataContext.IsDebugMode)
         </td>
     </tr>
     <tr>
+        <td>
+            <span class="debug-table-header">Border Thickness</span>
+        </td>
+        <td>
+            <span class="d-flex gap-1">
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.BorderThickness.Left:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.BorderThickness = DataContext.BorderThickness with {Left = intValue}; } })">
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.BorderThickness.Top:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.BorderThickness = DataContext.BorderThickness with {Top = intValue}; } })">
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.BorderThickness.Right:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.BorderThickness = DataContext.BorderThickness with {Right = intValue}; } })">
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.BorderThickness.Bottom:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.BorderThickness = DataContext.BorderThickness with {Bottom = intValue}; } })">
+                </ReactiveSection>
+            </span>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="debug-table-header">Padding</span>
+        </td>
+        <td>
+            <span class="d-flex gap-1">
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.Padding.Left:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.Padding = DataContext.Padding with {Left = intValue}; } })">
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.Padding.Top:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.Padding = DataContext.Padding with {Top = intValue}; } })">
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.Padding.Right:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.Padding = DataContext.Padding with {Right = intValue}; } })">
+                </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
+                    <input type="number"
+                           class="form-control"
+                           value="@($"{DataContext.Padding.Bottom:F0}")"
+                           oninput="@((ChangeEventArgs x) => { if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue)) { DataContext.Padding = DataContext.Padding with {Bottom = intValue}; } })">
+                </ReactiveSection>
+            </span>
+
+        </td>
+    </tr>
+    <tr>
         <td>Flags</td>
         <td>
             <span class="d-flex gap-5">
@@ -263,8 +442,8 @@ else if (DataContext.IsDebugMode)
                 <button class="btn btn-success p-0 m-0 px-5"
                         disabled="@(DataContext.IsDebugMode == false)"
                         @onclick="@(() => DataContext.IsDebugMode = false)">
-                Exit debug mode
-            </button>
+                    Exit debug mode
+                </button>
             </span>
         </td>
     </tr>
@@ -286,15 +465,15 @@ else
 
 
 @code {
-    private bool isDragging;
-    private System.Drawing.Point startPoint;
-    private System.Drawing.Point windowInitialPosition;
+    private readonly SerialDisposable dragAnchor;
 
-    private IntPtr nativeWindowHandle;
-
+    private Vector2 titleDragStartPoint;
+    private Vector2 minDragDistance;
+    
     public BlazorWindowContent()
     {
         Anchors.Add(() => ContentPresenter = null);
+        dragAnchor = new SerialDisposable().AddTo(Anchors);
 
         ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.IsDebugMode));
 
@@ -312,10 +491,9 @@ else
 
     [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
 
-    public BlazorContentControl ContentControl => BlazorContentControlAccessor.Control;
-
     public BlazorContentPresenter ContentPresenter { get; private set; }
-
+    public ElementReference TitleRef { get; private set; }
+    
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -335,47 +513,44 @@ else
                 }
             })
             .AddTo(Anchors);
-
-        nativeWindowHandle = DataContext.GetWindowHandle();
     }
 
-    private void StartDrag(MouseEventArgs e)
+    private void ToggleWindowState()
     {
-        if (!ContentControl.CaptureMouse())
+        //FIXME Does not work - due to StartDrag intercepting the focus, need to implement DOM event listener + Drag distance analysis
+        if (DataContext.WindowState == WindowState.Normal)
         {
-            throw new ApplicationException();
+            DataContext.Maximize();
         }
-
-        isDragging = true;
-        startPoint = System.Windows.Forms.Cursor.Position;
-
-        var windowRect = UnsafeNative.GetWindowRect(nativeWindowHandle);
-        windowInitialPosition = windowRect.Location;
-
-        ContentControl.MouseUp += ControlOnMouseUp;
-        ContentControl.MouseMove += ControlOnMouseMove;
-    }
-
-    private void ControlOnMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        if (!isDragging)
+        else if (DataContext.WindowState == WindowState.Maximized)
         {
-            return;
+            DataContext.Restore();
         }
-
-        var current = System.Windows.Forms.Cursor.Position;
-        var diffX = current.X - startPoint.X;
-        var diffY = current.Y - startPoint.Y;
-
-        UnsafeNative.SetWindowPos(nativeWindowHandle, new System.Drawing.Point(windowInitialPosition.X + diffX, windowInitialPosition.Y + diffY));
     }
 
-    private void ControlOnMouseUp(object sender, MouseButtonEventArgs e)
+    private void StartDrag()
     {
-        isDragging = false;
-        ContentControl.MouseUp -= ControlOnMouseUp;
-        ContentControl.MouseMove -= ControlOnMouseMove;
-        ContentControl.ReleaseMouseCapture();
+        dragAnchor.Disposable = new CompositeDisposable()
+        {
+            Disposable.Create(() => titleDragStartPoint = default),
+            DataContext.EnableDragMove()
+        };
     }
+
+    private void HandleMouseDown(MouseEventArgs obj)
+    {
+        titleDragStartPoint = GetCursorPosition();
+        minDragDistance = new Vector2(System.Windows.Forms.SystemInformation.DragSize.Width, System.Windows.Forms.SystemInformation.DragSize.Height);
+
+        StartDrag();
+    }
+
+    private static Vector2 GetCursorPosition()
+    {
+        var cursorPosition = System.Windows.Forms.Cursor.Position;
+        var current = new Vector2(cursorPosition.X, cursorPosition.Y);
+        return current;
+    }
+
 
 }
