@@ -9,7 +9,9 @@ public interface IRandomNumberGenerator
     int Next(int max);
 
     double NextDouble();
-
+    
+    float NextFloat();
+    
     public TimeSpan NextTimeSpan(TimeSpan minDelay, TimeSpan maxDelay)
     {
         return GenerateDelay(minDelay, maxDelay);

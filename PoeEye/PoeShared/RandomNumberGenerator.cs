@@ -29,4 +29,9 @@ internal sealed class RandomNumberGenerator : IRandomNumberGenerator
     {
         return rng.NextDouble();
     }
+
+    public float NextFloat()
+    {
+        return (float)rng.NextDouble();
+    }
 }
