@@ -630,20 +630,12 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
                     Log.Debug($"Updating {nameof(Padding)} to {command.Padding}");
                     //min padding must be at least 1px to accomodate for WPF rounding
                     //otherwise browser content gets cropped in some cases
-                    if (command.TitleBarDisplayMode is TitleBarDisplayMode.Custom)
-                    {
-                        window.ContentControl.Margin = new Thickness(0);
-                    }
-                    else
-                    {
-                        window.ContentControl.Margin = new Thickness(
-                            left: Math.Max(command.Padding.Left, 1),
-                            top: Math.Max(command.Padding.Top, 1),
-                            right: Math.Max(command.Padding.Right, 1),
-                            bottom: Math.Max(command.Padding.Bottom, 1)
-                        );
-                    }
-
+                    window.ContentControl.Margin = new Thickness(
+                        left: Math.Max(command.Padding.Left, 1),
+                        top: Math.Max(command.Padding.Top, 1),
+                        right: Math.Max(command.Padding.Right, 1),
+                        bottom: Math.Max(command.Padding.Bottom, 1)
+                    );
                     break;
                 }
                 case SetResizeMode command:

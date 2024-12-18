@@ -79,66 +79,6 @@
     }
 </ReactiveSection>
 
-<ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
-
-    @{
-        var borderZIndex = 65535;
-        var borderThickness = DataContext.BorderThickness;
-        var borderColor = DataContext.BorderColor;
-        var borderColorAsHex = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
-
-        var topBorderStyle = new CssBuilder()
-            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"background-color: {borderColorAsHex};")
-            .AddValue($"z-index: {borderZIndex};")
-            .AddValue($"cursor: n-resize;");
-
-        var rightBorderStyle = new CssBuilder()
-            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"width: {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"right: 0;")
-            .AddValue($"background-color: {borderColorAsHex};")
-            .AddValue($"z-index: {borderZIndex};")
-            .AddValue($"cursor: w-resize;");
-
-        var bottomBorderStyle = new CssBuilder()
-            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"bottom: 0;")
-            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"background-color: {borderColorAsHex};")
-            .AddValue($"z-index: {borderZIndex};")
-            .AddValue($"cursor: n-resize;");
-
-        var leftBorderStyle = new CssBuilder()
-            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"width: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"background-color: {borderColorAsHex};")
-            .AddValue($"z-index: {borderZIndex};")
-            .AddValue($"cursor: w-resize;");
-    }
-    <div class="position-fixed"
-         style="@topBorderStyle">
-    </div>
-
-    <div class="position-fixed"
-         style="@rightBorderStyle">
-    </div>
-
-    <div class="position-fixed"
-         style="@bottomBorderStyle">
-    </div>
-
-    <div class="position-fixed"
-         style="@leftBorderStyle">
-    </div>
-
-
-</ReactiveSection>
-
-
 <div class="overflow-auto">
 @if (DataContext.Anchors.IsDisposed)
 {
@@ -461,6 +401,66 @@ else
     </BlazorContentPresenter>
 }
 </div>
+
+<ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
+
+    @{
+        var borderZIndex = 65535;
+        var borderThickness = DataContext.BorderThickness;
+        var borderColor = DataContext.BorderColor;
+        var borderColorAsHex = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
+
+        var topBorderStyle = new CssBuilder()
+            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: n-resize;");
+
+        var rightBorderStyle = new CssBuilder()
+            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"width: {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"right: 0;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: w-resize;");
+
+        var bottomBorderStyle = new CssBuilder()
+            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"bottom: 0;")
+            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: n-resize;");
+
+        var leftBorderStyle = new CssBuilder()
+            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
+            .AddValue($"width: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"background-color: {borderColorAsHex};")
+            .AddValue($"z-index: {borderZIndex};")
+            .AddValue($"cursor: w-resize;");
+    }
+    <div class="position-fixed"
+         style="@topBorderStyle">
+    </div>
+
+    <div class="position-fixed"
+         style="@rightBorderStyle">
+    </div>
+
+    <div class="position-fixed"
+         style="@bottomBorderStyle">
+    </div>
+
+    <div class="position-fixed"
+         style="@leftBorderStyle">
+    </div>
+
+
+</ReactiveSection>
+
 </div>
 
 
@@ -469,7 +469,7 @@ else
 
     private Vector2 titleDragStartPoint;
     private Vector2 minDragDistance;
-    
+
     public BlazorWindowContent()
     {
         Anchors.Add(() => ContentPresenter = null);
@@ -493,7 +493,7 @@ else
 
     public BlazorContentPresenter ContentPresenter { get; private set; }
     public ElementReference TitleRef { get; private set; }
-    
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
