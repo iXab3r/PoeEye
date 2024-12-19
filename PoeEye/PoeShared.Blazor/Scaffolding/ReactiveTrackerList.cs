@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reactive.Linq;
 using DynamicData;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Scaffolding;
 
@@ -62,6 +65,11 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     {
         EnsureNotSealed();
         Enqueue(observableCollection.Connect().Select(x => x?.ToString()));
+    }
+
+    public void Add<T, TRet>(T source, Expression<Func<T, TRet>> expression) where T : INotifyPropertyChanged
+    {
+        Add(source.WhenAnyValue(expression));
     }
     
     public void Add(params IObservable<string>[] sources)

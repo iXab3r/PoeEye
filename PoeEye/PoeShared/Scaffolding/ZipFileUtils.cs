@@ -13,13 +13,11 @@ public static class ZipFileUtils
         IProgressReporter progressReporter = default)
     {
         var files = Directory.GetFiles(sourceDirectory.FullName, "*", SearchOption.AllDirectories);
-        var totalSizeBytes = files.Sum(file => new FileInfo(file).Length);
-        var totalProcessedBytes = 0d;
+        var totalProcessedFiles = 0;
         using var zipToOpen = new FileStream(archivePath.FullName, FileMode.Create);
         using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create);
         foreach (var file in files)
         {
-            var fileSize = ByteSize.FromBytes(new FileInfo(file).Length);
             var entryName = Path.GetRelativePath(sourceDirectory.FullName, file);
             var entry = archive.CreateEntry(entryName, compressionLevel);
 
@@ -29,9 +27,9 @@ public static class ZipFileUtils
                 fileStream.CopyTo(entryStream);
             }
 
-            totalProcessedBytes += fileSize.Bytes;
+            totalProcessedFiles++;
             
-            progressReporter?.Update(totalProcessedBytes * 100d / totalSizeBytes);
+            progressReporter?.Update(current: totalProcessedFiles, files.Length);
         }
 
         var resultArchive = new FileInfo(archivePath.FullName);

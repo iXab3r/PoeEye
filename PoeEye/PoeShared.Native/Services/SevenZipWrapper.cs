@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -74,6 +75,51 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
         processStartInfo.Arguments = args.JoinStrings(" ");
         ProcessHelper.RunCmd(processStartInfo);
         Log.Info($"Output directory contains following files: {arguments.OutputDirectory.EnumerateFiles().Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
+    }
+    
+    public void CreateFromDirectory(
+        DirectoryInfo sourceDirectory,
+        FileInfo archivePath,
+        CompressionLevel compressionLevel = CompressionLevel.NoCompression)
+    {
+        Log.Info($"Creating archive from directory: {sourceDirectory.FullName} to {archivePath.FullName}");
+
+        if (!sourceDirectory.Exists)
+        {
+            throw new DirectoryNotFoundException($"Source directory not found: {sourceDirectory.FullName}");
+        }
+
+        var processStartInfo = PrepareProcessStartInfo();
+
+        // Set compression level based on the input
+        var compressionArg = compressionLevel switch
+        {
+            CompressionLevel.Fastest => "-mx=1",
+            CompressionLevel.Optimal => "-mx=9",
+            CompressionLevel.NoCompression => "-mx=0",
+            _ => "-mx=5"
+        };
+
+        var args = new List<string>
+        {
+            "a", // Add files to archive
+            compressionArg,
+            $"\"{archivePath.FullName}\"",
+            $"\"{Path.Combine(sourceDirectory.FullName, "*")}\"", // Add all files
+            "-r" // Recursively include subdirectories
+        };
+
+        processStartInfo.Arguments = args.JoinStrings(" ");
+
+        ProcessHelper.RunCmd(processStartInfo);
+
+        archivePath.Refresh();
+        if (!archivePath.Exists)
+        {
+            throw new FileNotFoundException($"Failed to create archive: {archivePath.FullName}");
+        }
+
+        Log.Info($"Archive created successfully at {archivePath.FullName}, size: {archivePath.Length} bytes");
     }
 
     private static ProcessStartInfo PrepareProcessStartInfo()

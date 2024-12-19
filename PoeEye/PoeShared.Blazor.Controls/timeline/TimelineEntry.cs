@@ -1,23 +1,29 @@
 using System;
 using System.IO;
 using System.Reactive.Disposables;
+using DynamicData;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Controls;
 
 public abstract class TimelineEntry : DisposableReactiveObject
 {
+    protected TimelineEntry()
+    {
+        Images = new SourceList<FileInfo>().AddTo(Anchors);
+    }
+
     public DateTime? Timestamp { get; init; }
     
     public bool IsBusy { get; set; }
     
     public double? ProgressPercent { get; set; }
     
-    public string Text { get; set; }
+    public string? Text { get; set; }
 
-    public SourceListEx<FileInfo> Images { get; } = new();
+    public ISourceList<FileInfo> Images { get; }
     
-    public string PrefixIcon { get; init; }
+    public string? PrefixIcon { get; init; }
 
     public IDisposable Rent()
     {
