@@ -418,21 +418,29 @@ internal sealed class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazor
     public void SetWindowRect(Rectangle rect)
     {
         EnsureNotDisposed();
-        Log.Debug($"Setting window rect to {rect}");
+        Log.Debug($"Setting window rect to {rect} from {new Rectangle(Left, Top, Width, Height)}");
+        windowLeft.SetValue(rect.Left, TrackedPropertyUpdateSource.Internal);
+        windowTop.SetValue(rect.Top, TrackedPropertyUpdateSource.Internal);
+        windowWidth.SetValue(rect.Width, TrackedPropertyUpdateSource.Internal);
+        windowHeight.SetValue(rect.Height, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowRectCommand(rect));
     }
 
     public void SetWindowSize(Size windowSize)
     {
         EnsureNotDisposed();
-        Log.Debug($"Resizing window to {windowSize}");
+        Log.Debug($"Resizing window to {windowSize} from {new Size(Width, Height)}");
+        windowWidth.SetValue(windowSize.Width, TrackedPropertyUpdateSource.Internal);
+        windowHeight.SetValue(windowSize.Height, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowSizeCommand(windowSize));
     }
 
     public void SetWindowPos(Point windowPos)
     {
         EnsureNotDisposed();
-        Log.Debug($"Moving window to {windowPos}");
+        Log.Debug($"Moving window to {windowPos} from {new Point(Left, Top)}");
+        windowLeft.SetValue(windowPos.X, TrackedPropertyUpdateSource.Internal);
+        windowTop.SetValue(windowPos.Y, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowPosCommand(windowPos));
     }
 
