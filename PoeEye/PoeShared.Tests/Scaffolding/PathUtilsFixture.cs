@@ -18,6 +18,7 @@ public class PathUtilsFixture : FixtureBase
     [TestCase(null, null)]
     [TestCase(null, "")]
     [TestCase(null, "a", "b")]
+    [TestCase(null, "\\")] // Single root directory
     [TestCase("a", "a")]
     [TestCase("a", "a\\b", "a\\c")]
     [TestCase("a", "a\\b\\", "a\\c")]
@@ -32,7 +33,6 @@ public class PathUtilsFixture : FixtureBase
     [TestCase(@"a\b\c", "a/b\\c", "a/b/c")] // Mixed separators Windows
     [TestCase("a", "a/b", "a\\c")] // Mixed separators with common path
     [TestCase("a/b/c", "a/b/c", "a/b/c/d", "a/b/c/e")] // Common path with multiple extensions
-    [TestCase("\\", "\\")] // Single root directory
     [TestCase("a\\b", "a\\b\\c", "a\\b\\d")] // Common path with deeper branches
     [TestCase("C:\\a", "C:\\a\\b", "C:\\a\\c\\d")] // Windows-style absolute paths
     [TestCase("/a", "/a/b", "/a/c")] // Unix-style absolute paths
