@@ -178,9 +178,9 @@ public static class PathUtils
     /// </example>
     public static string FindLongestCommonPath(IReadOnlyList<string> paths)
     {
-        if (paths.IsEmpty())
+        if (paths.Count <= 0)
         {
-            throw new ArgumentException("At least one path must be supplied");
+            return string.Empty;
         }
         foreach (var directorySeparator in DirectorySeparators)
         {
@@ -261,8 +261,13 @@ public static class PathUtils
     /// </example>
     public static string FindLongestCommonPath(IReadOnlyList<string> paths, char separator)
     {
+        if (paths.Count <= 0)
+        {
+            return string.Empty;
+        }
+        
         var commonPath = string.Empty;
-        var longestPath = paths.MaxBy(str => str.Length);
+        var longestPath = paths.OrderByDescending(x => x.Length).First();
         var separatedPath = longestPath.Split(separator, StringSplitOptions.RemoveEmptyEntries);
         foreach (var segment in separatedPath.AsEnumerable())
         {
