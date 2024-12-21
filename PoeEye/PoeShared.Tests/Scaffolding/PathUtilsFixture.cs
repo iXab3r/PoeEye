@@ -19,10 +19,27 @@ public class PathUtilsFixture : FixtureBase
     [TestCase(null, "a", "b")]
     [TestCase("a", "a")]
     [TestCase("a", "a\\b", "a\\c")]
+    [TestCase("a", "a\\b\\", "a\\c")]
+    [TestCase("a", "a\\b", "a\\c\\")]
+    [TestCase("a", "a\\b\\", "a\\c\\")]
     [TestCase("a", "a\\b\\c", "a\\c\\d")]
     [TestCase("a\\b", "a\\b")]
     [TestCase("a\\b", "a\\b", "a\\b\\c")]
     [TestCase("a/b", "a/b", "a/b/c")]
+    [TestCase("a\\b\\c", "a\\b\\c", "a\\b\\c")]
+    [TestCase("a/b", "a/b\\c", "a/b/c")] // Mixed separators
+    [TestCase("a", "a/b", "a\\c")] // Mixed separators with common path
+    [TestCase("a/b/c", "a/b/c", "a/b/c/d", "a/b/c/e")] // Common path with multiple extensions
+    [TestCase("\\", "\\")] // Single root directory
+    [TestCase("a\\b", "a\\b\\c", "a\\b\\d")] // Common path with deeper branches
+    [TestCase("C:\\a", "C:\\a\\b", "C:\\a\\c\\d")] // Windows-style absolute paths
+    [TestCase("/a", "/a/b", "/a/c")] // Unix-style absolute paths
+    [TestCase("folder/subfolder", "folder/subfolder/file.txt", "folder/subfolder/anotherfile.txt")] // Common path in nested directories
+    [TestCase(null, "a/b", "c/d")] // Completely unrelated paths
+    [TestCase(null, "", "")] // Empty paths
+    [TestCase(null, "C:\\a\\b", "D:\\a\\b")] // Different drive letters
+    [TestCase(null, "a/b", "/a/b")] // Relative and absolute paths
+    [TestCase(null, "folder/file1", "folder/file2", "folder2/file3")] // Partial overlap between some paths
     public void ShouldGetLongestCommonPath(string expected, params string[] paths)
     {
         //Given

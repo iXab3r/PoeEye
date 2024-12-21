@@ -165,36 +165,6 @@ public static class PathUtils
     }
 
     /// <summary>
-    ///     Gets the longest common path for the paths provided.
-    /// </summary>
-    /// <param name="paths">A read-only list of path strings.</param>
-    /// <returns>The common path as a string</returns>
-    /// <example>
-    ///     <code>
-    /// GetLongestCommonPath(new List<string>
-    ///             { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information"
-    ///             }); //Returns "C:\\Program Files"
-    /// </code>
-    /// </example>
-    public static string GetLongestCommonPath(IReadOnlyList<string> paths)
-    {
-        if (paths.IsEmpty())
-        {
-            throw new ArgumentException("At least one path must be supplied");
-        }
-        foreach (var directorySeparator in DirectorySeparators)
-        {
-            var path = FindLongestCommonPath(paths, directorySeparator);
-            if (!string.IsNullOrEmpty(path))
-            {
-                return path;
-            }
-        }
-
-        throw new ArgumentException($"Failed to find common path: {paths.DumpToString()}");
-    }
-    
-    /// <summary>
     ///     Finds the longest common path for the paths provided.
     /// </summary>
     /// <param name="paths">A read-only list of path strings.</param>
@@ -228,6 +198,29 @@ public static class PathUtils
     ///     Gets the longest common path for the paths provided.
     /// </summary>
     /// <param name="paths">A read-only list of path strings.</param>
+    /// <returns>The common path as a string</returns>
+    /// <example>
+    ///     <code>
+    /// GetLongestCommonPath(new List<string>
+    ///             { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information"
+    ///             }); //Returns "C:\\Program Files"
+    /// </code>
+    /// </example>
+    public static string GetLongestCommonPath(IReadOnlyList<string> paths)
+    {
+        var commonPath = FindLongestCommonPath(paths);
+        if (!string.IsNullOrEmpty(commonPath))
+        {
+            return commonPath;
+        }
+
+        throw new ArgumentException($"Failed to find common path(elements: {paths.Count}): {paths.DumpToString()}");
+    }
+
+    /// <summary>
+    ///     Gets the longest common path for the paths provided.
+    /// </summary>
+    /// <param name="paths">A read-only list of path strings.</param>
     /// <param name="separator">The character used as a directory separator in the paths.</param>
     /// <returns>The common path as a string</returns>
     /// <example>
@@ -245,12 +238,12 @@ public static class PathUtils
         }
 
         var commonPath = FindLongestCommonPath(paths, separator);
-        if (string.IsNullOrEmpty(commonPath))
+        if (!string.IsNullOrEmpty(commonPath))
         {
-            throw new ArgumentException($"Failed to find common path: {paths.DumpToString()}");
+            return commonPath;
         }
+        throw new ArgumentException($"Failed to find common path(elements: {paths.Count}): {paths.DumpToString()}");
 
-        return commonPath;
     }
 
     /// <summary>
@@ -269,10 +262,8 @@ public static class PathUtils
     public static string FindLongestCommonPath(IReadOnlyList<string> paths, char separator)
     {
         var commonPath = string.Empty;
-        var separatedPath = paths
-            .First(str => str.Length == paths.Max(st2 => st2.Length))
-            .Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
+        var longestPath = paths.MaxBy(str => str.Length);
+        var separatedPath = longestPath.Split(separator, StringSplitOptions.RemoveEmptyEntries);
         foreach (var segment in separatedPath.AsEnumerable())
         {
             if (commonPath.Length == 0 && paths.All(str => str.StartsWith(segment)))
