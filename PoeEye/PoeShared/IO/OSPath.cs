@@ -11,9 +11,11 @@ namespace PoeShared.IO;
 [JsonConverter(typeof(OSPathConverter))]
 public record OSPath : IComparable
 {
-    private static readonly char WindowsDirectorySeparator = '\\';
-    private static readonly char UnixDirectorySeparator = '/';
-    private static readonly char[] AllSeparators = { WindowsDirectorySeparator, UnixDirectorySeparator };
+    public static readonly OSPath Empty = new OSPath(string.Empty);
+    
+    public static readonly char WindowsDirectorySeparator = '\\';
+    public static readonly char UnixDirectorySeparator = '/';
+    public static readonly char[] AllSeparators = { WindowsDirectorySeparator, UnixDirectorySeparator };
     
     public OSPath(string fullPath) : this (fullPath, PathUtils.IsWindows)
     {

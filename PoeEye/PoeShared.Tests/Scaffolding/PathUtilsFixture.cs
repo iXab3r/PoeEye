@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Meziantou.Framework;
+using PoeShared.IO;
 using PoeShared.Scaffolding;
 using Shouldly;
 
@@ -27,7 +28,8 @@ public class PathUtilsFixture : FixtureBase
     [TestCase("a\\b", "a\\b", "a\\b\\c")]
     [TestCase("a/b", "a/b", "a/b/c")]
     [TestCase("a\\b\\c", "a\\b\\c", "a\\b\\c")]
-    [TestCase("a/b", "a/b\\c", "a/b/c")] // Mixed separators
+    [TestCase("a/b/c", "a/b\\c", "a/b/c")] // Mixed separators Unix
+    [TestCase(@"a\b\c", "a/b\\c", "a/b/c")] // Mixed separators Windows
     [TestCase("a", "a/b", "a\\c")] // Mixed separators with common path
     [TestCase("a/b/c", "a/b/c", "a/b/c/d", "a/b/c/e")] // Common path with multiple extensions
     [TestCase("\\", "\\")] // Single root directory
@@ -53,7 +55,7 @@ public class PathUtilsFixture : FixtureBase
         }
         else
         {
-            resultSupplier().ShouldBe(expected);
+            resultSupplier().ShouldBe(new OSPath(expected));
         }
     }
 

@@ -183,22 +183,43 @@ public static class PathUtils
     ///             }); //Returns "C:\\Program Files"
     /// </code>
     /// </example>
-    public static string FindLongestCommonPath(IReadOnlyList<string> paths)
+    public static OSPath FindLongestCommonPath(IReadOnlyList<string> paths)
     {
         if (paths.Count <= 0)
         {
-            return string.Empty;
+            return OSPath.Empty;
         }
-        foreach (var directorySeparator in DirectorySeparators)
+        
+        var commonPath = string.Empty;
+
+        var platformPaths = paths.Select(x => new OSPath(x).AsWindowsPath).ToArray();
+
+        var allSegments = platformPaths.OrderByDescending(x => x.Length)
+            .First()
+            .Split(OSPath.WindowsDirectorySeparator, StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var segment in allSegments)
         {
-            var path = FindLongestCommonPath(paths, directorySeparator);
-            if (!string.IsNullOrEmpty(path))
+            if (commonPath.Length == 0 && platformPaths.All(str => str.StartsWith(segment, StringComparison.OrdinalIgnoreCase)))
             {
-                return path;
-            } 
+                commonPath = segment;
+            }
+            else if (platformPaths.All(str => str.StartsWith(commonPath + OSPath.WindowsDirectorySeparator + segment, StringComparison.OrdinalIgnoreCase)))
+            {
+                commonPath += OSPath.WindowsDirectorySeparator + segment;
+            }
+            else
+            {
+                break;
+            }
         }
 
-        return string.Empty;
+        if (string.IsNullOrEmpty(commonPath))
+        {
+            return OSPath.Empty;
+        }
+
+        return new OSPath(commonPath);
     }
 
     /// <summary>
@@ -213,86 +234,15 @@ public static class PathUtils
     ///             }); //Returns "C:\\Program Files"
     /// </code>
     /// </example>
-    public static string GetLongestCommonPath(IReadOnlyList<string> paths)
+    public static OSPath GetLongestCommonPath(IReadOnlyList<string> paths)
     {
         var commonPath = FindLongestCommonPath(paths);
-        if (!string.IsNullOrEmpty(commonPath))
+        if (!string.IsNullOrEmpty(commonPath.FullName))
         {
             return commonPath;
         }
 
         throw new ArgumentException($"Failed to find common path(elements: {paths.Count}): {paths.DumpToString()}");
-    }
-
-    /// <summary>
-    ///     Gets the longest common path for the paths provided.
-    /// </summary>
-    /// <param name="paths">A read-only list of path strings.</param>
-    /// <param name="separator">The character used as a directory separator in the paths.</param>
-    /// <returns>The common path as a string</returns>
-    /// <example>
-    ///     <code>
-    /// GetLongestCommonPath(new List<string>
-    ///             { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information"
-    ///             }, '\\'); //Returns "C:\\Program Files"
-    /// </code>
-    /// </example>
-    public static string GetLongestCommonPath(IReadOnlyList<string> paths, char separator)
-    {
-        if (paths.IsEmpty())
-        {
-            throw new ArgumentException("At least one path must be supplied");
-        }
-
-        var commonPath = FindLongestCommonPath(paths, separator);
-        if (!string.IsNullOrEmpty(commonPath))
-        {
-            return commonPath;
-        }
-        throw new ArgumentException($"Failed to find common path(elements: {paths.Count}): {paths.DumpToString()}");
-
-    }
-
-    /// <summary>
-    ///     Finds the longest common path for the paths provided.
-    /// </summary>
-    /// <param name="paths">A read-only list of path strings.</param>
-    /// <param name="separator">The character used as a directory separator in the paths.</param>
-    /// <returns>The common path as a string or null if path not found</returns>
-    /// <example>
-    ///     <code>
-    /// GetLongestCommonPath(new List<string>
-    ///             { "C:\\Program Files\\Common Files", "C:\\Program Files\\Uninstall Information"
-    ///             }, '\\'); //Returns "C:\\Program Files"
-    /// </code>
-    /// </example>
-    public static string FindLongestCommonPath(IReadOnlyList<string> paths, char separator)
-    {
-        if (paths.Count <= 0)
-        {
-            return string.Empty;
-        }
-        
-        var commonPath = string.Empty;
-        var longestPath = paths.OrderByDescending(x => x.Length).First();
-        var separatedPath = longestPath.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var segment in separatedPath.AsEnumerable())
-        {
-            if (commonPath.Length == 0 && paths.All(str => str.StartsWith(segment)))
-            {
-                commonPath = segment;
-            }
-            else if (paths.All(str => str.StartsWith(commonPath + separator + segment)))
-            {
-                commonPath += separator + segment;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        return string.IsNullOrEmpty(commonPath) ? null : commonPath;
     }
 
     /// <summary>
@@ -381,7 +331,7 @@ public static class PathUtils
     {
         return string.IsNullOrWhiteSpace(path) ? 0 : path.Count(x => x == Path.DirectorySeparatorChar || x == Path.AltDirectorySeparatorChar);
     }
-    
+
     /// <summary>
     ///     Checks if the two provided paths are the same.
     /// </summary>
@@ -618,7 +568,7 @@ public static class PathUtils
             return Path.Combine(folderPath, candidateName);
         }, pathValidator, startIdx);
     }
-    
+
     /// <summary>
     ///     Creates a valid path name by appending a number to a base path name.
     /// </summary>
@@ -716,7 +666,7 @@ public static class PathUtils
     {
         return ReservedFileNames.Contains(fileName);
     }
-    
+
     /// <summary>
     /// Strips invalid characters from a given file name.
     /// </summary>
@@ -733,7 +683,7 @@ public static class PathUtils
         
         return result.ToString();
     }
-    
+
     /// <summary>
     /// Checks if a given file name is valid according to Windows file name rules.
     /// </summary>
