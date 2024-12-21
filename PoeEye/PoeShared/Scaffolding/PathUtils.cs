@@ -17,7 +17,14 @@ public static class PathUtils
         .Add(Path.AltDirectorySeparatorChar)
         .Add(Path.DirectorySeparatorChar);
 
-    private static readonly char[] DirectorySeparators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
+    private static readonly ImmutableHashSet<char> DirectorySeparators = ImmutableHashSet<char>.Empty
+        .Add(Path.DirectorySeparatorChar) // on Win - \, on Unix - /
+        .Add(Path.AltDirectorySeparatorChar) // on Win - /, on Unix - / (no difference)
+        .Add('/')
+        .Add('\\');
+
+    private static readonly char[] DirectorySeparatorsAsArray = DirectorySeparators.ToArray();
+        
     private static readonly ImmutableHashSet<string> InvalidFileNameParts;
 
     private static readonly ImmutableHashSet<string> ReservedFileNames = ImmutableHashSet<string>.Empty
@@ -356,7 +363,7 @@ public static class PathUtils
             return string.Empty;
         }
 
-        var separatorIdx = path.IndexOfAny(DirectorySeparators);
+        var separatorIdx = path.IndexOfAny(DirectorySeparatorsAsArray);
         return separatorIdx <= 0 ? path : path.Substring(0, separatorIdx);
     }
 

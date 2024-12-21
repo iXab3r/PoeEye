@@ -81,6 +81,7 @@ public class SharedLog : DisposableReactiveObject
         Log.Info($"Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
         Log.Info($"Is Elevated: {appArguments.IsElevated}");
         Log.Info($"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");
+        Log.Info($"FileSystem: {new { Path.PathSeparator, Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar }})");
     }
 
     public void SwitchLoggingLevel(Level loggingLevel)
