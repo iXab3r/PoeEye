@@ -177,7 +177,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
                     childServiceCollection.Add(unityServiceDescriptors);
 
-                    var childServiceProvider = childServiceCollection.BuildServiceProvider();
+                    var childServiceProvider = childServiceCollection.BuildServiceProvider();//FIXME memory leak for transient dependencies
 
                     var clock = childServiceProvider.GetRequiredService<IClock>();
                     var scoped = childServiceProvider.CreateScope();

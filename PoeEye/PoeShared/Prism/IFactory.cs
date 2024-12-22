@@ -8,6 +8,10 @@ public interface IFactory<out TOut>
     TOut Create();
 }
 
+public interface IScopedFactory<out TOut> : IFactory<TOut>
+{
+}
+
 public interface INamedFactory<out TOut>
 {
     [NotNull]

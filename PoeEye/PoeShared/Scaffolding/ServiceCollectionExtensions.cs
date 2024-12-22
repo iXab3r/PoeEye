@@ -35,48 +35,75 @@ public static class ServiceCollectionExtensions
         TryAdd(collection, typeof(TServiceType), typeof(TServiceImplementation), lifetime);
     }
     
-    public static void AddHostedServiceOfType<T>(this IServiceCollection services) where T : class
+    public static void AddHostedServiceOfType<TService>(this IServiceCollection services) where TService : class
     {
-        services.AddFactory<T>();
-        services.AddHostedService<ServiceHosting<T>>();
+        services.AddHostedService<ServiceHosting<TService>>();
     }
 
-    public static void AddHostedService<TService, TImplementation>(this IServiceCollection services)
-        where TService : class, IHostedService
-        where TImplementation : class, TService
+    public static void AddFactory<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factoryFunc)
+        where TService : class
     {
-        services.AddSingleton<TService, TImplementation>();
-        services.AddHostedService<TService>(sp => sp.GetRequiredService<TService>());
+        services.Add(new ServiceDescriptor(typeof(IFactory<TService>), x =>  new LifetimeFactory<TService>(x, factoryFunc), ServiceLifetime.Singleton));
+        services.Add(new ServiceDescriptor(typeof(IScopedFactory<TService>), x =>  new ScopedFactory<TService>(x, factoryFunc), ServiceLifetime.Scoped));
     }
 
     public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
         where TService : class
         where TImplementation : class, TService
     {
-        services.AddTransient<TService, TImplementation>();
-        AddFactory<TService>(services);
+        AddFactory<TService>(services, x => ActivatorUtilities.CreateInstance<TImplementation>(x));
     }
-        
+
     public static void AddFactory<TService>(this IServiceCollection services)
         where TService : class
     {
-        services.AddSingleton<Func<TService>>(x => x.GetRequiredService<TService>);
-        services.AddSingleton<IFactory<TService>, Factory<TService>>();
+        AddFactory(services, x => ActivatorUtilities.CreateInstance<TService>(x));
     }
 
-    internal sealed class Factory<T> : IFactory<T>
+    internal sealed class ScopedFactory<T> : IScopedFactory<T>
     {
-        private readonly Func<T> factoryFunc;
+        private readonly IServiceProvider serviceProvider;
+        private readonly Func<IServiceProvider, T> factoryFunc;
+        private readonly CompositeDisposable anchors = new CompositeDisposable();
 
-        public Factory(Func<T> factoryFunc)
+        public ScopedFactory(IServiceProvider serviceProvider, Func<IServiceProvider, T> factoryFunc)
         {
-            Guard.ArgumentNotNull(factoryFunc, nameof(factoryFunc));
+            this.serviceProvider = serviceProvider;
             this.factoryFunc = factoryFunc;
         }
 
         public T Create()
         {
-            return factoryFunc();
+            var scope = serviceProvider.CreateScope();
+            return factoryFunc(scope.ServiceProvider);
+        }
+
+        public void Dispose()
+        {
+            if (anchors.IsDisposed)
+            {
+                return;
+            }
+            anchors.Dispose();
+        }
+    }
+    
+    internal sealed class LifetimeFactory<T> : IFactory<T>
+    {
+        private readonly IServiceProvider serviceProvider;
+        private readonly Func<IServiceProvider, T> factoryFunc;
+        private readonly IServiceScope serviceScope;
+
+        public LifetimeFactory(IServiceProvider serviceProvider, Func<IServiceProvider, T> factoryFunc)
+        {
+            this.serviceProvider = serviceProvider;
+            this.factoryFunc = factoryFunc;
+            serviceScope = this.serviceProvider.CreateScope();
+        }
+
+        public T Create()
+        {
+            return factoryFunc(serviceScope.ServiceProvider);
         }
     }
 }
