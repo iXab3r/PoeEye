@@ -19,7 +19,7 @@ public static class CachingRegistrations
     {
         services.AddSingleton(typeof(ICachingProxyFactory), _ => container.Resolve<ICachingProxyFactory>());
         services.AddSingleton(typeof(ICachingProxyFactoryConfigurator),  _ => container.Resolve<ICachingProxyFactory>());
-        services.AddTransient(typeof(ICachingProxyFactory<>), typeof(CachingProxyFactory<>));
+        services.AddScoped(typeof(ICachingProxyFactory<>), typeof(CachingProxyFactory<>));
     }
     
     public static void AddCommonService(this IServiceCollection services, IUnityContainer container)
