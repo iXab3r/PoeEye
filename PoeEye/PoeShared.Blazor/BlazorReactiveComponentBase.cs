@@ -22,36 +22,48 @@ namespace PoeShared.Blazor;
 /// </summary>
 public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
 {
-    private static readonly Binder<BlazorReactiveComponentBase> Binder = new();
-
     /// <summary>
     /// Observable sequence that signals when a property of the component changes.
     /// </summary>
     private readonly Subject<object> whenChanged = new();
     private readonly ReactiveChangeDetector changeDetector = new();
     
-    /// <summary>
-    /// Static constructor to initialize the binder for the component.
-    /// </summary>
-    static BlazorReactiveComponentBase()
-    {
-        Binder.BindIf(x => !(x.JsRuntime is SafeJsRuntime), x => x.JsRuntime == null ? default(IJSRuntime) : new SafeJsRuntime(x.JsRuntime, x))
-            .To(x => x.JsRuntime);
-    }
-
+    private readonly Lazy<SafeJsRuntime> safeJsRuntime;
+    private IJSRuntime jsRuntime;
+    
     /// <summary>
     /// Constructor to initialize the BlazorReactiveComponentBase instance.
     /// </summary>
     protected BlazorReactiveComponentBase()
     {
+        safeJsRuntime = new Lazy<SafeJsRuntime>(() =>
+        {
+            if (jsRuntime is null)
+            {
+                throw new InvalidOperationException("JsRuntime is not initialized yet");
+            }
+
+            return new SafeJsRuntime(jsRuntime, this);
+        });
         ChangeTrackers = new ReactiveTrackerList();
-        Binder.Attach(this).AddTo(Anchors);
     }
-    
+
     /// <summary>
     /// Gets or sets the JavaScript runtime associated with the component.
     /// </summary>
-    [Inject] public IJSRuntime JsRuntime { get; private set; }
+    [Inject]
+    public IJSRuntime JsRuntime
+    {
+        get => safeJsRuntime.Value;
+        private set
+        {
+            if (jsRuntime != null)
+            {
+                throw new InvalidOperationException("JsRuntime is already initialized");
+            }
+            jsRuntime = value;
+        }
+    }
     
     /// <summary>
     /// Gets or sets the data context for the component.
@@ -151,8 +163,6 @@ public abstract class BlazorReactiveComponentBase : ReactiveComponentBase
             catch (Exception e)
             {
                 owner.Log.Warn($"Component has encountered JS invocation error, identifier: {identifier}", e);
-                owner.Dispose();
-
                 await owner.InvokeAsync(() => throw new AggregateException(
                     new InvalidOperationException("Do not forget to await JS invocations!"),
                     e));
