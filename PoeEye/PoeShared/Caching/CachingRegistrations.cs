@@ -30,5 +30,6 @@ public static class CachingRegistrations
         services.AddSingleton(sp => container.Resolve<IAppArguments>());
         
         services.AddSingleton(container);
+        services.AddFactories();
     }
 }

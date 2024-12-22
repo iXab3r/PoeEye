@@ -7,6 +7,8 @@ namespace PoeShared.Scaffolding;
 
 public static class ServiceCollectionExtensions
 {
+    private static readonly IFluentLog Log = typeof(ServiceCollectionExtensions).PrepareLogger();
+
     public static void TryAdd<TServiceImplementation>(this IServiceCollection collection,
         ServiceLifetime lifetime)
     {
@@ -39,25 +41,32 @@ public static class ServiceCollectionExtensions
     {
         services.AddHostedService<ServiceHosting<TService>>();
     }
-
-    public static void AddFactory<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factoryFunc)
-        where TService : class
+    
+    public static void AddFactories(this IServiceCollection services)
     {
-        services.Add(new ServiceDescriptor(typeof(IFactory<TService>), x =>  new LifetimeFactory<TService>(x, factoryFunc), ServiceLifetime.Singleton));
-        services.Add(new ServiceDescriptor(typeof(IScopedFactory<TService>), x =>  new ScopedFactory<TService>(x, factoryFunc), ServiceLifetime.Scoped));
+        services.Add(new ServiceDescriptor(typeof(IFactory<>),  typeof(LifetimeFactory<>), ServiceLifetime.Singleton));
+        services.Add(new ServiceDescriptor(typeof(IScopedFactory<>),  typeof(ScopedFactory<>), ServiceLifetime.Scoped));
+    }
+
+    public static void AddFactory<TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> factoryFunc)
+        where TImplementation : class
+    {
+        EnsureNotAbstract<TImplementation>();
+        
+        services.Add(new ServiceDescriptor(typeof(IFactory<TImplementation>), x =>  new LifetimeFactory<TImplementation>(x, factoryFunc), ServiceLifetime.Singleton));
+        services.Add(new ServiceDescriptor(typeof(IScopedFactory<TImplementation>), x =>  new ScopedFactory<TImplementation>(x, factoryFunc), ServiceLifetime.Scoped));
     }
 
     public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
         where TService : class
         where TImplementation : class, TService
     {
-        AddFactory<TService>(services, x => ActivatorUtilities.CreateInstance<TImplementation>(x));
-    }
-
-    public static void AddFactory<TService>(this IServiceCollection services)
-        where TService : class
-    {
-        AddFactory(services, x => ActivatorUtilities.CreateInstance<TService>(x));
+        EnsureNotAbstract<TImplementation>();
+        
+        services.Add(new ServiceDescriptor(typeof(IFactory<TService>), x =>  new LifetimeFactory<TImplementation>(x), ServiceLifetime.Singleton));
+        services.Add(new ServiceDescriptor(typeof(IScopedFactory<TService>), x =>  new ScopedFactory<TImplementation>(x), ServiceLifetime.Scoped));
+        services.Add(new ServiceDescriptor(typeof(IFactory<TImplementation>), x =>  new LifetimeFactory<TImplementation>(x), ServiceLifetime.Singleton));
+        services.Add(new ServiceDescriptor(typeof(IScopedFactory<TImplementation>), x =>  new ScopedFactory<TImplementation>(x), ServiceLifetime.Scoped));
     }
 
     internal sealed class ScopedFactory<T> : IScopedFactory<T>
@@ -65,6 +74,10 @@ public static class ServiceCollectionExtensions
         private readonly IServiceProvider serviceProvider;
         private readonly Func<IServiceProvider, T> factoryFunc;
         private readonly CompositeDisposable anchors = new CompositeDisposable();
+        
+        public ScopedFactory(IServiceProvider serviceProvider) : this(serviceProvider, CreateInstance<T>)
+        {
+        }
 
         public ScopedFactory(IServiceProvider serviceProvider, Func<IServiceProvider, T> factoryFunc)
         {
@@ -74,7 +87,7 @@ public static class ServiceCollectionExtensions
 
         public T Create()
         {
-            var scope = serviceProvider.CreateScope();
+            var scope = serviceProvider.CreateScope().AddTo(anchors);
             return factoryFunc(scope.ServiceProvider);
         }
 
@@ -93,6 +106,10 @@ public static class ServiceCollectionExtensions
         private readonly IServiceProvider serviceProvider;
         private readonly Func<IServiceProvider, T> factoryFunc;
         private readonly IServiceScope serviceScope;
+        
+        public LifetimeFactory(IServiceProvider serviceProvider) : this(serviceProvider, CreateInstance<T>)
+        {
+        }
 
         public LifetimeFactory(IServiceProvider serviceProvider, Func<IServiceProvider, T> factoryFunc)
         {
@@ -104,6 +121,32 @@ public static class ServiceCollectionExtensions
         public T Create()
         {
             return factoryFunc(serviceScope.ServiceProvider);
+        }
+    }
+
+    private static void EnsureNotAbstract<TService>()
+    {
+        var type = typeof(TService);
+        if (type.IsInterface)
+        {
+            throw new ArgumentException($"Failed to to register factory for interface {typeof(TService)}");
+        }
+        if (type.IsAbstract)
+        {
+            throw new ArgumentException($"Failed to to register factory for abstract class {typeof(TService)}");
+        }
+    }
+    
+    private static TService CreateInstance<TService>(IServiceProvider serviceProvider)
+    {
+        try
+        {
+            return ActivatorUtilities.CreateInstance<TService>(serviceProvider);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to resolve instance of type {typeof(TService)}, service provider: {serviceProvider}", e);
+            throw;
         }
     }
 }
