@@ -73,7 +73,6 @@ public static class ServiceCollectionExtensions
     {
         private readonly IServiceProvider serviceProvider;
         private readonly Func<IServiceProvider, T> factoryFunc;
-        private readonly CompositeDisposable anchors = new CompositeDisposable();
         
         public ScopedFactory(IServiceProvider serviceProvider) : this(serviceProvider, CreateInstance<T>)
         {
@@ -87,17 +86,8 @@ public static class ServiceCollectionExtensions
 
         public T Create()
         {
-            var scope = serviceProvider.CreateScope().AddTo(anchors);
+            var scope = serviceProvider.CreateScope();
             return factoryFunc(scope.ServiceProvider);
-        }
-
-        public void Dispose()
-        {
-            if (anchors.IsDisposed)
-            {
-                return;
-            }
-            anchors.Dispose();
         }
     }
     
