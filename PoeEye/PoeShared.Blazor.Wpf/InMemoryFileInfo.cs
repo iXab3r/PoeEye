@@ -16,6 +16,10 @@ public sealed class InMemoryFileInfo : IFileInfo
         LastModified = lastModified;
     }
 
+    public InMemoryFileInfo(string name, byte[] fileBytes) : this(name, fileBytes, lastModified: DateTimeOffset.Now)
+    {
+    }
+
     public Stream CreateReadStream()
     {
         return new MemoryStream(fileBytes);

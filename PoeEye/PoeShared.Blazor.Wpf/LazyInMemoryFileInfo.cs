@@ -25,6 +25,10 @@ public sealed class LazyInMemoryFileInfo : IFileInfo
         LastModified = lastModified;
     }
 
+    public LazyInMemoryFileInfo(string name, Func<byte[]> fileBytesGetter) : this(name, fileBytesGetter, lastModified: DateTimeOffset.Now)
+    {
+    }
+
     public Stream CreateReadStream()
     {
         return new MemoryStream(fileBytesSupplier.Value);
