@@ -31,16 +31,22 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
     /// Gets or sets list of additional files which will be included into browser
     /// </summary>
     ImmutableArray<IFileInfo> AdditionalFiles { get; set; }
-    
+
+    /// <summary>
+    /// Gets or sets the startup location of the window.
+    /// </summary>
+    WindowStartupLocation WindowStartupLocation { get; set; }
+        
     /// <summary>
     /// Gets or sets additional file provider which will be used by Blazor
     /// </summary>
     IFileProvider AdditionalFileProvider { get; set; }
 
     /// <summary>
-    /// Gets or sets the startup location of the window.
+    /// Adds additional file provider which will be used by Blazor. Added to the end of the list.
+    /// Removed on disposal
     /// </summary>
-    WindowStartupLocation WindowStartupLocation { get; set; }
+    IDisposable RegisterFileProvider(IFileProvider fileProvider);
 
     /// <summary>
     /// Shows Chromium DevTools

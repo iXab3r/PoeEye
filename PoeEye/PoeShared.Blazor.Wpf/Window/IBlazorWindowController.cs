@@ -63,6 +63,11 @@ public interface IBlazorWindowController
     bool Topmost { get; set; }
     
     /// <summary>
+    /// Gets or sets a value indicating whether the window should NOT be activated when clicked
+    /// </summary>
+    bool NoActivate { get; set; }
+    
+    /// <summary>
     /// Gets or sets a value indicating whether the window should have close button.
     /// </summary>
     bool ShowCloseButton { get; set; }

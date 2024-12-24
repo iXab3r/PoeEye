@@ -372,6 +372,17 @@ else if (DataContext.IsDebugMode)
                         </label>
                     </span>
                 </ReactiveSection>
+                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.NoActivate)))">
+                    <span class="d-flex gap-1">
+                        <input id="NoActivate" type="checkbox"
+                               @bind:get="@(DataContext.NoActivate)"
+                               @bind:set="@(x => DataContext.NoActivate = x)"
+                               @bind:event="oninput"/>
+                        <label for="NoActivate" class="rcb-label">
+                            No Activate
+                        </label>
+                    </span>
+                </ReactiveSection>
             </span>
         </td>
     </tr>
