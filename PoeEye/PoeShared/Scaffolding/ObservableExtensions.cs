@@ -9,6 +9,15 @@ namespace PoeShared.Scaffolding;
 
 public static class ObservableExtensions
 {
+    private static Func<TimeSpan, int, TimeSpan> DefaultDelayStrategy => (retryTimeout, attemptIdx) => attemptIdx switch
+    {
+        < 1 => retryTimeout / 30,
+        < 2 => retryTimeout / 6,
+        < 4 => retryTimeout / 3,
+        < 5 => retryTimeout / 2,
+        _ => retryTimeout
+    };
+    
     private static readonly Action NoOperation = () => { };
 
     public static IObservable<TResult> SwitchLatestAsync<TSource, TResult>(this IObservable<TSource> source, Func<TSource, CancellationToken, Task<TResult>> asyncMethod)
@@ -107,6 +116,14 @@ public static class ObservableExtensions
     {
         return observable
             .RetryWithBackOff<T, Exception>(strategy);
+    }
+    
+    public static IObservable<T> RetryWithBackOff<T>(
+        this IObservable<T> observable,
+        TimeSpan retryTimeout)
+    {
+        return observable
+            .RetryWithBackOff<T, Exception>((_, attemptIdx) => DefaultDelayStrategy(retryTimeout, attemptIdx));
     }
 
     [DebuggerStepThrough]
