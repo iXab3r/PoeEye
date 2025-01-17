@@ -55,7 +55,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
     {
         base.BuildRenderTree(builder);
 
-        var seq = 0;
+        const int seq = 0;
 
         var hasAttribute = !string.IsNullOrEmpty(Id) ||
                            !string.IsNullOrEmpty(Class) ||
@@ -63,35 +63,35 @@ public sealed class ReactiveSection : BlazorReactiveComponent
                            AdditionalAttributes != null;
         if (AsElement != null || hasAttribute)
         {
-            builder.OpenElement(seq++, AsElement ?? "span");
+            builder.OpenElement(seq + 1, AsElement ?? "span");
         
             if (!string.IsNullOrEmpty(Id))
             {
-                builder.AddAttribute(seq++, "id", Id);
+                builder.AddAttribute(seq + 2, "id", Id);
             }
         
             if (!string.IsNullOrEmpty(Class))
             {
-                builder.AddAttribute(seq++, "class", Class);
+                builder.AddAttribute(seq + 3, "class", Class);
             }
         
             if (!string.IsNullOrEmpty(Style))
             {
-                builder.AddAttribute(seq++, "style", Style);
+                builder.AddAttribute(seq + 4, "style", Style);
             }
         
             if (AdditionalAttributes != null)
             {
                 foreach (var attribute in AdditionalAttributes)
                 {
-                    builder.AddAttribute(seq++, attribute.Key, attribute.Value);
+                    builder.AddAttribute(seq + 5, attribute.Key, attribute.Value);
                 }
             }
         
             var childContent = ChildContent;
             if (childContent != null)
             {
-                builder.AddContent(seq++, childContent);
+                builder.AddContent(seq + 6, childContent);
             }
             builder.CloseElement();
         }
@@ -100,7 +100,7 @@ public sealed class ReactiveSection : BlazorReactiveComponent
             var childContent = ChildContent;
             if (childContent != null)
             {
-                builder.AddContent(seq++, childContent);
+                builder.AddContent(seq + 100, childContent);
             }
         }
     }
