@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging; 
+using PoeShared.Scaffolding;
+using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -27,7 +28,7 @@ internal class CheckForUpdateImpl : IEnableLogger
         this.urlDownloader = urlDownloader;
         this.rootAppDirectory = rootAppDirectory;
     }
-    
+
     public async Task<IPoeUpdateInfo> CheckForUpdate(
         IReadOnlyList<IReleaseEntry> localReleases,
         string updateUrlOrPath,
@@ -52,6 +53,7 @@ internal class CheckForUpdateImpl : IEnableLogger
             Log.Debug($"Loading releases from local path {updateUrlOrPath}");
             releaseFile = await LoadRemoteReleasesFromFile(updateUrlOrPath);
         }
+
         progressCallback(33);
 
         var parsedReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, userToken: null).ToArray();
@@ -66,10 +68,10 @@ internal class CheckForUpdateImpl : IEnableLogger
         {
             const int maxReleasesToLog = 5;
             Log.Debug(parsedReleases.Length > maxReleasesToLog
-                ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.Select(x => new { x.PackageName, x.Filename, x.Filesize, x.Version }).OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToString()}"
-                : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.Select(x => new { x.PackageName, x.Filename, x.Filesize, x.Version }).DumpToString()}");
+                ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.Select(x => new {x.PackageName, x.Filename, x.Filesize, x.Version}).OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToString()}"
+                : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.Select(x => new {x.PackageName, x.Filename, x.Filesize, x.Version}).DumpToString()}");
         }
-            
+
         var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);
 
         progressCallback(100);
@@ -101,6 +103,7 @@ internal class CheckForUpdateImpl : IEnableLogger
             {
                 Log.Warn("Failed to load local releases, starting from scratch", ex);
             }
+
             localReleases = ArraySegment<ReleaseEntry>.Empty;
             shouldInitialize = true;
         }
@@ -115,7 +118,7 @@ internal class CheckForUpdateImpl : IEnableLogger
     }
 
     private static async Task<string> LoadRemoteReleasesFromUrl(
-        string updateUrlOrPath, 
+        string updateUrlOrPath,
         IFileDownloader urlDownloader,
         IReleaseEntry latestLocalRelease)
     {
@@ -166,7 +169,7 @@ internal class CheckForUpdateImpl : IEnableLogger
             goto retry;
         }
     }
-            
+
     private static async Task<string> LoadRemoteReleasesFromFile(string updateUrlOrPath)
     {
         Log.Info($"Reading RELEASES file from {updateUrlOrPath}");
@@ -213,7 +216,7 @@ internal class CheckForUpdateImpl : IEnableLogger
     }
 
     public IPoeUpdateInfo DetermineUpdateInfo(
-        IReadOnlyCollection<IReleaseEntry> localReleases, 
+        IReadOnlyCollection<IReleaseEntry> localReleases,
         IReadOnlyCollection<IReleaseEntry> remoteReleases,
         bool ignoreDeltaUpdates)
     {
@@ -224,20 +227,41 @@ internal class CheckForUpdateImpl : IEnableLogger
 
         return DetermineUpdateInfo(localReleases, remoteReleases);
     }
-            
+
     private IPoeUpdateInfo DetermineUpdateInfo(
-        IReadOnlyCollection<IReleaseEntry> localReleases, 
+        IReadOnlyCollection<IReleaseEntry> localReleases,
         IReadOnlyCollection<IReleaseEntry> remoteReleases)
     {
-        var packageDirectory = Utility.PackageDirectoryForAppDir(rootAppDirectory);
-
         if (remoteReleases == null || remoteReleases.Count == 0)
         {
-            Log.Warn("Release information couldn't be determined due to remote corrupt RELEASES file");
+            Log.Warn("Release information couldn't be determined due to corrupted remote RELEASES file");
             throw new Exception("Corrupted remote RELEASES file");
         }
 
-        var currentRelease = Utility.FindCurrentVersion(localReleases);
+        IReleaseEntry currentRelease;
+        var entryAssembly = Assembly.GetEntryAssembly();
+        var entryVersion = entryAssembly?.GetName()?.Version;
+        Log.Info($"Determining local version, entry point: {entryAssembly} v{entryVersion}");
+        if (localReleases.IsEmpty() && remoteReleases.Any() && entryAssembly != null)
+        {
+            Log.Warn($"No local releases - trying to guess by entry assembly version: {entryAssembly} v{entryAssembly.GetName().Version}");
+            currentRelease = remoteReleases.FirstOrDefault(x => x.Version.Version.Build == entryAssembly.GetName().Version?.Build);
+            if (currentRelease == null)
+            {
+                Log.Warn($"Failed to find remote release matching entry point version {entryVersion}, remote releases:\n\t{remoteReleases.Select(x => new { x.PackageName, x.Filename, x.Version }).DumpToTable()}");
+            }
+        }
+        else
+        {
+            currentRelease = Utility.FindCurrentVersion(localReleases);
+            if (currentRelease == null)
+            {
+                Log.Warn($"Failed to find local release, local version:\n\t{localReleases.Select(x => new { x.PackageName, x.Filename, x.Version }).DumpToTable()}");
+            }
+        }
+
+        Log.Info($"Current release: {currentRelease}");
+        var packageDirectory = Utility.PackageDirectoryForAppDir(rootAppDirectory);
         return PoeUpdateInfo.Create(currentRelease, localReleases, remoteReleases, packageDirectory);
     }
 

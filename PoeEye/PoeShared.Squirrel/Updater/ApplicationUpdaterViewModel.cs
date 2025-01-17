@@ -42,9 +42,16 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     static ApplicationUpdaterViewModel()
     {
-        Binder.Bind(x => x.isBusyLatch.IsBusy || x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy).To((x, v) => x.IsBusy = v, x => x.uiScheduler);
-        Binder.Bind(x => x.LatestUpdate != null).OnScheduler(x => x.uiScheduler).To(x => x.CanUpdateToLatest);
-        Binder.Bind(x => x.LatestUpdate != null && x.LatestUpdate.ReleasesToApply.EmptyIfNull().Any()).OnScheduler(x => x.uiScheduler).To(x => x.HasUpdatesToInstall);
+        Binder.Bind(x => x.isBusyLatch.IsBusy || x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy)
+            .To((x, v) => x.IsBusy = v, x => x.uiScheduler);
+        
+        Binder.Bind(x => x.LatestUpdate != null)
+            .OnScheduler(x => x.uiScheduler)
+            .To(x => x.CanUpdateToLatest);
+        
+        Binder.Bind(x => x.LatestUpdate != null && x.LatestUpdate.ReleasesToApply.EmptyIfNull().Any())
+            .OnScheduler(x => x.uiScheduler)
+            .To(x => x.HasUpdatesToInstall);
     }
 
     public ApplicationUpdaterViewModel(
