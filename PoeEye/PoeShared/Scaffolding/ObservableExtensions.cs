@@ -17,9 +17,9 @@ public static class ObservableExtensions
         < 5 => retryTimeout / 2,
         _ => retryTimeout
     };
-    
-    private static readonly Action NoOperation = () => { };
 
+    private static readonly Action NoOperation = () => { };
+    
     public static IObservable<TResult> SwitchLatestAsync<TSource, TResult>(this IObservable<TSource> source, Func<TSource, CancellationToken, Task<TResult>> asyncMethod)
     {
         return Observable.Create<TResult>(async observer =>
@@ -51,65 +51,97 @@ public static class ObservableExtensions
             {
                 observer.OnError(ex); // Propagate the error to the observer
             }
+
             observer.OnCompleted();
         });
     }
-    
+
     public static IObservable<T> Synchronize<T>(this IObservable<T> observable, NamedLock gate)
     {
         return observable.Synchronize(gate.Gate);
     }
-    
+
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<Task> supplier)
     {
         return SubscribeAsync(observable, _ => supplier());
     }
-    
+
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> supplier)
     {
         return SubscribeAsync(observable, supplier, _ => { });
     }
-    
+
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<Task> supplier, Action<Exception> onError)
     {
         return SubscribeAsync(observable, _ => supplier(), onError);
     }
-    
+
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, CancellationToken, Task> supplier)
     {
         return SubscribeAsync(observable, supplier, _ => { });
     }
-    
+
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, CancellationToken, Task> supplier, Action<Exception> onError)
     {
         return observable.Select(x => Observables.FromAsyncSafe(token => supplier(x, token)).Take(1)).Concat().Subscribe(() => { }, onError);
     }
-    
+
     public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> supplier, Action<Exception> onError)
     {
         return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat().Subscribe(() => { }, onError);
     }
-    
+
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, CancellationToken, Task<T1>> supplier)
     {
         return observable.Select(x => Observables.FromAsyncSafe((token) => supplier(x, token)).Take(1)).Concat();
     }
-    
+
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier)
     {
         return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat();
     }
-    
+
     public static IObservable<T1> SelectAsync<T, T1>(this IObservable<T> observable, Func<T, Task<T1>> supplier, IScheduler scheduler)
     {
         return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat();
     }
-    
+
     public static IObservable<Unit> SelectAsync<T>(this IObservable<T> observable, Func<T, Task> supplier, IScheduler scheduler)
     {
         return observable.Select(x => Observables.FromAsyncSafe(_ => supplier(x)).Take(1)).Concat();
     }
-    
+
+    public static IObservable<T> RepeatWithBackoff<T>(
+        this IObservable<T> observable,
+        TimeSpan repeatTimeout)
+    {
+        return observable
+            .RepeatWithBackoff(attemptIdx => DefaultDelayStrategy(repeatTimeout, attemptIdx));
+    }
+
+    public static IObservable<T> RepeatWithBackoff<T>(
+        this IObservable<T> observable,
+        Func<int, TimeSpan?> strategy)
+    {
+        var attemptIdx = 0;
+        var pipeline = Observable
+            .Defer(
+                () =>
+                {
+                    if (attemptIdx++ == 0)
+                    {
+                        return observable;
+                    }
+
+                    var delay = strategy(attemptIdx);
+                    return delay == null
+                        ? Observable.Empty<T>()
+                        : observable.DelaySubscription(delay.Value);
+                });
+
+        return pipeline.Repeat();
+    }
+
     public static IObservable<T> RetryWithBackOff<T>(
         this IObservable<T> observable,
         Func<Exception, int, TimeSpan?> strategy)
@@ -117,7 +149,7 @@ public static class ObservableExtensions
         return observable
             .RetryWithBackOff<T, Exception>(strategy);
     }
-    
+
     public static IObservable<T> RetryWithBackOff<T>(
         this IObservable<T> observable,
         TimeSpan retryTimeout)
@@ -131,7 +163,7 @@ public static class ObservableExtensions
     {
         return observable.Subscribe(_ => onNext());
     }
-        
+
     [DebuggerStepThrough]
     public static IDisposable SubscribeToErrors<T>(this IObservable<T> source, Action<Exception> onError)
     {
@@ -143,13 +175,13 @@ public static class ObservableExtensions
     {
         return SubscribeSafe(source, x => onNext(), onError);
     }
-        
+
     [DebuggerStepThrough]
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError)
     {
         return SubscribeSafe(source, onNext, onError, NoOperation);
     }
-        
+
     [DebuggerStepThrough]
     public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted)
     {
@@ -180,8 +212,8 @@ public static class ObservableExtensions
             }
         });
     }
-        
-    public static IDisposable SubscribeSafe<T>(this IObservable<T> source, 
+
+    public static IDisposable SubscribeSafe<T>(this IObservable<T> source,
         Func<Task> asyncAction, Action<Exception> handler)
     {
         async Task<Unit> Wrapped(T t)
@@ -194,14 +226,15 @@ public static class ObservableExtensions
             {
                 handler(e);
             }
+
             return Unit.Default;
         }
 
         return source.SelectMany(Wrapped).SubscribeSafe(_ => { }, handler);
     }
 
-    public static IDisposable SubscribeSafe<T>(this IObservable<T> source, 
-        Func<T,Task> asyncAction, Action<Exception> handler)
+    public static IDisposable SubscribeSafe<T>(this IObservable<T> source,
+        Func<T, Task> asyncAction, Action<Exception> handler)
     {
         async Task<Unit> Wrapped(T t)
         {
@@ -213,8 +246,10 @@ public static class ObservableExtensions
             {
                 handler(e);
             }
+
             return Unit.Default;
         }
+
         return source.SelectMany(Wrapped).SubscribeSafe(_ => { }, handler);
     }
 
@@ -232,22 +267,22 @@ public static class ObservableExtensions
     {
         return SwitchIfNotDefault(observable, trueSelector: selector, falseSelector: Observable.Empty<TOut>);
     }
-    
+
     public static IObservable<T> EnableIf<T>(this IObservable<T> source, IObservable<bool> condition)
     {
         return EnableIf(source, condition, Observable.Empty<T>());
     }
-    
+
     public static IObservable<T> EnableIf<T>(
-        this IObservable<T> source, 
-        IObservable<bool> condition, 
+        this IObservable<T> source,
+        IObservable<bool> condition,
         IObservable<T> alternateSource)
     {
         return condition
             .Select(x => x ? source : alternateSource)
             .Switch();
     }
-    
+
     public static IObservable<TOut> SwitchIf<TIn, TOut>(
         this IObservable<TIn> observable,
         [NotNull] Predicate<TIn> condition,
@@ -273,7 +308,7 @@ public static class ObservableExtensions
     {
         return observable.SelectSafeOrDefault(onNext, _ => { });
     }
-        
+
     public static IObservable<TOut> SelectSafeOrDefault<TIn, TOut>(
         this IObservable<TIn> observable,
         [NotNull] Func<TIn, TOut> onNext,
@@ -287,7 +322,7 @@ public static class ObservableExtensions
     }
 
     public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(
-        this IObservable<TIn> observable, 
+        this IObservable<TIn> observable,
         [NotNull] Func<TIn, TOut> onNext,
         [NotNull] Func<TException, TOut> onError)
         where TException : Exception
@@ -314,7 +349,7 @@ public static class ObservableExtensions
     }
 
     public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(
-        this IObservable<TIn> observable, 
+        this IObservable<TIn> observable,
         [NotNull] Func<TIn, TOut> onNext,
         [NotNull] Func<TIn, TException, TOut> onError)
         where TException : Exception
@@ -331,7 +366,7 @@ public static class ObservableExtensions
             }
         });
     }
-        
+
     public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext, [NotNull] Action<Exception> onError)
     {
         return observable.Subscribe(_ => onNext(), onError);
@@ -359,7 +394,7 @@ public static class ObservableExtensions
         return WithPrevious(source)
             .Select(t => resultSelector(t.Item1, t.Item2));
     }
-        
+
     public static IObservable<(TSource Previous, TSource Current)> WithPrevious<TSource>(
         this IObservable<TSource> source)
     {
@@ -367,7 +402,7 @@ public static class ObservableExtensions
             (default(TSource), default(TSource)),
             (previous, current) => (previous.Item2, current));
     }
-    
+
     public static IObservable<TSource> SkipUntil<TSource>(
         this IObservable<TSource> source,
         Func<TSource, bool> condition)
@@ -375,7 +410,7 @@ public static class ObservableExtensions
         var sharedObservable = source.Publish().RefCount();
         return sharedObservable.SkipWhile(condition).Take(1).Concat(sharedObservable);
     }
-    
+
     public static IObservable<TSource> DoWithPrevious<TSource>(
         this IObservable<TSource> source, Action<TSource> action)
     {
@@ -385,7 +420,7 @@ public static class ObservableExtensions
             return x.Item2;
         });
     }
-        
+
     public static IObservable<TSource> DisposePrevious<TSource>(
         this IObservable<TSource> source) where TSource : IDisposable
     {
@@ -396,7 +431,7 @@ public static class ObservableExtensions
     {
         return RetryWithDelay(source, timeSpan, Scheduler.Default);
     }
-        
+
     public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan, IScheduler scheduler)
     {
         if (source == null)
@@ -408,6 +443,7 @@ public static class ObservableExtensions
         {
             throw new ArgumentOutOfRangeException("timeSpan");
         }
+
         if (timeSpan == TimeSpan.Zero)
         {
             return source.Retry();
@@ -415,14 +451,14 @@ public static class ObservableExtensions
 
         return source.Catch(source.SubscribeOn(scheduler).DelaySubscription(timeSpan).Retry());
     }
-    
+
     public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSourceProperty>(
         [NotNull] this IObservable<TSourceProperty> sourceObservable)
     {
-        var result = new ObservableAsPropertyHelper<TSourceProperty>(sourceObservable, onChanged:src => { }, onChanging: null, initialValue: default, deferSubscription: false);
+        var result = new ObservableAsPropertyHelper<TSourceProperty>(sourceObservable, onChanged: src => { }, onChanging: null, initialValue: default, deferSubscription: false);
         return result;
     }
-        
+
     public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSource, TSourceProperty>(
         [NotNull] this IObservable<TSourceProperty> sourceObservable,
         out ObservableAsPropertyHelper<TSourceProperty> result,
@@ -444,7 +480,7 @@ public static class ObservableExtensions
     {
         return instance.ToProperty(instancePropertyExtractor, sourceObservable, default, false, scheduler);
     }
-    
+
     /// <summary>
     /// https://www.zerobugbuild.com/?p=192
     /// This is a problem that comes up when the UI dispatcher can’t keep up with inbound activity.
@@ -489,12 +525,14 @@ public static class ObservableExtensions
                             localNotification = outsideNotification;
                             outsideNotification = null;
                         }
+
                         localNotification.Accept(observer);
                         bool hasPendingNotification;
                         lock (gate)
                         {
                             hasPendingNotification = active = (outsideNotification != null);
                         }
+
                         if (hasPendingNotification)
                         {
                             self();
@@ -511,7 +549,7 @@ public static class ObservableExtensions
     /// </summary>
     /// <returns></returns>
     public static IObservable<T> WithExpirationTime<T>(
-        this IObservable<T> source, 
+        this IObservable<T> source,
         TimeSpan expirationTime,
         Func<T, T> fallbackValueSupplier)
     {
@@ -519,6 +557,7 @@ public static class ObservableExtensions
         {
             return source;
         }
+
         return source
             .Select(x => Observable.Return(x).Concat(Observable.Timer(expirationTime).Select(_ => fallbackValueSupplier(x)).Take(1))).Switch();
     }
