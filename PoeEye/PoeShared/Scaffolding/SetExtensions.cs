@@ -26,6 +26,6 @@ public static class SetExtensions
             throw new ArgumentNullException(nameof(items));
         }
 
-        return items.Aggregate(false, (b, item) => b || set.Add(item));
+        return items.Aggregate(false, (b, item) => set.Add(item) || b);
     }
 }
