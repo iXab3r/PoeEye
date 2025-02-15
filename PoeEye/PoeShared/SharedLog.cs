@@ -74,6 +74,7 @@ public class SharedLog : DisposableReactiveObject
         Log.Info($"Parsed args: {appArguments.Dump()}");
         Log.Info($"CmdLine: {Environment.CommandLine}");
         Log.Info($"CommandLineArgs: {appArguments.StartupArgs}");
+        Log.Info($"Time: {  new { DateTime.UtcNow, DateTime.Now, TimeZoneLocal = TimeZoneInfo.Local } }");
         Log.Info($"AppDomain: { new { AppDomain.CurrentDomain.Id, AppDomain.CurrentDomain.FriendlyName, AppDomain.CurrentDomain.BaseDirectory,  AppDomain.CurrentDomain.DynamicDirectory }})");
         Log.Info($"Assemblies: { new { Entry = Assembly.GetEntryAssembly(), Executing = Assembly.GetExecutingAssembly(), Calling = Assembly.GetCallingAssembly() }})");
         Log.Info($"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
