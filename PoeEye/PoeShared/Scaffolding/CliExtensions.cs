@@ -12,12 +12,11 @@ public static class CliExtensions
     public static async IAsyncEnumerable<CommandEvent> ListenAndLogAsync(this Command command, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var anchors = new CompositeDisposable();
-        var log = Log.WithSuffix(command.ToString());
         int? processId = null;
+        var log = Log.WithSuffix(() => $"PID: {(processId == null ? "not started" : processId.Value)}");
         try
         {
             log.Info($"Running command: {command}");
-            
 
             await foreach (var cmdEvent in ListenAsync(log, command, Encoding.Default, Encoding.Default, cancellationToken))
             {
@@ -118,7 +117,7 @@ public static class CliExtensions
         catch (ArgumentException)
         {
             // usually this means that the process has already terminated
-            log.Debug($"Failed to get process by Id {processId.Value}, probably the process has already terminated itself");
+            log.Debug($"Tried to terminate the process - could not find it by Id {processId.Value}, probably it has already terminated itself");
             return;
         }
 
