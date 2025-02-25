@@ -9,8 +9,22 @@ namespace PoeShared.Modularity;
 /// </summary>
 public sealed record BinaryResourceRef : IHasValidation
 {
-    public static readonly BinaryResourceRef Empty = new(); 
-    
+    public static readonly BinaryResourceRef Empty = new();
+
+    public BinaryResourceRef()
+    {
+    }
+
+    public BinaryResourceRef(byte[] data)
+    {
+        Data = data;
+    }
+
+    public BinaryResourceRef(string uri)
+    {
+        Uri = uri;
+    }
+
     /// <summary>
     /// Gets the URI of the binary resource if it is stored externally.
     /// </summary>
