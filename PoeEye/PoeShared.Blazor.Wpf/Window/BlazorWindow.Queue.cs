@@ -214,7 +214,10 @@ partial class BlazorWindow
                 case SetBackgroundColor command:
                 {
                     Log.Debug($"Updating {nameof(BackgroundColor)} to {command.BackgroundColor}");
-                    var color = new SolidColorBrush(command.BackgroundColor);
+                    var calculatedColor = command.BackgroundColor == Colors.Transparent
+                        ? Colors.Transparent with { A = 1 } //true transparent window is non-clickable
+                        : command.BackgroundColor;
+                    var color = new SolidColorBrush(calculatedColor);
                     color.Freeze();
                     window.Background = color;
                     break;
