@@ -134,8 +134,6 @@ public partial class UnsafeNative
 
         var windowHelper = new WindowInteropHelper(window);
         var windowHandle = new WindowHandle(windowHelper.EnsureHandle());
-        
-        MakeTopmost(windowHandle.Handle);
 
         Log.Debug($"Showing window, hWnd: {windowHandle}, windowState: {window.WindowState}");
         window.Show();

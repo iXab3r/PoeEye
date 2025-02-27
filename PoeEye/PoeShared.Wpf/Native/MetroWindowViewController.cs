@@ -141,6 +141,10 @@ public sealed class MetroWindowViewController : DisposableReactiveObject, IMetro
         UnsafeNative.ShowWindow(Window);
         //FIXME Mahapps window resets topmost after minimize/maximize operations
         Window.Topmost = Topmost;
+        if (Topmost)
+        {
+            UnsafeNative.MakeTopmost(windowHandle.Value);
+        }
     }
 
     public void TakeScreenshot(string fileName)
