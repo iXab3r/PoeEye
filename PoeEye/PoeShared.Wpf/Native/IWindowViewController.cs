@@ -33,8 +33,6 @@ public interface IWindowViewController : IDisposableReactiveObject, IViewControl
     IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
     
     IntPtr Handle { get; }
-
-    ReactiveMetroWindow Window { get; }
         
     void TakeScreenshot(string fileName);
         

@@ -1,4 +1,5 @@
 ﻿using System;
+using PoeShared.UI;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -14,6 +15,12 @@ public interface IBlazorWindowNativeController
     /// <returns>An <see cref="IntPtr"/> representing the native window handle.</returns>
     IntPtr GetWindowHandle();
 
+    /// <summary>
+    /// Gets the rectangular bounds of the native window, including position and size.
+    /// </summary>
+    /// <returns></returns>
+    System.Drawing.Rectangle GetWindowRect();
+    
     /// <summary>
     /// Sets the rectangular bounds of the native window, including position and size.
     /// </summary>
@@ -31,4 +38,11 @@ public interface IBlazorWindowNativeController
     /// </summary>
     /// <param name="windowPos">A <see cref="System.Drawing.Point"/> specifying the new top-left corner position of the window.</param>
     void SetWindowPos(System.Drawing.Point windowPos);
+}
+
+public interface IBlazorWindowMetroController
+{
+    ReactiveMetroWindowBase GetWindow();
+
+    void EnsureCreated();
 }

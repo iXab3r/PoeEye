@@ -29,7 +29,7 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
 
     string Title { [CanBeNull] get; }
     
-    IWindowViewController WindowController { [CanBeNull] get; }
+    IMetroWindowViewController WindowController { [CanBeNull] get; }
 
     IObservable<Unit> WhenLoaded { get; }
     IObservable<Unit> WhenClosed { get; }
@@ -46,5 +46,5 @@ public interface IWindowViewModel : IDisposableReactiveObject, ICanBeActive, ICa
     
     double? TargetAspectRatio { get; set; }
     
-    public void SetOverlayWindow([NotNull] IWindowViewController controller);
+    public void SetOverlayWindow([NotNull] IMetroWindowViewController controller);
 }

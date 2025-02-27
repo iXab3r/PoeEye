@@ -29,7 +29,7 @@ public partial class App : ApplicationBase
             
         var window = new MainWindow();
         Container.RegisterOverlayController();
-        var viewController = new WindowViewController(window);
+        var viewController = new MetroWindowViewController(window);
         Container.RegisterInstance<IWindowViewController>(WellKnownWindows.MainWindow, viewController, new ContainerControlledLifetimeManager());
         window.DataContext = Container.Resolve<MainWindowViewModel>();
         window.Show();

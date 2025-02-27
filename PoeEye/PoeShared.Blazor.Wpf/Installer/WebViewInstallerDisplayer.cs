@@ -20,7 +20,7 @@ internal sealed class WebViewInstallerDisplayer : IWebViewInstallerDisplayer
     public bool? ShowDialog(WebViewInstallerArgs args)
     {
         var window = windowFactory.Create();
-        var viewController = new WindowViewController(window);
+        var viewController = new MetroWindowViewController(window);
         window.Owner = args.Owner;
         using var updaterWindowViewModel = webViewInstallerFactory.Create(viewController, args);
         {

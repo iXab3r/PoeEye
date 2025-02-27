@@ -166,6 +166,11 @@ public interface IBlazorWindowController
     /// Observable sequence for when the window is fully loaded and rendered.
     /// </summary>
     IObservable<EventArgs> WhenLoaded { get; }
+    
+    /// <summary>
+    /// Observable sequence for when the window is unloaded
+    /// </summary>
+    IObservable<EventArgs> WhenUnloaded { get; }
 
     /// <summary>
     /// Observable sequence for when the window is closed.

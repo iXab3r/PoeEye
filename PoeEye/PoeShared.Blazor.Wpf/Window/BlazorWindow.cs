@@ -15,6 +15,7 @@ using Microsoft.Extensions.FileProviders;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using PoeShared.UI;
 using Unity;
 using Color = System.Windows.Media.Color;
 using Point = System.Drawing.Point;
@@ -22,7 +23,7 @@ using Size = System.Drawing.Size;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
+internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow, IBlazorWindowMetroController
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
 
@@ -151,6 +152,14 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
             .Replay(1);
         whenLoadedSource.Connect().AddTo(Anchors);
         WhenLoaded = whenLoadedSource;
+        
+        var whenUnloadedSource = Observable
+            .FromEventPattern<EventHandler, EventArgs>(h => Unloaded += h, h => Unloaded -= h)
+            .Select(x => x.EventArgs)
+            .Take(1)
+            .Replay(1);
+        whenUnloadedSource.Connect().AddTo(Anchors);
+        WhenUnloaded = whenUnloadedSource;
 
         var whenClosedSource = Observable
             .FromEventPattern<EventHandler, EventArgs>(h => Closed += h, h => Closed -= h)
@@ -323,6 +332,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public IObservable<KeyEventArgs> WhenPreviewKeyDown { get; }
     public IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
     public IObservable<EventArgs> WhenLoaded { get; }
+    public IObservable<EventArgs> WhenUnloaded { get; }
     public IObservable<EventArgs> WhenClosed { get; }
     public IObservable<CancelEventArgs> WhenClosing { get; }
     public IObservable<EventArgs> WhenActivated { get; }
@@ -336,8 +346,9 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public event EventHandler Activated;
     public event EventHandler Deactivated;
     public event EventHandler Loaded;
+    public event EventHandler Unloaded;
     public event EventHandler Closed;
-
+    
     public void ShowDevTools()
     {
         Log.Debug("Enqueueing ShowDevTools command");
@@ -410,16 +421,39 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public IntPtr GetWindowHandle()
     {
+        var window = GetWindow();
+        return window.WindowHandle;
+    }
+
+    public ReactiveMetroWindowBase GetWindow()
+    {
         EnsureNotDisposed();
         if (!windowSupplier.IsValueCreated)
         {
             throw new InvalidOperationException("Window is not created yet");
         }
 
-        var window = windowSupplier.Value;
-        return window.WindowHandle;
+        return windowSupplier.Value;
     }
 
+    public void EnsureCreated()
+    {
+        if (uiScheduler.IsOnScheduler())
+        {
+            HandleUpdate();
+        }
+        else
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    public Rectangle GetWindowRect()
+    {
+        EnsureNotDisposed();
+        return new Rectangle(Left, Top, Width, Height);
+    }
+    
     public void SetWindowRect(Rectangle rect)
     {
         EnsureNotDisposed();

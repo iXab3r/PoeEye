@@ -20,7 +20,7 @@ internal sealed class UpdaterWindowDisplayer : IUpdaterWindowDisplayer
     public bool? ShowDialog(UpdaterWindowArgs args)
     {
         var window = windowFactory.Create();
-        var viewController = new WindowViewController(window);
+        var viewController = new MetroWindowViewController(window);
         window.Owner = args.Owner;
         using var updaterWindowViewModel = updaterWindowFactory.Create(viewController, args);
         {

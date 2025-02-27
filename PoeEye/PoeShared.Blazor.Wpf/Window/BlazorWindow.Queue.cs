@@ -597,6 +597,12 @@ partial class BlazorWindow
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.Loaded?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Unloaded += h, h => window.Unloaded -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.Unloaded?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
 
             Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => window.Closed += h, h => window.Closed -= h)

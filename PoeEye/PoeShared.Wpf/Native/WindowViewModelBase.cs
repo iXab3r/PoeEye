@@ -127,7 +127,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
     
     public IObservable<Unit> WhenClosed => whenClosed;
 
-    public IWindowViewController WindowController { get; private set; }
+    public IMetroWindowViewController WindowController { get; private set; }
 
     public IObservable<KeyEventArgs> WhenKeyUp { get; }
 
@@ -177,7 +177,7 @@ public abstract class WindowViewModelBase : DisposableReactiveObject, IWindowVie
         builder.AppendParameter(nameof(NativeBounds), NativeBounds);
     }
 
-    public void SetOverlayWindow(IWindowViewController controller)
+    public void SetOverlayWindow(IMetroWindowViewController controller)
     {
         Guard.ArgumentNotNull(controller, nameof(controller));
 

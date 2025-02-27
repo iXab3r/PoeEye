@@ -59,10 +59,10 @@ public class ReactiveMetroWindow : ReactiveMetroWindowBase
                 }, Log.HandleUiException)
             .AddTo(Anchors);
         Dpi = new PointF(1, 1);
-        Controller = new WindowViewController(this).AddTo(Anchors);
+        Controller = new MetroWindowViewController(this).AddTo(Anchors);
     }
 
-    public IWindowViewController Controller { get; }
+    public IMetroWindowViewController Controller { get; }
 
     public Rectangle NativeBounds { get; set; }
 

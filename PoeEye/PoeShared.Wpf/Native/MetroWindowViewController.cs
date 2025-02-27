@@ -17,15 +17,15 @@ using ReactiveUI;
 
 namespace PoeShared.Native;
 
-public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
+public sealed class MetroWindowViewController : DisposableReactiveObject, IMetroWindowViewController
 {
     private readonly Lazy<IntPtr> windowHandle;
-    
-    public WindowViewController(ReactiveMetroWindow owner)
+
+    public MetroWindowViewController(ReactiveMetroWindow owner)
     {
-        Window = owner;
+        this.Window = owner;
         windowHandle = new Lazy<IntPtr>(() => new WindowInteropHelper(owner).EnsureHandle());
-        Log = typeof(WindowViewController).PrepareLogger().WithSuffix(() => $"WVC");
+        Log = typeof(MetroWindowViewController).PrepareLogger().WithSuffix(() => $"WVC");
         Log.Debug($"Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
 
         WhenLoaded = owner.ListenWhenLoaded();
@@ -91,7 +91,7 @@ public sealed class WindowViewController : DisposableReactiveObject, IWindowView
     public IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
 
     public IntPtr Handle => windowHandle.Value;
-        
+
     public ReactiveMetroWindow Window { get; }
 
     public void Activate()
