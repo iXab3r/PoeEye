@@ -24,6 +24,7 @@ internal sealed class WindowHandle : IWindowHandle
     private readonly Lazy<Icon> iconSupplier;
     private readonly Lazy<BitmapSource> iconBitmapSupplier;
     private readonly Lazy<IWindowHandle> ownerSupplier;
+    private readonly Lazy<bool> isWindowSupplier;
     private readonly Lazy<IWindowHandle> parentSupplier;
     private readonly Lazy<User32.WindowStyles> windowStyle;
     private readonly Lazy<User32.WindowStylesEx> windowStyleEx;
@@ -69,6 +70,22 @@ internal sealed class WindowHandle : IWindowHandle
             }
 
             return string.Empty;
+        });
+
+        isWindowSupplier = new Lazy<bool>(() =>
+        {
+            try
+            {
+                return User32.IsWindow(Handle);
+            }
+            catch (Exception ex)
+            {
+                if (Log.IsWarnEnabled)
+                {
+                    Log.Warn($"Failed to get IsWindow, last error: {Kernel32.GetLastError()}", ex);
+                }
+            }
+            return false;
         });
 
         processIdSupplier = new Lazy<(int processId, int threadId)>(() =>
@@ -351,6 +368,8 @@ internal sealed class WindowHandle : IWindowHandle
     public bool IsVisible => User32.IsWindowVisible(Handle);
 
     public bool IsIconic => User32.IsIconic(Handle);
+
+    public bool IsWindow => isWindowSupplier.Value;
 
     public IWindowHandle Owner => ownerSupplier.Value;
     public IWindowHandle Parent => parentSupplier.Value;

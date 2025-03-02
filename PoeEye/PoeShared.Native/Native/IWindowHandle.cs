@@ -125,6 +125,11 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// Gets a value indicating whether the window is minimized (iconic).
     /// </summary>
     bool IsIconic { get; }
+    
+    /// <summary>
+    /// Gets whether the current handle represents Window
+    /// </summary>
+    bool IsWindow { get; }
 
     /// <summary>
     /// Gets the owner of the window.
