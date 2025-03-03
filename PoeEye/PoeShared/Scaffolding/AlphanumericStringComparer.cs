@@ -86,10 +86,8 @@ public class AlphanumericStringComparer : IComparer<string>
             string str2 = new string(space2);
 
             int result;
-            if (char.IsDigit(space1[0]) && char.IsDigit(space2[0]))
+            if (char.IsDigit(space1[0]) && char.IsDigit(space2[0]) && int.TryParse(str1, out var thisNumericChunk) && int.TryParse(str2, out var thatNumericChunk))
             {
-                int thisNumericChunk = int.Parse(str1);
-                int thatNumericChunk = int.Parse(str2);
                 result = thisNumericChunk.CompareTo(thatNumericChunk);
             }
             else
