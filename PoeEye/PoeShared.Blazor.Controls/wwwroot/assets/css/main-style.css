@@ -536,6 +536,7 @@ pre code.hljs{
 
 /* Controls are hidden when the container is not hovered */
 .hover-container {
+    pointer-events: all;
 }
 
 .hover-container .hover-container-controls {
