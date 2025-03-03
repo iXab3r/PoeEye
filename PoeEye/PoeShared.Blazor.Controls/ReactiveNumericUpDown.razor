@@ -1,5 +1,8 @@
-﻿<input type="number"
-       class="form-control"
+﻿@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+<input type="number"
+       class="@Class"
+       style="@Style"
        min="@Min"
        max="@Max"
        step="@Step"
@@ -20,6 +23,8 @@
        [Parameter] public double Value { get; set; }
 
        [Parameter] public EventCallback<double> ValueChanged { get; set; }
+       
+       
        
        private static double Parse(object value)
        {

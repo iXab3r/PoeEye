@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿namespace PoeShared.Blazor.Controls;
 
-namespace PoeShared.Blazor.Controls;
-
-public partial class ReactiveNumericUpDown : ComponentBase
+public partial class ReactiveNumericUpDown 
 {
+    public ReactiveNumericUpDown()
+    {
+        Class = "form-control";
+    }
 }
