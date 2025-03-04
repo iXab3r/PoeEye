@@ -478,9 +478,6 @@ else
 @code {
     private readonly SerialDisposable dragAnchor;
 
-    private Vector2 titleDragStartPoint;
-    private Vector2 minDragDistance;
-
     public BlazorWindowContent()
     {
         Anchors.Add(() => ContentPresenter = null);
@@ -543,25 +540,13 @@ else
     {
         dragAnchor.Disposable = new CompositeDisposable()
         {
-            Disposable.Create(() => titleDragStartPoint = default),
+            Disposable.Create(() => { }),
             DataContext.EnableDragMove()
         };
     }
 
     private void HandleMouseDown(MouseEventArgs obj)
     {
-        titleDragStartPoint = GetCursorPosition();
-        minDragDistance = new Vector2(System.Windows.Forms.SystemInformation.DragSize.Width, System.Windows.Forms.SystemInformation.DragSize.Height);
-
         StartDrag();
     }
-
-    private static Vector2 GetCursorPosition()
-    {
-        var cursorPosition = System.Windows.Forms.Cursor.Position;
-        var current = new Vector2(cursorPosition.X, cursorPosition.Y);
-        return current;
-    }
-
-
 }

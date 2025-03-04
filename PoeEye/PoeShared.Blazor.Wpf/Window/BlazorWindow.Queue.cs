@@ -208,7 +208,10 @@ partial class BlazorWindow
                 case SetOpacity command:
                 {
                     Log.Debug($"Updating {nameof(Opacity)} to {command.Opacity}");
-                    window.Opacity = command.Opacity;
+                    var calculatedOpacity = command.Opacity <= 0
+                        ? 0.01d //true transparent window is non-clickable, got 0.01 is from testing as min value
+                        : command.Opacity;
+                    window.Opacity = calculatedOpacity;
                     break;
                 }
                 case SetBackgroundColor command:
