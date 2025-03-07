@@ -152,7 +152,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     {
         SharedLog.Instance.SwitchImmediateFlush(true);
 
-        RestartAsUsingPowershell(processPath, arguments, verb);
+        RestartUsingLauncher(processPath, arguments, verb, LauncherMethod.SwapApp);
     }
 
     public void RestartAsAdmin()
@@ -333,22 +333,19 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Exit();
         throw new InvalidOperationException("Should never hit this line");
     }
-    
-    private void RestartAsAdminUsingPowershell()
-    {
-        Log.Info("Restarting current process with admin privileges");
-        var arguments = StripBooleanArgumentFromCmdLine(appArguments.StartupArgs, "adminMode");
-        RestartAsUsingPowershell(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas");
-    }
 
-    private string StripBooleanArgumentFromCmdLine(string arguments, string argName)
+    private static string StripBooleanArgumentFromCmdLine(string arguments, string argName)
     {
         var regex = new Regex($"--?{argName}\\s+(true|false)?", RegexOptions.IgnoreCase);
         var replacement = regex.Replace(arguments, string.Empty);
         return replacement;
     }
 
-    private void RestartAsUsingPowershell(string processPath, string arguments, string verb)
+    [Obsolete("Replaced with stand-alone updater")]
+    private void RestartAsUsingPowershell(
+        string processPath, 
+        string arguments, 
+        string verb)
     {
         Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
 
