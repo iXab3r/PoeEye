@@ -501,7 +501,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         {
             window = windowSupplier.Value;
             SubscribeToWindow(Log, window, this)
-                .Subscribe(x => { EnqueueUpdate(x); })
+                .SubscribeSafe(x => { EnqueueUpdate(x); }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             Log.Debug("NativeWindow created and subscribed successfully");
