@@ -1,11 +1,9 @@
-using System.Diagnostics;
+// ReSharper disable InconsistentNaming Following MahApps style
 using System.Linq;
 using ControlzEx.Native;
 using MahApps.Metro.Controls;
 using PInvoke;
 using PoeShared.Scaffolding;
-
-namespace PoeShared.UI;
 
 using System;
 using System.Collections;
@@ -19,12 +17,9 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Controls.Primitives;
 using ControlzEx;
-using ControlzEx.Theming;
-using MahApps.Metro.Automation.Peers;
-using MahApps.Metro.Behaviors;
-using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.ValueBoxes;
-using Microsoft.Xaml.Behaviors;
+
+namespace PoeShared.UI;
 
 /// <summary>
 /// An extended Window class.
@@ -943,7 +938,7 @@ public class MetroWindow : WindowChromeWindow
     /// </summary>
     protected override AutomationPeer OnCreateAutomationPeer()
     {
-        return new MetroWindowAutomationPeer(this);
+        return new NoopWindowAutomationPeer(this);
     }
 
     protected internal IntPtr CriticalHandle
