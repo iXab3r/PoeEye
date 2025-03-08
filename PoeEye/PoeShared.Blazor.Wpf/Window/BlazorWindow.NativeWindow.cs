@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using MahApps.Metro.Controls;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
 using ReactiveUI;
@@ -36,6 +37,9 @@ internal partial class BlazorWindow
 
             Content = ContentControl;
             AllowsTransparency = true;
+            WindowButtonCommandsOverlayBehavior = OverlayBehavior.Never;
+            LeftWindowCommandsOverlayBehavior = WindowCommandsOverlayBehavior.Never;
+            RightWindowCommandsOverlayBehavior = WindowCommandsOverlayBehavior.Never;
 
             Anchors.Add(() => Log.Debug("Disposed native window"));
         }
