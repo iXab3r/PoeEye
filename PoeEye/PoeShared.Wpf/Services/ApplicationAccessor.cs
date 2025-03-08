@@ -152,7 +152,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     {
         SharedLog.Instance.SwitchImmediateFlush(true);
 
-        RestartUsingLauncher(processPath, arguments, verb, LauncherMethod.SwapApp);
+        StartUsingLauncher(processPath, arguments, verb, LauncherMethod.StartApp);
     }
 
     public void RestartAsAdmin()
@@ -166,7 +166,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     {
         SharedLog.Instance.SwitchImmediateFlush(true);
 
-        RestartUsingLauncher(processPath, arguments, verb: default, LauncherMethod.SwapApp);
+        StartUsingLauncher(processPath, arguments, verb: default, LauncherMethod.SwapApp);
     }
 
     public void Terminate(int exitCode)
@@ -261,16 +261,17 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     {
         Log.Info("Restarting current process with admin privileges using launcher");
         var arguments = StripBooleanArgumentFromCmdLine(appArguments.StartupArgs, "adminMode");
-        RestartUsingLauncher(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas", LauncherMethod.RestartApp);
+        StartUsingLauncher(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas", LauncherMethod.StartApp);
     }
 
-    private void RestartUsingLauncher(
+    private void StartUsingLauncher(
         string processPath, 
         string arguments, 
         string verb, 
         LauncherMethod method)
     {
         Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
+        var waitTimeout = TimeSpan.FromSeconds(60);
         if (string.IsNullOrEmpty(processPath))
         {
             throw new ArgumentException("Failed to resolve executable path");
@@ -285,7 +286,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
             }
 
             Log.Info($"Supplied arguments contain '-', compressing args: {arguments}");
-            RestartUsingLauncher(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb, method);
+            StartUsingLauncher(processPath: processPath, arguments: StringUtils.ToHexGzip(arguments), verb: verb, method);
             return;
         }
         
@@ -293,19 +294,30 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
 
         var launcherPath = method switch
         {
+            LauncherMethod.StartApp => Environment.ProcessPath,
             LauncherMethod.SwapApp => processPath,
-            LauncherMethod.RestartApp => Environment.ProcessPath,
-            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported restart method: {method}")
+            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported launcher method: {method}")
         };
         if (string.IsNullOrEmpty(launcherPath))
         {
             throw new ArgumentException("Failed to resolve launcher path");
         }
+
+        var exePath = method switch
+        {
+            LauncherMethod.StartApp => processPath,
+            LauncherMethod.SwapApp => Environment.ProcessPath,
+            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported launcher method: {method}")
+        };
+        if (string.IsNullOrEmpty(exePath))
+        {
+            throw new ArgumentException("Failed to resolve target executable path");
+        }
      
         var argumentsBuilder = new StringBuilder();
         argumentsBuilder.Append($" --launcherMethod {method}");
-        argumentsBuilder.Append($" --processId {Environment.ProcessId} --timeoutMs 60000");
-        argumentsBuilder.Append($" --exePath=\"{Environment.ProcessPath}\"");
+        argumentsBuilder.Append($" --processId {Environment.ProcessId} --timeoutMs {waitTimeout.TotalMilliseconds:F0}");
+        argumentsBuilder.Append($" --exePath=\"{exePath}\"");
         if (!string.IsNullOrEmpty(arguments))
         {
             argumentsBuilder.Append($" --exeArguments=\"{arguments}\"");

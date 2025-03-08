@@ -45,7 +45,7 @@ public static class Program
             
             var handler = new LauncherServiceHandler();
             handler.AddHandler(nameof(LauncherMethod.Version), HandleVersion);
-            handler.AddHandler<RestartAppArguments>(nameof(LauncherMethod.RestartApp), HandleRestart);
+            handler.AddHandler<RestartAppArguments>(nameof(LauncherMethod.StartApp), HandleRestart);
             handler.AddHandler<SwapAppArguments>(nameof(LauncherMethod.SwapApp), HandleSwapApp);
             if (!handler.TryHandle(args))
             {
