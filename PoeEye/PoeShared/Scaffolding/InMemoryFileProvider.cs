@@ -38,6 +38,11 @@ public sealed class InMemoryFileProvider : DisposableReactiveObjectWithLogger, I
     {
         var decodedSubpath = HttpUtility.UrlDecode(subpath).TrimStart('/');
 
+        if (string.IsNullOrEmpty(decodedSubpath) || decodedSubpath == ".")
+        {
+            return new InMemoryDirectoryContents(filesByName.Items);
+        }
+        
         var matchingFiles = filesByName.Items
             .Where(file => PathUtils.IsSubDir(decodedSubpath, file.Name))
             .ToList();
