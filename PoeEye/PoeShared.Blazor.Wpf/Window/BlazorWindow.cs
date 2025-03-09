@@ -210,6 +210,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public WindowStartupLocation WindowStartupLocation { get; set; }
 
+    public new IFluentLog Log => base.Log;
+    
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
 
     public TitleBarDisplayMode TitleBarDisplayMode { get; set; }

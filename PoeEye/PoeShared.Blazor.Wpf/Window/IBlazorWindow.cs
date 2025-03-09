@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Windows;
 using Microsoft.Extensions.FileProviders;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Unity;
 

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using PoeShared.Logging;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -12,6 +13,11 @@ namespace PoeShared.Blazor.Wpf;
 /// </summary>
 public interface IBlazorWindowController
 {
+    /// <summary>
+    /// Gets logger which could be used to produce messages on behalf of the window
+    /// </summary>
+    IFluentLog Log { get; }
+    
     /// <summary>
     /// Gets or sets the window resize mode, defining how the user can resize the window.
     /// </summary>
