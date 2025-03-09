@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
+﻿using System.Web;
 using DynamicData;
 using DynamicData.Kernel;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using PoeShared.IO;
-using PoeShared.Scaffolding;
 
-namespace PoeShared.Blazor.Wpf;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Primitives;
-using ReactiveUI;
-using DynamicData;
+namespace PoeShared.Scaffolding;
 
 /// <summary>
 /// Provides an in-memory file provider for serving files and directory contents dynamically.

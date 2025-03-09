@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
-using ByteSizeLib;
+﻿using ByteSizeLib;
 using Microsoft.Extensions.FileProviders;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Scaffolding;
 
 public sealed class InMemoryFileInfo : IFileInfo
 {
