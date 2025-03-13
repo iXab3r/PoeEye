@@ -14,6 +14,7 @@ using PInvoke;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Services;
 using Unity;
 using Win32Exception = System.ComponentModel.Win32Exception;
 
@@ -53,6 +54,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 #endif
 
     public WinEventHookWrapper(
+        IApplicationAccessor applicationAccessor,
         WinEventHookArguments hookArgs,
         [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
     {
@@ -63,8 +65,18 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         Log.Debug($"New WinEvent hook created");
 
         Disposable.Create(() => Log.Info($"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
-        hookThread = new WorkerThread($"Hook {hookArgs.ToString()}", token => RunHookThread(), autoStart: true).AddTo(Anchors);
-        notificationsThread = new WorkerThread($"HookNotifications {hookArgs.ToString()}", token => RunNotificationsThread(), autoStart: true).AddTo(Anchors);
+        hookThread = new WorkerThread($"Hook {hookArgs.ToString()}", token => RunHookThread(), autoStart: false).AddTo(Anchors);
+        notificationsThread = new WorkerThread($"HookNotifications {hookArgs.ToString()}", token => RunNotificationsThread(), autoStart: false).AddTo(Anchors);
+
+        applicationAccessor.WhenLoaded
+            .Subscribe(() =>
+            {
+                Log.Info("Starting hook threads");
+                hookThread.Start();
+                notificationsThread.Start();
+            })
+            .AddTo(Anchors);
+        
         Disposable.Create(() => Log.Info($"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
     }
     private IFluentLog Log { get; }
