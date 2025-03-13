@@ -95,7 +95,7 @@ public abstract class ApplicationBase : Application
             }
             
             var erService = Container.Resolve<IErrorReportingService>();
-            Log.Debug($"Error reporting service: {erService}");
+            Log.Debug($"Resolved reporting service: {erService}");
 
             var applicationAccessor = Container.Resolve<IApplicationAccessor>();
             Log.Info($"Last run state: {new {applicationAccessor.LastLoadWasSuccessful, applicationAccessor.LastExitWasGraceful}}");
