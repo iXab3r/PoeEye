@@ -18,6 +18,7 @@ namespace PoeShared.Services;
 public sealed class MemoryPool : IMemoryPool
 {
     public static IMemoryPool Shared => MemoryPoolSupplier.Value;
+    public static IMemoryPool Fake => FakeMemoryPoolSupplier.Value;
 
     /// <summary>
     /// The maximum length of an array instance that may be stored in the pool.
@@ -30,6 +31,7 @@ public sealed class MemoryPool : IMemoryPool
     private static readonly int MaxArrayPerBucket = 50;
         
     private static readonly Lazy<IMemoryPool> MemoryPoolSupplier = new Lazy<IMemoryPool>(() => new MemoryPool());
+    private static readonly Lazy<IMemoryPool> FakeMemoryPoolSupplier = new Lazy<IMemoryPool>(() => new FakeMemoryPool());
 
     private readonly ArrayPool<byte> arrayPool = ArrayPool<byte>.Create(MaxArraySize, MaxArrayPerBucket);
 
