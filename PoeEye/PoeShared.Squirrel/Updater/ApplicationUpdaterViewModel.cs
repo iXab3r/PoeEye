@@ -39,16 +39,17 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     private readonly IApplicationUpdaterModel updaterModel;
     private readonly IMessageBoxService messageBoxService;
     private readonly ISharedResourceLatch isBusyLatch;
+    private readonly ISharedResourceLatch applyLatch;
 
     static ApplicationUpdaterViewModel()
     {
-        Binder.Bind(x => x.isBusyLatch.IsBusy || x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy)
+        Binder.Bind(x => x.isBusyLatch.IsBusy || x.applyLatch.IsBusy || x.updaterModel.IsBusy || x.RestartCommand.IsBusy || x.ApplyUpdateCommand.IsBusy || x.CheckForUpdatesCommand.IsBusy)
             .To((x, v) => x.IsBusy = v, x => x.uiScheduler);
-        
+
         Binder.Bind(x => x.LatestUpdate != null)
             .OnScheduler(x => x.uiScheduler)
             .To(x => x.CanUpdateToLatest);
-        
+
         Binder.Bind(x => x.LatestUpdate != null && x.LatestUpdate.ReleasesToApply.EmptyIfNull().Any())
             .OnScheduler(x => x.uiScheduler)
             .To(x => x.HasUpdatesToInstall);
@@ -75,6 +76,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         this.messageBoxService = messageBoxService;
         this.uiScheduler = uiScheduler;
         this.isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
+        applyLatch = new SharedResourceLatch().AddTo(Anchors);
 
         var checkForUpdatesCommandSink = new Subject<Unit>();
         CheckForUpdatesCommand = CommandWrapper
@@ -239,12 +241,92 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public FileInfo LauncherExecutable => updaterModel.LauncherExecutable;
 
-    public async Task PrepareForceUpdate(IReleaseEntry targetRelease)
+    public Task<IReleaseEntry> FetchUpdate(Version targetVersion)
+    {
+        return updaterModel.CheckForUpdate(targetVersion);
+    }
+
+    public async Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry targetRelease)
     {
         Log.Debug($"Force update preparation requested, target: {new {targetRelease.Version, targetRelease.Filename, targetRelease.Filesize}}");
-        LatestUpdate = await updaterModel.PrepareForceUpdate(targetRelease);
+        var result = await updaterModel.PrepareForceUpdate(targetRelease);
+        LatestUpdate = result;
         updaterModel.Reset();
         SetStatus($"Ready to update to v{LatestVersion}");
+        return result;
+    }
+
+    public async Task DownloadUpdate(bool applyAutomatically)
+    {
+        Log.Debug($"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
+        if (applyLatch.IsBusy)
+        {
+            throw new InvalidOperationException("Another operation is already in progress");
+        }
+
+        using var _ = applyLatch.Rent();
+        SetStatus($"Preparing to update to v{LatestVersion}...");
+
+        var latestUpdate = LatestUpdate;
+        if (latestUpdate == null)
+        {
+            throw new InvalidOperationException("Latest update must be specified");
+        }
+
+        var currentVersion = LatestAppliedVersion;
+        var targetVersion = LatestVersion;
+        var isDowngrade = currentVersion > targetVersion;
+        Log.Info($"Validating update: {currentVersion} => {targetVersion} (downgrade: {isDowngrade})");
+        if (isDowngrade)
+        {
+            if (await messageBoxService.ShowConfirmation("Version downgrade",
+                    $"Are you sure you want to update to v{targetVersion} as your current version is newer {currentVersion}?{Environment.NewLine}This may bring compatibility problems and is not recommended.") == false)
+            {
+                return;
+            }
+        }
+
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            SetStatus($"Verifying installation files v{LatestVersion} ({ByteSize.FromBytes(latestUpdate.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
+            var isVerified = await updaterModel.VerifyRelease(latestUpdate);
+            SetStatus($"Verified v{LatestVersion}");
+
+            if (!isVerified)
+            {
+                SetStatus($"Downloading v{LatestVersion} ({ByteSize.FromBytes(latestUpdate.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
+                await updaterModel.DownloadRelease(latestUpdate);
+                SetStatus($"Downloaded v{LatestVersion}");
+            }
+
+            if (!applyAutomatically)
+            {
+                return;
+            }
+
+            SetStatus($"Installing v{LatestVersion}...");
+            await updaterModel.ApplyRelease(latestUpdate);
+            IsOpen = true;
+            SetStatus($"Successfully updated to v{LatestVersion}, restarting...");
+            LatestUpdate = default;
+            await RestartCommandExecuted();
+        }
+        catch (Exception ex)
+        {
+            Log.HandleException(ex);
+            IsOpen = true;
+            SetError($"Failed to apply update to v{LatestVersion}, UpdateSource: {UpdateSource} - {ex.Message}");
+        }
+        finally
+        {
+            var timeToSleep = UiConstants.ArtificialShortDelay - sw.Elapsed;
+            if (timeToSleep > TimeSpan.Zero)
+            {
+                await Task.Delay(timeToSleep);
+            }
+        }
     }
 
     private void ShowUpdaterCommandExecuted(object arg)
@@ -352,75 +434,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     private async Task ApplyUpdateCommandExecuted(bool applyRelease)
     {
-        Log.Debug($"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
-        if (ApplyUpdateCommand.IsBusy)
-        {
-            Log.Debug("Already in progress");
-            return;
-        }
-        
-        SetStatus($"Preparing to update to v{LatestVersion}...");
-
-        var latestUpdate = LatestUpdate;
-        if (latestUpdate == null)
-        {
-            throw new InvalidOperationException("Latest update must be specified");
-        }
-
-        var currentVersion = LatestAppliedVersion;
-        var targetVersion = LatestVersion;
-        var isDowngrade = currentVersion > targetVersion;
-        Log.Info($"Validating update: {currentVersion} => {targetVersion} (downgrade: {isDowngrade})");
-        if (isDowngrade)
-        {
-            if (await messageBoxService.ShowConfirmation("Version downgrade",
-                    $"Are you sure you want to update to v{targetVersion} as your current version is newer {currentVersion}?{Environment.NewLine}This may bring compatibility problems and is not recommended.") == false)
-            {
-                return;
-            }   
-        }
-
-        var sw = Stopwatch.StartNew();
-
-        try
-        {
-            SetStatus($"Verifying installation files v{LatestVersion} ({ByteSize.FromBytes(latestUpdate.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
-            var isVerified = await updaterModel.VerifyRelease(latestUpdate);
-            SetStatus($"Verified v{LatestVersion}");
-
-            if (!isVerified)
-            {
-                SetStatus($"Downloading v{LatestVersion} ({ByteSize.FromBytes(latestUpdate.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
-                await updaterModel.DownloadRelease(latestUpdate);
-                SetStatus($"Downloaded v{LatestVersion}");
-            }
-
-            if (!applyRelease)
-            {
-                return;
-            }
-
-            SetStatus($"Installing v{LatestVersion}...");
-            await updaterModel.ApplyRelease(latestUpdate);
-            IsOpen = true;
-            SetStatus($"Successfully updated to v{LatestVersion}, restarting...");
-            LatestUpdate = default;
-            await RestartCommandExecuted();
-        }
-        catch (Exception ex)
-        {
-            Log.HandleException(ex);
-            IsOpen = true;
-            SetError($"Failed to apply update to v{LatestVersion}, UpdateSource: {UpdateSource} - {ex.Message}");
-        }
-        finally
-        {
-            var timeToSleep = UiConstants.ArtificialShortDelay - sw.Elapsed;
-            if (timeToSleep > TimeSpan.Zero)
-            {
-                await Task.Delay(timeToSleep);
-            }
-        }
+        await DownloadUpdate(applyRelease);
     }
 
     private void SetStatus(string text)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -17,7 +18,7 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
 
     private readonly Func<string, Task<IPoeUpdateManager>> managerFactory;
     private readonly ResourceChooser<string> uriChooser;
-    private readonly NamedLock gate = new("ManagerLock");
+    private readonly SemaphoreSlim gate = new(1, 1);
 
     public ResilientUpdateManager(
         IEnumerable<string> uris,
@@ -32,6 +33,11 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
         Action<int> progress = null)
     {
         return await SafeGet(x => x.CheckForUpdate(ignoreDeltaUpdates, progress));
+    }
+
+    public async Task<IPoeUpdateInfo> CheckForUpdate(Version targetVersion, Action<int> progress = null)
+    {
+        return await SafeGet(x => x.CheckForUpdate(targetVersion, progress));
     }
 
     public async Task<IReadOnlyCollection<FileInfo>> DownloadReleases(
@@ -67,7 +73,7 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
         var log = Log.WithSuffix(getterExpr.ToString());
         
         log.Debug($"Acquiring lock {gate}");
-        using var @lock = gate.Enter();
+        using var @lock = await gate.Rent();
 
         var allUris = uriChooser.ToArray();
         log.Debug($"Contacting URIs in the following order: {allUris.DumpToString()}");
@@ -92,6 +98,6 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
             }
         }
 
-        throw new InvalidStateException($"Failed to perform request, URIs: {allUris.Dump()}");
+        throw new InvalidStateException($"Failed to perform request, URIs: {allUris.DumpToString()}");
     }
 }

@@ -50,5 +50,9 @@ public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     
     FileInfo LauncherExecutable { get; }
 
-    Task PrepareForceUpdate(IReleaseEntry targetRelease);
+    Task<IReleaseEntry> FetchUpdate(Version targetVersion);
+    
+    Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry targetRelease);
+    
+    Task DownloadUpdate(bool applyAutomatically);
 }

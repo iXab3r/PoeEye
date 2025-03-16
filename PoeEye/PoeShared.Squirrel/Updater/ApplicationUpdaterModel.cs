@@ -147,7 +147,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     public int ProgressPercent { get; private set; }
 
     public bool IsBusy { get; private set; }
-    
+
     public async Task<bool> VerifyRelease(IPoeUpdateInfo updateInfo)
     {
         Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
@@ -176,7 +176,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         var downloadedReleases = await mgr.DownloadReleases(updateInfo.ReleasesToApply, x => progressTracker.Update(x, "DownloadRelease"));
         Log.Warn($"Downloaded following releases:\n\t{downloadedReleases.DumpToTable()}");
     }
-    
+
     public async Task ApplyRelease(IPoeUpdateInfo updateInfo)
     {
         Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
@@ -264,6 +264,20 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
         Log.Debug($"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
         LatestUpdate = updateInfo;
+    }
+
+    public async Task<IReleaseEntry> CheckForUpdate(Version targetVersion)
+    {
+        Guard.ArgumentNotNull(targetVersion, nameof(targetVersion));
+        
+        using var unused = CreateIsBusyAnchor();
+        using var mgr = await CreateManager();
+        using var progressTracker = new ComplexProgressTracker();
+        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = (int)x);
+        
+        var updateInfo = await mgr.CheckForUpdate(targetVersion, CheckUpdateProgress);
+        Log.Debug($"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
+        return updateInfo.FutureReleaseEntry;
     }
 
     public Task RestartApplication()

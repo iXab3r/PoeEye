@@ -31,6 +31,8 @@ public interface IApplicationUpdaterModel : IDisposableReactiveObject
 
     Task CheckForUpdates();
 
+    Task<IReleaseEntry> CheckForUpdate(Version targetVersion);
+    
     Task<bool> VerifyRelease(IPoeUpdateInfo updateInfo);
 
     Task RestartApplication();

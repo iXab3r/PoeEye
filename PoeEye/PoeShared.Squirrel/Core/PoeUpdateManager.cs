@@ -70,6 +70,21 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject, IPoeUpd
         return result;
     }
 
+    public async Task<IPoeUpdateInfo> CheckForUpdate(Version targetVersion, Action<int> progress = null)
+    {
+        using var sw = new BenchmarkTimer($"Checking for updates, target version: {targetVersion}", Log);
+        using var updateLock = AcquireUpdateLock();
+            
+        sw.Step("Update lock acquired");
+        var checkForUpdate = new CheckForUpdateImpl(urlDownloader, RootAppDirectory);
+        var result = await checkForUpdate.CheckForUpdate(
+            UpdateUrlOrPath,
+            targetVersion,
+            progress);
+        sw.Step("Update check completed");
+        return result;
+    }
+
     public async Task<IReadOnlyCollection<FileInfo>> DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
     {
         using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToString()}", Log);

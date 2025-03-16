@@ -28,6 +28,41 @@ internal class CheckForUpdateImpl : IEnableLogger
         this.urlDownloader = urlDownloader;
         this.rootAppDirectory = rootAppDirectory;
     }
+    
+    public async Task<IPoeUpdateInfo> CheckForUpdate(
+        string updateUrlOrPath,
+        Version targetVersion,
+        Action<int> progressCallback)
+    {
+        progressCallback ??= _ => { };
+        var localReleases = Array.Empty<ReleaseEntry>();
+        
+        string releaseFile;
+        if (Utility.IsHttpUrl(updateUrlOrPath))
+        {
+            Log.Debug($"Loading releases from remote path {updateUrlOrPath}");
+            releaseFile = await LoadRemoteReleasesFromUrl(updateUrlOrPath, urlDownloader, latestLocalRelease: null, fileName: "RELEASES-LIST");
+        }
+        else
+        {
+            throw new NotSupportedException("Target version update is not supported for local releases");
+        }
+        progressCallback(33);
+        var parsedReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, userToken: null).ToArray();
+        progressCallback(55);
+
+        var futureReleaseEntry = parsedReleases.FirstOrDefault(x => x.Version.Version == targetVersion);
+        if (futureReleaseEntry == null)
+        {
+            throw new Exception($"Could not find release entry for version {targetVersion}, total entries: {parsedReleases.Length}");
+        }
+
+        var packageDirectory = Utility.PackageDirectoryForAppDir(rootAppDirectory);
+        var futureUpdateInfo = PoeUpdateInfo.Create(currentVersion: null, localReleases, new[] { futureReleaseEntry }, packageDirectory);
+        progressCallback(100);
+
+        return futureUpdateInfo;
+    }
 
     public async Task<IPoeUpdateInfo> CheckForUpdate(
         IReadOnlyList<IReleaseEntry> localReleases,
@@ -120,14 +155,15 @@ internal class CheckForUpdateImpl : IEnableLogger
     private static async Task<string> LoadRemoteReleasesFromUrl(
         string updateUrlOrPath,
         IFileDownloader urlDownloader,
-        IReleaseEntry latestLocalRelease)
+        IReleaseEntry latestLocalRelease,
+        string fileName)
     {
         if (updateUrlOrPath.EndsWith("/"))
         {
             updateUrlOrPath = updateUrlOrPath.Substring(0, updateUrlOrPath.Length - 1);
         }
 
-        Log.Info($"Downloading RELEASES file from {updateUrlOrPath}");
+        Log.Info($"Downloading {fileName} file from {updateUrlOrPath}");
 
         var retries = 3;
 
@@ -135,7 +171,7 @@ internal class CheckForUpdateImpl : IEnableLogger
 
         try
         {
-            var uri = Utility.AppendPathToUri(new Uri(updateUrlOrPath), "RELEASES");
+            var uri = Utility.AppendPathToUri(new Uri(updateUrlOrPath), fileName);
 
             if (latestLocalRelease != null)
             {
@@ -168,6 +204,14 @@ internal class CheckForUpdateImpl : IEnableLogger
             retries--;
             goto retry;
         }
+    }
+
+    private static async Task<string> LoadRemoteReleasesFromUrl(
+        string updateUrlOrPath,
+        IFileDownloader urlDownloader,
+        IReleaseEntry latestLocalRelease)
+    {
+        return await LoadRemoteReleasesFromUrl(updateUrlOrPath, urlDownloader, latestLocalRelease, "RELEASES");
     }
 
     private static async Task<string> LoadRemoteReleasesFromFile(string updateUrlOrPath)
