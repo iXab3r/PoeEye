@@ -133,7 +133,8 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         this.RaiseWhenSourceValue(x => x.UpdateSource, updaterModel, x => x.UpdateSource, uiScheduler).AddTo(Anchors);
 
         RestartCommand = CommandWrapper
-            .Create(RestartCommandExecuted);
+            .Create(Restart)
+            .AddTo(Anchors);
 
         RestartCommand
             .ThrownExceptions
@@ -311,7 +312,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             IsOpen = true;
             SetStatus($"Successfully updated to v{LatestVersion}, restarting...");
             LatestUpdate = default;
-            await RestartCommandExecuted();
+            await Restart();
         }
         catch (Exception ex)
         {
@@ -326,6 +327,26 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             {
                 await Task.Delay(timeToSleep);
             }
+        }
+    }
+
+    public async Task Restart()
+    {
+        Log.Debug("Restart application requested");
+
+        try
+        {
+            IsOpen = true;
+            SetStatus("Restarting application...");
+
+            await updaterModel.RestartApplicationViaLauncher();
+        }
+        catch (Exception ex)
+        {
+            IsOpen = true;
+
+            Log.HandleUiException(ex);
+            SetError($"Failed to restart application - {ex.Message}");
         }
     }
 
@@ -448,25 +469,5 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         IsInErrorStatus = true;
         StatusText = text;
         updaterModel.Reset();
-    }
-
-    private async Task RestartCommandExecuted()
-    {
-        Log.Debug("Restart application requested");
-
-        try
-        {
-            IsOpen = true;
-            SetStatus("Restarting application...");
-
-            await updaterModel.RestartApplicationViaLauncher();
-        }
-        catch (Exception ex)
-        {
-            IsOpen = true;
-
-            Log.HandleUiException(ex);
-            SetError($"Failed to restart application - {ex.Message}");
-        }
     }
 }

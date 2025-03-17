@@ -55,4 +55,6 @@ public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry targetRelease);
     
     Task DownloadUpdate(bool applyAutomatically);
+
+    Task Restart();
 }
