@@ -38,6 +38,12 @@ public static class GeometryExtensions
         return WinRect.FromLTRB((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
     }
     
+    public static WinPoint Transform(this WinPoint point, Matrix3x2 transformationMatrix)
+    {
+        var vector = Vector2.Transform(new Vector2(point.X, point.Y), transformationMatrix);
+        return new WinPoint((int)vector.X, (int)vector.Y);
+    }
+    
     public static WinRectangleF Transform(this WinRectangleF bounds, Matrix3x2 transformationMatrix)
     {
         var topLeft = Vector2.Transform(new Vector2(bounds.Left, bounds.Top), transformationMatrix);
