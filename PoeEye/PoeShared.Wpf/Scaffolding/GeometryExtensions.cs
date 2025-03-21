@@ -58,6 +58,20 @@ public static class GeometryExtensions
     }
     
     /// <summary>
+    /// Ensures the RectangleF has positive width and height by adjusting its position if needed.
+    /// This is useful for correcting inverted or negative-sized rectangles.
+    /// </summary>
+    /// <param name="rect">The RectangleF to normalize.</param>
+    /// <returns>A RectangleF with positive width and height.</returns>
+    public static RectangleF Normalize(this RectangleF rect)
+    {
+        var x = rect.Width >= 0 ? rect.X : rect.X + rect.Width;
+        var y = rect.Height >= 0 ? rect.Y : rect.Y + rect.Height;
+
+        return new RectangleF(x, y, Math.Abs(rect.Width), Math.Abs(rect.Height));
+    }
+    
+    /// <summary>
     /// Centers a rectangle inside another rectangle.
     /// Useful when positioning objects neatly.
     /// </summary>

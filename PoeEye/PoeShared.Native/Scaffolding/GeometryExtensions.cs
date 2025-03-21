@@ -43,6 +43,11 @@ public static class GeometryExtensions
         var vector = Vector2.Transform(new Vector2(point.X, point.Y), transformationMatrix);
         return new WinPoint((int)vector.X, (int)vector.Y);
     }
+      
+    public static Vector2 Transform(this Vector2 vector, Matrix3x2 transformationMatrix)
+    {
+        return Vector2.Transform(vector, transformationMatrix);
+    }
     
     public static WinRectangleF Transform(this WinRectangleF bounds, Matrix3x2 transformationMatrix)
     {
