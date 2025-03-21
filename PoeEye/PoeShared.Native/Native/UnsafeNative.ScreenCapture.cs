@@ -26,14 +26,15 @@ public partial class UnsafeNative
 
     public static Bitmap GetDesktopImageViaCopyFromScreen(Rectangle region)
     {
-        if (region.Width <= 0 || region.Height <= 0)
+        if (region.Width < 0 || region.Height < 0)
         {
-            return null;
+            throw new ArgumentException($"Invalid region(must be non-negative): {region}");
         }
-            
-        var sourceBmp = new Bitmap(region.Width, region.Height, PixelFormat.Format32bppRgb); // Format32bppRgb is used because in most cases PrintWindow/CopyDeviceContext returns 32bppRgb
+
+        var actualRegion = region.IsEmpty ? System.Windows.Forms.SystemInformation.VirtualScreen : region;
+        var sourceBmp = new Bitmap(actualRegion.Width, actualRegion.Height, PixelFormat.Format32bppRgb); // Format32bppRgb is used because in most cases PrintWindow/CopyDeviceContext returns 32bppRgb
         using var captureGraphics = Graphics.FromImage(sourceBmp);
-        captureGraphics.CopyFromScreen(region.Left,region.Top,0,0,region.Size);
+        captureGraphics.CopyFromScreen(actualRegion.Left,actualRegion.Top,0,0,actualRegion.Size);
         return sourceBmp;
     }
         

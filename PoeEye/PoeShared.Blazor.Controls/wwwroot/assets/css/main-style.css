@@ -63,6 +63,10 @@ video {
     padding-right: 3px;
 }
 
+.pointer-events-none {
+    pointer-events: none !important;
+}
+
 .spinner-border-lg {
     --bs-spinner-width: 5rem;
     --bs-spinner-height: 5rem;
