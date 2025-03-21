@@ -20,6 +20,7 @@ internal partial class BlazorWindow
                 {
                     var childContainer = parentContainer.CreateChildContainer().AddTo(Anchors);
                     childContainer.RegisterSingleton<IBlazorWindowController>(_ => owner);
+                    childContainer.RegisterSingleton<IBlazorWindowAccessor>(_ => new BlazorWindowAccessor(owner));
                     ChildContainer = childContainer;
                 })
                 .AddTo(Anchors);

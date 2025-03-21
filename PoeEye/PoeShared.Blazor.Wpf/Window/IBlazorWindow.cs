@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Windows;
 using Microsoft.Extensions.FileProviders;
 using PoeShared.Logging;
@@ -20,7 +21,15 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
     
     /// <summary>
     /// Gets or sets the data context which will be assigned to View.
+    /// This property is a legacy one, will be removed in future versions and is replaced with DataContext
     /// </summary>
+    object DataContext { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the data context which will be assigned to View.
+    /// </summary>
+    [Obsolete($"Replaced with {nameof(DataContext)} - to be removed in future versions")]
+    [Browsable(false)]
     object ViewDataContext { get; set; }
     
     /// <summary>

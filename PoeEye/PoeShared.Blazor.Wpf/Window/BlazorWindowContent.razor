@@ -406,8 +406,7 @@ else
 {
     <BlazorContentPresenter
         @ref="@ContentPresenter"
-
-        Content="@(DataContext.ViewDataContext)"
+        Content="@(DataContext.DataContext)"
         ViewType="@(DataContext.ViewType)">
     </BlazorContentPresenter>
 }
@@ -484,6 +483,8 @@ else
         dragAnchor = new SerialDisposable().AddTo(Anchors);
 
         ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.IsDebugMode));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.DataContext));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.ViewType));
 
         this.WhenAnyValue(x => x.ContentPresenter)
             .WithPrevious()

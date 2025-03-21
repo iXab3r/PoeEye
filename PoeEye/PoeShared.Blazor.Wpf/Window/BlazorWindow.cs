@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -70,6 +71,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         complexFileProvider = new ComplexFileProvider().AddTo(Anchors);
         additionalFileProviderAnchor = new SerialDisposable().AddTo(Anchors);
 
+        this.RaiseWhenSourceValue(x => x.ViewDataContext, this, x => x.DataContext).AddTo(Anchors);
+
         Disposable.Create(() =>
         {
             try
@@ -117,34 +120,6 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         ShowMaxButton = true;
         ShowCloseButton = true;
 
-        WhenKeyDown =
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => KeyDown += h, h => KeyDown -= h)
-                .Select(x => x.EventArgs)
-                .Publish()
-                .RefCount();
-
-        WhenKeyUp =
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => KeyUp += h, h => KeyUp -= h)
-                .Select(x => x.EventArgs)
-                .Publish()
-                .RefCount();
-
-        WhenPreviewKeyDown =
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => PreviewKeyDown += h, h => PreviewKeyDown -= h)
-                .Select(x => x.EventArgs)
-                .Publish()
-                .RefCount();
-
-        WhenPreviewKeyUp =
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => PreviewKeyUp += h, h => PreviewKeyUp -= h)
-                .Select(x => x.EventArgs)
-                .Publish()
-                .RefCount();
-
         var whenLoadedSource = Observable
             .FromEventPattern<EventHandler, EventArgs>(h => Loaded += h, h => Loaded -= h)
             .Select(x => x.EventArgs)
@@ -152,7 +127,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
             .Replay(1);
         whenLoadedSource.Connect().AddTo(Anchors);
         WhenLoaded = whenLoadedSource;
-        
+
         var whenUnloadedSource = Observable
             .FromEventPattern<EventHandler, EventArgs>(h => Unloaded += h, h => Unloaded -= h)
             .Select(x => x.EventArgs)
@@ -190,6 +165,76 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
                 .Publish()
                 .RefCount();
 
+        WhenKeyDown =
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => KeyDown += h, h => KeyDown -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenKeyUp =
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => KeyUp += h, h => KeyUp -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenPreviewKeyDown =
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => PreviewKeyDown += h, h => PreviewKeyDown -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenPreviewKeyUp =
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => PreviewKeyUp += h, h => PreviewKeyUp -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenMouseDown =
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => MouseDown += h, h => MouseDown -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenMouseUp =
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => MouseUp += h, h => MouseUp -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenPreviewMouseDown =
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => PreviewMouseDown += h, h => PreviewMouseDown -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenPreviewMouseUp =
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => PreviewMouseUp += h, h => PreviewMouseUp -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenPreviewMouseMove =
+            Observable
+                .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => PreviewMouseMove += h, h => PreviewMouseMove -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
+        WhenMouseMove =
+            Observable
+                .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => MouseMove += h, h => MouseMove -= h)
+                .Select(x => x.EventArgs)
+                .Publish()
+                .RefCount();
+
         WhenClosed.Subscribe(() =>
         {
             if (Anchors.IsDisposed)
@@ -204,18 +249,26 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public Type ViewType { get; set; }
 
-    public object ViewDataContext { get; set; }
+    public object DataContext { get; set; }
+
+    [Obsolete($"Replaced with {nameof(DataContext)} - to be removed in future versions")]
+    [Browsable(false)]
+    public object ViewDataContext
+    {
+        get => DataContext;
+        set => DataContext = value;
+    }
 
     public IUnityContainer Container { get; set; }
 
     public WindowStartupLocation WindowStartupLocation { get; set; }
 
     public new IFluentLog Log => base.Log;
-    
+
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
 
     public TitleBarDisplayMode TitleBarDisplayMode { get; set; }
-    
+
     public IDisposable RegisterFileProvider(IFileProvider fileProvider)
     {
         return complexFileProvider.Add(fileProvider);
@@ -227,7 +280,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         set => showInTaskbar.SetValue(value, TrackedPropertyUpdateSource.External);
     }
 
-    public WindowState WindowState 
+    public WindowState WindowState
     {
         get => windowState.State.Value;
         set => windowState.SetValue(value, TrackedPropertyUpdateSource.External);
@@ -333,6 +386,12 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public IObservable<KeyEventArgs> WhenKeyUp { get; }
     public IObservable<KeyEventArgs> WhenPreviewKeyDown { get; }
     public IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
+    public IObservable<MouseButtonEventArgs> WhenMouseDown { get; }
+    public IObservable<MouseButtonEventArgs> WhenMouseUp { get; }
+    public IObservable<MouseEventArgs> WhenMouseMove { get; }
+    public IObservable<MouseButtonEventArgs> WhenPreviewMouseDown { get; }
+    public IObservable<MouseButtonEventArgs> WhenPreviewMouseUp { get; }
+    public IObservable<MouseEventArgs> WhenPreviewMouseMove { get; }
     public IObservable<EventArgs> WhenLoaded { get; }
     public IObservable<EventArgs> WhenUnloaded { get; }
     public IObservable<EventArgs> WhenClosed { get; }
@@ -340,6 +399,12 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public IObservable<EventArgs> WhenActivated { get; }
     public IObservable<EventArgs> WhenDeactivated { get; }
 
+    public event MouseButtonEventHandler MouseDown;
+    public event MouseButtonEventHandler MouseUp;
+    public event MouseButtonEventHandler PreviewMouseDown;
+    public event MouseButtonEventHandler PreviewMouseUp;
+    public event MouseEventHandler MouseMove;
+    public event MouseEventHandler PreviewMouseMove;
     public event KeyEventHandler KeyDown;
     public event KeyEventHandler KeyUp;
     public event KeyEventHandler PreviewKeyDown;
@@ -350,11 +415,33 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public event EventHandler Loaded;
     public event EventHandler Unloaded;
     public event EventHandler Closed;
-    
+
     public void ShowDevTools()
     {
         Log.Debug("Enqueueing ShowDevTools command");
         EnqueueUpdate(new ShowDevToolsCommand());
+    }
+
+    public void WaitForIdle(TimeSpan timeout)
+    {
+        var sw = new Stopwatch();
+        using var resetEvent = new ManualResetEventSlim();
+        EnqueueUpdate(new WaitForIdleCommand(resetEvent, DateTimeOffset.Now));
+        
+        Log.Debug($"Enqueueing WaitForIdle command");
+        if (timeout > TimeSpan.Zero)
+        {
+            Log.Debug($"Awaiting for window being idle, timeout: {timeout}");
+            resetEvent.Wait(timeout);
+        }
+        else
+        {
+            Log.Debug($"Awaiting for window being idle without timeout");
+            resetEvent.Wait();
+        }
+
+        var elapsed = sw.Elapsed;
+        Log.Debug($"All events in the queue have been processed, elapsed: {elapsed.TotalMilliseconds:F0}ms ({elapsed.Ticks:F0} ticks)");
     }
 
     public void Minimize()
@@ -374,7 +461,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         Log.Debug("Enqueueing Restore command");
         EnqueueUpdate(new RestoreCommand());
     }
-    
+
     public void Hide()
     {
         Log.Debug("Enqueueing Hide command");
@@ -387,6 +474,12 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         EnqueueUpdate(new ShowCommand());
 
         Log.Debug("Showing window in non-blocking way");
+    }
+
+    public void Activate()
+    {
+        Log.Debug("Enqueueing Activate command");
+        EnqueueUpdate(new ActivateCommand());
     }
 
     public void ShowDialog(CancellationToken cancellationToken = default)
@@ -455,7 +548,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         EnsureNotDisposed();
         return new Rectangle(Left, Top, Width, Height);
     }
-    
+
     public void SetWindowRect(Rectangle rect)
     {
         EnsureNotDisposed();
@@ -491,9 +584,16 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         EnqueueUpdate().AndForget();
     }
 
-    private Task EnqueueUpdate()
+    private async Task EnqueueUpdate()
     {
-        return Observable.Start(HandleUpdate, uiScheduler).ToTask();
+        if (uiScheduler.IsOnScheduler())
+        {
+            HandleUpdate();
+        }
+        else
+        {
+            await Observable.Start(HandleUpdate, uiScheduler).ToTask();
+        }
     }
 
     private NativeWindow GetOrCreate()

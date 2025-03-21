@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -31,6 +32,11 @@ partial class BlazorWindow
     /// </summary>
     private const int MA_NOACTIVATE = 3;
     
+    /// <summary>
+    /// In a window currently covered by another window in the same thread (the message will be sent to underlying windows in the same thread until one of them returns a code that is not HTTRANSPARENT).
+    /// </summary>
+    private static readonly IntPtr HTTRANSPARENT = new(-1);
+    
     private void HandleEvent(IWindowEvent windowEvent)
     {
         if (windowEvent is DisposeWindowCommand)
@@ -51,6 +57,11 @@ partial class BlazorWindow
             Log.Debug($"Disposing the window: {new {window}}");
             window.Close();
             window.Dispose();
+        }
+        else if (windowEvent is WaitForIdleCommand waitForIdleCommand)
+        { 
+            Log.Debug($"Notifying that queue is processed to this point: {waitForIdleCommand}");
+            waitForIdleCommand.ResetEvent.Set();
         }
         else if (windowEvent is IWindowCommand)
         {
@@ -87,6 +98,12 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Hiding the window: {new {window.WindowState}}");
                     window.Hide();
+                    break;
+                }
+                case ActivateCommand:
+                {
+                    Log.Debug($"Activating the window");
+                    window.Activate();
                     break;
                 }
                 case ShowDevToolsCommand:
@@ -579,21 +596,65 @@ partial class BlazorWindow
                 .Subscribe(x => observer.OnNext(new SetBlazorAdditionalFiles(x)))
                 .AddTo(anchors);
 
+
             // events propagation
+            var inputEventSource = window.ContentControl.WebView;
             Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.ContentControl.WebView.KeyUp += h, h => window.ContentControl.WebView.KeyUp -= h)
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseDown += h, h => inputEventSource.MouseDown -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.MouseDown?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseUp += h, h => inputEventSource.MouseUp -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.MouseUp?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseDown += h, h => inputEventSource.PreviewMouseDown -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.PreviewMouseDown?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseUp += h, h => inputEventSource.PreviewMouseUp -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.PreviewMouseUp?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.MouseMove += h, h => inputEventSource.MouseMove -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.MouseMove?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.PreviewMouseMove += h, h => inputEventSource.PreviewMouseMove -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.PreviewMouseMove?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyDown += h, h => inputEventSource.KeyDown -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(x => blazorWindow.KeyDown?.Invoke(blazorWindow, x))
+                .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyUp += h, h => inputEventSource.KeyUp -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.KeyUp?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
 
             Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.ContentControl.WebView.PreviewKeyDown += h, h => window.ContentControl.WebView.PreviewKeyDown -= h)
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.PreviewKeyDown += h, h => inputEventSource.PreviewKeyDown -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.PreviewKeyDown?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
 
             Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => window.ContentControl.WebView.PreviewKeyUp += h, h => window.ContentControl.WebView.PreviewKeyUp -= h)
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.PreviewKeyUp += h, h => inputEventSource.PreviewKeyUp -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.PreviewKeyUp?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
@@ -817,6 +878,16 @@ partial class BlazorWindow
                     handled = true;
                     break;
                 }
+                case User32.WindowMessage.WM_NCHITTEST:
+                {
+                    if (IsClickThrough)
+                    {
+                        //this makes the window transparent to GetWindowFromPoint (as usually expected for non-interactive windows)
+                        handled = true;
+                        return HTTRANSPARENT; 
+                    }
+                    break;
+                }
                 case User32.WindowMessage.WM_MOUSEACTIVATE:
                 {
                     if (NoActivate)
@@ -915,9 +986,13 @@ partial class BlazorWindow
         return IntPtr.Zero;
     }
 
+    private sealed record WaitForIdleCommand(ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
+    
     private sealed record ShowCommand : IWindowCommand;
 
     private sealed record HideCommand : IWindowCommand;
+    
+    private sealed record ActivateCommand : IWindowCommand;
 
     private sealed record ShowDevToolsCommand : IWindowCommand;
 

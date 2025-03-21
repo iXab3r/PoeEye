@@ -42,7 +42,7 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
         {
             var wnd = blazorWindowFactory.Create();
             wnd.ViewType = typeof(MainCounterView);
-            wnd.ViewDataContext = new MainCounterViewModel();
+            wnd.DataContext = new MainCounterViewModel();
             wnd.Title = "Test";
             wnd.Height = 300;
             wnd.Width = 200;
@@ -53,7 +53,7 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
         {
             var wnd = blazorWindowFactory.Create();
             wnd.ViewType = typeof(MainCounterView);
-            wnd.ViewDataContext = new MainCounterViewModel();
+            wnd.DataContext = new MainCounterViewModel();
             wnd.Title = "Test blocking";
             wnd.Height = 600;
             wnd.Width = 800;

@@ -45,6 +45,26 @@ public readonly struct Percentage : IEquatable<Percentage>
     /// Implicit conversion from <see cref="Percentage"/> to <see cref="float"/>.
     /// </summary>
     public static implicit operator float(Percentage percentage) => percentage.value;
+    
+    /// <summary>
+    /// Implicit conversion from <see cref="float"/> to <see cref="Percentage"/>.
+    /// </summary>
+    public static implicit operator Percentage(double value) => new Percentage((float)value);
+
+    /// <summary>
+    /// Implicit conversion from <see cref="Percentage"/> to <see cref="float"/>.
+    /// </summary>
+    public static implicit operator double(Percentage percentage) => percentage.value;
+    
+    /// <summary>
+    /// Implicit conversion from <see cref="float"/> to <see cref="Percentage"/>.
+    /// </summary>
+    public static implicit operator Percentage(int value) => new Percentage(value);
+
+    /// <summary>
+    /// Implicit conversion from <see cref="Percentage"/> to <see cref="float"/>.
+    /// </summary>
+    public static implicit operator int(Percentage percentage) => (int)percentage.value;
 
     /// <summary>
     /// Multiplies a value by this percentage.

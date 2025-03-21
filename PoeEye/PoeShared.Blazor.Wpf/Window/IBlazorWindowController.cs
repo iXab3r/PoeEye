@@ -167,6 +167,36 @@ public interface IBlazorWindowController
     /// Observable sequence for when a key is released before other event handlers process the input.
     /// </summary>
     IObservable<KeyEventArgs> WhenPreviewKeyUp { get; }
+    
+    /// <summary>
+    /// Observable sequence for when a mouse button is pressed while the window has focus.
+    /// </summary>
+    IObservable<MouseButtonEventArgs> WhenMouseDown { get; }
+
+    /// <summary>
+    /// Observable sequence for when a mouse button is released while the window has focus.
+    /// </summary>
+    IObservable<MouseButtonEventArgs> WhenMouseUp { get; }
+
+    /// <summary>
+    /// Observable sequence for when a mouse button is pressed before other event handlers process the input.
+    /// </summary>
+    IObservable<MouseButtonEventArgs> WhenPreviewMouseDown { get; }
+
+    /// <summary>
+    /// Observable sequence for when a mouse button is released before other event handlers process the input.
+    /// </summary>
+    IObservable<MouseButtonEventArgs> WhenPreviewMouseUp { get; }
+    
+    /// <summary>
+    /// Observable sequence for when mouse is moved and the window is in focus.
+    /// </summary>
+    IObservable<MouseEventArgs> WhenMouseMove { get; }
+    
+    /// <summary>
+    /// Observable before any other events for when mouse is moved and the window is in focus.
+    /// </summary>
+    IObservable<MouseEventArgs> WhenPreviewMouseMove { get; }
 
     /// <summary>
     /// Observable sequence for when the window is fully loaded and rendered.
@@ -217,6 +247,36 @@ public interface IBlazorWindowController
     /// Occurs before any other event handlers for a key-up event.
     /// </summary>
     event KeyEventHandler PreviewKeyUp;
+    
+    /// <summary>
+    /// Occurs when a mouse button is pressed while the window has focus.
+    /// </summary>
+    event MouseButtonEventHandler MouseDown;
+
+    /// <summary>
+    /// Occurs when a mouse button is released while the window has focus.
+    /// </summary>
+    event MouseButtonEventHandler MouseUp;
+    
+    /// <summary>
+    /// Occurs when mouse is moved and the window is in focus.
+    /// </summary>
+    event MouseEventHandler MouseMove;
+
+    /// <summary>
+    /// Occurs before any other event handlers for a mouse-down event.
+    /// </summary>
+    event MouseButtonEventHandler PreviewMouseDown;
+
+    /// <summary>
+    /// Occurs before any other event handlers for a mouse-up event.
+    /// </summary>
+    event MouseButtonEventHandler PreviewMouseUp;
+    
+    /// <summary>
+    /// Occurs  before any other event handlers when mouse is moved and the window is in focus.
+    /// </summary>
+    event MouseEventHandler PreviewMouseMove;
 
     /// <summary>
     /// Occurs when the window is about to close, providing the option to cancel.
@@ -242,6 +302,11 @@ public interface IBlazorWindowController
     /// Occurs when the window is closed.
     /// </summary>
     event EventHandler Closed;
+
+    /// <summary>
+    /// Waits until all Window messages are processed
+    /// </summary>
+    void WaitForIdle(TimeSpan timeout = default);
     
     /// <summary>
     /// Minimizes the window
@@ -267,6 +332,11 @@ public interface IBlazorWindowController
     /// Shows the window, making it visible.
     /// </summary>
     void Show();
+    
+    /// <summary>
+    /// Activates the window, bringing it to front and giving focus.
+    /// </summary>
+    void Activate();
 
     /// <summary>
     /// Shows the window as a modal dialog, blocking other interactions until closed.
