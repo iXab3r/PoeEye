@@ -24,8 +24,7 @@ internal sealed class SingleGlobalInstance : IDisposable, IEnableLogger
 
         var path = Path.Combine(Path.GetTempPath(), ".squirrel-lock-" + key);
 
-        var st = new Stopwatch();
-        st.Start();
+        var st = Stopwatch.StartNew();
 
         Log.Debug($"Acquiring update lock @ {path}");
         var fh = default(FileStream);

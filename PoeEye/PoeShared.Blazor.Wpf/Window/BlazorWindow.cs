@@ -424,7 +424,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void WaitForIdle(TimeSpan timeout)
     {
-        var sw = new Stopwatch();
+        var sw = Stopwatch.StartNew();
         using var resetEvent = new ManualResetEventSlim();
         EnqueueUpdate(new WaitForIdleCommand(resetEvent, DateTimeOffset.Now));
         
