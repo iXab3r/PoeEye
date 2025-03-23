@@ -51,6 +51,7 @@ public abstract class FixtureBase
             .RegisterType(typeof(INamedFactory<,,>), typeof(Factory<,,>))
             .RegisterType(typeof(INamedFactory<,>), typeof(Factory<,>))
             .RegisterType(typeof(INamedFactory<>), typeof(Factory<>));
+        UnityContainer.RegisterInstance(Log);
         
         Container = new Fixture();
         Container.Customize(new AutoMoqCustomization());
