@@ -10,6 +10,7 @@ public static class ObjectReflectionExtensions
     private static readonly ConcurrentDictionary<(Type type, string propertyName), PropertyInfo> PropertyAccessorByName = new();
 
     private static readonly Regex PropertyPathRegexValidator = new Regex(@"^[\w\.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly string ExternalInitTypeFullName = typeof(System.Runtime.CompilerServices.IsExternalInit).FullName;
     
     public static T GetPropertyValue<T>(this object model, string propertyPath)
     {
@@ -98,9 +99,50 @@ public static class ObjectReflectionExtensions
         return propertyInfo;
     }
 
+    /// <summary>
+    /// Determines whether the specified <see cref="PropertyInfo"/> represents an indexed property.
+    /// </summary>
+    /// <param name="propertyInfo">The property to inspect.</param>
+    /// <returns><c>true</c> if the property is an indexed property; otherwise, <c>false</c>.</returns>
     public static bool IsIndexedProperty(this PropertyInfo propertyInfo)
     {
         return propertyInfo.GetIndexParameters().Length > 0;
+    }
+    
+    /// <summary>
+    /// Determines whether the specified <see cref="PropertyInfo"/> represents an init-only property.
+    /// </summary>
+    /// <param name="propertyInfo">The property to inspect.</param>
+    /// <returns><c>true</c> if the property is marked as init-only; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// Init-only properties are marked with the <c>System.Runtime.CompilerServices.IsExternalInit</c> modifier
+    /// in their metadata, which is a feature introduced in C# 9 for immutable objects.
+    /// </remarks>
+    public static bool IsInitOnly(this PropertyInfo propertyInfo)
+    {
+        var setMethod = propertyInfo.SetMethod;
+        if (setMethod == null)
+        {
+            return false; // No setter = cannot be init-only-
+        }
+
+        var returnParameter = setMethod.ReturnParameter;
+        if (returnParameter == null)
+        {
+            return false;
+        }
+
+        var modreq = returnParameter.GetRequiredCustomModifiers();
+        if (modreq.Length == 0)
+        {
+            return false;
+        }
+        
+        return modreq.Any(type =>
+        {
+            //comparing via Name as EA scripting system could have multiple different ExternalInit types loaded in
+            return string.Equals(type.FullName, ExternalInitTypeFullName, StringComparison.Ordinal);
+        });
     }
 
     public static object SetPropertyValue<T>(this object model, string propertyPath, T value)

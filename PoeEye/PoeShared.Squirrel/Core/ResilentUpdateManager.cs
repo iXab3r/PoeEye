@@ -73,7 +73,7 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
         var log = Log.WithSuffix(getterExpr.ToString());
         
         log.Debug($"Acquiring lock {gate}");
-        using var @lock = await gate.Rent();
+        using var @lock = await gate.RentAsync();
 
         var allUris = uriChooser.ToArray();
         log.Debug($"Contacting URIs in the following order: {allUris.DumpToString()}");
