@@ -582,11 +582,40 @@ public partial class UnsafeNative
         ActivateWindow(new WindowHandle(window));
     }
 
+    /// <summary>
+    /// Activates the specified window by bringing it to the foreground.
+    /// </summary>
+    /// <param name="window">The window handle to activate.</param>
+    /// <exception cref="InvalidStateException">
+    /// Thrown if the window fails to become the foreground window within the specified timeout.
+    /// </exception>
     public static void ActivateWindow(IWindowHandle window)
     {
         ActivateWindow(window, TimeSpan.FromMilliseconds(500));
     }
+    
+    /// <summary>
+    /// Activates the specified window by bringing it to the foreground.
+    /// </summary>
+    /// <param name="window">The window handle to activate.</param>
+    /// <param name="timeout">The maximum time allowed for the activation attempt.</param>
+    /// <exception cref="InvalidStateException">
+    /// Thrown if the window fails to become the foreground window within the specified timeout.
+    /// </exception>
+    public static void ActivateWindow(IWindowHandle window, TimeSpan timeout)
+    {
+        ActivateWindow(window, timeout, Log.WithSuffix(window));
+    }
 
+    /// <summary>
+    /// Activates the specified window by bringing it to the foreground.
+    /// </summary>
+    /// <param name="window">The window handle to activate.</param>
+    /// <param name="timeout">The maximum time allowed for the activation attempt.</param>
+    /// <param name="log">The logger for capturing diagnostic information.</param>
+    /// <exception cref="InvalidStateException">
+    /// Thrown if the window fails to become the foreground window within the specified timeout.
+    /// </exception>
     public static void ActivateWindow(IWindowHandle window, TimeSpan timeout, IFluentLog log)
     {
         if (window == null || window.Handle == IntPtr.Zero)
@@ -640,11 +669,6 @@ public partial class UnsafeNative
 
             TaskExtensions.Sleep(10);
         }
-    }
-
-    public static void ActivateWindow(IWindowHandle window, TimeSpan timeout)
-    {
-        ActivateWindow(window, timeout, Log.WithSuffix(window));
     }
 
     public static bool SetForegroundWindow(IntPtr hwnd)
