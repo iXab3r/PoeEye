@@ -108,7 +108,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         set => title = value;
     }
 
-    [Parameter] public RenderFragment TitleTemplate { get; set; }
+    [Parameter] public RenderFragment? TitleTemplate { get; set; }
 
     [Parameter] public TItem DataItem { get; set; }
 

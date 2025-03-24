@@ -175,8 +175,15 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
     private void OnDragLeave(DragEventArgs e)
     {
-        SelfNode.SetDragTarget(false);
-        SelfNode.SetParentTargetContainer(false);
+        if (SelfNode.IsDragTarget)
+        {
+            SelfNode.SetDragTarget(false);
+        }
+
+        if (SelfNode.ParentNode != null && SelfNode.ParentNode.IsTargetContainer)
+        {
+            SelfNode.SetParentTargetContainer(false);
+        }
     }
 
     private void OnDragEnter(DragEventArgs e)
@@ -186,7 +193,10 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
             return;
         }
 
-        SelfNode.SetDragTarget(true);
+        if (!SelfNode.IsDragTarget)
+        {
+            SelfNode.SetDragTarget(true);
+        }
         dragTargetClientX = e.ClientX;
     }
 
