@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Converters;
 
@@ -10,6 +11,18 @@ public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
 
     public static TimeSpanToHumanReadableStringConverter Instance => InstanceSupplier.Value;
 
+    public string Convert(RandomTimeSpan timeSpan)
+    {
+        if (timeSpan.Randomize)
+        {
+            return $"{Convert(timeSpan.Min)} - {Convert(timeSpan.Max)}";
+        }
+        else
+        {
+            return Convert(timeSpan.Min);
+        }
+    }
+    
     public string Convert(TimeSpan timeSpan)
     {
         if (timeSpan == TimeSpan.MaxValue)
