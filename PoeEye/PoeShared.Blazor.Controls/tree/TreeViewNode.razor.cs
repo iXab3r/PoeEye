@@ -36,7 +36,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         NodeId = TreeViewHelper.GetNextNodeId();
 
         ChangeTrackers.Add(this.WhenAnyValue(x => x.IsVisible));
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.IsTargetBottom));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.IsTargetBelow));
         ChangeTrackers.Add(this.WhenAnyValue(x => x.IsTargetContainer));
 
         Binder.Attach(this).AddTo(Anchors);
@@ -124,7 +124,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
     public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
 
-    public bool IsTargetBottom { get; private set; }
+    public bool IsTargetBelow { get; private set; }
 
     public bool IsTargetContainer { get; private set; }
 
@@ -269,14 +269,14 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         IsLeaf = false;
     }
 
-    internal void SetTargetBottom(bool value)
+    internal void SetTargetBelow(bool value)
     {
-        if (IsTargetBottom == value)
+        if (IsTargetBelow == value)
         {
             return;
         }
 
-        IsTargetBottom = value;
+        IsTargetBelow = value;
     }
 
     internal void SetDragTarget(bool value)
@@ -388,8 +388,8 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             .If("ant-tree-treenode-checkbox-indeterminate", () => Indeterminate)
             .If("ant-tree-treenode-selected", () => Selected)
             .If("drop-target", () => IsDragTarget)
-            .If("drag-over-gap-bottom", () => IsDragTarget && IsTargetBottom)
-            .If("drag-over", () => IsDragTarget && !IsTargetBottom)
+            .If("drag-over-gap-bottom", () => IsDragTarget && IsTargetBelow)
+            .If("drag-over", () => IsDragTarget && !IsTargetBelow)
             .If("drop-container", () => IsTargetContainer)
             .If("ant-tree-treenode-leaf-last", () => IsLastNode);
     }

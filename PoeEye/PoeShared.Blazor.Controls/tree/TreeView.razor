@@ -10,6 +10,7 @@
      @onkeydown:stopPropagation="false" 
      
      @ondrop="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleOnDrop))" @ondrop:preventDefault
+     @ondragend="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragEnd))" @ondragend:preventDefault
      @ondragenter="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragEnter))"
      @ondragover="@(EventUtil.AsNonRenderingEventHandler<DragEventArgs>(HandleDragOver))"
 >

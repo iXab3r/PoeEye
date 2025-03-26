@@ -60,10 +60,10 @@
             }
         </span>
     }
-    <ReactiveSection Trackers="@(new() {this.WhenAnyValue(x => x.SelfNode.IsDragTarget)})">
+    <ReactiveSection Trackers="@(new() {this.WhenAnyValue(x => x.SelfNode.IsDragTarget, x => x.SelfNode.IsTargetBelow)})">
         @if (SelfNode.IsDragTarget)
         {
-            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.IsTargetBottom ? "4px" : "28px");right:0;bottom:-3px;"></div>
+            <div class="ant-tree-drop-indicator" style="left:@(SelfNode.IsTargetBelow ? "4px" : "28px");right:0;bottom:-3px;"></div>
         }
     </ReactiveSection>
 </span>

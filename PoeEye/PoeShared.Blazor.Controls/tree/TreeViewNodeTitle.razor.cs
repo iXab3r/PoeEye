@@ -188,7 +188,7 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
     private void OnDragEnter(DragEventArgs e)
     {
-        if (TreeComponent.DragItem == SelfNode)
+        if (!CanDropBelow(TreeComponent.DragItem, SelfNode) && !CanDropInto(TreeComponent.DragItem, SelfNode))
         {
             return;
         }
@@ -206,11 +206,6 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
     /// <param name="e"></param>
     private async Task OnDragOver(DragEventArgs e)
     {
-        if (TreeComponent.DragItem == SelfNode)
-        {
-            return;
-        }
-
         if (e.ClientX - dragTargetClientX > OffSetx)
         {
             if (SelfNode.Expanded == false && SelfNode.IsLeaf == false)
@@ -218,37 +213,57 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
                 await SelfNode.Expand(true);
             }
             
-            SelfNode.SetTargetBottom(false);
-            SelfNode.SetParentTargetContainer(false);
+            if (CanDropInto(TreeComponent.DragItem, SelfNode))
+            {
+                SelfNode.SetTargetBelow(false);
+                SelfNode.SetParentTargetContainer(false);
+                return;
+            }
         }
-        else if (SelfNode.Droppable)
+
+        if (SelfNode.Droppable)
         {
-            SelfNode.SetTargetBottom(true);
+            SelfNode.SetTargetBelow(true);
             SelfNode.SetParentTargetContainer(true);
         }
     }
 
     private async Task OnDrop(DragEventArgs e)
     {
-        SelfNode.SetDragTarget(false);
-        SelfNode.SetParentTargetContainer(false);
-
-        var dragItem = TreeComponent.DragItem;
-        if (dragItem != null)
+        try
         {
-            if (SelfNode.IsTargetBottom)
+            var dragItem = TreeComponent.DragItem;
+            if (dragItem != null)
             {
-                await dragItem.DragMoveDown(SelfNode);
+                if (SelfNode.IsTargetBelow)
+                {
+                    if (!CanDropBelow(TreeComponent.DragItem, SelfNode))
+                    {
+                        return;
+                    }
+                    
+                    await dragItem.DragMoveDown(SelfNode);
+                }
+                else
+                {
+                    if (!CanDropInto(TreeComponent.DragItem, SelfNode))
+                    {
+                        return;
+                    }
+                    
+                    await dragItem.DragMoveInto(SelfNode);
+                }
             }
-            else
+
+            if (TreeComponent.OnDrop.HasDelegate)
             {
-                await dragItem.DragMoveInto(SelfNode);
+                await TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem, e, SelfNode.IsTargetBelow) {TargetNode = SelfNode});
             }
         }
-
-        if (TreeComponent.OnDrop.HasDelegate)
+        finally
         {
-            await TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem, e, SelfNode.IsTargetBottom) {TargetNode = SelfNode});
+            SelfNode.SetDragTarget(false);
+            SelfNode.SetParentTargetContainer(false);
         }
     }
 
@@ -258,5 +273,61 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
         {
             TreeComponent.OnDragEnd.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent, TreeComponent.DragItem) {TargetNode = SelfNode});
         }
+    }
+    
+    private bool CanDropBelow(TreeViewNode<TItem>? dragItem, TreeViewNode<TItem> targetItem)
+    {
+        if (!CanDrop(TreeComponent, dragItem, targetItem))
+        {
+            return false;
+        }
+
+        if (TreeComponent.CanDropBelowExpression != null)
+        {
+            if (!TreeComponent.CanDropBelowExpression(dragItem, targetItem))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    private bool CanDropInto(TreeViewNode<TItem>? dragItem, TreeViewNode<TItem> targetItem)
+    {
+        if (!CanDrop(TreeComponent, dragItem, targetItem))
+        {
+            return false;
+        }
+
+        if (TreeComponent.CanDropInsideExpression != null)
+        {
+            if (!TreeComponent.CanDropInsideExpression(dragItem, targetItem))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    private static bool CanDrop(TreeView<TItem> tree, TreeViewNode<TItem>? dragItem, TreeViewNode<TItem> targetItem)
+    {
+        if (dragItem == targetItem)
+        {
+            return false;
+        }
+        
+        if (dragItem != null)
+        {
+            //dragItem could be null if we're dragging FROM OUTSIDE the tree
+            var createsCircularReference = dragItem.EnumerateChildrenAndSelf().Any(x => ReferenceEquals(x, targetItem));
+            if (createsCircularReference)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

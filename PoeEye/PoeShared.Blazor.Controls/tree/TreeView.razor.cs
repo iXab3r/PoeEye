@@ -92,6 +92,10 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     [Parameter] public Func<TreeViewNode<TItem>, IEnumerable<TItem>>? ChildrenExpression { get; set; }
 
     [Parameter] public Func<TreeViewNode<TItem>, bool>? DisabledExpression { get; set; }
+    
+    [Parameter] public TreeViewCanDropHandler<TItem>? CanDropBelowExpression { get; set; }
+    
+    [Parameter] public TreeViewCanDropHandler<TItem>? CanDropInsideExpression { get; set; }
 
     [Parameter] public RenderFragment<TreeViewNode<TItem>>? IndentTemplate { get; set; }
 
@@ -284,6 +288,11 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     private async Task HandleDragEnter(DragEventArgs e)
     {
+    } 
+    
+    private async Task HandleDragEnd(DragEventArgs e)
+    {
+        DragItem = null;
     }
 
     private async Task HandleDragOver(DragEventArgs e)
