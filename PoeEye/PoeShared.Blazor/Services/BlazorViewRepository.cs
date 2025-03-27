@@ -61,11 +61,11 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         RegisterViewType(viewType, contentType, key);
     }
     
-    private void RegisterViewType(Type viewType, Type viewContentType, object key)
+    private void RegisterViewType(Type viewType, Type dataContextType, object key)
     {
         var viewKey = new ViewKey()
         {
-            ContentType = viewContentType, 
+            DataContextType = dataContextType, 
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
@@ -93,7 +93,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     {
         var viewKey = new ViewKey()
         {
-            ContentType = contentType, 
+            DataContextType = contentType, 
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
@@ -112,7 +112,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             var interfaces = contentType.GetInterfaces();
             foreach (var @interface in interfaces)
             {
-                var byInterfaceKey = new ViewKey() {ContentType = @interface, Key = key};
+                var byInterfaceKey = new ViewKey() {DataContextType = @interface, Key = key};
                 if (TryResolveViewType(byInterfaceKey, out var registrationByInterface))
                 {
                     log.Debug($"Resolved registered view by interface {byInterfaceKey}: {registrationByInterface}");
@@ -173,8 +173,21 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
                     continue;
                 }
 
-                var contentType = ResolveContentType(typeInfo.BaseViewType);
-                RegisterViewType(viewType: typeInfo.ViewType, viewContentType: contentType, key: blazorViewAttribute?.ViewTypeKey);
+                logger.Debug($"Blazor view {typeInfo} view type inferred automatically {typeInfo.ViewType}");
+                
+                Type dataContextType;
+                if (blazorViewAttribute != null && blazorViewAttribute.DataContextType != null)
+                {
+                    logger.Debug($"Blazor data context type has view type override set to {blazorViewAttribute.DataContextType}");
+                    dataContextType = blazorViewAttribute.DataContextType;
+                }
+                else
+                {
+                    dataContextType = ResolveContentType(typeInfo.BaseViewType);
+                    logger.Debug($"Blazor data context type has been inferred automatically from {typeInfo.BaseViewType} to {dataContextType}");
+                }
+
+                RegisterViewType(viewType: typeInfo.ViewType, dataContextType: dataContextType, key: blazorViewAttribute?.ViewTypeKey);
                 logger.Debug($"Successfully registered Blazor view {typeInfo}");
             }
         }
@@ -186,6 +199,11 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     
     private static Type ResolveContentType(Type type)
     {
+        if (type == typeof(BlazorReactiveComponent))
+        {
+            return typeof(object);
+        }
+        
         var genericTypeDef = type.IsGenericType ? type.GetGenericTypeDefinition() : default;
         if (genericTypeDef != typeof(BlazorReactiveComponent<>))
         {
@@ -201,7 +219,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         return genericTypeArguments[0];
     }
     
-    private static Type ResolveBaseViewType(Type type)
+    private static Type ResolveBaseViewTypeLegacy(Type type)
     {
         var genericTypeDef = type.IsGenericType ? type.GetGenericTypeDefinition() : default;
         if (genericTypeDef == typeof(BlazorReactiveComponent<>))
@@ -214,7 +232,27 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             return null;
         }
 
-        return ResolveBaseViewType(type.BaseType);
+        return ResolveBaseViewTypeLegacy(type.BaseType);
+    }
+    
+    private static Type ResolveBaseViewType(Type type)
+    {
+        while (type != null && type != typeof(object))
+        {
+            if (type == typeof(BlazorReactiveComponent))
+            {
+                return type;
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(BlazorReactiveComponent<>))
+            {
+                return type;
+            }
+
+            type = type.BaseType;
+        }
+
+        return null;
     }
 
     private readonly record struct ViewRegistration
@@ -226,7 +264,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
     private readonly record struct ViewKey
     {
-        public Type ContentType { get; init; }
+        public Type DataContextType { get; init; }
         public object Key { get; init; }
     }
 }

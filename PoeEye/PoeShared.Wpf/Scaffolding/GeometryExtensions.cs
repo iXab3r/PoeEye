@@ -201,6 +201,15 @@ public static class GeometryExtensions
         result.Offset(offset);
         return result;
     }
+    
+    /// <summary>
+    /// Moves a Rectangle by adding a WinPoint's values.
+    /// Useful for small position shifts in layouts.
+    /// </summary>
+    public static WinRect OffsetBy(this WinRect rect, int deltaX, int deltaY)
+    {
+        return OffsetBy(rect, new WinPoint(deltaX, deltaY));
+    }
 
     /// <summary>
     /// Moves a nullable WinRect by adding a nullable WinPoint's values.

@@ -40,6 +40,11 @@ public static class GraphicsExtensions
     {
         return WpfColor.FromArgb(color.A, color.R, color.G, color.B);
     }
+    
+    public static string ToHtml(this WinColor c)
+    {
+        return System.Drawing.ColorTranslator.ToHtml(c);
+    }
 
     public static WinPixelFormat ToWinPixelFormat(this WpfPixelFormat sourceFormat)
     {
