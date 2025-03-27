@@ -40,7 +40,7 @@ public abstract class MetaFixtureBase : FixtureBase
     public void ShouldHaveAssemblyHasBlazorViews(ModuleDefMD module)
     {
         //Given
-        var baseTypes = new[] { typeof(BlazorReactiveComponent<>) };
+        var baseTypes = new[] { typeof(BlazorReactiveComponent<>), typeof(BlazorReactiveComponent) };
 
         //When
         var allViews = FindImplementations(module, baseTypes).ToList();
