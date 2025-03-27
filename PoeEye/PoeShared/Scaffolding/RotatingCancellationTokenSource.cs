@@ -43,7 +43,7 @@ public sealed class RotatingCancellationTokenSource : DisposableReactiveObject
         var current = Interlocked.CompareExchange(ref cts, null, cts);
         if (current == null)
         {
-            throw new InvalidOperationException("CancellationTokenSource is not in use");
+            return;
         }
 
         current.Cancel();
