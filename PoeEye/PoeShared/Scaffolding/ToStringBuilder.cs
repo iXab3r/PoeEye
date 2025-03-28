@@ -30,18 +30,19 @@ public sealed class ToStringBuilder
         return result;
     }
 
-    public void Append(string value)
+    public ToStringBuilder Append(string value)
     {
         primaryPartBuilder.Append(value);
+        return this;
     }
 
-    public void AppendParameterIfNotDefault<T>(string parameterName, T value)
+    public ToStringBuilder AppendParameterIfNotDefault<T>(string parameterName, T value)
     {
         try
         {
             if (Equals(value, default(T)) || (value is string stringValue && string.IsNullOrEmpty(stringValue)))
             {
-                return;
+                return this;
             }
             AppendParameter(parameterName, value);
         }
@@ -50,9 +51,10 @@ public sealed class ToStringBuilder
             Log.Error($"Failed to format nullable parameter {parameterName}", e);
             paramsPartBuilder.Append($"{parameterName} ERROR: {e}");
         }
+        return this;
     }
     
-    public void AppendParameter<T>(string parameterName, T value)
+    public ToStringBuilder AppendParameter<T>(string parameterName, T value)
     {
         try
         {
@@ -68,6 +70,7 @@ public sealed class ToStringBuilder
             Log.Error($"Failed to format parameter {parameterName}", e);
             paramsPartBuilder.Append($"{parameterName} ERROR: {e}");
         }
+        return this;
     }
 
     public string ParametersToString()

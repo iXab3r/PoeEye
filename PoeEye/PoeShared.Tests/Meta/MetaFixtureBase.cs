@@ -6,6 +6,7 @@ using System.Reflection;
 using dnlib.DotNet;
 using PoeShared.Blazor;
 using PoeShared.Blazor.Scaffolding;
+using PoeShared.Blazor.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 
@@ -40,21 +41,30 @@ public abstract class MetaFixtureBase : FixtureBase
     public void ShouldHaveAssemblyHasBlazorViews(ModuleDefMD module)
     {
         //Given
-        var baseTypes = new[] { typeof(BlazorReactiveComponent<>), typeof(BlazorReactiveComponent) };
+        var blazorViewAttribute = typeof(BlazorViewAttribute);
 
         //When
-        var allViews = FindImplementations(module, baseTypes).ToList();
-        Log.Debug($"Detected views:\n\t{allViews.DumpToTable()}");
+        var basicComponents = FindImplementations(module,  new[] { typeof(BlazorReactiveComponent) }).ToList();
+        var genericComponents = FindImplementations(module,  new[] { typeof(BlazorReactiveComponent<>) }).ToList();
+        var attributedComponents = basicComponents
+            .Select(x => new {Type = x, Attribute = x.CustomAttributes.FirstOrDefault(y => y.TypeFullName == blazorViewAttribute.FullName)})
+            .Where(x => x.Attribute != null)
+            .ToArray();
+        Log.Debug($"Detected generic components:\n\t{genericComponents.DumpToTable()}");
+        Log.Debug($"Detected attributed basic components:\n\t{attributedComponents.DumpToTable()}");
+
+        var assemblyHasAttribute = module.Assembly
+            .CustomAttributes
+            .FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasBlazorViewsAttribute).FullName);
 
         //Then
-        var attribute = module.Assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(AssemblyHasBlazorViewsAttribute).FullName);
-        if (allViews.Any())
+        if (genericComponents.Any() || attributedComponents.Any())
         {
-            attribute.ShouldNotBeNull($"Assembly {module} contains Blazor views thus it must have attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it:\n\t{allViews.Select(x => x.FullName).DumpToTable()}");
+            assemblyHasAttribute.ShouldNotBeNull($"Assembly {module} contains Blazor views thus it must have attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it:\n\t{basicComponents.Select(x => x.FullName).DumpToTable()}");
         }
         else
         {
-            attribute.ShouldBeNull($"Assembly {module} does not contain any blazor views thus it does not need attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it");
+            assemblyHasAttribute.ShouldBeNull($"Assembly {module} does not contain any blazor views thus it does not need attribute {typeof(AssemblyHasBlazorViewsAttribute)} on it");
         }
     }
 
