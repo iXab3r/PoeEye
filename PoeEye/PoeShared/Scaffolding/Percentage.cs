@@ -4,7 +4,7 @@
 /// Represents a percentage value (0-100).
 /// Provides utility methods for conversion and scaling.
 /// </summary>
-public readonly struct Percentage : IEquatable<Percentage>
+public readonly struct Percentage : IEquatable<Percentage>, IFormattable
 {
     private readonly float value;
 
@@ -81,7 +81,13 @@ public readonly struct Percentage : IEquatable<Percentage>
     public override int GetHashCode() => value.GetHashCode();
 
     /// <inheritdoc/>
-    public override string ToString() => $"{value}%";
+    public override string ToString() => ToString("F0", null);
+
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+        format ??= "F0";
+        return $"{value.ToString(format, formatProvider)}%";
+    }
 
     public static bool operator ==(Percentage left, Percentage right)
     {
