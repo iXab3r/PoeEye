@@ -3,6 +3,7 @@
 <span class="@(new CssBuilder("rcb-container").AddClass(Class))">
     <input type="checkbox"
            id="@Id"
+           disabled="@Disabled"
            @bind:get="@IsChecked"
            @bind:set="@HandleCheckedChanged"
            @bind:event="oninput"/>
@@ -11,3 +12,4 @@
         @ChildContent
     </label>
 </span>
+
