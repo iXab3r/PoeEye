@@ -67,6 +67,10 @@ video {
     pointer-events: none !important;
 }
 
+.pointer-events-all {
+    pointer-events: all !important;
+}
+
 .spinner-border-lg {
     --bs-spinner-width: 5rem;
     --bs-spinner-height: 5rem;
