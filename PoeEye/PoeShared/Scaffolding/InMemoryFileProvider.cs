@@ -21,7 +21,7 @@ namespace PoeShared.Scaffolding;
 /// <item>Automatically updates the count of files available.</item>
 /// </list>
 /// </summary>
-public sealed class InMemoryFileProvider : DisposableReactiveObjectWithLogger, IFileProvider, ISourceCache<IFileInfo, OSPath>
+public sealed class InMemoryFileProvider : DisposableReactiveObjectWithLogger, IInMemoryFileProvider
 {
     private readonly ISourceCache<IFileInfo, OSPath> filesByName = new SourceCache<IFileInfo, OSPath>(x => new OSPath(x.Name));
 

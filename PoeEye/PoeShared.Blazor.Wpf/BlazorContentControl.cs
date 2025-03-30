@@ -173,6 +173,8 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(sp => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
                     childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(sp => new BlazorContentControlAccessor(this));
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
+                    childServiceCollection.AddSingleton<IInMemoryFileProvider>(sp => inMemoryFileProvider);
+                    childServiceCollection.AddSingleton<ICoreWebView2Accessor>(sp => new CoreWebView2Accessor(WebView.WebView));
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
                     childServiceCollection.Add(unityServiceDescriptors);

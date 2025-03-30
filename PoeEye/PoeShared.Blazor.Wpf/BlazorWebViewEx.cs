@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Core.Raw;
 using Microsoft.Web.WebView2.Wpf;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
