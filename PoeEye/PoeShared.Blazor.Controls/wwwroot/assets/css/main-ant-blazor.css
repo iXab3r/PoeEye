@@ -39,16 +39,37 @@
     background-color: var(--bs-border-color);
 }
 
-.ant-radio {
-    color: var(--eye-MaterialDesignBody);
+.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
+    color: #1890ff;
+    font-weight: 500;
 }
 
-.ant-radio-wrapper{
-    color: var(--eye-MaterialDesignBody);
+.ant-radio-button-wrapper:focus-within {
+    box-shadow: inherit;
+}
+
+.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):focus-within {
+    box-shadow: inherit;
+}
+
+.ant-radio {
+    font-size: inherit;
+    color: inherit;
+}
+
+.ant-radio-group {
+    font-size: inherit;
+    color: inherit;
+}
+
+.ant-radio-wrapper {
+    font-size: inherit;
+    color: inherit;
 }
 
 .ant-radio-button-wrapper {
-    color: var(--eye-MaterialDesignBody);
+    font-size: inherit;
+    color: inherit;
 }
 
 .ant-radio-disabled + span {
@@ -273,19 +294,6 @@ textarea,
     display: flex;
     align-items: center;
     min-height: 20px;
-}
-
-.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
-    color: #1890ff;
-    font-weight: 500;
-}
-
-.ant-radio-button-wrapper:focus-within {
-    box-shadow: inherit;
-}
-
-.ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):focus-within {
-    box-shadow: inherit;
 }
 
 .ant-select-multiple .ant-select-selection-item-remove{
