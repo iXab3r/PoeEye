@@ -43,7 +43,7 @@ public static class FixtureExtensions
     public static Mock<IConfigProvider<TConfig>> RegisterConfigProvider<TConfig>(
         this Fixture container,
         TConfig config) 
-        where TConfig : IPoeEyeConfig
+        where TConfig : IPoeEyeConfig, new()
     {
         var configProvider = new Mock<IConfigProvider<TConfig>>();
         configProvider

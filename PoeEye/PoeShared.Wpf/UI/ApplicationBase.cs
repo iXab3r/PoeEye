@@ -13,12 +13,13 @@ namespace PoeShared.UI;
 public abstract class ApplicationBase : Application
 {
     private readonly ApplicationCore core;
-    private readonly IUnityContainer container;
-    
+
     protected ApplicationBase()
     {
-        container = new UnityContainer();
-        core = container.Resolve<ApplicationCore>();
+        Container = new UnityContainer();
+        core = Container.Resolve<ApplicationCore>();
         core.BindToApplication(this);
     }
+
+    protected IUnityContainer Container { get; }
 }
