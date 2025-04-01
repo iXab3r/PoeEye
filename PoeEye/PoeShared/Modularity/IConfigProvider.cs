@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace PoeShared.Modularity;
 
 public interface IConfigProvider<TConfig>
-    where TConfig : IPoeEyeConfig
+    where TConfig : IPoeEyeConfig, new()
 {
     TConfig ActualConfig { [NotNull] get; }
 

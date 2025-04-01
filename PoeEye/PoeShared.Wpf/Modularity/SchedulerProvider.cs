@@ -148,8 +148,30 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
             Log.Debug("Dispatcher thread started");
             var dispatcher = Dispatcher.CurrentDispatcher;
             Log.Debug($"Dispatcher: {dispatcher}");
-            var scheduler = new DispatcherScheduler(dispatcher);
-            using var anchors = new CompositeDisposable();
+            var scheduler = new DispatcherScheduler(dispatcher); 
+            //using var listener = Listen(scheduler);
+          
+            Log.Debug($"Scheduler: {dispatcher}");
+            consumer.TrySetResult(scheduler);
+
+            Log.Debug("Starting dispatcher...");
+            Dispatcher.Run();
+        }
+        catch (Exception e)
+        {
+            Log.HandleException(e);
+            consumer.TrySetException(e);
+            throw; 
+        }
+        finally
+        {
+            Log.Debug("Dispatcher thread completed");
+        }
+    }
+
+    private static IDisposable Listen(DispatcherScheduler scheduler)
+    {
+          using var anchors = new CompositeDisposable();
             Observable
                 .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                     h => scheduler.Dispatcher.Hooks.OperationStarted += h,
@@ -180,22 +202,7 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
                     h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
                 .SubscribeSafe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs), Log.HandleUiException)
                 .AddTo(anchors);
-            Log.Debug($"Scheduler: {dispatcher}");
-            consumer.TrySetResult(scheduler);
-
-            Log.Debug("Starting dispatcher...");
-            Dispatcher.Run();
-        }
-        catch (Exception e)
-        {
-            Log.HandleException(e);
-            consumer.TrySetException(e);
-            throw; 
-        }
-        finally
-        {
-            Log.Debug("Dispatcher thread completed");
-        }
+            return anchors;
     }
 
     private static void LogEvent(string eventName, DispatcherHookEventArgs eventArgs)
