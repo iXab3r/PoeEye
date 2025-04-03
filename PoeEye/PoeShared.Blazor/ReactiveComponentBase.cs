@@ -131,6 +131,11 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     public CompositeDisposable Anchors { get; } = new();
     
     /// <summary>
+    /// Indicates whether the component is initialized. Set after the first OnInitialized call.
+    /// </summary>
+    public bool IsComponentInitialized { get; private set; }
+    
+    /// <summary>
     /// Indicates whether the component is loaded. Set after the first OnParametersSet call.
     /// </summary>
     public bool IsComponentLoaded { get; private set; }
@@ -269,6 +274,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        IsComponentInitialized = true;
     }
 
     /// <inheritdoc />

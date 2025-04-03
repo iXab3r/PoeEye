@@ -1,0 +1,67 @@
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+<div class="@Class" style="@Style">
+    <div class="d-flex align-items-center gap-3" style="cursor: pointer;">
+        <ReactiveButton Class="btn border-0 d-flex gap-3 align-items-center" Command="ToggleIsExpanded">
+            <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.IsExpanded)))">
+                <i class="@SwitcherClassMapper"></i>
+            </ReactiveSection>
+
+            <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.Title, x => x.TitleContent)))">
+                @if (TitleContent != null)
+                {
+                    @TitleContent
+                }
+                else @if (!string.IsNullOrEmpty(Title))
+                {
+                    <strong>@Title</strong>
+                }
+            </ReactiveSection>
+        </ReactiveButton>
+
+        <hr class="flex-grow-1"/>
+        <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.TailContent)))">
+            @if (TailContent != null)
+            {
+                @TailContent
+            }
+        </ReactiveSection>
+    </div>
+
+    <div id="@Id">
+        <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.IsExpanded)))">
+            @if (IsExpanded)
+            {
+                @ChildContent
+            }
+        </ReactiveSection>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsExpanded { get; set; } = true;
+
+    [Parameter] public string? Title { get; set; }
+
+    [Parameter] public RenderFragment? TitleContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? TailContent { get; set; }
+
+    protected ClassMapper SwitcherClassMapper { get; } = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Id = $"reactive-expander-container-{ComponentId}";
+        SwitcherClassMapper
+            .Add("fa-solid")
+            .Get(() => IsExpanded ? "fa-angle-down" : "fa-angle-right");
+    }
+
+    private async Task ToggleIsExpanded()
+    {
+        IsExpanded = !IsExpanded;
+    }
+
+}

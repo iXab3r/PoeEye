@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using DynamicData;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
@@ -36,8 +35,8 @@ namespace PoeShared.Blazor.Wpf;
 
 public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 {
+    private static readonly GlobalIdProvider IdProvider = new();
     private static readonly Binder<BlazorContentControl> Binder = new();
-    private static readonly IFluentLog Log = typeof(BlazorContentControl).PrepareLogger();
 
     public static readonly DependencyProperty ViewTypeProperty = DependencyProperty.Register(
         nameof(ViewType), typeof(Type), typeof(BlazorContentControl), new PropertyMetadata(default(Type)));
@@ -47,7 +46,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public static readonly DependencyProperty AdditionalFilesProperty = DependencyProperty.Register(
         nameof(AdditionalFiles), typeof(IEnumerable<IFileInfo>), typeof(BlazorContentControl), new PropertyMetadata(default(IEnumerable<IFileInfo>)));
-    
+
     public static readonly DependencyProperty AdditionalFileProviderProperty = DependencyProperty.Register(
         nameof(AdditionalFileProvider), typeof(IFileProvider), typeof(BlazorContentControl), new PropertyMetadata(default(IFileProvider)));
 
@@ -56,13 +55,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public static readonly DependencyProperty ContainerProperty = DependencyProperty.Register(
         nameof(Container), typeof(IUnityContainer), typeof(BlazorContentControl), new PropertyMetadata(default(IUnityContainer)));
-    
+
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly SerialDisposable activeContentAnchors;
     private readonly SerialDisposable activeViewAnchors;
     private readonly WebViewServiceProvider webViewServiceProvider;
     private readonly JSComponentConfigurationStoreAccessor jsComponentConfigurationStoreAccessor;
     private readonly DispatcherScheduler uiScheduler;
+    private readonly DateTimeOffset timestampCreated;
+    private readonly string globalId = IdProvider.Next("BCC");
 
     static BlazorContentControl()
     {
@@ -73,6 +74,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public BlazorContentControl()
     {
+        Log = this.GetType().PrepareLogger().WithSuffix(globalId);
         Disposable.Create(() => Log.Debug("Blazor content control is being disposed")).AddTo(Anchors);
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         activeContentAnchors = new SerialDisposable().AddTo(Anchors);
@@ -96,13 +98,19 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         ZoomOutCommand = BlazorCommandWrapper.Create(ZoomOut);
         ResetZoomCommand = BlazorCommandWrapper.Create(ResetZoom);
 
-        var serviceCollection = new ServiceCollection
-        {
-            UnityServiceCollection.Instance
-        };
-        serviceCollection.AddBlazorWebView();
-        serviceCollection.AddWpfBlazorWebView();
-        serviceCollection.AddBlazorWebViewDeveloperTools();
+        this.Loaded += OnLoaded;
+        this.Initialized += OnInitialized;
+        Log.Debug($"BlazorContentControl has been created");
+        timestampCreated = DateTimeOffset.Now;
+
+        Binder.Attach(this).AddTo(Anchors);
+    }
+    
+    protected IFluentLog Log { get; }
+
+    private void OnInitialized(object sender, EventArgs e)
+    {
+        Log.Debug($"BlazorContentControl has been initialized");
 
         new RootComponent
         {
@@ -116,6 +124,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             ComponentType = typeof(BlazorContentPresenterWrapper)
         }.AddTo(WebView.RootComponents);
         
+        var serviceCollection = new ServiceCollection
+        {
+            UnityServiceCollection.Instance
+        };
+        serviceCollection.AddBlazorWebView();
+        serviceCollection.AddWpfBlazorWebView();
+        serviceCollection.AddBlazorWebViewDeveloperTools();
+        
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
         var generatedIndexFileName = "index.g.html";
         var contentRoot = "wwwroot";
@@ -125,22 +141,23 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             .Select(x => x ?? UnityServiceCollection.Instance.BuildServiceProvider().GetService<IUnityContainer>());
 
         Observable.CombineLatest(
-                this.WhenAnyValue(x => x.ViewType), 
-                this.WhenAnyValue(x => x.AdditionalFileProvider), 
-                unityContainerSource, 
+                this.WhenAnyValue(x => x.ViewType),
+                this.WhenAnyValue(x => x.AdditionalFileProvider),
+                unityContainerSource,
                 (viewType, additionalFileProvider, container) => new {viewType, additionalFileProvider, container})
-            .ObserveOn(uiScheduler)
+            .ObserveOnIfNeeded(uiScheduler)
             .SubscribeAsync(async state =>
             {
                 using var rent = isBusyLatch.Rent();
 
-                Log.Debug($"Reloading control, new content type: {state.viewType}");
+                var timestampUpdated = DateTimeOffset.Now;
+                Log.Debug($"Reloading control, new content type: {state.viewType}, time taken(created->updated): {timestampUpdated - timestampCreated}");
 
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 Disposable.Create(() => Log.Debug("Content is being disposed")).AddTo(contentAnchors);
 
                 var inMemoryFileProvider = new InMemoryFileProvider();
-                var proxyFileProvider = new ProxyFileProvider(){ FileProvider = state.additionalFileProvider };
+                var proxyFileProvider = new ProxyFileProvider() {FileProvider = state.additionalFileProvider};
                 WebView.FileProvider = new CompositeFileProvider(inMemoryFileProvider, proxyFileProvider);
 
                 if (UnhandledException != null)
@@ -159,31 +176,64 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                     // views have to be transient to allow to re-create them if needed (e.g. on error)
                     childServiceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
                     {
+                        var log = Log.WithSuffix(nameof(BlazorContentPresenterWrapper));
+                        log.Debug($"Creating a new wrapper for a view type: {state.viewType}");
                         var contentPresenter = new BlazorContentPresenterWrapper()
                         {
                             ViewType = state.viewType,
                         }.AddTo(contentAnchors);
 
                         this.WhenAnyValue(contentControl => contentControl.Content)
-                            .Subscribe(content => { contentPresenter.Content = content; })
+                            .Subscribe(content =>
+                            {
+                                log.Debug($"Updating content to {content}");
+                                contentPresenter.Content = content;
+                            })
+                            .AddTo(contentAnchors);
+                        
+                        contentPresenter.WhenAnyValue(x => x.IsComponentInitialized)
+                            .Where(x => x)
+                            .Subscribe(() =>
+                            {
+                                var timestampInitialized = DateTimeOffset.Now;
+                                log.Debug($"Component has initialized, total time (updated->initialized): {timestampInitialized - timestampUpdated}");
+                            })
+                            .AddTo(contentAnchors);
+                        contentPresenter.WhenAnyValue(x => x.IsComponentLoaded)
+                            .Where(x => x)
+                            .Subscribe(() =>
+                            {
+                                var timestampLoaded = DateTimeOffset.Now;
+                                log.Debug($"Component has loaded, total time (updated->loaded): {timestampLoaded - timestampUpdated}");
+                            })
+                            .AddTo(contentAnchors);
+                        contentPresenter.WhenAnyValue(x => x.IsComponentRendered)
+                            .Where(x => x)
+                            .Subscribe(() =>
+                            {
+                                var timestampRendered = DateTimeOffset.Now;
+                                log.Debug($"Component has rendered, total time (updated->rendered): {timestampRendered - timestampUpdated}");
+                            })
                             .AddTo(contentAnchors);
                         return contentPresenter;
                     });
 
-                    childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(sp => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
-                    childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(sp => new BlazorContentControlAccessor(this));
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
-                    childServiceCollection.AddSingleton<IInMemoryFileProvider>(sp => inMemoryFileProvider);
-                    childServiceCollection.AddSingleton<ICoreWebView2Accessor>(sp => new CoreWebView2Accessor(WebView.WebView));
+                    childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
+                    childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
+                    childServiceCollection.AddSingleton<IInMemoryFileProvider>(_ => inMemoryFileProvider);
+                    childServiceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
                     childServiceCollection.Add(unityServiceDescriptors);
 
-                    var childServiceProvider = childServiceCollection.BuildServiceProvider();//FIXME memory leak for transient dependencies
+                    var childServiceProvider = childServiceCollection.BuildServiceProvider(); //FIXME memory leak for transient dependencies
 
-                    var clock = childServiceProvider.GetRequiredService<IClock>();
-                    var scoped = childServiceProvider.CreateScope();
-                    var scopedClock = scoped.ServiceProvider.GetRequiredService<IClock>();
+                    childServiceProvider.GetRequiredService<IClock>(); //ensure global scope works
+                    using (var scoped = childServiceProvider.CreateScope())
+                    {
+                        scoped.ServiceProvider.GetRequiredService<IClock>(); //ensure local scope works
+                    }
 
                     webViewServiceProvider.ServiceProvider = childServiceProvider;
 
@@ -231,10 +281,10 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                         WebView.HostPage = hostPage;
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     Log.Error($"Failed to initialize view using {state}");
-                    UnhandledException = e;
+                    UnhandledException = ex;
                 }
                 finally
                 {
@@ -242,8 +292,11 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 }
             })
             .AddTo(Anchors);
+    }
 
-        Binder.Attach(this).AddTo(Anchors);
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Log.Debug($"BlazorContentControl has been loaded");
     }
 
     public Type ViewType
@@ -272,7 +325,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
     public IFileProvider AdditionalFileProvider
     {
-        get => (IFileProvider)GetValue(AdditionalFileProviderProperty);
+        get => (IFileProvider) GetValue(AdditionalFileProviderProperty);
         set => SetValue(AdditionalFileProviderProperty, value);
     }
 
@@ -344,7 +397,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         {
             return;
         }
-        
+
         await webView.EnsureCoreWebView2Async();
         webView.CoreWebView2.OpenDevToolsWindow();
     }
@@ -362,7 +415,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         {
             return;
         }
-        
+
         await webView.EnsureCoreWebView2Async();
         webView.Reload();
     }
@@ -396,14 +449,14 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 webView.UnhandledException -= OnUnhandledException; //after webview crash it will be recreated anyways
                 Log.Error(ReferenceEquals(sender, WebView.WebView) ? $"WebView has crashed: {sender}" : $"Obsolete(replaced) WebView has crashed: {sender}", e.Exception);
                 break;
-            case Dispatcher dispatcher:
+            case Dispatcher _:
                 Log.Error($"WebView dispatcher has encountered an error", e.Exception);
                 break;
             default:
                 Log.Error($"WebView has encountered an error from {sender}", e.Exception);
                 break;
         }
-        
+
         UnhandledException = e.Exception;
         e.Handled = true; // JS context is already dead at this point
     }

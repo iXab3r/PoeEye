@@ -264,6 +264,10 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         StartUsingLauncher(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas", LauncherMethod.StartApp);
     }
 
+    /// <summary>
+    /// Starts the app using built-in launcher.
+    /// This costs around 4 extra seconds for compressed/obfuscated app and ~2 seconds without
+    /// </summary>
     private void StartUsingLauncher(
         string processPath, 
         string arguments, 

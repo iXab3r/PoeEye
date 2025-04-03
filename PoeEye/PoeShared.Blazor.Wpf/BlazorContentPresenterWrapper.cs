@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -36,12 +37,16 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
 
     public BlazorContentPresenterWrapper()
     {
+        Log.Debug("ContentPresenter is being created");
         Disposable.Create(() => View = null).AddTo(Anchors);
         
-        this.WhenAnyValue(x => x.View)
+        this.WhenAnyProperty(x => x.Content)
+            .Select(x => Content)
             .WithPrevious()
+            .Skip(1)
             .Subscribe(x =>
             {
+                Log.Debug($"ContentPresenter view has been updated: {x}");
                 if (x.Previous is IDisposable disposableView)
                 {
                     disposableView.Dispose();
@@ -52,9 +57,18 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
 
     protected override void OnInitialized()
     {
+        Log.Debug($"ContentPresenter is being initialized, view: {View}");
+
         base.OnInitialized();
         this.WhenAnyProperty(x => x.Content)
             .SubscribeAsync(x => Refresh($"Content has been updated"))
             .AddTo(Anchors);
+    }
+
+    protected override async Task OnAfterFirstRenderAsync()
+    {
+        await base.OnAfterFirstRenderAsync();
+        
+        Log.Debug($"ContentPresenter has been rendered for the first time, view: {View}");
     }
 }
