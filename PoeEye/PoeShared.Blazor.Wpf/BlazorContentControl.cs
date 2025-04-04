@@ -103,14 +103,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         Log.Debug($"BlazorContentControl has been created");
         timestampCreated = DateTimeOffset.Now;
 
-        Binder.Attach(this).AddTo(Anchors);
-    }
-    
-    protected IFluentLog Log { get; }
-
-    private void OnInitialized(object sender, EventArgs e)
-    {
-        Log.Debug($"BlazorContentControl has been initialized");
 
         new RootComponent
         {
@@ -123,7 +115,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             Selector = "#app",
             ComponentType = typeof(BlazorContentPresenterWrapper)
         }.AddTo(WebView.RootComponents);
-        
+
         var serviceCollection = new ServiceCollection
         {
             UnityServiceCollection.Instance
@@ -131,7 +123,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         serviceCollection.AddBlazorWebView();
         serviceCollection.AddWpfBlazorWebView();
         serviceCollection.AddBlazorWebViewDeveloperTools();
-        
+
         var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
         var generatedIndexFileName = "index.g.html";
         var contentRoot = "wwwroot";
@@ -145,7 +137,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
                 unityContainerSource,
                 (viewType, additionalFileProvider, container) => new {viewType, additionalFileProvider, container})
-            .ObserveOnIfNeeded(uiScheduler)
+            .ObserveOn(uiScheduler)
             .SubscribeAsync(async state =>
             {
                 using var rent = isBusyLatch.Rent();
@@ -190,7 +182,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                                 contentPresenter.Content = content;
                             })
                             .AddTo(contentAnchors);
-                        
+
                         contentPresenter.WhenAnyValue(x => x.IsComponentInitialized)
                             .Where(x => x)
                             .Subscribe(() =>
@@ -292,6 +284,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 }
             })
             .AddTo(Anchors);
+
+        Binder.Attach(this).AddTo(Anchors);
+    }
+
+    protected IFluentLog Log { get; }
+
+    private void OnInitialized(object sender, EventArgs e)
+    {
+        Log.Debug($"BlazorContentControl has been initialized");
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
