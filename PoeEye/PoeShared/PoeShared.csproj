@@ -20,8 +20,8 @@
         <PackageReference Include="log4net" Version="2.0.8" />
         <PackageReference Include="CliWrap" Version="3.6.4"/>
         <PackageReference Include="DeepCloner" Version="0.10.4" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
         
         <PackageReference Include="Polly" Version="7.2.3" />
         <PackageReference Include="Meziantou.Framework.FullPath" Version="1.0.7"><NoWarn>NU1701</NoWarn></PackageReference>
