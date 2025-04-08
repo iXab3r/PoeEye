@@ -22,7 +22,6 @@ using PoeShared.Prism;
 using PoeShared.Services;
 using PropertyBinder;
 using ReactiveUI;
-using Syroot.Windows.IO;
 using Unity;
 
 namespace PoeShared.UI;
@@ -178,7 +177,7 @@ internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
             FileName = defaultFileName,
             InitialDirectory = !string.IsNullOrEmpty(initialDirectory) && Directory.Exists(initialDirectory)
                 ? initialDirectory
-                : KnownFolders.Downloads.ExpandedPath,
+                : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             Filter = "7z Archive|*.7z;|All files|*.*"
         };
         if (op.ShowDialog() != true)
