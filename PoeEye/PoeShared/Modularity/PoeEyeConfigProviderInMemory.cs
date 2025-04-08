@@ -12,18 +12,8 @@ public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
     private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
     private readonly SourceCache<IPoeEyeConfig, string> loadedConfigs = new(ConfigProviderUtils.GetConfigName);
 
-    public PoeEyeConfigProviderInMemory(IAppArguments appArguments)
+    public PoeEyeConfigProviderInMemory()
     {
-        Guard.ArgumentNotNull(appArguments, nameof(appArguments));
-            
-        if (appArguments.IsDebugMode)
-        {
-            Log.Debug($"[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
-        }
-        else
-        {
-            throw new ApplicationException($"InMemory config must be used only in debug mode, args: {appArguments.Dump()}");
-        }
     }
 
     public IObservableCache<IPoeEyeConfig, string> Configs => loadedConfigs;

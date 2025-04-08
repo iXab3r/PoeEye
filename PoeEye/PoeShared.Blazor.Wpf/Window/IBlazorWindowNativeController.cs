@@ -42,7 +42,7 @@ public interface IBlazorWindowNativeController
 
 public interface IBlazorWindowMetroController
 {
-    ReactiveMetroWindowBase GetWindow();
+    ReactiveWindow GetWindow();
 
     void EnsureCreated();
 }

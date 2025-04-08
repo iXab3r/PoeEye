@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -59,7 +60,7 @@ internal sealed class BlazorWindowViewController : DisposableReactiveObject, IBl
         set => blazorWindow.SetWindowRect(value);
     }
 
-    public ReactiveMetroWindowBase Window
+    public Window Window
     {
         get
         {

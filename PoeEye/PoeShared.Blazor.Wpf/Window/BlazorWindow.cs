@@ -520,7 +520,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         return window.WindowHandle;
     }
 
-    public ReactiveMetroWindowBase GetWindow()
+    public ReactiveWindow GetWindow()
     {
         EnsureNotDisposed();
         if (!windowSupplier.IsValueCreated)

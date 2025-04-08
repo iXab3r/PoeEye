@@ -178,16 +178,17 @@ partial class BlazorWindow
                     Log.Debug($"Updating {nameof(TitleBarDisplayMode)} to {command.TitleBarDisplayMode}");
 
                     var displayMode = command.TitleBarDisplayMode == TitleBarDisplayMode.Default
-                        ? TitleBarDisplayMode.System
+                        ? TitleBarDisplayMode.Custom
                         : command.TitleBarDisplayMode;
 
                     var showSystemBar = displayMode is TitleBarDisplayMode.System;
+                    /*
                     window.ShowTitleBar = showSystemBar;
                     window.ShowSystemMenu = showSystemBar;
                     window.ShowSystemMenuOnRightClick = showSystemBar;
                     window.ShowMinButton = showSystemBar && command.ShowMinButton;
                     window.ShowMaxRestoreButton = showSystemBar && command.ShowMaxButton;
-                    window.ShowCloseButton = showSystemBar && command.ShowCloseButton;
+                    window.ShowCloseButton = showSystemBar && command.ShowCloseButton;*/
                     break;
                 }
                 case SetWindowPadding command:
