@@ -22,7 +22,7 @@
 
 <div class="d-grid h-100 overflow-hidden" style="grid-template-rows: auto 1fr;">
 <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
-    @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom)
+    @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.Default)
     {
         <div class="d-flex w-100 bg-secondary-subtle text-white text-uppercase font-play align-items-center"
              @ref="@TitleRef">

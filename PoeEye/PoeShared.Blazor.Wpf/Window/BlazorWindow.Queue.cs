@@ -810,12 +810,13 @@ partial class BlazorWindow
                         break;
                     }
 
-                    if (!User32.GetWindowRect(desktopMonitor, out var monitorRect))
+                    if (!User32.GetMonitorInfo(desktopMonitor, out var monitorInfo))
                     {
                         log.Warn($"Failed to set initial window size - could not get rect of desktop monitor {desktopMonitor.ToHexadecimal()}");
                         break;
                     }
 
+                    var monitorRect = monitorInfo.rcMonitor;
                     var monitorBounds = Rectangle.FromLTRB(monitorRect.left, monitorRect.top, monitorRect.right, monitorRect.bottom);
                     log.Debug($"Centering window within monitor {monitorBounds}");
                     CenterWindowWithin(monitorBounds);

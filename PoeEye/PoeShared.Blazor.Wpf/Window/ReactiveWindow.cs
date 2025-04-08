@@ -21,6 +21,7 @@ public class ReactiveWindow : Window, IDisposableReactiveObject
     public ReactiveWindow()
     {
         Loaded += OnLoaded;
+        Closed += OnClosed;
     }
 
     public void Dispose()

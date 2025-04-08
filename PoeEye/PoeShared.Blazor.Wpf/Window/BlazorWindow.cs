@@ -24,6 +24,10 @@ using Size = System.Drawing.Size;
 
 namespace PoeShared.Blazor.Wpf;
 
+/// <summary>
+/// Things to note:
+/// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
+/// </summary>
 internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow, IBlazorWindowMetroController
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
@@ -61,9 +65,9 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         [OptionalDependency] IScheduler uiScheduler = default)
     {
         Log.AddSuffix($"BWnd#{windowId}");
-        Log.Debug("New window is created");
+        Log.Debug("New window is being created");
         this.unityContainer = unityContainer;
-
+        
         this.uiScheduler = uiScheduler ?? SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
