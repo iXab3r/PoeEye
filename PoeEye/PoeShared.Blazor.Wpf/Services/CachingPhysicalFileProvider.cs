@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using ByteSizeLib;
@@ -9,19 +10,20 @@ using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using IFileInfo = Microsoft.Extensions.FileProviders.IFileInfo;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Blazor.Wpf.Services;
 
 /// <summary>
 /// This file provider caches pre-loads all files inside content root which measurably reduces access time on slow systems.
 /// Also this fixes a problem with virtualized file system - file watchers which are used by PhysicalFileProvider are not stable
 /// </summary>
-public sealed class CachingFileProvider : IFileProvider
+internal sealed class CachingPhysicalFileProvider : ICachingPhysicalFileProvider
 {
-    private static readonly IFluentLog Log = typeof(CachingFileProvider).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(CachingPhysicalFileProvider).PrepareLogger();
+    private static readonly ConcurrentDictionary<string, IFileProvider> StaticFilesProvidersByPath = new();
 
     private readonly InMemoryFileProvider memoryCache = new();
 
-    public CachingFileProvider(DirectoryInfo contentRoot)
+    public CachingPhysicalFileProvider(DirectoryInfo contentRoot)
     {
         ContentRoot = contentRoot;
         Log.AddSuffix($"Root: {contentRoot.FullName}");
@@ -30,8 +32,8 @@ public sealed class CachingFileProvider : IFileProvider
         {
             var directoryFiles = contentRoot.GetFiles("*", SearchOption.AllDirectories).Select(x => new
             {
-                RelativePath=Path.GetRelativePath(contentRoot.FullName, x.FullName),
-                x.LastWriteTime, 
+                RelativePath = Path.GetRelativePath(contentRoot.FullName, x.FullName),
+                x.LastWriteTime,
                 Size = ByteSize.FromBytes(x.Length),
                 x.FullName,
             }).ToArray();
@@ -54,8 +56,13 @@ public sealed class CachingFileProvider : IFileProvider
             Log.Warn("Root directory does not exist");
         }
     }
-    
+
     public DirectoryInfo ContentRoot { get; }
+
+    public static IFileProvider GetOrAdd(DirectoryInfo contentRoot)
+    {
+        return StaticFilesProvidersByPath.GetOrAdd(contentRoot.FullName, _ => new CachingPhysicalFileProvider(contentRoot));
+    }
 
     public IDirectoryContents GetDirectoryContents(string subpath)
     {
@@ -64,6 +71,7 @@ public sealed class CachingFileProvider : IFileProvider
         {
             Log.Warn($"Failed to get contents of directory {subpath}");
         }
+
         return result;
     }
 
@@ -74,6 +82,7 @@ public sealed class CachingFileProvider : IFileProvider
         {
             Log.Warn($"Failed to content of file {subpath}");
         }
+
         return result;
     }
 

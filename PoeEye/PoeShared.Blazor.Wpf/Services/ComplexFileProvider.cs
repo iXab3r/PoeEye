@@ -6,9 +6,12 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Blazor.Wpf.Services;
 
-public sealed class ComplexFileProvider : DisposableReactiveObjectWithLogger, IFileProvider
+/// <summary>
+/// Reactive version of CompositeFileProvider
+/// </summary>
+internal sealed class ComplexFileProvider : DisposableReactiveObjectWithLogger, IFileProvider
 {
     private readonly ISourceList<IFileProvider> providersSource = new SourceList<IFileProvider>();
 

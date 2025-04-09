@@ -178,9 +178,9 @@ public class SharedLog : DisposableReactiveObject
         {
             Threshold = Level.All,
             StaticLogFileName = false,  // Set to true if you don't need the filename to change dynamically
-            File = "launcher/launcher.log",
+            File = "logs/launcher.log",
             ImmediateFlush = true,
-            AppendToFile = false,
+            AppendToFile = true,
             MaxFileSize = 1024 * 1024 * 100, // 100 MB
             RollingStyle = RollingFileAppender.RollingMode.Size,
             MaxSizeRollBackups = 10,  // Maximum number of backup files to keep

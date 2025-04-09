@@ -9,6 +9,9 @@
          <Platforms>AnyCPU</Platforms>
          <UseWpf>true</UseWpf>
          <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+         <RazorClassLibrary>true</RazorClassLibrary>
+         <EnableDefaultContentItems>true<!-- Important for Blazor Scoped CSS --></EnableDefaultContentItems>
+         <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
      </PropertyGroup>
 
      <ItemGroup>
@@ -20,37 +23,17 @@
      </ItemGroup>
 
      <ItemGroup>
+         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="7.0.2">
+             <!-- 7.0.2 is min for WPF WebView -->
+         </PackageReference>
+         <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46">
+         </PackageReference> 
          <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
          <PackageReference Include="System.Management" Version="8.0.0" />
      </ItemGroup>
 
      <ItemGroup>
        <None Remove="Resources\WebView.ico" />
-       <None Include="wwwroot\index.html" />
        <Resource Include="Resources\WebView.ico" />
      </ItemGroup>
-
-     <ItemGroup>
-       <Content Update="index">
-         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-       </Content>
-       <Content Update="wwwroot\js\blazor.utils.js">
-         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-       </Content>
-       <EmbeddedResource Include="..\..\Submodules\PoeEye\PoeEye\PoeShared.Blazor.Wpf\wwwroot\index.html">
-         <Link>wwwroot\index.html</Link>
-       </EmbeddedResource>
-     </ItemGroup>
-
-     <ItemGroup>
-       <Compile Update="BlazorContentControl.cs">
-         <DependentUpon>BlazorContentControl.xaml</DependentUpon>
-       </Compile>
-       <Compile Update="IBlazorContentControl.cs">
-         <DependentUpon>BlazorContentControl.xaml</DependentUpon>
-       </Compile>
-     </ItemGroup>
-
-     <Import Project="..\maui\src\BlazorWebView\src\Wpf\build\Microsoft.AspNetCore.Components.WebView.Wpf.targets" />
 </Project>

@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.FileProviders;
+using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
-using PoeShared.UI;
 using Unity;
 using Color = System.Windows.Media.Color;
 using Point = System.Drawing.Point;
@@ -55,19 +55,19 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly IScheduler uiScheduler;
-    private readonly ManualResetEventSlim isClosed = new(false);
+    private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
     private readonly ComplexFileProvider complexFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
 
     public BlazorWindow(
         IUnityContainer unityContainer,
-        [OptionalDependency] IScheduler uiScheduler = default)
+        [OptionalDependency] IScheduler uiScheduler = null)
     {
         Log.AddSuffix($"BWnd#{windowId}");
         Log.Debug("New window is being created");
         this.unityContainer = unityContainer;
-        
+        isClosedTcs = new TaskCompletionSource();
         this.uiScheduler = uiScheduler ?? SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
@@ -75,13 +75,18 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         complexFileProvider = new ComplexFileProvider().AddTo(Anchors);
         additionalFileProviderAnchor = new SerialDisposable().AddTo(Anchors);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         this.RaiseWhenSourceValue(x => x.ViewDataContext, this, x => x.DataContext).AddTo(Anchors);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         Disposable.Create(() =>
         {
             try
             {
-                isClosed.Set();
+                if (!isClosedTcs.TrySetResult())
+                {
+                    Log.Debug($"Could not notify about window disposal, tcs: {isClosedTcs}");
+                }
 
                 if (!windowSupplier.IsValueCreated)
                 {
@@ -494,7 +499,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         try
         {
             Log.Debug("Awaiting for the window to be closed");
-            isClosed.Wait(cancellationToken);
+            isClosedTcs.Task.Wait(cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -630,10 +635,23 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
             return;
         }
 
-        while (eventQueue.TryTake(out var windowEvent))
+        try
         {
-            HandleEvent(windowEvent);
+            while (eventQueue.TryTake(out var windowEvent))
+            {
+                HandleEvent(windowEvent);
+            }
         }
+        catch (Exception e)
+        {
+            Log.Error("Critical error in Window message queue", e);
+            if (!isClosedTcs.TrySetException(e))
+            {
+                Log.Warn($"Failed to notify about exception, tcs: {isClosedTcs}");
+            }
+            throw;
+        }
+    
     }
 
     private NativeWindow CreateWindow()

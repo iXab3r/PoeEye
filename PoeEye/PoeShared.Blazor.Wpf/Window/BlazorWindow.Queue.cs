@@ -678,7 +678,10 @@ partial class BlazorWindow
                 .Subscribe(x =>
                 {
                     blazorWindow.Closed?.Invoke(blazorWindow, x);
-                    blazorWindow.isClosed.Set();
+                    if (!blazorWindow.isClosedTcs.TrySetResult())
+                    {
+                        blazorWindow.Log.Debug($"Could not notify about window closure, tcs: {blazorWindow.isClosedTcs}");
+                    }
                 })
                 .AddTo(anchors);
 

@@ -20,13 +20,13 @@ using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Color = System.Drawing.Color;
+using DirectoryInfo = System.IO.DirectoryInfo;
 
 namespace PoeShared.Blazor.Wpf;
 
 public class BlazorWebViewEx : BlazorWebView, IDisposable
 {
     private static readonly IFluentLog Log = typeof(BlazorWebViewEx).PrepareLogger();
-    private static readonly ConcurrentDictionary<string, IFileProvider> StaticFilesProvidersByPath = new();
     private const string WebViewTemplateChildName = "WebView";
 
     protected CompositeDisposable Anchors { get; } = new();
@@ -147,12 +147,12 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         Log.Debug($"Permission requested: {e.PermissionKind}, state: {e.State}");
         e.State = CoreWebView2PermissionState.Allow;
     }
-
+    
     public override IFileProvider CreateFileProvider(string contentRootDir)
     {
         var contentRoot = new DirectoryInfo(contentRootDir);
         Log.Debug($"Initializing content provider @ {contentRoot}");
-        var staticFilesProvider = StaticFilesProvidersByPath.GetOrAdd(contentRoot.FullName, _ => new CachingFileProvider(contentRoot));
+        var staticFilesProvider = CachingPhysicalFileProvider.GetOrAdd(new DirectoryInfo(contentRoot.FullName));
         return new CompositeFileProvider(proxyFileProvider, staticFilesProvider);
     }
 

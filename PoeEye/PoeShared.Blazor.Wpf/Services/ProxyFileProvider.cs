@@ -1,7 +1,7 @@
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Blazor.Wpf.Services;
 
 internal sealed class ProxyFileProvider : IFileProvider
 {

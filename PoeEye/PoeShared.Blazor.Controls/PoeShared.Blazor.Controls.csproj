@@ -22,13 +22,13 @@
         <PackageReference Include="BlazorComponentUtilities" Version="1.8.0" />
         <PackageReference Include="AntDesign" Version="0.18.1" />
         <PackageReference Include="FluentValidation" Version="9.5.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
         <PackageReference Include="Humanizer.Core" Version="2.14.1" />
         <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
             <ExcludeAssets>runtime</ExcludeAssets>
             <IncludeAssets>All</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="StronglyTypedId" Version="1.0.0-beta07" />
+        <PackageReference Include="StronglyTypedId" Version="1.0.0-beta07" PrivateAssets="all" ExcludeAssets="runtime" />
     </ItemGroup>
 
     <ItemGroup>

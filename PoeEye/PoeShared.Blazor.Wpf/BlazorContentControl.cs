@@ -103,7 +103,6 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         Log.Debug($"BlazorContentControl has been created");
         timestampCreated = DateTimeOffset.Now;
 
-
         new RootComponent
         {
             Selector = "headOutlet",
@@ -124,13 +123,13 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
         serviceCollection.AddWpfBlazorWebView();
         serviceCollection.AddBlazorWebViewDeveloperTools();
 
-        var indexFileContentTemplate = ResourceReader.ReadResourceAsString(Assembly.GetExecutingAssembly(), @"wwwroot.index.html");
         var generatedIndexFileName = "index.g.html";
         var contentRoot = "wwwroot";
         var hostPage = Path.Combine(contentRoot, generatedIndexFileName); // wwwroot must be included as a part of path to become ContentRoot;
 
         var unityContainerSource = this.WhenAnyValue(x => x.Container)
             .Select(x => x ?? UnityServiceCollection.Instance.BuildServiceProvider().GetService<IUnityContainer>());
+        
 
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.ViewType),
@@ -150,8 +149,9 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
 
                 var inMemoryFileProvider = new InMemoryFileProvider();
                 var proxyFileProvider = new ProxyFileProvider() {FileProvider = state.additionalFileProvider};
-                WebView.FileProvider = new CompositeFileProvider(inMemoryFileProvider, proxyFileProvider);
-
+                var webViewFileProvider = new CompositeFileProvider(inMemoryFileProvider, proxyFileProvider);
+                WebView.FileProvider = webViewFileProvider;
+                
                 if (UnhandledException != null)
                 {
                     Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
@@ -259,6 +259,15 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
 
+                    //static web assets file provider is created by WebView manager and we cannot directly access it from outside
+                    //thus we create our own, still prioritizing the usual one - this gives user the ability to replace assets
+                    var staticWebAssetsFileProvider = new CompositeFileProvider(
+                        webViewFileProvider, //reads from user-controlled cache
+                        childServiceProvider.GetRequiredService<IRootContentFileProvider>(), //reads from the disk
+                        childServiceProvider.GetRequiredService<IStaticWebAssetsFileProvider>() //reads from disk using manifest
+                        );
+                    var indexFileContentTemplate =  staticWebAssetsFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
+
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                     inMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
@@ -275,7 +284,7 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Failed to initialize view using {state}");
+                    Log.Error($"Failed to initialize view using {state}", ex);
                     UnhandledException = ex;
                 }
                 finally
