@@ -32,22 +32,13 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                 return $"Tmr{name}, {dueTime.TotalMilliseconds:F0}ms, {period.TotalMilliseconds:F0}ms";
             }
         });
-        Log.Debug($"[{this}] Initializing timer");
         this.period = period;
         this.amendPeriod = amendPeriod;
         timer = new Timer(Callback, null, dueTime, TimeSpan.FromMilliseconds(-1));
         Disposable.Create(() =>
         {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug($"[{this}] Disposing - acquiring lock");
-            }
             lock (padlock)
             {
-                if (Log.IsDebugEnabled)
-                {
-                    Log.Debug($"[{this}] Disposing timer {timer}");
-                }
                 timer?.Dispose();
                 timer = null;
             }
@@ -61,49 +52,24 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
         var executionTime = TimeSpan.Zero;
         try
         {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug($"[{this}] Executing timer handler");
-            }
-               
             lock (padlock)
             {
                 if (timer == null)
                 {
-                    if (Log.IsDebugEnabled)
-                    {
-                        Log.Debug($"[{this}] Callback - timer is already disposed on entry");
-                    }
                     return;
                 }
 
-                if (Log.IsDebugEnabled)
-                {
-                    Log.Debug($"[{this}] Stopping timer loop temporarily");
-                }
                 timer.Change(Timeout.Infinite, Timeout.Infinite);
             }
 
             var now = Stopwatch.GetTimestamp();
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug($"[{this}] Producing OnNext");
-            }
             sink.OnNext(cycleIdx++);
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug($"[{this}] Processed OnNext");
-            }
 
             executionTime = TimeSpan.FromSeconds((Stopwatch.GetTimestamp() - now) / (float) Stopwatch.Frequency);
             lock (padlock)
             {
                 if (timer == null)
                 {
-                    if (Log.IsDebugEnabled)
-                    {
-                        Log.Debug($"[{this}] Callback - timer is already disposed on exit");
-                    }
                     return;
                 }
 
@@ -111,27 +77,12 @@ internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
                     amendPeriod
                         ? Math.Max(0, period.TotalMilliseconds - executionTime.TotalMilliseconds)
                         : period.TotalMilliseconds);
-                if (Log.IsDebugEnabled)
-                {
-                    Log.Debug($"[{this}] Re-arming timer loop, execute in: {executeIn}");
-                }
                 timer.Change(executeIn, TimeSpan.Zero);
             }
         }
         catch (Exception ex)
         {
-            if (Log.IsWarnEnabled)
-            {
-                Log.Warn($"[{this}] Timer handler captured an error, propagating to sink", ex);
-            }
             sink.OnError(ex);
-        }
-        finally
-        {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug($"[{this}] Timer handler completed in {executionTime.TotalMilliseconds:F0}ms");
-            }
         }
     }
 

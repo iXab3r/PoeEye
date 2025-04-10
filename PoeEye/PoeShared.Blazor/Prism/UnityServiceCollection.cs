@@ -18,11 +18,10 @@ public sealed class UnityServiceCollection : ServiceCollection
     {
         this.AddLogging(builder =>
         {
-            builder.SetMinimumLevel(LogLevel.Information);
+            builder.SetMinimumLevel(LogLevel.Warning);
             builder.ClearProviders();
             builder.AddProvider(new Log4NetLoggerProvider());
-
-            builder.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Trace);
+            builder.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Warning);
         });
     }
 }

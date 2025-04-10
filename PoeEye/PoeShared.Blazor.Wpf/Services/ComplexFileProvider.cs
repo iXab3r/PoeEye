@@ -42,7 +42,7 @@ internal sealed class ComplexFileProvider : DisposableReactiveObjectWithLogger, 
         foreach (var provider in FileProviders)
         {
             var fileInfo = provider.GetFileInfo(subpath);
-            if (fileInfo is not NotFoundFileInfo)
+            if (fileInfo is not NotFoundFileInfo && fileInfo.Exists)
             {
                 return fileInfo;
             }
@@ -56,7 +56,7 @@ internal sealed class ComplexFileProvider : DisposableReactiveObjectWithLogger, 
         foreach (var provider in FileProviders)
         {
             var directory = provider.GetDirectoryContents(subpath);
-            if (directory is not NotFoundDirectoryContents)
+            if (directory is not NotFoundDirectoryContents && directory.Exists)
             {
                 return directory;
             }

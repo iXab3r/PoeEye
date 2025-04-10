@@ -146,11 +146,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 Disposable.Create(() => Log.Debug("Content is being disposed")).AddTo(contentAnchors);
-
-                var inMemoryFileProvider = new InMemoryFileProvider();
-                var proxyFileProvider = new ProxyFileProvider() {FileProvider = state.additionalFileProvider};
-                var webViewFileProvider = new CompositeFileProvider(inMemoryFileProvider, proxyFileProvider);
-                WebView.FileProvider = webViewFileProvider;
                 
                 if (UnhandledException != null)
                 {
@@ -213,7 +208,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
                     childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
                     childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
-                    childServiceCollection.AddSingleton<IInMemoryFileProvider>(_ => inMemoryFileProvider);
                     childServiceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
@@ -229,6 +223,28 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                     webViewServiceProvider.ServiceProvider = childServiceProvider;
 
+                    var globalMemoryFileProvider = new InMemoryFileProvider();
+                  
+                    //static web assets file provider is created by WebView manager, and we cannot directly access it from outside
+                    //thus we create our own, still prioritizing the usual one - this gives user the ability to replace assets
+                    var publicInMemoryFileProvider = new InMemoryFileProvider();
+                    childServiceCollection.AddSingleton<IInMemoryFileProvider>(_ => publicInMemoryFileProvider);
+
+                    var proxyFileProvider = new ProxyFileProvider() 
+                    {
+                        FileProvider = state.additionalFileProvider
+                    };
+                    
+                    var rootFileProvider = childServiceProvider.GetRequiredService<IRootContentFileProvider>();
+                    
+                    var webViewFileProvider = new CompositeFileProvider(
+                        publicInMemoryFileProvider, 
+                        proxyFileProvider, 
+                        globalMemoryFileProvider,
+                        rootFileProvider);
+                        
+                    WebView.FileProvider = webViewFileProvider; //under the hood initializes StaticWebAssets provider, which should not ever be reached
+
                     var blazorContentRepository = childServiceProvider.GetRequiredService<IBlazorContentRepository>();
                     var repositoryAdditionalFiles = blazorContentRepository.AdditionalFiles.Items.ToArray();
                     var controlAdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
@@ -243,7 +259,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                                 continue;
                             }
 
-                            inMemoryFileProvider.FilesByName.AddOrUpdate(file);
+                            globalMemoryFileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
 
@@ -259,17 +275,10 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
 
-                    //static web assets file provider is created by WebView manager and we cannot directly access it from outside
-                    //thus we create our own, still prioritizing the usual one - this gives user the ability to replace assets
-                    var staticWebAssetsFileProvider = new CompositeFileProvider(
-                        webViewFileProvider, //reads from user-controlled cache
-                        childServiceProvider.GetRequiredService<IRootContentFileProvider>(), //reads from the disk
-                        childServiceProvider.GetRequiredService<IStaticWebAssetsFileProvider>() //reads from disk using manifest
-                        );
-                    var indexFileContentTemplate =  staticWebAssetsFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
-
+                   
+                    var indexFileContentTemplate =  webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
-                    inMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
+                    publicInMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
                     if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
                     {

@@ -152,7 +152,7 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         if (moduleTask.IsValueCreated)
         {
             var module = await moduleTask.Value;
-            await module.DisposeAsync();
+            await module.DisposeJsSafeAsync();
         }
     }
 }
