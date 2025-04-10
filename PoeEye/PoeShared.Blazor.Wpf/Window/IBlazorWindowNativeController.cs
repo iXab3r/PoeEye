@@ -1,5 +1,4 @@
 ﻿using System;
-using PoeShared.UI;
 
 namespace PoeShared.Blazor.Wpf;
 

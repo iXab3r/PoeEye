@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.FileProviders;
+using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -68,7 +69,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         Log.Debug("New window is being created");
         this.unityContainer = unityContainer;
         isClosedTcs = new TaskCompletionSource();
-        this.uiScheduler = uiScheduler ?? SchedulerProvider.Instance.GetOrAdd("BlazorWindow");
+        this.uiScheduler = uiScheduler ?? BlazorSchedulerProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);

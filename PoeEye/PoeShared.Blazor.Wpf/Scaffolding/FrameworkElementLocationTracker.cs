@@ -91,7 +91,7 @@ internal sealed class FrameworkElementLocationTracker : DisposableReactiveObject
         try
         {
             var rect = GetControlScreenCoordinates(FrameworkElement, Parent);
-            BoundsOnScreen = rect.ToWinRectangle();
+            BoundsOnScreen = new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
         }
         catch (Exception e)
         {

@@ -1,9 +1,5 @@
-using System.CommandLine.Parsing;
-using System.Diagnostics;
-using System.Globalization;
 using System.Reflection;
 using CommandLine;
-using Microsoft.CodeAnalysis;
 using PoeShared.Modularity;
 using Parser = CommandLine.Parser;
 
@@ -86,7 +82,7 @@ public class AppArguments : AppOptions, IAppArguments
         ProcessId = Process.GetCurrentProcess().Id;
         IsElevated = true;
         AppDomainDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var arguments = CommandLineStringSplitter.Instance.Split(Environment.CommandLine).ToArray();
+        var arguments = CommandLineSplitter.Instance.Split(Environment.CommandLine).ToArray();
         CommandLineArguments = arguments.Skip(1).ToArray();
         if (CommandLineArguments.Length == 1)
         {
@@ -96,7 +92,7 @@ public class AppArguments : AppOptions, IAppArguments
                 //compressed arg list
                 var decompressed = StringUtils.FromHexGzip(CommandLineArguments[0]);
                 Log.Info($"Decompressed arguments: {decompressed}");
-                CommandLineArguments = CommandLineStringSplitter.Instance.Split(decompressed).ToArray();
+                CommandLineArguments = CommandLineSplitter.Instance.Split(decompressed).ToArray();
             }
         }
         

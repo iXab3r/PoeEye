@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using PoeShared.Blazor.Prism;
-using PoeShared.Blazor.Wpf.Installer;
-using PoeShared.Blazor.Wpf.Services;
+﻿using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Unity;
@@ -21,13 +13,9 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
     protected override void Initialize()
     {
         Container
-            .RegisterType<IWebViewInstaller, WebViewInstaller>()
-            .RegisterType<IBlazorWindow, BlazorWindow>()
-            .RegisterType<IBlazorWindowViewController, BlazorWindowViewController>()
-            .RegisterType<IWebViewInstallerWindow, WebViewInstallerWindow>();
+            .RegisterType<IBlazorWindow, BlazorWindow>();
         
         Container.RegisterSingleton<IStaticWebAssetsFileProvider, StaticWebAssetsFileProvider>();
-        Container.RegisterSingleton<IWebViewInstallerDisplayer, WebViewInstallerDisplayer>();
         Container.RegisterSingleton<IWebViewAccessor>(x => WebViewAccessor.Instance);
         Container.RegisterSingleton<IRootContentFileProvider, RootContentFileProvider>();
     }

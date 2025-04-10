@@ -27,6 +27,7 @@
       <ProjectReference Include="..\PoeShared.Blazor.Wpf\PoeShared.Blazor.Wpf.csproj" />
       <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
       <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
+      <ProjectReference Include="..\PoeShared.Squirrel\PoeShared.Squirrel.csproj" />
       <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
       <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     </ItemGroup>

@@ -1,8 +1,7 @@
-<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<scaffolding:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:eye="http://coderush.net/poeeye/">
-    <eye:SharedResourceDictionary.MergedDictionaries>
-        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/Installer/WebViewInstaller.xaml" />
-        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/BlazorContentControl.xaml" />
-    </eye:SharedResourceDictionary.MergedDictionaries>
-</eye:SharedResourceDictionary>
+                    xmlns:scaffolding="clr-namespace:PoeShared.Blazor.Wpf.Scaffolding">
+    <scaffolding:SharedResourceDictionary.MergedDictionaries>
+        <scaffolding:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Blazor.Wpf;component/BlazorContentControl.xaml" />
+    </scaffolding:SharedResourceDictionary.MergedDictionaries>
+</scaffolding:SharedResourceDictionary>

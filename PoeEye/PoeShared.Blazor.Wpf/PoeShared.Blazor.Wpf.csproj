@@ -17,8 +17,7 @@
      <ItemGroup>
          <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" />
          <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
-         <ProjectReference Include="..\PoeShared.Squirrel\PoeShared.Squirrel.csproj" />
-         <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
+         <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
          <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
      </ItemGroup>
 
@@ -28,6 +27,7 @@
          </PackageReference>
          <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46">
          </PackageReference> 
+         <PackageReference Include="PInvoke.SHCore" Version="0.6.49" /> 
          <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
          <PackageReference Include="System.Management" Version="8.0.0" />
      </ItemGroup>

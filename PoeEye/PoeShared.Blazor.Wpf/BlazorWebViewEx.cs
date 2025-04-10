@@ -16,6 +16,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Core.Raw;
 using Microsoft.Web.WebView2.Wpf;
+using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -86,7 +87,8 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     
     private void OnBlazorWebViewInitialized(object sender, BlazorWebViewInitializedEventArgs e)
     {
-        this.Observe(BackgroundProperty, x => Background)
+        this.Observe(BackgroundProperty)
+            .Select(x => Background)
             .Select(x => x is SolidColorBrush solidColorBrush ? solidColorBrush.Color : default)
             .Subscribe(x => { WebView.DefaultBackgroundColor = Color.FromArgb(x.A, x.R, x.G, x.B); })
             .AddTo(Anchors);

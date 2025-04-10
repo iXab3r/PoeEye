@@ -8,8 +8,8 @@ using System.Windows.Interactivity;
 using System.Windows.Interop;
 using Microsoft.Web.WebView2.Wpf;
 using PInvoke;
+using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 
 namespace PoeShared.Blazor.Wpf.Behaviors;
 

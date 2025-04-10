@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Input;
 using DynamicData;
 using PoeShared.Blazor.Wpf;
-using PoeShared.Blazor.Wpf.Installer;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
@@ -29,7 +28,6 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
 
 
     public BlazorSandboxViewModel(
-        IWebViewInstallerDisplayer webViewInstallerDisplayer,
         IWebViewAccessor webViewAccessor,
         MainCounterViewModel mainCounter,
         IFactory<IBlazorWindow> blazorWindowFactory)
@@ -37,7 +35,6 @@ public sealed class BlazorSandboxViewModel : DisposableReactiveObject
         WebViewAccessor = webViewAccessor;
         MainCounter = mainCounter.AddTo(Anchors);
 
-        ShowInstaller = CommandWrapper.Create(() => webViewInstallerDisplayer.ShowDialog(new WebViewInstallerArgs()));
         ShowWindow = CommandWrapper.Create(() =>
         {
             var wnd = blazorWindowFactory.Create();

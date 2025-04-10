@@ -1,31 +1,21 @@
-﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<scaffolding:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                              xmlns:eye="http://coderush.net/poeeye/"
-                              xmlns:st="http://schemas.spicytaco.io/"
-                              xmlns:dd="urn:gong-wpf-dragdrop"
-                              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                              xmlns:themes="clr-namespace:PoeShared.Themes;assembly=PoeShared.Wpf"
-                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                               xmlns:wpf="clr-namespace:PoeShared.Blazor.Wpf"
+                              xmlns:scaffolding="clr-namespace:PoeShared.Blazor.Wpf.Scaffolding"
+                              xmlns:converters="clr-namespace:PoeShared.Blazor.Wpf.Converters"
                               mc:Ignorable="d">
-    <eye:SharedResourceDictionary.MergedDictionaries>
-        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
-        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
-        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-    </eye:SharedResourceDictionary.MergedDictionaries>
-
     <ControlTemplate x:Key="BlazorContentControlErrorTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
         <Border>
-            <st:StackPanel Orientation="Vertical">
-                <Border BorderBrush="{StaticResource NegativeBrush}" BorderThickness="0 0 0 1">
-                    <TextBlock Foreground="{StaticResource NegativeBrush}" Text="Render exception" />
+            <StackPanel Orientation="Vertical">
+                <Border BorderBrush="IndianRed" BorderThickness="0 0 0 1">
+                    <TextBlock Foreground="IndianRed" Text="Render exception" />
                 </Border>
                 <Button
                     Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}"
                     Content="Try to recover" HorizontalAlignment="Left" />
-                <Border Padding="5" st:StackPanel.Fill="Fill">
+                <Border Padding="5">
                     <TextBox
                         IsReadOnly="True"
                         Background="Transparent"
@@ -35,10 +25,10 @@
                         VerticalScrollBarVisibility="Auto"
                         VerticalContentAlignment="Stretch"
                         TextWrapping="Wrap"
-                        Foreground="{StaticResource WarningBrush}"
+                        Foreground="Coral"
                         Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledExceptionMessage, Mode=OneWay}" />
                 </Border>
-            </st:StackPanel>
+            </StackPanel>
         </Border>
     </ControlTemplate>
 
@@ -59,7 +49,7 @@
             <ProgressBar Grid.Row="1" IsIndeterminate="True"
                          Height="4"
                          x:Name="WebViewIsBusyAdorner"
-                         Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
+                         Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsBusy, Converter={x:Static converters:TrueToVisibleFalseToCollapsedConverter.Instance}}" />
         </Grid>
     </ControlTemplate>
 
@@ -74,14 +64,14 @@
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True"/>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=UnhandledException, Converter={StaticResource NullToFalseConverter}}" Value="False"/>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=UnhandledException, Converter={x:Static converters:NullToFalseConverter.Instance}}" Value="False"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True"/>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=UnhandledException, Converter={StaticResource NullToFalseConverter}}" Value="True"/>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=UnhandledException, Converter={x:Static converters:NullToFalseConverter.Instance}}" Value="True"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Template" Value="{StaticResource BlazorContentControlErrorTemplate}" />
             </MultiDataTrigger>
@@ -95,4 +85,4 @@
     </Style>
 
     <Style TargetType="{x:Type wpf:BlazorContentControl}" BasedOn="{StaticResource DefaultBlazorContentControlStyle}" />
-</eye:SharedResourceDictionary>
+</scaffolding:SharedResourceDictionary>

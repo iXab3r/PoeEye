@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using DynamicData;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
@@ -23,17 +25,15 @@ using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
-using PoeShared.UI;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
 
 namespace PoeShared.Blazor.Wpf;
 
-public class BlazorContentControl : ReactiveControl, IBlazorContentControl
+public class BlazorContentControl : Control, IBlazorContentControl
 {
     private static readonly GlobalIdProvider IdProvider = new();
     private static readonly Binder<BlazorContentControl> Binder = new();
@@ -487,5 +487,26 @@ public class BlazorContentControl : ReactiveControl, IBlazorContentControl
             .Replace("<!--% AdditionalStylesheetsBlock %-->", cssLinksText)
             .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
         return indexFileContent;
+    }
+    
+    public void Dispose()
+    {
+        Anchors.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public CompositeDisposable Anchors { get; } = new();
+
+    public void RaisePropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        RaisePropertyChanged(e.Property.Name);
     }
 }

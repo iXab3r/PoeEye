@@ -4,9 +4,9 @@ using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Interop;
+using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
-using PoeShared.UI;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -74,7 +74,6 @@ public class ReactiveWindow : Window, IDisposableReactiveObject
     {
         return new NoopWindowAutomationPeer(this);
     }
-
 
     protected void MakeTransparent()
     {

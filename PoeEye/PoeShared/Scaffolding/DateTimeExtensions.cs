@@ -1,5 +1,10 @@
 ﻿namespace PoeShared.Scaffolding;
 
+public interface IDispatcherScheduler
+{
+    bool CheckAccess();
+}
+
 public static class DateTimeExtensions
 {
     public static bool IsInRange(this DateTimeOffset date, DateTimeOffset start, DateTimeOffset end)
