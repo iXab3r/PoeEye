@@ -15,9 +15,11 @@
     <SupportedPlatform Include="windows" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" ><PrivateAssets>all</PrivateAssets></PackageReference>
     
-    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.4">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
       <ExcludeAssets>runtime</ExcludeAssets>
@@ -26,7 +28,9 @@
     <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="Microsoft.Data.OData" Version="5.8.5" />
+    <PackageReference Include="Microsoft.Data.OData" Version="5.8.5">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

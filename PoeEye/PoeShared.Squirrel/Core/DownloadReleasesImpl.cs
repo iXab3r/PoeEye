@@ -34,23 +34,32 @@ internal class DownloadReleasesImpl : IEnableLogger
     {
         progress ??= _ => { };
         using var progressTracker = new ComplexProgressTracker();
-        using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => progress((int)x));
+        using var progressUpdater = progressTracker
+            .WhenAnyValue(x => x.ProgressPercent)
+            .Subscribe(x => progress((int)x));
 
-        return await releasesToDownload.ToAsyncEnumerable()
-            .AllAsync(x =>
+        var allValid = true;
+        var tasks = releasesToDownload.Select(async x =>
+        {
+            try
             {
-                try
+                if (!await Task.Run(() => ValidateChecksum(x)))
                 {
-                    return ValidateChecksum(x);
+                    allValid = false;
                 }
-                finally
+            }
+            finally
+            {
+                lock (progressTracker)
                 {
-                    lock (progressTracker)
-                    {
-                        progressTracker.Update(100, x.Filename);
-                    }
+                    progressTracker.Update(100, x.Filename);
                 }
-            });;
+            }
+        });
+
+        await Task.WhenAll(tasks);
+
+        return allValid;
     }
 
     public async Task<IReadOnlyCollection<FileInfo>> DownloadReleases(

@@ -1,12 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reflection;
 using AutoFixture;
-using LiteDB;
 using Newtonsoft.Json.Linq;
-using NUnit.Framework;
 using PoeShared.Modularity;
 using PoeShared.Tests.Helpers;
 
