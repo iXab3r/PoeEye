@@ -38,6 +38,7 @@ public sealed class CommonRegistrations : UnityContainerExtension
             .RegisterSingleton<IUniqueIdGenerator, UniqueIdGenerator>()
             .RegisterSingleton<ILoggerFactory, Log4NetLoggerFactory>()
             .RegisterSingleton<ILoggerProvider, Log4NetLoggerProvider>()
+            .RegisterSingleton<IFileDownloader, BasicAuthFileDownloader>()
             .RegisterSingleton<IAssemblyTracker>(x => IAssemblyTracker.Instance)
             .RegisterSingleton<ISleepController>(x => SleepController.Instance)
             .RegisterSingleton<ICsharpExpressionParser>(x => CsharpExpressionParser.Instance)

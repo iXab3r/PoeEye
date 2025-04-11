@@ -10,6 +10,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
+using IFileDownloader = PoeShared.Services.IFileDownloader;
 
 namespace PoeShared.Squirrel.Core;
 

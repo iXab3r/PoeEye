@@ -9,6 +9,7 @@ using PoeShared.Squirrel.Scaffolding;
 using ReactiveUI;
 using Splat;
 using Squirrel;
+using IFileDownloader = PoeShared.Services.IFileDownloader;
 
 namespace PoeShared.Squirrel.Core;
 

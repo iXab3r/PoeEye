@@ -14,6 +14,7 @@ using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
 using Squirrel.Shell;
+using IFileDownloader = PoeShared.Services.IFileDownloader;
 
 namespace PoeShared.Squirrel.Core;
 

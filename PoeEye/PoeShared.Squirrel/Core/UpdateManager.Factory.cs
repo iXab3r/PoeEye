@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PoeShared.Scaffolding;
+using PoeShared.Services;
 
 namespace PoeShared.Squirrel.Core;
 

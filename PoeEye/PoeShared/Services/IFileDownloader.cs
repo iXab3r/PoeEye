@@ -1,7 +1,4 @@
-using System;
-using System.Threading.Tasks;
-
-namespace PoeShared.Squirrel.Core;
+namespace PoeShared.Services;
 
 public interface IFileDownloader 
 {

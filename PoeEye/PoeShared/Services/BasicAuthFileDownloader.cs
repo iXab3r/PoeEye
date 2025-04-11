@@ -1,18 +1,9 @@
-using System;
-using System.IO;
 using System.Net;
-using System.Reactive.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
-using PoeShared.Squirrel.Core;
-using PoeShared.Squirrel.Scaffolding;
-using PoeShared.UI;
 
-namespace PoeShared.Squirrel.Updater;
+namespace PoeShared.Services;
 
-internal sealed class BasicAuthFileDownloader : IFileDownloader
+public sealed class BasicAuthFileDownloader : IFileDownloader
 {
     private static readonly IFluentLog Log = typeof(BasicAuthFileDownloader).PrepareLogger();
 
@@ -30,7 +21,6 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
                 h => wc.DownloadProgressChanged += h,
                 h => wc.DownloadProgressChanged -= h)
             .Where(x => progress != null)
-            .Sample(UiConstants.UiThrottlingDelay)
             .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException);
         var outputDirectory = Path.GetDirectoryName(targetFile);
         if (!string.IsNullOrEmpty(outputDirectory) && !Directory.Exists(outputDirectory))
@@ -71,7 +61,7 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
             throw new FormatException($"Failed to parse URI: {uri}");
         }
 
-        return Utility.GetRemoteFileSize(uri);
+        return GetRemoteFileSize(uri);
     }
 
     private WebClient CreateClient()
@@ -95,5 +85,21 @@ internal sealed class BasicAuthFileDownloader : IFileDownloader
         }
 
         return result;
+    }
+    
+    private static async Task<long> GetRemoteFileSize(Uri uriPath)
+    {
+        var webRequest = WebRequest.Create(uriPath);
+        webRequest.Method = "HEAD";
+
+        using var webResponse = await webRequest.GetResponseAsync();
+            
+        var contentLength = webResponse.Headers.Get("Content-Length");
+        if (long.TryParse(contentLength, out var fileSize))
+        {
+            return fileSize;
+        }
+
+        throw new ApplicationException($"Failed to get file size from {uriPath}, content headers: {webRequest.Headers}");
     }
 }
