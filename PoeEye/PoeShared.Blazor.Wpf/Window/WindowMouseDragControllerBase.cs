@@ -8,30 +8,38 @@ namespace PoeShared.Blazor.Wpf;
 
 internal abstract class WindowMouseDragControllerBase : DisposableReactiveObject
 {
+    private readonly AtomicFlag changedCursor = new AtomicFlag();
+    private readonly AtomicFlag changedCursorBack = new AtomicFlag();
+    private Cursor originalCursor;
+
     public WindowMouseDragControllerBase(IBlazorWindow blazorWindow, BlazorContentControl contentControl)
     {
         BlazorWindow = blazorWindow;
         ContentControl = contentControl;
-            
+
         StartPoint = GetCursorPosition();
         WindowInitialPosition = new Point(blazorWindow.Left, blazorWindow.Top);
-        
-        blazorWindow.Log.Debug($"Window dragging has been started: {new { StartPoint, WindowInitialPosition }}");
-        
+        WindowInitialSize = new Size(blazorWindow.Width, blazorWindow.Height);
+
         if (!ContentControl.CaptureMouse())
         {
             throw new ApplicationException($"Failed to capture mouse inside window {blazorWindow}");
         }
-            
+
+        originalCursor = Mouse.OverrideCursor;
         ContentControl.MouseUp += ControlOnMouseUp;
         ContentControl.MouseMove += ControlOnMouseMove;
-        
+
         Disposable.Create(() =>
         {
-            blazorWindow.Log.Debug($"Window dragging has stopped: {new { StartPoint, EndPoint = GetCursorPosition(), WindowInitialPosition, WindowPosition = new Point(blazorWindow.Left, blazorWindow.Top) }}");
-            
             ContentControl.MouseUp -= ControlOnMouseUp;
             ContentControl.MouseMove -= ControlOnMouseMove;
+
+            if (changedCursorBack.Set())
+            {
+                Mouse.OverrideCursor = originalCursor;
+            }
+
             try
             {
                 ContentControl.ReleaseMouseCapture();
@@ -42,25 +50,48 @@ internal abstract class WindowMouseDragControllerBase : DisposableReactiveObject
             }
         }).AddTo(Anchors);
     }
-        
+
     public IBlazorWindow BlazorWindow { get; }
-        
+
     public BlazorContentControl ContentControl { get; }
-    
+
     public Point WindowInitialPosition { get; }
+
+    public Size WindowInitialSize { get; }
 
     public Point StartPoint { get; }
 
     public bool IsDragging => !Anchors.IsDisposed;
 
+    public Point CursorPosition => GetCursorPosition();
+
     protected abstract void HandleMove(Point cursorPosition);
+
+    protected virtual Cursor GetOverrideCursor()
+    {
+        return null;
+    }
 
     private void ControlOnMouseMove(object sender, MouseEventArgs e)
     {
+        if (changedCursor.Set())
+        {
+            var overrideCursor = GetOverrideCursor();
+            if (overrideCursor != null)
+            {
+                originalCursor = Mouse.OverrideCursor;
+                Mouse.OverrideCursor = overrideCursor;
+            }
+            else
+            {
+                changedCursorBack.Set();
+            }
+        }
+
         var current = GetCursorPosition();
         HandleMove(current);
     }
-        
+
     private void ControlOnMouseUp(object sender, MouseButtonEventArgs e)
     {
         Dispose();

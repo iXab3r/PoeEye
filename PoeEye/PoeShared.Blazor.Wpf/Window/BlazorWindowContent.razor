@@ -419,54 +419,85 @@ else
         var borderThickness = DataContext.BorderThickness;
         var borderColor = DataContext.BorderColor;
         var borderColorAsHex = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
+        var cornerThumbSize = "10px";
 
         var topBorderStyle = new CssBuilder()
-            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
-            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"width: calc(100vw - {borderThickness.Left}px - {borderThickness.Right}px);")
+            .AddValue($"height: {borderThickness.Top}px;")
+            .AddValue($"left: {borderThickness.Left}px;")
+            .AddValue($"top: 0;")
             .AddValue($"background-color: {borderColorAsHex};")
             .AddValue($"z-index: {borderZIndex};")
             .AddValue($"cursor: n-resize;");
 
         var rightBorderStyle = new CssBuilder()
-            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"width: {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"height: calc(100vh - {borderThickness.Top}px - {borderThickness.Bottom}px);")
+            .AddValue($"width: {borderThickness.Right}px;")
             .AddValue($"right: 0;")
+            .AddValue($"top: {borderThickness.Top}px;")
             .AddValue($"background-color: {borderColorAsHex};")
             .AddValue($"z-index: {borderZIndex};")
-            .AddValue($"cursor: w-resize;");
+            .AddValue($"cursor: e-resize;");
 
         var bottomBorderStyle = new CssBuilder()
-            .AddValue($"width: calc(100vw - {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Right.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"height: {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"width: calc(100vw - {borderThickness.Left}px - {borderThickness.Right}px);")
+            .AddValue($"height: {borderThickness.Bottom}px;")
+            .AddValue($"left: {borderThickness.Left}px;")
             .AddValue($"bottom: 0;")
-            .AddValue($"left: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
             .AddValue($"background-color: {borderColorAsHex};")
             .AddValue($"z-index: {borderZIndex};")
-            .AddValue($"cursor: n-resize;");
+            .AddValue($"cursor: s-resize;");
 
         var leftBorderStyle = new CssBuilder()
-            .AddValue($"height: calc(100vh - {borderThickness.Top.ToString(CultureInfo.InvariantCulture)}px * 2 - {borderThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px * 2);")
-            .AddValue($"width: {borderThickness.Left.ToString(CultureInfo.InvariantCulture)}px;")
+            .AddValue($"height: calc(100vh - {borderThickness.Top}px - {borderThickness.Bottom}px);")
+            .AddValue($"width: {borderThickness.Left}px;")
+            .AddValue($"top: {borderThickness.Top}px;")
+            .AddValue($"left: 0;")
             .AddValue($"background-color: {borderColorAsHex};")
             .AddValue($"z-index: {borderZIndex};")
             .AddValue($"cursor: w-resize;");
+
+        // Corners
+        var cornerBase = new CssBuilder()
+            .AddValue($"width: {cornerThumbSize};")
+            .AddValue($"height: {cornerThumbSize};")
+            .AddValue($"position: fixed;")
+            .AddValue($"background-color: transparent;")
+            .AddValue($"z-index: {borderZIndex + 1};");
+
+        var topLeftCornerStyle = new CssBuilder(cornerBase.ToString())
+            .AddValue($"top: 0;")
+            .AddValue($"left: 0;")
+            .AddValue("cursor: nwse-resize;");
+
+        var topRightCornerStyle = new CssBuilder(cornerBase.ToString())
+            .AddValue($"top: 0;")
+            .AddValue($"right: 0;")
+            .AddValue("cursor: nesw-resize;");
+
+        var bottomLeftCornerStyle =new CssBuilder(cornerBase.ToString())
+            .AddValue($"bottom: 0;")
+            .AddValue($"left: 0;")
+            .AddValue("cursor: nesw-resize;");
+
+        var bottomRightCornerStyle  =new CssBuilder(cornerBase.ToString())
+            .AddValue($"bottom: 0;")
+            .AddValue($"right: 0;")
+            .AddValue("cursor: nwse-resize;");
     }
-    <div class="position-fixed"
-         style="@topBorderStyle">
-    </div>
 
-    <div class="position-fixed"
-         style="@rightBorderStyle">
-    </div>
+    <!-- Edge Resizers -->
+    <div class="position-fixed" style="@topBorderStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.Top))"></div>
+    <div class="position-fixed" style="@rightBorderStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.Right))"></div>
+    <div class="position-fixed" style="@bottomBorderStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.Bottom))"></div>
+    <div class="position-fixed" style="@leftBorderStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.Left))"></div>
 
-    <div class="position-fixed"
-         style="@bottomBorderStyle">
-    </div>
+    <!-- Corner Resizers -->
+    <div style="@topLeftCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.TopLeft))"></div>
+    <div style="@topRightCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.TopRight))"></div>
+    <div style="@bottomLeftCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.BottomLeft))"></div>
+    <div style="@bottomRightCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.BottomRight))"></div>
 
-    <div class="position-fixed"
-         style="@leftBorderStyle">
-    </div>
 
 
 </ReactiveSection>
@@ -499,6 +530,7 @@ else
     }
 
     [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
+    [Inject] public IBlazorWindowAccessor BlazorWindowAccessor { get; init; }
 
     public BlazorContentPresenter ContentPresenter { get; private set; }
     public ElementReference TitleRef { get; private set; }
@@ -546,8 +578,16 @@ else
         };
     }
 
-    private void HandleMouseDown(MouseEventArgs obj)
+    private void HandleMouseDown(MouseEventArgs mouseEventArgs)
     {
         StartDrag();
+    }
+
+    private void StartResize(WindowResizeDirection direction)
+    {
+        dragAnchor.Disposable = new WindowEdgeResizeController(
+            BlazorWindowAccessor.Window, 
+            BlazorContentControlAccessor.Control, 
+            direction);
     }
 }
