@@ -12,8 +12,8 @@
 
     <ItemGroup>
         <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All" ExcludeAssets="runtime"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" ><PrivateAssets>all</PrivateAssets></PackageReference>
-        <PackageReference Include="squirrel.windows" Version="1.9.0"  PrivateAssets="All" ><NoWarn>NU1701;NU1608</NoWarn></PackageReference>
+        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
+        <PackageReference Include="squirrel.windows" Version="1.9.0"  ><NoWarn>NU1701;NU1608</NoWarn></PackageReference>
     </ItemGroup>
 
     <ItemGroup>

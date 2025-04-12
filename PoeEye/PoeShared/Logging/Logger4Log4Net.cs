@@ -13,11 +13,17 @@ public sealed class Logger4Log4Net : ILogger
         logger = LogManager.GetLogger(repository?.Name, name);
     }
     
+    public LogLevel MinimumLevel { get; set; }
+    
     public void Log<TState>(
         LogLevel logLevel, EventId eventId, 
         TState state, Exception exception, 
         Func<TState, Exception, string> formatter)
     {
+        if (!IsEnabled(logLevel))
+        {
+            return;
+        }
         var message = formatter(state, exception);
 
         switch (logLevel)
@@ -45,6 +51,10 @@ public sealed class Logger4Log4Net : ILogger
  
     public bool IsEnabled(LogLevel logLevel)
     {
+        if (MinimumLevel < logLevel)
+        {
+            return false;
+        }
         return logLevel switch
         {
             LogLevel.Trace => logger.IsDebugEnabled,

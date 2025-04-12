@@ -23,6 +23,7 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
 
     public StaticWebAssetsFileProvider(FileInfo staticWebFileRuntimeJsonFile)
     {
+        Log.Info($"Initializing static web assets file provider @ {staticWebFileRuntimeJsonFile.FullName} (exists: {staticWebFileRuntimeJsonFile.Exists})");
         RuntimeAssetsFile = staticWebFileRuntimeJsonFile;
         staticWebAssetsFileProvider = CreateStaticWebAssetsFileProvider(new InMemoryFileProvider(), staticWebFileRuntimeJsonFile);
     }

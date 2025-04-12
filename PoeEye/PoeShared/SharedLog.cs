@@ -6,6 +6,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
+using log4net.Filter;
 using log4net.Layout;
 using log4net.Repository;
 using log4net.Repository.Hierarchy;
@@ -67,6 +68,19 @@ public class SharedLog : DisposableReactiveObject
         XmlConfigurator.ConfigureAndWatch(repository, logConfig);
         Log.Info($"Logging settings loaded from {logConfig}");
         DumpApplicationInfo(appArguments);
+    }
+    
+    public void SetLoggerLevel(string loggerName, Level level)
+    {
+        var hierarchy = (Hierarchy)LogManager.GetRepository(Assembly.GetEntryAssembly());
+    
+        // Get or create logger
+        var logger = hierarchy.GetLogger(loggerName) as Logger;
+        if (logger != null)
+        {
+            logger.Level = level;
+            logger.Additivity = true; // true means logs bubble up to root, set false if you don't want that
+        }
     }
 
     public void DumpApplicationInfo(IAppArguments appArguments)
@@ -171,24 +185,36 @@ public class SharedLog : DisposableReactiveObject
         };
         return AddAppender(consoleAppender);
     }
-    
+
     public IDisposable AddLocalLogFileAppender()
     {
-        var fileAppender = new RollingFileAppender()
+        return AddLocalLogFileAppender($"logs/app.log", Level.All);
+    }
+    
+    public IDisposable AddLocalLogFileAppender(string filePathPattern, Level logLevel)
+    {
+        var layout = new PatternLayout
         {
-            Threshold = Level.All,
-            StaticLogFileName = false,  // Set to true if you don't need the filename to change dynamically
-            File = "logs/launcher.log",
-            ImmediateFlush = true,
-            AppendToFile = true,
-            MaxFileSize = 1024 * 1024 * 100, // 100 MB
-            RollingStyle = RollingFileAppender.RollingMode.Size,
-            MaxSizeRollBackups = 10,  // Maximum number of backup files to keep
-            Layout = new PatternLayout()
-            {
-                ConversionPattern = "%date [%thread] %-5level %logger - %message%newline"
-            }
+            ConversionPattern = "%date [%-2thread] %-5level %message [%logger]%newline"
         };
+        layout.ActivateOptions();
+
+        var fileAppender = new RollingFileAppender
+        {
+            Name = "LocalFileAppender",
+            Threshold = logLevel,
+            StaticLogFileName = false,
+            File = filePathPattern,
+            ImmediateFlush = true,
+            AppendToFile = false,
+            MaxFileSize = 1024 * 1024 * 50,
+            RollingStyle = RollingFileAppender.RollingMode.Composite,
+            PreserveLogFileNameExtension = true,
+            MaxSizeRollBackups = 5,
+            LockingModel = new FileAppender.ExclusiveLock(),
+            Layout = layout
+        };
+
         ((PatternLayout)fileAppender.Layout).ActivateOptions();
         fileAppender.ActivateOptions();
         

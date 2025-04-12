@@ -10,18 +10,11 @@ namespace PoeShared.Blazor.Prism;
 /// </summary>
 public sealed class UnityServiceCollection : ServiceCollection
 {
-    private static readonly Lazy<UnityServiceCollection> InstanceSupplier = new();
+    private static readonly Lazy<UnityServiceCollection> InstanceSupplier = new(() => new UnityServiceCollection());
 
     public static UnityServiceCollection Instance => InstanceSupplier.Value;
 
-    public UnityServiceCollection()
+    private UnityServiceCollection()
     {
-        this.AddLogging(builder =>
-        {
-            builder.SetMinimumLevel(LogLevel.Warning);
-            builder.ClearProviders();
-            builder.AddProvider(new Log4NetLoggerProvider());
-            builder.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Warning);
-        });
     }
 }

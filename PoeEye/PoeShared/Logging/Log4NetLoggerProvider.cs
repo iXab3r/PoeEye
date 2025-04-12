@@ -14,9 +14,14 @@ public sealed class Log4NetLoggerProvider : ILoggerProvider
     public void Dispose()
     {
     }
+    
+    public LogLevel MinimumLevel { get; set; }
  
     public ILogger CreateLogger(string categoryName)
     {
-        return loggers.GetOrAdd(categoryName, x => new Logger4Log4Net(categoryName));
+        return loggers.GetOrAdd(categoryName, x => new Logger4Log4Net(categoryName)
+        {
+            MinimumLevel = MinimumLevel
+        });
     }
 }
