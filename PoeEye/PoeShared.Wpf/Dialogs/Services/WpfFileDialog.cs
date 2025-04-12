@@ -1,14 +1,15 @@
-using System;
-using System.IO;
 using PoeShared.Scaffolding;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace PoeShared.Dialogs.Services;
 
-public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveFileDialog, IOpenFileDialog
+using System;
+using System.IO;
+
+public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFileDialog, IOpenFileDialog
 {
-    public Win32FileDialog()
+    public WpfFileDialog()
     {
     }
     
@@ -19,6 +20,11 @@ public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveF
     public string InitialFileName { get; set; }
     
     public string Filter { get; set; }
+
+    public FileInfo ShowDialog(IntPtr hwndOwner)
+    {
+        throw new NotSupportedException("Using Owner is not supported");
+    }
 
     public FileInfo LastFile { get; private set; }
     
@@ -32,7 +38,7 @@ public sealed class Win32FileDialog : DisposableReactiveObjectWithLogger, ISaveF
             InitialDirectory = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory) 
                 ? InitialDirectory
                 : Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures),
-            Filter = Filter
+            Filter = Filter,
         };
         
         if (dialog.ShowDialog() != true)

@@ -34,6 +34,11 @@ public sealed class ComDlg32FileDialog : DisposableReactiveObjectWithLogger, ISa
         return new FileInfo(ofn.file);
     }
 
+    public FileInfo ShowDialog(IntPtr hwndOwner)
+    {
+        throw new NotSupportedException("Using Owner is not supported");
+    }
+
     public string Title { get; set; }
 
     public string InitialDirectory { get; set; }
