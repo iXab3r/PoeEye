@@ -272,6 +272,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                             continue;
                         }
 
+                        Log.Debug($"Registering RootComponent: {kvp}");
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
 

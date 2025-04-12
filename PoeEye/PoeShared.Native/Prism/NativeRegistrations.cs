@@ -64,7 +64,7 @@ public sealed class NativeRegistrations : UnityContainerExtension
                     }
                 )));
 
-        Container.RegisterWindowTracker<PassthroughWindowTrackerTitleMatcher>(WellKnownWindows.AllWindows);
+        Container.RegisterWindowTracker<PassthroughWindowTrackerMatcher>(WellKnownWindows.AllWindows);
         Container.RegisterWindowTracker<MainWindowTrackerTitleMatcher>(WellKnownWindows.MainWindow);
         Container.RegisterWindowTracker<OverlayWindowMatcher>(WellKnownWindows.OverlayWindow);
         Container.RegisterSingleton<IWindowTracker>(x => x.Resolve<IWindowTracker>(WellKnownWindows.AllWindows));
