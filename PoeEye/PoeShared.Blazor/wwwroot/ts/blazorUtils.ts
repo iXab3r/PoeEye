@@ -11,6 +11,80 @@ import {ComponentParameters, IDynamicRootComponent, IBlazor, Blazor, logAndThrow
 log.setLevel('info'); // Change this level as needed.
 
 /**
+ * Adds one or more classes to an element.
+ * @param target A selector string or HTMLElement.
+ * @param classNames A single class or array of classes to add.
+ */
+export function addClass(target: string | HTMLElement, classNames: string | string[]): void {
+    const element = resolveElement(target);
+    const classes = normalizeClassNames(classNames);
+
+    try {
+        element.classList.add(...classes);
+    } catch (error) {
+        logAndThrow(`Error adding class(es) '${classes.join(', ')}' to element`, error);
+    }
+}
+
+/**
+ * Removes one or more classes from an element.
+ * @param target A selector string or HTMLElement.
+ * @param classNames A single class or array of classes to remove.
+ */
+export function removeClass(target: string | HTMLElement, classNames: string | string[]): void {
+    const element = resolveElement(target);
+    const classes = normalizeClassNames(classNames);
+
+    try {
+        element.classList.remove(...classes);
+    } catch (error) {
+        logAndThrow(`Error removing class(es) '${classes.join(', ')}' from element`, error);
+    }
+}
+
+/**
+ * Toggles a single class on an element.
+ * @param target A selector string or HTMLElement.
+ * @param className The class to toggle.
+ */
+export function toggleClass(target: string | HTMLElement, className: string): void {
+    const element = resolveElement(target);
+    const classTrimmed = className.trim();
+
+    if (!classTrimmed) {
+        logAndThrow(`Invalid class name '${className}'`);
+    }
+
+    try {
+        element.classList.toggle(classTrimmed);
+    } catch (error) {
+        logAndThrow(`Error toggling class '${classTrimmed}' on element`, error);
+    }
+}
+
+/**
+ * Checks if the element has the specified class.
+ * @param target A selector string or HTMLElement.
+ * @param className The class to check for.
+ * @returns True if the element has the class, false otherwise.
+ */
+export function hasClass(target: string | HTMLElement, className: string): boolean {
+    const element = resolveElement(target);
+    const classTrimmed = className.trim();
+
+    if (!classTrimmed) {
+        logAndThrow(`Invalid class name '${className}'`);
+    }
+
+    try {
+        return element.classList.contains(classTrimmed);
+    } catch (error) {
+        logAndThrow(`Error checking class '${classTrimmed}' on element`, error);
+    }
+}
+
+
+/**
  * Reads text from the clipboard using the Clipboard API.
  * @returns A Promise that resolves to the clipboard text.
  * @throws An error if reading from the clipboard fails.
@@ -238,6 +312,33 @@ function getElementByIdOrThrow<T extends HTMLElement>(elementId: string): T{
     }
 
     return targetElement;
+}
+
+/**
+ * Normalizes the input into an HTMLElement or throws if not found.
+ * @param target A selector string or an HTMLElement.
+ * @returns The resolved HTMLElement.
+ */
+function resolveElement(target: string | HTMLElement): HTMLElement {
+    if (typeof target === 'string') {
+        const element = document.querySelector<HTMLElement>(target);
+        if (!element) {
+            logAndThrow(`Element with selector '${target}' not found`);
+        }
+        return element;
+    } else if (target instanceof HTMLElement) {
+        return target;
+    } else {
+        logAndThrow(`Invalid target: must be a selector string or HTMLElement`);
+    }
+}
+
+/**
+ * Ensures the classNames input is always an array of non-empty strings.
+ */
+function normalizeClassNames(classNames: string | string[]): string[] {
+    const classes = Array.isArray(classNames) ? classNames : [classNames];
+    return classes.map(c => c.trim()).filter(c => c.length > 0);
 }
 
 /**

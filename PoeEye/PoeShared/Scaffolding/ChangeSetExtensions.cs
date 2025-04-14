@@ -349,6 +349,8 @@ public static class ChangeSetExtensions
             }
 
             var newItem = factoryFunc(key);
+            items.AddOrUpdate(newItem);
+            
             result = Optional<T>.Create(newItem);
         });
         if (!result.HasValue)

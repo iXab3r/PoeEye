@@ -146,6 +146,55 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         var module = await GetModuleAsync();
         await module.InvokeVoidAsync("scrollToBottom", elementSelector, (int)duration.TotalMilliseconds);
     }
+    
+    
+    public async Task AddClass(ElementReference elementRef, params string[] classNames)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("addClass", elementRef, classNames);
+    }
+
+    public async Task RemoveClass(ElementReference elementRef, params string[] classNames)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("removeClass", elementRef, classNames);
+    }
+
+    public async Task ToggleClass(ElementReference elementRef, string className)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("toggleClass", elementRef, className);
+    }
+
+    public async Task<bool> HasClass(ElementReference elementRef, string className)
+    {
+        var module = await GetModuleAsync();
+        return await module.InvokeAsync<bool>("hasClass", elementRef, className);
+    }
+    
+    public async Task AddClass(string selectorOrElementId, params string[] classNames)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("addClass", selectorOrElementId, classNames);
+    }
+
+    public async Task RemoveClass(string selectorOrElementId, params string[] classNames)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("removeClass", selectorOrElementId, classNames);
+    }
+
+    public async Task ToggleClass(string selectorOrElementId, string className)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("toggleClass", selectorOrElementId, className);
+    }
+
+    public async Task<bool> HasClass(string selectorOrElementId, string className)
+    {
+        var module = await GetModuleAsync();
+        return await module.InvokeAsync<bool>("hasClass", selectorOrElementId, className);
+    }
 
     public async ValueTask DisposeAsync()
     {

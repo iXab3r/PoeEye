@@ -123,4 +123,68 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
         string methodName) where THandler : class;
     
     Task RemoveKeyboardHook(ElementReference elementRef);
+    
+    /// <summary>
+    /// Adds one or more CSS classes to the element specified by a selector or DOM reference.
+    /// </summary>
+    /// <param name="selectorOrElement">A CSS selector (e.g., "#myElement") or an <see cref="ElementReference"/> representing the target element.</param>
+    /// <param name="classNames">One or more CSS class names to add.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task AddClass(string selectorOrElement, params string[] classNames);
+
+    /// <summary>
+    /// Removes one or more CSS classes from the element specified by a selector or DOM reference.
+    /// </summary>
+    /// <param name="selectorOrElement">A CSS selector (e.g., ".active") or an <see cref="ElementReference"/> representing the target element.</param>
+    /// <param name="classNames">One or more CSS class names to remove.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task RemoveClass(string selectorOrElement, params string[] classNames);
+
+    /// <summary>
+    /// Toggles the presence of a CSS class on the target element.
+    /// </summary>
+    /// <param name="selectorOrElement">A CSS selector or <see cref="ElementReference"/> targeting the DOM element.</param>
+    /// <param name="className">The class name to toggle.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task ToggleClass(string selectorOrElement, string className);
+
+    /// <summary>
+    /// Checks whether a DOM element has a specific CSS class.
+    /// </summary>
+    /// <param name="selectorOrElement">A CSS selector or <see cref="ElementReference"/> representing the element.</param>
+    /// <param name="className">The class name to check for.</param>
+    /// <returns>A task that resolves to <c>true</c> if the element has the class; otherwise, <c>false</c>.</returns>
+    Task<bool> HasClass(string selectorOrElement, string className);
+    
+    /// <summary>
+    /// Adds one or more CSS classes to the element specified by a selector or DOM reference.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element.</param>
+    /// <param name="classNames">One or more CSS class names to add.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task AddClass(ElementReference elementRef, params string[] classNames);
+
+    /// <summary>
+    /// Removes one or more CSS classes from the element specified by a selector or DOM reference.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element.</param>
+    /// <param name="classNames">One or more CSS class names to remove.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task RemoveClass(ElementReference elementRef, params string[] classNames);
+
+    /// <summary>
+    /// Toggles the presence of a CSS class on the target element.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element.</param>
+    /// <param name="className">The class name to toggle.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task ToggleClass(ElementReference elementRef, string className);
+
+    /// <summary>
+    /// Checks whether a DOM element has a specific CSS class.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element.</param>
+    /// <param name="className">The class name to check for.</param>
+    /// <returns>A task that resolves to <c>true</c> if the element has the class; otherwise, <c>false</c>.</returns>
+    Task<bool> HasClass(ElementReference elementRef, string className);
 }
