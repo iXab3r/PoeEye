@@ -258,6 +258,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     }
 
     public Type ViewType { get; set; }
+    
+    public Type ViewTypeForTitleBar { get; set; }
 
     public object DataContext { get; set; }
 

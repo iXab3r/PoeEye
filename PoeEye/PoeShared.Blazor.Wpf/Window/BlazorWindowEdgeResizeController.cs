@@ -4,11 +4,15 @@ using System.Windows.Input;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal sealed class WindowEdgeResizeController : WindowMouseDragControllerBase
+/// <summary>
+/// Implements the default window resize behavior for a <see cref="IBlazorWindow"/>, enabling the window
+/// to be resized by dragging edges/corners
+/// </summary>
+public class BlazorWindowEdgeResizeController : BlazorWindowMouseDragControllerBase
 {
     private readonly WindowResizeDirection direction;
 
-    public WindowEdgeResizeController(
+    public BlazorWindowEdgeResizeController(
         IBlazorWindow blazorWindow,
         BlazorContentControl contentControl,
         WindowResizeDirection direction)
@@ -30,11 +34,10 @@ internal sealed class WindowEdgeResizeController : WindowMouseDragControllerBase
         };
     }
 
-    protected override void HandleMove(Point cursorPosition)
+    protected override void HandleMove(int deltaX, int deltaY)
     {
-        var dx = cursorPosition.X - StartPoint.X;
-        var dy = cursorPosition.Y - StartPoint.Y;
-
+        var dx = deltaX;
+        var dy = deltaY;
         var rect = new Rectangle(
             WindowInitialPosition.X,
             WindowInitialPosition.Y,
@@ -83,7 +86,6 @@ internal sealed class WindowEdgeResizeController : WindowMouseDragControllerBase
         // Prevent collapsing to negative or zero size
         rect.Width = Math.Max(BlazorWindow.MinWidth, rect.Width);
         rect.Height = Math.Max(BlazorWindow.MinHeight, rect.Height);
-
         BlazorWindow.SetWindowRect(rect);
     }
 }

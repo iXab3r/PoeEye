@@ -191,7 +191,7 @@ public class SharedLog : DisposableReactiveObject
         return AddLocalLogFileAppender($"logs/app.log", Level.All);
     }
     
-    public IDisposable AddLocalLogFileAppender(string filePathPattern, Level logLevel)
+    public IDisposable AddLocalLogFileAppender(string filePathPattern, Level logLevel, bool immediateFlush = true)
     {
         var layout = new PatternLayout
         {
@@ -205,7 +205,7 @@ public class SharedLog : DisposableReactiveObject
             Threshold = logLevel,
             StaticLogFileName = false,
             File = filePathPattern,
-            ImmediateFlush = true,
+            ImmediateFlush = immediateFlush,
             AppendToFile = false,
             MaxFileSize = 1024 * 1024 * 50,
             RollingStyle = RollingFileAppender.RollingMode.Composite,

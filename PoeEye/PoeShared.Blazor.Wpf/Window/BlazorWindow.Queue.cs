@@ -164,7 +164,7 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Starting dragging the window");
                     dragAnchor.Disposable = null;
-                    dragAnchor.Disposable = new WindowMouseDragController(this, window.ContentControl).AddTo(command.Anchor);
+                    dragAnchor.Disposable = new BlazorWindowMouseDragController(this, window.ContentControl).AddTo(command.Anchor);
                     break;
                 }
                 case SetWindowSizeCommand command:

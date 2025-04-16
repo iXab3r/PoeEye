@@ -20,6 +20,11 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
     Type ViewType { get; set; }
     
     /// <summary>
+    /// Gets or sets type of View which will be displayed inside title bar
+    /// </summary>
+    Type ViewTypeForTitleBar { get; set; }
+    
+    /// <summary>
     /// Gets or sets the data context which will be assigned to View.
     /// This property is a legacy one, will be removed in future versions and is replaced with DataContext
     /// </summary>
