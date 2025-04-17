@@ -40,6 +40,10 @@ video {
     text-shadow: 2px 2px 0 #000;
 }
 
+.user-select-text {
+    user-select: text !important;
+}
+
 .d-grid-center{
     display: grid;
     place-items: center;
