@@ -43,15 +43,15 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
         Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
     }
 
+    public void Add<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
+    {
+        AddCollection(observableCacheSource);
+    }
+
     public void AddCollection<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
         Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
-    }
-    
-    public void Add<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
-    {
-        AddCollection(observableCacheSource);
     }
 
     public void AddCollection<T>(IObservable<IObservableList<T>> observableListSource)
@@ -163,18 +163,6 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
         return this;
     }
 
-    public ReactiveTrackerList WithCollection<T>(IObservable<IObservableList<T>> observableListSource)
-    {
-        AddCollection(observableListSource);
-        return this;
-    }
-    
-    public ReactiveTrackerList WithCollection<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
-    {
-        AddCollection(observableCacheSource);
-        return this;
-    }
-
     public ReactiveTrackerList With<T>(IObservable<ISourceList<T>> observableListSource)
     {
         Add(observableListSource);
@@ -204,10 +192,28 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
         Add(observableCache);
         return this;
     }
+
+    public ReactiveTrackerList WithCollection<T>(IObservable<IObservableList<T>> observableListSource)
+    {
+        AddCollection(observableListSource);
+        return this;
+    }
+    
+    public ReactiveTrackerList WithCollection<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
+    {
+        AddCollection(observableCacheSource);
+        return this;
+    }
     
     public ReactiveTrackerList WithCollection<T, TKey>(IObservableCache<T, TKey> observableCache)
     {
         Add(observableCache);
+        return this;
+    }
+    
+    public ReactiveTrackerList WithCollection<T>(IObservableList<T> observableList)
+    {
+        Add(observableList);
         return this;
     }
 
