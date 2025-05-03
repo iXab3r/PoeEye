@@ -2,7 +2,7 @@
 @using JetBrains.Annotations
 @inherits ReactiveComponentBase
 
-<BlazorErrorBoundary @ref="errorBoundary">
+<BlazorErrorBoundary @ref="errorBoundary" >
     <ChildContent>
         @if (ResolvedViewType != null)
         {
@@ -33,6 +33,13 @@
         <div class="p-2 text-warning">
             @if (errorBoundary.CurrentException != null)
             {
+                var currentException = errorBoundary?.CurrentException;
+                if (currentException != null && !ReferenceEquals(lastLoggedException, currentException))
+                {
+                    Log.Error("BlazorContentPresenter encountered an error", currentException);
+                }
+                lastLoggedException = currentException;
+                
                 @errorBoundary.CurrentException
             }
             else
@@ -40,13 +47,12 @@
                 <div>$"Exception is not known"</div>
             }
         </div>
-        
     </ErrorContent>
 </BlazorErrorBoundary>
 
 @code {
-
     private BlazorErrorBoundary errorBoundary;
+    private Exception lastLoggedException;
     
     [Parameter] public RenderFragment NotFoundTemplate { get; set; }
 
@@ -60,4 +66,9 @@
         errorBoundary?.Recover();
     }
 
+    public override ValueTask DisposeAsync()
+    {
+        lastLoggedException = null;
+        return base.DisposeAsync();
+    }
 }
