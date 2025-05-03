@@ -43,23 +43,23 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         this.appArguments = appArguments;
         
         
-        var appDomainDir = new DirectoryInfo(appArguments.AppDomainDirectory); // %localappdata%/XXX OR something/XXX
-        var envLocalAppData = appArguments.EnvironmentLocalAppData; // %localappdata%
-        var localAppData = envLocalAppData.GetSubdirectory(this.appArguments.AppName);
-        IsInstalledIntoLocalAppData = localAppData.IsParentOf(appDomainDir);
-        Log.Info($"Application startup info: { new { Environment.ProcessPath, IsInstalledIntoLocalAppData } }");
+        var appDomainDir = new DirectoryInfo(appArguments.AppDomainDirectory);  
+        IsInstalledIntoLocalAppData = appArguments.EnvironmentLocalAppData.IsParentOf(appDomainDir); // %localappdata%/XXX OR something/XXX
+        Log.Info($"Application startup info: { new { Environment.ProcessPath, IsInstalledIntoLocalAppData, appDomainDir, appArguments.EnvironmentLocalAppData, appArguments.LocalAppDataDirectory } }");
 
         MostRecentVersionAppFolder = appDomainDir;
         RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
 
         if (IsInstalledIntoLocalAppData)
         {
+            //this is a normal Squirrel use-case with app being installed into LocalAppData
             AppRootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
             RootDirectory = AppRootDirectory.Parent;
             LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
         }
         else
         {
+            //portable version of the app running elsewhere
             AppRootDirectory = appDomainDir;
             RootDirectory = appDomainDir;
             LauncherExecutable = RunningExecutable;

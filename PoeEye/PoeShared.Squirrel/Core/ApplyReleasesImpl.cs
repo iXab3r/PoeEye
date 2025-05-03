@@ -66,11 +66,12 @@ internal class ApplyReleasesImpl : IEnableLogger
             "Failed to install package to app dir");
         progress(30);
 
-        Log.Debug("Preparing local releases list");
+        Log.Debug($"Preparing local releases list, root directory: {rootAppDirectory}");
         var localReleases = await Log.ErrorIfThrows(
             async () =>
             {
                 var releasesFilePath = Utility.LocalReleaseFileForAppDir(rootAppDirectory);
+                Log.Debug($"Updating local releases list @ {releasesFilePath} (exists: {File.Exists(releasesFilePath)})");
                 Utility.WriteLocalReleases(releasesFilePath, new[] { release });
                 return Utility.LoadLocalReleases(releasesFilePath);
             },
