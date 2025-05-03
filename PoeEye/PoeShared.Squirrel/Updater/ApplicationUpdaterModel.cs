@@ -42,33 +42,51 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         this.applicationAccessor = applicationAccessor;
         this.appArguments = appArguments;
         
-        
-        var appDomainDir = new DirectoryInfo(appArguments.AppDomainDirectory);  
-        IsInstalledIntoLocalAppData = appArguments.EnvironmentLocalAppData.IsParentOf(appDomainDir); // %localappdata%/XXX OR something/XXX
-        Log.Info($"Application startup info: { new { Environment.ProcessPath, IsInstalledIntoLocalAppData, appDomainDir, appArguments.EnvironmentLocalAppData, appArguments.LocalAppDataDirectory } }");
-
-        MostRecentVersionAppFolder = appDomainDir;
         RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
+        if (RunningExecutable.LinkTarget != null)
+        {
+            Log.Info($"Application seem to be launcher via symlink, resolving symlink path @ {RunningExecutable.FullName}");
+            var resolved = RunningExecutable.ResolveLinkTarget(returnFinalTarget: true);
+            if (resolved == null)
+            {
+                Log.Warn($"Failed to resolve launcher via symlink, using running executable path: {RunningExecutable.FullName}");
+                LauncherExecutable = RunningExecutable;
+            }
+            else
+            {
+                Log.Warn($"Resolved launcher executable path: {RunningExecutable.FullName} => {resolved.FullName}");
+                LauncherExecutable = new FileInfo(resolved.FullName);
+            }
+        }
+        else
+        {
+            Log.Info($"Application is launcher via normal executable: {RunningExecutable.FullName}");
+            LauncherExecutable = RunningExecutable;
+        }
+        
+        var launcherDirectory = LauncherExecutable.Directory;  
+        IsInstalledIntoLocalAppData = appArguments.EnvironmentLocalAppData.IsParentOf(launcherDirectory); // %localappdata%/XXX OR something/XXX
+        Log.Info($"Application startup info: { new { Environment.ProcessPath, IsInstalledIntoLocalAppData, launcherDirectory, appArguments.AppDomainDirectory, appArguments.EnvironmentLocalAppData, appArguments.LocalAppDataDirectory } }");
 
+        MostRecentVersionAppFolder = launcherDirectory;
         if (IsInstalledIntoLocalAppData)
         {
             //this is a normal Squirrel use-case with app being installed into LocalAppData
             AppRootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
             RootDirectory = AppRootDirectory.Parent;
-            LauncherExecutable = new FileInfo(Path.Combine(AppRootDirectory.FullName, $"{appArguments.AppName}.exe"));
         }
         else
         {
             //portable version of the app running elsewhere
-            AppRootDirectory = appDomainDir;
-            RootDirectory = appDomainDir;
-            LauncherExecutable = RunningExecutable;
+            AppRootDirectory = launcherDirectory;
+            RootDirectory = launcherDirectory;
         }
+        
         Log.Info($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
 
         if (IsInstalledIntoLocalAppData == false)
         {
-            CleanupUpdateRelatedFiles(appDomainDir);
+            CleanupUpdateRelatedFiles(launcherDirectory);
         }
 
         updateSourceProvider
