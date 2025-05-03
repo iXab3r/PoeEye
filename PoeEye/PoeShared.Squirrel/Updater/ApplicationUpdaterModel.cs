@@ -29,6 +29,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     private static readonly string UpdaterExecutableName = "update.exe";
     private readonly IAppArguments appArguments;
     private readonly IApplicationAccessor applicationAccessor;
+    private readonly IApplicationUpdaterInstallationInfoProvider installationInfoProvider;
 
     static ApplicationUpdaterModel()
     {
@@ -37,56 +38,19 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     public ApplicationUpdaterModel(
         IApplicationAccessor applicationAccessor,
         IUpdateSourceProvider updateSourceProvider,
+        IApplicationUpdaterInstallationInfoProvider installationInfoProvider,
         IAppArguments appArguments)
     {
         this.applicationAccessor = applicationAccessor;
+        this.installationInfoProvider = installationInfoProvider;
         this.appArguments = appArguments;
-        
-        RunningExecutable = new FileInfo(Environment.ProcessPath ?? throw new InvalidStateException("Process path must be defined"));
-        if (RunningExecutable.LinkTarget != null)
-        {
-            Log.Info($"Application seem to be launcher via symlink, resolving symlink path @ {RunningExecutable.FullName}");
-            var resolved = RunningExecutable.ResolveLinkTarget(returnFinalTarget: true);
-            if (resolved == null)
-            {
-                Log.Warn($"Failed to resolve launcher via symlink, using running executable path: {RunningExecutable.FullName}");
-                LauncherExecutable = RunningExecutable;
-            }
-            else
-            {
-                Log.Warn($"Resolved launcher executable path: {RunningExecutable.FullName} => {resolved.FullName}");
-                LauncherExecutable = new FileInfo(resolved.FullName);
-            }
-        }
-        else
-        {
-            Log.Info($"Application is launcher via normal executable: {RunningExecutable.FullName}");
-            LauncherExecutable = RunningExecutable;
-        }
-        
-        var launcherDirectory = LauncherExecutable.Directory;  
-        IsInstalledIntoLocalAppData = appArguments.EnvironmentLocalAppData.IsParentOf(launcherDirectory); // %localappdata%/XXX OR something/XXX
-        Log.Info($"Application startup info: { new { Environment.ProcessPath, IsInstalledIntoLocalAppData, launcherDirectory, appArguments.AppDomainDirectory, appArguments.EnvironmentLocalAppData, appArguments.LocalAppDataDirectory } }");
-
-        MostRecentVersionAppFolder = launcherDirectory;
-        if (IsInstalledIntoLocalAppData)
-        {
-            //this is a normal Squirrel use-case with app being installed into LocalAppData
-            AppRootDirectory = new DirectoryInfo(appArguments.LocalAppDataDirectory);
-            RootDirectory = AppRootDirectory.Parent;
-        }
-        else
-        {
-            //portable version of the app running elsewhere
-            AppRootDirectory = launcherDirectory;
-            RootDirectory = launcherDirectory;
-        }
         
         Log.Info($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
 
-        if (IsInstalledIntoLocalAppData == false)
+        MostRecentVersionAppFolder = LauncherExecutable.Directory;
+        if (IsSquirrel == false)
         {
-            CleanupUpdateRelatedFiles(launcherDirectory);
+            CleanupUpdateRelatedFiles(MostRecentVersionAppFolder);
         }
 
         updateSourceProvider
@@ -142,21 +106,21 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
     }
 
-    public DirectoryInfo RootDirectory { get; }
+    public DirectoryInfo RootDirectory => installationInfoProvider.RootDirectory;
     
-    public FileInfo RunningExecutable { get; }
-    
-    public FileInfo LauncherExecutable { get; }
+    public FileInfo RunningExecutable => installationInfoProvider.RunningExecutable;
 
-    public DirectoryInfo AppRootDirectory { get; }
+    public FileInfo LauncherExecutable => installationInfoProvider.LauncherExecutable;
+
+    public DirectoryInfo AppRootDirectory => installationInfoProvider.AppRootDirectory;
 
     public DirectoryInfo MostRecentVersionAppFolder { get; set; }
 
     public UpdateSourceInfo UpdateSource { get; private set; }
 
     public bool IgnoreDeltaUpdates { get; set; }
-    
-    public bool IsInstalledIntoLocalAppData { get; }
+
+    public bool IsSquirrel => installationInfoProvider.IsSquirrel;
 
     public Version LatestAppliedVersion { get; private set; }
 
@@ -237,7 +201,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             throw new ApplicationException("Expected non-empty new version folder path");
         }
 
-        if (IsInstalledIntoLocalAppData == false)
+        if (IsSquirrel == false)
         {
             SwapAndRestart(new DirectoryInfo(newVersionFolder));
         }
@@ -362,7 +326,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         {
             Log.Debug($"Using GitHub source: {UpdateSource.Dump()}");
 
-            if (IsInstalledIntoLocalAppData == false)
+            if (IsSquirrel == false)
             {
                 throw new NotSupportedException("Non-local app-data installation is not supported by github update manager");
             }
@@ -378,7 +342,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         {
             Log.Debug($"Using BasicHTTP source: {UpdateSource.Dump()}");
 
-            if (IsInstalledIntoLocalAppData)
+            if (IsSquirrel)
             {
                 var mgr = new PoeUpdateManager(
                     updateUrl, 
