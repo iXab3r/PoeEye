@@ -296,17 +296,6 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         
         ReportTermination(0); // report termination to release locks, resources, etc
 
-        var launcherPath = method switch
-        {
-            LauncherMethod.StartApp => Environment.ProcessPath,
-            LauncherMethod.SwapApp => processPath,
-            _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unsupported launcher method: {method}")
-        };
-        if (string.IsNullOrEmpty(launcherPath))
-        {
-            throw new ArgumentException("Failed to resolve launcher path");
-        }
-
         var exePath = method switch
         {
             LauncherMethod.StartApp => processPath,
@@ -334,7 +323,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         {
             UseShellExecute = true,
             Arguments = argumentsBuilder.ToString(),
-            FileName = launcherPath,
+            FileName = processPath,
             WindowStyle = ProcessWindowStyle.Hidden,
             Verb = verb ?? string.Empty
         };
@@ -363,7 +352,7 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         string arguments, 
         string verb)
     {
-        Log.Info($"Restarting current process as '{processPath}', args: {arguments}");
+        Log.Info($"Restarting current process using PS as '{processPath}', args: {arguments}");
 
         if (arguments != null && arguments.Contains('-'))
         {
