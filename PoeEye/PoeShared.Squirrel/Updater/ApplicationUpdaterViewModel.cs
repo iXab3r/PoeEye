@@ -338,7 +338,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             IsOpen = true;
             SetStatus("Restarting application...");
 
-            await updaterModel.RestartApplicationViaLauncher();
+            updaterModel.RestartApplicationViaLauncher();
         }
         catch (Exception ex)
         {
