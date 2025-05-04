@@ -35,9 +35,9 @@ public interface IApplicationUpdaterModel : IDisposableReactiveObject
     
     Task<bool> VerifyRelease(IPoeUpdateInfo updateInfo);
 
-    Task RestartApplication();
+    void RestartApplication();
     
-    Task RestartApplicationViaLauncher();
+    void RestartApplicationViaLauncher();
 
     Task DownloadRelease([NotNull] IPoeUpdateInfo updateInfo);
     

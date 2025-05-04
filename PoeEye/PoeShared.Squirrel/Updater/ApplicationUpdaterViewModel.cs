@@ -312,7 +312,6 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             IsOpen = true;
             SetStatus($"Successfully updated to v{LatestVersion}, restarting...");
             LatestUpdate = default;
-            await Restart();
         }
         catch (Exception ex)
         {

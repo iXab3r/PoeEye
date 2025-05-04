@@ -201,15 +201,22 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             throw new ApplicationException("Expected non-empty new version folder path");
         }
 
-        if (IsSquirrel == false)
-        {
-            SwapAndRestart(new DirectoryInfo(newVersionFolder));
-        }
-
         MostRecentVersionAppFolder = new DirectoryInfo(newVersionFolder);
         LatestAppliedVersion = lastAppliedRelease.Version.Version;
         LatestUpdate = null;
-        ProgressPercent = 0;
+        ProgressPercent = 100;
+        
+        if (IsSquirrel == false)
+        {
+            Log.Info($"Swapping the application, new version folder: {newVersionFolder}");
+            SwapAndRestart(new DirectoryInfo(newVersionFolder));
+        }
+        else
+        {
+            var newLauncher = new FileInfo(Path.Combine(newVersionFolder, LauncherExecutable.Name));
+            Log.Info($"Restarting the application, new version folder: {newVersionFolder}, launcher: {newLauncher.FullName} (exists: {newLauncher.Exists})");
+            Restart(newLauncher);
+        }
     }
 
     public void Reset()
@@ -262,17 +269,17 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         return updateInfo.FutureReleaseEntry;
     }
 
-    public Task RestartApplication()
+    public void RestartApplication()
     {
-        return Restart(RunningExecutable);
+        Restart(RunningExecutable);
     }
 
-    public Task RestartApplicationViaLauncher()
+    public void RestartApplicationViaLauncher()
     {
-        return Restart(LauncherExecutable);
+        Restart(LauncherExecutable);
     }
 
-    private async Task Restart(FileInfo executable)
+    private void Restart(FileInfo executable)
     {
         using var unused = CreateIsBusyAnchor();
         Log.Debug($"Starting application @ '{executable.FullName}', args: {appArguments.StartupArgs} ...");
