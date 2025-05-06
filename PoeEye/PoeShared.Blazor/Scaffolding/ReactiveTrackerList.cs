@@ -10,6 +10,57 @@ using ReactiveUI;
 
 namespace PoeShared.Blazor.Scaffolding;
 
+public sealed class ReactiveTrackerList<T> where T : class, INotifyPropertyChanged
+{
+    private readonly T instance;
+    private readonly ReactiveTrackerList trackerList;
+
+    public ReactiveTrackerList(T instance) : this(instance, new ReactiveTrackerList())
+    {
+        this.instance = instance;
+    }
+    
+    public ReactiveTrackerList(T instance, ReactiveTrackerList trackerList)
+    {
+        this.instance = instance;
+        this.trackerList = trackerList;
+    }
+
+    public ReactiveTrackerList<T> With<TValue>(Func<T, IObservable<TValue>> observableFactory)
+    {
+        var observable = observableFactory(instance);
+        trackerList.Add(observable);
+        return this;
+    }
+    
+    public ReactiveTrackerList<T> WithValue<T1>(Expression<Func<T, T1>> property1)
+    {
+        var whenValue = instance.WhenAnyValue(property1);
+        trackerList.Add(whenValue);
+        return this;
+    }
+    
+    public ReactiveTrackerList<T> WithValue<T1, T2>(Expression<Func<T, T1>> property1, Expression<Func<T, T2>> property2)
+    {
+        var whenValue = instance.WhenAnyValue(property1, property2);
+        trackerList.Add(whenValue);
+        return this;
+    }
+
+    public ReactiveTrackerList<T> WithValue<T1, T2, T3>(Expression<Func<T, T1>> property1, Expression<Func<T, T2>> property2, Expression<Func<T, T3>> property3)
+    {
+        var whenValue = instance.WhenAnyValue(property1, property2, property3);
+        trackerList.Add(whenValue);
+        return this;
+    }
+    
+    public ReactiveTrackerList Build()
+    {
+        var list = new ReactiveTrackerList(trackerList.ToArray());
+        return list;
+    }
+}
+
 public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, ICanBeSealed
 {
     private readonly AtomicFlag isSealed = new();
@@ -17,6 +68,16 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     public ReactiveTrackerList(params IObservable<string>[] sources)
     {
         Add(sources);
+    }
+    
+    public ReactiveTrackerList<T> ForInstance<T>(T instance) where T : class, INotifyPropertyChanged
+    {
+        return new ReactiveTrackerList<T>(instance, this);
+    }
+
+    public static ReactiveTrackerList<T> For<T>(T instance) where T : class, INotifyPropertyChanged
+    {
+        return new ReactiveTrackerList<T>(instance);
     }
 
     public void Add<T>(IObservable<T> source)
@@ -34,13 +95,15 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     public void Add<T, TKey>(IObservable<IHierarchicalSourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch()
+            .Select(x => x?.ToString()));
     }
 
     public void Add<T, TKey>(IObservable<IObservableCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch()
+            .Select(x => x?.ToString()));
     }
 
     public void Add<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
@@ -51,7 +114,8 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     public void AddCollection<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
     {
         EnsureNotSealed();
-        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch().Select(x => x?.ToString()));
+        Enqueue(observableCacheSource.Select(x => x != null ? x.ToObservableChangeSet() : new IntermediateCache<T, TKey>().ToObservableChangeSet()).Switch()
+            .Select(x => x?.ToString()));
     }
 
     public void AddCollection<T>(IObservable<IObservableList<T>> observableListSource)
@@ -96,7 +160,7 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
         EnsureNotSealed();
         Add(observableList.Connect());
     }
-    
+
     public void Add<T, TKey>(IObservableCache<T, TKey> observableCache)
     {
         EnsureNotSealed();
@@ -106,7 +170,7 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
     public void Add<TOut>(IObservable<IChangeSet<TOut>> changeSetObservable)
     {
         EnsureNotSealed();
-        Add(changeSetObservable.Select(x => new {x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes, x.Moves}));
+        Add(changeSetObservable.Select(x => new { x.TotalChanges, AsString = x.ToString(), x.Replaced, x.Adds, x.Removes, x.Refreshes, x.Moves }));
     }
 
     public void Add<T, T1>(IObservable<T> source1, IObservable<T1> source2)
@@ -186,7 +250,7 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
         Add(observableList);
         return this;
     }
-    
+
     public ReactiveTrackerList With<T, TKey>(IObservableCache<T, TKey> observableCache)
     {
         Add(observableCache);
@@ -198,19 +262,19 @@ public sealed class ReactiveTrackerList : ConcurrentQueue<IObservable<string>>, 
         AddCollection(observableListSource);
         return this;
     }
-    
+
     public ReactiveTrackerList WithCollection<T, TKey>(IObservable<ISourceCache<T, TKey>> observableCacheSource)
     {
         AddCollection(observableCacheSource);
         return this;
     }
-    
+
     public ReactiveTrackerList WithCollection<T, TKey>(IObservableCache<T, TKey> observableCache)
     {
         Add(observableCache);
         return this;
     }
-    
+
     public ReactiveTrackerList WithCollection<T>(IObservableList<T> observableList)
     {
         Add(observableList);
