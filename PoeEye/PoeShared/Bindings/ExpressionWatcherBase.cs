@@ -10,13 +10,13 @@ namespace PoeShared.Bindings;
 /// </summary>
 public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWatcher
 {
-    private static readonly MethodInfo WatcherFactoryMethod = typeof(ExpressionWatcherBase).GetMethods(BindingFlags.Static | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == nameof(PrepareWatcher) && x.IsGenericMethod)
-                                                              ?? throw new MissingMethodException($"Failed to find method {nameof(PrepareWatcher)} in type {typeof(ExpressionWatcherBase)}");
+    private static readonly MethodInfo ExpressionWatcherFactoryMethod = typeof(ExpressionWatcherBase).GetMethods(BindingFlags.Static | BindingFlags.NonPublic).FirstOrDefault(x => x.Name == nameof(CreateTypedWatcher) && x.IsGenericMethod)
+                                                              ?? throw new MissingMethodException($"Failed to find method {nameof(CreateTypedWatcher)} in type {typeof(ExpressionWatcherBase)}");
 
     private static readonly ConcurrentDictionary<(Type, Type), Func<string, string, IValueWatcher>> TypedWatcherFactory = new();
+    private static readonly ConcurrentDictionary<(Type, Type, string), Expression> ExpressionByType = new();
 
     protected static readonly Binder<ExpressionWatcherBase> Binder = new();
-
 
     static ExpressionWatcherBase()
     {
@@ -131,8 +131,9 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
 
         try
         {
-            var watcherFactory = TypedWatcherFactory.GetOrAdd((sourceType, propertyType), x => PrepareFactoryFunc(x.Item1, x.Item2));
-            return watcherFactory(sourceExprText, conditionExprText);
+            var watcherFactory = TypedWatcherFactory.GetOrAdd((sourceType, propertyType), y => PrepareFactoryFunc(y.Item1, y.Item2));
+            var watcher = watcherFactory(sourceExprText, conditionExprText);
+            return watcher;
         }
         catch (Exception e)
         {
@@ -143,12 +144,29 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
         }
     }
 
-    private static ExpressionWatcher<TSource, TProperty> PrepareWatcher<TSource, TProperty>(string sourceExprText, string conditionExprText) where TSource : class
+    private static ExpressionWatcher<TSource, TProperty> CreateTypedWatcher<TSource, TProperty>(string sourceExprText, string conditionExprText) where TSource : class
     {
-        var sourceBinderExpr = CsharpExpressionParser.Instance.ParseFunction<TSource, TProperty>($"{sourceExprText}");
-        var conditionBinderExpr = CsharpExpressionParser.Instance.ParseFunction<TSource, bool>($"{conditionExprText}");
+        var sourceBinderExpr = ExpressionByType.GetOrAdd((typeof(TSource), typeof(TProperty), sourceExprText), x =>
+        {
+            return CsharpExpressionParser.Instance.ParseFunction<TSource, TProperty>($"{x.Item3}");
+        });
 
-        return new ExpressionWatcher<TSource, TProperty>(sourceBinderExpr, conditionBinderExpr);
+        if (sourceBinderExpr is not Expression<Func<TSource, TProperty>> sourceBinderExpressionTyped)
+        {
+            throw new FormatException($"Failed to get source Expression<Func<{typeof(TSource)}, {typeof(TProperty)}>> from string {sourceExprText}, result: {sourceBinderExpr}");
+        }
+        
+        var conditionBinderExpr = ExpressionByType.GetOrAdd((typeof(TSource), typeof(bool), conditionExprText), x =>
+        {
+            return CsharpExpressionParser.Instance.ParseFunction<TSource, bool>($"{x.Item3}");
+        });
+
+        if (conditionBinderExpr is not Expression<Func<TSource, bool>> conditionBinderExprTyped)
+        {
+            throw new FormatException($"Failed to get condition Expression<Func<{typeof(TSource)}, {typeof(bool)}>> from string {conditionExprText}, result: {conditionBinderExpr}");
+        }
+        
+        return new ExpressionWatcher<TSource, TProperty>(sourceBinderExpressionTyped, conditionBinderExprTyped);
     }
 
     private static Func<string, string, IValueWatcher> PrepareFactoryFunc(Type sourceType, Type propertyType)
@@ -156,7 +174,7 @@ public abstract class ExpressionWatcherBase : DisposableReactiveObject, IValueWa
         var sourceExprParameter = Expression.Parameter(typeof(string), "sourceExprText");
         var conditionExprParameter = Expression.Parameter(typeof(string), "conditionExprText");
 
-        var method = WatcherFactoryMethod.MakeGenericMethod(sourceType, propertyType);
+        var method = ExpressionWatcherFactoryMethod.MakeGenericMethod(sourceType, propertyType);
         var methodExpr = Expression.Call(method, sourceExprParameter, conditionExprParameter);
 
         var lambda = Expression.Lambda<Func<string, string, IValueWatcher>>(methodExpr, sourceExprParameter, conditionExprParameter);

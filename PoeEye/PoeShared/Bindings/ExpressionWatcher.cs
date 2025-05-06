@@ -55,6 +55,8 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
     private readonly SerialDisposable sourceBinderAnchors;
 
     private readonly string watcherId = $"EW#{Interlocked.Increment(ref ExpressionWatcherHelper.GlobalIdx)}";
+    
+    private static readonly ConcurrentDictionary<(Type, Type, Expression<Func<TSource, TProperty>>, Expression<Func<TSource, bool>>), object> BindersByType = new();
 
     static ExpressionWatcher()
     {
@@ -66,7 +68,7 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         Expression<Func<TSource, bool>> condition)
     {
         Log = typeof(ExpressionWatcher<TSource, TProperty>).PrepareLogger("ExpressionWatcher").WithSuffix(watcherId).WithSuffix(ToString);
-        Log.Debug($"Expression created, source: {sourceAccessor}, condition: {condition}");
+        Log.Debug($"Expression is being created, source: {sourceAccessor}, condition: {condition}");
 
         this.sourceAccessor = sourceAccessor;
         this.condition = condition;
@@ -87,6 +89,7 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
             .BindIf(condition, x => true)
             .Else(x => false)
             .To((x, v) => HasValue = v);
+        Log.Debug($"Expression has prepared the binder, source: {sourceAccessor}, condition: {condition}");
 
         SupportsSetValue = CanPrepareSetter(sourceAccessor);
         assignmentActionSupplier = new Lazy<Action<TSource, TProperty>>(() => SupportsSetValue ? PrepareSetter(sourceAccessor) : throw new NotSupportedException($"Assignment is not supported for {sourceAccessor}"));
@@ -119,8 +122,11 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
             Source = default;
         }).AddTo(Anchors);
             
+        Log.Debug($"Attaching binder, source: {sourceAccessor}, condition: {condition}");
         Binder.Attach(this).AddTo(Anchors);
         Disposable.Create(() => Log.Info("Disposed")).AddTo(Anchors);
+        
+        Log.Debug($"Expression has being created, source: {sourceAccessor}, condition: {condition}");
     }
 
     public ExpressionWatcher(Expression<Func<TSource, TProperty>> sourceAccessor) : this(sourceAccessor, x => x != null)
@@ -292,6 +298,4 @@ public sealed class ExpressionWatcher<TSource, TProperty> : DisposableReactiveOb
         var setter = PropertyBinder.Binder.ExpressionCompiler.Compile(Expression.Lambda<Action<TSource, TProperty>>(assign, targetExp, valueExp));
         return setter;
     }
-
-      
 }
