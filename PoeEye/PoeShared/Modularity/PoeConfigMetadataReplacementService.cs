@@ -27,12 +27,12 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
 
         this.WhenAnyValue(x => x.AutomaticallyLoadReplacements)
             .Select(x => x
-                ? assemblyTracker.Assemblies.WhenAdded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>() != null)
+                ? assemblyTracker.Assemblies.WhenAdded
                 : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {
-                Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
+                Log.Debug($"Adding assembly to processing queue: {x}, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
             })
             .AddTo(Anchors);
@@ -109,7 +109,13 @@ internal sealed class PoeConfigMetadataReplacementService : DisposableReactiveOb
     private void EnsureQueueIsProcessed()
     {
         while (unprocessedAssemblies.TryDequeue(out var assembly))
-        { 
+        {
+            var hasReplacements = assembly.GetCustomAttribute<AssemblyHasPoeMetadataReplacementsAttribute>();
+            if (hasReplacements == null)
+            {
+                continue;
+            }
+            
             Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count}), processing {assembly}");
             LoadMetadataReplacementsFromAssembly(assembly);
         }

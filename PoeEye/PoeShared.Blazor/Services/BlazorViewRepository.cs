@@ -5,11 +5,14 @@ using PoeShared.Scaffolding;
 using PoeShared.Services;
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using DynamicData;
 using DynamicData.Kernel;
 using PoeShared.Blazor.Scaffolding;
@@ -24,6 +27,8 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     private readonly SourceCache<ViewRegistration, ViewKey> viewsByKey = new(x => x.Key);
     private readonly ISubject<Unit> whenChanged = new Subject<Unit>();
 
+    private readonly int maxProcessingThreads = Math.Min(4, Environment.ProcessorCount);
+
     public BlazorViewRepository(
         IClock clock,
         IAssemblyTracker assemblyTracker)
@@ -31,13 +36,14 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         Log.AddSuffix("Blazor views cache");
 
         this.clock = clock;
-        
+
+        Log.Info($"Processing threads: {maxProcessingThreads} (processor count: {Environment.ProcessorCount})");
         this.WhenAnyValue(x => x.AutomaticallyProcessAssemblies)
-            .Select(x => x ? assemblyTracker.Assemblies.WhenAdded.Where(assembly => assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>() != null) : Observable.Empty<Assembly>())
+            .Select(x => x ? assemblyTracker.Assemblies.WhenAdded : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {
-                Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
+                Log.Debug($"Adding assembly to processing queue: {x}, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
             }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -48,7 +54,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             .Subscribe(whenChanged)
             .AddTo(Anchors);
     }
-    
+
     public bool AutomaticallyProcessAssemblies { get; set; } = true;
 
     public IObservable<Unit> WhenChanged => whenChanged;
@@ -60,12 +66,12 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         var contentType = ResolveContentType(baseViewType);
         RegisterViewType(viewType, contentType, key);
     }
-    
+
     private void RegisterViewType(Type viewType, Type dataContextType, object key)
     {
         var viewKey = new ViewKey()
         {
-            DataContextType = dataContextType, 
+            DataContextType = dataContextType,
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
@@ -93,7 +99,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     {
         var viewKey = new ViewKey()
         {
-            DataContextType = contentType, 
+            DataContextType = contentType,
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
@@ -112,7 +118,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             var interfaces = contentType.GetInterfaces();
             foreach (var @interface in interfaces)
             {
-                var byInterfaceKey = new ViewKey() {DataContextType = @interface, Key = key};
+                var byInterfaceKey = new ViewKey() { DataContextType = @interface, Key = key };
                 if (TryResolveViewType(byInterfaceKey, out var registrationByInterface))
                 {
                     log.Debug($"Resolved registered view by interface {byInterfaceKey}: {registrationByInterface}");
@@ -135,34 +141,64 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
     private void EnsureQueueIsProcessed()
     {
-        while (unprocessedAssemblies.TryDequeue(out var assembly))
-        {
-            Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count}), processing {assembly}");
-            LoadViewsFromAssembly(assembly);
-        }
+        EnsureQueueIsProcessedParallel();
     }
-    
-    private void LoadViewsFromAssembly(Assembly assembly)
+
+    private void EnsureQueueIsProcessedParallel()
+    {
+        var sw = ValueStopwatch.StartNew();
+        var processedAssembliesCount = 0;
+        var viewsRegistered = 0;
+        ConcurrentQueueUtils.Process(unprocessedAssemblies, assembly =>
+        {
+            try
+            {
+                var hasViewsAttribute = assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>();
+                if (hasViewsAttribute == null)
+                {
+                    return;
+                }
+
+                Log.Info($"Loading BlazorViews from assembly {assembly}");
+                var views = LoadViewsFromAssembly(assembly);
+                Interlocked.Increment(ref processedAssembliesCount);
+                Interlocked.Add(ref viewsRegistered, views);
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Failed to process the assembly: {assembly}", e);
+            }
+        });
+        if (viewsRegistered <= 0)
+        {
+            return;
+        }
+        Log.Info($"Processed assemblies({processedAssembliesCount}), loaded {viewsRegistered} view(s) in {sw.ElapsedMilliseconds:F0}ms");
+    }
+
+    private int LoadViewsFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.ToString());
         logger.Debug("Loading Blazor views from assembly");
 
+        var viewsRegistered = 0;
+        
         try
         {
             var matchingTypes = assembly.GetTypes()
                 .Where(x => !x.IsAbstract)
                 .Select(x => new
                 {
-                    ViewType = x, 
+                    ViewType = x,
                     BaseViewType = ResolveBaseViewType(x)
                 }).Where(x => x.BaseViewType != null).ToArray();
             if (!matchingTypes.Any())
             {
-                return;
+                return 0; 
             }
+
             logger.Debug($"Detected Blazor views in assembly:\n\t{matchingTypes.DumpToTable()}");
             foreach (var typeInfo in matchingTypes)
             {
@@ -174,7 +210,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
                 }
 
                 logger.Debug($"Blazor view {typeInfo} view type inferred automatically {typeInfo.ViewType}");
-                
+
                 Type dataContextType;
                 if (blazorViewAttribute != null && blazorViewAttribute.DataContextType != null)
                 {
@@ -189,21 +225,23 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
                 RegisterViewType(viewType: typeInfo.ViewType, dataContextType: dataContextType, key: blazorViewAttribute?.ViewTypeKey);
                 logger.Debug($"Successfully registered Blazor view {typeInfo}");
+                viewsRegistered++;
             }
         }
         catch (Exception e)
         {
             logger.Warn($"Failed to load Blazor views from assembly {new { assembly, assembly.Location }}", e);
         }
+        return viewsRegistered;
     }
-    
+
     private static Type ResolveContentType(Type type)
     {
         if (type == typeof(BlazorReactiveComponent))
         {
             return typeof(object);
         }
-        
+
         var genericTypeDef = type.IsGenericType ? type.GetGenericTypeDefinition() : default;
         if (genericTypeDef != typeof(BlazorReactiveComponent<>))
         {
@@ -213,12 +251,13 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         var genericTypeArguments = type.GetGenericArguments();
         if (genericTypeArguments.Length != 1)
         {
-            throw new ArgumentException($"Expected type {type} (generic: {genericTypeDef}) to have a single generic argument, but was: {genericTypeArguments.Select(x => x.ToString()).DumpToString()}");
+            throw new ArgumentException(
+                $"Expected type {type} (generic: {genericTypeDef}) to have a single generic argument, but was: {genericTypeArguments.Select(x => x.ToString()).DumpToString()}");
         }
 
         return genericTypeArguments[0];
     }
-    
+
     private static Type ResolveBaseViewTypeLegacy(Type type)
     {
         var genericTypeDef = type.IsGenericType ? type.GetGenericTypeDefinition() : default;
@@ -234,7 +273,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
         return ResolveBaseViewTypeLegacy(type.BaseType);
     }
-    
+
     private static Type ResolveBaseViewType(Type type)
     {
         while (type != null && type != typeof(object))

@@ -23,12 +23,12 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
         this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
             .Select(x => x
-                ? assemblyTracker.Assemblies.WhenAdded.Where(x => x.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>() != null)
+                ? assemblyTracker.Assemblies.WhenAdded
                 : Observable.Empty<Assembly>())
             .Switch()
             .Subscribe(x =>
             {
-                Log.Debug($"Adding assembly {x} to processing queue, size: {unprocessedAssemblies.Count}");
+                Log.Debug($"Adding assembly to processing queue: {x}, size: {unprocessedAssemblies.Count}");
                 unprocessedAssemblies.Enqueue(x);
             })
             .AddTo(Anchors);
@@ -171,6 +171,11 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
     {
         while (unprocessedAssemblies.TryDequeue(out var assembly))
         {
+            var hasConfigs = assembly.GetCustomAttribute<AssemblyHasPoeConfigConvertersAttribute>();
+            if (hasConfigs == null)
+            {
+                continue;
+            }
             Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count}), processing {assembly}");
             LoadConvertersFromAssembly(assembly);
         }
