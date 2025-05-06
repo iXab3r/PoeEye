@@ -148,9 +148,13 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
     private void EnsureQueueIsProcessedParallel()
     {
+        if (unprocessedAssemblies.IsEmpty)
+        {
+            return;
+        }
+        Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count})");
         var sw = ValueStopwatch.StartNew();
         var processedAssembliesCount = 0;
-        var viewsRegistered = 0;
         ConcurrentQueueUtils.Process(unprocessedAssemblies, assembly =>
         {
             try
@@ -162,29 +166,55 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
                 }
 
                 Log.Info($"Loading BlazorViews from assembly {assembly}");
-                var views = LoadViewsFromAssembly(assembly);
+                LoadViewsFromAssembly(assembly);
                 Interlocked.Increment(ref processedAssembliesCount);
-                Interlocked.Add(ref viewsRegistered, views);
             }
             catch (Exception e)
             {
                 Log.Warn($"Failed to process the assembly: {assembly}", e);
             }
         });
-        if (viewsRegistered <= 0)
-        {
-            return;
-        }
-        Log.Info($"Processed assemblies({processedAssembliesCount}), loaded {viewsRegistered} view(s) in {sw.ElapsedMilliseconds:F0}ms");
+        Log.Info($"Processed assemblies({processedAssembliesCount}) in {sw.ElapsedMilliseconds:F0}ms");
     }
 
-    private int LoadViewsFromAssembly(Assembly assembly)
+    private void EnsureQueueIsProcessedSingleThread()
+    {
+        lock (unprocessedAssemblies)
+        {
+            Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count})");
+            var sw = ValueStopwatch.StartNew();
+
+            var assembliesToProcess = unprocessedAssemblies.Count;
+            var processedAssembliesCount = 0;
+            while (unprocessedAssemblies.TryDequeue(out var assembly))
+            {
+                try
+                {
+                    var hasViewsAttribute = assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>();
+                    if (hasViewsAttribute == null)
+                    {
+                        return;
+                    }
+
+                    Log.Info($"Processing {assembly}");
+                    LoadViewsFromAssembly(assembly);
+                    Interlocked.Increment(ref processedAssembliesCount);
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"Failed to process the assembly: {assembly}", e);
+                }
+            }
+
+            Log.Info($"Processed assemblies({processedAssembliesCount}/{assembliesToProcess}) in {sw.ElapsedMilliseconds:F0}ms");
+        }
+    }
+
+    private void LoadViewsFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.ToString());
         logger.Debug("Loading Blazor views from assembly");
 
-        var viewsRegistered = 0;
-        
         try
         {
             var matchingTypes = assembly.GetTypes()
@@ -196,7 +226,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
                 }).Where(x => x.BaseViewType != null).ToArray();
             if (!matchingTypes.Any())
             {
-                return 0; 
+                return;
             }
 
             logger.Debug($"Detected Blazor views in assembly:\n\t{matchingTypes.DumpToTable()}");
@@ -225,14 +255,12 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
                 RegisterViewType(viewType: typeInfo.ViewType, dataContextType: dataContextType, key: blazorViewAttribute?.ViewTypeKey);
                 logger.Debug($"Successfully registered Blazor view {typeInfo}");
-                viewsRegistered++;
             }
         }
         catch (Exception e)
         {
             logger.Warn($"Failed to load Blazor views from assembly {new { assembly, assembly.Location }}", e);
         }
-        return viewsRegistered;
     }
 
     private static Type ResolveContentType(Type type)
