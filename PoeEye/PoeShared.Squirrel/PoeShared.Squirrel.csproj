@@ -22,9 +22,6 @@
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All" IncludeAssets="All" ExcludeAssets="runtime">
     </PackageReference>
-    <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29">
-      <NoWarn>NU1701</NoWarn>
-    </PackageReference>
     <PackageReference Include="Microsoft.Data.OData" Version="5.8.5">
     </PackageReference>
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.410601" PrivateAssets="all">

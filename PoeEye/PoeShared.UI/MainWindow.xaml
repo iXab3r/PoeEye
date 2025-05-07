@@ -22,9 +22,6 @@
             <TabItem Header="AutoComplete">
                 <eye:CachedContentControl Content="{Binding AutoCompleteSandbox}" />
             </TabItem>
-            <TabItem Header="Audio">
-                <eye:CachedContentControl Content="{Binding AudioSandbox}" />
-            </TabItem>
             <TabItem Header="Listbox">
                 <st:StackPanel Orientation="Vertical">
                     <eye:ButtonEx Command="{Binding RegenerateLargeListCommand}" Content="Regenerate"></eye:ButtonEx>
