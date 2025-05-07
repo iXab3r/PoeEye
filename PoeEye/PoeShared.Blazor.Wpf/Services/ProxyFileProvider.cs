@@ -3,7 +3,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace PoeShared.Blazor.Wpf.Services;
 
-internal sealed class ProxyFileProvider : IFileProvider
+public sealed class ProxyFileProvider : IFileProvider
 {
     public IFileProvider FileProvider { get; set; }
     

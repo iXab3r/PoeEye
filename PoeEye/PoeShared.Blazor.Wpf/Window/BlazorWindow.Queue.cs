@@ -63,6 +63,11 @@ partial class BlazorWindow
             Log.Debug($"Notifying that queue is processed to this point: {waitForIdleCommand}");
             waitForIdleCommand.ResetEvent.Set();
         }
+        else if (windowEvent is InvokeCommand invokeCommand)
+        {
+            invokeCommand.ActionToExecute();
+            invokeCommand.ResetEvent.Set();
+        }
         else if (windowEvent is IWindowCommand)
         {
             if (Anchors.IsDisposed)
@@ -992,6 +997,8 @@ partial class BlazorWindow
     }
 
     private sealed record WaitForIdleCommand(ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
+    
+    private sealed record InvokeCommand(Action ActionToExecute, ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
     
     private sealed record ShowCommand : IWindowCommand;
 

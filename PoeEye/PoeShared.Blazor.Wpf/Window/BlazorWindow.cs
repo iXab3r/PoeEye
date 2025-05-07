@@ -434,6 +434,12 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         EnqueueUpdate(new ShowDevToolsCommand());
     }
 
+    public void BeginInvoke(Action action)
+    {
+        using var resetEvent = new ManualResetEventSlim();
+        EnqueueUpdate(new InvokeCommand(action, resetEvent, DateTimeOffset.Now));
+    }
+
     public void WaitForIdle(TimeSpan timeout)
     {
         var sw = Stopwatch.StartNew();

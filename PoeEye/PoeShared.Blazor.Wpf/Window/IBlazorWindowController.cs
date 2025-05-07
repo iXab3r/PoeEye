@@ -304,6 +304,11 @@ public interface IBlazorWindowController
     event EventHandler Closed;
 
     /// <summary>
+    /// Schedules specific operation for execution as a part of Window message processing
+    /// </summary>
+    void BeginInvoke(Action action);
+
+    /// <summary>
     /// Waits until all Window messages are processed
     /// </summary>
     void WaitForIdle(TimeSpan timeout = default);

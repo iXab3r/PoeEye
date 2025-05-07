@@ -17,9 +17,9 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
 {
     public object Content { get; set; }
     
-    public object ViewTypeKey { get; init; }
-    
-    public Type ViewType { get; init; }
+    public Type ViewType { get; set; }
+
+    public object ViewTypeKey { get; set; }
 
     public object View { get; private set; }
     
@@ -62,6 +62,9 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
         base.OnInitialized();
         this.WhenAnyProperty(x => x.Content)
             .SubscribeAsync(x => Refresh($"Content has been updated"))
+            .AddTo(Anchors);
+        this.WhenAnyProperty(x => x.ViewType)
+            .SubscribeAsync(x => Refresh($"ViewType has been updated"))
             .AddTo(Anchors);
     }
 

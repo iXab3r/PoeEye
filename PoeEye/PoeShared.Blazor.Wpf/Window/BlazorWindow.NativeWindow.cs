@@ -30,7 +30,6 @@ internal partial class BlazorWindow
 
             ContentControl = new BlazorContentControl()
             {
-                Container = ChildContainer,
                 ViewType = typeof(BlazorWindowContent),
                 AdditionalFileProvider = owner.complexFileProvider,
                 Content = owner
