@@ -132,17 +132,16 @@ public class BlazorContentControl : Control, IBlazorContentControl
         
 
         Observable.CombineLatest(
-                this.WhenAnyValue(x => x.ViewType),
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
                 unityContainerSource,
-                (viewType, additionalFileProvider, container) => new {viewType, additionalFileProvider, container})
-            .ObserveOn(uiScheduler)
+                (additionalFileProvider, container) => new {additionalFileProvider, container})
+            .ObserveOnIfNeeded(uiScheduler)
             .SubscribeAsync(async state =>
             {
                 using var rent = isBusyLatch.Rent();
 
                 var timestampUpdated = DateTimeOffset.Now;
-                Log.Debug($"Reloading control, new content type: {state.viewType}, time taken(created->updated): {timestampUpdated - timestampCreated}");
+                Log.Debug($"Reloading control, time taken(created->updated): {timestampUpdated - timestampCreated}");
 
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 Disposable.Create(() => Log.Debug("Content is being disposed")).AddTo(contentAnchors);
@@ -164,13 +163,18 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     childServiceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
                     {
                         var log = Log.WithSuffix(nameof(BlazorContentPresenterWrapper));
-                        log.Debug($"Creating a new wrapper for a view type: {state.viewType}");
-                        var contentPresenter = new BlazorContentPresenterWrapper()
-                        {
-                            ViewType = state.viewType,
-                        }.AddTo(contentAnchors);
+                        log.Debug($"Creating a new wrapper");
+                        var contentPresenter = new BlazorContentPresenterWrapper().AddTo(contentAnchors);
 
-                        this.WhenAnyValue(contentControl => contentControl.Content)
+                        this.WhenAnyValue(x => x.ViewType)
+                            .Subscribe(x =>
+                            {
+                                log.Debug($"Updating view type: {x}");
+                                contentPresenter.ViewType = x;
+                            })
+                            .AddTo(contentAnchors);
+
+                        this.WhenAnyValue(x => x.Content)
                             .Subscribe(content =>
                             {
                                 log.Debug($"Updating content to {content}");
@@ -205,6 +209,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         return contentPresenter;
                     });
 
+                    childServiceCollection.AddSingleton<IUnityContainer>(sp => state.container);
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
                     childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
                     childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));

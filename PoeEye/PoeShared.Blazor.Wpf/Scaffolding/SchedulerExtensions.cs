@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Windows.Threading;
 using PoeShared.Scaffolding;
 
@@ -26,4 +27,10 @@ internal static class SchedulerExtensions
             throw new ArgumentException($"Unsupported type of Scheduler: {scheduler}");
         }
     }   
+    
+    public static IObservable<T> ObserveOnIfNeeded<T>(this IObservable<T> source, DispatcherScheduler dispatcher)
+    {
+        return source
+            .SelectMany(x => dispatcher.CheckAccess() ? Observable.Return(x) : Observable.Return(x).ObserveOn(dispatcher));
+    }
 }
