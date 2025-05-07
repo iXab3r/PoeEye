@@ -27,7 +27,7 @@ public sealed class CommandWrapper : DisposableReactiveObject, ICommandWrapper
 
 #if DEBUG
     // ReSharper disable once UnusedMember.Local Needed for debugging
-    private readonly StackTrace createdFrom = new();
+    private readonly string createdFrom = new StackTrace().ToString();
 #endif
 
     private CommandWrapper(ICommand command)

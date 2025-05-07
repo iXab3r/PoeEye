@@ -32,7 +32,8 @@ public sealed class ObservableCollectionEx<T> : DisposableReactiveObjectWithLogg
 
     public ObservableCollectionEx()
     {
-        Log.WithSuffix($"<{typeof(T).Name}>").WithSuffix($"TID {parentThread}");
+        Log.AddSuffix($"<{typeof(T).Name}>");
+        Log.AddSuffix($"TID {parentThread}");
 #if OBSERVABLECOLLECTIONEX_ENABLE_STACKTRACE_LOG
         WriteLog($"Collection of type {typeof(T)} is created @ {parentStackTraceInfo}");
 #endif
