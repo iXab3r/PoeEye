@@ -12,17 +12,17 @@
       @ondblclick="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnDblClick))"
       @oncontextmenu="@(EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(OnContextMenu))" @oncontextmenu:stopPropagation="@TreeComponent.OnContextMenu.HasDelegate" @oncontextmenu:preventDefault="@TreeComponent.OnContextMenu.HasDelegate"
 
-      @ondragstart="@(Draggable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragStart) : default)"
-      @ondrop="@(Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDrop) : default)" @ondrop:preventDefault
+      @ondragstart="@(SelfNode.IsDraggable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragStart) : null!)"
+      @ondrop="@(SelfNode.IsDroppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDrop) : null!)" @ondrop:preventDefault
 
-      @ondragleave="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave) : default)"
-      @ondragenter="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter) : default)"
-      @ondragend="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnd) : default)"
+      @ondragleave="@(SelfNode.IsDraggable || SelfNode.IsDroppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragLeave) : null!)"
+      @ondragenter="@(SelfNode.IsDraggable || SelfNode.IsDroppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnter) : null!)"
+      @ondragend="@(SelfNode.IsDraggable || SelfNode.IsDroppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragEnd) : null!)"
       
-      @ondragover="@(Draggable || Droppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragOver) : default)" @ondragover:preventDefault
+      @ondragover="@(SelfNode.IsDraggable || SelfNode.IsDroppable ? EventUtil.AsNonRenderingEventHandler<DragEventArgs>(OnDragOver) : null!)" @ondragover:preventDefault
 
-      aria-dropeffect="@(SelfNode.Droppable ? "move" : "none")"
-      draggable="@(Draggable ? "true" : "false")"
+      aria-dropeffect="@(SelfNode.IsDroppable ? "move" : "none")"
+      draggable="@(SelfNode.IsDraggable ? "true" : "false")"
       aria-grabbed="true">
     @if (TreeComponent.TitleIconTemplate != null && TreeComponent.ShowIcon)
     {

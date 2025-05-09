@@ -33,9 +33,8 @@ public partial class TreeViewNodeSwitcher<TItem> : BlazorReactiveComponent
     public TreeViewNode<TItem> SelfNode { get; set; }
 
     [Parameter] public EventCallback<MouseEventArgs> OnSwitcherClick { get; set; }
-    
-    
-    protected ClassMapper ClassMapper { get; } = new();
+
+    private ClassMapper ClassMapper { get; } = new();
 
     protected override void OnInitialized()
     {

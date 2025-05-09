@@ -73,8 +73,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     [Parameter] public string? SwitcherIcon { get; set; }
 
-    [Parameter] public RenderFragment? Nodes { get; set; }
-
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     [Parameter] public TreeViewSelectionMode SelectionMode { get; set; } = TreeViewSelectionMode.SingleItem;
@@ -133,13 +131,19 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     public IObservableCache<TreeViewNode<TItem>, string> NodesByKey { get; }
 
+    internal IDictionary<(long, long), TreeViewDragDropInfo> DragDropStateByNodeIds { get; } = new Dictionary<(long, long), TreeViewDragDropInfo>();
+
     internal bool IsCtrlKeyDown { get; private set; }
 
     internal bool IsShiftKeyDown { get; private set; }
 
-    internal TreeViewNode<TItem>? DragItem { get; set; }
 
-    internal List<TreeViewNode<TItem>> ChildNodes { get; set; } = new();
+    internal List<TreeViewNode<TItem>> ChildNodes { get; } = new();
+    
+    internal TreeViewNode<TItem>? DragDropNode { get; private set; }
+    internal TreeViewNode<TItem>? DragDropTargetContainerNode { get; private set; }
+    internal TreeViewNode<TItem>? DragDropTargetBelowNode { get; private set; }
+    internal TreeViewNode<TItem>? DragDropTargetNode { get; private set; }
 
     [Inject] private IDomEventListener DomEventListener { get; init; } = null!;
 
@@ -148,17 +152,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         await base.SetParametersAsync(parameters);
-    }
-
-    public IEnumerable<TreeViewNode<TItem>> EnumerateChildren()
-    {
-        foreach (var childNode in ChildNodes)
-        {
-            foreach (var node in childNode.EnumerateChildrenAndSelf())
-            {
-                yield return node;
-            }
-        }
     }
 
     public override ValueTask DisposeAsync()
@@ -203,43 +196,6 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         }
     }
 
-    protected override void OnInitialized()
-    {
-        SetClassMapper();
-        base.OnInitialized();
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            DomEventListener.AddShared<KeyboardEventArgs>("document", "keydown", DocumentOnKeyDown);
-            DomEventListener.AddShared<KeyboardEventArgs>("document", "keyup", DocumentOnKeyUp);
-        }
-
-        base.OnAfterRender(firstRender);
-    }
-
-    protected void DocumentOnKeyDown(KeyboardEventArgs eventArgs)
-    {
-        HandleCtrlKeyPress(eventArgs);
-    }
-
-    protected void DocumentOnKeyUp(KeyboardEventArgs eventArgs)
-    {
-        HandleCtrlKeyPress(eventArgs);
-    }
-
-    internal Task AddToSelection(params TreeViewNode<TItem>[] selectedNodes)
-    {
-        return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: true);
-    }
-
-    internal Task SetSelection(params TreeViewNode<TItem>[] selectedNodes)
-    {
-        return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: false);
-    }
-
     internal async Task SetSelection(HashSet<TreeViewNode<TItem>> selectedNodes, bool preserveSelection = false)
     {
         var existingSelection = preserveSelection ? SelectedItemsById.Items.ToHashSet() : new HashSet<TreeViewNode<TItem>>();
@@ -256,6 +212,69 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             await node.SelectedChanged.InvokeAsync(shouldBeSelected);
         }
     }
+    
+    internal void SetDragTargetNode(TreeViewNode<TItem>? node)
+    {
+        if (ReferenceEquals(DragDropTargetNode, node))
+        {
+            return;
+        }
+
+        DragDropTargetNode = node;
+    }
+    
+    internal void SetDragDropTargetContainerNode(TreeViewNode<TItem>? node)
+    {
+        if (ReferenceEquals(DragDropTargetContainerNode, node))
+        {
+            return; 
+        }
+
+        DragDropTargetContainerNode = node;
+    }
+    
+    internal void SetDragDropTargetBelowNode(TreeViewNode<TItem>? node)
+    {
+        if (ReferenceEquals(DragDropTargetBelowNode, node))
+        {
+            return;
+        }
+
+        DragDropTargetBelowNode = node;
+    }
+
+    internal void NotifyDragStart(TreeViewNode<TItem> node)
+    {
+        DragDropStateByNodeIds.Clear();
+        DragDropNode = node;
+    }
+    
+    internal void NotifyDragEnd()
+    {
+        DragDropStateByNodeIds.Clear();
+        DragDropNode = null;
+        DragDropTargetNode = null;
+        DragDropTargetBelowNode = null;
+        DragDropTargetContainerNode = null;
+    }
+
+    protected override void OnInitialized()
+    {
+        SetClassMapper();
+        base.OnInitialized();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            DomEventListener.AddShared<KeyboardEventArgs>("document", "keydown", DocumentOnKeyDown);
+            DomEventListener.AddShared<KeyboardEventArgs>("document", "keyup", DocumentOnKeyUp);
+            DomEventListener.AddShared<FocusEventArgs>("window", "blur", WindowOnBlur);
+        }
+
+        base.OnAfterRender(firstRender);
+    }
 
     private void SetClassMapper()
     {
@@ -267,12 +286,40 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             .If("draggable-tree", () => Draggable)
             .If("ant-tree-unselectable", () => SelectionMode == TreeViewSelectionMode.Disabled);
     }
+    
+    private void DocumentOnKeyDown(KeyboardEventArgs eventArgs)
+    {
+        HandleCtrlKeyPress(eventArgs);
+    }
+
+    private void WindowOnBlur(FocusEventArgs eventArgs)
+    {
+        NotifyDragEnd();
+    }
+    
+    private void DocumentOnKeyUp(KeyboardEventArgs eventArgs)
+    {
+        HandleCtrlKeyPress(eventArgs);
+    }
+
+    private Task AddToSelection(params TreeViewNode<TItem>[] selectedNodes)
+    {
+        return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: true);
+    }
+
+    private Task SetSelection(params TreeViewNode<TItem>[] selectedNodes)
+    {
+        return SetSelection(new HashSet<TreeViewNode<TItem>>(selectedNodes), preserveSelection: false);
+    }
 
     private async Task HandleContextMenu(MouseEventArgs args)
     {
         if (OnContextMenu.HasDelegate)
         {
-            await OnContextMenu.InvokeAsync(new TreeViewEventArgs<TItem>(this, null, args));
+            await OnContextMenu.InvokeAsync(new TreeViewEventArgs<TItem>(this)
+            {
+                OriginalEvent = args
+            });
         }
     }
 
@@ -292,10 +339,14 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     
     private async Task HandleDragEnd(DragEventArgs e)
     {
-        DragItem = null;
+        NotifyDragEnd();
     }
 
     private async Task HandleDragOver(DragEventArgs e)
+    {
+    }
+    
+    private async Task HandleMouseLeave(MouseEventArgs e)
     {
     }
 

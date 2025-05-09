@@ -7,7 +7,7 @@
 }
 
 <span class="@ClassMapper.Class" @onclick="OnClick">
-    @if (SelfNode?.IsLeaf == false && TreeComponent?.ShowExpand == true)
+    @if (SelfNode.IsLeaf == false && TreeComponent.ShowExpand == true)
     {
         <Icon Type="caret-down" Theme="outline" Class="ant-tree-switcher-icon"/>
     }

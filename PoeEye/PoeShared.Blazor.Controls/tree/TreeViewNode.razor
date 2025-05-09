@@ -3,15 +3,16 @@
 @typeparam TItem
 
 @{
-
 }
 
-@if (IsVisible)
-{
-    <CascadingValue Value="@this" Name="SelfNode">
+<CascadingValue Value="@this" Name="SelfNode">
+    <ReactiveSection Trackers="@(new ReactiveTrackerList()
+                                   .With(this.WhenAnyValue(x => x.IsVisible, x => x.Disabled, x => x.Selected))
+                                   .With(this.WhenAnyValue(x => x.SwitcherClose, x => x.SwitcherOpen))
+                                   .With(this.WhenAnyValue(x => x.IsTargetContainer, x => x.IsTargetBelow, x => x.IsDragTarget, x => x.IsLastNode)))">
         <div @key="NodeId"
              @ref="@ElementRef"
-             class="@classMapper.Class" 
+             class="@classMapper.Class"
              style="@Style">
 
             <TreeViewIndent TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
@@ -20,11 +21,11 @@
 
             <TreeViewNodeTitle TItem="TItem"></TreeViewNodeTitle>
         </div>
-    </CascadingValue>
-}
+    </ReactiveSection>
+</CascadingValue>
 
 <CascadingValue Value="@this" Name="Node">
-    @if (DataItem != null && ChildContent == null && Nodes == null)
+    @if (DataItem != null && ChildContent == null)
     {
         foreach (var item in ChildDataItems)
         {
@@ -34,9 +35,5 @@
     else if (ChildContent != null)
     {
         @ChildContent
-    }
-    else
-    {
-        @Nodes
     }
 </CascadingValue>
