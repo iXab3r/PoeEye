@@ -354,6 +354,10 @@ textarea,
     width: 100%;
 }
 
+.ant-tree .ant-tree-treenode {
+    padding: 0;
+}
+
 .ant-tree-indent-unit{
     width: 16px;
 }
