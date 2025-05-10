@@ -157,6 +157,14 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     Task<bool> HasClass(string selectorOrElement, string className);
     
     /// <summary>
+    /// Sets CSS class in the element specified by a selector or DOM reference.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element.</param>
+    /// <param name="classNames">One or more CSS class names</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task SetClass(ElementReference elementRef, params string[] classNames);
+    
+    /// <summary>
     /// Adds one or more CSS classes to the element specified by a selector or DOM reference.
     /// </summary>
     /// <param name="elementRef">A reference to the HTML element.</param>

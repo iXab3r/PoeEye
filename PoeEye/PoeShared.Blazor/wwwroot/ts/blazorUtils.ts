@@ -11,6 +11,22 @@ import {ComponentParameters, IDynamicRootComponent, IBlazor, Blazor, logAndThrow
 log.setLevel('info'); // Change this level as needed.
 
 /**
+ * Sets the class list of an element, replacing any existing classes.
+ * @param target A selector string or HTMLElement.
+ * @param classNames A single class or array of classes to set.
+ */
+export function setClass(target: string | HTMLElement, classNames: string | string[]): void {
+    const element = resolveElement(target);
+    const classes = normalizeClassNames(classNames);
+
+    try {
+        element.className = classes.join(' ');
+    } catch (error) {
+        logAndThrow(`Error setting class(es) '${classes.join(', ')}' on element`, error);
+    }
+}
+
+/**
  * Adds one or more classes to an element.
  * @param target A selector string or HTMLElement.
  * @param classNames A single class or array of classes to add.

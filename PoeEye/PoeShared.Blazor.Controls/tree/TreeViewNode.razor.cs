@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using AntDesign;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
@@ -19,25 +22,23 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     private const double MinDragDistanceOffsetX = 25;
 
     private double dragTargetClientX;
-    private bool disabled;
     private string icon;
     private string key;
     private string title;
 
     static TreeViewNode()
     {
-        Binder.Bind(x => x.Expanded && !x.IsLeaf)
-            .To(x => x.IsSwitcherOpen);
-
-        Binder.Bind(x => !x.Expanded && !x.IsLeaf)
-            .To(x => x.IsSwitcherClose);
-        
+        Binder.Bind(x => x.Expanded && !x.IsLeaf).To(x => x.IsSwitcherOpen);
+        Binder.Bind(x => !x.Expanded && !x.IsLeaf).To(x => x.IsSwitcherClose);
         Binder.Bind(x => ReferenceEquals(x.TreeComponent.DragDropTargetContainerNode, x)).To(x => x.IsTargetContainer);
         Binder.Bind(x => ReferenceEquals(x.TreeComponent.DragDropTargetBelowNode, x)).To(x => x.IsTargetBelow);
         Binder.Bind(x => ReferenceEquals(x.TreeComponent.DragDropTargetNode, x)).To(x => x.IsDragTarget);
-        
+
         Binder.Bind(x => x.TreeComponent.Draggable && !x.Disabled && x.Draggable).To(x => x.IsDraggable);
         Binder.Bind(x => x.TreeComponent.Draggable && !x.Disabled && x.Droppable).To(x => x.IsDroppable);
+        
+        Binder.Bind(x => !x.Hidden && (x.ParentNode == null || (x.ParentNode.Expanded && x.ParentNode.IsVisible))).To(x => x.IsVisible);
+        Binder.Bind(x => x.Disabled || (x.ParentNode != null && x.ParentNode.Disabled)).To(x => x.IsDisabled);
     }
 
     public TreeViewNode()
@@ -67,11 +68,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     }
 
     [Parameter]
-    public bool Disabled
-    {
-        get => disabled || (ParentNode?.Disabled ?? false);
-        set => disabled = value;
-    }
+    public bool Disabled { get; set; }
 
     [Parameter] public bool Selected { get; set; }
 
@@ -114,7 +111,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     [Parameter] public bool Hidden { get; set; }
 
     public bool IsLeaf { get; private set; } = true;
-    
+
     public int TreeLevel => (ParentNode?.TreeLevel ?? -1) + 1;
 
     public bool IsSwitcherOpen { get; [UsedImplicitly] private set; }
@@ -128,40 +125,16 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     public bool IsTargetContainer { get; [UsedImplicitly] private set; }
 
     public bool IsLastNode => NodeIndex == (ParentNode?.ChildNodes.Count ?? TreeComponent?.ChildNodes.Count) - 1;
-    
+
     internal bool IsDroppable { get; [UsedImplicitly] private set; }
-    
     internal bool IsDraggable { get; [UsedImplicitly] private set; }
-
     internal int NodeIndex { get; set; }
-
     internal long NodeId { get; }
+    internal bool IsVisible { get; [UsedImplicitly] private set; }
+    internal bool IsDisabled { get; [UsedImplicitly] private set; }
 
     private List<TreeViewNode<TItem>> ChildNodes { get; } = new();
     
-    private bool IsVisible
-    {
-        get
-        {
-            if (Hidden)
-            {
-                return false;
-            }
-
-            if (ParentNode == null)
-            {
-                return true;
-            }
-
-            if (ParentNode.Expanded == false)
-            {
-                return false;
-            }
-
-            return ParentNode.IsVisible;
-        }
-    }
-
     private bool SwitcherOpen => Expanded && !IsLeaf;
 
     private bool SwitcherClose => !Expanded && !IsLeaf;
@@ -199,6 +172,11 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     {
         SetExpanded(expanded);
         await TreeComponent.OnNodeExpand(this, Expanded, new MouseEventArgs());
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
     }
 
     public override string ToString()
@@ -268,8 +246,31 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         Remove();
         await treeNode.AddNextNode(DataItem);
     }
-    
-    
+
+    protected override void OnAfterFirstRender()
+    {
+        base.OnAfterFirstRender();
+
+        this.WhenAnyValue(x => x.Class)
+            .Skip(1)
+            .Subscribe(x =>
+            {
+                try
+                {
+                    TreeComponent.JsPoeBlazorUtils.SetClass(ElementRef, x);
+                }
+                catch (Exception)
+                {
+                    if (Anchors.IsDisposed)
+                    {
+                        return;
+                    }
+
+                    throw;
+                }
+            })
+            .AddTo(Anchors);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -295,12 +296,21 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         {
             await Expand(TreeComponent.ExpandedKeys.Any(k => k == Key));
         }
-        
+
         SetTreeViewNodeClassMapper();
-        
+
         Binder.Attach(this).AddTo(Anchors);
+        
+        var classTracker = new ReactiveTrackerList()
+            .With(this.WhenAnyValue(x => x.IsVisible, x => x.IsDisabled, x => x.Selected))
+            .With(this.WhenAnyValue(x => x.SwitcherClose, x => x.SwitcherOpen))
+            .With(this.WhenAnyValue(x => x.IsTargetContainer, x => x.IsTargetBelow, x => x.IsDragTarget, x => x.IsLastNode));
+
+        classTracker.Merge()
+            .Subscribe(x => Class = classMapper.ToString())
+            .AddTo(Anchors);
     }
-    
+
     private IList<TItem> GetParentChildDataItems()
     {
         if (ParentNode != null)
@@ -343,7 +353,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         classMapper
             .Add("ant-tree-treenode")
             .If("d-none", () => !IsVisible)
-            .If("ant-tree-treenode-disabled", () => Disabled)
+            .If("ant-tree-treenode-disabled", () => IsDisabled)
             .If("ant-tree-treenode-switcher-open", () => SwitcherOpen)
             .If("ant-tree-treenode-switcher-close", () => SwitcherClose)
             .If("ant-tree-treenode-selected", () => Selected)
@@ -369,7 +379,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             tn.Selected = true;
         }
     }
-    
+
     internal async Task OnDragStart(DragEventArgs e)
     {
         TreeComponent.NotifyDragStart(this);
@@ -383,7 +393,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             });
         }
     }
-    
+
     internal async Task OnDragEnd(DragEventArgs e)
     {
         if (TreeComponent.OnDragEnd.HasDelegate)
@@ -394,6 +404,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
                 TargetNode = this
             });
         }
+
         TreeComponent.NotifyDragEnd();
     }
 
@@ -409,7 +420,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         var dragItem = TreeComponent.DragDropNode;
         var state = new TreeViewDragDropInfo(CanDropBelow: CanDropBelow(dragItem, this), CanDropInto: CanDropInto(dragItem, this));
         TreeComponent.DragDropStateByNodeIds[(this.NodeId, dragItem?.NodeId ?? 0)] = state;
-        
+
         if (state is { CanDropBelow: false, CanDropInto: false })
         {
             TreeComponent.SetDragTargetNode(null);
@@ -433,7 +444,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             {
                 await this.Expand(true);
             }
-            
+
             if (state.CanDropInto)
             {
                 TreeComponent.SetDragDropTargetBelowNode(null);
@@ -446,7 +457,8 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         {
             TreeComponent.SetDragDropTargetBelowNode(this);
             TreeComponent.SetDragDropTargetContainerNode(this.ParentNode);
-        } else if (state.CanDropInto)
+        }
+        else if (state.CanDropInto)
         {
             TreeComponent.SetDragDropTargetBelowNode(null);
             TreeComponent.SetDragDropTargetContainerNode(this.ParentNode);
@@ -466,7 +478,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
                     {
                         return;
                     }
-                    
+
                     await dragItem.DragMoveDown(this);
                 }
                 else
@@ -475,7 +487,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
                     {
                         return;
                     }
-                    
+
                     await dragItem.DragMoveInto(this);
                 }
             }
@@ -485,7 +497,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
                 await TreeComponent.OnDrop.InvokeAsync(new TreeViewEventArgs<TItem>(TreeComponent)
                 {
                     Node = TreeComponent.DragDropNode,
-                    DropBelow =  this.IsTargetBelow,
+                    DropBelow = this.IsTargetBelow,
                     TargetNode = this
                 });
             }
@@ -495,7 +507,7 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
             TreeComponent.NotifyDragEnd();
         }
     }
-    
+
     private bool CanDropBelow(TreeViewNode<TItem>? dragItem, TreeViewNode<TItem> targetItem)
     {
         if (!CanDrop(TreeComponent, dragItem, targetItem))
@@ -513,9 +525,10 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         {
             return false;
         }
+
         return true;
     }
-    
+
     private bool CanDropInto(TreeViewNode<TItem>? dragItem, TreeViewNode<TItem> targetItem)
     {
         if (!CanDrop(TreeComponent, dragItem, targetItem))
@@ -533,16 +546,17 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
         {
             return false;
         }
+
         return true;
     }
-    
+
     private static bool CanDrop(TreeView<TItem> tree, TreeViewNode<TItem>? dragItem, TreeViewNode<TItem> targetItem)
     {
         if (dragItem == targetItem)
         {
             return false;
         }
-        
+
         if (dragItem != null)
         {
             //dragItem could be null if we're dragging FROM OUTSIDE the tree

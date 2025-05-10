@@ -147,6 +147,11 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         await module.InvokeVoidAsync("scrollToBottom", elementSelector, (int)duration.TotalMilliseconds);
     }
     
+    public async Task SetClass(ElementReference elementRef, params string[] classNames)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("setClass", elementRef, classNames);
+    }
     
     public async Task AddClass(ElementReference elementRef, params string[] classNames)
     {

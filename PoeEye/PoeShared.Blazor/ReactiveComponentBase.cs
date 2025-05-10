@@ -221,6 +221,10 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         Interlocked.Increment(ref renderCount);
         Interlocked.Exchange(ref unrenderedChangeCount, 0);
         base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            OnAfterFirstRender();
+        }
     }
 
     /// <summary>
@@ -236,7 +240,21 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     protected virtual async Task OnAfterFirstRenderAsync()
     {
     }
-
+    
+    /// <summary>
+    /// Method invoked first time the component has been rendered. Note that the component does
+    /// not automatically re-render after the completion of any returned <see cref="Task"/>, because
+    /// that would cause an infinite render loop.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing any asynchronous operation.</returns>
+    /// <remarks>
+    /// The <see cref="OnAfterRender(bool)"/> and <see cref="OnAfterRenderAsync(bool)"/> lifecycle methods
+    /// are useful for performing interop, or interacting with values received from <c>@ref</c>.
+    /// </remarks>
+    protected virtual void OnAfterFirstRender()
+    {
+    }
+    
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

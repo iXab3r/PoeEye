@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using AntDesign;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
@@ -16,11 +18,8 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 {
     public TreeViewNodeTitle()
     {
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.Selected));
         ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsDraggable));
         ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsDroppable));
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen));
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen));
     }
 
     [CascadingParameter(Name = "Tree")]
@@ -31,6 +30,50 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
 
     private ClassMapper TitleClassMapper { get; } = new();
 
+    protected override void OnInitialized()
+    {
+        SetTitleClassMapper();
+        base.OnInitialized();
+
+        var trackers = new ReactiveTrackerList()
+        {
+            this.WhenAnyValue(x => x.SelfNode.Selected),
+            this.WhenAnyValue(x => x.SelfNode.IsSwitcherOpen),
+            this.WhenAnyValue(x => x.SelfNode.IsSwitcherClose)
+        };
+        trackers.Merge().Subscribe(x => Class = TitleClassMapper.ToString()).AddTo(Anchors);
+    }
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override void OnAfterFirstRender()
+    {
+        base.OnAfterFirstRender();
+        
+        this.WhenAnyValue(x => x.Class)
+            .Skip(1)
+            .Subscribe(x =>
+            {
+                try
+                {
+                    TreeComponent.JsPoeBlazorUtils.SetClass(ElementRef, x);
+                }
+                catch (Exception)
+                {
+                    if (Anchors.IsDisposed)
+                    {
+                        return;
+                    }
+
+                    throw;
+                }
+            })
+            .AddTo(Anchors);
+    }
+
     private void SetTitleClassMapper()
     {
         TitleClassMapper
@@ -39,12 +82,6 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
             .If("ant-tree-node-content-wrapper-open", () => SelfNode.IsSwitcherOpen)
             .If("ant-tree-node-content-wrapper-close", () => SelfNode.IsSwitcherClose)
             .If("ant-tree-node-selected", () => SelfNode.Selected);
-    }
-
-    protected override void OnInitialized()
-    {
-        SetTitleClassMapper();
-        base.OnInitialized();
     }
 
     private async Task OnClick(MouseEventArgs args)
@@ -68,7 +105,9 @@ public partial class TreeViewNodeTitle<TItem> : BlazorReactiveComponent
                     .Items
                     .Where(x => x.Selected)
                     .ToHashSet();
-                if (TreeComponent.IsShiftKeyDown && selectedNodes.Any())
+                if (TreeComponent.IsShiftKeyDown && 
+                    selectedNodes.Any() && 
+                    false) //does not work due to list reshuffling, has to be rewritten
                 {
                     var allNodes = TreeComponent.NodesById
                         .Items

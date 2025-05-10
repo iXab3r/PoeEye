@@ -145,9 +145,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     internal TreeViewNode<TItem>? DragDropTargetBelowNode { get; private set; }
     internal TreeViewNode<TItem>? DragDropTargetNode { get; private set; }
 
+    [Inject] internal IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; } = null!;
     [Inject] private IDomEventListener DomEventListener { get; init; } = null!;
-
-    [Inject] private IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; } = null!;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -160,7 +159,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
         DomEventListener?.Dispose();
         return base.DisposeAsync();
     }
-
+    
     internal void AddChildNode(TreeViewNode<TItem> treeNode)
     {
         treeNode.NodeIndex = ChildNodes.Count;
@@ -266,14 +265,16 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-        {
-            DomEventListener.AddShared<KeyboardEventArgs>("document", "keydown", DocumentOnKeyDown);
-            DomEventListener.AddShared<KeyboardEventArgs>("document", "keyup", DocumentOnKeyUp);
-            DomEventListener.AddShared<FocusEventArgs>("window", "blur", WindowOnBlur);
-        }
-
         base.OnAfterRender(firstRender);
+    }
+
+    protected override void OnAfterFirstRender()
+    {
+        base.OnAfterFirstRender();
+        
+        DomEventListener.AddShared<KeyboardEventArgs>("document", "keydown", DocumentOnKeyDown);
+        DomEventListener.AddShared<KeyboardEventArgs>("document", "keyup", DocumentOnKeyUp);
+        DomEventListener.AddShared<FocusEventArgs>("window", "blur", WindowOnBlur);
     }
 
     private void SetClassMapper()

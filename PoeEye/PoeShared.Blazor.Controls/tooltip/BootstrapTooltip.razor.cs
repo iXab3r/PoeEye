@@ -22,7 +22,7 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
     /// Sets the text of the tooltip.
     /// </summary>
     [Parameter, EditorRequired]
-    public string Title { get; set; } = String.Empty;
+    public string? Title { get; set; } = String.Empty;
 
     /// <summary>
     /// Enables HTML Content in the tooltip. 
@@ -155,7 +155,7 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
         tmp.html = Html;
         tmp.placement = Placement.ToString().ToLower();
         tmp.template = Template;
-        tmp.title = Title;
+        tmp.title = Title ?? string.Empty;
         tmp.trigger = String.Join(' ', Trigger.Distinct().Select(x => x.ToString().ToLower()));
         tmp.fallbackPlacements = FallbackPlacements.Select(x => x.ToString().ToLower()).ToArray();
         tmp.boundary = Boundary;

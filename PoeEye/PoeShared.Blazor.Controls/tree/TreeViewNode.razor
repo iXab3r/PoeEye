@@ -6,22 +6,15 @@
 }
 
 <CascadingValue Value="@this" Name="SelfNode">
-    <ReactiveSection Trackers="@(new ReactiveTrackerList()
-                                   .With(this.WhenAnyValue(x => x.IsVisible, x => x.Disabled, x => x.Selected))
-                                   .With(this.WhenAnyValue(x => x.SwitcherClose, x => x.SwitcherOpen))
-                                   .With(this.WhenAnyValue(x => x.IsTargetContainer, x => x.IsTargetBelow, x => x.IsDragTarget, x => x.IsLastNode)))">
-        <div @key="NodeId"
-             @ref="@ElementRef"
-             class="@classMapper.Class"
-             style="@Style">
+    <div @key="@($"tv-node-{NodeId}")"
+         @ref="@ElementRef"
+         class="@Class"
+         style="@Style">
 
-            <TreeViewIndent TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
-
-            <TreeViewNodeSwitcher OnSwitcherClick="@OnSwitcherClick" TItem="TItem"></TreeViewNodeSwitcher>
-
-            <TreeViewNodeTitle TItem="TItem"></TreeViewNodeTitle>
-        </div>
-    </ReactiveSection>
+        <TreeViewIndent @key="@($"tv-node-indent-{NodeId}")" TreeLevel="@TreeLevel" TItem="TItem"></TreeViewIndent>
+        <TreeViewNodeSwitcher @key="@($"tv-node-switcher-{NodeId}")" OnSwitcherClick="@OnSwitcherClick" TItem="TItem"></TreeViewNodeSwitcher>
+        <TreeViewNodeTitle @key="@($"tv-node-title-{NodeId}")" TItem="TItem"></TreeViewNodeTitle>
+    </div>
 </CascadingValue>
 
 <CascadingValue Value="@this" Name="Node">
@@ -29,7 +22,7 @@
     {
         foreach (var item in ChildDataItems)
         {
-            <TreeViewNode DataItem="@item" @key="@($"TreeViewNode-{item?.GetHashCode()}")"></TreeViewNode>
+            <TreeViewNode DataItem="@item" @key="@($"tv-node-{NodeId}-child-{item?.GetHashCode()}")"></TreeViewNode>
         }
     }
     else if (ChildContent != null)
