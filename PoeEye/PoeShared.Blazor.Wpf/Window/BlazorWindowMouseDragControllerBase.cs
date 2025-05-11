@@ -38,6 +38,7 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
         originalCursor = Mouse.OverrideCursor;
         ContentControl.MouseUp += ControlOnMouseUp;
         ContentControl.MouseMove += ControlOnMouseMove;
+        HandleMouseMove();
 
         Disposable.Create(() =>
         {
@@ -128,7 +129,7 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
         return null;
     }
 
-    private void ControlOnMouseMove(object sender, MouseEventArgs e)
+    private void HandleMouseMove()
     {
         var current = GetCursorPosition();
 
@@ -158,6 +159,11 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
         }
 
         HandleMove(current);
+    }
+
+    private void ControlOnMouseMove(object sender, MouseEventArgs e)
+    {
+        HandleMouseMove();
     }
 
     private void ControlOnMouseUp(object sender, MouseButtonEventArgs e)
