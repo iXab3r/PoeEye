@@ -124,7 +124,23 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
     protected override async Task OnAfterFirstRenderAsync()
     {
         await base.OnAfterFirstRenderAsync();
-        await Setup();
+
+        try
+        {
+            await Setup();
+        }
+        catch (Exception e) when (e is OperationCanceledException or ObjectDisposedException or InvalidOperationException)
+        {
+            //could happen on very quick refreshes
+        }
+        catch (Exception e)
+        {
+            if (e.IsJSException())
+            {
+                return;
+            }
+            throw;
+        }
     }
 
     protected override async Task OnParametersSetAsync()
@@ -138,7 +154,6 @@ public partial class BootstrapTooltip : BlazorReactiveComponent
     private async Task Setup()
     {
         var module = await GetModuleAsync();
-        
         await module.InvokeVoidAsync("setup", new object[] {ComponentId.ToString(), OptionsToJson()});
     }
 
