@@ -14,6 +14,9 @@ namespace PoeShared.Blazor.Wpf;
 /// </summary>
 public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObject, IBlazorWindowNativeController
 {
+    public const string TitleBarAnchorName = $"--blazor-window-titlebar";
+    public const string WindowAnchorName = $"--blazor-window";
+    
     /// <summary>
     /// Gets or sets type of View which will be displayed within the window.
     /// </summary>

@@ -20,11 +20,12 @@
     <link href="_content/PoeShared.Blazor.Wpf/PoeShared.Blazor.Wpf.bundle.scp.css" rel="stylesheet"/>
 </HeadContent>
 
-<div class="d-grid h-100 overflow-hidden" style="grid-template-rows: auto 1fr;">
+<div class="d-grid h-100 overflow-hidden" style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
         @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.Default)
         {
             <div class="d-flex w-100 bg-secondary-subtle text-white text-uppercase font-play align-items-center"
+                 style="@(new CssBuilder().AddValue($"anchor-name: {IBlazorWindow.TitleBarAnchorName};").Build())"
                  @ref="@TitleRef">
                 <ReactiveSection
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ViewTypeForTitleBar)))">
