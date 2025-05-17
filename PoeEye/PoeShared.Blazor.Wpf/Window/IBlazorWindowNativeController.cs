@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reactive.Concurrency;
+using System.Windows.Threading;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -8,6 +10,11 @@ namespace PoeShared.Blazor.Wpf;
 /// </summary>
 public interface IBlazorWindowNativeController
 {
+    /// <summary>
+    /// Gets the current window dispatcher
+    /// </summary>
+    Dispatcher Dispatcher { get; }
+    
     /// <summary>
     /// Retrieves the handle (HWND) of the native window associated with this Blazor window instance.
     /// </summary>

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Microsoft.Extensions.FileProviders;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
@@ -55,7 +56,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     private readonly PropertyValueHolder<bool> noActivate;
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
-    private readonly IScheduler uiScheduler;
+    private readonly Dispatcher uiDispatcher;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
     private readonly ComplexFileProvider complexFileProvider;
@@ -63,13 +64,13 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public BlazorWindow(
         IUnityContainer unityContainer,
-        [OptionalDependency] IScheduler uiScheduler = null)
+        [OptionalDependency] Dispatcher dispatcher = null)
     {
         Log.AddSuffix($"BWnd#{windowId}");
         Log.Debug("New window is being created");
         this.unityContainer = unityContainer;
         isClosedTcs = new TaskCompletionSource();
-        this.uiScheduler = uiScheduler ?? BlazorSchedulerProvider.Instance.GetOrAdd("BlazorWindow");
+        this.uiDispatcher = dispatcher ?? BlazorDispatcherProvider.Instance.GetOrAdd("BlazorWindow").Dispatcher;
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
@@ -532,6 +533,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         return anchor;
     }
 
+    public Dispatcher Dispatcher => uiDispatcher;
+
     public IntPtr GetWindowHandle()
     {
         var window = GetWindow();
@@ -551,7 +554,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void EnsureCreated()
     {
-        if (uiScheduler.IsOnScheduler())
+        if (uiDispatcher.CheckAccess())
         {
             HandleUpdate();
         }
@@ -563,13 +566,11 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public Rectangle GetWindowRect()
     {
-        EnsureNotDisposed();
         return new Rectangle(Left, Top, Width, Height);
     }
 
     public void SetWindowRect(Rectangle rect)
     {
-        EnsureNotDisposed();
         Log.Debug($"Setting window rect to {rect} from {new Rectangle(Left, Top, Width, Height)}");
         windowLeft.SetValue(rect.Left, TrackedPropertyUpdateSource.Internal);
         windowTop.SetValue(rect.Top, TrackedPropertyUpdateSource.Internal);
@@ -580,7 +581,6 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void SetWindowSize(Size windowSize)
     {
-        EnsureNotDisposed();
         Log.Debug($"Resizing window to {windowSize} from {new Size(Width, Height)}");
         windowWidth.SetValue(windowSize.Width, TrackedPropertyUpdateSource.Internal);
         windowHeight.SetValue(windowSize.Height, TrackedPropertyUpdateSource.Internal);
@@ -589,7 +589,6 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void SetWindowPos(Point windowPos)
     {
-        EnsureNotDisposed();
         Log.Debug($"Moving window to {windowPos} from {new Point(Left, Top)}");
         windowLeft.SetValue(windowPos.X, TrackedPropertyUpdateSource.Internal);
         windowTop.SetValue(windowPos.Y, TrackedPropertyUpdateSource.Internal);
@@ -604,13 +603,13 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     private async Task EnqueueUpdate()
     {
-        if (uiScheduler.IsOnScheduler())
+        if (uiDispatcher.CheckAccess())
         {
             HandleUpdate();
         }
         else
         {
-            await Observable.Start(HandleUpdate, uiScheduler).ToTask();
+            await uiDispatcher.InvokeAsync(HandleUpdate);
         }
     }
 
@@ -637,7 +636,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     private void HandleUpdate()
     {
-        uiScheduler.EnsureOnScheduler();
+        uiDispatcher.VerifyAccess();
 
         if (eventQueue.Count <= 0)
         {
@@ -665,7 +664,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     private NativeWindow CreateWindow()
     {
-        uiScheduler.EnsureOnScheduler();
+        uiDispatcher.VerifyAccess();
 
         var window = new NativeWindow(this)
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Drawing;
-using System.Windows.Input;
+using System.Windows.Forms;
 
 namespace PoeShared.Blazor.Wpf;
 

@@ -2,8 +2,6 @@
 using System.Reactive.Disposables;
 using System.Windows.Forms;
 using PoeShared.Scaffolding;
-using Cursor = System.Windows.Input.Cursor;
-using Cursors = System.Windows.Input.Cursors;
 
 namespace PoeShared.Blazor.Wpf;
 

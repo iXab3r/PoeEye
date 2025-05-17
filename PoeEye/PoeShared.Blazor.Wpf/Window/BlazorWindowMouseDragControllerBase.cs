@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Reactive.Disposables;
-using System.Windows.Forms;
 using System.Windows.Input;
 using PoeShared.Scaffolding;
-using Cursor = System.Windows.Input.Cursor;
+using Cursor = System.Windows.Forms.Cursor;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace PoeShared.Blazor.Wpf;
@@ -35,7 +34,7 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
             throw new ApplicationException($"Failed to capture mouse inside window {blazorWindow}");
         }
 
-        originalCursor = Mouse.OverrideCursor;
+        originalCursor = Cursor.Current;
         ContentControl.MouseUp += ControlOnMouseUp;
         ContentControl.MouseMove += ControlOnMouseMove;
         HandleMouseMove();
@@ -48,7 +47,7 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
             if (changedCursorBack == false)
             {
                 changedCursorBack = true;
-                Mouse.OverrideCursor = originalCursor;
+                Cursor.Current = originalCursor;
             }
 
             try
@@ -149,8 +148,8 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
             var overrideCursor = GetOverrideCursor();
             if (overrideCursor != null)
             {
-                originalCursor = Mouse.OverrideCursor;
-                Mouse.OverrideCursor = overrideCursor;
+                originalCursor = Cursor.Current;
+                Cursor.Current = overrideCursor;
             }
             else
             {
