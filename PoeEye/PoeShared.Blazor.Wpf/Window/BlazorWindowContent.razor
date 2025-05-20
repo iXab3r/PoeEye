@@ -20,7 +20,8 @@
     <link href="_content/PoeShared.Blazor.Wpf/PoeShared.Blazor.Wpf.bundle.scp.css" rel="stylesheet"/>
 </HeadContent>
 
-<div class="d-grid h-100 overflow-hidden" style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
+<div class="d-grid h-100 overflow-hidden"
+     style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
         @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.Default)
         {
@@ -46,7 +47,8 @@
                               style="user-select: none;"
                               @ondblclick="ToggleWindowState"
                               @onmousedown="HandleMouseDown">
-                            <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
+                            <ReactiveSection
+                                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
                                 @DataContext.Title
                             </ReactiveSection>
                         </span>
@@ -56,8 +58,8 @@
                 <span class="flex-grow-1"></span>
                 <span class="d-flex gap-1 h-100">
                 <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton)))">
-                    @if (DataContext.ShowMinButton)
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton, x => x.ResizeMode)))">
+                    @if (DataContext.ShowMinButton && DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip or ResizeMode.CanMinimize)
                     {
                         <button class="btn btn-secondary-outline p-0 m-0 px-2"
                                 @onclick="@(() => DataContext.Minimize())">
@@ -66,20 +68,23 @@
                     }
                 </ReactiveSection>
                 <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton, x => x.WindowState)))">
-                    @if (DataContext.WindowState != WindowState.Maximized)
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton, x => x.ResizeMode, x => x.WindowState)))">
+                    @if (DataContext.ShowMaxButton && DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
                     {
-                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
-                                @onclick="@(() => DataContext.WindowState = WindowState.Maximized)">
-                            <i class="fa-regular fa-window-maximize"></i>
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
-                                @onclick="@(() => DataContext.WindowState = WindowState.Normal)">
-                            <i class="fa-regular fa-window-restore"></i>
-                        </button>
+                        @if (DataContext.WindowState != WindowState.Maximized)
+                        {
+                            <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                                    @onclick="@(() => DataContext.WindowState = WindowState.Maximized)">
+                                <i class="fa-regular fa-window-maximize"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                                    @onclick="@(() => DataContext.WindowState = WindowState.Normal)">
+                                <i class="fa-regular fa-window-restore"></i>
+                            </button>
+                        }
                     }
                 </ReactiveSection>
                 <ReactiveSection
@@ -112,431 +117,7 @@
         else if (DataContext.IsDebugMode)
         {
             <div style="max-width: 30em;">
-                <table class="table table-dark table-striped table-sm">
-                    <colgroup>
-                        <col style="width: auto; min-width: 7em;">
-                        <col style="width: 100%;">
-                    </colgroup>
-                    <thead>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Title</span>
-                        </td>
-                        <td>
-                            <ReactiveSection
-                                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
-                                <InputText type="text" class="form-control" placeholder="name..."
-                                           @bind-Value="@DataContext.Title"/>
-                            </ReactiveSection>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Commands</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <span class="p-1 py-2 border border-1"
-                      @onmousedown="StartDrag">
-                    Drag
-                </span>
-                <button class="btn btn-secondary p-0 m-0 px-3"
-                        @onclick="@(() => BlazorContentControlAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
-                    DevTools
-                </button>
-                <span class="vr"></span>
-                <button class="btn btn-secondary p-0 m-0 px-1"
-                        @onclick="@(() => DataContext.Hide())">
-                    Hide
-                </button>
-                <button class="btn btn-secondary p-0 m-0 px-1"
-                        @onclick="@(() => DataContext.Close())">
-                    Close
-                </button>
-                <button class="btn btn-secondary p-0 m-0 px-1"
-                        @onclick="@(() => DataContext.Dispose())">
-                    Dispose
-                </button>
-            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Size</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-3">
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Left)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Left:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Left = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Top)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Top:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Top = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Width)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Width:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Width = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Height)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Height:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Height = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-            </span>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Min Size</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.MinWidth)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.MinWidth:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.MinWidth = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.MinHeight)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.MinHeight:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.MinHeight = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-            </span>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Max Size</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.MaxWidth)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.MaxWidth:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.MaxWidth = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.MaxHeight)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.MaxHeight:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.MaxHeight = intValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-            </span>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Title Bar</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
-                    <button class="btn btn-secondary p-0 m-0 px-1 rounded-0"
-                            disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.Default)"
-                            @onclick="@(() => DataContext.TitleBarDisplayMode = TitleBarDisplayMode.Default)">
-                        Default
-                    </button>
-                    <button class="btn btn-secondary p-0 m-0 px-1 rounded-0"
-                            disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
-                            @onclick="@(() => DataContext.TitleBarDisplayMode = TitleBarDisplayMode.System)">
-                        System
-                    </button>
-                    <button class="btn btn-secondary p-0 m-0 px-1 rounded-0"
-                            disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.Custom)"
-                            @onclick="@(() => DataContext.TitleBarDisplayMode = TitleBarDisplayMode.Custom)">
-                        Custom
-                    </button>
-                    <button class="btn btn-secondary p-0 m-0 px-1 rounded-0"
-                            disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.None)"
-                            @onclick="@(() => DataContext.TitleBarDisplayMode = TitleBarDisplayMode.None)">
-                        None
-                    </button>
-                </ReactiveSection>
-            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Opacity</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Opacity)))">
-                    <input type="number"
-                           class="form-control"
-                           min="0"
-                           max="1"
-                           step="0.01"
-                           value="@($"{DataContext.Opacity:F2}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && double.TryParse(stringValue, out var doubleValue))
-                                        {
-                                            DataContext.Opacity = doubleValue;
-                                        }
-                                    })">
-                </ReactiveSection>
-            </span>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Border Thickness</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.BorderThickness.Left:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.BorderThickness = DataContext.BorderThickness with {Left = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.BorderThickness.Top:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.BorderThickness = DataContext.BorderThickness with {Top = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.BorderThickness.Right:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.BorderThickness = DataContext.BorderThickness with {Right = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.BorderThickness.Bottom:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.BorderThickness = DataContext.BorderThickness with {Bottom = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-            </span>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <span class="debug-table-header">Padding</span>
-                        </td>
-                        <td>
-            <span class="d-flex gap-1">
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Padding.Left:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Padding = DataContext.Padding with {Left = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Padding.Top:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Padding = DataContext.Padding with {Top = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Padding.Right:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Padding = DataContext.Padding with {Right = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
-                    <input type="number"
-                           class="form-control"
-                           value="@($"{DataContext.Padding.Bottom:F0}")"
-                           oninput="@((ChangeEventArgs x) =>
-                                    {
-                                        if (x.Value is string stringValue && int.TryParse(stringValue, out var intValue))
-                                        {
-                                            DataContext.Padding = DataContext.Padding with {Bottom = intValue};
-                                        }
-                                    })">
-                </ReactiveSection>
-            </span>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Flags</td>
-                        <td>
-            <span class="d-flex gap-5">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowInTaskbar)))">
-                    <span class="d-flex gap-1">
-                        <input id="ShowInTaskbar" type="checkbox"
-                               @bind:get="@(DataContext.ShowInTaskbar)"
-                               @bind:set="@(x => DataContext.ShowInTaskbar = x)"
-                               @bind:event="oninput"/>
-                        <label for="ShowInTaskbar" class="rcb-label">
-                            ShowInTaskbar
-                        </label>
-                    </span>
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.IsClickThrough)))">
-                    <span class="d-flex gap-1">
-                        <input id="IsClickThrough" type="checkbox"
-                               @bind:get="@(DataContext.IsClickThrough)"
-                               @bind:set="@(x => DataContext.IsClickThrough = x)"
-                               @bind:event="oninput"/>
-                        <label for="IsClickThrough" class="rcb-label">
-                            IsClickThrough
-                        </label>
-                    </span>
-                </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Topmost)))">
-                    <span class="d-flex gap-1">
-                        <input id="Topmost" type="checkbox"
-                               @bind:get="@(DataContext.Topmost)"
-                               @bind:set="@(x => DataContext.Topmost = x)"
-                               @bind:event="oninput"/>
-                        <label for="Topmost" class="rcb-label">
-                            Topmost
-                        </label>
-                    </span>
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.NoActivate)))">
-                    <span class="d-flex gap-1">
-                        <input id="NoActivate" type="checkbox"
-                               @bind:get="@(DataContext.NoActivate)"
-                               @bind:set="@(x => DataContext.NoActivate = x)"
-                               @bind:event="oninput"/>
-                        <label for="NoActivate" class="rcb-label">
-                            No Activate
-                        </label>
-                    </span>
-                </ReactiveSection>
-            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-            <span class="w-100 d-flex">
-                <span class="flex-grow-1"></span>
-                <button class="btn btn-success p-0 m-0 px-5"
-                        disabled="@(DataContext.IsDebugMode == false)"
-                        @onclick="@(() => DataContext.IsDebugMode = false)">
-                    Exit debug mode
-                </button>
-            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <BlazorWindowDebugPanel DataContext="@DataContext"/>
             </div>
         }
         else
@@ -623,22 +204,30 @@
                 .AddValue("cursor: nwse-resize;");
         }
 
-        <!-- Edge Resizers -->
-        <div class="position-fixed" style="@topBorderStyle"
-             @onmousedown="@(() => StartResize(WindowResizeDirection.Top))"></div>
-        <div class="position-fixed" style="@rightBorderStyle"
-             @onmousedown="@(() => StartResize(WindowResizeDirection.Right))"></div>
-        <div class="position-fixed" style="@bottomBorderStyle"
-             @onmousedown="@(() => StartResize(WindowResizeDirection.Bottom))"></div>
-        <div class="position-fixed" style="@leftBorderStyle"
-             @onmousedown="@(() => StartResize(WindowResizeDirection.Left))"></div>
+        <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ResizeMode)))">
+            @if (DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
+            {
+                <!-- Edge Resizers -->
+                <div class="position-fixed" style="@topBorderStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.Top))"></div>
+                <div class="position-fixed" style="@rightBorderStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.Right))"></div>
+                <div class="position-fixed" style="@bottomBorderStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.Bottom))"></div>
+                <div class="position-fixed" style="@leftBorderStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.Left))"></div>
 
-        <!-- Corner Resizers -->
-        <div style="@topLeftCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.TopLeft))"></div>
-        <div style="@topRightCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.TopRight))"></div>
-        <div style="@bottomLeftCornerStyle" @onmousedown="@(() => StartResize(WindowResizeDirection.BottomLeft))"></div>
-        <div style="@bottomRightCornerStyle"
-             @onmousedown="@(() => StartResize(WindowResizeDirection.BottomRight))"></div>
+                <!-- Corner Resizers -->
+                <div style="@topLeftCornerStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.TopLeft))"></div>
+                <div style="@topRightCornerStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.TopRight))"></div>
+                <div style="@bottomLeftCornerStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.BottomLeft))"></div>
+                <div style="@bottomRightCornerStyle"
+                     @onmousedown="@(() => StartResize(WindowResizeDirection.BottomRight))"></div>
+            }
+        </ReactiveSection>
 
 
     </ReactiveSection>
