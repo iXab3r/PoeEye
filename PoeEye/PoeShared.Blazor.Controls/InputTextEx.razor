@@ -4,6 +4,7 @@
 <input @attributes="AdditionalAttributes"
        @ref="@elementRef"
        class="@CssClass"
+       placeholder="@Placeholder"
        @bind="CurrentValueAsString"
        @bind:event="oninput"/>
 
@@ -11,6 +12,7 @@
     private ElementReference? elementRef;
     
     [Parameter] public bool FocusOnFirstRender { get; set; }
+    [Parameter] public string Placeholder { get; set; }
 
     [Inject]
     protected IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
