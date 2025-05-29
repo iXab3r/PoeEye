@@ -40,8 +40,8 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
         Log.Debug("ContentPresenter is being created");
         Disposable.Create(() => View = null).AddTo(Anchors);
         
-        this.WhenAnyProperty(x => x.Content)
-            .Select(x => Content)
+        this.WhenAnyProperty(x => x.View)
+            .Select(x => View)
             .WithPrevious()
             .Skip(1)
             .Subscribe(x =>
