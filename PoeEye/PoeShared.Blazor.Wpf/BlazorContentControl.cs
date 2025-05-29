@@ -129,7 +129,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
         var unityContainerSource = this.WhenAnyValue(x => x.Container)
             .Select(x => x ?? UnityServiceCollection.Instance.BuildServiceProvider().GetService<IUnityContainer>());
-        
+
 
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
@@ -145,7 +145,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                 var contentAnchors = new CompositeDisposable().AssignTo(activeContentAnchors);
                 Disposable.Create(() => Log.Debug("Content is being disposed")).AddTo(contentAnchors);
-                
+
                 if (UnhandledException != null)
                 {
                     Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
@@ -216,7 +216,25 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     childServiceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
 
                     var unityServiceDescriptors = state.container.ToServiceDescriptors();
-                    childServiceCollection.Add(unityServiceDescriptors);
+                    foreach (var unityServiceDescriptor in unityServiceDescriptors)
+                    {
+                        var typeRegistrations = childServiceCollection
+                            .Where(x =>
+                                x.ServiceType == unityServiceDescriptor.ServiceType &&
+                                x.ServiceKey == unityServiceDescriptor.ServiceKey)
+                            .ToArray();
+                        
+                        var higherOrderRegistration = typeRegistrations
+                            .Where(x => x.Lifetime is ServiceLifetime.Singleton or ServiceLifetime.Scoped)
+                            .ToArray();
+                        if (unityServiceDescriptor.Lifetime is ServiceLifetime.Transient && higherOrderRegistration.Length > 0)
+                        {
+                            //transient dependency scope differs in .NET container and was converted either to Scoped or Singleton
+                            continue;
+                        }
+
+                        childServiceCollection.Add(unityServiceDescriptor);
+                    }
 
                     var childServiceProvider = childServiceCollection.BuildServiceProvider(); //FIXME memory leak for transient dependencies
 
@@ -229,25 +247,25 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     webViewServiceProvider.ServiceProvider = childServiceProvider;
 
                     var globalMemoryFileProvider = new InMemoryFileProvider();
-                  
+
                     //static web assets file provider is created by WebView manager, and we cannot directly access it from outside
                     //thus we create our own, still prioritizing the usual one - this gives user the ability to replace assets
                     var publicInMemoryFileProvider = new InMemoryFileProvider();
                     childServiceCollection.AddSingleton<IInMemoryFileProvider>(_ => publicInMemoryFileProvider);
 
-                    var proxyFileProvider = new ProxyFileProvider() 
+                    var proxyFileProvider = new ProxyFileProvider()
                     {
                         FileProvider = state.additionalFileProvider
                     };
-                    
+
                     var rootFileProvider = childServiceProvider.GetRequiredService<IRootContentFileProvider>();
-                    
+
                     var webViewFileProvider = new CompositeFileProvider(
-                        publicInMemoryFileProvider, 
-                        proxyFileProvider, 
+                        publicInMemoryFileProvider,
+                        proxyFileProvider,
                         globalMemoryFileProvider,
                         rootFileProvider);
-                        
+
                     WebView.FileProvider = webViewFileProvider; //under the hood initializes StaticWebAssets provider, which should not ever be reached
 
                     var blazorContentRepository = childServiceProvider.GetRequiredService<IBlazorContentRepository>();
@@ -281,8 +299,8 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
 
-                   
-                    var indexFileContentTemplate =  webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
+
+                    var indexFileContentTemplate = webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                     publicInMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
@@ -503,7 +521,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
             .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
         return indexFileContent;
     }
-    
+
     public void Dispose()
     {
         Anchors.Dispose();
@@ -518,7 +536,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);

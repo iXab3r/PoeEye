@@ -8,8 +8,8 @@ namespace PoeShared.Scaffolding;
 public sealed class SourceCacheAccessor<TObject, TKey> : DisposableReactiveObject
 {
     private static readonly Binder<SourceCacheAccessor<TObject, TKey>> Binder = new();
+    private readonly SharedResourceLatch isUpdating = new();
     private TObject value;
-    private SharedResourceLatch isUpdating = new();
 
     static SourceCacheAccessor()
     {

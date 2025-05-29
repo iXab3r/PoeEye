@@ -79,7 +79,14 @@ public static class EnumHelper
 
         return result;
     }
-        
+
+    public static (T Value, string Description)[] GetValuesAndDescriptions<T>()
+    {
+        return EnumHelper.GetValuesAndDescriptions(typeof(T))
+            .Select(x => ((T)x.Value, x.Description))
+            .ToArray();
+    }
+    
     public static EnumValueWithDescription[] GetValuesAndDescriptions(Type enumType)
     {
            return GetValuesAndDescriptions(enumType, "Default");

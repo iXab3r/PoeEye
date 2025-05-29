@@ -35,6 +35,14 @@ public readonly struct Percentage : IEquatable<Percentage>, IFormattable
     {
         return new Percentage(decimalValue * 100);
     }
+    
+    /// <summary>
+    /// Converts a decimal value (0.0 to 1.0) to a percentage.
+    /// </summary>
+    public static Percentage FromDecimal(double decimalValue)
+    {
+        return new Percentage((float)decimalValue * 100);
+    }
 
     /// <summary>
     /// Implicit conversion from <see cref="float"/> to <see cref="Percentage"/>.

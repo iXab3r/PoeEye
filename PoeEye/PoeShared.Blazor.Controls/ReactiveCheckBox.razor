@@ -1,13 +1,13 @@
 @inherits PoeShared.Blazor.BlazorReactiveComponent
 
-<span class="@(new CssBuilder("rcb-container").AddClass(Class))">
+<span id="@Id" class="@(new CssBuilder("rcb-container").AddClass(Class))">
     <input type="checkbox"
-           id="@Id"
+           id="@ComponentId"
            disabled="@Disabled"
            @bind:get="@IsChecked"
            @bind:set="@HandleCheckedChanged"
            @bind:event="oninput"/>
-    <label for="@Id"
+    <label for="@ComponentId"
            class="rcb-label">
         @ChildContent
     </label>
