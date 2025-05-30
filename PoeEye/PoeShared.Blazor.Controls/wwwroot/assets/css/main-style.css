@@ -59,6 +59,11 @@ video {
     grid-auto-flow: row;
 }
 
+.d-flex-center {
+    display: flex;
+    align-items: center;
+}
+
 .flex-flow-wrap {
     flex-flow: wrap;
 }

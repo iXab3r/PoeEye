@@ -1,6 +1,6 @@
 ﻿@inherits PoeShared.Blazor.BlazorReactiveComponent
 
-<input type="number"
+<input type="range"
        class="@Class"
        style="@Style"
        min="@Min"
@@ -21,9 +21,9 @@
 
        [Parameter] public EventCallback<double> ValueChanged { get; set; }
 
-       public ReactiveNumericUpDown()
+       public ReactiveRangeSlider()
        {
-              Class = "form-control";
+              Class = "";
        }
 
        private static double Parse(object value)

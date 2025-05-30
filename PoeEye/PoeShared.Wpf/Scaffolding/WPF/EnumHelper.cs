@@ -80,10 +80,14 @@ public static class EnumHelper
         return result;
     }
 
-    public static (T Value, string Description)[] GetValuesAndDescriptions<T>()
+    public static EnumValueWithDescription<T>[] GetValuesAndDescriptions<T>()
     {
         return EnumHelper.GetValuesAndDescriptions(typeof(T))
-            .Select(x => ((T)x.Value, x.Description))
+            .Select(x => new EnumValueWithDescription<T>()
+            {
+                Value = (T)x.Value, 
+                Description = x.Description
+            })
             .ToArray();
     }
     
@@ -136,6 +140,18 @@ public static class EnumHelper
     public struct EnumValueWithDescription
     {
         public object Value { get; set; }
+
+        public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Value}: {Description}";
+        }
+    }
+    
+    public struct EnumValueWithDescription<T>
+    {
+        public T Value { get; set; }
 
         public string Description { get; set; }
 

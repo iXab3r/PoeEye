@@ -1,7 +1,7 @@
 @inherits PoeShared.Blazor.BlazorReactiveComponent
 
 <div class="@Class" style="@Style">
-    <div class="d-flex align-items-center gap-3" style="cursor: pointer;">
+    <div class="r-expander-header" >
         <ReactiveButton Class="btn border-0 d-flex gap-3 align-items-center" Command="ToggleIsExpanded">
             <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.IsExpanded)))">
                 <i class="@SwitcherClassMapper"></i>
@@ -28,7 +28,7 @@
         </ReactiveSection>
     </div>
 
-    <div id="@Id">
+    <div id="@Id" class="r-expander-content">
         <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.IsExpanded)))">
             @if (IsExpanded)
             {

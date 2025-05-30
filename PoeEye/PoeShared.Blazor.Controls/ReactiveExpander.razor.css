@@ -1,0 +1,11 @@
+﻿.r-expander-content {
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
+}
+
+.r-expander-header {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    cursor: pointer;
+}
