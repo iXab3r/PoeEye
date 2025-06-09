@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Concurrency;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace PoeShared.Blazor.Wpf;
@@ -48,7 +49,7 @@ public interface IBlazorWindowNativeController
 
 public interface IBlazorWindowMetroController
 {
-    ReactiveWindow GetWindow();
+    Window GetWindow();
 
     void EnsureCreated();
 }

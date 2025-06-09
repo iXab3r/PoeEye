@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf.Services;
@@ -24,6 +25,11 @@ internal sealed class WebViewServiceProvider : DisposableReactiveObjectWithLogge
             throw new InvalidOperationException("Service provider is not ready");
         }
 
-        return provider.GetService(serviceType);
+        var result = provider.GetService(serviceType);
+        if (result is IServiceScopeFactory scopeFactory)
+        {
+            
+        }
+        return result;
     }
 }

@@ -11,6 +11,7 @@
 @using ReactiveUI
 @using PoeShared.Blazor
 @using Microsoft.AspNetCore.Components.Forms
+@using PoeShared.Blazor.Services
 @using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Native
 @using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
@@ -18,14 +19,18 @@
 
 <HeadContent>
     <link href="_content/PoeShared.Blazor.Wpf/PoeShared.Blazor.Wpf.bundle.scp.css" rel="stylesheet"/>
+    <link href="_content/PoeShared.Blazor.Wpf/css/blazor-window.css" rel="stylesheet"/>
 </HeadContent>
 
 <div class="d-grid h-100 overflow-hidden"
+     @ref="@ElementRef"
+     id="@(IBlazorWindow.WindowId)"
      style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
         @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.Default)
         {
-            <div class="d-flex w-100 bg-secondary-subtle text-white text-uppercase font-play align-items-center"
+            <div class="d-flex w-100 align-items-center"
+                 id="@(IBlazorWindow.WindowTitleBarId)"
                  style="@(new CssBuilder().AddValue($"anchor-name: {IBlazorWindow.TitleBarAnchorName};").Build())"
                  @ref="@TitleRef">
                 <ReactiveSection
@@ -134,9 +139,16 @@
 
         @{
             var borderZIndex = 65535;
+            var minThickness = 4;
             var borderThickness = DataContext.BorderThickness;
+            var resizeBorderThickness = new Thickness(
+                Math.Max(borderThickness.Left, minThickness),
+                Math.Max(borderThickness.Top, minThickness),
+                Math.Max(borderThickness.Right, minThickness),
+                Math.Max(borderThickness.Bottom, minThickness));
+
             var borderColor = DataContext.BorderColor;
-            var borderColorAsHex = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
+            var borderColorAsHtmlColor = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
             var cornerThumbSize = "10px";
 
             var topBorderStyle = new CssBuilder()
@@ -144,35 +156,67 @@
                 .AddValue($"height: {borderThickness.Top}px;")
                 .AddValue($"left: {borderThickness.Left}px;")
                 .AddValue($"top: 0;")
-                .AddValue($"background-color: {borderColorAsHex};")
-                .AddValue($"z-index: {borderZIndex};")
-                .AddValue($"cursor: n-resize;");
+                .AddValue($"background-color: {borderColorAsHtmlColor};")
+                .AddValue($"z-index: {borderZIndex};");
 
             var rightBorderStyle = new CssBuilder()
                 .AddValue($"height: calc(100vh - {borderThickness.Top}px - {borderThickness.Bottom}px);")
                 .AddValue($"width: {borderThickness.Right}px;")
                 .AddValue($"right: 0;")
                 .AddValue($"top: {borderThickness.Top}px;")
-                .AddValue($"background-color: {borderColorAsHex};")
-                .AddValue($"z-index: {borderZIndex};")
-                .AddValue($"cursor: e-resize;");
+                .AddValue($"background-color: {borderColorAsHtmlColor};")
+                .AddValue($"z-index: {borderZIndex};");
 
             var bottomBorderStyle = new CssBuilder()
                 .AddValue($"width: calc(100vw - {borderThickness.Left}px - {borderThickness.Right}px);")
                 .AddValue($"height: {borderThickness.Bottom}px;")
                 .AddValue($"left: {borderThickness.Left}px;")
                 .AddValue($"bottom: 0;")
-                .AddValue($"background-color: {borderColorAsHex};")
-                .AddValue($"z-index: {borderZIndex};")
-                .AddValue($"cursor: s-resize;");
+                .AddValue($"background-color: {borderColorAsHtmlColor};")
+                .AddValue($"z-index: {borderZIndex};");
 
             var leftBorderStyle = new CssBuilder()
                 .AddValue($"height: calc(100vh - {borderThickness.Top}px - {borderThickness.Bottom}px);")
                 .AddValue($"width: {borderThickness.Left}px;")
                 .AddValue($"top: {borderThickness.Top}px;")
                 .AddValue($"left: 0;")
-                .AddValue($"background-color: {borderColorAsHex};")
+                .AddValue($"background-color: {borderColorAsHtmlColor};")
+                .AddValue($"z-index: {borderZIndex};");
+
+            var topBorderResizeStyle = new CssBuilder()
+                .AddValue($"width: calc(100vw - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
+                .AddValue($"height: {resizeBorderThickness.Top}px;")
+                .AddValue($"left: {resizeBorderThickness.Left}px;")
+                .AddValue($"top: 0;")
+                .AddValue($"background-color: transparent;")
                 .AddValue($"z-index: {borderZIndex};")
+                .AddValue($"cursor: n-resize;");
+
+            var rightBorderResizeStyle = new CssBuilder()
+                .AddValue($"height: calc(100vh - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
+                .AddValue($"width: {resizeBorderThickness.Right}px;")
+                .AddValue($"right: 0;")
+                .AddValue($"top: {resizeBorderThickness.Top}px;")
+                .AddValue($"background-color: transparent;")
+                .AddValue($"z-index: {borderZIndex + 1};")
+                .AddValue($"cursor: e-resize;");
+
+            var bottomBorderResizeStyle = new CssBuilder()
+                .AddValue($"width: calc(100vw - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
+                .AddValue($"height: {resizeBorderThickness.Bottom}px;")
+                .AddValue($"left: {resizeBorderThickness.Left}px;")
+                .AddValue($"bottom: 0;")
+                .AddValue($"background-color: transparent;")
+                .AddValue($"z-index: {borderZIndex + 1};")
+                .AddValue($"cursor: s-resize;");
+
+            var leftBorderResizeStyle = new CssBuilder()
+                .AddValue($"height: calc(100vh - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
+                .AddValue($"width: {resizeBorderThickness.Left}px;")
+                .AddValue($"top: {resizeBorderThickness.Top}px;")
+                .AddValue($"left: 0;")
+                .AddValue($"background-color: transparent;")
+                .AddValue($"z-index: {borderZIndex + 1};")
                 .AddValue($"cursor: w-resize;");
 
             // Corners
@@ -204,17 +248,24 @@
                 .AddValue("cursor: nwse-resize;");
         }
 
+        <!-- Border -->
+        <div class="position-fixed user-select-none" style="@topBorderStyle"></div>
+        <div class="position-fixed user-select-none" style="@rightBorderStyle"></div>
+        <div class="position-fixed user-select-none" style="@bottomBorderStyle"></div>
+        <div class="position-fixed user-select-none" style="@leftBorderStyle"></div>
+
         <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ResizeMode)))">
+
             @if (DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
             {
                 <!-- Edge Resizers -->
-                <div class="position-fixed" style="@topBorderStyle"
+                <div class="position-fixed" style="@topBorderResizeStyle"
                      @onmousedown="@(() => StartResize(WindowResizeDirection.Top))"></div>
-                <div class="position-fixed" style="@rightBorderStyle"
+                <div class="position-fixed" style="@rightBorderResizeStyle"
                      @onmousedown="@(() => StartResize(WindowResizeDirection.Right))"></div>
-                <div class="position-fixed" style="@bottomBorderStyle"
+                <div class="position-fixed" style="@bottomBorderResizeStyle"
                      @onmousedown="@(() => StartResize(WindowResizeDirection.Bottom))"></div>
-                <div class="position-fixed" style="@leftBorderStyle"
+                <div class="position-fixed" style="@leftBorderResizeStyle"
                      @onmousedown="@(() => StartResize(WindowResizeDirection.Left))"></div>
 
                 <!-- Corner Resizers -->
@@ -273,12 +324,15 @@
 
     [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
     [Inject] public IBlazorWindowAccessor BlazorWindowAccessor { get; init; }
+    [Inject] public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
 
     public BlazorContentPresenter TitleBarContentPresenter { get; private set; }
 
     public BlazorContentPresenter ContentPresenter { get; private set; }
 
     public ElementReference TitleRef { get; private set; }
+
+    public bool WindowIsActive { get; private set; }
 
     protected override void OnInitialized()
     {
@@ -296,6 +350,48 @@
                 {
                     await BlazorContentControlAccessor.Control.OpenDevTools();
                     x.Handled = true;
+                }
+            })
+            .AddTo(Anchors);
+
+        WindowIsActive = UnsafeNative.GetForegroundWindow() == BlazorWindowAccessor.Window.GetWindowHandle();
+        BlazorWindowAccessor.Window
+            .WhenActivated
+            .Subscribe(() => { WindowIsActive = true; })
+            .AddTo(Anchors);
+
+        BlazorWindowAccessor.Window
+            .WhenDeactivated
+            .Subscribe(() => { WindowIsActive = false; })
+            .AddTo(Anchors);
+    }
+
+    protected override void OnAfterFirstRender()
+    {
+        base.OnAfterFirstRender();
+
+        this.WhenAnyValue(x => x.WindowIsActive)
+            .SubscribeAsync(async isActive =>
+            {
+                try
+                {
+                    if (isActive)
+                    {
+                        await JsPoeBlazorUtils.RemoveClass(ElementRef, "blazor-window-inactive");
+                    }
+                    else
+                    {
+                        await JsPoeBlazorUtils.AddClass(ElementRef, "blazor-window-inactive");
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (e.IsJSException())
+                    {
+                        return;
+                    }
+
+                    throw;
                 }
             })
             .AddTo(Anchors);

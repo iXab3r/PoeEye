@@ -31,12 +31,12 @@ partial class BlazorWindow
     /// Does not activate the window, and does not discard the mouse message.
     /// </summary>
     private const int MA_NOACTIVATE = 3;
-    
+
     /// <summary>
     /// In a window currently covered by another window in the same thread (the message will be sent to underlying windows in the same thread until one of them returns a code that is not HTTRANSPARENT).
     /// </summary>
     private static readonly IntPtr HTTRANSPARENT = new(-1);
-    
+
     private void HandleEvent(IWindowEvent windowEvent)
     {
         if (windowEvent is DisposeWindowCommand)
@@ -47,7 +47,7 @@ partial class BlazorWindow
                 return;
             }
 
-            var window = GetOrCreate();
+            var window = GetOrCreate(); //technically we never create the window here, only getting it
             if (window.Anchors.IsDisposed)
             {
                 Log.Debug($"Window already disposed - ignoring disposal request");
@@ -59,7 +59,7 @@ partial class BlazorWindow
             window.Dispose();
         }
         else if (windowEvent is WaitForIdleCommand waitForIdleCommand)
-        { 
+        {
             Log.Debug($"Notifying that queue is processed to this point: {waitForIdleCommand}");
             waitForIdleCommand.ResetEvent.Set();
         }
@@ -241,7 +241,7 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Updating {nameof(BackgroundColor)} to {command.BackgroundColor}");
                     var calculatedColor = command.BackgroundColor == Colors.Transparent
-                        ? Colors.Transparent with { A = 1 } //true transparent window is non-clickable
+                        ? Colors.Transparent with {A = 1} //true transparent window is non-clickable
                         : command.BackgroundColor;
                     var color = new SolidColorBrush(calculatedColor);
                     color.Freeze();
@@ -279,14 +279,7 @@ partial class BlazorWindow
                 case SetNoActivate command:
                 {
                     Log.Debug($"Updating {nameof(NoActivate)} to {command.NoActivate}");
-                    if (command.NoActivate)
-                    {
-                        UnsafeNative.SetWindowExNoActivate(window.WindowHandle);
-                    }
-                    else
-                    {
-                        UnsafeNative.SetWindowExActivate(window.WindowHandle);
-                    }
+                    window.SetActivation(command.NoActivate == false);
                     break;
                 }
                 case SetBlazorUnityContainer command:
@@ -562,7 +555,7 @@ partial class BlazorWindow
                     blazorWindow.WhenAnyValue(x => x.NoActivate)
                         .Subscribe(x => observer.OnNext(new SetNoActivate(x)))
                         .AddTo(anchors);
-                    
+
                     //to avoid System.InvalidOperationException: Transparent mode requires AllowsTransparency to be set to True
                     blazorWindow.WhenAnyValue(x => x.IsClickThrough)
                         .Subscribe(x => observer.OnNext(new SetIsClickThrough(x)))
@@ -610,43 +603,43 @@ partial class BlazorWindow
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.MouseDown?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseUp += h, h => inputEventSource.MouseUp -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.MouseUp?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseDown += h, h => inputEventSource.PreviewMouseDown -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.PreviewMouseDown?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseUp += h, h => inputEventSource.PreviewMouseUp -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.PreviewMouseUp?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.MouseMove += h, h => inputEventSource.MouseMove -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.MouseMove?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.PreviewMouseMove += h, h => inputEventSource.PreviewMouseMove -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.PreviewMouseMove?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyDown += h, h => inputEventSource.KeyDown -= h)
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.KeyDown?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyUp += h, h => inputEventSource.KeyUp -= h)
                 .Select(x => x.EventArgs)
@@ -670,7 +663,7 @@ partial class BlazorWindow
                 .Select(x => x.EventArgs)
                 .Subscribe(x => blazorWindow.Loaded?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Unloaded += h, h => window.Unloaded -= h)
                 .Select(x => x.EventArgs)
@@ -682,6 +675,13 @@ partial class BlazorWindow
                 .Select(x => x.EventArgs)
                 .Subscribe(x =>
                 {
+                    blazorWindow.Log.Debug($"Native Window has been closed");
+                    if (!window.IsDisposed)
+                    {
+                        blazorWindow.Log.Debug($"Disposing native window");
+                        window.Dispose();
+                    }
+
                     blazorWindow.Closed?.Invoke(blazorWindow, x);
                     if (!blazorWindow.isClosedTcs.TrySetResult())
                     {
@@ -865,7 +865,7 @@ partial class BlazorWindow
             }
         }
     }
-    
+
 
     private IntPtr WindowHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
@@ -894,8 +894,9 @@ partial class BlazorWindow
                     {
                         //this makes the window transparent to GetWindowFromPoint (as usually expected for non-interactive windows)
                         handled = true;
-                        return HTTRANSPARENT; 
+                        return HTTRANSPARENT;
                     }
+
                     break;
                 }
                 case User32.WindowMessage.WM_MOUSEACTIVATE:
@@ -905,6 +906,7 @@ partial class BlazorWindow
                         handled = true;
                         return new IntPtr(MA_NOACTIVATE);
                     }
+
                     break;
                 }
                 case User32.WindowMessage.WM_GETMINMAXINFO
@@ -997,13 +999,13 @@ partial class BlazorWindow
     }
 
     private sealed record WaitForIdleCommand(ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
-    
+
     private sealed record InvokeCommand(Action ActionToExecute, ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
-    
+
     private sealed record ShowCommand : IWindowCommand;
 
     private sealed record HideCommand : IWindowCommand;
-    
+
     private sealed record ActivateCommand : IWindowCommand;
 
     private sealed record ShowDevToolsCommand : IWindowCommand;
@@ -1031,7 +1033,7 @@ partial class BlazorWindow
     private sealed record SetWindowSizeCommand(Size Size) : IWindowCommand;
 
     private sealed record SetTopmostCommand(bool Topmost) : IWindowCommand;
-    
+
     private sealed record SetNoActivate(bool NoActivate) : IWindowCommand;
 
     private sealed record SetVisibleCommand(bool IsVisible) : IWindowCommand;

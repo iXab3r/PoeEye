@@ -210,6 +210,10 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     });
 
                     childServiceCollection.AddSingleton<IUnityContainer>(sp => state.container);
+                    
+                    //very important - IServiceScopeFactory for Root provider, the one built using BuildServiceProvider
+                    //will always be ServiceProviderEngineScope, that is how ServiceProvider works
+                    //so fallback is not reliable, it works only for NESTED scopes, not the root one
                     childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
                     childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
                     childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
@@ -232,16 +236,16 @@ public class BlazorContentControl : Control, IBlazorContentControl
                             //transient dependency scope differs in .NET container and was converted either to Scoped or Singleton
                             continue;
                         }
-
+                        
                         childServiceCollection.Add(unityServiceDescriptor);
                     }
 
-                    var childServiceProvider = childServiceCollection.BuildServiceProvider(); //FIXME memory leak for transient dependencies
+                    var childServiceProvider = new UnityFallbackServiceProvider(childServiceCollection.BuildServiceProvider(), state.container); //FIXME memory leak for transient dependencies
+                    childServiceProvider.GetRequiredService<IClock>(); //ensure DI by itself works
 
-                    childServiceProvider.GetRequiredService<IClock>(); //ensure global scope works
-                    using (var scoped = childServiceProvider.CreateScope())
+                    using (var tempScope = childServiceProvider.CreateScope())
                     {
-                        scoped.ServiceProvider.GetRequiredService<IClock>(); //ensure local scope works
+                        tempScope.ServiceProvider.GetRequiredService<IClock>(); //ensure local scope works
                     }
 
                     webViewServiceProvider.ServiceProvider = childServiceProvider;

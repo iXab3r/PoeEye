@@ -10,19 +10,20 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf;
 
-public class ReactiveWindow : Window, IDisposableReactiveObject
+internal class ReactiveWindow : Window, IDisposableReactiveObject
 {
+    public ReactiveWindow()
+    {
+        Loaded += OnLoaded;
+    }
+    
     public CompositeDisposable Anchors { get; } = new();
 
     public IntPtr WindowHandle { get; private set; }
 
-    private bool AllowsTransparencyAfterLoad { get; set; }
+    public bool IsDisposed => Anchors.IsDisposed;
 
-    public ReactiveWindow()
-    {
-        Loaded += OnLoaded;
-        Closed += OnClosed;
-    }
+    private bool AllowsTransparencyAfterLoad { get; set; }
 
     public void Dispose()
     {
@@ -57,11 +58,6 @@ public class ReactiveWindow : Window, IDisposableReactiveObject
     {
         base.OnPropertyChanged(e);
         RaisePropertyChanged(e.Property.Name);
-    }
-
-    private void OnClosed(object sender, EventArgs e)
-    {
-        Dispose();
     }
 
     /// <summary>

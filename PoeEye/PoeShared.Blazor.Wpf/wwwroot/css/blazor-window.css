@@ -1,0 +1,28 @@
+@font-face {
+    font-family: 'Play';
+    src: url('../fonts/Play-Regular.ttf') format('truetype');
+}
+
+#blazor-window {
+    font-family: Play, serif;
+}
+
+#blazor-window-titlebar {
+    background: linear-gradient(to right, #2d3a45, #2f2f2f);
+    color: white;
+    text-transform: uppercase !important;
+}
+
+#blazor-window-statusbar {
+    background: linear-gradient(to right,
+    #2d3a45 40%,
+    #2f2f2f 90%
+    );
+    color: white;
+}
+
+.blazor-window-inactive #blazor-window-titlebar,
+.blazor-window-inactive #blazor-window-statusbar {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}

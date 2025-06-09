@@ -541,6 +541,11 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         return window.WindowHandle;
     }
 
+    Window IBlazorWindowMetroController.GetWindow()
+    {
+        return GetWindow();
+    }
+    
     public ReactiveWindow GetWindow()
     {
         EnsureNotDisposed();

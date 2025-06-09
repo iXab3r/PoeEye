@@ -16,6 +16,9 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
 {
     public const string TitleBarAnchorName = $"--blazor-window-titlebar";
     public const string WindowAnchorName = $"--blazor-window";
+    public const string WindowId = $"blazor-window";
+    public const string WindowTitleBarId = $"blazor-window-titlebar";
+    public const string WindowStatusBarId = $"blazor-window-statusbar";
     
     /// <summary>
     /// Gets or sets type of View which will be displayed within the window.

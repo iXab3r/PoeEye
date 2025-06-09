@@ -21,7 +21,11 @@ internal partial class BlazorWindow
                 .Select(x => x ?? owner.unityContainer)
                 .Subscribe(parentContainer =>
                 {
-                    var childContainer = parentContainer.CreateChildContainer().AddTo(Anchors);
+                    //that is a very shady moment - child container has to be kept alive for the entire period
+                    //kept alive = managed via Parent Anchors, not its own
+                    //otherwise, when _current_ window gets disposed, the entire container will be disposed
+                    //maybe move registrations to another nested container to avoid this?
+                    var childContainer = parentContainer.CreateChildContainer().AddTo(owner.Anchors);
                     childContainer.RegisterSingleton<IBlazorWindowController>(_ => owner);
                     childContainer.RegisterSingleton<IBlazorWindowAccessor>(_ => new BlazorWindowAccessor(owner));
                     ChildContainer = childContainer;
@@ -34,6 +38,7 @@ internal partial class BlazorWindow
                 AdditionalFileProvider = owner.complexFileProvider,
                 Content = owner
             }.AddTo(Anchors);
+            
             this.WhenAnyValue(x => x.ChildContainer)
                 .Subscribe(x => { ContentControl.Container = x; })
                 .AddTo(Anchors);

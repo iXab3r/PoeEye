@@ -82,4 +82,40 @@ public static class TaskExtensions
             }
         }
     }
+    
+    /// <summary>
+    /// Task will be awaited and exceptions will be forwarded to RxApp.DefaultExceptionHandler.
+    /// </summary>
+    public static async void AndForget(this ValueTask task, bool ignoreExceptions = false)
+    {
+        try
+        {
+            await task;
+        }
+        catch (Exception ex)
+        {
+            if (!ignoreExceptions)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(ex);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Task will be awaited and exceptions will be forwarded to RxApp.DefaultExceptionHandler.
+    /// </summary>
+    public static async void AndForget<T>(this ValueTask<T> task, bool ignoreExceptions = false)
+    {
+        try
+        {
+            await task;
+        }
+        catch (Exception ex)
+        {
+            if (!ignoreExceptions)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(ex);
+            }
+        }
+    }
 }
