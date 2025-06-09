@@ -7,6 +7,7 @@ using AntDesign;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 using PropertyBinder;
@@ -253,16 +254,22 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
 
         this.WhenAnyValue(x => x.Class)
             .Skip(1)
-            .Subscribe(x =>
+            .SubscribeAsync(async x =>
             {
                 try
                 {
-                    TreeComponent.JsPoeBlazorUtils.SetClass(ElementRef, x);
+                    await TreeComponent.JsPoeBlazorUtils.SetClass(ElementRef, x);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     if (Anchors.IsDisposed)
                     {
+                        return;
+                    }
+
+                    if (ex is JSException)
+                    {
+                        Log.Warn($"JS exception when tried to update the class to {x} in {this}", ex);
                         return;
                     }
 
