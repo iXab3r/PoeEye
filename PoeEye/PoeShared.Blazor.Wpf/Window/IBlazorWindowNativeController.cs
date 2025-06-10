@@ -50,6 +50,4 @@ public interface IBlazorWindowNativeController
 public interface IBlazorWindowMetroController
 {
     Window GetWindow();
-
-    void EnsureCreated();
 }

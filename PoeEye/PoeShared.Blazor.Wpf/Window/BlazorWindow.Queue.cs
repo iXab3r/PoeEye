@@ -47,7 +47,7 @@ partial class BlazorWindow
                 return;
             }
 
-            var window = GetOrCreate(); //technically we never create the window here, only getting it
+            var window = GetWindowOrThrow(); //technically we never create the window here, only getting it
             if (window.Anchors.IsDisposed)
             {
                 Log.Debug($"Window already disposed - ignoring disposal request");

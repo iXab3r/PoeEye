@@ -537,36 +537,13 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public IntPtr GetWindowHandle()
     {
-        var window = GetWindow();
+        var window = GetWindowOrThrow();
         return window.WindowHandle;
     }
 
-    Window IBlazorWindowMetroController.GetWindow()
+    public Window GetWindow()
     {
-        return GetWindow();
-    }
-    
-    public ReactiveWindow GetWindow()
-    {
-        EnsureNotDisposed();
-        if (!windowSupplier.IsValueCreated)
-        {
-            throw new InvalidOperationException("Window is not created yet");
-        }
-
-        return windowSupplier.Value;
-    }
-
-    public void EnsureCreated()
-    {
-        if (uiDispatcher.CheckAccess())
-        {
-            HandleUpdate();
-        }
-        else
-        {
-            throw new NotSupportedException();
-        }
+        return GetOrCreate();
     }
 
     public Rectangle GetWindowRect()
@@ -598,6 +575,17 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         windowLeft.SetValue(windowPos.X, TrackedPropertyUpdateSource.Internal);
         windowTop.SetValue(windowPos.Y, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowPosCommand(windowPos));
+    }
+
+    private ReactiveWindow GetWindowOrThrow()
+    {
+        EnsureNotDisposed();
+        if (!windowSupplier.IsValueCreated)
+        {
+            throw new InvalidOperationException("Window is not created yet");
+        }
+
+        return windowSupplier.Value;
     }
 
     private void EnqueueUpdate(IWindowEvent windowEvent)

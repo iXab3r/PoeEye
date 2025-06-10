@@ -108,9 +108,9 @@ internal sealed class ErrorReportingService : DisposableReactiveObject, IErrorRe
         });
     }
 
-    public void ReportProblem()
+    public void ReportProblem(Exception error = null)
     {
-        ShowExceptionDialog(default(Exception));
+        ShowExceptionDialog(error);
     }
 
     private void ShowExceptionDialog(Exception exception)

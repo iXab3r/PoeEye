@@ -43,6 +43,8 @@ public interface IWindowViewController : IDisposableReactiveObject, IViewControl
     void Close(bool? result);
         
     void Close();
+
+    void SetWindowRect(WinRect rect);
         
     bool Topmost { get; set; }
 }

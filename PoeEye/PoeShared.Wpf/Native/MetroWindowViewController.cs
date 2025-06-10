@@ -127,6 +127,11 @@ public sealed class MetroWindowViewController : DisposableReactiveObject, IMetro
         Close(null);
     }
 
+    public void SetWindowRect(WinRect rect)
+    {
+        UnsafeNative.SetWindowRect(Window.WindowHandle, rect);
+    }
+
     public bool Topmost { get; set; }
 
     public void Hide()

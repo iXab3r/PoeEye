@@ -2,7 +2,7 @@
 
 public interface IErrorReportingService 
 {
-    void ReportProblem();
+    void ReportProblem(Exception error = null);
 
     void SetReportConsumer(IErrorReportHandler reportHandler);
 
