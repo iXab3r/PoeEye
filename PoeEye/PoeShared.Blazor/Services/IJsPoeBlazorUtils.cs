@@ -109,6 +109,31 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// Loads CSS file dynamically
     /// </summary>
     Task LoadCss(string cssPath);
+    
+    /// <summary>
+    /// Registers a DOM element as a file drop target within the WebView2-based Blazor UI.
+    /// </summary>
+    /// <param name="elementRef">A reference to the HTML element that should accept dropped files.</param>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation of enabling the file drop target.
+    /// </returns>
+    /// <remarks>
+    /// This method typically invokes a JavaScript function (e.g., <c>registerFileDropTarget</c>) to
+    /// attach <c>dragover</c> and <c>drop</c> event listeners to the specified element. When files
+    /// are dropped onto the element, they are posted to the WebView2 host via
+    /// <c>window.chrome.webview.postMessageWithAdditionalObjects</c>.
+    ///
+    /// The host application can handle these messages through the WebView2
+    /// <c>CoreWebView2.WebMessageReceived</c> event, receiving each file as a <c>CoreWebView2File</c>.
+    ///
+    /// Requires WebView2 SDK version 1.0.1518.46 or later, which supports <c>postMessageWithAdditionalObjects</c>.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// await RegisterFileDropTarget(myElementRef);
+    /// </code>
+    /// </example>
+    Task RegisterFileDropTarget(ElementReference elementRef);
 
     Task<IDynamicRootComponent> AddRootComponent(string elementId, string componentIdentifier, object initialParameters = default);
 

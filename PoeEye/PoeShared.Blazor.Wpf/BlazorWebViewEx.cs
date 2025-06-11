@@ -103,7 +103,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.WebView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; 
         e.WebView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false; 
         e.WebView.PreviewKeyDown += WebViewOnPreviewKeyDown;
-        
+        e.WebView.CoreWebView2.WebMessageReceived += CoreWebView2OnWebMessageReceived;
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
         Log.Info($"Updating virtual mappings, drives: {drives.Select(x => x.FullName).DumpToString()}");
         foreach (var rootDirectory in drives)
@@ -123,6 +123,14 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
                 continue;
             }
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
+        }
+    }
+
+    private void CoreWebView2OnWebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        if (e.AdditionalObjects != null)
+        {
+            
         }
     }
 

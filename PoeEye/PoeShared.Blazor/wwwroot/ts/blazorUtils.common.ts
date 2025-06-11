@@ -30,3 +30,51 @@ export interface IRootComponentsFunctions {
 export interface IBlazor {
     rootComponents: IRootComponentsFunctions;
 }
+
+
+/**
+ * Interface that defines the useful methods on the .NET object reference passed by Blazor.
+ */
+export interface IBlazorInteropObject {
+    invokeMethodAsync<T>(methodName: string, ...args: any[]): Promise<T>;
+    invokeMethod<T>(methodName: string, ...args: any[]): T;
+}
+
+export interface CoreWebView2 {
+    postMessage(message: any): void;
+    postMessageWithAdditionalObjects(message: any, additionalObjects: ArrayLike<any>): void;
+    addEventListener(
+        type: "message",
+        listener: (event: { data: any; additionalObjects?: any[] }) => void
+    ): void;
+    removeEventListener(
+        type: "message",
+        listener: (event: { data: any; additionalObjects?: any[] }) => void
+    ): void;
+}
+
+export interface ChromeWithWebView {
+    webview: CoreWebView2;
+}
+
+export interface ChromeWindow {
+    chrome?: ChromeWithWebView;
+}
+
+export function getChromeWebView2(): CoreWebView2 | null {
+    const maybeChrome = (window as any).chrome;
+
+    if (!maybeChrome || typeof maybeChrome !== "object") {
+        console.warn("window.chrome is not available or not an object.");
+        return null;
+    }
+
+    const maybeWebView = maybeChrome.webview;
+
+    if (!maybeWebView || typeof maybeWebView.postMessage !== "function") {
+        console.warn("chrome.webview is not available or does not implement postMessage.");
+        return null;
+    }
+
+    return maybeWebView as CoreWebView2;
+}

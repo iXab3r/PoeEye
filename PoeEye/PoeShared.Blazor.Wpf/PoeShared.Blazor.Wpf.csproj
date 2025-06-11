@@ -28,7 +28,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="7.0.2">
             <!-- 7.0.2 is min for WPF WebView -->
         </PackageReference>
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46">
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45">
         </PackageReference>
         <PackageReference Include="PInvoke.SHCore" Version="0.6.49">
         </PackageReference>
