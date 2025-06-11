@@ -35,17 +35,8 @@ export function addKeyboardHook(element: HTMLElement, dotNetReference: DotNet.Do
     keyDownListeners.set(element, eventHandler);
 }
 
-/**
- * Removes the previously installed keyboard hook from the specified HTMLElement.
- * @param element The HTML element to remove the keydown listener from.
- */
-export function removeKeyboardHook(element: HTMLElement): void {
-    const eventHandler = this.eventListeners.get(element);
-
-    if (eventHandler) {
-        element.removeEventListener('keydown', eventHandler);
-        keyDownListeners.delete(element);
-    }
+export function createElementInputManager(element: HTMLElement) : ElementInputEventManager{
+    return new ElementInputEventManager(element);
 }
 
 // Define an interface that matches the structure of Blazor's KeyboardEventArgs
@@ -67,4 +58,21 @@ interface IHotkeyGesture {
     shiftKey: boolean;
     altKey: boolean;
     metaKey: boolean;
+}
+
+interface IElementInputEventManager extends Disposable {
+    
+}
+
+class ElementInputEventManager implements Disposable {
+    
+    private readonly target: HTMLElement;
+
+    constructor(target: HTMLElement) {
+        this.target = target;
+    }
+
+    [Symbol.dispose](): void {
+        throw new Error('Method not implemented.');
+    }
 }
