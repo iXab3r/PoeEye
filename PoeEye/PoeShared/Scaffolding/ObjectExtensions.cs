@@ -26,6 +26,11 @@ public static class ObjectExtensions
 
         return JsonConvert.SerializeObject(instance, formatting);
     }
+
+    public static string DumpToJson<T>(this T instance)
+    {
+        return ToJson(instance, Formatting.Indented);
+    }
     
     public static string Dump<T>(this T instance)
     {
