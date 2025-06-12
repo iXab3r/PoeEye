@@ -16,8 +16,8 @@ public sealed class ToStringBuilder
     {
         this.ownerName = ownerName;
     }
-    
-    public ToStringBuilder([NotNull] object owner) : this (owner.GetType().Name)
+
+    public ToStringBuilder([NotNull] object owner) : this(owner.GetType().Name)
     {
     }
 
@@ -44,6 +44,7 @@ public sealed class ToStringBuilder
             {
                 return this;
             }
+
             AppendParameter(parameterName, value);
         }
         catch (Exception e)
@@ -51,9 +52,10 @@ public sealed class ToStringBuilder
             Log.Error($"Failed to format nullable parameter {parameterName}", e);
             paramsPartBuilder.Append($"{parameterName} ERROR: {e}");
         }
+
         return this;
     }
-    
+
     public ToStringBuilder AppendParameter<T>(string parameterName, T value)
     {
         try
@@ -70,6 +72,7 @@ public sealed class ToStringBuilder
             Log.Error($"Failed to format parameter {parameterName}", e);
             paramsPartBuilder.Append($"{parameterName} ERROR: {e}");
         }
+
         return this;
     }
 
@@ -77,7 +80,7 @@ public sealed class ToStringBuilder
     {
         return paramsPartBuilder.ToString();
     }
-    
+
     public override string ToString()
     {
         try
@@ -91,8 +94,11 @@ public sealed class ToStringBuilder
             {
                 result.Append(ownerName);
             }
-            
-            result.Append($"{{ {paramsPartBuilder} }}");
+
+            if (paramsPartBuilder.Length > 0)
+            {
+                result.Append($"{{ {paramsPartBuilder} }}");
+            }
 
             return result.ToString();
         }
