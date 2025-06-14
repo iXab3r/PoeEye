@@ -283,6 +283,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public TitleBarDisplayMode TitleBarDisplayMode { get; set; }
 
+    public IBlazorContentControlConfigurator ControlConfigurator { get; set; }
+
     public IDisposable RegisterFileProvider(IFileProvider fileProvider)
     {
         return compositeFileProvider.Add(fileProvider);

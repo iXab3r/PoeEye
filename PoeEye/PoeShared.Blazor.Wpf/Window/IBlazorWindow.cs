@@ -62,6 +62,11 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
     /// Gets or sets additional file provider which will be used by Blazor
     /// </summary>
     IFileProvider AdditionalFileProvider { get; set; }
+    
+    /// <summary>
+    /// Gets or sets Blazor control configurator which allows to inject custom actions into the pipeline
+    /// </summary>
+    IBlazorContentControlConfigurator ControlConfigurator { get; set; }
 
     /// <summary>
     /// Adds additional file provider which will be used by Blazor. Added to the end of the list.

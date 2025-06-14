@@ -11,7 +11,7 @@ namespace PoeShared.Blazor.Wpf;
 /// This class is intended to simplify the creation of configurators by allowing implementers 
 /// to override only the lifecycle stages they are interested in.
 /// </summary>
-public abstract class BlazorContentControlVisitorBase : IBlazorContentControlConfigurator
+public abstract class BlazorContentControlConfiguratorBase : IBlazorContentControlConfigurator
 {
     /// <inheritdoc />
     public virtual Task OnConfiguringAsync()

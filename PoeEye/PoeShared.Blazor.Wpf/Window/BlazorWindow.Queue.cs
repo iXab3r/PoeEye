@@ -302,6 +302,12 @@ partial class BlazorWindow
                     window.ContentControl.AdditionalFiles = command.AdditionalFiles;
                     break;
                 }
+                case SetBlazorControlConfigurator command:
+                {
+                    Log.Debug($"Updating {nameof(ControlConfigurator)} to {command.ControlConfigurator}");
+                    window.ContentControl.Configurator = command.ControlConfigurator;
+                    break;
+                }
                 default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
             }
         }
@@ -372,6 +378,7 @@ partial class BlazorWindow
                 ShowCloseButton: blazorWindow.ShowCloseButton,
                 ShowMinButton: blazorWindow.ShowCloseButton,
                 ShowMaxButton: blazorWindow.ShowMaxButton));
+            blazorWindow.HandleEvent(new SetBlazorControlConfigurator(blazorWindow.ControlConfigurator));
             blazorWindow.HandleEvent(new SetBlazorAdditionalFiles(blazorWindow.AdditionalFiles));
             blazorWindow.HandleEvent(new SetBlazorFileProvider(blazorWindow.AdditionalFileProvider));
             blazorWindow.HandleEvent(new SetBlazorUnityContainer(blazorWindow.Container));
@@ -594,7 +601,11 @@ partial class BlazorWindow
                 .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetBlazorAdditionalFiles(x)))
                 .AddTo(anchors);
-
+            
+            blazorWindow.WhenAnyValue(x => x.ControlConfigurator)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetBlazorControlConfigurator(x)))
+                .AddTo(anchors);
 
             // events propagation
             var inputEventSource = window.ContentControl.WebView;
@@ -1059,6 +1070,8 @@ partial class BlazorWindow
     private sealed record SetBlazorUnityContainer(IUnityContainer ChildContainer) : IWindowCommand;
 
     private sealed record SetBlazorFileProvider(IFileProvider FileProvider) : IWindowCommand;
+    
+    private sealed record SetBlazorControlConfigurator(IBlazorContentControlConfigurator ControlConfigurator) : IWindowCommand;
 
     private sealed record SetBlazorAdditionalFiles(ImmutableArray<IFileInfo> AdditionalFiles) : IWindowCommand;
 

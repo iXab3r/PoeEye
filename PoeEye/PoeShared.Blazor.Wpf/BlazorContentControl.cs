@@ -50,8 +50,8 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
     public static readonly DependencyProperty AdditionalFileProviderProperty = DependencyProperty.Register(
         nameof(AdditionalFileProvider), typeof(IFileProvider), typeof(BlazorContentControl), new PropertyMetadata(default(IFileProvider)));
-    
-  public static readonly DependencyProperty ConfiguratorProperty = DependencyProperty.Register(
+
+    public static readonly DependencyProperty ConfiguratorProperty = DependencyProperty.Register(
         nameof(Configurator), typeof(IBlazorContentControlConfigurator), typeof(BlazorContentControl), new PropertyMetadata(default(IBlazorContentControlConfigurator)));
 
     public static readonly DependencyProperty EnableHotkeysProperty = DependencyProperty.Register(
@@ -134,7 +134,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
         var unityContainerSource = this.WhenAnyValue(x => x.Container)
             .Select(x => x ?? UnityServiceCollection.Instance.BuildServiceProvider().GetService<IUnityContainer>());
 
-
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
                 this.WhenAnyValue(x => x.Configurator),
@@ -157,11 +156,15 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     UnhandledException = null;
                 }
 
+                var configurator = new CompositeBlazorContentControlConfigurator();
+                configurator.Add(new LoggingBlazorContentControlConfigurator(Log));
                 if (state.visitor != null)
                 {
-                    Log.Debug($"Notifying visitor that we've started initializing the view: {state.visitor}");
-                    await state.visitor.OnConfiguringAsync();
+                    configurator.Add(state.visitor);
                 }
+
+                Log.Debug($"Notifying visitor that we've started initializing the view");
+                await configurator.OnConfiguringAsync();
 
                 try
                 {
@@ -221,7 +224,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     });
 
                     childServiceCollection.AddSingleton<IUnityContainer>(sp => state.container);
-                    
+
                     //very important - IServiceScopeFactory for Root provider, the one built using BuildServiceProvider
                     //will always be ServiceProviderEngineScope, that is how ServiceProvider works
                     //so fallback is not reliable, it works only for NESTED scopes, not the root one
@@ -238,7 +241,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                                 x.ServiceType == unityServiceDescriptor.ServiceType &&
                                 x.ServiceKey == unityServiceDescriptor.ServiceKey)
                             .ToArray();
-                        
+
                         var higherOrderRegistration = typeRegistrations
                             .Where(x => x.Lifetime is ServiceLifetime.Singleton or ServiceLifetime.Scoped)
                             .ToArray();
@@ -247,16 +250,13 @@ public class BlazorContentControl : Control, IBlazorContentControl
                             //transient dependency scope differs in .NET container and was converted either to Scoped or Singleton
                             continue;
                         }
-                        
+
                         childServiceCollection.Add(unityServiceDescriptor);
                     }
 
-                    if (state.visitor != null)
-                    {
-                        Log.Debug($"Notifying visitor that registration stage is ongoing: {state.visitor}");
-                        await state.visitor.OnRegisteringServicesAsync(childServiceCollection);
-                    }
-                    
+                    Log.Debug($"Notifying visitor that registration stage is ongoing");
+                    await configurator.OnRegisteringServicesAsync(childServiceCollection);
+
                     var childServiceProvider = new UnityFallbackServiceProvider(childServiceCollection.BuildServiceProvider(), state.container); //FIXME memory leak for transient dependencies
                     childServiceProvider.GetRequiredService<IClock>(); //ensure DI by itself works
 
@@ -306,7 +306,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                             globalMemoryFileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
-                    
+
                     var indexFileContentTemplate = webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
                     var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
                     publicInMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
@@ -323,12 +323,9 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         Log.Debug($"Registering RootComponent: {kvp}");
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
-                    
-                    if (state.visitor != null)
-                    {
-                        Log.Debug($"Notifying visitor everything is up and ready for work: {state.visitor}");
-                        await state.visitor.OnInitializedAsync(childServiceProvider);
-                    }
+
+                    Log.Debug($"Notifying visitor everything is up and ready for work");
+                    await configurator.OnInitializedAsync(childServiceProvider);
 
                     if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
                     {
@@ -403,7 +400,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
         get => (IBlazorContentControlConfigurator) GetValue(ConfiguratorProperty);
         set => SetValue(ConfiguratorProperty, value);
     }
-    
+
     public bool EnableHotkeys
     {
         get => (bool) GetValue(EnableHotkeysProperty);
