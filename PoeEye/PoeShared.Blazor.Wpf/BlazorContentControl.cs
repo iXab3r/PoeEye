@@ -30,6 +30,7 @@ using PoeShared.Services;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
+using CompositeFileProvider = Microsoft.Extensions.FileProviders.CompositeFileProvider;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -49,6 +50,9 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
     public static readonly DependencyProperty AdditionalFileProviderProperty = DependencyProperty.Register(
         nameof(AdditionalFileProvider), typeof(IFileProvider), typeof(BlazorContentControl), new PropertyMetadata(default(IFileProvider)));
+    
+  public static readonly DependencyProperty ConfiguratorProperty = DependencyProperty.Register(
+        nameof(Configurator), typeof(IBlazorContentControlConfigurator), typeof(BlazorContentControl), new PropertyMetadata(default(IBlazorContentControlConfigurator)));
 
     public static readonly DependencyProperty EnableHotkeysProperty = DependencyProperty.Register(
         nameof(EnableHotkeys), typeof(bool), typeof(BlazorContentControl), new PropertyMetadata(true));
@@ -133,8 +137,9 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
+                this.WhenAnyValue(x => x.Configurator),
                 unityContainerSource,
-                (additionalFileProvider, container) => new {additionalFileProvider, container})
+                (additionalFileProvider, visitor, container) => new {additionalFileProvider, visitor, container})
             .ObserveOnIfNeeded(uiScheduler)
             .SubscribeAsync(async state =>
             {
@@ -150,6 +155,12 @@ public class BlazorContentControl : Control, IBlazorContentControl
                 {
                     Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
                     UnhandledException = null;
+                }
+
+                if (state.visitor != null)
+                {
+                    Log.Debug($"Notifying visitor that we've started initializing the view: {state.visitor}");
+                    await state.visitor.OnConfiguringAsync();
                 }
 
                 try
@@ -240,6 +251,12 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         childServiceCollection.Add(unityServiceDescriptor);
                     }
 
+                    if (state.visitor != null)
+                    {
+                        Log.Debug($"Notifying visitor that registration stage is ongoing: {state.visitor}");
+                        await state.visitor.OnRegisteringServicesAsync(childServiceCollection);
+                    }
+                    
                     var childServiceProvider = new UnityFallbackServiceProvider(childServiceCollection.BuildServiceProvider(), state.container); //FIXME memory leak for transient dependencies
                     childServiceProvider.GetRequiredService<IClock>(); //ensure DI by itself works
 
@@ -289,6 +306,10 @@ public class BlazorContentControl : Control, IBlazorContentControl
                             globalMemoryFileProvider.FilesByName.AddOrUpdate(file);
                         }
                     }
+                    
+                    var indexFileContentTemplate = webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
+                    var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
+                    publicInMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
 
                     var jsComponentsAccessor = new JSComponentConfigurationStoreAccessor(blazorContentRepository.JSComponents);
                     var webRootComponentsAccessor = new JSComponentConfigurationStoreAccessor(WebView.RootComponents.JSComponents);
@@ -302,11 +323,12 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         Log.Debug($"Registering RootComponent: {kvp}");
                         webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
                     }
-
-
-                    var indexFileContentTemplate = webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
-                    var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
-                    publicInMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
+                    
+                    if (state.visitor != null)
+                    {
+                        Log.Debug($"Notifying visitor everything is up and ready for work: {state.visitor}");
+                        await state.visitor.OnInitializedAsync(childServiceProvider);
+                    }
 
                     if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
                     {
@@ -376,6 +398,12 @@ public class BlazorContentControl : Control, IBlazorContentControl
         set => SetValue(AdditionalFileProviderProperty, value);
     }
 
+    public IBlazorContentControlConfigurator Configurator
+    {
+        get => (IBlazorContentControlConfigurator) GetValue(ConfiguratorProperty);
+        set => SetValue(ConfiguratorProperty, value);
+    }
+    
     public bool EnableHotkeys
     {
         get => (bool) GetValue(EnableHotkeysProperty);

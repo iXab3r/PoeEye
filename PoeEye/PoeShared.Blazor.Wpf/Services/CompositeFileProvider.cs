@@ -11,11 +11,11 @@ namespace PoeShared.Blazor.Wpf.Services;
 /// <summary>
 /// Reactive version of CompositeFileProvider
 /// </summary>
-internal sealed class ComplexFileProvider : DisposableReactiveObjectWithLogger, IFileProvider
+internal sealed class CompositeFileProvider : DisposableReactiveObjectWithLogger, IFileProvider
 {
     private readonly ISourceList<IFileProvider> providersSource = new SourceList<IFileProvider>();
 
-    public ComplexFileProvider()
+    public CompositeFileProvider()
     {
         providersSource
             .Connect()

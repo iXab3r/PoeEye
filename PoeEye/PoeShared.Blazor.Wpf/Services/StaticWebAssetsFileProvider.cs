@@ -64,7 +64,7 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
             throw new InvalidOperationException("Failed to create static web assets file provider.");
         }
 
-        if (result is not CompositeFileProvider compositeFileProvider)
+        if (result is not Microsoft.Extensions.FileProviders.CompositeFileProvider compositeFileProvider)
         {
             Log.Info("Could not create StaticWebAssets provider - manifest may be missing, normal for released/published apps");
             return originalProvider;

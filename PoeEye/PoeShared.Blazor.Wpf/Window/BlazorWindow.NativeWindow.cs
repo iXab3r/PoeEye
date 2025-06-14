@@ -35,7 +35,7 @@ internal partial class BlazorWindow
             ContentControl = new BlazorContentControl()
             {
                 ViewType = typeof(BlazorWindowContent),
-                AdditionalFileProvider = owner.complexFileProvider,
+                AdditionalFileProvider = owner.compositeFileProvider,
                 Content = owner
             }.AddTo(Anchors);
             

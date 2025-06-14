@@ -21,6 +21,7 @@ using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Color = System.Drawing.Color;
+using CompositeFileProvider = Microsoft.Extensions.FileProviders.CompositeFileProvider;
 using DirectoryInfo = System.IO.DirectoryInfo;
 
 namespace PoeShared.Blazor.Wpf;

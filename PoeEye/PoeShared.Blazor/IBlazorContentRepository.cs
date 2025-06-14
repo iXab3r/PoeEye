@@ -7,5 +7,4 @@ namespace PoeShared.Blazor;
 public interface IBlazorContentRepository : IJSComponentConfiguration
 {
     ISourceList<IFileInfo> AdditionalFiles { get; }
-    
 }

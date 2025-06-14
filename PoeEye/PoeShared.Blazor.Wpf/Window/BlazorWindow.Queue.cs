@@ -293,7 +293,7 @@ partial class BlazorWindow
                     Log.Debug($"Updating {nameof(AdditionalFileProvider)} to {command.FileProvider}");
                     additionalFileProviderAnchor.Disposable = command.FileProvider == null
                         ? null
-                        : complexFileProvider.Add(command.FileProvider);
+                        : compositeFileProvider.Add(command.FileProvider);
                     break;
                 }
                 case SetBlazorAdditionalFiles command:

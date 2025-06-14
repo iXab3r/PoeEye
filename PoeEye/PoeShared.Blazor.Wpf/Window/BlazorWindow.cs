@@ -21,6 +21,7 @@ using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using Unity;
 using Color = System.Windows.Media.Color;
+using CompositeFileProvider = PoeShared.Blazor.Wpf.Services.CompositeFileProvider;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -59,7 +60,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     private readonly Dispatcher uiDispatcher;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
-    private readonly ComplexFileProvider complexFileProvider;
+    private readonly CompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
 
     public BlazorWindow(
@@ -74,7 +75,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
-        complexFileProvider = new ComplexFileProvider().AddTo(Anchors);
+        compositeFileProvider = new CompositeFileProvider().AddTo(Anchors);
         additionalFileProviderAnchor = new SerialDisposable().AddTo(Anchors);
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -259,7 +260,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     }
 
     public Type ViewType { get; set; }
-    
+
     public Type ViewTypeForTitleBar { get; set; }
 
     public object DataContext { get; set; }
@@ -284,7 +285,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public IDisposable RegisterFileProvider(IFileProvider fileProvider)
     {
-        return complexFileProvider.Add(fileProvider);
+        return compositeFileProvider.Add(fileProvider);
     }
 
     public bool ShowInTaskbar
@@ -446,7 +447,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         var sw = Stopwatch.StartNew();
         using var resetEvent = new ManualResetEventSlim();
         EnqueueUpdate(new WaitForIdleCommand(resetEvent, DateTimeOffset.Now));
-        
+
         Log.Debug($"Enqueueing WaitForIdle command");
         if (timeout > TimeSpan.Zero)
         {
@@ -579,7 +580,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     private ReactiveWindow GetWindowOrThrow()
     {
-        EnsureNotDisposed();
+        //important! We do not check any states here, window could be even Disposed at this point
         if (!windowSupplier.IsValueCreated)
         {
             throw new InvalidOperationException("Window is not created yet");
@@ -640,19 +641,30 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         {
             while (eventQueue.TryTake(out var windowEvent))
             {
-                HandleEvent(windowEvent);
+                try
+                {
+                    HandleEvent(windowEvent);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidStateException($"Failed to process event: {windowEvent}", e);
+                }
             }
         }
         catch (Exception e)
         {
+            if (Anchors.IsDisposed && e is ObjectDisposedException || e.InnerException is ObjectDisposedException)
+            {
+                Log.Warn("Disposal exception occurred after window has already been disposed");
+            }
             Log.Error("Critical error in Window message queue", e);
             if (!isClosedTcs.TrySetException(e))
             {
                 Log.Warn($"Failed to notify about exception, tcs: {isClosedTcs}");
             }
+
             throw;
         }
-    
     }
 
     private NativeWindow CreateWindow()

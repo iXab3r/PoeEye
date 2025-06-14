@@ -27,7 +27,7 @@ internal sealed class RootContentFileProvider : IRootContentFileProvider
 {
     private static readonly IFluentLog Log = typeof(RootContentFileProvider).PrepareLogger();
 
-    private readonly ComplexFileProvider fileProvider;
+    private readonly CompositeFileProvider fileProvider;
 
     /// <summary>
     /// Initializes a new instance of <see cref="RootContentFileProvider"/> by probing known locations
@@ -70,7 +70,7 @@ internal sealed class RootContentFileProvider : IRootContentFileProvider
         providersToRegister.Add(new StaticWebAssetsFileProvider());
 
         Log.Info($"📦 Registering {providersToRegister.Count} content file providers");
-        fileProvider = new ComplexFileProvider();
+        fileProvider = new CompositeFileProvider();
         foreach (var provider in providersToRegister)
         {
             fileProvider.Add(provider);
