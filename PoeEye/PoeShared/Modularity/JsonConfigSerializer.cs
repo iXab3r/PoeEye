@@ -10,7 +10,7 @@ namespace PoeShared.Modularity;
 
 internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger, IConfigSerializer
 {
-    private static readonly int MaxDepth = 1024;
+    private static readonly int MaxDepth = IConfigSerializer.MaxDepth;
     private static readonly int MaxCharsToLog = 1024;
 
     private readonly SourceListEx<JsonConverter> converters = new();
