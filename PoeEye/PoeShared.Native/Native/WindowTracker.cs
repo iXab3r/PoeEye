@@ -57,7 +57,7 @@ public class WindowTracker : DisposableReactiveObjectWithLogger, IWindowTracker
     {
         var previousState = new {IsActive, MatchingWindowHandle, ActiveWindowTitle, ActiveWindowHandle, ActiveProcessId};
         ActiveWindow = window;
-        IsActive = windowMatcher.IsMatch(window);
+        IsActive = window.Handle != 0 && windowMatcher.IsMatch(window);
         MatchingWindow = IsActive ? ActiveWindow : default;
 
         if (previousState.ActiveWindowHandle != ActiveWindowHandle)
