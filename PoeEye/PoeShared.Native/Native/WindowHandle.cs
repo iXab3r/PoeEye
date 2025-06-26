@@ -168,6 +168,11 @@ internal sealed class WindowHandle : IWindowHandle
             
         processDataSupplier = new Lazy<(string processName, string processPath, string commandLine, string processArgs, DateTime createdAt)>(() =>
         {
+            if (ProcessId == 0)
+            {
+                return (default, default, default, default, default);
+            }
+            
             try
             {
                 string nativeProcessPath;
