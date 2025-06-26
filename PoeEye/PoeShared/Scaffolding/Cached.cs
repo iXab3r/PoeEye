@@ -32,6 +32,11 @@ public sealed record Cached<T>
 
     public T GetOrRefresh(Func<T> valueFactory)
     {
+        return GetOrRefresh(_ => valueFactory());
+    }
+    
+    public T GetOrRefresh(Func<T, T> valueFactory)
+    {
         var currentMilliseconds = stopwatch.ElapsedMilliseconds;
         if (CalculateIsExpired(currentMilliseconds))
         {
@@ -50,11 +55,16 @@ public sealed record Cached<T>
 
     private T RefreshValue(long currentMs, Func<T> valueFactory)
     {
+        return RefreshValue(currentMs, _ => valueFactory());
+    }
+    
+    private T RefreshValue(long currentMs, Func<T, T> valueFactory)
+    {
         if (Interlocked.CompareExchange(ref initialized, 1, 0) == 0)
         {
             try
             {
-                var newValue = valueFactory();
+                var newValue = valueFactory(Value);
                 var newExpiryMilliseconds = currentMs + ttl.TotalMilliseconds;
 
                 Value = newValue;
