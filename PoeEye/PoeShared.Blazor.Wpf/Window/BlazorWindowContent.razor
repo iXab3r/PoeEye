@@ -111,7 +111,7 @@
         }
     </ReactiveSection>
 
-    <div class="overflow-auto">
+    <div id="@(IBlazorWindow.WindowBody)" class="overflow-auto">
         @if (DataContext.Anchors.IsDisposed)
         {
             <div class="d-grid-center">

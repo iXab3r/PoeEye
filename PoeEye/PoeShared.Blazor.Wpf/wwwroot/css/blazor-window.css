@@ -11,6 +11,11 @@
     background: linear-gradient(to right, #2d3a45, #2f2f2f);
     color: white;
     text-transform: uppercase !important;
+    position: relative;
+}
+
+#blazor-window-body {
+    position: relative;
 }
 
 #blazor-window-statusbar {

@@ -18,6 +18,7 @@ public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObj
     public const string WindowAnchorName = $"--blazor-window";
     public const string WindowId = $"blazor-window";
     public const string WindowTitleBarId = $"blazor-window-titlebar";
+    public const string WindowBody = $"blazor-window-body";
     public const string WindowStatusBarId = $"blazor-window-statusbar";
     
     /// <summary>
