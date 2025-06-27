@@ -375,6 +375,8 @@ internal sealed class WindowHandle : IWindowHandle
     public bool IsIconic => User32.IsIconic(Handle);
 
     public bool IsWindow => isWindowSupplier.Value;
+    
+    public bool IsForeground => User32.GetForegroundWindow() == Handle;
 
     public IWindowHandle Owner => ownerSupplier.Value;
     public IWindowHandle Parent => parentSupplier.Value;

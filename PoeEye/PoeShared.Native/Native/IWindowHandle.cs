@@ -130,6 +130,11 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// Gets whether the current handle represents Window
     /// </summary>
     bool IsWindow { get; }
+    
+    /// <summary>
+    /// Gets whether the window is in the foreground (i.e. focused)
+    /// </summary>
+    bool IsForeground { get; }
 
     /// <summary>
     /// Gets the owner of the window.
