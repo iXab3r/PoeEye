@@ -42,9 +42,9 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         {
             throw new InvalidStateException($"It is expected than inner WebView2 will be hosted as {WebViewTemplateChildName} inside visual tree of {this}, got nothing instead");
         }
-        if (frameworkElementFactory.Type != typeof(WebView2))
+        if (frameworkElementFactory.Type != typeof(WebView2CompositionControl))
         {
-            throw new InvalidStateException($"It is expected than inner WebView2 will be hosted as WPF version of WebView2 ({typeof(WebView2)}) {WebViewTemplateChildName} inside visual tree of {this}, got other control instead: {frameworkElementFactory.Type}");
+            throw new InvalidStateException($"It is expected than inner WebView2CompositionControl will be hosted as WPF version of WebView2 ({typeof(WebView2CompositionControl)}) {WebViewTemplateChildName} inside visual tree of {this}, got other control instead: {frameworkElementFactory.Type}");
         }
         Template = new ControlTemplate
         {
