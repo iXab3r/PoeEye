@@ -6,7 +6,7 @@ namespace PoeShared.Scaffolding;
 public static class VectorExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Point ToPoint(this Vector2 vector)
+    public static Point ToWinPoint(this Vector2 vector)
     {
         return new Point((int) Math.Round(vector.X), (int) Math.Round(vector.Y));
     }
