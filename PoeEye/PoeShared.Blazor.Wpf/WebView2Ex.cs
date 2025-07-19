@@ -43,7 +43,7 @@ namespace PoeShared.Blazor.Wpf;
 /// 
 /// Somehow prevent the bubbling system from working. E.g. suppressing it at the very beginning. That is my route.
 /// </summary>
-internal sealed class WebView2Ex : WebView2CompositionControl
+internal sealed class WebView2Ex : WebView2
 {
     public static readonly DependencyProperty IgnoreKeypressesProperty = DependencyProperty.Register(
         nameof(IgnoreKeypresses), typeof(bool), typeof(WebView2Ex), new PropertyMetadata(defaultValue: true));
