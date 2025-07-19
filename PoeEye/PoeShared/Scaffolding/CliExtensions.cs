@@ -9,40 +9,70 @@ public static class CliExtensions
 {
     private static readonly IFluentLog Log = typeof(CliExtensions).PrepareLogger();
 
-    public static async IAsyncEnumerable<CommandEvent> ListenAndLogAsync(this Command command, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public static IEnumerable<CommandEvent> ListenAndLog(this Command command, IFluentLog log, CancellationToken cancellationToken = default)
+    {
+        if (command == null)
+        {
+            throw new ArgumentNullException(nameof(command));
+        }
+
+        var enumerator = command.ListenAndLogAsync(log, cancellationToken).GetAsyncEnumerator(cancellationToken);
+        try
+        {
+            while (true)
+            {
+                var moveNextTask = enumerator.MoveNextAsync().AsTask();
+                var hasMore = moveNextTask.GetAwaiter().GetResult();
+
+                if (!hasMore)
+                {
+                    break;
+                }
+
+                yield return enumerator.Current;
+            }
+        }
+        finally
+        {
+            var disposeTask = enumerator.DisposeAsync().AsTask();
+            disposeTask.GetAwaiter().GetResult();
+        }
+    }
+
+    public static async IAsyncEnumerable<CommandEvent> ListenAndLogAsync(this Command command, IFluentLog log, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var anchors = new CompositeDisposable();
         int? processId = null;
-        var log = Log.WithSuffix(() => $"PID: {(processId == null ? "not started" : processId.Value)}");
+        var processLog = log.WithSuffix(() => $"PID: {(processId == null ? "not started" : processId.Value)}");
         try
         {
-            log.Info($"Running command: {command}");
+            processLog.Info($"Running command: {command}");
 
-            await foreach (var cmdEvent in ListenAsync(log, command, Encoding.Default, Encoding.Default, cancellationToken))
+            await foreach (var cmdEvent in ListenAsync(processLog, command, Encoding.Default, Encoding.Default, cancellationToken))
             {
                 switch (cmdEvent)
                 {
                     case StartedCommandEvent started:
                         processId = started.ProcessId;
-                        log.AddPrefix($"PID {started.ProcessId}");
-                        log.Info($"Process started; ID: {started.ProcessId}");
-                        
+                        processLog.AddPrefix($"PID {started.ProcessId}");
+                        processLog.Info($"Process started; ID: {started.ProcessId}");
+
                         cancellationToken.Register(() =>
                         {
-                            log.Warn($"Forcefully cancelling command process(id {started.ProcessId}): {command}");
-                            TerminateProcessById(started.ProcessId, log);
-                            log.Warn($"Forcefully terminated process(id {started.ProcessId}): {command}");
+                            processLog.Warn($"Forcefully cancelling command process(id {started.ProcessId}): {command}");
+                            TerminateProcessById(started.ProcessId, processLog);
+                            processLog.Warn($"Forcefully terminated process(id {started.ProcessId}): {command}");
                         }).AddTo(anchors);
-                        
+
                         break;
                     case StandardOutputCommandEvent stdOut:
-                        log.Debug($"Out> {stdOut.Text}");
+                        processLog.Debug($"Out> {stdOut.Text}");
                         break;
                     case StandardErrorCommandEvent stdErr:
-                        log.Warn($"Err> {stdErr.Text}");
+                        processLog.Warn($"Err> {stdErr.Text}");
                         break;
                     case ExitedCommandEvent exited:
-                        log.Info($"Process exited; Code: {exited.ExitCode}");
+                        processLog.Info($"Process exited; Code: {exited.ExitCode}");
                         break;
                 }
 
@@ -51,9 +81,14 @@ public static class CliExtensions
         }
         finally
         {
-            log.Info("Command completed");
-            TerminateProcessById(processId, log);
+            processLog.Info("Command completed");
+            TerminateProcessById(processId, processLog);
         }
+    }
+
+    public static IAsyncEnumerable<CommandEvent> ListenAndLogAsync(this Command command, CancellationToken cancellationToken = default)
+    {
+        return ListenAndLogAsync(command, Log, cancellationToken);
     }
 
     /// <summary>
@@ -154,7 +189,7 @@ public static class CliExtensions
 
     private static IObservable<CommandEvent> ListenAsync(
         IFluentLog log,
-         Command command,
+        Command command,
         Encoding standardOutputEncoding,
         Encoding standardErrorEncoding,
         CancellationToken forcefulCancellationToken,
@@ -165,18 +200,12 @@ public static class CliExtensions
             var anchors = new CompositeDisposable();
             var stdOutPipe = PipeTarget.Merge(
                 command.StandardOutputPipe,
-                PipeTarget.ToDelegate(async (line, innerCancellationToken) =>
-                {
-                    observer.OnNext(new StandardOutputCommandEvent(line));
-                }, standardOutputEncoding)
+                PipeTarget.ToDelegate(async (line, innerCancellationToken) => { observer.OnNext(new StandardOutputCommandEvent(line)); }, standardOutputEncoding)
             );
 
             var stdErrPipe = PipeTarget.Merge(
                 command.StandardErrorPipe,
-                PipeTarget.ToDelegate(async (line, innerCancellationToken) =>
-                {
-                    observer.OnNext(new StandardErrorCommandEvent(line));
-                }, standardErrorEncoding)
+                PipeTarget.ToDelegate(async (line, innerCancellationToken) => { observer.OnNext(new StandardErrorCommandEvent(line)); }, standardErrorEncoding)
             );
 
             var commandWithPipes = command
@@ -191,7 +220,7 @@ public static class CliExtensions
                 observer.OnNext(new StartedCommandEvent(commandTask.ProcessId));
                 log.Debug($"Awaiting for process completion");
                 var result = await commandTask.ConfigureAwait(false);
-                log.Debug($"Process {commandTask.ProcessId} has exited: { new { result.ExitCode, result.ExitTime, result.RunTime, result.StartTime } }");
+                log.Debug($"Process {commandTask.ProcessId} has exited: {new {result.ExitCode, result.ExitTime, result.RunTime, result.StartTime}}");
                 observer.OnNext(new ExitedCommandEvent(result.ExitCode));
                 observer.OnCompleted();
             }
@@ -201,7 +230,6 @@ public static class CliExtensions
             }
 
             return anchors;
-
         });
     }
 }
