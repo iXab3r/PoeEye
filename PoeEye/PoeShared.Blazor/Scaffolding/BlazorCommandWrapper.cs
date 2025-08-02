@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Input;
 using PoeShared.Logging;
@@ -28,6 +31,7 @@ public sealed class BlazorCommandWrapper
         {
             throw new ArgumentException("Synchronization context must be set for Commands to work properly");
         }
+
         return new SynchronizationContextScheduler(synchronizationContext);
     }
 
@@ -36,12 +40,12 @@ public sealed class BlazorCommandWrapper
         var command = ReactiveCommand.Create(execute);
         return FromReactiveCommand(command);
     }
-        
+
     public static BlazorCommandWrapper<Unit, Unit> Create()
     {
         return Create(() => { });
     }
-    
+
     public static BlazorCommandWrapper<Unit, Unit> Create(Action execute, IObservable<bool> canExecute)
     {
         return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute.ObserveOn(CurrentScheduler), CurrentScheduler));
@@ -51,7 +55,7 @@ public sealed class BlazorCommandWrapper
     {
         return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(CurrentScheduler), CurrentScheduler));
     }
-    
+
     public static BlazorCommandWrapper<TIn, Unit> Create<TIn>(Func<TIn, Task> execute, IObservable<bool> canExecute)
     {
         return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute.ObserveOn(CurrentScheduler), CurrentScheduler));
@@ -90,7 +94,7 @@ public sealed class BlazorCommandWrapper
 /// </summary>
 public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveObject, ICommandWrapper
 {
-     private static readonly IFluentLog Log = typeof(BlazorCommandWrapper<TParam, TResult>).PrepareLogger();
+    private static readonly IFluentLog Log = typeof(BlazorCommandWrapper<TParam, TResult>).PrepareLogger();
 
     private readonly Subject<Exception> thrownExceptions = new();
     private readonly ISharedResourceLatch isBusyLatch;
@@ -108,14 +112,14 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         command.ThrownExceptions.SubscribeSafe(HandleException, Log.HandleUiException).AddTo(Anchors);
         isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         isBusyLatch.WhenAnyValue(x => x.IsBusy).SubscribeSafe(x => IsBusy = x, Log.HandleUiException).AddTo(Anchors);
-        
+
         schedulerThreadId = Environment.CurrentManagedThreadId;
-        InnerCommand = command;//.AddTo(Anchors); Update to https://github.com/reactiveui/ReactiveUI/commit/d24e69f2dd47729045507d7f16ad0bb418c6925e
+        InnerCommand = command; //.AddTo(Anchors); Update to https://github.com/reactiveui/ReactiveUI/commit/d24e69f2dd47729045507d7f16ad0bb418c6925e
         Observable.FromEventPattern(
                 handler => WpfCommand.CanExecuteChanged += handler,
                 handler => WpfCommand.CanExecuteChanged -= handler)
             .Subscribe(_ => InnerCommandOnCanExecuteChanged(WpfCommand, EventArgs.Empty))
-            .AddTo(Anchors); 
+            .AddTo(Anchors);
     }
 
     private void InnerCommandOnCanExecuteChanged(object sender, EventArgs e)
@@ -128,7 +132,7 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         Log.Error($"CanExecute is executed on an invalid thread, expected thread: {schedulerThreadId}, actual: {Thread.CurrentThread} id: {Environment.CurrentManagedThreadId}");
 #endif
     }
-        
+
     public IObservable<Exception> ThrownExceptions => thrownExceptions;
 
     public bool IsBusy { get; private set; }
@@ -138,7 +142,7 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
     public string Description { get; set; }
 
     private ReactiveCommand<TParam, TResult> InnerCommand { get; }
-    
+
     private ICommand WpfCommand => InnerCommand;
 
     public IObservable<object> WhenExecuted => whenExecuted;
@@ -162,7 +166,7 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
     public async Task ExecuteAsync(TParam parameter)
     {
         using var isBusy = isBusyLatch.Rent();
-        
+
         ResetError();
         EnsureNotDisposed();
 
@@ -178,7 +182,7 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
         try
         {
             EnsureNotDisposed();
-            
+
             WpfCommand.Execute(parameter is TParam param ? param : default);
             whenExecuted.OnNext(parameter);
         }
@@ -207,8 +211,63 @@ public sealed class BlazorCommandWrapper<TParam, TResult> : DisposableReactiveOb
     private void HandleException(Exception exception)
     {
         Log.HandleException(exception);
-        Error = exception.Message;
+
+        try
+        {
+            var unwrapped = UnwrapException(exception, maxDepth: 3);
+            Error = string.Join(" - ", unwrapped.Select(x => x.Message));
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Failed to unwrap exception of type {e.GetType()}: {e}", e);
+            Error = e.Message;
+        }
+       
         thrownExceptions.OnNext(exception);
     }
-}
 
+    private static IEnumerable<Exception> UnwrapException(Exception ex, int maxDepth)
+    {
+        var visited = new HashSet<Exception>(ReferenceEqualityComparer.Instance);
+        var depth = 0;
+
+        yield return ex;
+
+        while (depth < maxDepth && ex != null && visited.Add(ex))
+        {
+            Exception inner;
+            if (ex is AggregateException ae)
+            {
+                if (ae.InnerException != null)
+                {
+                    inner = ae.InnerException;
+                }
+                else if (ae.InnerExceptions.Count > 0)
+                {
+                    inner = ae.InnerExceptions[0];
+                }
+                else
+                {
+                    inner = null;
+                }
+            }  
+            else if (ex.InnerException != null)
+            {
+                inner = ex.InnerException;
+            }
+            else
+            {
+                inner = null;
+            }
+
+            if (inner == null)
+            {
+                break;
+            }
+            
+            ex = inner;
+            depth++;
+            yield return inner;
+        }
+    }
+}
