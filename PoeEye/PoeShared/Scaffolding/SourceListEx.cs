@@ -23,7 +23,7 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     public SourceListEx(ISourceList<T> sourceList, IScheduler scheduler = null)
     {
         this.sourceList = sourceList.AddTo(Anchors);
-        sourceList.CountChanged.Subscribe(x => Count = x).AddTo(Anchors);
+        sourceList.CountChanged.Subscribe(x => RaisePropertyChanged(nameof(Count))).AddTo(Anchors);
         var collectionSource = sourceList.Connect();
         if (scheduler != null)
         {
@@ -41,7 +41,7 @@ public sealed class SourceListEx<T> : DisposableReactiveObject, ISourceListEx<T>
     {
     }
 
-    public int Count { get; [UsedImplicitly] private set; }
+    public int Count => sourceList.Count;
 
     public IObservable<int> CountChanged => sourceList.CountChanged;
 
