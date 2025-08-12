@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System;
 
 //FIXME This whole PoeConfigConverter is an awful mess that must be rewritten at some point
+//NOTE 2025-08-12 Damn, it's been a while. This is actually quite stable and very useful. Messy - yes, but it works and is really flexible
 internal sealed class PoeConfigConverter : JsonConverter
 {
     private static readonly IFluentLog Log = typeof(PoeConfigConverter).PrepareLogger();

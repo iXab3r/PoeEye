@@ -1,26 +1,92 @@
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace PoeShared.Modularity;
 
+/// <summary>
+/// Provides helper methods for resolving and loading assemblies and types dynamically.
+/// Includes caching, configurable auto-loading, and per-thread resolution context.
+/// </summary>
 public sealed class AssemblyHelper
 {
+    public static AssemblyHelper Instance => AssemblyHelperSupplier.Value;
+
     private static readonly IFluentLog Log = typeof(AssemblyHelper).PrepareLogger();
+    private static readonly Lazy<AssemblyHelper> AssemblyHelperSupplier = new();
+
+    /// <summary>
+    /// This is an array of additional assemblies that will be analyzed first during resolution
+    /// Use case - when we have some generated-on-the-fly assemblies which must take preference over those loaded earlier
+    /// </summary>
+    [ThreadStatic] private static RefCountedLinkedSet<Assembly> resolutionContextSource;
+    private static RefCountedLinkedSet<Assembly> ResolutionContext => resolutionContextSource ??= new RefCountedLinkedSet<Assembly>();
 
     private readonly ConcurrentDictionary<string, Assembly> loadedAssemblyByName = new();
     private readonly ConcurrentDictionary<string, Type> loadedTypesByName = new();
 
-    private static readonly Lazy<AssemblyHelper> AssemblyHelperSupplier = new();
-
-    public static AssemblyHelper Instance => AssemblyHelperSupplier.Value;
-
+    /// <summary>
+    /// Gets or sets a value indicating whether the helper should attempt to load assemblies automatically
+    /// when they cannot be resolved from the current AppDomain.
+    /// </summary>
     public bool AttemptToLoadIfNotResolved { get; set; } = false;
 
+    /// <summary>
+    /// Pushes a set of assemblies into the thread-local resolution context, which will be checked first
+    /// when resolving types.
+    /// </summary>
+    /// <param name="assembly">The assemblies to push into the resolution context.</param>
+    /// <returns>
+    /// An <see cref="IDisposable"/> that, when disposed, restores the previous resolution context.
+    /// Must be disposed on the same thread that called this method.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the disposable is invoked from a different thread than the one where <see cref="PushAssemblies"/> was called.
+    /// </exception>    
+    public IDisposable PushAssemblies(Assembly assembly)
+    {
+        var pushThread = Environment.CurrentManagedThreadId;
+        var anchor = ResolutionContext.Add(assembly);
+        
+        return Disposable.Create(() =>
+        {
+            if (pushThread != Environment.CurrentManagedThreadId)
+            {
+                throw new InvalidOperationException($"Disposal must happen on the same thread where Push was, current thread: {Environment.CurrentManagedThreadId}, expected: {pushThread}");
+            }
+
+            anchor.Dispose();
+        });
+    }
+
+    /// <summary>
+    /// Resolves a <see cref="Type"/> from the provided metadata, searching the resolution context,
+    /// cached types, loaded assemblies, and optionally attempting to load missing assemblies.
+    /// </summary>
+    /// <param name="metadata">The metadata describing the type to resolve.</param>
+    /// <returns>
+    /// The resolved <see cref="Type"/> if found; otherwise, <c>null</c>.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if <paramref name="metadata"/> does not specify a valid type name.
+    /// </exception>
+    /// <exception cref="FormatException">
+    /// Thrown if assembly name is missing from the metadata and the type is not already resolvable.
+    /// </exception>
     public Type ResolveType(PoeConfigMetadata metadata)
     {
         if (string.IsNullOrEmpty(metadata.TypeName))
         {
             Log.Warn($"Invalid metadata: {metadata}");
             throw new ArgumentException($"Invalid metadata - typename is not set");
+        }
+
+        foreach (var candidateAssembly in ResolutionContext)
+        {
+            if (TryToLoadFromAssembly(candidateAssembly, metadata.TypeName, out var loadedType))
+            {
+                //do not cache this
+                return loadedType;
+            }
         }
 
         {
@@ -133,6 +199,11 @@ public sealed class AssemblyHelper
             return false;
         }
 
+        return TryToLoadFromAssembly(assembly, typeName, out type);
+    }
+
+    private static bool TryToLoadFromAssembly(Assembly assembly, string typeName, out Type type)
+    {
         var loadedType = assembly.GetType(typeName, throwOnError: false);
         if (loadedType != null)
         {
@@ -140,7 +211,7 @@ public sealed class AssemblyHelper
             return true;
         }
 
-        Log.Debug($"Assembly {assemblyName} is loaded but does not contain type {typeName}");
+        Log.Debug($"Assembly {assembly.FullName} is loaded but does not contain type {typeName}");
         type = null;
         return false;
     }

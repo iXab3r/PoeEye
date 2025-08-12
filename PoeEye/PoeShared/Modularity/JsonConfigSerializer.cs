@@ -1,4 +1,5 @@
 using System.Reactive;
+using System.Reflection;
 using DynamicData;
 using Newtonsoft.Json;
 using PoeShared.Services;
@@ -67,6 +68,7 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
     public void Serialize(object data, TextWriter textWriter)
     {
         using var jsonWriter = CreateWriter(textWriter);
+        
         jsonSerializer.Serialize(jsonWriter, data);
     }
 
