@@ -42,10 +42,15 @@ public sealed class AssemblyHelper
     /// <exception cref="InvalidOperationException">
     /// Thrown if the disposable is invoked from a different thread than the one where <see cref="PushAssemblies"/> was called.
     /// </exception>    
-    public IDisposable PushAssemblies(Assembly assembly)
+    public IDisposable PushAssemblies(params Assembly[] assembly)
     {
+        if (assembly.Length == 0)
+        {
+            return Disposable.Empty;
+        }
+        
         var pushThread = Environment.CurrentManagedThreadId;
-        var anchor = ResolutionContext.Add(assembly);
+        var anchor = assembly.Select(x => ResolutionContext.Add(x)).ToCompositeDisposable();
         
         return Disposable.Create(() =>
         {
