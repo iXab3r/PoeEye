@@ -30,7 +30,6 @@ using PoeShared.Services;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
-using CompositeFileProvider = Microsoft.Extensions.FileProviders.CompositeFileProvider;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -280,8 +279,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     };
 
                     var rootFileProvider = childServiceProvider.GetRequiredService<IRootContentFileProvider>();
-
-                    var webViewFileProvider = new CompositeFileProvider(
+                    var webViewFileProvider = new ReactiveCompositeFileProvider(
                         publicInMemoryFileProvider,
                         proxyFileProvider,
                         globalMemoryFileProvider,

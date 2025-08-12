@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reactive.Disposables;
 using DynamicData;
@@ -11,12 +12,17 @@ namespace PoeShared.Blazor.Wpf.Services;
 /// <summary>
 /// Reactive version of CompositeFileProvider
 /// </summary>
-internal sealed class CompositeFileProvider : DisposableReactiveObjectWithLogger, IFileProvider
+internal sealed class ReactiveCompositeFileProvider : DisposableReactiveObjectWithLogger, IFileProvider
 {
     private readonly ISourceList<IFileProvider> providersSource = new SourceList<IFileProvider>();
 
-    public CompositeFileProvider()
+    public ReactiveCompositeFileProvider(params IFileProvider[] providers) : this((IEnumerable<IFileProvider>)providers)
     {
+    }
+    
+    public ReactiveCompositeFileProvider(IEnumerable<IFileProvider> providers)
+    {
+        providersSource.AddRange(providers);
         providersSource
             .Connect()
             .Subscribe(x =>
@@ -24,6 +30,9 @@ internal sealed class CompositeFileProvider : DisposableReactiveObjectWithLogger
                 FileProviders = providersSource.Items.ToImmutableArray();   
             })
             .AddTo(Anchors);
+    }
+    public ReactiveCompositeFileProvider() : this (ArraySegment<IFileProvider>.Empty)
+    {
     }
 
     public ImmutableArray<IFileProvider> FileProviders { get; private set; } = ImmutableArray<IFileProvider>.Empty;

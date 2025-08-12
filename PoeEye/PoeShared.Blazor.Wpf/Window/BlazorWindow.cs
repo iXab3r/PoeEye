@@ -21,7 +21,6 @@ using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using Unity;
 using Color = System.Windows.Media.Color;
-using CompositeFileProvider = PoeShared.Blazor.Wpf.Services.CompositeFileProvider;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -60,7 +59,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     private readonly Dispatcher uiDispatcher;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
-    private readonly CompositeFileProvider compositeFileProvider;
+    private readonly ReactiveCompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
 
     public BlazorWindow(
@@ -75,7 +74,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
-        compositeFileProvider = new CompositeFileProvider().AddTo(Anchors);
+        compositeFileProvider = new ReactiveCompositeFileProvider().AddTo(Anchors);
         additionalFileProviderAnchor = new SerialDisposable().AddTo(Anchors);
 
 #pragma warning disable CS0618 // Type or member is obsolete
