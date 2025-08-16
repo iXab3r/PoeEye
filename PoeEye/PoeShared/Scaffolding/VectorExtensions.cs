@@ -28,6 +28,18 @@ public static class VectorExtensions
     {
         return new Vector2(point.X, point.Y);
     }
+
+    /// <summary>
+    /// Adds a random offset to the X and Y components of the vector, within the range specified by the maxOffset.
+    /// </summary>
+    /// <param name="vector">The original vector.</param>
+    /// <param name="maxOffset">The maximum random offset for each component.</param>
+    /// <returns>A new vector with the random offset applied.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 WithRandomOffset(this Vector2 vector, Point maxOffset)
+    {
+        return WithRandomOffset(vector, new Vector2(maxOffset.X, maxOffset.Y));
+    }
     
     /// <summary>
     /// Adds a random offset to the X and Y components of the vector, within the range specified by the maxOffset.
