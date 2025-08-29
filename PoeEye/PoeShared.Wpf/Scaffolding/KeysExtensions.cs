@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
 using System.Windows.Input;
 using PoeShared.Native;
 using PoeShared.UI;
@@ -33,6 +34,28 @@ public static class KeyEventArgsExtensions
             result |= ModifierKeys.Windows;
         }
 
+        return result;
+    }
+    
+    public static IReadOnlyList<Key> ToInputKeys(this ModifierKeys keys)
+    {
+        var result = new List<Key>();
+        if (keys.HasFlag(ModifierKeys.Alt))
+        {
+            result.Add(Key.LeftAlt);
+        }
+        if (keys.HasFlag(ModifierKeys.Control))
+        {
+            result.Add(Key.LeftCtrl);
+        }
+        if (keys.HasFlag(ModifierKeys.Shift))
+        {
+            result.Add(Key.LeftShift);
+        }
+        if (keys.HasFlag(ModifierKeys.Windows))
+        {
+            result.Add(Key.LWin);
+        }
         return result;
     }
 
