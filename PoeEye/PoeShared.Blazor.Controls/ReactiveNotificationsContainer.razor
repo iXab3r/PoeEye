@@ -1,20 +1,59 @@
 ﻿@using System.Threading
+@using PoeShared.Blazor.Controls.Services
 @inherits PoeShared.Blazor.BlazorReactiveComponent
 @inject INotificationService NotificationService
 @inject ModalService ModalService
 
-<AntContainer/>
+@if (ownsAntContainer)
+{
+    <AntContainer/>
+}
 
 @code {
-    [Parameter]
-    public IObservable<NotificationConfig> Notifications { get; set; }
-    
-    [Parameter]
-    public IObservable<AntConfirmRequest> ConfirmRequests { get; set; }
+
+    private bool ownsAntContainer;
+
+    [Parameter] public IObservable<NotificationConfig>? Notifications { get; set; }
+
+    [Parameter] public IObservable<AntConfirmRequest>? ConfirmRequests { get; set; }
+
+    [Inject] internal IScopedAntContainerRegistry? AntRegistry { get; init; }
 
     public async void CloseAll()
     {
         await ModalService.DestroyAllConfirmAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (AntRegistry == null)
+        {
+            throw new InvalidOperationException("AntRegistry is not initialized");
+        }
+
+        ownsAntContainer = AntRegistry.TryAcquire();
+
+        AntRegistry.Released += OnAntContainerReleased;
+        Disposable.Create(() => AntRegistry.Released -= OnAntContainerReleased).AddTo(Anchors);
+
+        base.OnInitialized();
+    }
+
+    private void OnAntContainerReleased()
+    {
+        // try to take over when previous owner is disposed
+        if (AntRegistry == null)
+        {
+            throw new InvalidOperationException("AntRegistry is not initialized");
+        }
+
+        if (!ownsAntContainer && AntRegistry.TryAcquire())
+        {
+            ownsAntContainer = true;
+            Refresh("AntRegistry re-registration").AndForget(ignoreExceptions: true);
+        }
     }
 
     protected override async Task OnAfterFirstRenderAsync()
@@ -22,7 +61,7 @@
         await base.OnAfterFirstRenderAsync();
 
         var synchronizationContext = SynchronizationContext.Current ?? throw new InvalidOperationException("Synchronization context must be set");
-        
+
         this.WhenAnyValue(x => x.Notifications)
             .Select(x => x ?? Observable.Empty<NotificationConfig>())
             .Switch()
@@ -33,7 +72,7 @@
                 NotificationService.Open(x);
             })
             .AddTo(Anchors);
-        
+
         this.WhenAnyValue(x => x.ConfirmRequests)
             .Select(x => x ?? Observable.Empty<AntConfirmRequest>())
             .Switch()

@@ -60,10 +60,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Prism\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <TypeScriptCompile Include="wwwroot\ts\BootstrapTooltip.ts" />
       <TypeScriptCompile Include="wwwroot\ts\placeholder.ts" />
       <TypeScriptCompile Include="wwwroot\ts\SplitContainer.ts" />
