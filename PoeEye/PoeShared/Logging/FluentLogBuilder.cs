@@ -12,15 +12,29 @@ internal sealed class FluentLogBuilder : IFluentLog
 
     ILogWriter IFluentLog.Writer => logWriter;
         
-    public bool IsDebugEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Debug || logWriter.IsDebugEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Debug;
+    /// <summary>
+    /// Checks whether a given <paramref name="level"/> is enabled.
+    /// Writer must allow the level, and the effective threshold must be ≤ level.
+    /// </summary>
+    public bool IsEnabled(FluentLogLevel level)
+        => WriterAllows(logWriter, level) && EffectiveMin <= level;
 
-    public bool IsInfoEnabled =>  Data.MinLogLevelOverride is <= FluentLogLevel.Info || logWriter.IsInfoEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Info;
+    /// <summary>True if DEBUG is enabled under the current writer and threshold.</summary>
+    public bool IsDebugEnabled => IsEnabled(FluentLogLevel.Debug);
 
-    public bool IsWarnEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Warn || logWriter.IsWarnEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Warn;
+    /// <summary>True if INFO is enabled under the current writer and threshold.</summary>
+    public bool IsInfoEnabled  => IsEnabled(FluentLogLevel.Info);
 
-    public bool IsErrorEnabled => Data.MinLogLevelOverride is <= FluentLogLevel.Error || logWriter.IsErrorEnabled && (FluentLogSettings.Instance.MinLogLevel ?? default) <= FluentLogLevel.Error;
+    /// <summary>True if WARN is enabled under the current writer and threshold.</summary>
+    public bool IsWarnEnabled  => IsEnabled(FluentLogLevel.Warn);
+
+    /// <summary>True if ERROR is enabled under the current writer and threshold.</summary>
+    public bool IsErrorEnabled => IsEnabled(FluentLogLevel.Error);
     
     public LogData Data { get; set; }
+    
+    private FluentLogLevel EffectiveMin =>
+        Data.MinLogLevelOverride ?? FluentLogSettings.Instance.MinLogLevel ?? default;
         
     public void Debug(string message, Exception exception)
     {
@@ -222,4 +236,17 @@ internal sealed class FluentLogBuilder : IFluentLog
             return $"Internal logger error: {e.Message}";
         }
     }
+    
+    /// <summary>
+    /// Maps a level to the writer's own capability flags.
+    /// Writer is the boss: if this returns false, logging is off regardless of thresholds.
+    /// </summary>
+    private static bool WriterAllows(ILogWriter logWriter, FluentLogLevel level) => level switch
+    {
+        FluentLogLevel.Debug => logWriter.IsDebugEnabled,
+        FluentLogLevel.Info  => logWriter.IsInfoEnabled,
+        FluentLogLevel.Warn  => logWriter.IsWarnEnabled,
+        FluentLogLevel.Error => logWriter.IsErrorEnabled,
+        _ => false
+    };
 }

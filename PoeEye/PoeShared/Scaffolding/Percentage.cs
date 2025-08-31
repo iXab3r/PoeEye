@@ -17,6 +17,15 @@ public readonly struct Percentage : IEquatable<Percentage>, IFormattable
     {
         this.value = value;
     }
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Percentage"/> struct.
+    /// </summary>
+    /// <param name="value">The percentage value (0 to 100).</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the value is out of range.</exception>
+    public Percentage(double value) : this((float)value)
+    {
+    }
 
     /// <summary>
     /// Returns the percentage value as a float (0-100).
