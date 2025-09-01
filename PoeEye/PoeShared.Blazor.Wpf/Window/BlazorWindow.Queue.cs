@@ -719,23 +719,29 @@ partial class BlazorWindow
                 .Subscribe(x => blazorWindow.Deactivated?.Invoke(blazorWindow, x))
                 .AddTo(anchors);
 
-            var interop = new WindowInteropHelper(window);
-            var windowHandle = interop.EnsureHandle();
-            if (windowHandle == IntPtr.Zero)
+            if (!blazorWindow.Anchors.IsDisposed)
             {
-                throw new InvalidStateException("Failed to get created window handle");
-            }
+                var interop = new WindowInteropHelper(window);
+                var windowHandle = interop.EnsureHandle();
+                if (windowHandle == IntPtr.Zero)
+                {
+                    throw new InvalidStateException("Failed to get created window handle");
+                }
 
-            if (window.WindowHandle == IntPtr.Zero)
+                if (window.WindowHandle == IntPtr.Zero)
+                {
+                    throw new InvalidStateException("Created window handle is zero");
+                }
+
+                log.AddSuffix($"Wnd {windowHandle.ToHexadecimal()}");
+                log.Debug($"Created new window");
+            }
+            else
             {
-                throw new InvalidStateException("Created window handle is zero");
+                log.Warn($"Failed to create window - already disposed");
             }
-
-            log.AddSuffix($"Wnd {windowHandle.ToHexadecimal()}");
-            log.Debug($"Created new window");
 
             Disposable.Create(() => log.Debug("Window subscription has been disposed")).AddTo(anchors);
-
             return anchors;
         });
 
