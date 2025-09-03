@@ -10,19 +10,19 @@ public static class VectorExtensions
     {
         return new Point((int) Math.Round(vector.X), (int) Math.Round(vector.Y));
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static PointF ToPointF(this Vector2 vector)
     {
         return new PointF(vector.X, vector.Y);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 ToVector2(this Point point)
     {
         return new Vector2(point.X, point.Y);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 ToVector2(this PointF point)
     {
@@ -40,7 +40,7 @@ public static class VectorExtensions
     {
         return WithRandomOffset(vector, new Vector2(maxOffset.X, maxOffset.Y));
     }
-    
+
     /// <summary>
     /// Adds a random offset to the X and Y components of the vector, within the range specified by the maxOffset.
     /// </summary>
@@ -50,8 +50,19 @@ public static class VectorExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 WithRandomOffset(this Vector2 vector, Vector2 maxOffset)
     {
-        var randomOffsetX = maxOffset.X != 0 ? (float)(RandomNumberGenerator.Instance.NextDouble() * 2 - 1) * maxOffset.X : 0;
-        var randomOffsetY = maxOffset.Y != 0 ? (float)(RandomNumberGenerator.Instance.NextDouble() * 2 - 1) * maxOffset.Y : 0;
+        var randomOffsetX = maxOffset.X != 0 ? (float) (RandomNumberGenerator.Instance.NextDouble() * 2 - 1) * maxOffset.X : 0;
+        var randomOffsetY = maxOffset.Y != 0 ? (float) (RandomNumberGenerator.Instance.NextDouble() * 2 - 1) * maxOffset.Y : 0;
         return new Vector2(vector.X + randomOffsetX, vector.Y + randomOffsetY);
+    }
+
+    /// <summary>
+    /// Checks if both X and Y components of the vector are finite numbers.
+    /// </summary>
+    /// <param name="vector">The vector to check.</param>
+    /// <returns>True if both X and Y components are finite numbers, false otherwise.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsFinite(this Vector2 vector)
+    {
+        return float.IsFinite(vector.X) && float.IsFinite(vector.Y);
     }
 }
