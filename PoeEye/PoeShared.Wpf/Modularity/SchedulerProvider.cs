@@ -44,11 +44,21 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
         Add(WellKnownSchedulers.UIIdle, container.Resolve<IScheduler>(WellKnownSchedulers.UIIdle));
     }
 
-    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
     public IScheduler GetOrAdd(string name)
     {
         Log.Debug($"Retrieving scheduler {name}");
         return schedulers.GetOrAdd(name, x => CreateDispatcherScheduler(name, ThreadPriority.Normal));
+    }
+
+    public DispatcherScheduler GetOrAddDispatcherScheduler(string name)
+    {
+        var scheduler = GetOrAdd(name);
+        if (scheduler is not DispatcherScheduler dispatcherScheduler)
+        {
+            throw new InvalidOperationException($"Scheduler {name} is not a dispatcher scheduler: {scheduler}");
+        }
+
+        return dispatcherScheduler;
     }
 
     public bool TryGet(string name, out IScheduler scheduler)

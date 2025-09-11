@@ -10,6 +10,9 @@ public interface ISchedulerProvider
     [NotNull]
     IScheduler GetOrAdd([NotNull] string name);
     
+    [NotNull]
+    DispatcherScheduler GetOrAddDispatcherScheduler([NotNull] string name);
+    
     bool TryGet([NotNull] string name, out IScheduler scheduler);
     
     [NotNull]
