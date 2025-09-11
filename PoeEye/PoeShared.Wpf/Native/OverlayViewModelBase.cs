@@ -184,7 +184,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
         var overlayBounds = config.OverlayBounds;
         if (!overlayBounds.IsNotEmptyArea() || overlayBounds.IsNotEmptyArea() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.VirtualScreen))
         {
-            Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.Dump()}, config: {config.Dump()}");
+            Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToString()}, config: {config.DumpToString()}");
             ResetToDefault();
         }
         else
@@ -194,7 +194,7 @@ public abstract class OverlayViewModelBase : WindowViewModelBase, IOverlayViewMo
 
         if (config.OverlayOpacity <= 0.01)
         {
-            Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation}, config: {config.Dump()}");
+            Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation}, config: {config.DumpToString()}");
 
             config.OverlayOpacity = 1;
             if (UnlockWindowCommand.CanExecute(null))

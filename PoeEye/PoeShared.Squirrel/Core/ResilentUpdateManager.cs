@@ -87,7 +87,7 @@ public sealed class ResilientUpdateManager : DisposableReactiveObject, IPoeUpdat
                 
                 log.WithSuffix(uri).Debug($"Performing request");
                 var result = await Task.Run(() => getter(manager));
-                log.WithSuffix(uri).Debug($"Got request result: {result.Dump()}");
+                log.WithSuffix(uri).Debug($"Got request result: {result.DumpToString()}");
                 uriChooser.ReportAlive(uri);
                 return result;
             }

@@ -32,21 +32,21 @@ public static class ObjectExtensions
         return ToJson(instance, Formatting.Indented);
     }
     
-    public static string Dump<T>(this T instance)
+    public static string DumpToString<T>(this T instance)
     {
         return ToStringSafe(instance);
     }
 
-    [Obsolete("Replaced with Dump(), left here for compatibility reasons")]
+    [Obsolete("Replaced with DumpToString(), left here for compatibility reasons")]
     public static string DumpToText<T>(this T instance)
     {
-        return instance.Dump();
+        return instance.DumpToString();
     }
 
-    [Obsolete("Replaced with Dump(), left here for compatibility reasons")]
+    [Obsolete("Replaced with DumpToString(), left here for compatibility reasons")]
     public static string DumpToTextRaw<T>(this T instance)
     {
-        return instance.Dump();
+        return instance.DumpToString();
     }
 
     public static string DumpToString<T>(this IEnumerable<T> instance)
@@ -324,7 +324,7 @@ public static class ObjectExtensions
     {
         if (instance == null)
         {
-            return instance.Dump();
+            return instance.DumpToString();
         }
         var result = new StringBuilder();
         var itemCount = 0;
@@ -336,7 +336,7 @@ public static class ObjectExtensions
                 {
                     result.Append(separator);
                 }
-                result.Append(item.Dump());
+                result.Append(item.DumpToString());
             }
             itemCount++;
         }

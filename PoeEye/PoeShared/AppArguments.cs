@@ -175,7 +175,7 @@ public class AppArguments : AppOptions, IAppArguments
                 settings.IgnoreUnknownArguments = true;
                 settings.ParsingCulture = CultureInfo.InvariantCulture;
             });
-        Log.Info($"Command line parser settings: {parser.Settings.Dump()}");
+        Log.Info($"Command line parser settings: {parser.Settings.DumpToString()}");
         var result = parser.ParseArguments<AppOptions>(args ?? Array.Empty<string>());
         Log.Info($"Command line parsing result: {result.Tag}, type: {result}");
         switch (result)
@@ -213,6 +213,6 @@ public class AppArguments : AppOptions, IAppArguments
             IsAdminMode,
             ApplicationExecutablePath,
             ApplicationExecutableName
-        }.Dump());
+        }.DumpToString());
     }
 }

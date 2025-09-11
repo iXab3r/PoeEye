@@ -347,7 +347,7 @@ internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboard
         if (Log.IsDebugEnabled)
         {
             Log.Debug(
-                $"Keyboard/Mouse event: {arg.Dump()}");
+                $"Keyboard/Mouse event: {arg.DumpToString()}");
         }
     }
 

@@ -60,6 +60,6 @@ public class VirtualizedListContainer<T> : DisposableReactiveObject, IVirtualize
 
     protected override void FormatToString(ToStringBuilder builder)
     {
-        builder.Append(HasValue ? $"[{Value.Dump()}]" : "<Empty>");
+        builder.Append(HasValue ? $"[{Value.DumpToString()}]" : "<Empty>");
     }
 }

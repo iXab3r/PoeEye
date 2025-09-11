@@ -4,7 +4,7 @@ internal static class LogDataExtensions
 {
     public static LogData WithPrefix<T>(this LogData logData, T prefix)
     {
-        return logData.WithPrefix(() => prefix.Dump());
+        return logData.WithPrefix(() => prefix.DumpToString());
     }
     
     public static LogData WithMaxLineLength(this LogData logData, int? value)
@@ -34,7 +34,7 @@ internal static class LogDataExtensions
 
     public static LogData WithSuffix<T>(this LogData logData, T suffix)
     {
-        return logData.WithSuffix(() => suffix.Dump());
+        return logData.WithSuffix(() => suffix.DumpToString());
     }
     
     public static LogData WithSuffix(this LogData logData, Func<string> suffixSupplier, bool brackets = true)

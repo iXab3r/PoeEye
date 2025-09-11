@@ -65,21 +65,21 @@ internal abstract class MMDeviceProviderBase : DisposableReactiveObjectWithLogge
             .Throttle(ThrottlingTimeout)
             .StartWithDefault()
             .Select(x => EnumerateLines())
-            .DistinctUntilChanged(x => x.Dump())
+            .DistinctUntilChanged(x => x.DumpToString())
             .SubscribeSafe(newLines =>
             {
                 Log.Debug($"Lines list changed:\n\tCurrent lines list:\n\t\t{lines.Items.DumpToTable("\n\t\t")}\n\tNew lines list:\n\t\t{newLines.DumpToTable("\n\t\t")}");
                 var linesToAdd = newLines.Except(lines.Items).ToArray();
                 if (linesToAdd.Any())
                 {
-                    Log.Debug($"Adding lines: {linesToAdd.Dump()}");
+                    Log.Debug($"Adding lines: {linesToAdd.DumpToString()}");
                     lines.AddRange(linesToAdd);
                 }
 
                 var linesToRemove = lines.Items.Except(newLines).ToArray();
                 if (linesToRemove.Any())
                 {
-                    Log.Debug($"Removing lines: {linesToRemove.Dump()}");
+                    Log.Debug($"Removing lines: {linesToRemove.DumpToString()}");
                     lines.RemoveMany(linesToRemove);
                 }
             }, Log.HandleUiException)

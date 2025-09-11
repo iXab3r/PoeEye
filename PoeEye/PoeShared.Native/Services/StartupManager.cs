@@ -21,7 +21,7 @@ internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
         Guard.ArgumentNotNull(appArguments, nameof(appArguments));
         Guard.ArgumentNotNull(args, nameof(args));
-        Log.Debug($"Creating startup helper using args: {args.Dump()}, isElevated: {appArguments.IsElevated}...");
+        Log.Debug($"Creating startup helper using args: {args.DumpToString()}, isElevated: {appArguments.IsElevated}...");
 
         Guard.ArgumentNotNull(args.ExecutablePath, nameof(args.ExecutablePath));
         Guard.ArgumentNotNull(args.UniqueAppName, nameof(args.UniqueAppName));

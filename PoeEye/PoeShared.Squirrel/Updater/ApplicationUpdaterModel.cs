@@ -233,7 +233,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
 
         using var mgr = await CreateManager();
         var updateInfo = await mgr.PrepareUpdate(IgnoreDeltaUpdates, ArraySegment<IReleaseEntry>.Empty, new[] { releaseEntry });
-        Log.Debug($"Force UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
+        Log.Debug($"Force UpdateInfo:\r\n{updateInfo.DumpToString().TakeChars(300)}");
         return updateInfo;
     }
 
@@ -251,7 +251,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         Log.Debug($"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
 
         var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
-        Log.Debug($"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
+        Log.Debug($"UpdateInfo:\r\n{updateInfo.DumpToString().TakeChars(300)}");
         LatestUpdate = updateInfo;
     }
 
@@ -265,7 +265,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var progressUpdater = progressTracker.WhenAnyValue(x => x.ProgressPercent).Subscribe(x => ProgressPercent = (int)x);
         
         var updateInfo = await mgr.CheckForUpdate(targetVersion, CheckUpdateProgress);
-        Log.Debug($"UpdateInfo:\r\n{updateInfo.Dump().TakeChars(300)}");
+        Log.Debug($"UpdateInfo:\r\n{updateInfo.DumpToString().TakeChars(300)}");
         return updateInfo.FutureReleaseEntry;
     }
 
@@ -323,7 +323,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     }
     private async Task<IPoeUpdateManager> CreateManager(string updateUrl)
     {
-        Log.Debug($"Using update source: {UpdateSource.Dump()}");
+        Log.Debug($"Using update source: {UpdateSource.DumpToString()}");
 
         var downloader = new BasicAuthFileDownloader(
             new NetworkCredential(
@@ -331,7 +331,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
                 UpdateSource.Password?.ToUnsecuredString()));
         if (updateUrl.Contains("github"))
         {
-            Log.Debug($"Using GitHub source: {UpdateSource.Dump()}");
+            Log.Debug($"Using GitHub source: {UpdateSource.DumpToString()}");
 
             if (IsSquirrel == false)
             {
@@ -347,7 +347,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
         else
         {
-            Log.Debug($"Using BasicHTTP source: {UpdateSource.Dump()}");
+            Log.Debug($"Using BasicHTTP source: {UpdateSource.DumpToString()}");
 
             if (IsSquirrel)
             {

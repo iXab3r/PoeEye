@@ -22,7 +22,7 @@ public class SharedLog : DisposableReactiveObject
     private static readonly Lazy<IFluentLog> LogInstanceSupplier = new(() =>
     {
         var log = LogManager.GetLogger(typeof(SharedLog));
-        log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.Dump()}");
+        log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.DumpToString()}");
         var process = Process.GetCurrentProcess();
         return log.ToFluent().WithSuffix($"{process.ProcessName} PID {process.Id}");
     });
@@ -85,7 +85,7 @@ public class SharedLog : DisposableReactiveObject
 
     public void DumpApplicationInfo(IAppArguments appArguments)
     {
-        Log.Info($"Parsed args: {appArguments.Dump()}");
+        Log.Info($"Parsed args: {appArguments.DumpToString()}");
         Log.Info($"CmdLine: {Environment.CommandLine}");
         Log.Info($"CommandLineArgs: {appArguments.StartupArgs}");
         Log.Info($"Time: {  new { DateTime.UtcNow, DateTime.Now, TimeZoneLocal = TimeZoneInfo.Local } }");
