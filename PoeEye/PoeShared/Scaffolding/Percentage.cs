@@ -4,6 +4,9 @@
 /// Represents a percentage value (0-100).
 /// Provides utility methods for conversion and scaling.
 /// </summary>
+
+[System.Text.Json.Serialization.JsonConverter(typeof(PercentageSystemTextJsonConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(PercentageNewtonsoftJsonConverter))]
 public readonly struct Percentage : IEquatable<Percentage>, IFormattable
 {
     private readonly float value;
