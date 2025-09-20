@@ -67,7 +67,22 @@ public sealed class BinaryResourceRefConverter : JsonConverter
                             }
                             case nameof(BinaryResourceRef.ContentType):
                             {
-                                contentType = new MimeContentType(reader.ReadAsString());
+                                // Move to the value token
+                                if (!reader.Read())
+                                {
+                                    throw new JsonSerializationException("Unexpected end while reading ContentType.");
+                                }
+
+                                if (reader.TokenType == JsonToken.Null)
+                                {
+                                    contentType = null;
+                                }
+                                else
+                                {
+                                    // Delegate to serializer so it can invoke MimeContentTypeNewtonsoftJsonConverter
+                                    var parsed = serializer.Deserialize<MimeContentType>(reader);
+                                    contentType = parsed;
+                                }
                                 break;
                             }
                             case nameof(BinaryResourceRef.Data):

@@ -6,6 +6,8 @@ namespace PoeShared.Modularity;
 /// Readonly MIME content-type. The main difference between this and ContentType is immutability and better serialization support
 /// Also, ContentType uses few weird constructs like TrackingStringDictionary which is not supported by CompareService 
 /// </summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(MimeContentTypeSystemTextJsonConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(MimeContentTypeNewtonsoftJsonConverter))]
 public readonly record struct MimeContentType
 {
     public MimeContentType(string value)
