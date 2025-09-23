@@ -7,7 +7,19 @@ namespace PoeShared.Scaffolding;
 public static class FileUtils
 {
     private static readonly IFluentLog Log = typeof(FileUtils).PrepareLogger();
-    
+
+    /// <summary>
+    /// Mirrors source into destination using a simple plan-based copy.
+    /// Logs a file-by-file table with hashes and copies only what is needed.
+    /// A marker file named ".copied" is stored in the destination to indicate completion.
+    /// </summary>
+    /// <param name="source">Source directory to mirror from.</param>
+    /// <param name="destination">Destination directory to mirror into.</param>
+    public static bool MirrorDirectory(DirectoryInfo source, DirectoryInfo destination)
+    {
+        return DirectoryMirror.Mirror(source, destination);
+    }
+
     public static void RemoveEverythingInside(this DirectoryInfo directory)
     {
         if (!directory.Exists) 
