@@ -7,7 +7,6 @@ namespace PoeShared.Modularity;
 /// <summary>
 /// Represents a reference to a binary resource, which can be either stored as binary data or referenced via a URI.
 /// </summary>
-[Newtonsoft.Json.JsonConverter(typeof(BinaryResourceRefConverter))]
 public sealed record BinaryResourceRef : IHasValidation
 {
     public static readonly BinaryResourceRef Empty = new();
