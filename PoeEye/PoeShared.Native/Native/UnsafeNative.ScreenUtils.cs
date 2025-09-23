@@ -159,23 +159,15 @@ public partial class UnsafeNative
         return new(graphics.DpiX / 96f, graphics.DpiY / 96f);
     }
 
-    public static Rectangle GetClientRect(IntPtr hwnd)
+    public static WinRect GetClientRect(IntPtr hwnd)
     {
-        var rect = new RECT();
-        if (!User32.GetClientRect(hwnd, out rect))
+        if (!User32.GetClientRect(hwnd, out var rect))
         {
             Log.Warn($"Failed to GetClientRect({hwnd}), LastError: {Kernel32.GetLastError()}");
-            return Rectangle.Empty;
+            return WinRect.Empty;
         }
 
-        var windowBounds = GetWindowRect(hwnd);
-        var clientSize = new Size(rect.right - rect.left, rect.bottom - rect.top);
-
-        return new Rectangle(
-            windowBounds.Left,
-            windowBounds.Top,
-            clientSize.Width,
-            clientSize.Height);
+        return WinRect.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
     }
 
     public static bool IsWindowsXP()
