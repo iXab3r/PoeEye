@@ -18,6 +18,8 @@ internal static class DirectoryMirror
         FileInfo Destination,
         string RelativePath,
         string Size,
+        string CreatedAt,
+        string ModifiedAt,
         string SrcHash,
         string DstHash,
         string Action
@@ -43,8 +45,8 @@ internal static class DirectoryMirror
 
         // Log table
         var table = BuildTable(
-            new[] { "File", "Size", "SrcHash", "DstHash", "Plan" },
-            plan.Select(x => new[] { x.RelativePath, x.Size, x.SrcHash, x.DstHash, x.Action })
+            new[] { "Plan", "File", "Size", "Created", "Modified", "SrcHash", "DstHash" },
+            plan.Select(x => new[] { x.Action, x.RelativePath, x.Size, x.CreatedAt, x.ModifiedAt, x.SrcHash, x.DstHash })
         );
         Log.Info($"Mirror plan (hash) for {source.FullName} → {destination.FullName} \n" + table);
 
@@ -95,7 +97,7 @@ internal static class DirectoryMirror
                 action = isMismatch ? "Copy (mismatch)" : "Skip";
             }
 
-            results.Add(new PlanItem(sourceFile, destinationFile, relativePath, size, srcHashStr, dstHashStr, action));
+            results.Add(new PlanItem(sourceFile, destinationFile, relativePath, size,  source.CreationTime.ToString(CultureInfo.InvariantCulture), source.LastWriteTime.ToString(CultureInfo.InvariantCulture), srcHashStr, dstHashStr, action));
         }
 
         return results;
