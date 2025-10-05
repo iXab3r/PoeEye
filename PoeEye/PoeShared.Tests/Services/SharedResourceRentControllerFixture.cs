@@ -17,7 +17,7 @@ public class SharedResourceRentControllerFixture : FixtureBase
 
 
         //Then
-        var isRented = await instance.IsRented.Take(1);
+        var isRented = await instance.WhenRented.Take(1);
         isRented.ShouldBe(new AnnotatedBoolean(true, "test"));
     }
 
@@ -32,7 +32,7 @@ public class SharedResourceRentControllerFixture : FixtureBase
         rent.Dispose();
 
         //Then
-        var isRented = await instance.IsRented.Take(1);
+        var isRented = await instance.WhenRented.Take(1);
         isRented.ShouldBe(default);
     }
 

@@ -48,7 +48,7 @@ public interface ISharedResourceRentController : INotifyPropertyChanged
     /// This example demonstrates how to subscribe to the rental status of the resource.
     /// <code>
     /// var manager = new SharedResourceRentManager();
-    /// manager.IsRented.Subscribe(status =>
+    /// manager.WhenRented.Subscribe(status =>
     /// {
     ///     if (status.Value)
     ///     {
