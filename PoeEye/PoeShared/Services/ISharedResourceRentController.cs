@@ -20,6 +20,27 @@ namespace PoeShared.Services;
 public interface ISharedResourceRentController : INotifyPropertyChanged
 {
     /// <summary>
+    /// Provides optional name of the resource.
+    /// </summary>
+    string Name { get; }
+    
+    /// <summary>
+    /// Provides whether the resource is rented.
+    /// The key difference between this property and <see cref="WhenRented"/> is that this uses NotifyPropertyChanged to notify subscribers,
+    /// which is known to have worse performance AND reliability than RX-based solutions.
+    /// Use this property only when performance is not a concern, e.g. for IsLoading indicators
+    /// </summary>
+    bool IsRented { get; }
+    
+    /// <summary>
+    /// Provides the current rental status of the resource.
+    /// The key difference between this property and <see cref="WhenRented"/> is that this uses NotifyPropertyChanged to notify subscribers,
+    /// which is known to have worse performance AND reliability than RX-based solutions.
+    /// Use this property only when performance is not a concern, e.g. for IsLoading indicators 
+    /// </summary>
+    AnnotatedBoolean IsRentedState { get; }
+    
+    /// <summary>
     /// Provides the current rental status of the resource.
     /// If there are multiple reasons why the resource is rented, they will all be listed together.
     /// </summary>
@@ -40,7 +61,7 @@ public interface ISharedResourceRentController : INotifyPropertyChanged
     /// });
     /// </code>
     /// </example>
-    IObservable<AnnotatedBoolean> IsRented { get; }
+    IObservable<AnnotatedBoolean> WhenRented { get; }
         
     /// <summary>
     /// Temporarily rents the resource for the specified reason.

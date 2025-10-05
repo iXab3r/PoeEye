@@ -10,7 +10,7 @@ public sealed class SharedResourceRentController : DisposableReactiveObject, ISh
     private long keyCounter = 0;
     private long usageCounter = 0;
 
-    public SharedResourceRentController() : this(name: default)
+    public SharedResourceRentController() : this(name: string.Empty)
     {
     }
 
@@ -18,13 +18,25 @@ public sealed class SharedResourceRentController : DisposableReactiveObject, ISh
     {
         isRentedSubject = new BehaviorSubject<AnnotatedBoolean>(default);
         Name = name;
-        IsRented = isRentedSubject.DistinctUntilChanged().AsObservable();
+        WhenRented = isRentedSubject.DistinctUntilChanged().AsObservable();
+        WhenRented.Subscribe(x =>
+        {
+            RaisePropertyChanged(nameof(IsRentedState));
+            RaisePropertyChanged(nameof(IsRented));
+        }).AddTo(Anchors);
     }
     
+    /// <inheritdoc />
     public string Name { get; }
+
+    /// <inheritdoc />
+    public AnnotatedBoolean IsRentedState => isRentedSubject.Value;
     
     /// <inheritdoc />
-    public IObservable<AnnotatedBoolean> IsRented { get; }
+    public bool IsRented => IsRentedState.Value;
+    
+    /// <inheritdoc />
+    public IObservable<AnnotatedBoolean> WhenRented { get; }
     
     /// <inheritdoc />
     public IDisposable Rent(string reason)

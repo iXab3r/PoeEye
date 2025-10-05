@@ -76,7 +76,7 @@ public partial class WindowFinder
 
         var cancellationTokenSource = new CancellationTokenSource();
         using var cancellationSubscription = isBusyLatch
-            .IsRented
+            .WhenRented
             .WithPrevious()
             .Where(x => x.Previous.Value == true && x.Current.Value == false)
             .Subscribe(x =>
