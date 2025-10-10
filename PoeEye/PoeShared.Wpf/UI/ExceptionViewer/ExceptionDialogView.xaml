@@ -36,7 +36,9 @@
 
             <DataTemplate x:Key="ExceptionDialogItemPreview" DataType="{x:Type eye:ExceptionDialogSelectableItem}">
                 <Grid>
-                    <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                    <ScrollViewer CanContentScroll="True" 
+                                  VerticalScrollBarVisibility="Auto" 
+                                  HorizontalScrollBarVisibility="Auto"
                                   x:Name="SelectedItemDescription">
                         <TextBox
                             Height="NaN"
@@ -57,6 +59,19 @@
                     </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
+
+            <!-- Custom template for CommentTextBox to ensure proper scrollbars in this dialog -->
+            <ControlTemplate x:Key="ExceptionDialogTextBoxTemplate" TargetType="{x:Type TextBox}">
+                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{TemplateBinding Background}"
+                        SnapsToDevicePixels="True">
+                    <ScrollViewer x:Name="PART_ContentHost"
+                                  Focusable="False"
+                                  HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
+                </Border>
+            </ControlTemplate>
         </eye:SharedResourceDictionary>
     </Window.Resources>
 
@@ -77,22 +92,29 @@
 
         <Border Grid.Row="1" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Margin="0,5">
             <TextBox wpf:FocusHelper.IsFocused="True"
-                     Height="NaN"
+                     x:Name="CommentTextBox"
+                     Template="{StaticResource ExceptionDialogTextBoxTemplate}"
                      AcceptsReturn="True"
+                     TextWrapping="Wrap"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Stretch"
                      VerticalContentAlignment="Stretch"
+                     Height="60"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                      Text="{Binding Comment, Mode=TwoWay}" />
         </Border>
 
         <Grid Grid.Row="2" IsEnabled="{Binding SaveReportCommand.IsBusy, Converter={StaticResource NotConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="100" MaxWidth="300" />
+                <ColumnDefinition Width="*" MinWidth="100" MaxWidth="300" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <ListBox Grid.Column="0" ItemsSource="{Binding Attachments}"
                      SelectedItem="{Binding SelectedItem}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                      Grid.IsSharedSizeScope="True">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type eye:ExceptionDialogSelectableItem}">
