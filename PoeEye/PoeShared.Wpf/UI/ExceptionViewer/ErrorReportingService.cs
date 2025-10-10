@@ -197,7 +197,7 @@ internal sealed class ErrorReportingService : DisposableReactiveObject, IErrorRe
 
     private void ReportCrash(Exception exception, string developerMessage = "")
     {
-        Log.Error($"Unhandled application exception({developerMessage})", exception);
+        Log.Error($"Unhandled application exception({developerMessage})\n{exception.BuildExceptionReport()}", exception);
         using var @lock = exceptionReportGate.Enter();
         if (appArguments.IsDebugMode || Debugger.IsAttached)
         {

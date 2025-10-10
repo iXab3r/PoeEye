@@ -27,6 +27,26 @@ public static class ExceptionExtensions
 
         return new AggregateException(exceptions);
     }
+    
+    public static string BuildExceptionReport(this Exception ex)
+    {
+        var sb = new StringBuilder();
+        int depth = 0;
+        for (var e = ex; e != null; e = e.InnerException)
+        {
+            sb.AppendLine($"[{depth}] {e.GetType().Name}: {e.Message}");
+            sb.AppendLine($"  Source: {e.Source}");
+            sb.AppendLine($"  TargetSite: {e.TargetSite}");
+            sb.AppendLine($"  StackTrace:\n{e.StackTrace}");
+            if (e.Data?.Count > 0)
+            {
+                foreach (DictionaryEntry kv in e.Data)
+                    sb.AppendLine($"  Data[{kv.Key}] = {kv.Value}");
+            }
+            depth++;
+        }
+        return sb.ToString();
+    }
 
     public static bool TryCutOffStackTrace(this Exception ex, Predicate<string> cutoffCondition, out string formattedStackTrace)
     {
