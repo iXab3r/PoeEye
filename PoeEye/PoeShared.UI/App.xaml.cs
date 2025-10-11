@@ -23,7 +23,7 @@ public partial class App : ApplicationBase
 
         Container.AddNewExtensionIfNotExists<BlazorWpfRegistrations>();
         Container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
-        Container.AddNewExtensionIfNotExists<BlazorWebRegistrations>();
+        Container.AddNewExtensionIfNotExists<PoeSharedBlazorRegistrations>();
 
         Container.RegisterSingleton<IConfigProvider, IConfigProviderFromFile>();
             

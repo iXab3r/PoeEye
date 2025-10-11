@@ -9,7 +9,7 @@ using Unity.Extension;
 
 namespace PoeShared.Blazor.Prism;
 
-public sealed class BlazorWebRegistrations : UnityContainerExtension
+public sealed class PoeSharedBlazorRegistrations : UnityContainerExtension
 {
     protected override void Initialize()
     {
@@ -21,7 +21,6 @@ public sealed class BlazorWebRegistrations : UnityContainerExtension
         
         Container.RegisterSingleton<BlazorContentRepository>(typeof(IBlazorContentRepository));
         UnityServiceCollection.Instance.AddBlazorContentRepository(Container);
-        
         UnityServiceCollection.Instance.AddBlazorUtils(Container);
 
         Container.RegisterSingleton<ISystemClock, MicrosoftExtensionsSystemClock>();

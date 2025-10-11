@@ -8,7 +8,7 @@ namespace PoeShared.Blazor.Controls.Prism;
 
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection AddBlazorControls(this IServiceCollection services, IUnityContainer unityContainer)
+    public static IServiceCollection AddPoeSharedBlazorControls(this IServiceCollection services)
     {
         services.AddScoped<IScopedAntContainerRegistry, ScopedAntContainerRegistry>();
         return services;

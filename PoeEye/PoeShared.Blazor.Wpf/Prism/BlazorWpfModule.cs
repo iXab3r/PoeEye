@@ -13,6 +13,6 @@ public sealed class BlazorWpfModule : DynamicModule
     protected override void RegisterTypesInternal(IUnityContainer container)
     {
         container.AddNewExtensionIfNotExists<BlazorWpfRegistrations>();
-        container.AddNewExtensionIfNotExists<BlazorWebRegistrations>();
+        container.AddNewExtensionIfNotExists<PoeSharedBlazorRegistrations>();
     }
 }

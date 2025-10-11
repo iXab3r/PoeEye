@@ -3,10 +3,10 @@ using Unity.Extension;
 
 namespace PoeShared.Blazor.Controls.Prism;
 
-public sealed class BlazorControlsRegistrations : UnityContainerExtension
+public sealed class PoeSharedBlazorControlsRegistrations : UnityContainerExtension
 {
     protected override void Initialize()
     {
-        UnityServiceCollection.Instance.AddBlazorControls(Container);
+        UnityServiceCollection.Instance.AddPoeSharedBlazorControls();
     }
 }
