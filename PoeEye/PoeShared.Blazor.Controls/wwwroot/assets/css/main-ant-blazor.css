@@ -477,13 +477,17 @@ textarea,
     border-width: 1px;
     border-color: var(--eye-Primary500);
     border-style: solid;
-    padding: 5px;
+    padding: 0;
+}
+
+.ant-dropdown-menu-submenu-popup ul{
+    margin: 0;
 }
 
 .ant-dropdown-menu-item,
 .ant-dropdown-menu-submenu-title {
     color: var(--eye-MaterialDesignBody);
-    padding: 0 !important;
+    padding: 0.2em 0.5em;
 }
 
 .ant-dropdown-menu-submenu-selected .ant-dropdown-menu-submenu-title {
