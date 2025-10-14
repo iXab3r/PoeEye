@@ -9,7 +9,8 @@ export function setup(id: string, options: string): void {
             const oOptions = JSON.parse(options);
             const tooltip = Tooltip.getOrCreateInstance(element, oOptions);
         } else {
-            console.error(`Element with ID ${identifier} not found.`);
+            //in some cases an element may just disappear before the tooltip is fully initialized
+            //console.error(`Element with ID ${identifier} not found.`);
         }
     } catch (e) {
         console.error(`Error from Tooltip Setup: ${(e as Error).message}`);
