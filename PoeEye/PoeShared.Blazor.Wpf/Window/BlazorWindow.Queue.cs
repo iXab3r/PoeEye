@@ -81,7 +81,7 @@ partial class BlazorWindow
             {
                 case SetVisibleCommand command:
                 {
-                    Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}");
+                    Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}: {new {window.WindowState}}");
                     if (command.IsVisible)
                     {
                         window.Show();
@@ -91,18 +91,6 @@ partial class BlazorWindow
                         window.Hide();
                     }
 
-                    break;
-                }
-                case ShowCommand:
-                {
-                    Log.Debug($"Showing the window: {new {window.WindowState}}");
-                    window.Show();
-                    break;
-                }
-                case HideCommand:
-                {
-                    Log.Debug($"Hiding the window: {new {window.WindowState}}");
-                    window.Hide();
                     break;
                 }
                 case ActivateCommand:
@@ -357,6 +345,8 @@ partial class BlazorWindow
     {
         return Observable.Create<IWindowEvent>(observer =>
         {
+            log.Debug($"Creating new window and subscriptions");
+
             var anchors = new CompositeDisposable();
             Disposable.Create(() => log.Debug("Window subscription is being disposed")).AddTo(anchors);
 
@@ -511,12 +501,6 @@ partial class BlazorWindow
                 .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x.Value)))
                 .AddTo(anchors);
 
-            blazorWindow.windowVisible
-                .Listen()
-                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
-                .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
-                .AddTo(anchors);
-
             Observable.CombineLatest(
                     blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode),
                     blazorWindow.WhenAnyValue(x => x.Padding),
@@ -585,6 +569,12 @@ partial class BlazorWindow
                 .Skip(1)
                 .Subscribe(x => { observer.OnNext(x); })
                 .AddTo(anchors);
+            
+            blazorWindow.windowVisible
+                .Listen()
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
+                .Subscribe(x => observer.OnNext(new SetVisibleCommand(x.Value)))
+                .AddTo(anchors);
 
             // blazor-related events
             blazorWindow.WhenAnyValue(x => x.Container)
@@ -601,7 +591,7 @@ partial class BlazorWindow
                 .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetBlazorAdditionalFiles(x)))
                 .AddTo(anchors);
-            
+
             blazorWindow.WhenAnyValue(x => x.ControlConfigurator)
                 .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetBlazorControlConfigurator(x)))
@@ -1019,10 +1009,6 @@ partial class BlazorWindow
 
     private sealed record InvokeCommand(Action ActionToExecute, ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
 
-    private sealed record ShowCommand : IWindowCommand;
-
-    private sealed record HideCommand : IWindowCommand;
-
     private sealed record ActivateCommand : IWindowCommand;
 
     private sealed record ShowDevToolsCommand : IWindowCommand;
@@ -1076,7 +1062,7 @@ partial class BlazorWindow
     private sealed record SetBlazorUnityContainer(IUnityContainer ChildContainer) : IWindowCommand;
 
     private sealed record SetBlazorFileProvider(IFileProvider FileProvider) : IWindowCommand;
-    
+
     private sealed record SetBlazorControlConfigurator(IBlazorContentControlConfigurator ControlConfigurator) : IWindowCommand;
 
     private sealed record SetBlazorAdditionalFiles(ImmutableArray<IFileInfo> AdditionalFiles) : IWindowCommand;

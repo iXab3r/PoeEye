@@ -486,13 +486,13 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public void Hide()
     {
         Log.Debug("Enqueueing Hide command");
-        EnqueueUpdate(new HideCommand());
+        EnqueueUpdate(new SetVisibleCommand(false));
     }
 
     public void Show()
     {
         EnsureNotDisposed();
-        EnqueueUpdate(new ShowCommand());
+        EnqueueUpdate(new SetVisibleCommand(true));
 
         Log.Debug("Showing window in non-blocking way");
     }
@@ -507,7 +507,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     {
         EnsureNotDisposed();
         Log.Debug("Showing window in blocking way");
-        EnqueueUpdate(new ShowCommand());
+        EnqueueUpdate(new SetVisibleCommand(true));
         try
         {
             Log.Debug("Awaiting for the window to be closed");
@@ -614,10 +614,13 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         if (!windowSupplier.IsValueCreated)
         {
             window = windowSupplier.Value;
+            Log.Debug($"Subscribing to window {window}, events in queue: {eventQueue.Count}");
             SubscribeToWindow(Log, window, this)
-                .SubscribeSafe(x => { EnqueueUpdate(x); }, Log.HandleUiException)
+                .SubscribeSafe(x =>
+                {
+                    EnqueueUpdate(x);
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
-
             Log.Debug("NativeWindow created and subscribed successfully");
         }
         else
@@ -637,7 +640,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         {
             return;
         }
-
+        
         try
         {
             while (eventQueue.TryTake(out var windowEvent))
