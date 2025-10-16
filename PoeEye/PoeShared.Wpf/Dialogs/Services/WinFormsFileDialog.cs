@@ -2,6 +2,8 @@
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using System.Collections.Immutable;
+using System.Linq;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Dialogs.Services;
@@ -19,6 +21,8 @@ public sealed class WinFormsFileDialog : DisposableReactiveObjectWithLogger, ISa
     public FileInfo LastFile { get; private set; }
 
     FileInfo IOpenFileDialog.ShowDialog() => ShowOpenDialog();
+
+    ImmutableArray<FileInfo> IOpenFileDialog.ShowDialogMultiselect() => ShowOpenDialogMultiselect();
 
     FileInfo ISaveFileDialog.ShowDialog() => ShowSaveDialog();
 
@@ -50,6 +54,39 @@ public sealed class WinFormsFileDialog : DisposableReactiveObjectWithLogger, ISa
             LastFile = result;
             Log.Info($"User selected file: {result} (exists: {result.Exists})");
             return result;
+        });
+    }
+
+    private ImmutableArray<FileInfo> ShowOpenDialogMultiselect(IntPtr hwndOwner = default)
+    {
+        return EnsureSta(() =>
+        {
+            Log.Info($"Showing OpenFileDialog (WinForms, multiselect), parameters: {new { Title, InitialDirectory, Filter, InitialFileName, LastFile }}");
+
+            using var dialog = new OpenFileDialog
+            {
+                Title = Title,
+                FileName = InitialFileName,
+                InitialDirectory = IsValidDirectory(InitialDirectory) ? InitialDirectory : GetDefaultFolder(),
+                Filter = Filter,
+                Multiselect = true
+            };
+
+            var owner = hwndOwner != IntPtr.Zero ? new Win32Window(hwndOwner) : null;
+
+            if (dialog.ShowDialog(owner) != DialogResult.OK)
+            {
+                Log.Info("User cancelled OpenFileDialog (multiselect)");
+                return ImmutableArray<FileInfo>.Empty;
+            }
+
+            var files = dialog.FileNames?.Select(x => new FileInfo(x)).ToImmutableArray() ?? ImmutableArray<FileInfo>.Empty;
+            if (files.Length > 0)
+            {
+                LastFile = files[^1];
+            }
+            Log.Info($"User selected {files.Length} file(s)");
+            return files;
         });
     }
 

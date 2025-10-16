@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Collections.Immutable;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 
@@ -32,6 +33,13 @@ public sealed class ComDlg32FileDialog : DisposableReactiveObjectWithLogger, ISa
         }
 
         return new FileInfo(ofn.file);
+    }
+
+    ImmutableArray<FileInfo> IOpenFileDialog.ShowDialogMultiselect()
+    {
+        // Minimal implementation: fallback to single selection for legacy ComDlg32-based dialog
+        var file = ((IOpenFileDialog)this).ShowDialog();
+        return file != null ? ImmutableArray.Create(file) : ImmutableArray<FileInfo>.Empty;
     }
 
     public FileInfo ShowDialog(IntPtr hwndOwner)

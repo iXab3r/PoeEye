@@ -6,6 +6,8 @@ namespace PoeShared.Dialogs.Services;
 
 using System;
 using System.IO;
+using System.Collections.Immutable;
+using System.Linq;
 
 public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFileDialog, IOpenFileDialog
 {
@@ -51,6 +53,35 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
         LastFile = result;
         Log.Info($"User has selected file {result} (exists: {result.Exists})");
         return result;
+    }
+
+    ImmutableArray<FileInfo> IOpenFileDialog.ShowDialogMultiselect()
+    {
+        Log.Info($"Showing Open file dialog (multiselect), parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
+        var dialog = new OpenFileDialog()
+        {
+            Title = Title,
+            FileName = InitialFileName,
+            InitialDirectory = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory)
+                ? InitialDirectory
+                : Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures),
+            Filter = Filter,
+            Multiselect = true
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            Log.Info("User cancelled Open file dialog (multiselect)");
+            return ImmutableArray<FileInfo>.Empty;
+        }
+
+        var files = dialog.FileNames?.Select(x => new FileInfo(x)).ToImmutableArray() ?? ImmutableArray<FileInfo>.Empty;
+        if (files.Length > 0)
+        {
+            LastFile = files[^1];
+        }
+        Log.Info($"User selected {files.Length} file(s)");
+        return files;
     }
 
     FileInfo ISaveFileDialog.ShowDialog()
