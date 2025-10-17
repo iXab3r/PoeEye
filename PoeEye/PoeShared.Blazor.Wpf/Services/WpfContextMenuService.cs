@@ -109,6 +109,11 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
             manager.Handler(items);
             itemsSink.OnNext(items);
 
+            if (items.Count <= 0)
+            {
+                return;
+            }
+
             var invokeCtx = new BlazorContextMenuInvokeContext
             {
                 ComponentId = manager.DataCmId,
