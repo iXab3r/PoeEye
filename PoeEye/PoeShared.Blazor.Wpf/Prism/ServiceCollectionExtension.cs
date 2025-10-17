@@ -8,9 +8,15 @@ namespace PoeShared.Blazor.Wpf.Prism;
 
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection AddContextMenuService(this IServiceCollection services, IUnityContainer unityContainer)
+    public static IServiceCollection AddWebView2ContextMenuService(this IServiceCollection services, IUnityContainer unityContainer)
     {
         services.AddScoped<IBlazorContextMenuService, WebView2ContextMenuService>();
+        return services;
+    }  
+    
+    public static IServiceCollection AddWpfContextMenuService(this IServiceCollection services, IUnityContainer unityContainer)
+    {
+        services.AddScoped<IBlazorContextMenuService, WpfContextMenuService>();
         return services;
     }
 }

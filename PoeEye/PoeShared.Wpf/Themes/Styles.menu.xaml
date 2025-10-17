@@ -11,6 +11,7 @@
     </eye:SharedResourceDictionary.MergedDictionaries>
     
     <Style TargetType="{x:Type MenuItem}" x:Key="SlowHierarchicalMenuItem" BasedOn="{x:Null}">
+        <Setter Property="ui1:MenuItemSubmenuAssist.OpenOnHoverDelay" Value="50" />
         <Setter Property="Padding" Value="8,3" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="MinHeight" Value="27" />
@@ -56,8 +57,17 @@
                                               VerticalAlignment="Center"
                                               Visibility="{TemplateBinding InputGestureText, Converter={StaticResource NullToCollapsedConverter}}"
                                               Content="{TemplateBinding InputGestureText}" />
+
+                            <!-- Arrow for submenu items -->
+                            <TextBlock Grid.Column="2" x:Name="SubmenuArrow"
+                                       Text="▶"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="6,0,0,0"
+                                       Visibility="Collapsed"/>
                             <Popup
-                                Grid.Column="0" 
+                                Grid.Column="0"
                                 x:Name="PART_Popup"
                                 AllowsTransparency="True"
                                 Focusable="False"
@@ -111,10 +121,9 @@
                         <Trigger
                             Property="Role"
                             Value="SubmenuHeader">
-                            <Setter
-                                TargetName="PART_Popup"
-                                Property="Placement"
-                                Value="Right" />
+                            <Setter TargetName="PART_Popup" Property="Placement" Value="Right" />
+                            <Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="InputGesturePresenter" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="ui1:ContextMenuServiceExtensions.BindDataContextToMenuItemCommandParameter" Value="True">
                             <Setter Property="ui1:CommandWrapperHelper.CommandParameter" Value="{Binding DataContext, RelativeSource={RelativeSource Self}}" />
@@ -132,9 +141,11 @@
     </Style>
 
     <Style TargetType="{x:Type MenuItem}" x:Key="FastMenuItem" BasedOn="{x:Null}">
+        <Setter Property="ui1:MenuItemSubmenuAssist.OpenOnHoverDelay" Value="50" />
         <Setter Property="Padding" Value="8,3" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="MinHeight" Value="27" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Command">
             <Setter.Value>
@@ -175,9 +186,63 @@
                                               VerticalAlignment="Center"
                                               Visibility="{TemplateBinding InputGestureText, Converter={StaticResource NullToCollapsedConverter}}"
                                               Content="{TemplateBinding InputGestureText}" />
+
+                            <!-- Arrow for submenu items -->
+                            <TextBlock Grid.Column="2" x:Name="SubmenuArrow"
+                                       Text="▶"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="6,0,0,0"
+                                       Visibility="Collapsed"/>
+
+                            <!-- Submenu popup support (nested submenus) -->
+                            <Popup
+                                Grid.Column="0"
+                                x:Name="PART_Popup"
+                                AllowsTransparency="True"
+                                Focusable="False"
+                                IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                PopupAnimation="Fade"
+                                Placement="Right"
+                                HorizontalOffset="4"
+                                PlacementTarget="{Binding ElementName=Container}"
+                                CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(wpf:ShadowAssist.CacheMode)}">
+                                <Border
+                                    x:Name="SubMenuBorder"
+                                    Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuBase}}"
+                                    BorderBrush="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuBase}}"
+                                    BorderThickness="{Binding Path=BorderThickness, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuBase}}"
+                                    Effect="{DynamicResource MaterialDesignShadowDepth1}"
+                                    CornerRadius="0">
+                                    <Border Background="Transparent">
+                                        <ScrollViewer x:Name="SubMenuScrollViewer"
+                                                      Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                            <Grid RenderOptions.ClearTypeHint="Enabled" Margin="0 ">
+                                                <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
+                                                    <Rectangle x:Name="OpaqueRect"
+                                                               Fill="{Binding Background, ElementName=SubMenuBorder}"
+                                                               Height="{Binding ActualHeight, ElementName=SubMenuBorder}"
+                                                               Width="{Binding ActualWidth, ElementName=SubMenuBorder}" />
+                                                </Canvas>
+                                                <ItemsPresenter x:Name="ItemsPresenter"
+                                                                KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                                Grid.IsSharedSizeScope="True"
+                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                KeyboardNavigation.TabNavigation="Cycle" />
+                                            </Grid>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Border>
+                            </Popup>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="Role" Value="SubmenuHeader">
+                            <Setter TargetName="PART_Popup" Property="Placement" Value="Right" />
+                            <Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="InputGesturePresenter" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
                         <Trigger Property="ui1:ContextMenuServiceExtensions.BindDataContextToMenuItemCommandParameter" Value="True">
                             <Setter Property="ui1:CommandWrapperHelper.CommandParameter" Value="{Binding DataContext, RelativeSource={RelativeSource Self}}" />
                         </Trigger>

@@ -9,12 +9,14 @@ namespace PoeShared.Blazor.Services;
 
 public interface IBlazorContextMenuService
 {
-    IObservable<IList<CmItem>> WhenContextMenuRequested { get; }
+    IObservable<IList<BlazorContextMenuItem>> WhenContextMenuRequested { get; }
 
-    Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<CmItem>> handler);
+    Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<BlazorContextMenuItem>> handler);
+
+    Task ShowContextMenu(IList<BlazorContextMenuItem> items);
 }
 
-public abstract class CmItem
+public abstract class BlazorContextMenuItem
 {
     public string Label { get; init; } = "";
     public bool Enabled { get; init; } = true;
@@ -25,7 +27,7 @@ public abstract class CmItem
 }
 
 // Leaf types
-public sealed class CmCommand : CmItem
+public sealed class BlazorContextMenuCommand : BlazorContextMenuItem
 {
     /// <summary>
     /// Return a small icon stream (e.g., 16x16 PNG). Factory so we don’t keep streams alive.
@@ -35,34 +37,43 @@ public sealed class CmCommand : CmItem
     /// <summary>
     /// Async handler for clicks
     /// </summary>
-    public Func<CmInvokeContext, Task>? OnInvokeAsync { get; init; }
+    public Func<BlazorContextMenuInvokeContext, Task>? OnInvokeAsync { get; init; }
 }
 
-public sealed class CmCheckBox : CmItem
+public sealed class BlazorContextMenuCheckBox : BlazorContextMenuItem
 {
     public bool IsChecked { get; init; }
     
-    public Func<CmInvokeContext, Task>? OnToggleAsync { get; init; }
+    public Func<BlazorContextMenuInvokeContext, Task>? OnToggleAsync { get; init; }
 }
 
-public sealed class CmRadio : CmItem
+public sealed class BlazorContextMenuRadio : BlazorContextMenuItem
 {
     // Radios group by adjacency inside the same parent collection (matching WebView2 behavior).
     public bool IsChecked { get; init; }
-    public Func<CmInvokeContext, Task>? OnSelectAsync { get; init; }
+    public Func<BlazorContextMenuInvokeContext, Task>? OnSelectAsync { get; init; }
 }
 
-public sealed class CmSeparator : CmItem { }
+public sealed class BlazorContextMenuSeparator : BlazorContextMenuItem { }
 
-public sealed class CmSubmenu : CmItem
+public sealed class CmSubmenu : BlazorContextMenuItem
 {
-    public System.Collections.Immutable.ImmutableArray<CmItem> Children { get; init; } = System.Collections.Immutable.ImmutableArray<CmItem>.Empty;
+    public System.Collections.Immutable.ImmutableArray<BlazorContextMenuItem> Children { get; init; } = System.Collections.Immutable.ImmutableArray<BlazorContextMenuItem>.Empty;
 }
 
-public sealed class CmInvokeContext
+public sealed class BlazorContextMenuInvokeContext
 {
-    public required string? ComponentId { get; init; }   // e.g., your data-cm-id, if any
-    public required int X { get; init; }
-    public required int Y { get; init; }
-    public required object? Tag { get; init; }           // optional: your own payload
+    public string? ComponentId { get; init; }   // e.g., your data-cm-id, if any
+    
+    /// <summary>
+    /// Screen coordinates (not DPI-aware aka NOT device pixels)   
+    /// </summary>
+    public double X { get; init; }
+    
+    /// <summary>
+    /// Screen coordinates (not DPI-aware aka NOT device pixels)
+    /// </summary>
+    public double Y { get; init; }
+    
+    public object? Tag { get; init; }           // optional: your own payload
 }

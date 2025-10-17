@@ -24,8 +24,8 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
     private readonly ICoreWebView2Accessor coreWebView2Accessor;
     private readonly IJsPoeBlazorUtils poeBlazorUtils;
     private readonly ConcurrentDictionary<string, ContextMenuManager> managersById = new();
-    private readonly Subject<IList<CmItem>> itemsSink = new();
-    
+    private readonly Subject<IList<BlazorContextMenuItem>> itemsSink = new();
+
     public WebView2ContextMenuService(
         ICoreWebView2Accessor coreWebView2Accessor,
         IJsPoeBlazorUtils poeBlazorUtils)
@@ -37,20 +37,25 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
         coreWebView2Accessor.CoreWebView2.ContextMenuRequested += CoreWebView2OnContextMenuRequested;
     }
 
-    public IObservable<IList<CmItem>> WhenContextMenuRequested => itemsSink.AsObservable();
-    
-    public async Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<CmItem>> handler)
+    public IObservable<IList<BlazorContextMenuItem>> WhenContextMenuRequested => itemsSink.AsObservable();
+
+    public async Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<BlazorContextMenuItem>> handler)
     {
         var cmId = $"CM-{Guid.NewGuid()}";
         // Tag the element with a unique context menu id so we can resolve it from JS hit-testing
         await poeBlazorUtils.SetAttribute(elementRef, DataCmId, cmId);
         managersById[cmId] = new ContextMenuManager(elementRef, cmId, handler);
-        
+
         return Disposable.Create(() =>
         {
             managersById.TryRemove(cmId, out _);
             poeBlazorUtils.RemoveAttribute(elementRef, DataCmId).AndForget(ignoreExceptions: true);
         });
+    }
+
+    public Task ShowContextMenu(IList<BlazorContextMenuItem> items)
+    {
+        throw new NotImplementedException();
     }
 
     private async void CoreWebView2OnContextMenuRequested(object sender, CoreWebView2ContextMenuRequestedEventArgs e)
@@ -81,16 +86,16 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
                 e.Handled = true;
                 return;
             }
-            
-            var items = new List<CmItem>();
+
+            var items = new List<BlazorContextMenuItem>();
             if (managersById.TryGetValue(contextMenuElement.Node.Attributes[DataCmId], out var manager))
             {
                 manager.Handler(items);
             }
-            
+
             itemsSink.OnNext(items);
-            
-            Populate(Log, webView, e.MenuItems, items.ToArray(), new CmInvokeContext()
+
+            Populate(Log, webView, e.MenuItems, items.ToArray(), new BlazorContextMenuInvokeContext()
             {
                 ComponentId = contextMenuElement.Node.Attributes[DataCmId],
                 Tag = contextMenuElement,
@@ -119,8 +124,8 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
         IFluentLog log,
         CoreWebView2 webview,
         IList<CoreWebView2ContextMenuItem> targetCollection,
-        ReadOnlySpan<CmItem> items,
-        CmInvokeContext invokeContext)
+        ReadOnlySpan<BlazorContextMenuItem> items,
+        BlazorContextMenuInvokeContext invokeContext)
     {
         for (var i = 0; i < items.Length; i++)
         {
@@ -128,14 +133,14 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
 
             switch (item)
             {
-                case CmSeparator:
+                case BlazorContextMenuSeparator:
                 {
                     var sep = webview.Environment.CreateContextMenuItem(string.Empty, Stream.Null, CoreWebView2ContextMenuItemKind.Separator);
                     targetCollection.Add(sep);
                     break;
                 }
 
-                case CmCommand cmd:
+                case BlazorContextMenuCommand cmd:
                 {
                     using var icon = cmd.IconFactory?.Invoke() ?? Stream.Null; // can be null
                     var native = webview.Environment.CreateContextMenuItem(cmd.Label, icon, CoreWebView2ContextMenuItemKind.Command);
@@ -146,7 +151,7 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
                     break;
                 }
 
-                case CmCheckBox cb:
+                case BlazorContextMenuCheckBox cb:
                 {
                     var native = webview.Environment.CreateContextMenuItem(cb.Label, Stream.Null, CoreWebView2ContextMenuItemKind.CheckBox);
                     native.IsEnabled = cb.Enabled;
@@ -157,7 +162,7 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
                     break;
                 }
 
-                case CmRadio r:
+                case BlazorContextMenuRadio r:
                 {
                     var native = webview.Environment.CreateContextMenuItem(
                         r.Label, Stream.Null, CoreWebView2ContextMenuItemKind.Radio);
@@ -186,7 +191,7 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
         return;
 
         // One shared handler to avoid capturing per item
-        void Wire(CoreWebView2ContextMenuItem native, Func<CmInvokeContext, Task>? handler)
+        void Wire(CoreWebView2ContextMenuItem native, Func<BlazorContextMenuInvokeContext, Task>? handler)
         {
             if (handler is null)
             {
@@ -207,5 +212,5 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
         }
     }
 
-    private readonly record struct ContextMenuManager(ElementReference ElementRef, string DataCmId, Action<IList<CmItem>> Handler);
+    private readonly record struct ContextMenuManager(ElementReference ElementRef, string DataCmId, Action<IList<BlazorContextMenuItem>> Handler);
 }
