@@ -142,8 +142,7 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
 
                 case BlazorContextMenuCommand cmd:
                 {
-                    using var icon = cmd.IconFactory?.Invoke() ?? Stream.Null; // can be null
-                    var native = webview.Environment.CreateContextMenuItem(cmd.Label, icon, CoreWebView2ContextMenuItemKind.Command);
+                    var native = webview.Environment.CreateContextMenuItem(cmd.Label, Stream.Null, CoreWebView2ContextMenuItemKind.Command);
                     native.IsEnabled = cmd.Enabled;
 
                     Wire(native, cmd.OnInvokeAsync);

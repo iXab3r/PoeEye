@@ -19,6 +19,7 @@ public interface IBlazorContextMenuService
 public abstract class BlazorContextMenuItem
 {
     public string Label { get; init; } = "";
+    
     public bool Enabled { get; init; } = true;
     /// <summary>
     /// You can keep a stable id for testing/telemetry if you want
@@ -30,9 +31,9 @@ public abstract class BlazorContextMenuItem
 public sealed class BlazorContextMenuCommand : BlazorContextMenuItem
 {
     /// <summary>
-    /// Return a small icon stream (e.g., 16x16 PNG). Factory so we don’t keep streams alive.
+    /// Returns and object which is supposed to be used for icon, could be Stream for image, could be string for font icon, etc.
     /// </summary>
-    public Func<Stream>? IconFactory { get; init; }
+    public Func<object>? IconFactory { get; init; }
 
     /// <summary>
     /// Async handler for clicks

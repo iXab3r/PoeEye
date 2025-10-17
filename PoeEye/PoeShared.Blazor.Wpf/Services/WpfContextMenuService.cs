@@ -178,13 +178,24 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                     break;
                 case BlazorContextMenuCommand cmd:
                 {
-                    var mi = new MenuItem {Header = cmd.Label, IsEnabled = cmd.Enabled};
+                    var mi = new MenuItem
+                    {
+                        Header = cmd.Label,
+                        IsEnabled = cmd.Enabled
+                    };
+
                     if (cmd.IconFactory != null)
                     {
-                        using var iconStream = cmd.IconFactory.Invoke();
-                        if (iconStream != null)
+                        var iconObject = cmd.IconFactory();
+                        if (iconObject is Stream stream)
                         {
-                            mi.Icon = CreateImage(iconStream);
+                            using var iconStream = stream;
+                            var image = CreateImage(iconStream);
+                            mi.Icon = image;
+                        }
+                        else if (iconObject is string iconText)
+                        {
+                            mi.Icon = iconText;
                         }
                     }
 
@@ -194,14 +205,26 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                 }
                 case BlazorContextMenuCheckBox cb:
                 {
-                    var mi = new MenuItem {Header = cb.Label, IsEnabled = cb.Enabled, IsCheckable = true, IsChecked = cb.IsChecked};
+                    var mi = new MenuItem
+                    {
+                        Header = cb.Label,
+                        IsEnabled = cb.Enabled,
+                        IsCheckable = true,
+                        IsChecked = cb.IsChecked
+                    };
                     Wire(mi, cb.OnToggleAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
                 }
                 case BlazorContextMenuRadio r:
                 {
-                    var mi = new MenuItem {Header = r.Label, IsEnabled = r.Enabled, IsCheckable = true, IsChecked = r.IsChecked};
+                    var mi = new MenuItem
+                    {
+                        Header = r.Label,
+                        IsEnabled = r.Enabled,
+                        IsCheckable = true,
+                        IsChecked = r.IsChecked
+                    };
                     Wire(mi, r.OnSelectAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
