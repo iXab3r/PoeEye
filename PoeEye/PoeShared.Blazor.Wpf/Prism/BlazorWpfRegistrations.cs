@@ -1,4 +1,5 @@
-﻿using PoeShared.Blazor.Wpf.Services;
+﻿using PoeShared.Blazor.Prism;
+using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Unity;
@@ -18,5 +19,7 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
         Container.RegisterSingleton<IStaticWebAssetsFileProvider, StaticWebAssetsFileProvider>();
         Container.RegisterSingleton<IWebViewAccessor>(x => WebViewAccessor.Instance);
         Container.RegisterSingleton<IRootContentFileProvider, RootContentFileProvider>();
+        
+        UnityServiceCollection.Instance.AddContextMenuService(Container);
     }
 }

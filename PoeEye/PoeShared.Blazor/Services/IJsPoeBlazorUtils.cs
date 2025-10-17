@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -220,4 +221,32 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <param name="className">The class name to check for.</param>
     /// <returns>A task that resolves to <c>true</c> if the element has the class; otherwise, <c>false</c>.</returns>
     Task<bool> HasClass(ElementReference elementRef, string className);
+    
+    /// <summary>
+    /// Sets or removes an arbitrary attribute on a DOM element referenced by ElementReference.
+    /// If <paramref name="value"/> is null, the attribute is removed; otherwise it is set to the provided value.
+    /// </summary>
+    /// <param name="elementRef">Reference to the target DOM element.</param>
+    /// <param name="name">Attribute name (e.g., "data-cm-id").</param>
+    /// <param name="value">Attribute value or null to remove the attribute.</param>
+    Task SetAttribute(ElementReference elementRef, string name, string? value);
+
+    /// <summary>
+    /// Removes an arbitrary attribute from a DOM element referenced by ElementReference.
+    /// </summary>
+    /// <param name="elementRef">Reference to the target DOM element.</param>
+    /// <param name="name">Attribute name to remove.</param>
+    Task RemoveAttribute(ElementReference elementRef, string name);
+    
+    /// <summary>
+    /// Returns the list of DOM elements present at the given viewport coordinates along with their breadcrumb paths
+    /// (ancestors up to the document root). For each element and ancestor, includes tag, id, class list, and selected attributes.
+    /// </summary>
+    /// <param name="x">Viewport X coordinate (e.g., from mouse event clientX).</param>
+    /// <param name="y">Viewport Y coordinate (e.g., from mouse event clientY).</param>
+    /// <param name="maxDepth">Maximum number of elements from the hit-test stack to return. Use small numbers (e.g., 5–10).</param>
+    /// <param name="attributeNames">List of attribute names to include, e.g., new[]{"data-cm-id"}.</param>
+    /// <param name="cancellationToken">Cancellation token used to control async operation</param>
+    /// <returns>Array of breadcrumb descriptors for each element under the point.</returns>
+    Task<HtmlElementBreadcrumb[]> GetElementBreadcrumbsAt(double x, double y, int maxDepth, string[] attributeNames, CancellationToken cancellationToken = default);
 }

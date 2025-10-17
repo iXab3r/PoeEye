@@ -395,3 +395,108 @@ export function getElementByIdWithDelay(
         attemptToFindElement();
     });
 }
+
+
+/**
+ * Returns a list of elements at the given viewport coordinates along with breadcrumb info for each element.
+ * Breadcrumbs contain the element and its ancestors up to the document root, including tag, id, class list,
+ * and selected attributes (e.g., data-cm-id).
+ */
+export function getElementBreadcrumbsAt(x: number, y: number, maxItems: number, attributeNames: string[]): any[] {
+    try {
+        const elems = (document.elementsFromPoint?.(x, y) || []) as Element[];
+        const count = Math.max(0, Math.min(maxItems ?? 10, elems.length));
+        const attrs = Array.isArray(attributeNames) ? attributeNames : [];
+
+        function pickAttributes(el: Element): Record<string, string> {
+            const result: Record<string, string> = {};
+            for (const name of attrs) {
+                try {
+                    const v = el.getAttribute?.(name);
+                    if (v !== null && v !== undefined && String(v).length > 0) {
+                        result[name] = String(v);
+                    }
+                } catch (err) {
+                    // ignore attribute read errors
+                }
+            }
+            return result;
+        }
+
+        function toNode(el: Element, depth: number) {
+            const classList: string[] = (el as HTMLElement).classList ? Array.from((el as HTMLElement).classList) : [];
+            return {
+                tag: (el.tagName || '').toLowerCase(),
+                id: (el as HTMLElement).id || undefined,
+                classList,
+                attributes: pickAttributes(el),
+                depth
+            };
+        }
+
+        function rectOf(el: Element) {
+            const r = el.getBoundingClientRect?.();
+            return r ? { x: r.x, y: r.y, width: r.width, height: r.height } : { x: 0, y: 0, width: 0, height: 0 };
+        }
+
+        const result = [] as any[];
+        for (let i = 0; i < count; i++) {
+            const el = elems[i];
+            if (!el) { continue; }
+
+            const path = [] as any[];
+            let cur: Element | null = el;
+            let depth = 0;
+            while (cur) {
+                path.push(toNode(cur, depth));
+                cur = (cur as HTMLElement).parentElement;
+                depth++;
+            }
+
+            result.push({
+                index: i,
+                rect: rectOf(el),
+                node: toNode(el, 0),
+                path: path
+            });
+        }
+
+        return result;
+    } catch (error) {
+        logAndThrow(`Error getting element breadcrumbs at (${x}, ${y})`, error);
+    }
+}
+
+
+// Attribute helpers for setting/removing arbitrary attributes on elements
+export function setAttribute(target: string | HTMLElement, name: string, value: string | null | undefined): void {
+    const element = resolveElement(target);
+    const attrName = (name ?? '').trim();
+    if (!attrName) {
+        logAndThrow(`Invalid attribute name '${name}'`);
+    }
+
+    try {
+        if (value === null || value === undefined) {
+            element.removeAttribute(attrName);
+        } else {
+            element.setAttribute(attrName, String(value));
+        }
+    } catch (error) {
+        logAndThrow(`Error setting attribute '${attrName}' to '${value}'`, error);
+    }
+}
+
+export function removeAttribute(target: string | HTMLElement, name: string): void {
+    const element = resolveElement(target);
+    const attrName = (name ?? '').trim();
+    if (!attrName) {
+        logAndThrow(`Invalid attribute name '${name}'`);
+    }
+
+    try {
+        element.removeAttribute(attrName);
+    } catch (error) {
+        logAndThrow(`Error removing attribute '${attrName}'`, error);
+    }
+}

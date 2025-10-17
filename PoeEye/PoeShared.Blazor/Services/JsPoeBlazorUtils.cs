@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Threading;
 using Microsoft.AspNetCore.Components;
 using PoeShared.Blazor.Scaffolding;
 
@@ -183,6 +184,18 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         return await module.InvokeAsync<bool>("hasClass", elementRef, className);
     }
     
+    public async Task SetAttribute(ElementReference elementRef, string name, string? value)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("setAttribute", elementRef, name, value);
+    }
+
+    public async Task RemoveAttribute(ElementReference elementRef, string name)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("removeAttribute", elementRef, name);
+    }
+    
     public async Task AddClass(string selectorOrElementId, params string[] classNames)
     {
         var module = await GetModuleAsync();
@@ -205,6 +218,12 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
     {
         var module = await GetModuleAsync();
         return await module.InvokeAsync<bool>("hasClass", selectorOrElementId, className);
+    }
+
+    public async Task<HtmlElementBreadcrumb[]> GetElementBreadcrumbsAt(double x, double y, int maxDepth, string[] attributeNames, CancellationToken cancellationToken = default)
+    {
+        var module = await GetModuleAsync();
+        return await module.InvokeAsync<HtmlElementBreadcrumb[]>("getElementBreadcrumbsAt", cancellationToken, x, y, maxDepth, attributeNames);
     }
 
     public async ValueTask DisposeAsync()
