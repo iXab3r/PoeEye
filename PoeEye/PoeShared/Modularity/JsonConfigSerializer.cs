@@ -78,6 +78,32 @@ internal sealed class JsonConfigSerializer : DisposableReactiveObjectWithLogger,
         Serialize(data, stringWriter);
         return stringWriter.ToString();
     }
+    
+    public object Deserialize(string serializedData, Type type)
+    {
+        using var stringReader = new StringReader(serializedData);
+        return Deserialize(stringReader, type);
+    }
+
+    public object Deserialize(TextReader textReader, Type type)
+    {
+        using var jsonReader = CreateReader(textReader);
+
+        var result = jsonSerializer.Deserialize(jsonReader, type);
+        if (result == null)
+        {
+            throw new FormatException(
+                $"Could not deserialize data to instance of type {type} from data stream");
+        }
+
+        return result;
+    }
+
+    public object Deserialize(FileInfo file, Type type)
+    {
+        using var stringReader = new StreamReader(file.FullName);
+        return Deserialize(stringReader, type);
+    }
 
     public T Deserialize<T>(FileInfo file)
     {

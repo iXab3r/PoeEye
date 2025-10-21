@@ -66,7 +66,7 @@ partial class ReactiveListBox<TItem>
 
     [Parameter] public EventCallback<TItem> SelectedItemChanged { get; set; }
 
-    public int ItemsCount { get; private set; }
+    [Parameter] public int? ItemsCount { get; set; }
 
     protected string Classname => new CssBuilder("form-control").AddClass((string) Class).Build();
 

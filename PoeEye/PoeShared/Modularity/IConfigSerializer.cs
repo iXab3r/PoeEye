@@ -48,6 +48,12 @@ public interface IConfigSerializer
     void Serialize(object data, TextWriter textWriter);
     
     void Serialize(object data, FileInfo file);
+    
+    object Deserialize(string serializedData, Type type);
+    
+    object Deserialize(TextReader textReader, Type type);
+    
+    object Deserialize(FileInfo file, Type type);
 
     T Deserialize<T>(string serializedData);
     

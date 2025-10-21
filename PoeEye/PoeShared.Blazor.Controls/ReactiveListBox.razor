@@ -3,7 +3,7 @@
 
 <select id="@(ComponentId)" @bind="@SelectedValue" 
         class="@(new CssBuilder("form-control").AddClass(Class))" 
-        size="@(Math.Max(2, ItemsCount))">
+        size="@(ItemsCount == null ? null : Math.Max(2, ItemsCount.Value))">
     @foreach (var item in ItemsSource.EmptyIfNull())
     {
         <option value="@ValueSelector(item)">
