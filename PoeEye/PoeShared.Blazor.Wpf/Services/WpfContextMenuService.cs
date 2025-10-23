@@ -199,7 +199,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                         }
                     }
 
-                    Wire(mi, cmd.OnInvokeAsync, ctx, notificationService);
+                    Wire(item, mi, cmd.OnInvokeAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
                 }
@@ -212,7 +212,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                         IsCheckable = true,
                         IsChecked = cb.IsChecked
                     };
-                    Wire(mi, cb.OnToggleAsync, ctx, notificationService);
+                    Wire(item, mi, cb.OnToggleAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
                 }
@@ -225,7 +225,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                         IsCheckable = true,
                         IsChecked = r.IsChecked
                     };
-                    Wire(mi, r.OnSelectAsync, ctx, notificationService);
+                    Wire(item, mi, r.OnSelectAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
                 }
@@ -252,6 +252,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
     }
 
     private static void Wire(
+        BlazorContextMenuItem cmi,
         MenuItem menuItem,
         Func<BlazorContextMenuInvokeContext, Task>? handler,
         BlazorContextMenuInvokeContext ctx,
@@ -270,10 +271,10 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
             }
             catch (Exception ex)
             {
-                Log.Error($"Exception in WPF menu item '{menuItem.Header}'", ex);
+                Log.Error($"Exception in WPF menu item '{cmi.Label}'", ex);
                 notificationService.Error(new NotificationConfig()
                 {
-                    Message = $"Operation failed, menu item '{menuItem.Header}'",
+                    Message = $"Operation failed, menu item '{cmi.Label}'",
                     NotificationType = NotificationType.Error,
                     Duration = 30,
                     Placement = NotificationPlacement.TopRight
