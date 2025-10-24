@@ -76,7 +76,10 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
         {
             try
             {
-                managersById.TryRemove(cmId, out _);
+                if (managersById.TryRemove(cmId, out var manager))
+                {
+                    manager.Dispose();
+                }
                 DomEventListener.RemoveExclusive(elementRef, "contextmenu");
             }
             catch (Exception e)
@@ -101,6 +104,11 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
     {
         try
         {
+            if (manager.IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(manager), $"Manager is disposed: {manager}");
+            }
+            
             var json = obj.ToString();
             var jsonBack = JsonSerializer.Deserialize<JsonElement>(json);
             var mouse = MouseEventArgsJsonReader.Read(jsonBack);
@@ -358,5 +366,30 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
         return new Vector2(dipX, dipY);
     }
 
-    private readonly record struct ContextMenuManager(ElementReference ElementRef, string DataCmId, Action<IList<BlazorContextMenuItem>> Handler);
+    private sealed record ContextMenuManager : IDisposable
+    {
+        private static readonly Action<IList<BlazorContextMenuItem>> EmptyAction = _ => { };
+
+        public ContextMenuManager(ElementReference ElementRef, string DataCmId, Action<IList<BlazorContextMenuItem>> Handler)
+        {
+            this.ElementRef = ElementRef;
+            this.DataCmId = DataCmId;
+            this.Handler = Handler;
+        }
+
+        public void Dispose()
+        {
+            if (IsDisposed)
+            {
+                return;
+            }
+            IsDisposed = true;
+            Handler = EmptyAction; //there is a problem with DomEventListener.RemoveExclusive - it leaks, this allows to GC the handler at least
+        }
+
+        public ElementReference ElementRef { get; init; }
+        public string DataCmId { get; init; }
+        public bool IsDisposed { get; private set; }
+        public Action<IList<BlazorContextMenuItem>> Handler { get; private set; }
+    }
 }
