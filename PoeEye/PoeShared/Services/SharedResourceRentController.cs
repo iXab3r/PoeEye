@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Subjects;
+using JetBrains.Annotations;
 
 namespace PoeShared.Services;
 
@@ -39,7 +40,7 @@ public sealed class SharedResourceRentController : DisposableReactiveObject, ISh
     public IObservable<AnnotatedBoolean> WhenRented { get; }
     
     /// <inheritdoc />
-    public IDisposable Rent(string reason)
+    public IDisposable Rent(string reason = null)
     {
         var key = Interlocked.Increment(ref keyCounter);
         var usagesBeforeRent = Interlocked.Increment(ref usageCounter);

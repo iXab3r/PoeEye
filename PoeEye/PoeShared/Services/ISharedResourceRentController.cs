@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using JetBrains.Annotations;
 
 namespace PoeShared.Services;
 
@@ -80,5 +81,5 @@ public interface ISharedResourceRentController : INotifyPropertyChanged
     /// // The resource is no longer rented for Task B.
     /// </code>
     /// </example>
-    IDisposable Rent(string reason);
+    IDisposable Rent([CanBeNull] string reason = null);
 }

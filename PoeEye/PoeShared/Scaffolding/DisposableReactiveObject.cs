@@ -7,6 +7,7 @@ namespace PoeShared.Scaffolding;
 
 /// <summary>
 /// Represents an object that supports both disposability and reactive property changes.
+/// FIXME ConcurrentNpcEventInvoker, which it uses, provides an extra layer of safety in case of heavy multithreaded usage, BUT it costs extra memory (~1mb per 1000 instances)
 /// </summary>
 public abstract class DisposableReactiveObject : IDisposableReactiveObject
 {
