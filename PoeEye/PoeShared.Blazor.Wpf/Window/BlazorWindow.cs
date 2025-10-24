@@ -80,7 +80,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 #pragma warning disable CS0618 // Type or member is obsolete
         this.RaiseWhenSourceValue(x => x.ViewDataContext, this, x => x.DataContext).AddTo(Anchors);
 #pragma warning restore CS0618 // Type or member is obsolete
-
+        
         Disposable.Create(() =>
         {
             try
@@ -255,6 +255,16 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
             Log.Debug("Got Closed signal, disposing");
             Dispose();
+        }).AddTo(Anchors);
+        
+        Disposable.Create(() =>
+        {
+            Log.Debug("Blazor window is disposed, clenaing up references");
+            ViewType = null;
+            ViewTypeForTitleBar = null;
+            Container = null;
+            DataContext = null;
+            ControlConfigurator = null;
         }).AddTo(Anchors);
     }
 

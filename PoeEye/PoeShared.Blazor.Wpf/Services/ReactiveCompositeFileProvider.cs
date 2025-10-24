@@ -30,6 +30,8 @@ internal sealed class ReactiveCompositeFileProvider : DisposableReactiveObjectWi
                 FileProviders = providersSource.Items.ToImmutableArray();   
             })
             .AddTo(Anchors);
+
+        Anchors.Add(() => providersSource.Clear());
     }
     public ReactiveCompositeFileProvider() : this (ArraySegment<IFileProvider>.Empty)
     {

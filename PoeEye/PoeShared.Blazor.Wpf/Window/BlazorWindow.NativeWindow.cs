@@ -48,7 +48,13 @@ internal partial class BlazorWindow
             AllowsTransparency = true;
             WindowStyle = WindowStyle.None; //this basically disables System/Default
 
-            Anchors.Add(() => owner.Log.Debug("Disposed native window"));
+            Anchors.Add(() => 
+            {
+                owner.Log.Debug("Disposed native window");
+                Container = null;
+                ChildContainer = null;
+                ContentControl.Container = null;
+            });
         }
 
         public BlazorContentControl ContentControl { get; }
