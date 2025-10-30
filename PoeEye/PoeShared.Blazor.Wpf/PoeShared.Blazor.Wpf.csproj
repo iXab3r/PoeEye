@@ -15,9 +15,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Submodules\microsoft-dependency-injection\src\Unity.Microsoft.DependencyInjection.csproj" />
         <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj"/>
-        <ProjectReference Include="..\microsoft-dependency-injection\src\Unity.Microsoft.DependencyInjection.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor.Controls\PoeShared.Blazor.Controls.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj"/>
         <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj"/>
@@ -41,6 +39,7 @@
         </PackageReference>
         <PackageReference Include="System.Management" Version="8.0.0">
         </PackageReference>
+        <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
     </ItemGroup>
 
     <ItemGroup>
