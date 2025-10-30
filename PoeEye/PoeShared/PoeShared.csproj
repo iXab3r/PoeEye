@@ -45,9 +45,9 @@
         <PackageReference Include="CompareNETObjects" Version="4.83.0">
         </PackageReference>
         <PackageReference Include="System.Threading.Channels" Version="8.0.0" />
-        <PackageReference Include="Unity" Version="5.11.5" />
-        <PackageReference Include="Unity.Abstractions" Version="5.11.5" />
-        <PackageReference Include="Unity.Container" Version="5.11.5" />
+        <PackageReference Include="Unity" Version="5.11.7" />
+        <PackageReference Include="Unity.Abstractions" Version="5.11.7" />
+        <PackageReference Include="Unity.Container" Version="5.11.7" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\PoeShared.Generators\PoeShared.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />

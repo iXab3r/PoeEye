@@ -9,7 +9,11 @@ public sealed class BlazorContentRepository : IBlazorContentRepository
 {
     private readonly ISourceList<IFileInfo> additionalFiles = new SourceList<IFileInfo>();
 
-    public ISourceList<IFileInfo> AdditionalFiles => additionalFiles;
+    public BlazorContentRepository()
+    {
+    }
 
+    public ISourceList<IFileInfo> AdditionalFiles => additionalFiles;
+    
     public JSComponentConfigurationStore JSComponents { get; } = new();
 }

@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Components.WebView.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
@@ -30,6 +31,8 @@ using PoeShared.Services;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
+using Unity.Microsoft.DependencyInjection;
+using ServiceProvider = Unity.Microsoft.DependencyInjection.ServiceProvider;
 
 namespace PoeShared.Blazor.Wpf;
 
@@ -118,14 +121,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
             ComponentType = typeof(BlazorContentPresenterWrapper)
         }.AddTo(WebView.RootComponents);
 
-        var serviceCollection = new ServiceCollection
-        {
-            UnityServiceCollection.Instance
-        };
-        serviceCollection.AddBlazorWebView();
-        serviceCollection.AddWpfBlazorWebView();
-        serviceCollection.AddBlazorWebViewDeveloperTools();
-
         var generatedIndexFileName = "index.g.html";
         var contentRoot = "wwwroot";
         var hostPage = Path.Combine(contentRoot, generatedIndexFileName); // wwwroot must be included as a part of path to become ContentRoot;
@@ -137,7 +132,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
                 this.WhenAnyValue(x => x.Configurator),
                 unityContainerSource,
-                (additionalFileProvider, visitor, container) => new {additionalFileProvider, visitor, container})
+                (additionalFileProvider, visitor, container) => new ControlState(container, additionalFileProvider, visitor))
             .ObserveOnIfNeeded(uiScheduler)
             .SubscribeAsync(async state =>
             {
@@ -157,9 +152,9 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                 var configurator = new CompositeBlazorContentControlConfigurator();
                 configurator.Add(new LoggingBlazorContentControlConfigurator(Log));
-                if (state.visitor != null)
+                if (state.Configurator != null)
                 {
-                    configurator.Add(state.visitor);
+                    configurator.Add(state.Configurator);
                 }
 
                 Log.Debug($"Notifying visitor that we've started initializing the view");
@@ -167,13 +162,16 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                 try
                 {
-                    var childServiceCollection = new ServiceCollection {serviceCollection};
-
+                    var serviceCollection = state.ChildContainer.AsServiceCollection();
+                    serviceCollection.AddBlazorWebView();
+                    serviceCollection.AddWpfBlazorWebView();
+                    serviceCollection.AddBlazorWebViewDeveloperTools();
+                    
                     // this is needed mostly for compatibility-reasons with views that use UnityContainer
-                    childServiceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(webViewServiceProvider, state.container));
+                    serviceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(webViewServiceProvider, state.ChildContainer));
 
                     // views have to be transient to allow to re-create them if needed (e.g. on error)
-                    childServiceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
+                    serviceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
                     {
                         var log = Log.WithSuffix(nameof(BlazorContentPresenterWrapper));
                         log.Debug($"Creating a new wrapper");
@@ -222,41 +220,16 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         return contentPresenter;
                     });
 
-                    childServiceCollection.AddSingleton<IUnityContainer>(sp => state.container);
-
-                    //very important - IServiceScopeFactory for Root provider, the one built using BuildServiceProvider
-                    //will always be ServiceProviderEngineScope, that is how ServiceProvider works
-                    //so fallback is not reliable, it works only for NESTED scopes, not the root one
-                    childServiceCollection.AddSingleton<IServiceScopeFactory>(sp => new UnityFallbackServiceScopeFactory(sp, state.container));
-                    childServiceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
-                    childServiceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
-                    childServiceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
-
-                    var unityServiceDescriptors = state.container.ToServiceDescriptors();
-                    foreach (var unityServiceDescriptor in unityServiceDescriptors)
-                    {
-                        var typeRegistrations = childServiceCollection
-                            .Where(x =>
-                                x.ServiceType == unityServiceDescriptor.ServiceType &&
-                                x.ServiceKey == unityServiceDescriptor.ServiceKey)
-                            .ToArray();
-
-                        var higherOrderRegistration = typeRegistrations
-                            .Where(x => x.Lifetime is ServiceLifetime.Singleton or ServiceLifetime.Scoped)
-                            .ToArray();
-                        if (unityServiceDescriptor.Lifetime is ServiceLifetime.Transient && higherOrderRegistration.Length > 0)
-                        {
-                            //transient dependency scope differs in .NET container and was converted either to Scoped or Singleton
-                            continue;
-                        }
-
-                        childServiceCollection.Add(unityServiceDescriptor);
-                    }
+                    serviceCollection.AddSingleton<IUnityContainer>(sp => state.ChildContainer);
+                    serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
+                    serviceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
+                    serviceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
 
                     Log.Debug($"Notifying visitor that registration stage is ongoing");
-                    await configurator.OnRegisteringServicesAsync(childServiceCollection);
+                    await configurator.OnRegisteringServicesAsync(serviceCollection);
 
-                    var childServiceProvider = new UnityFallbackServiceProvider(childServiceCollection.BuildServiceProvider(), state.container); //FIXME memory leak for transient dependencies
+                    var childServiceProvider = BuildUnityServiceProvider(state.ChildContainer, serviceCollection);
+                    //var childServiceProvider = new UnityFallbackServiceProvider(childServiceCollection.BuildServiceProvider(), state.container); //FIXME memory leak for transient dependencies
                     childServiceProvider.GetRequiredService<IClock>(); //ensure DI by itself works
 
                     using (var tempScope = childServiceProvider.CreateScope())
@@ -271,14 +244,16 @@ public class BlazorContentControl : Control, IBlazorContentControl
                     //static web assets file provider is created by WebView manager, and we cannot directly access it from outside
                     //thus we create our own, still prioritizing the usual one - this gives user the ability to replace assets
                     var publicInMemoryFileProvider = new InMemoryFileProvider();
-                    childServiceCollection.AddSingleton<IInMemoryFileProvider>(_ => publicInMemoryFileProvider);
+                    serviceCollection.AddSingleton<IInMemoryFileProvider>(_ => publicInMemoryFileProvider);
+
+                    serviceCollection.AddScoped<IJSComponentConfiguration>(_ => WebView.RootComponents);
 
                     var proxyFileProvider = new ProxyFileProvider()
                     {
-                        FileProvider = state.additionalFileProvider
+                        FileProvider = state.AdditionalFileProvider
                     };
 
-                    var rootFileProvider = childServiceProvider.GetRequiredService<IRootContentFileProvider>();
+                    var rootFileProvider = webViewServiceProvider.ServiceProvider.GetRequiredService<IRootContentFileProvider>();
                     var webViewFileProvider = new ReactiveCompositeFileProvider(
                         publicInMemoryFileProvider,
                         proxyFileProvider,
@@ -287,7 +262,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                     WebView.FileProvider = webViewFileProvider; //under the hood initializes StaticWebAssets provider, which should not ever be reached
 
-                    var blazorContentRepository = childServiceProvider.GetRequiredService<IBlazorContentRepository>();
+                    var blazorContentRepository = webViewServiceProvider.ServiceProvider.GetRequiredService<IBlazorContentRepository>();
                     var repositoryAdditionalFiles = blazorContentRepository.AdditionalFiles.Items.ToArray();
                     var controlAdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
                     var additionalFiles = repositoryAdditionalFiles.Concat(controlAdditionalFiles).ToArray();
@@ -505,6 +480,15 @@ public class BlazorContentControl : Control, IBlazorContentControl
         var appArguments = webViewServiceProvider.ServiceProvider.GetRequiredService<IAppArguments>();
         e.UserDataFolder = appArguments.TempDirectory;
     }
+    
+    private static IServiceProvider BuildUnityServiceProvider(
+        IUnityContainer container,
+        IServiceCollection serviceCollection)
+    {
+        var factory = new ServiceProviderFactory(container);
+        var sp = factory.CreateServiceProvider(serviceCollection);
+        return sp;
+    }
 
     private static string FormatExceptionMessage(Exception exception)
     {
@@ -568,5 +552,22 @@ public class BlazorContentControl : Control, IBlazorContentControl
     {
         base.OnPropertyChanged(e);
         RaisePropertyChanged(e.Property.Name);
+    }
+
+    private sealed class ControlState : DisposableReactiveObject
+    {
+        public IUnityContainer Container { get; }
+        public IUnityContainer ChildContainer { get; }
+        public IFileProvider AdditionalFileProvider { get; }
+        public IBlazorContentControlConfigurator Configurator { get; }
+
+        public ControlState(IUnityContainer container, IFileProvider additionalFileProvider, IBlazorContentControlConfigurator configurator)
+        {
+            Container = container;
+            ChildContainer = container.CreateChildContainer().AddTo(Anchors);
+            AdditionalFileProvider = additionalFileProvider;
+            Configurator = configurator;
+            
+        }
     }
 }

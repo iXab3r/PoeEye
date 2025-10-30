@@ -20,6 +20,6 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
         Container.RegisterSingleton<IWebViewAccessor>(x => WebViewAccessor.Instance);
         Container.RegisterSingleton<IRootContentFileProvider, RootContentFileProvider>();
         
-        UnityServiceCollection.Instance.AddWpfContextMenuService(Container);
+        Container.AsServiceCollection().AddWpfContextMenuService(Container);
     }
 }

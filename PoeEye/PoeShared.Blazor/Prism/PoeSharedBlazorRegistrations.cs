@@ -15,14 +15,11 @@ public sealed class PoeSharedBlazorRegistrations : UnityContainerExtension
     {
         Container.RegisterSingleton<IServiceCollection>(x => UnityServiceCollection.Instance);
         UnityServiceCollection.Instance.AddSingleton<IUnityContainer>(Container);
-        
-        Container.RegisterSingleton<BlazorViewRepository>(typeof(IBlazorViewRepository), typeof(IBlazorViewRegistrator));
-        UnityServiceCollection.Instance.AddBlazorRepository(Container);
-        
-        Container.RegisterSingleton<BlazorContentRepository>(typeof(IBlazorContentRepository));
-        UnityServiceCollection.Instance.AddBlazorContentRepository(Container);
-        UnityServiceCollection.Instance.AddBlazorUtils(Container);
 
+        Container.RegisterSingleton<BlazorViewRepository>(typeof(IBlazorViewRepository), typeof(IBlazorViewRegistrator));
+        Container.RegisterSingleton<BlazorContentRepository>(typeof(IBlazorContentRepository));
         Container.RegisterSingleton<ISystemClock, MicrosoftExtensionsSystemClock>();
+
+        Container.AsServiceCollection().AddBlazorUtils(Container);
     }
 }
