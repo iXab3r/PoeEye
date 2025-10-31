@@ -24,6 +24,7 @@
     #2f2f2f 90%
     );
     color: white;
+    align-items: center;
 }
 
 .blazor-window-inactive #blazor-window-titlebar,

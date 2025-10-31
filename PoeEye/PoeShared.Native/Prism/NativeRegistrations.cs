@@ -42,6 +42,7 @@ public sealed class NativeRegistrations : UnityContainerExtension
             .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
         Container
+            .RegisterType<IPerformanceMetricsProvider, PerformanceMetricsProvider>()
             .RegisterType<IWindowSeeker, TaskWindowSeeker>()
             .RegisterType<IHttpClient, GenericHttpClient>();
 
