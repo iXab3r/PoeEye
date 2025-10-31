@@ -76,4 +76,6 @@ public interface IAppArguments : IAppConfig
     string[] CommandLineArguments { [CanBeNull] get; }
 
     bool Parse(string[] args);
+
+    string[] ParseCommandLineArguments(string commandLine);
 }

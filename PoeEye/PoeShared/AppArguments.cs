@@ -165,6 +165,11 @@ public class AppArguments : AppOptions, IAppArguments
         return Parse(this, args);
     }
 
+    public string[] ParseCommandLineArguments(string commandLine)
+    {
+        return CommandLineSplitter.Instance.Split(Environment.CommandLine).ToArray();
+    }
+
     private static bool Parse(AppOptions instance, string[] args)
     {
         Log.Info($"Parsing command line args: {args.DumpToString()}");
