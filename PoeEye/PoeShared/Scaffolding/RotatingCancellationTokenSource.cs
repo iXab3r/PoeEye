@@ -4,7 +4,7 @@ namespace PoeShared.Scaffolding;
 
 public sealed class RotatingCancellationTokenSource : DisposableReactiveObject
 {
-    private CancellationTokenSource cts;
+    private CancellationTokenSourceState ctsState;
     private long rentCount;
 
     public RotatingCancellationTokenSource()
@@ -16,47 +16,69 @@ public sealed class RotatingCancellationTokenSource : DisposableReactiveObject
 
     public IDisposable Rent(out CancellationToken cancellationToken)
     {
-        if (cts != null)
+        if (ctsState != null)
         {
             throw new InvalidOperationException("CancellationTokenSource is still in use");
         }
-            
-        var current = new CancellationTokenSource();
-        var previous = Interlocked.Exchange(ref cts, current);
 
+        var current = new CancellationTokenSourceState(new CancellationTokenSource());
+        
+        var previous = Interlocked.Exchange(ref ctsState, current);
         if (previous != null)
         {
             throw new InvalidOperationException("Another token was in use unexpectedly");
         }
-
-        IsRented = Interlocked.Increment(ref rentCount) > 0;
-        cancellationToken = current.Token;
-        return Disposable.Create(() =>
+        
+        Disposable.Create(() =>
         {
             IsRented = Interlocked.Decrement(ref rentCount) > 0;
             DisposeCurrentCts();
-        });
+        }).AddTo(current.Anchors);
+        IsRented = Interlocked.Increment(ref rentCount) > 0;
+        
+        cancellationToken = current.CancellationTokenSource.Token;
+        return current.Anchors;
     }
 
     public void Cancel()
     {
-        var current = Interlocked.CompareExchange(ref cts, null, cts);
+        var current = Interlocked.CompareExchange(ref ctsState, null, ctsState);
         if (current == null)
         {
             return;
         }
 
-        current.Cancel();
+        current.CancellationTokenSource.Cancel();
+        current.Dispose();
     }
 
     private void DisposeCurrentCts()
     {
-        var oldCts = Interlocked.Exchange(ref cts, null);
+        var oldCts = Interlocked.Exchange(ref ctsState, null);
         if (oldCts == null)
         {
             return;
         }
 
         oldCts.Dispose();
+    }
+
+    private sealed class CancellationTokenSourceState : IDisposable
+    {
+        public CancellationTokenSourceState(CancellationTokenSource cts)
+        {
+            Anchors = new CompositeDisposable();
+            CancellationTokenSource = cts;
+            // cts.AddTo(Anchors); //let it be GCed instead
+        }
+
+        public CancellationTokenSource CancellationTokenSource { get;  }
+        
+        public CompositeDisposable Anchors { get; }
+        
+        public void Dispose()
+        {
+            Anchors.Dispose();
+        }
     }
 }
