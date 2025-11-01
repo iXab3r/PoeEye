@@ -146,7 +146,7 @@ public class AppArguments : AppOptions, IAppArguments
             .Where(x => !string.Equals(AutostartFlag, x, StringComparison.OrdinalIgnoreCase))
             .JoinStrings(" ");
         
-        var profileSpecificArgsFilePath = Path.Combine(AppDataDirectory, "startup.cfg");
+        var profileSpecificArgsFilePath = Path.Combine(AppDataDirectory, IAppArguments.StartupConfigFileName);
         if (File.Exists(profileSpecificArgsFilePath))
         {
             string argsEx;
@@ -191,6 +191,8 @@ public class AppArguments : AppOptions, IAppArguments
                 }
             }
         }
+        
+        CompositeCommandLineArguments = CommandLineArguments.Concat(CommandLineArgumentsEx).ToArray();
     }
 
     public bool IsWindows { get; }
@@ -202,6 +204,8 @@ public class AppArguments : AppOptions, IAppArguments
     public string[] CommandLineArguments { get; }
     
     public string[] CommandLineArgumentsEx { get; }
+    
+    public string[] CompositeCommandLineArguments { get; }
 
     public int ProcessId { get; }
 
@@ -234,6 +238,7 @@ public class AppArguments : AppOptions, IAppArguments
                 settings.CaseSensitive = false;
                 settings.IgnoreUnknownArguments = true;
                 settings.ParsingCulture = CultureInfo.InvariantCulture;
+                settings.CaseInsensitiveEnumValues = true;
             });
         Log.Info($"Command line parser settings: {parser.Settings.DumpToString()}");
         var result = parser.ParseArguments<AppOptions>(args ?? Array.Empty<string>());

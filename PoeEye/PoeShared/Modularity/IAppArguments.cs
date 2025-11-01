@@ -51,6 +51,8 @@ public interface IAppConfig
 
 public interface IAppArguments : IAppConfig
 {
+    public static readonly string StartupConfigFileName = "startup.cfg";
+    
     string Profile { get; }
     
     string DataFolder { get; }
@@ -82,6 +84,11 @@ public interface IAppArguments : IAppConfig
     /// Contains command line arguments aggregated from additional sources - .exe sidecar, profile config, etc
     /// </summary>
     string[] CommandLineArgumentsEx { [CanBeNull] get; }
+    
+    /// <summary>
+    /// Contains command line arguments aggregated from ALL sources - command line, .exe sidecar, profile config, etc
+    /// </summary>
+    string[] CompositeCommandLineArguments { [CanBeNull] get; }
 
     bool Parse(string[] args);
 
