@@ -191,6 +191,10 @@ public class AppArguments : AppOptions, IAppArguments
                 }
             }
         }
+        else
+        {
+            CommandLineArgumentsEx = Array.Empty<string>();
+        }
         
         CompositeCommandLineArguments = CommandLineArguments.Concat(CommandLineArgumentsEx).ToArray();
     }
