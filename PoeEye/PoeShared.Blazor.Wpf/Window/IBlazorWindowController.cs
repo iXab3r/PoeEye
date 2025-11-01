@@ -147,6 +147,11 @@ public interface IBlazorWindowController
     /// Gets or sets state of the window - minimized/maximized/normal. 
     /// </summary>
     WindowState WindowState { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the startup location of the window.
+    /// </summary>
+    WindowStartupLocation WindowStartupLocation { get; set; }
 
     /// <summary>
     /// Observable sequence for when a key is pressed while the window has focus.

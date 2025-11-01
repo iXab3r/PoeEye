@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.Serialization;
 using CommandLine;
 using PoeShared.Modularity;
 using Parser = CommandLine.Parser;
@@ -9,6 +10,9 @@ public class AppOptions : DisposableReactiveObject
 {
     protected const string AutostartFlagValue = "autostart";
     public string AutostartFlag => $"--{AutostartFlagValue}";
+    
+    [Option( "appName", Default = null, HelpText = "Application name override - displayed in title, used for naming log files, etc")]
+    public string AppName { get; set; }
 
     [Option(AutostartFlagValue, Default = false)]
     public bool IsAutostart { get; set; }
@@ -31,9 +35,9 @@ public class AppOptions : DisposableReactiveObject
     [Option('s', "safeMode", Default = null, HelpText = "Safe-Mode - some functions are disabled at startup")]
     public bool? IsSafeMode { get; set; }
     
-    [Option('a', "adminMode", Default = null, HelpText = "Admin-Mode - require admin mode to function")]
+    [Option('a', "adminMode", Default = null, HelpText = "Admin-Mode - require elevated(admin) mode to function")]
     public bool? IsAdminMode { get; set; }
-        
+    
     [Option('m', "modules", HelpText = "Prism modules - Space-separated list of modules that will be loaded")]
     public IEnumerable<string> PrismModules { get; set; }
 }
@@ -42,13 +46,6 @@ public class AppArguments : AppOptions, IAppArguments
 {
     private static readonly string DefaultProfileName = "release";
     private static readonly IFluentLog Log = typeof(AppArguments).PrepareLogger();
-    private string appName;
-
-    public string AppName
-    {
-        get => appName ?? throw new ApplicationException($"{nameof(AppName)} must be set beforehand");
-        set => appName = value ?? throw new ApplicationException($"{nameof(AppName)} must be set");
-    }
 
     public string AppTitle => $"{(Profile != DefaultProfileName ? $"[{Profile.ToUpper()}]" : string.Empty)}{AppName} v{Version}".ToUpper();
 
@@ -76,50 +73,50 @@ public class AppArguments : AppOptions, IAppArguments
         IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 #endif
         
+        var arguments = CommandLineSplitter.Instance.Split(Environment.CommandLine).ToArray();
+        var cmdLineArgs = arguments.Skip(1).ToArray();
+        if (cmdLineArgs.Length == 1)
+        {
+            if (cmdLineArgs.Length == 1 && StringUtils.IsHexGzip(cmdLineArgs[0]))
+            {
+                Log.Info($"Decompressing arguments: {cmdLineArgs[0]}");
+                //compressed arg list
+                var decompressed = StringUtils.FromHexGzip(cmdLineArgs[0]);
+                Log.Info($"Decompressed arguments: {decompressed}");
+                cmdLineArgs = CommandLineSplitter.Instance.Split(decompressed).ToArray();
+            }
+        }
+        var parsed = Parse(cmdLineArgs);
+        if (!parsed)
+        {
+            SharedLog.Instance.InitializeLogging(this);
+            throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", CommandLineArguments)}");
+        }
+        
         var entryAssembly = Assembly.GetEntryAssembly() ?? throw new InvalidOperationException("Entry assembly is not specified");
-        AppName = (entryAssembly.GetCustomAttribute<AssemblyProductAttribute>() ?? throw new InvalidOperationException($"{nameof(AssemblyProductAttribute)} is not specified on assembly {entryAssembly}")).Product;
         Version = entryAssembly.GetName().Version;
+       
+        if (string.IsNullOrEmpty(AppName))
+        {
+            //app name is mandatory - supplied either via command line or via assembly attribute
+            //do not want to use the process name as it not stable enough
+            AppName = (entryAssembly.GetCustomAttribute<AssemblyProductAttribute>() ?? throw new InvalidOperationException($"{nameof(AssemblyProductAttribute)} is not specified on assembly {entryAssembly}")).Product;
+        }
+        
         ProcessId = Process.GetCurrentProcess().Id;
         IsElevated = true;
         AppDomainDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var arguments = CommandLineSplitter.Instance.Split(Environment.CommandLine).ToArray();
-        CommandLineArguments = arguments.Skip(1).ToArray();
-        if (CommandLineArguments.Length == 1)
-        {
-            if (CommandLineArguments.Length == 1 && StringUtils.IsHexGzip(CommandLineArguments[0]))
-            {
-                Log.Info($"Decompressing arguments: {CommandLineArguments[0]}");
-                //compressed arg list
-                var decompressed = StringUtils.FromHexGzip(CommandLineArguments[0]);
-                Log.Info($"Decompressed arguments: {decompressed}");
-                CommandLineArguments = CommandLineSplitter.Instance.Split(decompressed).ToArray();
-            }
-        }
         
-        StartupArgs = CommandLineArguments
-            .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
-            .Where(x => !string.Equals(AutostartFlag, x, StringComparison.OrdinalIgnoreCase))
-            .JoinStrings(" ");
         ApplicationExecutablePath = arguments.First();
         ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
-
-        var parsed = Parse(CommandLineArguments);
         
-        if (string.IsNullOrEmpty(Profile))
-        {
-            Profile = IsDebugMode ? "debug" : DefaultProfileName;
-        }
-        else
-        {
-            IsDebugMode = Profile == "debug";
-        }
-
         var defaultDataFolder = Path.Combine(AppDomainDirectory, "data");
         if (Directory.Exists(defaultDataFolder) && string.IsNullOrEmpty(DataFolder))
         {
+            //portable mode with local data folder
             DataFolder = defaultDataFolder;
         }
-
+        
         if (DataFolder != null)
         {
             LocalAppDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -130,13 +127,69 @@ public class AppArguments : AppOptions, IAppArguments
             LocalAppDataDirectory = Path.Combine(EnvironmentLocalAppData.FullName, AppName);
             RoamingAppDataDirectory = Path.Combine(EnvironmentAppData.FullName, AppName);
         }
+        
+        if (string.IsNullOrEmpty(Profile))
+        {
+            Profile = IsDebugMode ? "debug" : DefaultProfileName;
+        }
+        else
+        {
+            IsDebugMode = string.Equals(Profile, "debug", StringComparison.OrdinalIgnoreCase);
+        }
+        
         AppDataDirectory = Path.Combine(RoamingAppDataDirectory, Profile);
         TempDirectory = Path.Combine(AppDataDirectory, "temp");
+
+        CommandLineArguments = cmdLineArgs;
+        StartupArgs = cmdLineArgs
+            .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
+            .Where(x => !string.Equals(AutostartFlag, x, StringComparison.OrdinalIgnoreCase))
+            .JoinStrings(" ");
         
-        if (!parsed)
+        var profileSpecificArgsFilePath = Path.Combine(AppDataDirectory, "startup.cfg");
+        if (File.Exists(profileSpecificArgsFilePath))
         {
-            SharedLog.Instance.InitializeLogging(this);
-            throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", CommandLineArguments)}");
+            string argsEx;
+            try
+            {
+                argsEx = File.ReadAllText(profileSpecificArgsFilePath);
+                
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException($"Failed to read startup args file @ {profileSpecificArgsFilePath}", e);
+            }
+
+            AppArgumentsStartupConfig config;
+            try
+            {
+                config = System.Text.Json.JsonSerializer.Deserialize<AppArgumentsStartupConfig>(argsEx);
+                if (config == null)
+                {
+                    throw new SerializationException($"Failed to deserialized startup args file @ {profileSpecificArgsFilePath}");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException($"Failed to parse startup args file @ {profileSpecificArgsFilePath}", e);
+            }
+            
+            var cmdLineFromLine = string.IsNullOrEmpty(config.CommandLine) ? string.Empty : config.CommandLine;
+            var cmdLineArgsFromFile = CommandLineSplitter.Instance.Split(cmdLineFromLine).ToArray();
+
+            CommandLineArgumentsEx = cmdLineArgsFromFile;
+            if (CommandLineArgumentsEx.Length > 0)
+            {
+                var appOptionsFromFile = new AppOptions();
+                if (Parse(appOptionsFromFile, CommandLineArgumentsEx))
+                {
+                    //at this point we allow only very few specific overrides
+                    if (DataFolder != null && !string.IsNullOrEmpty(appOptionsFromFile.AppName))
+                    {
+                        AppName = appOptionsFromFile.AppName;
+                    }
+                }
+            }
         }
     }
 
@@ -147,6 +200,8 @@ public class AppArguments : AppOptions, IAppArguments
     public string StartupArgs { get; }
     
     public string[] CommandLineArguments { get; }
+    
+    public string[] CommandLineArgumentsEx { get; }
 
     public int ProcessId { get; }
 

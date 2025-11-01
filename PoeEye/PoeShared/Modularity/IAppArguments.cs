@@ -73,7 +73,15 @@ public interface IAppArguments : IAppConfig
         
     string StartupArgs { [CanBeNull] get; }
     
+    /// <summary>
+    /// Contains command line arguments loaded from the command line itself 
+    /// </summary>
     string[] CommandLineArguments { [CanBeNull] get; }
+    
+    /// <summary>
+    /// Contains command line arguments aggregated from additional sources - .exe sidecar, profile config, etc
+    /// </summary>
+    string[] CommandLineArgumentsEx { [CanBeNull] get; }
 
     bool Parse(string[] args);
 
