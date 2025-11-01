@@ -17,23 +17,23 @@ public static class UnityContainerExtensions
         return container;
     }
 
-    public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
-    {
-        instance.RegisterSingleton(typeof(TTo));
-
-        foreach (var type in types)
-        {
-            instance.RegisterType(type, typeof(TTo), new ContainerControlledLifetimeManager());
-        }
-
-        return instance;
-    }
-
     public static IUnityContainer RegisterType<TTo>(this IUnityContainer instance, params Type[] types)
     {
         foreach (var type in types)
         {
             instance.RegisterType(type, typeof(TTo));
+        }
+
+        return instance;
+    }
+
+    public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
+    {
+        instance.RegisterType(typeof(TTo), new ContainerControlledLifetimeManager());
+
+        foreach (var type in types)
+        {
+            instance.RegisterType(type, typeof(TTo), new ContainerControlledLifetimeManager());
         }
 
         return instance;
@@ -47,6 +47,28 @@ public static class UnityContainerExtensions
     public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, string name, Func<IUnityContainer, object> func)
     {
         return instance.RegisterFactory<TTo>(name, func, new ContainerControlledLifetimeManager());
+    }
+    
+    public static IUnityContainer RegisterExternalSingleton<TTo>(this IUnityContainer instance, params Type[] types)
+    {
+        instance.RegisterType(typeof(TTo), new NonDisposingContainerControlledLifetimeManager());
+
+        foreach (var type in types)
+        {
+            instance.RegisterType(type, typeof(TTo), new NonDisposingContainerControlledLifetimeManager());
+        }
+
+        return instance;
+    }
+
+    public static IUnityContainer RegisterExternalSingleton<TTo>(this IUnityContainer instance, Func<IUnityContainer, object> func)
+    {
+        return instance.RegisterFactory<TTo>(func, new NonDisposingContainerControlledLifetimeManager());
+    }
+
+    public static IUnityContainer RegisterExternalSingleton<TTo>(this IUnityContainer instance, string name, Func<IUnityContainer, object> func)
+    {
+        return instance.RegisterFactory<TTo>(name, func, new NonDisposingContainerControlledLifetimeManager());
     }
 
     public static IUnityContainer AddNewExtensionIfNotExists<TExtension>(this IUnityContainer container)
