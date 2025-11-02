@@ -131,7 +131,8 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
     {
         if (IsLoaded)
         {
-            throw new InvalidOperationException("Application is already loaded");
+            Log.Warn("Application is already loaded, ignoring readiness request");
+            return;
         }
 
         loadedTimestamp = clock.Now;
