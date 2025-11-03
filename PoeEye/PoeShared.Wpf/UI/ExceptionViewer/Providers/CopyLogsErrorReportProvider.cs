@@ -41,7 +41,7 @@ internal sealed class CopyLogsErrorReportProvider : IErrorReportItemProvider
         
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var logFilesToInclude = new DirectoryInfo(logFilesRoot)
-            .GetFiles("*.log", SearchOption.AllDirectories)
+            .GetFilesSafe("*.log", SearchOption.AllDirectories)
             .OrderByDescending(x => x.LastWriteTime)
             .Take(logsToInclude)
             .ToArray();

@@ -74,6 +74,7 @@ public static class DirectoryInfoExtensions
         return PathUtils.IsSubDir(parentDir.FullName, candidatePath.FullName);
     }
 
+    
     /// <summary>
     /// Recursively retrieves files from the specified directory and its subdirectories
     /// matching a given search pattern. This method will skip any inaccessible directories 
@@ -83,7 +84,7 @@ public static class DirectoryInfoExtensions
     /// <param name="searchPattern">The search string to match against the names of files in the directory.</param>
     /// <param name="searchOption"></param>
     /// <returns>A list of <see cref="FileInfo"/> objects representing the files found that match the search pattern.</returns>
-    public static IReadOnlyList<FileInfo> GetFilesSafe(this DirectoryInfo directory, string searchPattern, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    public static FileInfo[] GetFilesSafe(this DirectoryInfo directory, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
         if (!directory.Exists)
         {
@@ -130,7 +131,66 @@ public static class DirectoryInfoExtensions
             }
         }
 
-        return result;
+        return result.ToArray();
+    }
+    
+     /// <summary>
+    /// Recursively retrieves subfolders from the specified directory and its subdirectories
+    /// matching a given search pattern. This method will skip any inaccessible directories 
+    /// due to permission issues and continue with the next accessible directory.
+    /// </summary>
+    /// <param name="directory">The directory from which to start the search.</param>
+    /// <param name="searchPattern">The search string to match against the names of files in the directory.</param>
+    /// <param name="searchOption"></param>
+    /// <returns>A list of <see cref="FileInfo"/> objects representing the files found that match the search pattern.</returns>
+    public static DirectoryInfo[] GetDirectoriesSafe(this DirectoryInfo directory, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    {
+        if (!directory.Exists)
+        {
+            return Array.Empty<DirectoryInfo>();
+        }
+        
+        var result = new List<DirectoryInfo>();
+        try
+        {
+            var files = directory.GetDirectories(searchPattern, SearchOption.TopDirectoryOnly);
+            result.AddRange(files);
+        }
+        catch (UnauthorizedAccessException ex) 
+        {
+            Log.Warn($"Failed to access subfolders in directory {directory.FullName}", ex);
+        }
+
+        if (searchOption == SearchOption.AllDirectories)
+        {
+            try
+            {
+                var subDirs = directory.GetDirectories("*", SearchOption.TopDirectoryOnly);
+                foreach (var dirInfo in subDirs)
+                {
+                    if (!dirInfo.Exists)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        var subdirFiles = dirInfo.GetDirectoriesSafe(searchPattern, searchOption);
+                        result.AddRange(subdirFiles);
+                    }
+                    catch (DirectoryNotFoundException)
+                    {
+                        Log.Warn($"Virtualization error - folder seems to exist, but in fact it does not: {dirInfo.FullName}");
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Log.Warn($"Failed to access subdirectories in directory {directory.FullName}", ex);
+            }
+        }
+
+        return result.ToArray();
     }
     
     /// <summary>
@@ -141,12 +201,12 @@ public static class DirectoryInfoExtensions
     /// <param name="directoryInfo">The directory to be deleted.</param>
     public static void RemoveDirectory(this DirectoryInfo directoryInfo)
     {
-        foreach (var file in directoryInfo.GetFiles())
+        foreach (var file in directoryInfo.GetFilesSafe())
         {
             file.Attributes = FileAttributes.Normal;
         }
 
-        foreach (var subDir in directoryInfo.GetDirectories())
+        foreach (var subDir in directoryInfo.GetDirectoriesSafe())
         {
             RemoveDirectory(subDir); 
         }

@@ -62,7 +62,7 @@ internal static class DirectoryMirror
     private static IReadOnlyList<PlanItem> BuildPlan(DirectoryInfo source, DirectoryInfo destination, bool markerExists)
     {
         var results = new List<PlanItem>();
-        var sourceFiles = source.GetFiles("*", SearchOption.AllDirectories);
+        var sourceFiles = source.GetFilesSafe("*", SearchOption.AllDirectories);
         foreach (var sourceFile in sourceFiles)
         {
             var relativePath = Path.GetRelativePath(source.FullName, sourceFile.FullName);

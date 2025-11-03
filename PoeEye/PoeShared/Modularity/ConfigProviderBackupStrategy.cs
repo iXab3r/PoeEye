@@ -131,7 +131,7 @@ public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, ICo
                 continue;
             }
             obsoleteFile.Directory.Refresh();
-            if (obsoleteFile.Directory.GetFiles().Any())
+            if (obsoleteFile.Directory.GetFilesSafe().Any())
             {
                 Log.Debug($"Directory {obsoleteFile.Directory} still has files, skipping it");
                 continue;

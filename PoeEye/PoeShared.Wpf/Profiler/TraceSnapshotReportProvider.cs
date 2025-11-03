@@ -41,7 +41,7 @@ internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IE
         const int snapshotsToAttach = 1;
         Log.Debug("Preparing memory snapshots for report...");
         var snapshotsToInclude = (TracesFolder.Exists 
-                ? TracesFolder.GetFiles("*.dmw", SearchOption.TopDirectoryOnly) 
+                ? TracesFolder.GetFilesSafe("*.dmw", SearchOption.TopDirectoryOnly) 
                 : Array.Empty<FileInfo>())
             .OrderByDescending(x => x.LastWriteTime)
             .Take(maxSnapshotsToInclude)
@@ -92,7 +92,7 @@ internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IE
         const int snapshotsToAttach = 1;
         Log.Debug("Preparing performance snapshots for report...");
         var snapshotsToInclude = (TracesFolder.Exists 
-                ? TracesFolder.GetFiles("*.zip", SearchOption.TopDirectoryOnly) 
+                ? TracesFolder.GetFilesSafe("*.zip", SearchOption.TopDirectoryOnly) 
                 : Array.Empty<FileInfo>())
             .OrderByDescending(x => x.LastWriteTime)
             .Take(maxSnapshotsToInclude)
