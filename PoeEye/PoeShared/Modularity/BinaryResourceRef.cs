@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using Newtonsoft.Json;
+
 // ReSharper disable SealedMemberInSealedClass
 
 namespace PoeShared.Modularity;
@@ -18,11 +19,25 @@ public sealed record BinaryResourceRef : IHasValidation
     public BinaryResourceRef(byte[] data)
     {
         Data = data;
+        ContentLength = data?.Length;
     }
 
     public BinaryResourceRef(string uri)
     {
         Uri = uri;
+    }
+
+    public static BinaryResourceRef FromFile(FileInfo file)
+    {
+        var data = File.ReadAllBytes(file.FullName);
+        var lastModified = file.LastWriteTimeUtc;
+        return new BinaryResourceRef()
+        {
+            Data = data,
+            LastModified = lastModified,
+            FileName = file.Name,
+            ContentLength = data.Length,
+        };
     }
 
     /// <summary>
@@ -41,7 +56,7 @@ public sealed record BinaryResourceRef : IHasValidation
     public string CipherKeySalt { get; init; } 
     
     /// <summary>
-    /// Gets the hash of the binary data for integrity verification. If CipherSuite is not set, you can assume it is xxHash.
+    /// Gets the base64 hash of the binary data for integrity verification. If CipherSuite is not set, you can assume it is xxHash64.
     /// Hash is calculated on raw(decrypted) data and can be used for validation purposes.
     /// </summary>
     public string Hash { get; init; } 
