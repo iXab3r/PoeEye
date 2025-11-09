@@ -24,10 +24,20 @@ public static class CachingRegistrations
     
     public static void AddCommonService(this IServiceCollection services, IUnityContainer container)
     {
+        services.AddSingleton(sp => container.Resolve<IAppArguments>());
+        services.AddSingleton(sp => container.Resolve<IRandomNumberGenerator>());
         services.AddSingleton(sp => container.Resolve<IUniqueIdGenerator>());
         services.AddSingleton(sp => container.Resolve<IClock>());
         services.AddSingleton(sp => container.Resolve<IConfigSerializer>());
-        services.AddSingleton(sp => container.Resolve<IAppArguments>());
+        services.AddSingleton(sp => container.Resolve<IFileDownloader>());
+        services.AddSingleton(sp => container.Resolve<IAssemblyTracker>());
+        services.AddSingleton(sp => container.Resolve<ISleepController>());
+        services.AddSingleton(sp => container.Resolve<IMemoryPool>());
+        services.AddSingleton(sp => container.Resolve<IComparisonService>());
+        
+        services.AddTransient(sp => container.Resolve<IFolderCleanerService>());
+        services.AddTransient(sp => container.Resolve<IBufferedItemsProcessor>());
+        services.AddTransient(sp => container.Resolve<ISharedResourceLatch>());
         
         services.AddSingleton(container);
         services.AddFactories();

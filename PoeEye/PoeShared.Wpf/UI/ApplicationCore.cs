@@ -80,7 +80,7 @@ public class ApplicationCore : DisposableReactiveObject
         Log.Debug($"ThreadPool: worker [{minWorkerThreads}; {maxWorkerThreads}], completionPort [{minCompletionPortThreads}; {maxCompletionPortThreads}]");
 
         Log.Debug("Initializing housekeeping");
-        var cleanupService = Container.Resolve<IFolderCleanerService>();
+        var cleanupService = Container.Resolve<IFolderCleanerService>().AddTo(Anchors);
         cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.RoamingAppDataDirectory, "logs"))).AddTo(Anchors);
         cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
         cleanupService.CleanupTimeout = TimeSpan.FromHours(12);

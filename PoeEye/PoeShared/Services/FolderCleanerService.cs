@@ -6,47 +6,54 @@ namespace PoeShared.Services;
 
 internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCleanerService
 {
-    private static readonly IFluentLog Log = typeof(FolderCleanerService).PrepareLogger("FolderCleaner");
-
-    private readonly SourceList<DirectoryInfo> directoriesSource = new();
+    private readonly SourceList<DirectoryCleanupSettings> directoriesSource = new();
 
     public FolderCleanerService(IClock clock)
     {
+        Log = typeof(FolderCleanerService).PrepareLogger("FolderCleaner");
+        Log.AddSuffix(() => $"FC {(directoriesSource.Count == 1 ? $"{directoriesSource.Items.FirstOrDefault()?.Directory?.FullName}" : $"dirs: {directoriesSource.Count}")}");
         directoriesSource
             .Connect()
+            .Transform(x => x.Directory)
             .Bind(out var targetDirectories)
             .Subscribe()
             .AddTo(Anchors);
         TargetDirectories = targetDirectories;
 
         Observable.Merge(
-                this.WhenAnyValue(x => x.FileTimeToLive, x => x.CleanupTimeout).ToUnit(),
+                this.WhenAnyValue(x => x.FileTimeToLive, x => x.FileAccessTimeToLive, x => x.CleanupTimeout).ToUnit(),
                 directoriesSource.Connect().CountChanged().ToUnit())
             .Select(_ =>
             {
-                Log.Debug($"Cleanup period updated to {CleanupTimeout} with TTL set to {FileTimeToLive} with {directoriesSource.Count} target directories");
-                return CleanupTimeout > TimeSpan.Zero && FileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? Observables.BlockingTimer(CleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
+                Log.Debug($"Cleanup period updated to {CleanupTimeout} with defaults WriteTTL={FileTimeToLive}, AccessTTL={FileAccessTimeToLive} with {directoriesSource.Count} target directories");
+                var hasAnyTtl = (FileTimeToLive > TimeSpan.Zero) || (FileAccessTimeToLive > TimeSpan.Zero) || directoriesSource.Items.Any(s => (s.WriteTimeToLive > TimeSpan.Zero) || (s.AccessTimeToLive > TimeSpan.Zero));
+                return CleanupTimeout > TimeSpan.Zero && hasAnyTtl && directoriesSource.Count > 0 ? Observables.BlockingTimer(CleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
             })
             .Switch()
-            .Subscribe(() => HandleCleanupTimerTick(clock, FileTimeToLive ?? TimeSpan.MaxValue, directoriesSource.Items.ToArray()))
+            .Subscribe(() => HandleCleanupTimerTick(Log, clock, FileTimeToLive, FileAccessTimeToLive, directoriesSource.Items.ToArray()))
             .AddTo(Anchors);
     }
+    
+    public IFluentLog Log { get; }
 
-    private static void HandleCleanupTimerTick(IClock clock, TimeSpan ttl, DirectoryInfo[] directories)
+    private static void HandleCleanupTimerTick(IFluentLog log, IClock clock, TimeSpan? defaultWriteTtl, TimeSpan? defaultAccessTtl, DirectoryCleanupSettings[] directories)
     {
-        using var sw = new BenchmarkTimer($"Cleanup, TTL: {ttl}", Log);
+        using var sw = new BenchmarkTimer($"Cleanup, Default Write TTL: {defaultWriteTtl}, Default Access TTL: {defaultAccessTtl}", log);
         try
         {
-            if (ttl <= TimeSpan.Zero)
+            if ((defaultWriteTtl <= TimeSpan.Zero && defaultAccessTtl <= TimeSpan.Zero) && directories.All(d => d.WriteTimeToLive <= TimeSpan.Zero && d.AccessTimeToLive <= TimeSpan.Zero))
             {
-                sw.Step($"File TTL is not set, value: {ttl}");
+                sw.Step($"No TTLs are set, skipping cleanup");
                 return;
             }
 
-            sw.Step($"Starting cleanup cycle, TTL :{ttl.TotalDays:F0} days, directory list: {directories.DumpToString()}");
-            foreach (var directoryInfo in directories)
+            sw.Step($"Starting cleanup cycle, defaults: write={defaultWriteTtl}, access={defaultAccessTtl}, directory list: {directories.Select(x => x.Directory).DumpToString()}");
+            foreach (var settings in directories)
             {
-                sw.Step($"[{directoryInfo}] Processing directory...");
+                var directoryInfo = settings.Directory;
+                var writeTtl = settings.WriteTimeToLive ?? defaultWriteTtl ?? TimeSpan.Zero;
+                var accessTtl = settings.AccessTimeToLive ?? defaultAccessTtl ?? TimeSpan.Zero;
+                sw.Step($"[{directoryInfo}] Processing directory with TTLs: write={writeTtl}, access={accessTtl}...");
                 try
                 {
                     directoryInfo.Refresh();
@@ -57,7 +64,7 @@ internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCl
                     else
                     {
                         var allFiles = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories).ToArray();
-                        var filesToRemove = allFiles.Where(x => CheckThatFileMustBeRemoved(x, clock, ttl)).ToArray();
+                        var filesToRemove = allFiles.Where(x => CheckThatFileMustBeRemoved(x, clock, writeTtl, accessTtl)).ToArray();
 
                         var totalCleanedSize = 0L;
                         foreach (var fileInfo in filesToRemove)
@@ -71,59 +78,68 @@ internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCl
                             }
                             catch (Exception e)
                             {
-                                Log.Warn($"Failed to remove file {fileInfo.Name}", e);
+                                log.Warn($"Failed to remove file {fileInfo.Name}", e);
                                 sw.Step($"[{directoryInfo}] Failed to remove file {fileInfo.Name} - {e.Message}");
                             }
                         }
-                        
+
                         sw.Step($"[{directoryInfo}] Cleaned up {totalCleanedSize}b, {filesToRemove.Length} / {allFiles.Length} were removed or processed");
                     }
-                    
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"Failed to process directory {directoryInfo}", e);
+                    log.Warn($"Failed to process directory {directoryInfo}", e);
                     sw.Step($"[{directoryInfo}] Failed to process - {e.Message}");
                 }
             }
         }
         catch (Exception e)
         {
-            Log.Warn($"Exception in cleanup thread", e);
+            log.Warn($"Exception in cleanup thread", e);
             sw.Step($"Exception occurred - {e.Message}");
         }
-        finally{
+        finally
         {
-            sw.Step("Cleanup cycle completed");
-        }}
+            {
+                sw.Step("Cleanup cycle completed");
+            }
+        }
     }
 
-    private static bool CheckThatFileMustBeRemoved(FileInfo fileInfo, IClock clock, TimeSpan ttl)
+    private static bool CheckThatFileMustBeRemoved(FileInfo fileInfo, IClock clock, TimeSpan writeTtl, TimeSpan accessTtl)
     {
-        if (!fileInfo.Exists || fileInfo.IsReadOnly || ttl <= TimeSpan.Zero)
+        if (!fileInfo.Exists || fileInfo.IsReadOnly)
         {
             return false;
         }
 
         var utcNow = clock.UtcNow;
-        var writeExpired = utcNow - fileInfo.LastWriteTimeUtc > ttl;
-        return writeExpired;
+        var writeExpired = writeTtl > TimeSpan.Zero && (utcNow - fileInfo.LastWriteTimeUtc > writeTtl);
+        var accessExpired = accessTtl > TimeSpan.Zero && (utcNow - fileInfo.LastAccessTimeUtc > accessTtl);
+        return writeExpired || accessExpired;
     }
 
     public ReadOnlyObservableCollection<DirectoryInfo> TargetDirectories { get; }
 
+    public string Name { get; set; }
     public TimeSpan? FileTimeToLive { get; set; }
+    public TimeSpan? FileAccessTimeToLive { get; set; }
 
     public TimeSpan? CleanupTimeout { get; set; }
 
     public IDisposable AddDirectory(DirectoryInfo directoryInfo)
     {
-        Log.Debug($"Adding directory {directoryInfo} to directory list: {directoriesSource.Items.DumpToString()}");
-        directoriesSource.Add(directoryInfo);
+        return AddDirectory(new DirectoryCleanupSettings(directoryInfo));
+    }
+
+    public IDisposable AddDirectory(DirectoryCleanupSettings settings)
+    {
+        Log.Debug($"Adding directory {settings.Directory} to directory list: {directoriesSource.Items.Select(x => x.Directory).DumpToString()}");
+        directoriesSource.Add(settings);
         return Disposable.Create(() =>
         {
-            Log.Debug($"Removing directory {directoryInfo} from directory list: {directoriesSource.Items.DumpToString()}");
-            directoriesSource.Remove(directoryInfo);
+            Log.Debug($"Removing directory {settings.Directory} from directory list: {directoriesSource.Items.Select(x => x.Directory).DumpToString()}");
+            directoriesSource.Remove(settings);
         });
     }
 }
