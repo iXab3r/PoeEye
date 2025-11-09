@@ -1,5 +1,3 @@
-using BidirectionalMap;
-
 namespace PoeShared.Scaffolding;
 
 public static class DictionaryExtensions
@@ -67,21 +65,6 @@ public static class DictionaryExtensions
         out TValue value)
     {
         return dictionary.Remove(key, out value);
-    }
-    
-    public static bool TryGetValue<TKey, TValue>(
-        this BiMap<TKey, TValue>.Indexer<TKey, TValue> dictionaryIndexer,
-        TKey key,
-        out TValue value)
-    {
-        if (!dictionaryIndexer.ContainsKey(key))
-        {
-            value = default;
-            return false;
-        }
-
-        value = dictionaryIndexer[key];
-        return true;
     }
 
     public static void EditDiff<TKey>(

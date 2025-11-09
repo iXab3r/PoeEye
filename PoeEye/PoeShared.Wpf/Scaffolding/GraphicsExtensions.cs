@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
-using BidirectionalMap;
+using PoeShared.Scaffolding;
 using WinPixelFormat = System.Drawing.Imaging.PixelFormat;
 using WpfPixelFormat = System.Windows.Media.PixelFormat;
 
