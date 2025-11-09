@@ -35,7 +35,7 @@ internal sealed class ErrorReportingService : DisposableReactiveObject, IErrorRe
     public ErrorReportingService(
         IClock clock,
         IApplicationAccessor applicationAccessor,
-        IFolderCleanerService cleanupService,
+        IFolderCleaner cleanupService,
         IFactory<IReportItemsAggregator, ExceptionDialogConfig> reportItemsAggregatorFactory,
         IFactory<IExceptionDialogDisplayer, IReportItemsAggregator> exceptionDialogDisplayer,
         IFactory<MetricsReportProvider> metricsProviderFactory,

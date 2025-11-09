@@ -1,6 +1,6 @@
 ﻿namespace PoeShared.Services;
 
-public interface IFolderCleanerService 
+public interface IFolderCleaner : IDisposableReactiveObject
 {
     string Name { get; set; }
     

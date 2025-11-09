@@ -35,7 +35,7 @@ public static class CachingRegistrations
         services.AddSingleton(sp => container.Resolve<IMemoryPool>());
         services.AddSingleton(sp => container.Resolve<IComparisonService>());
         
-        services.AddTransient(sp => container.Resolve<IFolderCleanerService>());
+        services.AddTransient(sp => container.Resolve<IFolderCleaner>());
         services.AddTransient(sp => container.Resolve<IBufferedItemsProcessor>());
         services.AddTransient(sp => container.Resolve<ISharedResourceLatch>());
         

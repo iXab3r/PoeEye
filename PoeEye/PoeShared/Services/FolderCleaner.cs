@@ -4,13 +4,13 @@ using ReactiveUI;
 
 namespace PoeShared.Services;
 
-internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCleanerService
+internal sealed class FolderCleaner : DisposableReactiveObject, IFolderCleaner
 {
     private readonly SourceList<DirectoryCleanupSettings> directoriesSource = new();
 
-    public FolderCleanerService(IClock clock)
+    public FolderCleaner(IClock clock)
     {
-        Log = typeof(FolderCleanerService).PrepareLogger("FolderCleaner");
+        Log = typeof(FolderCleaner).PrepareLogger("FolderCleaner");
         Log.AddSuffix(() => $"FC {(directoriesSource.Count == 1 ? $"{directoriesSource.Items.FirstOrDefault()?.Directory?.FullName}" : $"dirs: {directoriesSource.Count}")}");
         directoriesSource
             .Connect()

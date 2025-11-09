@@ -17,7 +17,7 @@ internal sealed class TraceSnapshotReportProvider : DisposableReactiveObject, IE
     private static readonly IFluentLog Log = typeof(TraceSnapshotReportProvider).PrepareLogger();
 
     public TraceSnapshotReportProvider(
-        IFolderCleanerService cleanupService,
+        IFolderCleaner cleanupService,
         IAppArguments appArguments)
     {
         TracesFolder = new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, TracesFolderName));
