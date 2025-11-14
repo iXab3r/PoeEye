@@ -27,8 +27,6 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     private readonly SourceCache<ViewRegistration, ViewKey> viewsByKey = new(x => x.Key);
     private readonly ISubject<Unit> whenChanged = new Subject<Unit>();
 
-    private readonly int maxProcessingThreads = Math.Min(4, Environment.ProcessorCount);
-
     public BlazorViewRepository(
         IClock clock,
         IAssemblyTracker assemblyTracker)
@@ -37,7 +35,6 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
         this.clock = clock;
 
-        Log.Info($"Processing threads: {maxProcessingThreads} (processor count: {Environment.ProcessorCount})");
         this.WhenAnyValue(x => x.AutomaticallyProcessAssemblies)
             .Select(x => x ? assemblyTracker.Assemblies.WhenAdded : Observable.Empty<Assembly>())
             .Switch()
@@ -155,7 +152,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count})");
         var sw = ValueStopwatch.StartNew();
         var processedAssembliesCount = 0;
-        ConcurrentQueueUtils.Process(unprocessedAssemblies, assembly =>
+        ParallelUtils.ForEach(unprocessedAssemblies, assembly =>
         {
             try
             {
