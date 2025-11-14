@@ -9,9 +9,9 @@ using Shouldly;
 namespace PoeShared.Tests.Services;
 
 [TestFixture]
-public class SevenZipWrappeTests : FixtureBase
+public class SevenZipWrapperTests : FixtureBase
 {
-    private static readonly string TempFolderName = nameof(SevenZipWrappeTests);
+    private static readonly string TempFolderName = nameof(SevenZipWrapperTests);
 
     private DirectoryInfo tempFolder;
         
@@ -54,7 +54,7 @@ public class SevenZipWrappeTests : FixtureBase
         var outputFile = new FileInfo( Path.Combine(tempFolder.FullName, $"{nameof(ShouldCompress)}.7z"));
             
         //When
-        instance.AddToArchive(outputFile, new []{ inputFile });
+        instance.CreateArchive(outputFile, new []{ inputFile });
 
         //Then
         outputFile.Refresh();
@@ -75,7 +75,7 @@ public class SevenZipWrappeTests : FixtureBase
         var inputFile = GenerateFile(Path.Combine(tempFolder.FullName, nameof(ShouldExtract)), length);
         var outputFile = new FileInfo( Path.Combine(tempFolder.FullName, $"{nameof(ShouldExtract)}.7z"));
         var outputDirectory = new DirectoryInfo(Path.Combine(tempFolder.FullName, $"{nameof(ShouldExtract)}_out"));
-        instance.AddToArchive(outputFile, new []{ inputFile });
+        instance.CreateArchive(outputFile, new []{ inputFile });
 
         //When
         instance.ExtractArchive(outputFile, outputDirectory);

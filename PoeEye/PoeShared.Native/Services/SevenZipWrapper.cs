@@ -19,7 +19,7 @@ internal sealed class SevenZipWrapper : ISevenZipWrapper
             
     }
 
-    public void AddToArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
+    public void CreateArchive(FileInfo outputFileName, IReadOnlyList<FileInfo> filesToAdd)
     {
         Log.Info($"Adding to archive {outputFileName} files: {filesToAdd.Select(x => $"{x.Name} ({x.Length}b)").JoinStrings(", ")}");
 

@@ -32,7 +32,7 @@ public sealed class NativeRegistrations : UnityContainerExtension
             .RegisterSingleton<IAudioPlayer, AudioPlayer>()
             .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
             .RegisterSingleton<IKeyboardLayoutManager, KeyboardLayoutManager>()
-            .RegisterSingleton<ISevenZipWrapper, SevenZipWrapper>()
+            .RegisterSingleton<ISevenZipWrapper, SevenZipNativeWrapper>()
             .RegisterSingleton<ICredentialManager, MeziantouCredentialManager>()
             .RegisterSingleton<IForegroundWindowTracker, ForegroundWindowTracker>()
             .RegisterSingleton<IWindowBoundsTrackerFactory, WindowBoundsTrackerFactory>()

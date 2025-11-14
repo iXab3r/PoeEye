@@ -41,7 +41,6 @@
       <IncludeAssets>All</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Validation" Version="1.4.1" />
-    <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
     <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>

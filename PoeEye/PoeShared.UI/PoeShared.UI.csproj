@@ -34,7 +34,6 @@
     
     <ItemGroup>
       <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All"><ExcludeAssets>runtime</ExcludeAssets><IncludeAssets>All</IncludeAssets></PackageReference>
-      <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
       <PackageReference Include="WPFSVL" Version="1.0.0" />
     </ItemGroup>
     
