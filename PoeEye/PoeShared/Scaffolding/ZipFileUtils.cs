@@ -22,16 +22,16 @@ public static class ZipFileUtils
         CompressionLevel compressionLevel = CompressionLevel.NoCompression,
         IProgressReporter progressReporter = default)
     {
-        var files = Directory.GetFiles(sourceDirectory.FullName, "*", SearchOption.AllDirectories);
+        var files = sourceDirectory.GetFilesSafe("*", SearchOption.AllDirectories);
         var totalProcessedFiles = 0;
         using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
         foreach (var file in files)
         {
-            var entryName = Path.GetRelativePath(sourceDirectory.FullName, file);
+            var entryName = Path.GetRelativePath(sourceDirectory.FullName, file.FullName);
             var entry = archive.CreateEntry(entryName, compressionLevel);
 
             using (var entryStream = entry.Open())
-            using (var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read))
+            using (var fileStream = file.OpenRead())
             {
                 fileStream.CopyTo(entryStream);
             }

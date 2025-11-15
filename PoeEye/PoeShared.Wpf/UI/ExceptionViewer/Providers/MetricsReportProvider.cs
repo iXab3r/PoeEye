@@ -25,7 +25,7 @@ internal sealed class MetricsReportProvider : IErrorReportItemProvider
         Log.Debug("Preparing log files for crash report...");
         var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
         var filesToInclude = new DirectoryInfo(logFilesRoot)
-            .GetFiles("metrics*.txt", SearchOption.TopDirectoryOnly)
+            .GetFilesSafe("metrics*.txt", SearchOption.TopDirectoryOnly)
             .OrderByDescending(x => x.LastWriteTime)
             .ToArray();
 
