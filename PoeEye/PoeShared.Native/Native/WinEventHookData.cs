@@ -22,12 +22,12 @@ public readonly struct WinEventHookData
         EventTimeInMs = eventTimeInMs;
         WinEventHookHandle = winEventHookHandle;
     }
-    
-    public IntPtr WinEventHookHandle { get; init; }
-    public User32.WindowsEventHookType EventId { get; init; }
-    public IntPtr WindowHandle { get; init; }
-    public int ObjectId { get; init; }
-    public int ChildId { get; init; }
-    public int EventThreadId { get; init; }
-    public uint EventTimeInMs { get; init; }
+
+    public readonly IntPtr WinEventHookHandle;
+    public readonly User32.WindowsEventHookType EventId;
+    public readonly IntPtr WindowHandle;
+    public readonly int ObjectId;
+    public readonly int ChildId;
+    public readonly int EventThreadId;
+    public readonly uint EventTimeInMs;
 }
