@@ -1,9 +1,12 @@
+// ReSharper disable UnusedMember.Local used for debugging
+// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable used for debugging
+// ReSharper disable InconsistentNaming WinAPI naming
+
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -11,11 +14,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using PInvoke;
-using PoeShared.Prism;
-using PoeShared.Scaffolding; 
+using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Services;
-using Unity;
 using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace PoeShared.Native;
@@ -23,7 +24,6 @@ namespace PoeShared.Native;
 [SuppressMessage("ReSharper", "IdentifierTypo")]
 public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHookWrapper
 {
-    
     /*
      * Performance considerations:
      * EventMin: EVENT_OBJECT_NAMECHANGE, EventMax: EVENT_OBJECT_DESCRIPTIONCHANGE, ProcessId: 0, ThreadId: 0, Flags: WINEVENT_OUTOFCONTEXT
@@ -32,14 +32,11 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
      * EventMin: EVENT_OBJECT_LOCATIONCHANGE
      * About 50k events per 5 minutes, processing time < 400ms in total
      */
-    
-    private readonly IScheduler bgScheduler;
 
     private readonly User32.WinEventProc eventDelegate;
     private readonly WinEventHookArguments hookArgs;
 
     private readonly WorkerThread hookThread;
-
     private readonly Subject<WinEventHookData> whenWindowEventTriggered = new();
     private readonly BlockingCollection<WinEventHookData> unprocessedEvents = new();
     private readonly WorkerThread notificationsThread;
@@ -49,24 +46,24 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
     private long totalProcessingTimeTicks;
     private long totalNotificationsTimeTicks;
     private long errorsCount;
+
     private TimeSpan TotalProcessingTime => Stopwatch.GetElapsedTime(0, totalProcessingTimeTicks);
     private TimeSpan TotalNotificationsTime => Stopwatch.GetElapsedTime(0, totalNotificationsTimeTicks);
+
 #endif
 
     public WinEventHookWrapper(
         IApplicationAccessor applicationAccessor,
-        WinEventHookArguments hookArgs,
-        [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+        WinEventHookArguments hookArgs)
     {
         Log = typeof(WinEventHookWrapper).PrepareLogger().WithSuffix(hookArgs.ToString());
         this.hookArgs = hookArgs;
-        this.bgScheduler = bgScheduler;
         eventDelegate = WinEventDelegateProc;
         Log.Debug($"New WinEvent hook created");
 
         Disposable.Create(() => Log.Info($"Disposing {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
-        hookThread = new WorkerThread($"Hook {hookArgs.ToString()}", token => RunHookThread(), autoStart: false).AddTo(Anchors);
-        notificationsThread = new WorkerThread($"HookNotifications {hookArgs.ToString()}", token => RunNotificationsThread(), autoStart: false).AddTo(Anchors);
+        hookThread = new WorkerThread($"Hook {hookArgs.ToString()}", _ => RunHookThread(), autoStart: false).AddTo(Anchors);
+        notificationsThread = new WorkerThread($"HookNotifications {hookArgs.ToString()}", _ => RunNotificationsThread(), autoStart: false).AddTo(Anchors);
 
         applicationAccessor.WhenLoaded
             .Subscribe(() =>
@@ -77,8 +74,15 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             })
             .AddTo(Anchors);
         
+        Disposable.Create(() =>
+        {
+            Log.Info("Completing WinEventHook queue");
+            unprocessedEvents.CompleteAdding();
+        }).AddTo(Anchors);
+
         Disposable.Create(() => Log.Info($"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
     }
+
     private IFluentLog Log { get; }
 
     public IObservable<WinEventHookData> WhenWindowEventTriggered => whenWindowEventTriggered;
@@ -95,19 +99,19 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         Interlocked.Increment(ref invocationsCount);
         var startTimestamp = Stopwatch.GetTimestamp();
 #endif
+
+        var eventHookData = new WinEventHookData(
+            @event,
+            hwnd,
+            idChild,
+            idObject,
+            dwEventThread,
+            dwmsEventTime,
+            hWinEventHook);
+
+#if DEBUG
         try
         {
-            var eventHookData = new WinEventHookData
-            {
-                EventId = @event,
-                WindowHandle = hwnd,
-                ChildId = idChild,
-                ObjectId = idObject,
-                EventThreadId = dwEventThread,
-                EventTimeInMs = dwmsEventTime,
-                WinEventHookHandle = hWinEventHook
-            };
-
             if (Log.IsDebugEnabled)
             {
                 Log.Debug($"Event hook triggered: {eventHookData}");
@@ -118,18 +122,17 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         catch (Exception e)
         {
             Log.Warn($"Exception in window hook", e);
-#if DEBUG
             Interlocked.Increment(ref errorsCount);
-#endif
         }
         finally
         {
-#if DEBUG
             var endTimestamp = Stopwatch.GetTimestamp();
             var elapsedTimeTicks = endTimestamp - startTimestamp;
             Interlocked.Add(ref totalProcessingTimeTicks, elapsedTimeTicks);
-#endif
         }
+#else
+        unprocessedEvents.Add(eventHookData);
+#endif
     }
 
     private void RunHookThread()
@@ -155,11 +158,12 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
 #endif
                 try
                 {
-
+#if DEBUG
                     if (Log.IsDebugEnabled)
                     {
                         Log.Debug($"Raising event hook notification(queue: {unprocessedEvents.Count}): {eventHookData}");
                     }
+#endif
 
                     whenWindowEventTriggered.OnNext(eventHookData);
                 }
@@ -190,7 +194,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
     private IDisposable RegisterHook()
     {
         Log.Info($"Registering hook");
-            
+
         var hook = User32.SetWinEventHook(
             hookArgs.EventMin,
             hookArgs.EventMax,
@@ -209,7 +213,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
         return Disposable.Create(() =>
         {
             Log.Debug($"Unregistering hook (args: {hookArgs}) {hook.DangerousGetHandle().ToHexadecimal()}");
-            hook.DangerousRelease();
+            hook.Dispose();
         });
     }
 
@@ -223,13 +227,13 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
             {
                 log.Info($"Event loop started");
                 long messagesProcessed = 0;
-                while(GetMessage(out var msg, IntPtr.Zero, 0, 0 ))
+                while (GetMessage(out var msg, IntPtr.Zero, 0, 0))
                 {
                     try
                     {
                         if (msg.Message == WM_QUIT)
                         {
-                            log.Info($"Received {nameof(WM_QUIT)}, breaking event loop");
+                            log.Info($"Received {nameof(WM_QUIT)}, breaking event loop @ {messagesProcessed} messages");
                             break;
                         }
 
@@ -238,13 +242,13 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
                     }
                     catch (Exception e)
                     {
-                        log.Warn($"Exception in EventLoop", e);
+                        log.Warn($"Exception in EventLoop @ {messagesProcessed} message", e);
                     }
                     finally
                     {
                         messagesProcessed++;
                     }
-                } 
+                }
             }
             catch (Exception e)
             {
@@ -255,7 +259,7 @@ public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHoo
                 log.Info($"Event hook loop completed");
             }
         }
-            
+
         [DllImport("user32.dll")]
         private static extern bool GetMessage(out MSG lpMsg, IntPtr hwnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
