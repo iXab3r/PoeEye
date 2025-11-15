@@ -143,13 +143,19 @@ partial class BlazorWindow
                 }
                 case SetWindowPosCommand command:
                 {
-                    Log.Debug($"Setting window position to {command.Location}");
+                    if (ShouldLogThrottled(ref lastSetPosLogMs))
+                    {
+                        Log.Debug($"Setting window position to {command.Location}");
+                    }
                     UnsafeNative.SetWindowPos(window.WindowHandle, command.Location);
                     break;
                 }
                 case SetWindowRectCommand command:
                 {
-                    Log.Debug($"Setting window rect to {command.Rect}");
+                    if (ShouldLogThrottled(ref lastSetRectLogMs))
+                    {
+                        Log.Debug($"Setting window rect to {command.Rect}");
+                    }
                     UnsafeNative.SetWindowRect(window.WindowHandle, command.Rect);
                     break;
                 }
@@ -162,7 +168,10 @@ partial class BlazorWindow
                 }
                 case SetWindowSizeCommand command:
                 {
-                    Log.Debug($"Setting window size to {command.Size}");
+                    if (ShouldLogThrottled(ref lastSetSizeLogMs))
+                    {
+                        Log.Debug($"Setting window size to {command.Size}");
+                    }
                     UnsafeNative.SetWindowSize(window.WindowHandle, command.Size);
                     break;
                 }

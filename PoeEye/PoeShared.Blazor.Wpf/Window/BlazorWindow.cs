@@ -62,6 +62,12 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     private readonly ReactiveCompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
 
+    // Logging throttling: limit certain verbose logs 
+    private readonly Stopwatch logThrottleStopwatch = Stopwatch.StartNew();
+    private long lastSetPosLogMs;
+    private long lastSetSizeLogMs;
+    private long lastSetRectLogMs;
+
     public BlazorWindow(
         IUnityContainer unityContainer,
         [OptionalDependency] Dispatcher dispatcher = null)
@@ -565,7 +571,10 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void SetWindowRect(Rectangle rect)
     {
-        Log.Debug($"Setting window rect to {rect} from {new Rectangle(Left, Top, Width, Height)}");
+        if (ShouldLogThrottled(ref lastSetRectLogMs))
+        {
+            Log.Debug($"Setting window rect to {rect} from {new Rectangle(Left, Top, Width, Height)}");
+        }
         windowLeft.SetValue(rect.Left, TrackedPropertyUpdateSource.Internal);
         windowTop.SetValue(rect.Top, TrackedPropertyUpdateSource.Internal);
         windowWidth.SetValue(rect.Width, TrackedPropertyUpdateSource.Internal);
@@ -575,7 +584,10 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void SetWindowSize(Size windowSize)
     {
-        Log.Debug($"Resizing window to {windowSize} from {new Size(Width, Height)}");
+        if (ShouldLogThrottled(ref lastSetSizeLogMs))
+        {
+            Log.Debug($"Resizing window to {windowSize} from {new Size(Width, Height)}");
+        }
         windowWidth.SetValue(windowSize.Width, TrackedPropertyUpdateSource.Internal);
         windowHeight.SetValue(windowSize.Height, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowSizeCommand(windowSize));
@@ -583,7 +595,10 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     public void SetWindowPos(Point windowPos)
     {
-        Log.Debug($"Moving window to {windowPos} from {new Point(Left, Top)}");
+        if (ShouldLogThrottled(ref lastSetPosLogMs))
+        {
+            Log.Debug($"Moving window to {windowPos} from {new Point(Left, Top)}");
+        }
         windowLeft.SetValue(windowPos.X, TrackedPropertyUpdateSource.Internal);
         windowTop.SetValue(windowPos.Y, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowPosCommand(windowPos));
@@ -640,7 +655,19 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
         return window;
     }
+    
+    private bool ShouldLogThrottled(ref long lastLogMs, long minIntervalMs = 1000)
+    {
+        var now = logThrottleStopwatch.ElapsedMilliseconds;
+        var last = Interlocked.Read(ref lastLogMs);
+        if (now - last >= minIntervalMs)
+        {
+            Interlocked.Exchange(ref lastLogMs, now);
+            return true;
+        }
 
+        return false;
+    }
 
     private void HandleUpdate()
     {
