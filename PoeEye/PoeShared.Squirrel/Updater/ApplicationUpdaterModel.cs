@@ -69,7 +69,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     private static void CleanupUpdateRelatedFiles(DirectoryInfo appDomainDir)
     {
         Log.Info($"Doing cleanup of update-related files inside {appDomainDir}");
-        var foldersToRemove = new Queue<DirectoryInfo>(appDomainDir.GetDirectoriesSafe()
+        var foldersToRemove = new Queue<DirectoryInfo>(appDomainDir.GetDirectories()
             .Where(x => x.Name.StartsWith("app-", StringComparison.OrdinalIgnoreCase) || string.Equals(x.Name, "packages")));
             
         if (foldersToRemove.Any())
@@ -291,7 +291,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var unused = CreateIsBusyAnchor();
         
         Log.Info($"Completing portable-version update cycle, new version folder @ {newVersionFolder}");
-        var executables = newVersionFolder.GetFilesSafe("*.exe", SearchOption.TopDirectoryOnly);
+        var executables = newVersionFolder.GetFiles("*.exe", SearchOption.TopDirectoryOnly);
         if (!executables.Any())
         {
             throw new InvalidOperationException($"Failed to find any executables @ {newVersionFolder.FullName}");

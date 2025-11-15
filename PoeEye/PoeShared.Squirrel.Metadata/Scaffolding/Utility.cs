@@ -324,56 +324,53 @@ public static class Utility
 
         Log.Debug($"Starting to delete folder: {directoryPath}");
 
-        var dirInfo = new DirectoryInfo(directoryPath!);
-        if (!dirInfo.Exists)
+        if (!Directory.Exists(directoryPath))
         {
             Log.Warn($"DeleteDirectory: does not exist - {directoryPath}");
             return;
         }
 
         // From http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true/329502#329502
-        FileInfo[] files;
+        var files = new string[0];
         try
         {
-            files = dirInfo.GetFilesSafe();
+            files = Directory.GetFiles(directoryPath);
         }
         catch (UnauthorizedAccessException ex)
         {
             var message = $"The files inside {directoryPath} could not be read";
-            files = Array.Empty<FileInfo>();
             Log.Warn(message, ex);
         }
 
-        DirectoryInfo[] dirs;
+        var dirs = new string[0];
         try
         {
-            dirs = dirInfo.GetDirectoriesSafe();
+            dirs = Directory.GetDirectories(directoryPath);
         }
         catch (UnauthorizedAccessException ex)
         {
             var message = $"The directories inside {directoryPath} could not be read";
-            dirs = Array.Empty<DirectoryInfo>();
             Log.Warn(message, ex);
         }
 
         var fileOperations = files.ForEachAsync(
             file =>
             {
-                file.Attributes = FileAttributes.Normal;
-                file.Delete();
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
             });
 
         var directoryOperations =
-            dirs.ForEachAsync(async dir => await DeleteDirectory(dir.FullName));
+            dirs.ForEachAsync(async dir => await DeleteDirectory(dir));
 
         await Task.WhenAll(fileOperations, directoryOperations);
 
         Log.Debug($"Now deleting folder: {directoryPath}");
-        dirInfo.Attributes = FileAttributes.Normal;
+        File.SetAttributes(directoryPath, FileAttributes.Normal);
 
         try
         {
-            dirInfo.Delete(false);
+            Directory.Delete(directoryPath, false);
         }
         catch (Exception ex)
         {
@@ -395,7 +392,7 @@ public static class Utility
     public static IReadOnlyList<FileInfo> EnumeratePackagesForApp(string rootAppDirectory)
     {
         var packagesDirectory = PackageDirectoryForAppDir(rootAppDirectory);
-        var packages = new DirectoryInfo(packagesDirectory).GetFilesSafe("*.nupkg", SearchOption.TopDirectoryOnly);
+        var packages = Directory.GetFiles(packagesDirectory, "*.nupkg", SearchOption.TopDirectoryOnly).Select(x => new FileInfo(x));
         return packages.ToList();
     }
 

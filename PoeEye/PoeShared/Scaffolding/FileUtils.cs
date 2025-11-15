@@ -27,12 +27,12 @@ public static class FileUtils
             return;
         }
 
-        foreach (var subDir in directory.GetDirectoriesSafe())
+        foreach (var subDir in directory.GetDirectories())
         {
             subDir.Delete(true);
         }
 
-        foreach (var file in directory.GetFilesSafe())
+        foreach (var file in directory.GetFiles())
         {
             file.Delete();
         }
@@ -128,7 +128,7 @@ public static class FileUtils
             Directory.CreateDirectory(targetDir.FullName);
         }
 
-        var filesToCopy = sourceDir.GetFilesSafe();
+        var filesToCopy = sourceDir.GetFiles();
         Log.Debug($"Files to copy: {filesToCopy.Length}\n\t{filesToCopy.Select(x => $"{x.FullName} (exists: {x.Exists})").DumpToTable()}");
 
         foreach (var fileToCopy in filesToCopy)
@@ -157,7 +157,7 @@ public static class FileUtils
             Log.Debug(@$"Copied to {targetFilePath} ({ByteSize.FromBytes(targetFile.Length)})");
         }
 
-        var foldersToCopy = sourceDir.GetDirectoriesSafe();
+        var foldersToCopy = sourceDir.GetDirectories();
         Log.Debug($"Folders to copy: {foldersToCopy.Length}\n\t{foldersToCopy.Select(x => $"{x.FullName} (exists: {x.Exists})").DumpToTable()}");
         foreach (var folderToCopy in foldersToCopy)
         {

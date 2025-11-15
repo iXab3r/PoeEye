@@ -99,7 +99,7 @@ internal class ApplyReleasesImpl : IEnableLogger
 
         var trayFixer = new TrayStateChanger();
         var appDir = new DirectoryInfo(Utility.AppDirForRelease(rootAppDirectory, updateInfo.FutureReleaseEntry));
-        var allExes = appDir.GetFilesSafe("*.exe").Select(x => x.Name).ToList();
+        var allExes = appDir.GetFiles("*.exe").Select(x => x.Name).ToList();
 
         Log.ErrorIfThrows(() => trayFixer.RemoveDeadEntries(allExes, rootAppDirectory, updateInfo.FutureReleaseEntry.Version.ToString()));
         progress(80);
@@ -560,7 +560,7 @@ internal class ApplyReleasesImpl : IEnableLogger
                 }
             });
 
-        var shellLinks = new DirectoryInfo(taskbarPath).GetFilesSafe("*.lnk").Select(resolveLink).ToArray();
+        var shellLinks = new DirectoryInfo(taskbarPath).GetFiles("*.lnk").Select(resolveLink).ToArray();
 
         foreach (var shortcut in shellLinks)
         {
@@ -715,13 +715,13 @@ internal class ApplyReleasesImpl : IEnableLogger
         // scheduled for deletion by MoveFileEx it throws what seems like
         // NT's only error code, ERROR_ACCESS_DENIED. Squelch errors that
         // come from here.
-        var toCleanup = di.GetDirectoriesSafe()
+        var toCleanup = di.GetDirectories()
             .Where(x => x.Name.ToLowerInvariant().Contains("app-"))
             .Where(x => x.Name != currentVersionFolder && x.Name != originalVersionFolder)
             .Where(x => !IsAppFolderDead(x.FullName));
 
         // Include dead folders in folders to :fire:
-        toCleanup = di.GetDirectoriesSafe()
+        toCleanup = di.GetDirectories()
             .Where(x => x.Name.ToLowerInvariant().Contains("app-"))
             .Where(x => x.Name != currentVersionFolder && x.Name != originalVersionFolder);
 
@@ -797,7 +797,7 @@ internal class ApplyReleasesImpl : IEnableLogger
             return Enumerable.Empty<DirectoryInfo>();
         }
 
-        return rootDirectory.GetDirectoriesSafe()
+        return rootDirectory.GetDirectories()
             .Where(x => x.Name.StartsWith("app-", StringComparison.InvariantCultureIgnoreCase));
     }
 

@@ -30,7 +30,7 @@ internal sealed class CachingPhysicalFileProvider : ICachingPhysicalFileProvider
         Log.Debug("Initializing new caching file provider");
         if (contentRoot.Exists)
         {
-            var directoryFiles = contentRoot.GetFilesSafe("*", SearchOption.AllDirectories).Select(x => new
+            var directoryFiles = contentRoot.GetFiles("*", SearchOption.AllDirectories).Select(x => new
             {
                 RelativePath = Path.GetRelativePath(contentRoot.FullName, x.FullName),
                 x.LastWriteTime,
