@@ -4,8 +4,6 @@ public static class DirectoryInfoExtensions
 {
     private static readonly IFluentLog Log = typeof(DirectoryInfoExtensions).PrepareLogger();
 
-    private static readonly string AppDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory ?? string.Empty;
-    
     /// <summary>
     /// Creates a <see cref="DirectoryInfo"/> instance representing a subdirectory within the specified parent directory.
     /// </summary>
@@ -115,12 +113,6 @@ public static class DirectoryInfoExtensions
                     {
                         continue;
                     }
-                    
-                    if (IsBuggedVirtualizedDirectory(dirInfo.FullName))
-                    {
-                        Log.Warn($"Virtualization error - skipping folder: {dirInfo.FullName}");
-                        continue;
-                    }
 
                     try
                     {
@@ -181,12 +173,6 @@ public static class DirectoryInfoExtensions
                         continue;
                     }
 
-                    if (IsBuggedVirtualizedDirectory(dirInfo.FullName))
-                    {
-                        Log.Warn($"Virtualization error - skipping folder: {dirInfo.FullName}");
-                        continue;
-                    }
-
                     try
                     {
                         var subdirFiles = dirInfo.GetDirectoriesSafe(searchPattern, searchOption);
@@ -226,22 +212,5 @@ public static class DirectoryInfoExtensions
         }
 
         directoryInfo.Delete(true);
-    }
-
-    private static bool IsBuggedVirtualizedDirectory(string directoryPath)
-    {
-        if (string.IsNullOrEmpty(AppDomainBaseDirectory))
-        {
-            return false;
-        }
-
-        if (!PathUtils.IsDirOrSubDir(AppDomainBaseDirectory, directoryPath))
-        {
-            return false;
-        }
-        
-        var lastSegment = Path.GetFileName(directoryPath);
-        var prevSegment = Path.GetFileName(Path.GetDirectoryName(directoryPath));
-        return lastSegment == prevSegment;
     }
 }
