@@ -96,47 +96,12 @@ public static class DirectoryInfoExtensions
         var result = new List<FileInfo>();
         try
         {
-            var files = directory.GetFiles(searchPattern, SearchOption.TopDirectoryOnly);
+            var files = directory.GetFiles(searchPattern, searchOption);
             result.AddRange(files);
         }
         catch (UnauthorizedAccessException ex) 
         {
             Log.Warn($"Failed to access files in directory {directory.FullName}", ex);
-        }
-
-        if (searchOption == SearchOption.AllDirectories)
-        {
-            try
-            {
-                var subDirs = directory.GetDirectories("*", SearchOption.TopDirectoryOnly);
-                foreach (var dirInfo in subDirs)
-                {
-                    if (!dirInfo.Exists)
-                    {
-                        continue;
-                    }
-                    
-                    if (IsBuggedVirtualizedDirectory(dirInfo.FullName))
-                    {
-                        Log.Warn($"Virtualization error - skipping folder: {dirInfo.FullName}");
-                        continue;
-                    }
-
-                    try
-                    {
-                        var subdirFiles = dirInfo.GetFilesSafe(searchPattern, searchOption);
-                        result.AddRange(subdirFiles);
-                    }
-                    catch (DirectoryNotFoundException)
-                    {
-                        Log.Warn($"Virtualization error - folder seems to exist, but in fact it does not: {dirInfo.FullName}");
-                    }
-                }
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Log.Warn($"Failed to access subdirectories in directory {directory.FullName}", ex);
-            }
         }
 
         return result.ToArray();
@@ -161,49 +126,13 @@ public static class DirectoryInfoExtensions
         var result = new List<DirectoryInfo>();
         try
         {
-            var files = directory.GetDirectories(searchPattern, SearchOption.TopDirectoryOnly);
+            var files = directory.GetDirectories(searchPattern, searchOption);
             result.AddRange(files);
         }
         catch (UnauthorizedAccessException ex) 
         {
             Log.Warn($"Failed to access subfolders in directory {directory.FullName}", ex);
         }
-
-        if (searchOption == SearchOption.AllDirectories)
-        {
-            try
-            {
-                var subDirs = directory.GetDirectories("*", SearchOption.TopDirectoryOnly);
-                foreach (var dirInfo in subDirs)
-                {
-                    if (!dirInfo.Exists)
-                    {
-                        continue;
-                    }
-
-                    if (IsBuggedVirtualizedDirectory(dirInfo.FullName))
-                    {
-                        Log.Warn($"Virtualization error - skipping folder: {dirInfo.FullName}");
-                        continue;
-                    }
-
-                    try
-                    {
-                        var subdirFiles = dirInfo.GetDirectoriesSafe(searchPattern, searchOption);
-                        result.AddRange(subdirFiles);
-                    }
-                    catch (DirectoryNotFoundException)
-                    {
-                        Log.Warn($"Virtualization error - folder seems to exist, but in fact it does not: {dirInfo.FullName}");
-                    }
-                }
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Log.Warn($"Failed to access subdirectories in directory {directory.FullName}", ex);
-            }
-        }
-
         return result.ToArray();
     }
     
