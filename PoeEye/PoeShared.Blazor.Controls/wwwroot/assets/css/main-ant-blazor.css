@@ -593,3 +593,7 @@ h1, h2, h3, h4, h5, h6{
 .ant-tree-title {
     pointer-events: none;
 }
+
+.ant-radio-disabled .ant-radio-inner::after {
+    background-color: rgba(0, 0, 0, 0.8);
+}
