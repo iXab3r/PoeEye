@@ -39,7 +39,7 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
             FileName = InitialFileName,
             InitialDirectory = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory) 
                 ? InitialDirectory
-                : Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures),
+                : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             Filter = Filter,
         };
         
@@ -64,7 +64,7 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
             FileName = InitialFileName,
             InitialDirectory = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory)
                 ? InitialDirectory
-                : Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures),
+                : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             Filter = Filter,
             Multiselect = true
         };
@@ -93,7 +93,7 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
             FileName = InitialFileName,
             InitialDirectory = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory) 
                 ? InitialDirectory
-                : Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures),
+                : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             Filter = Filter
         };
         

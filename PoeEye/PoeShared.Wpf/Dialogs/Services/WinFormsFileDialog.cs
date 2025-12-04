@@ -162,7 +162,7 @@ public sealed class WinFormsFileDialog : DisposableReactiveObjectWithLogger, ISa
     private static bool IsValidDirectory(string dir) => !string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir);
 
     private static string GetDefaultFolder() =>
-        Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures);
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
     /// <summary>
     /// Wraps a raw HWND as an IWin32Window for use with WinForms dialogs.
