@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PoeShared.Scaffolding;
 
 public static class DictionaryExtensions
@@ -85,6 +87,22 @@ public static class DictionaryExtensions
         foreach (var item in itemsToProcess)
         {
             dictionary[item] = item;
+        }
+    }
+
+    public static bool TryRemoveWithLock<TKey, TValue>(this Dictionary<TKey, TValue> dict, object gate, TKey key, [NotNullWhen(true)] out TValue? value)
+    {
+        lock (gate)
+        {
+            return dict.Remove(key, out value);
+        }
+    }
+    
+    public static bool TryAddWithLock<TKey, TValue>(this Dictionary<TKey, TValue> dict, object gate, TKey key, [NotNullWhen(true)] TValue? value)
+    {
+        lock (gate)
+        {
+            return dict.TryAdd(key, value);
         }
     }
 }
