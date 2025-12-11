@@ -3,6 +3,8 @@ using System.Reactive.Concurrency;
 using System.Threading;
 using System.Windows.Threading;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
+using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity;
@@ -15,6 +17,7 @@ namespace PoeShared.Modularity;
 /// </remarks>
 public sealed class DispatcherScheduler : LocalScheduler, ISchedulerPeriodic, IDispatcherScheduler
 {
+    private static readonly IFluentLog Log = typeof(DispatcherScheduler).PrepareLogger();
 
     /// <summary>
     /// Gets the scheduler that schedules work on the <see cref="System.Windows.Threading.Dispatcher"/> for the current thread.
@@ -60,6 +63,68 @@ public sealed class DispatcherScheduler : LocalScheduler, ISchedulerPeriodic, ID
     {
         Dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         Priority = priority;
+    }
+    
+    public static DispatcherScheduler CreateDispatcherScheduler(string name, ThreadPriority priority)
+    {
+        return CreateDispatcherSchedulerInternal(name, priority);
+    }
+    
+    private static DispatcherScheduler CreateDispatcherSchedulerInternal(string name, ThreadPriority priority)
+    {
+        Guard.ArgumentNotNull(name, nameof(name));
+
+        Log.WithSuffix(name).Debug($"Creating new dispatcher");
+        var consumer = new TaskCompletionSource<DispatcherScheduler>();
+        var dispatcherThread = new Thread(InitializeDispatcherThread)
+        {
+            Name = $"S#{name}",
+            Priority = priority,
+            IsBackground = true
+        };
+        dispatcherThread.SetApartmentState(ApartmentState.STA);
+        Log.WithSuffix(name).Debug($"Starting dispatcher thread");
+        dispatcherThread.Start(consumer);
+        Log.WithSuffix(name).Debug($"Dispatcher thread started");
+        return consumer.Task.Result;
+    }
+
+    private static void InitializeDispatcherThread(object arg)
+    {
+        if (arg is not TaskCompletionSource<DispatcherScheduler> consumer)
+        {
+            throw new InvalidOperationException($"Wrong args: {arg}");
+        }
+
+        RunDispatcherThread(consumer);
+    }
+
+    private static void RunDispatcherThread(TaskCompletionSource<DispatcherScheduler> consumer)
+    {
+        try
+        {
+            Log.Debug("Dispatcher thread started");
+            var dispatcher = Dispatcher.CurrentDispatcher;
+            Log.Debug($"Dispatcher: {dispatcher}");
+            var scheduler = new DispatcherScheduler(dispatcher); 
+            //using var listener = Listen(scheduler);
+          
+            Log.Debug($"Scheduler: {dispatcher}");
+            consumer.TrySetResult(scheduler);
+
+            Log.Debug("Starting dispatcher...");
+            Dispatcher.Run();
+        }
+        catch (Exception e)
+        {
+            Log.HandleException(e);
+            consumer.TrySetException(e);
+            throw; 
+        }
+        finally
+        {
+            Log.Debug("Dispatcher thread completed");
+        }
     }
 
     /// <summary>
