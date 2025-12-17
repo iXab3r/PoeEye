@@ -20,9 +20,8 @@ public readonly record struct ErrorInfo
     public Exception Error { get; init; }
 
     public ErrorInfoId Id { get; } = new(Guid.NewGuid());
-    
-    [JsonIgnore]
-    public bool IsEmpty => Empty.Equals(this);
+
+    [JsonIgnore] public bool IsEmpty => string.IsNullOrEmpty(Message) && Error == null;
 
     public static implicit operator ErrorInfo(Exception e) => FromException(e);
 
