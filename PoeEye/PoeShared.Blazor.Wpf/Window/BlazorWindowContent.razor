@@ -48,7 +48,7 @@
                     }
                     else
                     {
-                        <span class="p-1 py-2 w-100"
+                        <span class="p-1 py-2 w-100 flex-grow-1"
                               style="user-select: none;"
                               @ondblclick="ToggleWindowState"
                               @onmousedown="HandleMouseDown">
@@ -60,7 +60,7 @@
                     }
                 </ReactiveSection>
 
-                <span class="flex-grow-1"></span>
+              
                 <span class="d-flex gap-1 h-100">
                 <ReactiveSection
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton, x => x.ResizeMode)))">
