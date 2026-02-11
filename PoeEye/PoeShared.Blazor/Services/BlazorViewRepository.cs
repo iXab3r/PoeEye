@@ -56,6 +56,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
 
     public IObservable<Unit> WhenChanged => whenChanged;
 
+    /// <inheritdoc />
     public void RegisterViewType(Type viewType, object key = default)
     {
         EnsureQueueIsProcessed();
@@ -64,7 +65,8 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         RegisterViewType(viewType, contentType, key);
     }
 
-    private void RegisterViewType(Type viewType, Type dataContextType, object key)
+    /// <inheritdoc />
+    public void RegisterViewType(Type viewType, Type dataContextType, object key = default)
     {
         var viewKey = new ViewKey()
         {
@@ -72,7 +74,7 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
             Key = key
         };
         var log = Log.WithSuffix(viewKey.ToString());
-        log.Debug($"Registering view type");
+        log.Debug($"Registering view type {viewType}");
 
         var registration = new ViewRegistration()
         {
@@ -174,39 +176,6 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         Log.Info($"Processed assemblies({processedAssembliesCount}) in {sw.ElapsedMilliseconds:F0}ms");
     }
 
-    private void EnsureQueueIsProcessedSingleThread()
-    {
-        lock (unprocessedAssemblies)
-        {
-            Log.Info($"Detected unprocessed assemblies({unprocessedAssemblies.Count})");
-            var sw = ValueStopwatch.StartNew();
-
-            var assembliesToProcess = unprocessedAssemblies.Count;
-            var processedAssembliesCount = 0;
-            while (unprocessedAssemblies.TryDequeue(out var assembly))
-            {
-                try
-                {
-                    var hasViewsAttribute = assembly.GetCustomAttribute<AssemblyHasBlazorViewsAttribute>();
-                    if (hasViewsAttribute == null)
-                    {
-                        return;
-                    }
-
-                    Log.Info($"Processing {assembly}");
-                    LoadViewsFromAssembly(assembly);
-                    Interlocked.Increment(ref processedAssembliesCount);
-                }
-                catch (Exception e)
-                {
-                    Log.Warn($"Failed to process the assembly: {assembly}", e);
-                }
-            }
-
-            Log.Info($"Processed assemblies({processedAssembliesCount}/{assembliesToProcess}) in {sw.ElapsedMilliseconds:F0}ms");
-        }
-    }
-
     private void LoadViewsFromAssembly(Assembly assembly)
     {
         var logger = Log.WithSuffix(assembly.ToString());
@@ -281,22 +250,6 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
         }
 
         return genericTypeArguments[0];
-    }
-
-    private static Type ResolveBaseViewTypeLegacy(Type type)
-    {
-        var genericTypeDef = type.IsGenericType ? type.GetGenericTypeDefinition() : default;
-        if (genericTypeDef == typeof(BlazorReactiveComponent<>))
-        {
-            return type;
-        }
-
-        if (type.BaseType == null)
-        {
-            return null;
-        }
-
-        return ResolveBaseViewTypeLegacy(type.BaseType);
     }
 
     private static Type ResolveBaseViewType(Type type)

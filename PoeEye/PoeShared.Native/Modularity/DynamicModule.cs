@@ -7,7 +7,8 @@ namespace PoeShared.Modularity;
 
 public abstract class DynamicModule : DisposableReactiveObjectWithLogger, IDynamicModule
 {
-    private AtomicFlag isRegistered = new();
+    private readonly AtomicFlag isRegistered = new();
+    private readonly AtomicFlag isInitialized = new();
 
     protected DynamicModule()
     {
@@ -29,6 +30,18 @@ public abstract class DynamicModule : DisposableReactiveObjectWithLogger, IDynam
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
         RegisterTypes(containerRegistry.GetContainer());
+    }
+
+    public void OnInitialized(IUnityContainer container)
+    {
+        if (!isInitialized.Set())
+        {
+            return;
+        }
+
+        Log.Info("Initializing types");
+        OnInitializedInternal(container);
+        Log.Info("Initializing types");
     }
 
     public void OnInitialized(IContainerProvider containerProvider)
