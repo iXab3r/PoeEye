@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -148,6 +149,12 @@ public class BlazorContentControl : Control, IBlazorContentControl
                 {
                     Log.Debug($"Erasing previous unhandled exception: {UnhandledException.Message}");
                     UnhandledException = null;
+                }
+
+                if (state.Container == null || state.ChildContainer == null)
+                {
+                    Log.Debug("Skipping reload cycle, containers are not initialized");
+                    return;
                 }
 
                 var configurator = new CompositeBlazorContentControlConfigurator();
@@ -388,7 +395,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
     /// </summary>
     public BlazorWebViewEx WebView { get; }
 
-    public Exception UnhandledException { get; private set; }
+    public Exception? UnhandledException { get; private set; }
 
     public string UnhandledExceptionMessage { get; [UsedImplicitly] private set; }
 
@@ -556,15 +563,15 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
     private sealed class ControlState : DisposableReactiveObject
     {
-        public IUnityContainer Container { get; }
-        public IUnityContainer ChildContainer { get; }
-        public IFileProvider AdditionalFileProvider { get; }
-        public IBlazorContentControlConfigurator Configurator { get; }
-
-        public ControlState(IUnityContainer container, IFileProvider additionalFileProvider, IBlazorContentControlConfigurator configurator)
+        public IUnityContainer? Container { get; }
+        public IUnityContainer? ChildContainer { get; }
+        public IFileProvider? AdditionalFileProvider { get; }
+        public IBlazorContentControlConfigurator? Configurator { get; }
+        
+        public ControlState(IUnityContainer? container, IFileProvider? additionalFileProvider, IBlazorContentControlConfigurator? configurator)
         {
             Container = container;
-            ChildContainer = container.CreateChildContainer().AddTo(Anchors);
+            ChildContainer = container?.CreateChildContainer().AddTo(Anchors);
             AdditionalFileProvider = additionalFileProvider;
             Configurator = configurator;
             

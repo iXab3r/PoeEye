@@ -21,6 +21,10 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
 
     private readonly IFileProvider staticWebAssetsFileProvider;
 
+    public StaticWebAssetsFileProvider(Assembly assembly) : this(ResolveRelativeToAssembly(assembly))
+    {
+    }
+
     public StaticWebAssetsFileProvider(FileInfo staticWebFileRuntimeJsonFile)
     {
         Log.Info($"Initializing static web assets file provider @ {staticWebFileRuntimeJsonFile.FullName} (exists: {staticWebFileRuntimeJsonFile.Exists})");
@@ -49,35 +53,15 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
         return staticWebAssetsFileProvider.Watch(filter);
     }
 
-    private static IFileProvider CreateStaticWebAssetsViaReflection(IFileProvider originalProvider)
-    {
-        var type = typeof(WebViewManager).Assembly.GetType("Microsoft.AspNetCore.Components.WebView.WebViewManager+StaticWebAssetsLoader", throwOnError: true);
-        var method = type!.GetMethod("UseStaticWebAssets", BindingFlags.Static | BindingFlags.NonPublic);
-        if (method == null)
-        {
-            throw new InvalidOperationException("UseStaticWebAssets method not found.");
-        }
-
-        var result = method.Invoke(null, new object[] {originalProvider});
-        if (result == null)
-        {
-            throw new InvalidOperationException("Failed to create static web assets file provider.");
-        }
-
-        if (result is not Microsoft.Extensions.FileProviders.CompositeFileProvider compositeFileProvider)
-        {
-            Log.Info("Could not create StaticWebAssets provider - manifest may be missing, normal for released/published apps");
-            return originalProvider;
-        }
-
-        Log.Info("Created StaticWebAssets provider");
-        return compositeFileProvider;
-    }
-
     private static IFileProvider CreateStaticWebAssetsFileProvider(IFileProvider fileProvider, FileInfo staticWebFileRuntimeJsonFile)
     {
+        if (!staticWebFileRuntimeJsonFile.Exists)
+        {
+            return fileProvider;
+        }
+        
         var webViewAssembly = typeof(WebViewManager).Assembly;
-
+        
         var manifestFileProviderType = webViewAssembly.GetType("Microsoft.AspNetCore.StaticWebAssets.ManifestStaticWebAssetFileProvider", throwOnError: true);
 
         var manifestFileProviderCtors = manifestFileProviderType!.GetConstructors();
@@ -98,11 +82,6 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
         if (contentRootsProperty == null)
         {
             throw new InvalidOperationException("StaticWebAssets Manifest ContentRoots property not found.");
-        }
-
-        if (!staticWebFileRuntimeJsonFile.Exists)
-        {
-            return fileProvider;
         }
 
         using var manifestStream = File.OpenRead(staticWebFileRuntimeJsonFile.FullName);
@@ -133,10 +112,9 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
         return manifestProvider;
     }
 
-    private static FileInfo ResolveRelativeToAssembly()
+    private static FileInfo ResolveRelativeToAssembly(Assembly assembly)
     {
-        var assembly = Assembly.GetEntryAssembly();
-        if (string.IsNullOrEmpty(assembly?.Location))
+        if (assembly == null || string.IsNullOrEmpty(assembly.Location))
         {
             return null;
         }
@@ -144,7 +122,12 @@ internal sealed class StaticWebAssetsFileProvider : IStaticWebAssetsFileProvider
         var name = Path.GetFileNameWithoutExtension(assembly.Location);
 
         var path = Path.Combine(Path.GetDirectoryName(assembly.Location)!, $"{name}.staticwebassets.runtime.json");
-        return new FileInfo(path); 
+        return new FileInfo(path);
     }
 
+    private static FileInfo ResolveRelativeToAssembly()
+    {
+        var assembly = Assembly.GetEntryAssembly();
+        return ResolveRelativeToAssembly(assembly);
+    }
 }

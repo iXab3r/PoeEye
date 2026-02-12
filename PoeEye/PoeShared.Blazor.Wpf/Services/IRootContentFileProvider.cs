@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.FileProviders;
 
 namespace PoeShared.Blazor.Wpf.Services;
@@ -19,6 +20,13 @@ namespace PoeShared.Blazor.Wpf.Services;
 /// </summary>
 public interface IRootContentFileProvider : IFileProvider
 {
+    /// <summary>
+    /// Adds an individual runtime static asset file(.staticwebassets.runtime.json) to the composite file provider. Typically, these files are JSON manifests 
+    /// or configuration files generated at runtime, listing static assets that should become available to the Blazor application.
+    /// </summary>
+    /// <param name="assembly">Assembly which is app's entry point</param>
+    public void AddRuntimeAssetsFile(Assembly assembly);
+    
     /// <summary>
     /// Adds an individual runtime static asset file(.staticwebassets.runtime.json) to the composite file provider. Typically, these files are JSON manifests 
     /// or configuration files generated at runtime, listing static assets that should become available to the Blazor application.

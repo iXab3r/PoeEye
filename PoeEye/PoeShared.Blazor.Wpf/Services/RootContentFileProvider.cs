@@ -77,6 +77,13 @@ internal sealed class RootContentFileProvider : IRootContentFileProvider
         }
     }
 
+    public void AddRuntimeAssetsFile(Assembly assembly)
+    {
+        Log.Info($"Trying to add new static web assets runtime file: {assembly})");
+        var provider = new StaticWebAssetsFileProvider(assembly);
+        fileProvider.Add(provider);
+    }
+
     /// <summary>
     /// Adds an individual runtime static asset file to the composite file provider. Typically, these files are JSON manifests 
     /// or configuration files generated at runtime, listing static assets that should become available to the Blazor application.

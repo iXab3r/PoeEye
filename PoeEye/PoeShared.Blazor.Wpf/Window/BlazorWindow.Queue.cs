@@ -864,7 +864,7 @@ partial class BlazorWindow
                     {
                         log.Warn("Owner handle is not set, centering within screen");
                         SetWindowStartupLocation(hwnd, WindowStartupLocation.CenterScreen);
-                        break;
+                        return;
                     }
 
                     if (!User32.GetWindowRect(owner, out var windowRect))
