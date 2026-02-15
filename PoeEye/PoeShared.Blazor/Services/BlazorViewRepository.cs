@@ -57,6 +57,14 @@ public class BlazorViewRepository : DisposableReactiveObjectWithLogger, IBlazorV
     public IObservable<Unit> WhenChanged => whenChanged;
 
     /// <inheritdoc />
+    public void RegisterViews(Assembly assembly)
+    {
+        Log.Debug($"Adding assembly(explicit call) to processing queue: {assembly}, size: {unprocessedAssemblies.Count}");
+        unprocessedAssemblies.Enqueue(assembly);
+        EnsureQueueIsProcessed();
+    }
+
+    /// <inheritdoc />
     public void RegisterViewType(Type viewType, object key = default)
     {
         EnsureQueueIsProcessed();

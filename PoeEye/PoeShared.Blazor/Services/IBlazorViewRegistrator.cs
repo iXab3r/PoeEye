@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace PoeShared.Blazor.Services;
 
@@ -15,6 +16,18 @@ namespace PoeShared.Blazor.Services;
 /// </example>
 public interface IBlazorViewRegistrator
 {
+    /// <summary>
+    /// Registers all views that are present in the specified assembly.
+    /// Once a view type is registered, it can be looked up using its content type and the specified key.
+    /// </summary>
+    /// <param name="assembly">Assembly containing Blazor views</param>
+    /// <example>
+    /// <code>
+    /// registrator.RegisterViews(Assembly.GetExecutingAssembly());
+    /// </code>
+    /// </example>
+    void RegisterViews(Assembly assembly);
+    
     /// <summary>
     /// Registers the provided Blazor view type with an optional associated key.
     /// Once a view type is registered, it can be looked up using its content type and the specified key.
