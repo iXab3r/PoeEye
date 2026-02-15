@@ -23,11 +23,9 @@ internal sealed class AssemblyTracker : DisposableReactiveObjectWithLogger, IAss
             .Where(assembly =>
             {
                 var assemblyName = assembly.GetName();
-                if (assemblyName.Name.StartsWith("ℛ*") || //legacy REPL assemblies
-                    assemblyName.Name.StartsWith("ℛ_") || 
-                    assemblyName.Name.StartsWith("Microsoft.GeneratedCod"))
+                if (assemblyName.IsCodeGenerated())
                 {
-                    Log.Debug($"Assembly is loaded, but not tracked, reason - blacklist: {assembly}");
+                    Log.Debug($"Assembly {assemblyName} is loaded, but not tracked, reason - blacklist: {assembly}");
                     // these are dynamically emitted assemblies
                     return false;
                 }
