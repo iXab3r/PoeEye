@@ -103,9 +103,10 @@ public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProv
     {
         if (!schedulers.TryAdd(name, scheduler))
         {
-            throw new InvalidOperationException($"Failed to add scheduler {name} to collection: {schedulers.DumpToString()}");
+            Log.Warn($"Failed to add scheduler {name} to collection: {schedulers.DumpToString()}");
         }
-
+        
+        schedulers[name] = scheduler;
         return scheduler;
     }
 
