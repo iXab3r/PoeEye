@@ -3,7 +3,10 @@ using PoeShared.IO;
 
 namespace PoeShared.Scaffolding;
 
-internal interface IFileProviderPathInfo
+/// <summary>
+/// Exposes the provider-relative subpath for <see cref="IFileInfo"/> implementations.
+/// </summary>
+public interface IFileProviderPathInfo
 {
     string Subpath { get; }
 }

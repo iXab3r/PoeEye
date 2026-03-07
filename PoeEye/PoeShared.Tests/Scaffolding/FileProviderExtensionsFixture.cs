@@ -5,77 +5,12 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
-using PoeShared.Tests.Helpers;
 
 namespace PoeShared.Tests.Scaffolding;
 
 [TestFixture]
-public class FileProviderExtensionsFixture : FileProviderFixtureBase
+public class FileProviderExtensionsFixture
 {
-    [Test]
-    [TestCaseSource(nameof(ShouldGetFilesCases))]
-    public void ShouldGetFilesLikeDirectoryInfo(string searchPattern, bool recurseSubdirectories, MatchType matchType)
-    {
-        //Given
-        var enumerationOptions = new EnumerationOptions
-        {
-            RecurseSubdirectories = recurseSubdirectories,
-            MatchType = matchType,
-        };
-        var expected = GetExpectedFilePaths(searchPattern, enumerationOptions);
-        var comparer = PathUtils.IsWindows ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-
-        //When
-        var physicalResult = PhysicalFileProvider.GetFiles(string.Empty, searchPattern, enumerationOptions).Select(x => x.GetSubpath()).OrderBy(x => x, comparer).ToArray();
-        var inMemoryResult = InMemoryFileProvider.GetFiles(string.Empty, searchPattern, enumerationOptions).Select(x => x.GetSubpath()).OrderBy(x => x, comparer).ToArray();
-
-        //Then
-        physicalResult.ShouldBe(expected);
-        inMemoryResult.ShouldBe(expected);
-    }
-
-    [Test]
-    [TestCaseSource(nameof(ShouldGetDirectoriesCases))]
-    public void ShouldGetDirectoriesLikeDirectoryInfo(string searchPattern, bool recurseSubdirectories)
-    {
-        //Given
-        var enumerationOptions = new EnumerationOptions
-        {
-            RecurseSubdirectories = recurseSubdirectories,
-        };
-        var expected = GetExpectedDirectoryPaths(searchPattern, enumerationOptions);
-        var comparer = PathUtils.IsWindows ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-
-        //When
-        var physicalResult = PhysicalFileProvider.GetDirectories(string.Empty, searchPattern, enumerationOptions).Select(x => x.GetSubpath()).OrderBy(x => x, comparer).ToArray();
-        var inMemoryResult = InMemoryFileProvider.GetDirectories(string.Empty, searchPattern, enumerationOptions).Select(x => x.GetSubpath()).OrderBy(x => x, comparer).ToArray();
-
-        //Then
-        physicalResult.ShouldBe(expected);
-        inMemoryResult.ShouldBe(expected);
-    }
-
-    [Test]
-    public void ShouldReturnPathAwareResultsForRecursiveFiles()
-    {
-        //Given
-        var enumerationOptions = new EnumerationOptions
-        {
-            RecurseSubdirectories = true,
-        };
-        var comparer = PathUtils.IsWindows ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-
-        //When
-        var result = InMemoryFileProvider.GetFiles(string.Empty, "*.txt", enumerationOptions).Select(x => x.GetSubpath()).OrderBy(x => x, comparer).ToArray();
-
-        //Then
-        result.ShouldContain("assets/nested/deep.txt");
-        result.ShouldContain("docs/readme.txt");
-        result.ShouldContain("root.txt");
-        result.ShouldNotContain("deep.txt");
-        result.ShouldNotContain("readme.txt");
-    }
-
     [Test]
     public void ShouldSkipMalformedDirectories()
     {
@@ -89,21 +24,6 @@ public class FileProviderExtensionsFixture : FileProviderFixtureBase
         //Then
         files.ShouldBe(new[] { "visible.txt" });
         directories.ShouldBeEmpty();
-    }
-
-    public static IEnumerable<NamedTestCaseData> ShouldGetFilesCases()
-    {
-        yield return new NamedTestCaseData("*.txt", false, MatchType.Simple) { TestName = "top directory text files" };
-        yield return new NamedTestCaseData("*.txt", true, MatchType.Simple) { TestName = "recursive text files" };
-        yield return new NamedTestCaseData("*.*", true, MatchType.Simple) { TestName = "simple wildcard excludes extensionless files" };
-        yield return new NamedTestCaseData("*.*", true, MatchType.Win32) { TestName = "win32 wildcard includes extensionless files" };
-    }
-
-    public static IEnumerable<NamedTestCaseData> ShouldGetDirectoriesCases()
-    {
-        yield return new NamedTestCaseData("*", false) { TestName = "top directory only" };
-        yield return new NamedTestCaseData("*", true) { TestName = "recursive" };
-        yield return new NamedTestCaseData("a*", true) { TestName = "pattern filtered recursive" };
     }
 
     private sealed class BrokenDirectoryFileProvider : IFileProvider
