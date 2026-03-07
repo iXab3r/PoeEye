@@ -10,6 +10,7 @@
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.17.0" />
     <PackageReference Include="InputSimulatorPlus" Version="1.0.7" />
     <PackageReference Include="Meziantou.Framework.FullPath" Version="1.0.7" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="7.0.2" />
     <PackageReference Include="Microsoft.Reactive.Testing" Version="4.2.0" />
     <PackageReference Include="Moq" Version="4.15.2" />
     <PackageReference Include="nunit" Version="3.13.3" />
