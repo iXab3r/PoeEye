@@ -18,8 +18,12 @@ public abstract class ApplicationBase : Application
     {
         Container = new UnityContainer();
         core = Container.Resolve<ApplicationCore>();
-        core.BindToApplication(this);
     }
 
     protected IUnityContainer Container { get; }
+
+    protected void BindToApplication(Application application)
+    {
+        core.BindToApplication(application);
+    }
 }

@@ -21,9 +21,12 @@ public partial class App : ApplicationBase
     {
         base.OnStartup(e);
 
+        BindToApplication(this);
+
         Container.AddNewExtensionIfNotExists<BlazorWpfRegistrations>();
         Container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
         Container.AddNewExtensionIfNotExists<PoeSharedBlazorRegistrations>();
+        Container.AddNewExtensionIfNotExists<CommonRegistrations>();
 
         Container.RegisterSingleton<IConfigProvider, IConfigProviderFromFile>();
             

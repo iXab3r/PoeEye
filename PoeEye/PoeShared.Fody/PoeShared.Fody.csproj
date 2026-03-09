@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <Append>false</Append>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FodyHelpers" Version="6.8.0" />
+    </ItemGroup>
+
+</Project>

@@ -21,13 +21,10 @@ namespace PoeShared.UI;
 
 public class ApplicationCore : DisposableReactiveObject
 {
-    private readonly IAppArguments appArguments;
-
-    public ApplicationCore(IUnityContainer container, IAppArguments appArguments)
+    public ApplicationCore(IUnityContainer container)
     {
         Log = GetType().PrepareLogger().WithSuffix(ToString);
         Container = container;
-        this.appArguments = appArguments;
     }
 
     public IUnityContainer Container { get; }
@@ -80,6 +77,7 @@ public class ApplicationCore : DisposableReactiveObject
         Log.Debug($"ThreadPool: worker [{minWorkerThreads}; {maxWorkerThreads}], completionPort [{minCompletionPortThreads}; {maxCompletionPortThreads}]");
 
         Log.Debug("Initializing housekeeping");
+        var appArguments = Container.Resolve<IAppArguments>();
         var cleanupService = Container.Resolve<IFolderCleaner>().AddTo(Anchors);
         cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.RoamingAppDataDirectory, "logs"))).AddTo(Anchors);
         cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
@@ -130,6 +128,7 @@ public class ApplicationCore : DisposableReactiveObject
     {
         Log.Debug("Attempting to load configuration from file");
         InitializeLogging();
+        var appArguments = Container.Resolve<IAppArguments>();
         var candidates = new[]
             {
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"log4net.{appArguments.AppName}.config"),
@@ -147,6 +146,7 @@ public class ApplicationCore : DisposableReactiveObject
 
     private void InitializeLogging()
     {
+        var appArguments = Container.Resolve<IAppArguments>();
         RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
         SharedLog.Instance.InitializeLogging(appArguments);
         SharedLog.Instance.AddTraceAppender().AddTo(Anchors);

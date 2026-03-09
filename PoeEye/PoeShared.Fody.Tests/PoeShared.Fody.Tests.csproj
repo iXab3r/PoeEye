@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7</TargetFramework>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PoeShared.Fody.TestAssembly\PoeShared.Fody.TestAssembly.csproj"/>
+        <ProjectReference Include="..\PoeShared.Fody\PoeShared.Fody.csproj"/>
+        <ProjectReference Include="..\PoeShared\PoeShared.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+        <PackageReference Include="Moq" Version="4.15.2"/>
+        <PackageReference Include="NUnit" Version="3.13.3"/>
+        <PackageReference Include="Shouldly" Version="4.2.1"/>
+    </ItemGroup>
+
+</Project>
