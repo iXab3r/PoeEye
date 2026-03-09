@@ -12,10 +12,15 @@
     color: white;
     text-transform: uppercase !important;
     position: relative;
+    overflow: hidden;
+    border-top-left-radius: var(--blazor-window-corner-radius, 0px);
+    border-top-right-radius: var(--blazor-window-corner-radius, 0px);
 }
 
 #blazor-window-body {
     position: relative;
+    border-bottom-left-radius: var(--blazor-window-corner-radius, 0px);
+    border-bottom-right-radius: var(--blazor-window-corner-radius, 0px);
 }
 
 #blazor-window-statusbar {

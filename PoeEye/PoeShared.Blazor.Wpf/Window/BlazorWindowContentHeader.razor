@@ -1,0 +1,9 @@
+﻿@namespace PoeShared.Blazor.Wpf
+@inherits BlazorReactiveComponent<IBlazorWindow>
+
+<HeadContent>
+    <link href="_content/PoeShared.Blazor.Wpf/PoeShared.Blazor.Wpf.bundle.scp.css" rel="stylesheet"/>
+    <link href="_content/PoeShared.Blazor.Wpf/css/blazor-window.css" rel="stylesheet"/>
+</HeadContent>
+
+<BlazorWindowContentTitleBar DataContext="@DataContext"/>

@@ -96,7 +96,7 @@ partial class BlazorWindow
                 case ActivateCommand:
                 {
                     Log.Debug($"Activating the window");
-                    window.Activate();
+                    ActivateWindowWhenReady(window, "activate command");
                     break;
                 }
                 case ShowDevToolsCommand:
@@ -141,6 +141,13 @@ partial class BlazorWindow
                     window.WindowState = command.WindowState;
                     break;
                 }
+                case SetWindowStartupLocationCommand command:
+                {
+                    Log.Debug($"Updating {nameof(WindowStartupLocation)} to {command.WindowStartupLocation}");
+                    window.WindowStartupLocation = command.WindowStartupLocation;
+                    ApplyWindowStartupLocation(window, command.WindowStartupLocation);
+                    break;
+                }
                 case SetWindowPosCommand command:
                 {
                     if (ShouldLogThrottled(ref lastSetPosLogMs))
@@ -178,19 +185,13 @@ partial class BlazorWindow
                 case SetShowTitleBarCommand command:
                 {
                     Log.Debug($"Updating {nameof(TitleBarDisplayMode)} to {command.TitleBarDisplayMode}");
-
-                    var displayMode = command.TitleBarDisplayMode == TitleBarDisplayMode.Default
-                        ? TitleBarDisplayMode.Custom
-                        : command.TitleBarDisplayMode;
-
-                    var showSystemBar = displayMode is TitleBarDisplayMode.System;
-                    /*
-                    window.ShowTitleBar = showSystemBar;
-                    window.ShowSystemMenu = showSystemBar;
-                    window.ShowSystemMenuOnRightClick = showSystemBar;
-                    window.ShowMinButton = showSystemBar && command.ShowMinButton;
-                    window.ShowMaxRestoreButton = showSystemBar && command.ShowMaxButton;
-                    window.ShowCloseButton = showSystemBar && command.ShowCloseButton;*/
+                    window.UpdateTitleBarDisplayMode(command.TitleBarDisplayMode);
+                    break;
+                }
+                case SetAllowsTransparency command:
+                {
+                    Log.Debug($"Updating {nameof(AllowsTransparency)} to {command.AllowsTransparency}");
+                    window.UpdateAllowsTransparency(command.AllowsTransparency);
                     break;
                 }
                 case SetWindowPadding command:
@@ -210,6 +211,10 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Updating {nameof(ResizeMode)} to {command.ResizeMode}");
                     window.ResizeMode = command.ResizeMode;
+                    if (TitleBarDisplayMode == TitleBarDisplayMode.System)
+                    {
+                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode.System);
+                    }
                     break;
                 }
                 case SetShowInTaskbar command:
@@ -220,6 +225,12 @@ partial class BlazorWindow
                 }
                 case SetIsClickThrough command:
                 {
+                    if (command.IsClickThrough && !AllowsTransparency)
+                    {
+                        Log.Warn($"{nameof(IsClickThrough)} requires {nameof(AllowsTransparency)} to be enabled");
+                        break;
+                    }
+
                     var overlayMode = command.IsClickThrough ? OverlayMode.Transparent : OverlayMode.Layered;
                     Log.Debug($"Updating OverlayMode to {overlayMode}");
                     window.SetOverlayMode(overlayMode);
@@ -260,6 +271,11 @@ partial class BlazorWindow
                     {
                         window.BorderThickness = new Thickness(0);
                     }
+                    else if (command.TitleBarDisplayMode == TitleBarDisplayMode.System)
+                    {
+                        window.BorderThickness = command.BorderThickness;
+                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode.System);
+                    }
                     else
                     {
                         window.BorderThickness = command.BorderThickness;
@@ -296,13 +312,15 @@ partial class BlazorWindow
                 case SetBlazorAdditionalFiles command:
                 {
                     Log.Debug($"Updating {nameof(AdditionalFiles)} to {command.AdditionalFiles}");
-                    window.ContentControl.AdditionalFiles = command.AdditionalFiles;
+                    window.BodyContentControl.AdditionalFiles = command.AdditionalFiles;
+                    window.TitleBarContentControl.AdditionalFiles = command.AdditionalFiles;
                     break;
                 }
                 case SetBlazorControlConfigurator command:
                 {
                     Log.Debug($"Updating {nameof(ControlConfigurator)} to {command.ControlConfigurator}");
-                    window.ContentControl.Configurator = command.ControlConfigurator;
+                    window.BodyContentControl.Configurator = command.ControlConfigurator;
+                    window.TitleBarContentControl.Configurator = command.ControlConfigurator;
                     break;
                 }
                 default: throw new ArgumentOutOfRangeException(nameof(windowEvent), $@"Unsupported event type: {windowEvent.GetType()}");
@@ -365,6 +383,7 @@ partial class BlazorWindow
             //best-case scenario - DPI won't change and there will be no blinking at all
             blazorWindow.HandleEvent(new SetShowInTaskbar(blazorWindow.ShowInTaskbar));
             blazorWindow.HandleEvent(new SetTopmostCommand(blazorWindow.Topmost));
+            blazorWindow.HandleEvent(new SetAllowsTransparency(blazorWindow.AllowsTransparency));
             blazorWindow.HandleEvent(new SetBackgroundColor(blazorWindow.BackgroundColor));
             blazorWindow.HandleEvent(new SetBorderThickness(blazorWindow.TitleBarDisplayMode, blazorWindow.BorderThickness));
             blazorWindow.HandleEvent(new SetBorderColor(blazorWindow.BorderColor));
@@ -375,7 +394,7 @@ partial class BlazorWindow
             blazorWindow.HandleEvent(new SetShowTitleBarCommand(
                 blazorWindow.TitleBarDisplayMode,
                 ShowCloseButton: blazorWindow.ShowCloseButton,
-                ShowMinButton: blazorWindow.ShowCloseButton,
+                ShowMinButton: blazorWindow.ShowMinButton,
                 ShowMaxButton: blazorWindow.ShowMaxButton));
             blazorWindow.HandleEvent(new SetBlazorControlConfigurator(blazorWindow.ControlConfigurator));
             blazorWindow.HandleEvent(new SetBlazorAdditionalFiles(blazorWindow.AdditionalFiles));
@@ -529,6 +548,11 @@ partial class BlazorWindow
                 .Subscribe(x => observer.OnNext(new SetBorderColor(x)))
                 .AddTo(anchors);
 
+            blazorWindow.WhenAnyValue(x => x.AllowsTransparency)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetAllowsTransparency(x)))
+                .AddTo(anchors);
+
             Observable.CombineLatest(
                     blazorWindow.WhenAnyValue(x => x.TitleBarDisplayMode),
                     blazorWindow.WhenAnyValue(x => x.BorderThickness),
@@ -546,6 +570,11 @@ partial class BlazorWindow
             blazorWindow.WhenAnyValue(x => x.WindowState)
                 .Skip(1)
                 .Subscribe(x => observer.OnNext(new SetWindowState(x)))
+                .AddTo(anchors);
+
+            blazorWindow.WhenAnyValue(x => x.WindowStartupLocation)
+                .Skip(1)
+                .Subscribe(x => observer.OnNext(new SetWindowStartupLocationCommand(x)))
                 .AddTo(anchors);
 
             window.WhenLoaded()
@@ -607,66 +636,8 @@ partial class BlazorWindow
                 .AddTo(anchors);
 
             // events propagation
-            var inputEventSource = window.ContentControl.WebView;
-            Observable
-                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseDown += h, h => inputEventSource.MouseDown -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.MouseDown?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseUp += h, h => inputEventSource.MouseUp -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.MouseUp?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseDown += h, h => inputEventSource.PreviewMouseDown -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.PreviewMouseDown?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseUp += h, h => inputEventSource.PreviewMouseUp -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.PreviewMouseUp?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.MouseMove += h, h => inputEventSource.MouseMove -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.MouseMove?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.PreviewMouseMove += h, h => inputEventSource.PreviewMouseMove -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.PreviewMouseMove?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyDown += h, h => inputEventSource.KeyDown -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.KeyDown?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyUp += h, h => inputEventSource.KeyUp -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.KeyUp?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.PreviewKeyDown += h, h => inputEventSource.PreviewKeyDown -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.PreviewKeyDown?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
-
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.PreviewKeyUp += h, h => inputEventSource.PreviewKeyUp -= h)
-                .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.PreviewKeyUp?.Invoke(blazorWindow, x))
-                .AddTo(anchors);
+            SubscribeToInputEvents(window.BodyContentControl.WebView);
+            SubscribeToInputEvents(window.TitleBarContentControl.WebView);
 
             Observable
                 .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
@@ -742,6 +713,69 @@ partial class BlazorWindow
 
             Disposable.Create(() => log.Debug("Window subscription has been disposed")).AddTo(anchors);
             return anchors;
+
+            void SubscribeToInputEvents(BlazorWebViewEx inputEventSource)
+            {
+                Observable
+                    .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseDown += h, h => inputEventSource.MouseDown -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.MouseDown?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.MouseUp += h, h => inputEventSource.MouseUp -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.MouseUp?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseDown += h, h => inputEventSource.PreviewMouseDown -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.PreviewMouseDown?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(h => inputEventSource.PreviewMouseUp += h, h => inputEventSource.PreviewMouseUp -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.PreviewMouseUp?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.MouseMove += h, h => inputEventSource.MouseMove -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.MouseMove?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<MouseEventHandler, MouseEventArgs>(h => inputEventSource.PreviewMouseMove += h, h => inputEventSource.PreviewMouseMove -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.PreviewMouseMove?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyDown += h, h => inputEventSource.KeyDown -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.KeyDown?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.KeyUp += h, h => inputEventSource.KeyUp -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.KeyUp?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.PreviewKeyDown += h, h => inputEventSource.PreviewKeyDown -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.PreviewKeyDown?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+
+                Observable
+                    .FromEventPattern<KeyEventHandler, KeyEventArgs>(h => inputEventSource.PreviewKeyUp += h, h => inputEventSource.PreviewKeyUp -= h)
+                    .Select(x => x.EventArgs)
+                    .Subscribe(x => blazorWindow.PreviewKeyUp?.Invoke(blazorWindow, x))
+                    .AddTo(anchors);
+            }
         });
 
         void UpdateWindowBoundsFromMonitor(IntPtr hwnd)
@@ -1014,6 +1048,97 @@ partial class BlazorWindow
         return IntPtr.Zero;
     }
 
+    private void ApplyWindowStartupLocation(NativeWindow window, WindowStartupLocation startupLocation)
+    {
+        if (window.WindowHandle == IntPtr.Zero || startupLocation == WindowStartupLocation.Manual)
+        {
+            return;
+        }
+
+        var windowBounds = UnsafeNative.GetWindowRect(window.WindowHandle);
+        if (windowBounds.Width <= 0 || windowBounds.Height <= 0)
+        {
+            return;
+        }
+
+        Rectangle targetBounds;
+        switch (startupLocation)
+        {
+            case WindowStartupLocation.CenterScreen:
+                if (!TryGetMonitorBounds(window.WindowHandle, out targetBounds))
+                {
+                    return;
+                }
+                break;
+            case WindowStartupLocation.CenterOwner:
+                if (!TryGetOwnerBounds(out targetBounds) && !TryGetMonitorBounds(window.WindowHandle, out targetBounds))
+                {
+                    return;
+                }
+                break;
+            default:
+                return;
+        }
+
+        var targetLocation = new Point(
+            targetBounds.X + (targetBounds.Width - windowBounds.Width) / 2,
+            targetBounds.Y + (targetBounds.Height - windowBounds.Height) / 2);
+        UnsafeNative.SetWindowPos(window.WindowHandle, targetLocation);
+    }
+
+    private bool TryGetMonitorBounds(IntPtr hwnd, out Rectangle monitorBounds)
+    {
+        var desktopMonitor = User32.MonitorFromWindow(hwnd, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+        if (desktopMonitor == IntPtr.Zero)
+        {
+            Log.Warn("Failed to find desktop monitor for startup location update");
+            monitorBounds = default;
+            return false;
+        }
+
+        if (!User32.GetMonitorInfo(desktopMonitor, out var monitorInfo))
+        {
+            Log.Warn($"Failed to get monitor info for startup location update: {desktopMonitor.ToHexadecimal()}");
+            monitorBounds = default;
+            return false;
+        }
+
+        var monitorRect = monitorInfo.rcMonitor;
+        monitorBounds = Rectangle.FromLTRB(monitorRect.left, monitorRect.top, monitorRect.right, monitorRect.bottom);
+        return true;
+    }
+
+    private bool TryGetOwnerBounds(out Rectangle ownerBounds)
+    {
+        IntPtr ownerHandle;
+        try
+        {
+            ownerHandle = Process.GetCurrentProcess().MainWindowHandle;
+        }
+        catch (Exception e)
+        {
+            Log.Warn("Failed to find main window of the current process for startup location update", e);
+            ownerBounds = default;
+            return false;
+        }
+
+        if (ownerHandle == IntPtr.Zero)
+        {
+            ownerBounds = default;
+            return false;
+        }
+
+        if (!User32.GetWindowRect(ownerHandle, out var ownerRect))
+        {
+            Log.Warn($"Failed to get owner rect for startup location update: {ownerHandle.ToHexadecimal()}");
+            ownerBounds = default;
+            return false;
+        }
+
+        ownerBounds = Rectangle.FromLTRB(ownerRect.left, ownerRect.top, ownerRect.right, ownerRect.bottom);
+        return true;
+    }
+
     private sealed record WaitForIdleCommand(ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
 
     private sealed record InvokeCommand(Action ActionToExecute, ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
@@ -1034,6 +1159,8 @@ partial class BlazorWindow
 
     private sealed record SetWindowState(WindowState WindowState) : IWindowCommand;
 
+    private sealed record SetWindowStartupLocationCommand(WindowStartupLocation WindowStartupLocation) : IWindowCommand;
+
     private sealed record SetWindowTitleCommand(string Title) : IWindowCommand;
 
     private sealed record SetWindowRectCommand(Rectangle Rect) : IWindowCommand;
@@ -1053,6 +1180,8 @@ partial class BlazorWindow
     private sealed record SetWindowPadding(TitleBarDisplayMode TitleBarDisplayMode, Thickness Padding) : IWindowCommand;
 
     private sealed record SetBorderThickness(TitleBarDisplayMode TitleBarDisplayMode, Thickness BorderThickness) : IWindowCommand;
+
+    private sealed record SetAllowsTransparency(bool AllowsTransparency) : IWindowCommand;
 
     private sealed record SetResizeMode(ResizeMode ResizeMode) : IWindowCommand;
 

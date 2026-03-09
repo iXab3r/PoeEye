@@ -1,0 +1,137 @@
+﻿@namespace PoeShared.Blazor.Wpf
+@using System.Reactive.Disposables
+@using System.Windows
+@using PoeShared.Blazor
+@using PoeShared.Blazor.Scaffolding
+@using PoeShared.Scaffolding
+@using ReactiveUI
+@using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
+@inherits BlazorReactiveComponent<IBlazorWindow>
+
+<div class="d-flex w-100 align-items-center"
+     id="@(IBlazorWindow.WindowTitleBarId)"
+     style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext)"
+     @ref="@ElementRef">
+    <ReactiveSection
+        Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ViewTypeForTitleBar, x => x.Title)))">
+        @{
+            var titleBarViewType = DataContext.ViewTypeForTitleBar;
+        }
+        @if (titleBarViewType != null)
+        {
+            <BlazorContentPresenter
+                @ref="@TitleBarContentPresenter"
+                Content="@(DataContext.DataContext)"
+                ViewType="@(titleBarViewType)">
+            </BlazorContentPresenter>
+        }
+        else
+        {
+            <span class="p-1 py-2 w-100 flex-grow-1"
+                  style="user-select: none;"
+                  @ondblclick="ToggleWindowState"
+                  @onmousedown="HandleMouseDown">
+                <ReactiveSection
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
+                    @DataContext.Title
+                </ReactiveSection>
+            </span>
+        }
+    </ReactiveSection>
+
+    <span class="d-flex gap-1 h-100">
+        <ReactiveSection
+            Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton, x => x.ResizeMode)))">
+            @if (DataContext.ShowMinButton && DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip or ResizeMode.CanMinimize)
+            {
+                <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                        @onclick="@(() => DataContext.Minimize())">
+                    <i class="fa-regular fa-window-minimize"></i>
+                </button>
+            }
+        </ReactiveSection>
+        <ReactiveSection
+            Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton, x => x.ResizeMode, x => x.WindowState)))">
+            @if (DataContext.ShowMaxButton && DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
+            {
+                @if (DataContext.WindowState != WindowState.Maximized)
+                {
+                    <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                            @onclick="@(() => DataContext.WindowState = WindowState.Maximized)">
+                        <i class="fa-regular fa-window-maximize"></i>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                            @onclick="@(() => DataContext.WindowState = WindowState.Normal)">
+                        <i class="fa-regular fa-window-restore"></i>
+                    </button>
+                }
+            }
+        </ReactiveSection>
+        <ReactiveSection
+            Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowCloseButton)))">
+            @if (DataContext.ShowCloseButton)
+            {
+                <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                        @onclick="@(() => DataContext.Close())">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            }
+        </ReactiveSection>
+    </span>
+</div>
+
+@code {
+    private readonly SerialDisposable dragAnchor;
+
+    public BlazorWindowContentTitleBar()
+    {
+        Anchors.Add(() => TitleBarContentPresenter = null);
+        dragAnchor = new SerialDisposable().AddTo(Anchors);
+
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.TitleBarDisplayMode));
+        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.WindowState));
+
+        this.WhenAnyValue(x => x.TitleBarContentPresenter)
+            .WithPrevious()
+            .Subscribe(x =>
+            {
+                if (x.Previous is IDisposable disposableView)
+                {
+                    disposableView.Dispose();
+                }
+            })
+            .AddTo(Anchors);
+    }
+
+    public BlazorContentPresenter TitleBarContentPresenter { get; private set; }
+
+    private void ToggleWindowState()
+    {
+        //FIXME Does not work - due to StartDrag intercepting the focus, need to implement DOM event listener + Drag distance analysis
+        if (DataContext.WindowState == WindowState.Normal)
+        {
+            DataContext.Maximize();
+        }
+        else if (DataContext.WindowState == WindowState.Maximized)
+        {
+            DataContext.Restore();
+        }
+    }
+
+    private void StartDrag()
+    {
+        dragAnchor.Disposable = new CompositeDisposable()
+        {
+            Disposable.Create(() => { }),
+            DataContext.EnableDragMove()
+        };
+    }
+
+    private void HandleMouseDown(MouseEventArgs mouseEventArgs)
+    {
+        StartDrag();
+    }
+}

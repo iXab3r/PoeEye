@@ -51,12 +51,34 @@ public partial class UnsafeNative
     
     [DllImport("dwmapi.dll")]
     private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out int pvAttribute, int cbAttribute);
+
+    [DllImport("dwmapi.dll")]
+    private static extern HResult DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
     
     [DllImport("dwmapi.dll", PreserveSig = false)]
     public static extern bool DwmIsCompositionEnabled();
     
     [DllImport("user32.dll")]
     private static extern bool GetTitleBarInfo(IntPtr hwnd, ref TITLEBARINFO pti);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr GetSystemMenu(IntPtr hwnd, bool revert);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int EnableMenuItem(IntPtr hMenu, uint itemId, uint enable);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DrawMenuBar(IntPtr hwnd);
+
+    private enum DwmWindowCornerPreference
+    {
+        Default = 0,
+        DoNotRound = 1,
+        Round = 2,
+        RoundSmall = 3
+    }
+
+    private const int DwmWindowCornerPreferenceAttribute = 33;
     
     
     /// <summary>Determines whether a window is maximized.</summary>
@@ -251,6 +273,177 @@ public partial class UnsafeNative
         var newStyle = flagsChanger(existingStyle);
         var newStyleResult = User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle);
         return true;
+    }
+
+    public static void ConfigureCustomWindowFrame(IntPtr hwnd, bool isResizable)
+    {
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
+        Log.Debug($"[{hwnd.ToHexadecimal()}] Configuring custom window frame: resizable={isResizable}");
+
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var newStyle = existingStyle;
+
+        if (isResizable)
+        {
+            newStyle |= User32.SetWindowLongFlags.WS_THICKFRAME;
+        }
+        else
+        {
+            newStyle &= ~User32.SetWindowLongFlags.WS_THICKFRAME;
+        }
+
+        if (newStyle != existingStyle && User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
+        {
+            Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
+        }
+
+        RefreshNonClientFrame(hwnd);
+    }
+
+    public static void TryEnableRoundedCorners(IntPtr hwnd)
+    {
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
+        if (!IsDWMEnabled() || !IsWindows10OrGreater(22000))
+        {
+            return;
+        }
+
+        var preference = (int) DwmWindowCornerPreference.Round;
+        var result = DwmSetWindowAttribute(hwnd, DwmWindowCornerPreferenceAttribute, ref preference, sizeof(int));
+        if (!result.Succeeded)
+        {
+            Log.Warn($"Failed to enable rounded corners for Window by HWND {hwnd.ToHexadecimal()}, error: {result}");
+        }
+    }
+
+    public static double GetApproximateWindowCornerRadius(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero || !IsDWMEnabled() || !IsWindows10OrGreater(22000) || IsZoomed(hwnd))
+        {
+            return 0;
+        }
+
+        return GetWindowCornerPreference(hwnd) switch
+        {
+            DwmWindowCornerPreference.DoNotRound => 0,
+            DwmWindowCornerPreference.RoundSmall => 4,
+            DwmWindowCornerPreference.Default => 8,
+            DwmWindowCornerPreference.Round => 8,
+            _ => 8
+        };
+    }
+
+    public static void ConfigureSystemCaptionButtons(IntPtr hwnd, bool showCloseButton, bool showMinButton, bool showMaxButton, bool isResizable)
+    {
+        const uint mfByCommand = 0x0000;
+        const uint mfGray = 0x0001;
+        const uint mfDisabled = 0x0002;
+        const uint scClose = 0xF060;
+
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
+        Log.Debug($"[{hwnd.ToHexadecimal()}] Configuring system caption buttons: close={showCloseButton}, min={showMinButton}, max={showMaxButton}, resizable={isResizable}");
+
+        var hasSystemMenu = showCloseButton || showMinButton || showMaxButton;
+        var existingStyle = (User32.SetWindowLongFlags) User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
+        var newStyle = existingStyle;
+
+        if (hasSystemMenu)
+        {
+            newStyle |= User32.SetWindowLongFlags.WS_SYSMENU;
+        }
+        else
+        {
+            newStyle &= ~User32.SetWindowLongFlags.WS_SYSMENU;
+        }
+
+        if (showMinButton)
+        {
+            newStyle |= User32.SetWindowLongFlags.WS_MINIMIZEBOX;
+        }
+        else
+        {
+            newStyle &= ~User32.SetWindowLongFlags.WS_MINIMIZEBOX;
+        }
+
+        if (showMaxButton)
+        {
+            newStyle |= User32.SetWindowLongFlags.WS_MAXIMIZEBOX;
+        }
+        else
+        {
+            newStyle &= ~User32.SetWindowLongFlags.WS_MAXIMIZEBOX;
+        }
+
+        if (isResizable)
+        {
+            newStyle |= User32.SetWindowLongFlags.WS_THICKFRAME;
+        }
+        else
+        {
+            newStyle &= ~User32.SetWindowLongFlags.WS_THICKFRAME;
+        }
+
+        if (newStyle != existingStyle && User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
+        {
+            Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
+        }
+
+        var systemMenu = GetSystemMenu(hwnd, revert: false);
+        if (systemMenu != IntPtr.Zero)
+        {
+            var closeMenuState = mfByCommand | (showCloseButton ? 0u : mfGray | mfDisabled);
+            if (EnableMenuItem(systemMenu, scClose, closeMenuState) == -1)
+            {
+                Log.Warn($"Failed to update close button state for Window by HWND {hwnd.ToHexadecimal()}");
+            }
+        }
+
+        RefreshNonClientFrame(hwnd);
+    }
+
+    private static DwmWindowCornerPreference GetWindowCornerPreference(IntPtr hwnd)
+    {
+        var result = DwmGetWindowAttribute(hwnd, (DwmApi.DWMWINDOWATTRIBUTE) DwmWindowCornerPreferenceAttribute, out int preference, sizeof(int));
+        if (!result.Succeeded || !Enum.IsDefined(typeof(DwmWindowCornerPreference), preference))
+        {
+            return DwmWindowCornerPreference.Default;
+        }
+
+        return (DwmWindowCornerPreference) preference;
+    }
+
+    private static void RefreshNonClientFrame(IntPtr hwnd)
+    {
+        const User32.SetWindowPosFlags frameChanged = (User32.SetWindowPosFlags) 0x0020;
+
+        Win32ErrorCode error;
+        if (!User32.SetWindowPos(hwnd,
+                IntPtr.Zero,
+                0,
+                0,
+                0,
+                0,
+                User32.SetWindowPosFlags.SWP_NOMOVE |
+                User32.SetWindowPosFlags.SWP_NOSIZE |
+                User32.SetWindowPosFlags.SWP_NOACTIVATE |
+                User32.SetWindowPosFlags.SWP_NOZORDER |
+                frameChanged) &&
+            (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+        {
+            Log.Warn($"Failed to refresh non-client frame for Window by HWND {hwnd.ToHexadecimal()}, error: {error}");
+        }
+
+        if (!DrawMenuBar(hwnd))
+        {
+            error = Kernel32.GetLastError();
+            if (error != Win32ErrorCode.NERR_Success)
+            {
+                Log.Warn($"Failed to redraw menu bar for Window by HWND {hwnd.ToHexadecimal()}, error: {error}");
+            }
+        }
     }
 
     public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)

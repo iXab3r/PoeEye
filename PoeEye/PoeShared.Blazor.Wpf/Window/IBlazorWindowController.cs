@@ -29,6 +29,12 @@ public interface IBlazorWindowController
     TitleBarDisplayMode TitleBarDisplayMode { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the native WPF window uses per-pixel transparency.
+    /// This is a creation-time capability and cannot be changed after the native window is created.
+    /// </summary>
+    bool AllowsTransparency { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the window should appear in the taskbar.
     /// </summary>
     bool ShowInTaskbar { get; set; }

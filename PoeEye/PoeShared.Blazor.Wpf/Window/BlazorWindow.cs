@@ -36,6 +36,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
     private readonly IUnityContainer unityContainer;
     private readonly Lazy<NativeWindow> windowSupplier;
+    private bool allowsTransparency = true;
 
     private readonly long windowId = BlazorWindowCounter.GetNext();
 
@@ -61,6 +62,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     private readonly SerialDisposable dragAnchor;
     private readonly ReactiveCompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
+    private readonly SerialDisposable windowSubscriptionAnchor;
 
     // Logging throttling: limit certain verbose logs 
     private readonly Stopwatch logThrottleStopwatch = Stopwatch.StartNew();
@@ -82,6 +84,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         dragAnchor = new SerialDisposable().AddTo(Anchors);
         compositeFileProvider = new ReactiveCompositeFileProvider().AddTo(Anchors);
         additionalFileProviderAnchor = new SerialDisposable().AddTo(Anchors);
+        windowSubscriptionAnchor = new SerialDisposable().AddTo(Anchors);
 
 #pragma warning disable CS0618 // Type or member is obsolete
         this.RaiseWhenSourceValue(x => x.ViewDataContext, this, x => x.DataContext).AddTo(Anchors);
@@ -297,6 +300,32 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
 
     public TitleBarDisplayMode TitleBarDisplayMode { get; set; } = TitleBarDisplayMode.Default;
+
+    public bool AllowsTransparency
+    {
+        get => allowsTransparency;
+        set
+        {
+            if (allowsTransparency == value)
+            {
+                return;
+            }
+
+            if (TitleBarDisplayMode == TitleBarDisplayMode.System && value)
+            {
+                Log.Warn($"{nameof(AllowsTransparency)} cannot be enabled while {nameof(TitleBarDisplayMode)} is {TitleBarDisplayMode.System}");
+                return;
+            }
+
+            if (windowSupplier.IsValueCreated && windowSupplier.Value.WindowHandle != IntPtr.Zero)
+            {
+                Log.Warn($"Ignoring change to {nameof(AllowsTransparency)} after the native window handle is created");
+                return;
+            }
+
+            RaiseAndSetIfChanged(ref allowsTransparency, value);
+        }
+    }
 
     public IBlazorContentControlConfigurator ControlConfigurator { get; set; }
 
@@ -640,12 +669,11 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         {
             window = windowSupplier.Value;
             Log.Debug($"Subscribing to window {window}, events in queue: {eventQueue.Count}");
-            SubscribeToWindow(Log, window, this)
+            windowSubscriptionAnchor.Disposable = SubscribeToWindow(Log, window, this)
                 .SubscribeSafe(x =>
                 {
                     EnqueueUpdate(x);
-                }, Log.HandleUiException)
-                .AddTo(Anchors);
+                }, Log.HandleUiException);
             Log.Debug("NativeWindow created and subscribed successfully");
         }
         else
@@ -719,5 +747,43 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
         //do not add window to Anchors! It must be disposed by DisposeWindow command
         return window;
+    }
+
+    private void ActivateWindowWhenReady(NativeWindow window, string reason)
+    {
+        uiDispatcher.VerifyAccess();
+
+        if (window == null || window.IsDisposed)
+        {
+            return;
+        }
+
+        void ActivateCore()
+        {
+            if (window.IsDisposed || !window.IsVisible || NoActivate)
+            {
+                return;
+            }
+
+            try
+            {
+                window.Activate();
+            }
+            catch (InvalidOperationException e)
+            {
+                Log.Warn($"Failed to activate window during {reason}", e);
+            }
+        }
+
+        if (window.IsLoaded)
+        {
+            window.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ActivateCore));
+            return;
+        }
+
+        window.WhenLoaded()
+            .Take(1)
+            .Subscribe(_ => window.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ActivateCore)))
+            .AddTo(window.Anchors);
     }
 }

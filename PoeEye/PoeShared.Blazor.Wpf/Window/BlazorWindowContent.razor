@@ -1,108 +1,25 @@
 ﻿@namespace PoeShared.Blazor.Wpf
-@using System.Globalization
-@using System.Numerics
 @using System.Reactive.Disposables
 @using System.Windows
-@using System.Windows.Input
 @using BlazorComponentUtilities
-@using JetBrains.Annotations
 @using PoeShared.Blazor.Scaffolding
 @using PoeShared.Scaffolding
 @using ReactiveUI
 @using PoeShared.Blazor
-@using Microsoft.AspNetCore.Components.Forms
 @using PoeShared.Blazor.Services
 @using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Native
-@using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
-<HeadContent>
-    <link href="_content/PoeShared.Blazor.Wpf/PoeShared.Blazor.Wpf.bundle.scp.css" rel="stylesheet"/>
-    <link href="_content/PoeShared.Blazor.Wpf/css/blazor-window.css" rel="stylesheet"/>
-</HeadContent>
-
-<div class="d-grid h-100 overflow-hidden"
+<div class="d-grid h-100 w-100 overflow-hidden position-relative"
      @ref="@ElementRef"
      id="@(IBlazorWindow.WindowId)"
      style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
-        @if (DataContext.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.Default)
+        @if (DataContext.TitleBarDisplayMode != TitleBarDisplayMode.None)
         {
-            <div class="d-flex w-100 align-items-center"
-                 id="@(IBlazorWindow.WindowTitleBarId)"
-                 style="@(new CssBuilder().AddValue($"anchor-name: {IBlazorWindow.TitleBarAnchorName};").Build())"
-                 @ref="@TitleRef">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ViewTypeForTitleBar)))">
-                    @{
-                        var titleBarViewType = DataContext.ViewTypeForTitleBar;
-                    }
-                    @if (titleBarViewType != null)
-                    {
-                        <BlazorContentPresenter
-                            @ref="@TitleBarContentPresenter"
-                            Content="@(DataContext.DataContext)"
-                            ViewType="@(titleBarViewType)">
-                        </BlazorContentPresenter>
-                    }
-                    else
-                    {
-                        <span class="p-1 py-2 w-100 flex-grow-1"
-                              style="user-select: none;"
-                              @ondblclick="ToggleWindowState"
-                              @onmousedown="HandleMouseDown">
-                            <ReactiveSection
-                                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
-                                @DataContext.Title
-                            </ReactiveSection>
-                        </span>
-                    }
-                </ReactiveSection>
-
-              
-                <span class="d-flex gap-1 h-100">
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton, x => x.ResizeMode)))">
-                    @if (DataContext.ShowMinButton && DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip or ResizeMode.CanMinimize)
-                    {
-                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
-                                @onclick="@(() => DataContext.Minimize())">
-                            <i class="fa-regular fa-window-minimize"></i>
-                        </button>
-                    }
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton, x => x.ResizeMode, x => x.WindowState)))">
-                    @if (DataContext.ShowMaxButton && DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
-                    {
-                        @if (DataContext.WindowState != WindowState.Maximized)
-                        {
-                            <button class="btn btn-secondary-outline p-0 m-0 px-2"
-                                    @onclick="@(() => DataContext.WindowState = WindowState.Maximized)">
-                                <i class="fa-regular fa-window-maximize"></i>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-secondary-outline p-0 m-0 px-2"
-                                    @onclick="@(() => DataContext.WindowState = WindowState.Normal)">
-                                <i class="fa-regular fa-window-restore"></i>
-                            </button>
-                        }
-                    }
-                </ReactiveSection>
-                <ReactiveSection
-                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowCloseButton)))">
-                    @if (DataContext.ShowCloseButton)
-                    {
-                        <button class="btn btn-secondary-outline p-0 m-0 px-2"
-                                @onclick="@(() => DataContext.Close())">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    }
-                </ReactiveSection>
-            </span>
+            <div style="@(new CssBuilder().AddValue($"anchor-name: {IBlazorWindow.TitleBarAnchorName};").Build())">
+                <BlazorWindowContentTitleBar DataContext="@DataContext"/>
             </div>
         }
         else
@@ -111,33 +28,11 @@
         }
     </ReactiveSection>
 
-    <div id="@(IBlazorWindow.WindowBody)" class="overflow-auto">
-        @if (DataContext.Anchors.IsDisposed)
-        {
-            <div class="d-grid-center">
-                <div class="spinner-border"></div>
-                Disposed
-            </div>
-        }
-        else if (DataContext.IsDebugMode)
-        {
-            <div style="max-width: 30em;">
-                <BlazorWindowDebugPanel DataContext="@DataContext"/>
-            </div>
-        }
-        else
-        {
-            <BlazorContentPresenter
-                @ref="@ContentPresenter"
-                Content="@(DataContext.DataContext)"
-                ViewType="@(DataContext.ViewType)">
-            </BlazorContentPresenter>
-        }
-    </div>
+    <BlazorWindowContentBody DataContext="@DataContext"/>
 
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
-
-        @{
+        @if (DataContext.TitleBarDisplayMode != TitleBarDisplayMode.System)
+        {
             var borderZIndex = 65535;
             var minThickness = 4;
             var borderThickness = DataContext.BorderThickness;
@@ -152,7 +47,7 @@
             var cornerThumbSize = "10px";
 
             var topBorderStyle = new CssBuilder()
-                .AddValue($"width: calc(100vw - {borderThickness.Left}px - {borderThickness.Right}px);")
+                .AddValue($"width: calc(100% - {borderThickness.Left}px - {borderThickness.Right}px);")
                 .AddValue($"height: {borderThickness.Top}px;")
                 .AddValue($"left: {borderThickness.Left}px;")
                 .AddValue($"top: 0;")
@@ -160,7 +55,7 @@
                 .AddValue($"z-index: {borderZIndex};");
 
             var rightBorderStyle = new CssBuilder()
-                .AddValue($"height: calc(100vh - {borderThickness.Top}px - {borderThickness.Bottom}px);")
+                .AddValue($"height: calc(100% - {borderThickness.Top}px - {borderThickness.Bottom}px);")
                 .AddValue($"width: {borderThickness.Right}px;")
                 .AddValue($"right: 0;")
                 .AddValue($"top: {borderThickness.Top}px;")
@@ -168,7 +63,7 @@
                 .AddValue($"z-index: {borderZIndex};");
 
             var bottomBorderStyle = new CssBuilder()
-                .AddValue($"width: calc(100vw - {borderThickness.Left}px - {borderThickness.Right}px);")
+                .AddValue($"width: calc(100% - {borderThickness.Left}px - {borderThickness.Right}px);")
                 .AddValue($"height: {borderThickness.Bottom}px;")
                 .AddValue($"left: {borderThickness.Left}px;")
                 .AddValue($"bottom: 0;")
@@ -176,7 +71,7 @@
                 .AddValue($"z-index: {borderZIndex};");
 
             var leftBorderStyle = new CssBuilder()
-                .AddValue($"height: calc(100vh - {borderThickness.Top}px - {borderThickness.Bottom}px);")
+                .AddValue($"height: calc(100% - {borderThickness.Top}px - {borderThickness.Bottom}px);")
                 .AddValue($"width: {borderThickness.Left}px;")
                 .AddValue($"top: {borderThickness.Top}px;")
                 .AddValue($"left: 0;")
@@ -184,7 +79,7 @@
                 .AddValue($"z-index: {borderZIndex};");
 
             var topBorderResizeStyle = new CssBuilder()
-                .AddValue($"width: calc(100vw - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
+                .AddValue($"width: calc(100% - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
                 .AddValue($"height: {resizeBorderThickness.Top}px;")
                 .AddValue($"left: {resizeBorderThickness.Left}px;")
                 .AddValue($"top: 0;")
@@ -193,7 +88,7 @@
                 .AddValue($"cursor: n-resize;");
 
             var rightBorderResizeStyle = new CssBuilder()
-                .AddValue($"height: calc(100vh - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
+                .AddValue($"height: calc(100% - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
                 .AddValue($"width: {resizeBorderThickness.Right}px;")
                 .AddValue($"right: 0;")
                 .AddValue($"top: {resizeBorderThickness.Top}px;")
@@ -202,7 +97,7 @@
                 .AddValue($"cursor: e-resize;");
 
             var bottomBorderResizeStyle = new CssBuilder()
-                .AddValue($"width: calc(100vw - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
+                .AddValue($"width: calc(100% - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
                 .AddValue($"height: {resizeBorderThickness.Bottom}px;")
                 .AddValue($"left: {resizeBorderThickness.Left}px;")
                 .AddValue($"bottom: 0;")
@@ -211,7 +106,7 @@
                 .AddValue($"cursor: s-resize;");
 
             var leftBorderResizeStyle = new CssBuilder()
-                .AddValue($"height: calc(100vh - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
+                .AddValue($"height: calc(100% - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
                 .AddValue($"width: {resizeBorderThickness.Left}px;")
                 .AddValue($"top: {resizeBorderThickness.Top}px;")
                 .AddValue($"left: 0;")
@@ -223,7 +118,7 @@
             var cornerBase = new CssBuilder()
                 .AddValue($"width: {cornerThumbSize};")
                 .AddValue($"height: {cornerThumbSize};")
-                .AddValue($"position: fixed;")
+                .AddValue($"position: absolute;")
                 .AddValue($"background-color: transparent;")
                 .AddValue($"z-index: {borderZIndex + 1};");
 
@@ -246,43 +141,48 @@
                 .AddValue($"bottom: 0;")
                 .AddValue($"right: 0;")
                 .AddValue("cursor: nwse-resize;");
+            
+            <!-- Border -->
+            <div class="position-absolute user-select-none" style="@topBorderStyle"></div>
+            <div class="position-absolute user-select-none" style="@rightBorderStyle"></div>
+            <div class="position-absolute user-select-none" style="@bottomBorderStyle"></div>
+            <div class="position-absolute user-select-none" style="@leftBorderStyle"></div>
+
+            <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ResizeMode)))">
+
+                @if (DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
+                {
+                    <!-- Edge Resizers -->
+                    <div class="position-absolute" style="@topBorderResizeStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.Top))"></div>
+                    <div class="position-absolute" style="@rightBorderResizeStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.Right))"></div>
+                    <div class="position-absolute" style="@bottomBorderResizeStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.Bottom))"></div>
+                    <div class="position-absolute" style="@leftBorderResizeStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.Left))"></div>
+
+                    <!-- Corner Resizers -->
+                    <div style="@topLeftCornerStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.TopLeft))"></div>
+                    <div style="@topRightCornerStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.TopRight))"></div>
+                    <div style="@bottomLeftCornerStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.BottomLeft))"></div>
+                    <div style="@bottomRightCornerStyle"
+                         @onmousedown:preventDefault="true"
+                         @onmousedown="@(() => StartResize(WindowResizeDirection.BottomRight))"></div>
+                }
+            </ReactiveSection>
         }
-
-        <!-- Border -->
-        <div class="position-fixed user-select-none" style="@topBorderStyle"></div>
-        <div class="position-fixed user-select-none" style="@rightBorderStyle"></div>
-        <div class="position-fixed user-select-none" style="@bottomBorderStyle"></div>
-        <div class="position-fixed user-select-none" style="@leftBorderStyle"></div>
-
-        <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ResizeMode)))">
-
-            @if (DataContext.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
-            {
-                <!-- Edge Resizers -->
-                <div class="position-fixed" style="@topBorderResizeStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.Top))"></div>
-                <div class="position-fixed" style="@rightBorderResizeStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.Right))"></div>
-                <div class="position-fixed" style="@bottomBorderResizeStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.Bottom))"></div>
-                <div class="position-fixed" style="@leftBorderResizeStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.Left))"></div>
-
-                <!-- Corner Resizers -->
-                <div style="@topLeftCornerStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.TopLeft))"></div>
-                <div style="@topRightCornerStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.TopRight))"></div>
-                <div style="@bottomLeftCornerStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.BottomLeft))"></div>
-                <div style="@bottomRightCornerStyle"
-                     @onmousedown="@(() => StartResize(WindowResizeDirection.BottomRight))"></div>
-            }
-        </ReactiveSection>
-
-
     </ReactiveSection>
-
 </div>
 
 
@@ -291,68 +191,18 @@
 
     public BlazorWindowContent()
     {
-        Anchors.Add(() => TitleBarContentPresenter = null);
-        Anchors.Add(() => ContentPresenter = null);
         dragAnchor = new SerialDisposable().AddTo(Anchors);
-
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.IsDebugMode));
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.DataContext));
-        ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.ViewType));
-
-        this.WhenAnyValue(x => x.TitleBarContentPresenter)
-            .WithPrevious()
-            .Subscribe(x =>
-            {
-                if (x.Previous is IDisposable disposableView)
-                {
-                    disposableView.Dispose();
-                }
-            })
-            .AddTo(Anchors);
-
-        this.WhenAnyValue(x => x.ContentPresenter)
-            .WithPrevious()
-            .Subscribe(x =>
-            {
-                if (x.Previous is IDisposable disposableView)
-                {
-                    disposableView.Dispose();
-                }
-            })
-            .AddTo(Anchors);
     }
 
     [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
     [Inject] public IBlazorWindowAccessor BlazorWindowAccessor { get; init; }
     [Inject] public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
 
-    public BlazorContentPresenter TitleBarContentPresenter { get; private set; }
-
-    public BlazorContentPresenter ContentPresenter { get; private set; }
-
-    public ElementReference TitleRef { get; private set; }
-
     public bool WindowIsActive { get; private set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        DataContext.WhenPreviewKeyDown
-            .SubscribeAsync(async x =>
-            {
-                if (x.Key == Key.F8)
-                {
-                    DataContext.IsDebugMode = !DataContext.IsDebugMode;
-                    x.Handled = true;
-                }
-                else if (x.Key == Key.F12)
-                {
-                    await BlazorContentControlAccessor.Control.OpenDevTools();
-                    x.Handled = true;
-                }
-            })
-            .AddTo(Anchors);
 
         WindowIsActive = UnsafeNative.GetForegroundWindow() == BlazorWindowAccessor.Window.GetWindowHandle();
         BlazorWindowAccessor.Window
@@ -395,33 +245,6 @@
                 }
             })
             .AddTo(Anchors);
-    }
-
-    private void ToggleWindowState()
-    {
-        //FIXME Does not work - due to StartDrag intercepting the focus, need to implement DOM event listener + Drag distance analysis
-        if (DataContext.WindowState == WindowState.Normal)
-        {
-            DataContext.Maximize();
-        }
-        else if (DataContext.WindowState == WindowState.Maximized)
-        {
-            DataContext.Restore();
-        }
-    }
-
-    private void StartDrag()
-    {
-        dragAnchor.Disposable = new CompositeDisposable()
-        {
-            Disposable.Create(() => { }),
-            DataContext.EnableDragMove()
-        };
-    }
-
-    private void HandleMouseDown(MouseEventArgs mouseEventArgs)
-    {
-        StartDrag();
     }
 
     private void StartResize(WindowResizeDirection direction)

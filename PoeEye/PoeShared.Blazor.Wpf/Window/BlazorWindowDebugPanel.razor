@@ -1,10 +1,16 @@
 ﻿@namespace PoeShared.Blazor.Wpf
+@using System.Collections.Generic
+@using System.Globalization
+@using System.Linq
 @using System.Reactive.Disposables
+@using System.Windows
+@using System.Windows.Media
 @using PoeShared.Blazor.Scaffolding
 @using ReactiveUI
 @using PoeShared.Blazor
 @using Microsoft.AspNetCore.Components.Forms
 @using PoeShared.Blazor.Wpf.Services
+@using PoeShared.Scaffolding
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
 <table class="table table-dark table-striped table-sm">
@@ -37,6 +43,14 @@
                       @onmousedown="StartDrag">
                     Drag
                 </span>
+                <button class="btn btn-secondary p-0 m-0 px-2"
+                        @onclick="@(() => DataContext.Show())">
+                    Show
+                </button>
+                <button class="btn btn-secondary p-0 m-0 px-2"
+                        @onclick="@(() => DataContext.Activate())">
+                    Activate
+                </button>
                 <button class="btn btn-secondary p-0 m-0 px-3"
                         @onclick="@(() => BlazorContentControlAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
                     DevTools
@@ -190,6 +204,24 @@
     </tr>
     <tr>
         <td>
+            <span class="debug-table-header">Startup</span>
+        </td>
+        <td>
+            <ReactiveSection
+                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.WindowStartupLocation)))">
+                <select class="form-select"
+                        value="@DataContext.WindowStartupLocation.ToString()"
+                        @onchange="HandleWindowStartupLocationChanged">
+                    @foreach (var startupLocation in WindowStartupLocations)
+                    {
+                        <option value="@startupLocation.ToString()">@startupLocation</option>
+                    }
+                </select>
+            </ReactiveSection>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <span class="debug-table-header">Title Bar</span>
         </td>
         <td>
@@ -222,6 +254,123 @@
     </tr>
     <tr>
         <td>
+            <span class="debug-table-header">Transparency</span>
+        </td>
+        <td>
+            <ReactiveSection
+                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.AllowsTransparency)))">
+                <span class="d-flex gap-3 align-items-center flex-wrap">
+                    <span class="d-flex gap-1">
+                        <input id="AllowsTransparency" type="checkbox"
+                               @bind:get="@(DataContext.AllowsTransparency)"
+                               @bind:set="@(x => DataContext.AllowsTransparency = x)"
+                               @bind:event="oninput"/>
+                        <label for="AllowsTransparency" class="rcb-label">
+                            AllowsTransparency
+                        </label>
+                    </span>
+                    <span class="text-muted small">
+                        Creation-time only. Changes are rejected after the native window is created.
+                    </span>
+                </span>
+            </ReactiveSection>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="debug-table-header">Window State</span>
+        </td>
+        <td>
+            <ReactiveSection
+                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.WindowState)))">
+                <span class="d-flex gap-1">
+                    <button class="btn btn-secondary p-0 m-0 px-2 rounded-0"
+                            disabled="@(DataContext.WindowState == WindowState.Normal)"
+                            @onclick="@(() => DataContext.WindowState = WindowState.Normal)">
+                        Normal
+                    </button>
+                    <button class="btn btn-secondary p-0 m-0 px-2 rounded-0"
+                            disabled="@(DataContext.WindowState == WindowState.Minimized)"
+                            @onclick="@(() => DataContext.WindowState = WindowState.Minimized)">
+                        Minimized
+                    </button>
+                    <button class="btn btn-secondary p-0 m-0 px-2 rounded-0"
+                            disabled="@(DataContext.WindowState == WindowState.Maximized)"
+                            @onclick="@(() => DataContext.WindowState = WindowState.Maximized)">
+                        Maximized
+                    </button>
+                </span>
+            </ReactiveSection>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="debug-table-header">Resize Mode</span>
+        </td>
+        <td>
+            <ReactiveSection
+                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ResizeMode)))">
+                <select class="form-select"
+                        value="@DataContext.ResizeMode.ToString()"
+                        @onchange="HandleResizeModeChanged">
+                    @foreach (var resizeMode in ResizeModes)
+                    {
+                        <option value="@resizeMode.ToString()">@resizeMode</option>
+                    }
+                </select>
+            </ReactiveSection>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="debug-table-header">Caption Buttons</span>
+        </td>
+        <td>
+            <span class="d-flex gap-4 flex-wrap">
+                <ReactiveSection
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton)))">
+                    <span class="d-flex gap-1">
+                        <input id="ShowMinButton" type="checkbox"
+                               @bind:get="@(DataContext.ShowMinButton)"
+                               @bind:set="@(x => DataContext.ShowMinButton = x)"
+                               disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
+                               @bind:event="oninput"/>
+                        <label for="ShowMinButton" class="rcb-label">
+                            Min
+                        </label>
+                    </span>
+                </ReactiveSection>
+                <ReactiveSection
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton)))">
+                    <span class="d-flex gap-1">
+                        <input id="ShowMaxButton" type="checkbox"
+                               @bind:get="@(DataContext.ShowMaxButton)"
+                               @bind:set="@(x => DataContext.ShowMaxButton = x)"
+                               disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
+                               @bind:event="oninput"/>
+                        <label for="ShowMaxButton" class="rcb-label">
+                            Max
+                        </label>
+                    </span>
+                </ReactiveSection>
+                <ReactiveSection
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowCloseButton)))">
+                    <span class="d-flex gap-1">
+                        <input id="ShowCloseButton" type="checkbox"
+                               @bind:get="@(DataContext.ShowCloseButton)"
+                               @bind:set="@(x => DataContext.ShowCloseButton = x)"
+                               disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
+                               @bind:event="oninput"/>
+                        <label for="ShowCloseButton" class="rcb-label">
+                            Close
+                        </label>
+                    </span>
+                </ReactiveSection>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <span class="debug-table-header">Opacity</span>
         </td>
         <td>
@@ -243,6 +392,48 @@
                 </ReactiveSection>
             </span>
 
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="debug-table-header">Background</span>
+        </td>
+        <td>
+            <ReactiveSection
+                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BackgroundColor)))">
+                <span class="d-flex gap-2 align-items-center">
+                    <span class="border rounded" style="@BuildColorPreviewStyle(DataContext.BackgroundColor)"></span>
+                    <select class="form-select"
+                            value="@GetColorOptionKey(DataContext.BackgroundColor, BackgroundColorOptions)"
+                            @onchange="HandleBackgroundColorChanged">
+                        @foreach (var colorOption in BackgroundColorOptions)
+                        {
+                            <option value="@colorOption.Key">@colorOption.Label</option>
+                        }
+                    </select>
+                </span>
+            </ReactiveSection>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="debug-table-header">Border Color</span>
+        </td>
+        <td>
+            <ReactiveSection
+                Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderColor)))">
+                <span class="d-flex gap-2 align-items-center">
+                    <span class="border rounded" style="@BuildColorPreviewStyle(DataContext.BorderColor)"></span>
+                    <select class="form-select"
+                            value="@GetColorOptionKey(DataContext.BorderColor, BorderColorOptions)"
+                            @onchange="HandleBorderColorChanged">
+                        @foreach (var colorOption in BorderColorOptions)
+                        {
+                            <option value="@colorOption.Key">@colorOption.Label</option>
+                        }
+                    </select>
+                </span>
+            </ReactiveSection>
         </td>
     </tr>
     <tr>
@@ -277,7 +468,8 @@
                                         }
                                     })">
                 </ReactiveSection>
-                <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Padding)))">
+                <ReactiveSection
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
                     <input type="number"
                            class="form-control"
                            value="@($"{DataContext.BorderThickness.Right:F0}")"
@@ -381,6 +573,18 @@
                     </span>
                 </ReactiveSection>
                 <ReactiveSection
+                    Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.IsVisible)))">
+                    <span class="d-flex gap-1">
+                        <input id="IsVisible" type="checkbox"
+                               @bind:get="@(DataContext.IsVisible)"
+                               @bind:set="@(x => DataContext.IsVisible = x)"
+                               @bind:event="oninput"/>
+                        <label for="IsVisible" class="rcb-label">
+                            Visible
+                        </label>
+                    </span>
+                </ReactiveSection>
+                <ReactiveSection
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.IsClickThrough)))">
                     <span class="d-flex gap-1">
                         <input id="IsClickThrough" type="checkbox"
@@ -435,9 +639,47 @@
 
 
 @code {
+    private static readonly ResizeMode[] ResizeModes = Enum.GetValues<ResizeMode>();
+    private static readonly WindowStartupLocation[] WindowStartupLocations = Enum.GetValues<WindowStartupLocation>();
+    private static readonly IReadOnlyList<ColorOption> BackgroundColorOptions = new[]
+    {
+        new ColorOption("window-default", "Window Default", Color.FromArgb(0xFF, 0x42, 0x42, 0x42)),
+        new ColorOption("transparent", "Transparent", Colors.Transparent),
+        new ColorOption("primary", "Primary", Color.FromRgb(0x0D, 0x6E, 0xFD)),
+        new ColorOption("secondary", "Secondary", Color.FromRgb(0x6C, 0x75, 0x7D)),
+        new ColorOption("success", "Success", Color.FromRgb(0x19, 0x87, 0x54)),
+        new ColorOption("danger", "Danger", Color.FromRgb(0xDC, 0x35, 0x45)),
+        new ColorOption("warning", "Warning", Color.FromRgb(0xFF, 0xC1, 0x07)),
+        new ColorOption("info", "Info", Color.FromRgb(0x0D, 0xCA, 0xF0)),
+        new ColorOption("light", "Light", Color.FromRgb(0xF8, 0xF9, 0xFA)),
+        new ColorOption("dark", "Dark", Color.FromRgb(0x21, 0x25, 0x29)),
+        new ColorOption("white", "White", Colors.White),
+        new ColorOption("black", "Black", Colors.Black),
+    };
+
+    private static readonly IReadOnlyList<ColorOption> BorderColorOptions = new[]
+    {
+        new ColorOption("transparent", "Transparent", Colors.Transparent),
+        new ColorOption("primary", "Primary", Color.FromRgb(0x0D, 0x6E, 0xFD)),
+        new ColorOption("secondary", "Secondary", Color.FromRgb(0x6C, 0x75, 0x7D)),
+        new ColorOption("success", "Success", Color.FromRgb(0x19, 0x87, 0x54)),
+        new ColorOption("danger", "Danger", Color.FromRgb(0xDC, 0x35, 0x45)),
+        new ColorOption("warning", "Warning", Color.FromRgb(0xFF, 0xC1, 0x07)),
+        new ColorOption("info", "Info", Color.FromRgb(0x0D, 0xCA, 0xF0)),
+        new ColorOption("light", "Light", Color.FromRgb(0xF8, 0xF9, 0xFA)),
+        new ColorOption("dark", "Dark", Color.FromRgb(0x21, 0x25, 0x29)),
+        new ColorOption("white", "White", Colors.White),
+        new ColorOption("black", "Black", Colors.Black),
+    };
+
     private readonly SerialDisposable dragAnchor;
 
     [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
+
+    public BlazorWindowDebugPanel()
+    {
+        dragAnchor = new SerialDisposable().AddTo(Anchors);
+    }
 
     private void StartDrag()
     {
@@ -447,4 +689,73 @@
             DataContext.EnableDragMove()
         };
     }
+
+    private void HandleResizeModeChanged(ChangeEventArgs args)
+    {
+        if (TryGetEnumValue<ResizeMode>(args.Value, out var resizeMode))
+        {
+            DataContext.ResizeMode = resizeMode;
+        }
+    }
+
+    private void HandleWindowStartupLocationChanged(ChangeEventArgs args)
+    {
+        if (TryGetEnumValue<WindowStartupLocation>(args.Value, out var startupLocation))
+        {
+            DataContext.WindowStartupLocation = startupLocation;
+        }
+    }
+
+    private void HandleBackgroundColorChanged(ChangeEventArgs args)
+    {
+        if (TryGetColorOption(args.Value, BackgroundColorOptions, out var color))
+        {
+            DataContext.BackgroundColor = color;
+        }
+    }
+
+    private void HandleBorderColorChanged(ChangeEventArgs args)
+    {
+        if (TryGetColorOption(args.Value, BorderColorOptions, out var color))
+        {
+            DataContext.BorderColor = color;
+        }
+    }
+
+    private static bool TryGetEnumValue<TEnum>(object value, out TEnum parsedValue) where TEnum : struct, Enum
+    {
+        parsedValue = default;
+        return value is string stringValue && Enum.TryParse<TEnum>(stringValue, ignoreCase: true, out parsedValue);
+    }
+
+    private static bool TryGetColorOption(object value, IReadOnlyList<ColorOption> options, out Color color)
+    {
+        var option = options.FirstOrDefault(x => x.Key == value as string);
+        if (option == null)
+        {
+            color = default;
+            return false;
+        }
+
+        color = option.Color;
+        return true;
+    }
+
+    private static string GetColorOptionKey(Color color, IReadOnlyList<ColorOption> options)
+    {
+        return options.FirstOrDefault(x => x.Color == color)?.Key ?? options[0].Key;
+    }
+
+    private static string BuildColorPreviewStyle(Color color)
+    {
+        return $"width: 1.5rem; height: 1.5rem; background-color: {ToCssColor(color)};";
+    }
+
+    private static string ToCssColor(Color color)
+    {
+        var alpha = (color.A / 255d).ToString("0.###", CultureInfo.InvariantCulture);
+        return $"rgba({color.R}, {color.G}, {color.B}, {alpha})";
+    }
+
+    private sealed record ColorOption(string Key, string Label, Color Color);
 }
