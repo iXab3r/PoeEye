@@ -8,6 +8,7 @@
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <UseWindowsForms>true</UseWindowsForms>
+        <UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <RazorClassLibrary>true</RazorClassLibrary>
@@ -16,6 +17,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\maui\src\BlazorWebView\src\WindowsForms\Microsoft.AspNetCore.Components.WebView.WindowsForms.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor.Controls\PoeShared.Blazor.Controls.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor.Hosting\PoeShared.Blazor.Hosting.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj"/>
@@ -24,9 +26,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="[7.0.2,)" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="[7.0.2,)" />
-        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="[7.0.2,)">
+            <!-- 7.0.2 is min for WPF WebView -->
+        </PackageReference>
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45">
+        </PackageReference>
+        <PackageReference Include="PInvoke.SHCore" Version="0.6.49" />
         <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
             <ExcludeAssets>runtime</ExcludeAssets>
             <IncludeAssets>All</IncludeAssets>

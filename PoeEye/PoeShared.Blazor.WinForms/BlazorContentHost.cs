@@ -156,11 +156,13 @@ public sealed partial class BlazorContentHost : ReactiveUserControl
 
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
+                this.WhenAnyValue(x => x.AdditionalFiles)
+                    .Select(x => (IReadOnlyList<IFileInfo>) (x?.ToArray() ?? Array.Empty<IFileInfo>())),
                 this.WhenAnyValue(x => x.Configurator),
                 unityContainerSource,
                 this.WhenAnyValue(x => x.IsWebViewInstalled),
                 this.WhenAnyValue(x => x.ReloadVersion),
-                (additionalFileProvider, configurator, container, isWebViewInstalled, reloadVersion) => new ControlState(container, additionalFileProvider, configurator, isWebViewInstalled, reloadVersion))
+                (additionalFileProvider, additionalFiles, configurator, container, isWebViewInstalled, reloadVersion) => new ControlState(container, additionalFileProvider, additionalFiles, configurator, isWebViewInstalled, reloadVersion))
             .ObserveOn(uiScheduler)
             .SubscribeAsync(async state =>
             {
@@ -216,8 +218,8 @@ public sealed partial class BlazorContentHost : ReactiveUserControl
                         RootComponents = WebView.RootComponents,
                         RootComponentsStore = WebView.RootComponents.JSComponents,
                         AdditionalFileProvider = state.AdditionalFileProvider,
-                        AdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>(),
-                        IndexFileSubpath = "index.html",
+                        AdditionalFiles = state.AdditionalFiles,
+                        IndexFileSubpath = "_content/PoeShared.Blazor.WinForms/index.html",
                         GeneratedIndexFileName = generatedIndexFileName,
                         HostPage = hostPage,
                         Log = Log,
@@ -232,6 +234,7 @@ public sealed partial class BlazorContentHost : ReactiveUserControl
 
                             serviceCollection.AddSingleton<IUnityContainer>(_ => state.ChildContainer!);
                             serviceCollection.AddSingleton<IWebViewAccessor>(_ => WebViewAccessor.Instance);
+                            serviceCollection.AddSingleton<IBlazorContentHostAccessor>(_ => new BlazorContentHostAccessor(this));
                             serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new ControlLocationTracker(this).AddTo(contentAnchors));
                             serviceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(() => WebView.WebView));
                         },
@@ -535,11 +538,12 @@ public sealed partial class BlazorContentHost : ReactiveUserControl
 
     private sealed class ControlState : DisposableReactiveObject
     {
-        public ControlState(IUnityContainer? container, IFileProvider? additionalFileProvider, IBlazorContentControlConfigurator? configurator, bool isWebViewInstalled, int reloadVersion)
+        public ControlState(IUnityContainer? container, IFileProvider? additionalFileProvider, IReadOnlyList<IFileInfo> additionalFiles, IBlazorContentControlConfigurator? configurator, bool isWebViewInstalled, int reloadVersion)
         {
             Container = container;
             ChildContainer = container?.CreateChildContainer().AddTo(Anchors);
             AdditionalFileProvider = additionalFileProvider;
+            AdditionalFiles = additionalFiles;
             Configurator = configurator;
             IsWebViewInstalled = isWebViewInstalled;
             ReloadVersion = reloadVersion;
@@ -550,6 +554,8 @@ public sealed partial class BlazorContentHost : ReactiveUserControl
         public IUnityContainer? ChildContainer { get; }
 
         public IFileProvider? AdditionalFileProvider { get; }
+
+        public IReadOnlyList<IFileInfo> AdditionalFiles { get; }
 
         public IBlazorContentControlConfigurator? Configurator { get; }
 

@@ -15,8 +15,9 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Extensions.FileProviders;
 using PoeShared.Blazor.Scaffolding;
-using PoeShared.Blazor.Wpf.Scaffolding;
+using PoeShared.Blazor.Wpf;
 using PoeShared.Blazor.Wpf.Services;
+using PoeShared.Blazor.WinForms.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
@@ -25,13 +26,13 @@ using Color = System.Windows.Media.Color;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
-namespace PoeShared.Blazor.Wpf;
+namespace PoeShared.Blazor.WinForms;
 
 /// <summary>
 /// Things to note:
 /// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
 /// </summary>
-internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow, IBlazorWindowMetroController
+internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
 
@@ -64,7 +65,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
     private readonly ReactiveCompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
-
+    
     // Logging throttling: limit certain verbose logs 
     private readonly Stopwatch logThrottleStopwatch = Stopwatch.StartNew();
     private long lastSetPosLogMs;
@@ -79,7 +80,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         Log.Debug("New window is being created");
         this.unityContainer = unityContainer;
         isClosedTcs = new TaskCompletionSource();
-        this.uiDispatcher = dispatcher ?? BlazorDispatcherProvider.Instance.GetOrAdd("BlazorWindow").Dispatcher;
+        this.uiDispatcher = dispatcher ?? BlazorWinFormsDispatcherProvider.Instance.GetOrAdd("BlazorWindow");
         windowSupplier = new Lazy<NativeWindow>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
@@ -589,11 +590,6 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         return window.WindowHandle;
     }
 
-    public Window GetWindow()
-    {
-        return GetOrCreate();
-    }
-
     public Rectangle GetWindowRect()
     {
         return new Rectangle(Left, Top, Width, Height);
@@ -634,7 +630,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
         EnqueueUpdate(new SetWindowPosCommand(windowPos));
     }
 
-    private ReactiveWindow GetWindowOrThrow()
+    private ReactiveForm GetWindowOrThrow()
     {
         //important! We do not check any states here, window could be even Disposed at this point
         if (!windowSupplier.IsValueCreated)
@@ -743,7 +739,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
 
         var window = new NativeWindow(this)
         {
-            WindowStartupLocation = WindowStartupLocation,
+            StartPosition = System.Windows.Forms.FormStartPosition.Manual,
         };
 
         //do not add window to Anchors! It must be disposed by DisposeWindow command
@@ -782,9 +778,22 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazo
             return;
         }
 
-        window.WhenLoaded()
-            .Take(1)
-            .Subscribe(_ => window.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ActivateCore)))
-            .AddTo(window.Anchors);
+        EventHandler? onLoad = null;
+        onLoad = (_, _) =>
+        {
+            if (onLoad != null)
+            {
+                window.Load -= onLoad;
+            }
+            window.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ActivateCore));
+        };
+        window.Load += onLoad;
+        Disposable.Create(() =>
+        {
+            if (onLoad != null)
+            {
+                window.Load -= onLoad;
+            }
+        }).AddTo(window.Anchors);
     }
 }

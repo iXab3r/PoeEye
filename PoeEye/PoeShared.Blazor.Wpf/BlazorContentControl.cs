@@ -131,9 +131,11 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
         Observable.CombineLatest(
                 this.WhenAnyValue(x => x.AdditionalFileProvider),
+                this.WhenAnyValue(x => x.AdditionalFiles)
+                    .Select(x => (IReadOnlyList<IFileInfo>) (x?.ToArray() ?? Array.Empty<IFileInfo>())),
                 this.WhenAnyValue(x => x.Configurator),
                 unityContainerSource,
-                (additionalFileProvider, visitor, container) => new ControlState(container, additionalFileProvider, visitor))
+                (additionalFileProvider, additionalFiles, visitor, container) => new ControlState(container, additionalFileProvider, additionalFiles, visitor))
             .ObserveOnIfNeeded(uiScheduler)
             .SubscribeAsync(async state =>
             {
@@ -177,7 +179,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         RootComponents = WebView.RootComponents,
                         RootComponentsStore = WebView.RootComponents.JSComponents,
                         AdditionalFileProvider = state.AdditionalFileProvider,
-                        AdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>(),
+                        AdditionalFiles = state.AdditionalFiles,
                         IndexFileSubpath = "_content/PoeShared.Blazor.Wpf/index.html",
                         GeneratedIndexFileName = generatedIndexFileName,
                         HostPage = hostPage,
@@ -453,11 +455,11 @@ public class BlazorContentControl : Control, IBlazorContentControl
         GC.SuppressFinalize(this);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public CompositeDisposable Anchors { get; } = new();
 
-    public void RaisePropertyChanged(string propertyName)
+    public void RaisePropertyChanged(string? propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -473,13 +475,15 @@ public class BlazorContentControl : Control, IBlazorContentControl
         public IUnityContainer? Container { get; }
         public IUnityContainer? ChildContainer { get; }
         public IFileProvider? AdditionalFileProvider { get; }
+        public IReadOnlyList<IFileInfo> AdditionalFiles { get; }
         public IBlazorContentControlConfigurator? Configurator { get; }
         
-        public ControlState(IUnityContainer? container, IFileProvider? additionalFileProvider, IBlazorContentControlConfigurator? configurator)
+        public ControlState(IUnityContainer? container, IFileProvider? additionalFileProvider, IReadOnlyList<IFileInfo> additionalFiles, IBlazorContentControlConfigurator? configurator)
         {
             Container = container;
             ChildContainer = container?.CreateChildContainer().AddTo(Anchors);
             AdditionalFileProvider = additionalFileProvider;
+            AdditionalFiles = additionalFiles;
             Configurator = configurator;
             
         }

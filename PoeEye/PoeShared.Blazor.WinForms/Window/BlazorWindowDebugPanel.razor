@@ -1,5 +1,6 @@
-﻿@namespace PoeShared.Blazor.Wpf
-@attribute [BlazorView(IsForManualRegistrationOnly = true)]
+﻿@attribute [BlazorView(IsForManualRegistrationOnly = true)]
+@namespace PoeShared.Blazor.WinForms
+@using PoeShared.Blazor.Wpf
 @using System.Collections.Generic
 @using System.Globalization
 @using System.Linq
@@ -10,8 +11,7 @@
 @using ReactiveUI
 @using PoeShared.Blazor
 @using Microsoft.AspNetCore.Components.Forms
-@using PoeShared.Blazor.Services
-@using PoeShared.Blazor.Wpf.Services
+@using PoeShared.Blazor.WinForms.Services
 @using PoeShared.Scaffolding
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
@@ -54,7 +54,7 @@
                     Activate
                 </button>
                 <button class="btn btn-secondary p-0 m-0 px-3"
-                        @onclick="@(() => BlazorContentControlAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
+                        @onclick="@(() => BlazorContentHostAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
                     DevTools
                 </button>
                 <span class="vr"></span>
@@ -264,8 +264,7 @@
                 <span class="d-flex gap-3 align-items-center flex-wrap">
                     <span class="d-flex gap-1">
                         <input id="AllowsTransparency" type="checkbox"
-                               @bind:get="@(DataContext.AllowsTransparency)"
-                               @bind:set="@(x => DataContext.AllowsTransparency = x)"
+                               @bind="DataContext.AllowsTransparency"
                                @bind:event="oninput"/>
                         <label for="AllowsTransparency" class="rcb-label">
                             AllowsTransparency
@@ -333,8 +332,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMinButton)))">
                     <span class="d-flex gap-1">
                         <input id="ShowMinButton" type="checkbox"
-                               @bind:get="@(DataContext.ShowMinButton)"
-                               @bind:set="@(x => DataContext.ShowMinButton = x)"
+                               @bind="DataContext.ShowMinButton"
                                disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
                                @bind:event="oninput"/>
                         <label for="ShowMinButton" class="rcb-label">
@@ -346,8 +344,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowMaxButton)))">
                     <span class="d-flex gap-1">
                         <input id="ShowMaxButton" type="checkbox"
-                               @bind:get="@(DataContext.ShowMaxButton)"
-                               @bind:set="@(x => DataContext.ShowMaxButton = x)"
+                               @bind="DataContext.ShowMaxButton"
                                disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
                                @bind:event="oninput"/>
                         <label for="ShowMaxButton" class="rcb-label">
@@ -359,8 +356,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowCloseButton)))">
                     <span class="d-flex gap-1">
                         <input id="ShowCloseButton" type="checkbox"
-                               @bind:get="@(DataContext.ShowCloseButton)"
-                               @bind:set="@(x => DataContext.ShowCloseButton = x)"
+                               @bind="DataContext.ShowCloseButton"
                                disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
                                @bind:event="oninput"/>
                         <label for="ShowCloseButton" class="rcb-label">
@@ -566,8 +562,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowInTaskbar)))">
                     <span class="d-flex gap-1">
                         <input id="ShowInTaskbar" type="checkbox"
-                               @bind:get="@(DataContext.ShowInTaskbar)"
-                               @bind:set="@(x => DataContext.ShowInTaskbar = x)"
+                               @bind="DataContext.ShowInTaskbar"
                                @bind:event="oninput"/>
                         <label for="ShowInTaskbar" class="rcb-label">
                             ShowInTaskbar
@@ -578,8 +573,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.IsVisible)))">
                     <span class="d-flex gap-1">
                         <input id="IsVisible" type="checkbox"
-                               @bind:get="@(DataContext.IsVisible)"
-                               @bind:set="@(x => DataContext.IsVisible = x)"
+                               @bind="DataContext.IsVisible"
                                @bind:event="oninput"/>
                         <label for="IsVisible" class="rcb-label">
                             Visible
@@ -590,8 +584,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.IsClickThrough)))">
                     <span class="d-flex gap-1">
                         <input id="IsClickThrough" type="checkbox"
-                               @bind:get="@(DataContext.IsClickThrough)"
-                               @bind:set="@(x => DataContext.IsClickThrough = x)"
+                               @bind="DataContext.IsClickThrough"
                                @bind:event="oninput"/>
                         <label for="IsClickThrough" class="rcb-label">
                             IsClickThrough
@@ -601,8 +594,7 @@
                 <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Topmost)))">
                     <span class="d-flex gap-1">
                         <input id="Topmost" type="checkbox"
-                               @bind:get="@(DataContext.Topmost)"
-                               @bind:set="@(x => DataContext.Topmost = x)"
+                               @bind="DataContext.Topmost"
                                @bind:event="oninput"/>
                         <label for="Topmost" class="rcb-label">
                             Topmost
@@ -613,8 +605,7 @@
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.NoActivate)))">
                     <span class="d-flex gap-1">
                         <input id="NoActivate" type="checkbox"
-                               @bind:get="@(DataContext.NoActivate)"
-                               @bind:set="@(x => DataContext.NoActivate = x)"
+                               @bind="DataContext.NoActivate"
                                @bind:event="oninput"/>
                         <label for="NoActivate" class="rcb-label">
                             No Activate
@@ -676,7 +667,7 @@
 
     private readonly SerialDisposable dragAnchor;
 
-    [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
+    [Inject] public IBlazorContentHostAccessor BlazorContentHostAccessor { get; init; }
 
     public BlazorWindowDebugPanel()
     {

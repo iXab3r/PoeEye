@@ -15,19 +15,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" Condition="Exists('..\..\..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj')"/>
-        <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" Condition="Exists('..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj')"/>
+        <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj"/>
         <ProjectReference Include="..\PoeShared.Blazor.Controls\PoeShared.Blazor.Controls.csproj" />
-        <ProjectReference Include="..\PoeShared.Blazor.Hosting\PoeShared.Blazor.Hosting.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj"/>
         <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj"/>
         <ProjectReference Include="..\PoeShared\PoeShared.csproj"/>
+        <ProjectReference Include="..\PoeShared.Blazor.Hosting\PoeShared.Blazor.Hosting.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="[7.0.2,)">
             <!-- 7.0.2 is min for WPF WebView -->
         </PackageReference>
@@ -41,7 +37,6 @@
         </PackageReference>
         <PackageReference Include="System.Management" Version="8.0.0">
         </PackageReference>
-        <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
     </ItemGroup>
 
     <ItemGroup>

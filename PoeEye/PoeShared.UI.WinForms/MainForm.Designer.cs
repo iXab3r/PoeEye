@@ -14,6 +14,10 @@ partial class Form1
     private System.Windows.Forms.Button incrementCountButton;
     private System.Windows.Forms.Button reloadHostButton;
     private System.Windows.Forms.Button devToolsButton;
+    private System.Windows.Forms.Button openWindowButton;
+    private System.Windows.Forms.Button openDialogWindowButton;
+    private System.Windows.Forms.Button closeAllWindowsButton;
+    private System.Windows.Forms.CheckBox shareContentCheckBox;
     private System.Windows.Forms.Label statusLabel;
     private System.Windows.Forms.Panel hostPanel;
 
@@ -48,6 +52,10 @@ partial class Form1
         this.incrementCountButton = new System.Windows.Forms.Button();
         this.reloadHostButton = new System.Windows.Forms.Button();
         this.devToolsButton = new System.Windows.Forms.Button();
+        this.openWindowButton = new System.Windows.Forms.Button();
+        this.openDialogWindowButton = new System.Windows.Forms.Button();
+        this.closeAllWindowsButton = new System.Windows.Forms.Button();
+        this.shareContentCheckBox = new System.Windows.Forms.CheckBox();
         this.statusLabel = new System.Windows.Forms.Label();
         this.hostPanel = new System.Windows.Forms.Panel();
         this.rootLayout.SuspendLayout();
@@ -79,6 +87,10 @@ partial class Form1
         this.controlPanel.Controls.Add(this.incrementCountButton);
         this.controlPanel.Controls.Add(this.reloadHostButton);
         this.controlPanel.Controls.Add(this.devToolsButton);
+        this.controlPanel.Controls.Add(this.openWindowButton);
+        this.controlPanel.Controls.Add(this.openDialogWindowButton);
+        this.controlPanel.Controls.Add(this.closeAllWindowsButton);
+        this.controlPanel.Controls.Add(this.shareContentCheckBox);
         this.controlPanel.Controls.Add(this.statusLabel);
         this.controlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
         this.controlPanel.Location = new System.Drawing.Point(12, 12);
@@ -147,14 +159,55 @@ partial class Form1
         this.devToolsButton.Text = "Open DevTools";
         this.devToolsButton.UseVisualStyleBackColor = true;
         // 
+        // openWindowButton
+        // 
+        this.openWindowButton.AutoSize = true;
+        this.openWindowButton.Location = new System.Drawing.Point(686, 3);
+        this.openWindowButton.Name = "openWindowButton";
+        this.openWindowButton.Size = new System.Drawing.Size(95, 25);
+        this.openWindowButton.TabIndex = 6;
+        this.openWindowButton.Text = "Open Window";
+        this.openWindowButton.UseVisualStyleBackColor = true;
+        // 
+        // openDialogWindowButton
+        // 
+        this.openDialogWindowButton.AutoSize = true;
+        this.openDialogWindowButton.Location = new System.Drawing.Point(787, 3);
+        this.openDialogWindowButton.Name = "openDialogWindowButton";
+        this.openDialogWindowButton.Size = new System.Drawing.Size(127, 25);
+        this.openDialogWindowButton.TabIndex = 7;
+        this.openDialogWindowButton.Text = "Open Modal Window";
+        this.openDialogWindowButton.UseVisualStyleBackColor = true;
+        // 
+        // closeAllWindowsButton
+        // 
+        this.closeAllWindowsButton.AutoSize = true;
+        this.closeAllWindowsButton.Location = new System.Drawing.Point(920, 3);
+        this.closeAllWindowsButton.Name = "closeAllWindowsButton";
+        this.closeAllWindowsButton.Size = new System.Drawing.Size(124, 25);
+        this.closeAllWindowsButton.TabIndex = 8;
+        this.closeAllWindowsButton.Text = "Close All Windows";
+        this.closeAllWindowsButton.UseVisualStyleBackColor = true;
+        // 
+        // shareContentCheckBox
+        // 
+        this.shareContentCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+        this.shareContentCheckBox.AutoSize = true;
+        this.shareContentCheckBox.Location = new System.Drawing.Point(1050, 6);
+        this.shareContentCheckBox.Name = "shareContentCheckBox";
+        this.shareContentCheckBox.Size = new System.Drawing.Size(127, 19);
+        this.shareContentCheckBox.TabIndex = 9;
+        this.shareContentCheckBox.Text = "Share host content";
+        this.shareContentCheckBox.UseVisualStyleBackColor = true;
+        // 
         // statusLabel
         // 
         this.statusLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
         this.statusLabel.AutoSize = true;
-        this.statusLabel.Location = new System.Drawing.Point(686, 9);
+        this.statusLabel.Location = new System.Drawing.Point(1183, 9);
         this.statusLabel.Name = "statusLabel";
         this.statusLabel.Size = new System.Drawing.Size(39, 15);
-        this.statusLabel.TabIndex = 6;
+        this.statusLabel.TabIndex = 10;
         this.statusLabel.Text = "Ready";
         // 
         // hostPanel

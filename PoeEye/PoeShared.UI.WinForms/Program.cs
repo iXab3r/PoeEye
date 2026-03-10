@@ -1,6 +1,10 @@
+using DynamicData;
+using PoeShared.Blazor;
 using PoeShared.Blazor.Prism;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.WinForms.Prism;
 using PoeShared.Prism;
+using PoeShared.UI.WinForms;
 using PoeShared.Scaffolding;
 using Unity;
 
@@ -18,7 +22,7 @@ static class Program
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
         using var container = CreateContainer();
-        Application.Run(new Form1(container));
+        Application.Run(container.Resolve<Form1>());
     }
 
     private static IUnityContainer CreateContainer()
@@ -27,6 +31,17 @@ static class Program
         container.AddNewExtensionIfNotExists<CommonRegistrations>();
         container.AddNewExtensionIfNotExists<PoeSharedBlazorRegistrations>();
         container.AddNewExtensionIfNotExists<BlazorWinFormsRegistrations>();
+        
+        var blazorContentRepository = container.Resolve<IBlazorContentRepository>();
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.WinForms/css/bootstrap.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.WinForms/css/bootstrap-extra.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.WinForms/css/app.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.WinForms/css/font-awesome6.min.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.WinForms/css/blazor-window.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.Controls/assets/css/main-colors.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.Controls/assets/css/main-style.css"));
+        blazorContentRepository.AdditionalFiles.Add(new RefFileInfo(@"_content/PoeShared.Blazor.Controls/assets/css/main-ant-blazor.css"));
+        
         return container;
     }
 }
