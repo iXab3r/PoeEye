@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net7-windows</TargetFramework>
+        <AssemblyTitle>PoeShared.Blazor.WinForms</AssemblyTitle>
+        <Product>PoeShared.Blazor.WinForms</Product>
+        <Copyright>Copyright © Xab3r 2026</Copyright>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <UseWindowsForms>true</UseWindowsForms>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <RazorClassLibrary>true</RazorClassLibrary>
+        <EnableDefaultContentItems>true<!-- Important for Blazor Scoped CSS --></EnableDefaultContentItems>
+        <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PoeShared.Blazor.Controls\PoeShared.Blazor.Controls.csproj" />
+        <ProjectReference Include="..\PoeShared.Blazor.Hosting\PoeShared.Blazor.Hosting.csproj" />
+        <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj"/>
+        <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj"/>
+        <ProjectReference Include="..\PoeShared\PoeShared.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="[7.0.2,)" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="[7.0.2,)" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
+        <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <IncludeAssets>All</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+</Project>

@@ -76,7 +76,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(BlazorContentControl), new FrameworkPropertyMetadata(typeof(BlazorContentControl)));
         Binder.Bind(x => x.isBusyLatch.IsBusy).To(x => x.IsBusy);
-        Binder.Bind(x => x.UnhandledException == null ? null : FormatExceptionMessage(x.UnhandledException)).To(x => x.UnhandledExceptionMessage);
+        Binder.Bind(x => x.UnhandledException == null ? null : BlazorContentHostUtilities.FormatExceptionMessage(x.UnhandledException)).To(x => x.UnhandledExceptionMessage);
     }
 
     public BlazorContentControl()
@@ -169,154 +169,43 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                 try
                 {
-                    var serviceCollection = state.ChildContainer.AsServiceCollection();
-                    serviceCollection.AddBlazorWebView();
-                    serviceCollection.AddWpfBlazorWebView();
-                    serviceCollection.AddBlazorWebViewDeveloperTools();
-                    
-                    // this is needed mostly for compatibility-reasons with views that use UnityContainer
-                    serviceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(webViewServiceProvider, state.ChildContainer));
-
-                    // views have to be transient to allow to re-create them if needed (e.g. on error)
-                    serviceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ =>
+                    await BlazorContentHostCompositor.ComposeAsync(new BlazorContentHostCompositionContext
                     {
-                        var log = Log.WithSuffix(nameof(BlazorContentPresenterWrapper));
-                        log.Debug($"Creating a new wrapper");
-                        var contentPresenter = new BlazorContentPresenterWrapper().AddTo(contentAnchors);
+                        ChildContainer = state.ChildContainer!,
+                        Configurator = configurator,
+                        WebViewServiceProvider = webViewServiceProvider,
+                        RootComponents = WebView.RootComponents,
+                        RootComponentsStore = WebView.RootComponents.JSComponents,
+                        AdditionalFileProvider = state.AdditionalFileProvider,
+                        AdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>(),
+                        IndexFileSubpath = "_content/PoeShared.Blazor.Wpf/index.html",
+                        GeneratedIndexFileName = generatedIndexFileName,
+                        HostPage = hostPage,
+                        Log = Log,
+                        State = state,
+                        RegisterHostServices = serviceCollection =>
+                        {
+                            serviceCollection.AddBlazorWebView();
+                            serviceCollection.AddWpfBlazorWebView();
+                            serviceCollection.AddBlazorWebViewDeveloperTools();
 
-                        this.WhenAnyValue(x => x.ViewType)
-                            .Subscribe(x =>
-                            {
-                                log.Debug($"Updating view type: {x}");
-                                contentPresenter.ViewType = x;
-                            })
-                            .AddTo(contentAnchors);
+                            // this is needed mostly for compatibility-reasons with views that use UnityContainer
+                            serviceCollection.AddTransient<IComponentActivator>(_ => new BlazorComponentActivator(webViewServiceProvider, state.ChildContainer!));
 
-                        this.WhenAnyValue(x => x.Content)
-                            .Subscribe(content =>
-                            {
-                                log.Debug($"Updating content to {content}");
-                                contentPresenter.Content = content;
-                            })
-                            .AddTo(contentAnchors);
+                            // views have to be transient to allow to re-create them if needed (e.g. on error)
+                            serviceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ => CreateContentPresenter(contentAnchors, timestampUpdated));
 
-                        contentPresenter.WhenAnyValue(x => x.IsComponentInitialized)
-                            .Where(x => x)
-                            .Subscribe(() =>
-                            {
-                                var timestampInitialized = DateTimeOffset.Now;
-                                log.Debug($"Component has initialized, total time (updated->initialized): {timestampInitialized - timestampUpdated}");
-                            })
-                            .AddTo(contentAnchors);
-                        contentPresenter.WhenAnyValue(x => x.IsComponentLoaded)
-                            .Where(x => x)
-                            .Subscribe(() =>
-                            {
-                                var timestampLoaded = DateTimeOffset.Now;
-                                log.Debug($"Component has loaded, total time (updated->loaded): {timestampLoaded - timestampUpdated}");
-                            })
-                            .AddTo(contentAnchors);
-                        contentPresenter.WhenAnyValue(x => x.IsComponentRendered)
-                            .Where(x => x)
-                            .Subscribe(() =>
-                            {
-                                var timestampRendered = DateTimeOffset.Now;
-                                log.Debug($"Component has rendered, total time (updated->rendered): {timestampRendered - timestampUpdated}");
-                            })
-                            .AddTo(contentAnchors);
-                        return contentPresenter;
+                            serviceCollection.AddSingleton<IUnityContainer>(_ => state.ChildContainer!);
+                            serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
+                            serviceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
+                            serviceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
+                        },
+                        SetWebViewFileProvider = fileProvider => WebView.FileProvider = fileProvider,
+                        GetCurrentHostPage = () => WebView.HostPage,
+                        IsWebViewReady = () => WebView.WebView?.CoreWebView2 != null,
+                        ReloadCurrentPage = Reload,
+                        SetHostPage = value => WebView.HostPage = value
                     });
-
-                    serviceCollection.AddSingleton<IUnityContainer>(sp => state.ChildContainer);
-                    serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
-                    serviceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
-                    serviceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
-
-                    Log.Debug($"Notifying visitor that registration stage is ongoing");
-                    await configurator.OnRegisteringServicesAsync(serviceCollection);
-
-                    var childServiceProvider = BuildUnityServiceProvider(state.ChildContainer, serviceCollection);
-                    //var childServiceProvider = new UnityFallbackServiceProvider(childServiceCollection.BuildServiceProvider(), state.container); //FIXME memory leak for transient dependencies
-                    childServiceProvider.GetRequiredService<IClock>(); //ensure DI by itself works
-
-                    using (var tempScope = childServiceProvider.CreateScope())
-                    {
-                        tempScope.ServiceProvider.GetRequiredService<IClock>(); //ensure local scope works
-                    }
-
-                    webViewServiceProvider.ServiceProvider = childServiceProvider;
-
-                    var globalMemoryFileProvider = new InMemoryFileProvider();
-
-                    //static web assets file provider is created by WebView manager, and we cannot directly access it from outside
-                    //thus we create our own, still prioritizing the usual one - this gives user the ability to replace assets
-                    var publicInMemoryFileProvider = new InMemoryFileProvider();
-                    serviceCollection.AddSingleton<IInMemoryFileProvider>(_ => publicInMemoryFileProvider);
-
-                    serviceCollection.AddScoped<IJSComponentConfiguration>(_ => WebView.RootComponents);
-
-                    var proxyFileProvider = new ProxyFileProvider()
-                    {
-                        FileProvider = state.AdditionalFileProvider
-                    };
-
-                    var rootFileProvider = webViewServiceProvider.ServiceProvider.GetRequiredService<IRootContentFileProvider>();
-                    var webViewFileProvider = new ReactiveCompositeFileProvider(
-                        publicInMemoryFileProvider,
-                        proxyFileProvider,
-                        globalMemoryFileProvider,
-                        rootFileProvider);
-
-                    WebView.FileProvider = webViewFileProvider; //under the hood initializes StaticWebAssets provider, which should not ever be reached
-
-                    var blazorContentRepository = webViewServiceProvider.ServiceProvider.GetRequiredService<IBlazorContentRepository>();
-                    var repositoryAdditionalFiles = blazorContentRepository.AdditionalFiles.Items.ToArray();
-                    var controlAdditionalFiles = AdditionalFiles?.ToArray() ?? Array.Empty<IFileInfo>();
-                    var additionalFiles = repositoryAdditionalFiles.Concat(controlAdditionalFiles).ToArray();
-                    if (additionalFiles.Any())
-                    {
-                        Log.Debug($"Loading additional files({additionalFiles.Length}):\n\t{additionalFiles.Select(x => x.Name).DumpToTable()}");
-                        foreach (var file in additionalFiles)
-                        {
-                            if (file is RefFileInfo)
-                            {
-                                continue;
-                            }
-
-                            globalMemoryFileProvider.FilesByName.AddOrUpdate(file);
-                        }
-                    }
-
-                    var indexFileContentTemplate = webViewFileProvider.ReadAllText("_content/PoeShared.Blazor.Wpf/index.html");
-                    var indexFileContent = PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
-                    publicInMemoryFileProvider.FilesByName.AddOrUpdate(new InMemoryFileInfo(generatedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now));
-
-                    var jsComponentsAccessor = new JSComponentConfigurationStoreAccessor(blazorContentRepository.JSComponents);
-                    var webRootComponentsAccessor = new JSComponentConfigurationStoreAccessor(WebView.RootComponents.JSComponents);
-                    foreach (var kvp in jsComponentsAccessor.JsComponentTypesByIdentifier)
-                    {
-                        if (webRootComponentsAccessor.JsComponentTypesByIdentifier.ContainsKey(kvp.Key))
-                        {
-                            continue;
-                        }
-
-                        Log.Debug($"Registering RootComponent: {kvp}");
-                        webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
-                    }
-
-                    Log.Debug($"Notifying visitor everything is up and ready for work");
-                    await configurator.OnInitializedAsync(childServiceProvider);
-
-                    if (WebView.HostPage == hostPage && WebView.WebView?.CoreWebView2 != null)
-                    {
-                        Log.Debug($"Reloading existing page, view type: {state}");
-                        await Reload();
-                    }
-                    else
-                    {
-                        Log.Debug($"Navigating to index page, view type: {state}");
-                        WebView.HostPage = hostPage;
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -343,6 +232,56 @@ public class BlazorContentControl : Control, IBlazorContentControl
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         Log.Debug($"BlazorContentControl has been loaded");
+    }
+
+    private BlazorContentPresenterWrapper CreateContentPresenter(CompositeDisposable contentAnchors, DateTimeOffset timestampUpdated)
+    {
+        var log = Log.WithSuffix(nameof(BlazorContentPresenterWrapper));
+        log.Debug($"Creating a new wrapper");
+        var contentPresenter = new BlazorContentPresenterWrapper().AddTo(contentAnchors);
+
+        this.WhenAnyValue(x => x.ViewType)
+            .Subscribe(x =>
+            {
+                log.Debug($"Updating view type: {x}");
+                contentPresenter.ViewType = x;
+            })
+            .AddTo(contentAnchors);
+
+        this.WhenAnyValue(x => x.Content)
+            .Subscribe(content =>
+            {
+                log.Debug($"Updating content to {content}");
+                contentPresenter.Content = content;
+            })
+            .AddTo(contentAnchors);
+
+        contentPresenter.WhenAnyValue(x => x.IsComponentInitialized)
+            .Where(x => x)
+            .Subscribe(() =>
+            {
+                var timestampInitialized = DateTimeOffset.Now;
+                log.Debug($"Component has initialized, total time (updated->initialized): {timestampInitialized - timestampUpdated}");
+            })
+            .AddTo(contentAnchors);
+        contentPresenter.WhenAnyValue(x => x.IsComponentLoaded)
+            .Where(x => x)
+            .Subscribe(() =>
+            {
+                var timestampLoaded = DateTimeOffset.Now;
+                log.Debug($"Component has loaded, total time (updated->loaded): {timestampLoaded - timestampUpdated}");
+            })
+            .AddTo(contentAnchors);
+        contentPresenter.WhenAnyValue(x => x.IsComponentRendered)
+            .Where(x => x)
+            .Subscribe(() =>
+            {
+                var timestampRendered = DateTimeOffset.Now;
+                log.Debug($"Component has rendered, total time (updated->rendered): {timestampRendered - timestampUpdated}");
+            })
+            .AddTo(contentAnchors);
+
+        return contentPresenter;
     }
 
     public Type ViewType
@@ -488,20 +427,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
         e.UserDataFolder = appArguments.TempDirectory;
     }
     
-    private static IServiceProvider BuildUnityServiceProvider(
-        IUnityContainer container,
-        IServiceCollection serviceCollection)
-    {
-        var factory = new ServiceProviderFactory(container);
-        var sp = factory.CreateServiceProvider(serviceCollection);
-        return sp;
-    }
-
-    private static string FormatExceptionMessage(Exception exception)
-    {
-        return $"{exception.GetType().Name}: {exception.Message} @ {exception.StackTrace}";
-    }
-
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)
     {
         switch (sender)
@@ -520,24 +445,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
         UnhandledException = e.Exception;
         e.Handled = true; // JS context is already dead at this point
-    }
-
-    private static string PrepareIndexFileContext(string template, IReadOnlyList<IFileInfo> additionalFiles)
-    {
-        var cssLinksText = additionalFiles
-            .Where(x => x.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.css", StringComparison.OrdinalIgnoreCase))
-            .Select(file => $"""<link href="{file.Name}" rel="stylesheet"></link>""")
-            .JoinStrings(Environment.NewLine);
-
-        var scriptsText = additionalFiles
-            .Where(x => x.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && !x.Name.EndsWith(".usr.js", StringComparison.OrdinalIgnoreCase))
-            .Select(file => $"""<script src="{file.Name}"></script>""")
-            .JoinStrings(Environment.NewLine);
-
-        var indexFileContent = template
-            .Replace("<!--% AdditionalStylesheetsBlock %-->", cssLinksText)
-            .Replace("<!--% AdditionalScriptsBlock %-->", scriptsText);
-        return indexFileContent;
     }
 
     public void Dispose()

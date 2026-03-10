@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7-windows</TargetFramework>
+        <AssemblyTitle>PoeShared.Blazor</AssemblyTitle>
+        <Product>PoeShared.Blazor.Hosting</Product>
+        <Copyright>Copyright © Xab3r 2026</Copyright>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <UseWpf>true</UseWpf>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
+        <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
+        <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <IncludeAssets>All</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="[7.0.2,)" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
+        <PackageReference Include="System.Management" Version="8.0.0" />
+        <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
+    </ItemGroup>
+
+</Project>

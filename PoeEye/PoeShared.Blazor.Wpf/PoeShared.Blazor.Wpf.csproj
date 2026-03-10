@@ -15,8 +15,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj"/>
+        <ProjectReference Include="..\..\..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" Condition="Exists('..\..\..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj')"/>
+        <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj" Condition="Exists('..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj')"/>
         <ProjectReference Include="..\PoeShared.Blazor.Controls\PoeShared.Blazor.Controls.csproj" />
+        <ProjectReference Include="..\PoeShared.Blazor.Hosting\PoeShared.Blazor.Hosting.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj"/>
         <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj"/>
         <ProjectReference Include="..\PoeShared\PoeShared.csproj"/>

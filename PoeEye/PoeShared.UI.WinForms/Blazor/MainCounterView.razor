@@ -1,0 +1,45 @@
+﻿@using PoeShared.Blazor.Wpf.Services
+@using ReactiveUI
+@inherits PoeShared.Blazor.BlazorReactiveComponent<PoeShared.UI.WinForms.Blazor.MainCounterViewModel>
+@inject IBlazorControlLocationTracker LocationTracker
+
+<h1>Counter</h1>
+
+<p>Content: @DataContext.DisplayName</p>
+<p>Instance: @DataContext.InstanceId</p>
+<p>The current count is: @DataContext.Count</p>
+<button @onclick="IncrementCount">Count</button>
+
+<HeadContent>
+    <meta name="description-counter" content="@DataContext.Count">
+    @if (DataContext.Count > 2)
+    {
+        <link href="_content/PoeShared.Blazor.WinForms/css/test.css" rel="stylesheet"/>
+    }
+</HeadContent>
+
+<ReactiveSection Trackers="@(new() { this.WhenAnyValue(x => x.RefreshRequestCount), DataContext.WhenAnyValue(x => x.Count) })">
+    <div>Reactive @DataContext.Count</div>
+</ReactiveSection>
+
+<ReactiveSection Trackers="@(new() { LocationTracker.WhenAnyValue(x => x.BoundsOnScreen) })">
+    <div>@LocationTracker.BoundsOnScreen</div>
+</ReactiveSection>
+
+@code {
+
+    void IncrementCount()
+    {
+        DataContext.Count++;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(10))
+            .Where(x => DataContext != null)
+            .Subscribe(x => IncrementCount())
+            .AddTo(Anchors);
+    }
+}

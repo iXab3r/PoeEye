@@ -1,0 +1,17 @@
+﻿@using System.Threading
+
+<h3>Slow View</h3>
+<p>This view blocks during initialization on purpose.</p>
+<h2>@Status</h2>
+
+@code {
+    public string Status { get; private set; } = "waiting";
+
+    protected override void OnInitialized()
+    {
+        Status = ".OnInitialized: entering";
+        Thread.Sleep(3000);
+        base.OnInitialized();
+        Status = ".OnInitialized: exiting";
+    }
+}

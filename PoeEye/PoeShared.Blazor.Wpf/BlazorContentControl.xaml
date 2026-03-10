@@ -3,6 +3,7 @@
                               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                               xmlns:wpf="clr-namespace:PoeShared.Blazor.Wpf"
+                              xmlns:hosting="clr-namespace:PoeShared.Blazor.Wpf;assembly=PoeShared.Blazor.Hosting"
                               xmlns:scaffolding="clr-namespace:PoeShared.Blazor.Wpf.Scaffolding"
                               xmlns:converters="clr-namespace:PoeShared.Blazor.Wpf.Converters"
                               mc:Ignorable="d">
@@ -63,21 +64,21 @@
         <Style.Triggers>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True"/>
+                    <Condition Binding="{Binding Source={x:Static hosting:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True"/>
                     <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=UnhandledException, Converter={x:Static converters:NullToFalseConverter.Instance}}" Value="False"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Template" Value="{StaticResource BlazorContentControlTemplate}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True"/>
+                    <Condition Binding="{Binding Source={x:Static hosting:WebViewAccessor.Instance}, Path=IsInstalled}" Value="True"/>
                     <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=UnhandledException, Converter={x:Static converters:NullToFalseConverter.Instance}}" Value="True"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Template" Value="{StaticResource BlazorContentControlErrorTemplate}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static wpf:WebViewAccessor.Instance}, Path=IsInstalled}" Value="False"/>
+                    <Condition Binding="{Binding Source={x:Static hosting:WebViewAccessor.Instance}, Path=IsInstalled}" Value="False"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Template" Value="{StaticResource TemporaryBlazorContentControlTemplate}" />
             </MultiDataTrigger>

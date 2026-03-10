@@ -1,0 +1,31 @@
+﻿<h3>Broken View</h3>
+
+<p>This view is intentionally unstable and exists to test exception handling inside the host.</p>
+
+<div>Without error boundary: <ExceptionPanel /></div>
+
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
+        <div>With error boundary: <ExceptionPanel /></div>
+    </ChildContent>
+    <ErrorContent>
+        <div class="border p-4 text-danger">
+            Something has gone wrong - this component crashed.
+            <button @onclick="Recover">Try to recover</button>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    private ErrorBoundary? errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private void Recover()
+    {
+        errorBoundary?.Recover();
+    }
+}

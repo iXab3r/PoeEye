@@ -1,0 +1,56 @@
+﻿@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+<div class="d-flex flex-column gap-2">
+    <button @onclick="ThrowException">Throw Exception</button>
+    <button @onclick="ThrowExceptionAsync">Awaited task throws</button>
+    <button @onclick="ThrowRenderTreeException">Throw RenderTree Exception</button>
+    <button @onclick="ThrowJsExceptionAsync">Awaited JS Exception</button>
+    <button @onclick="ThrowJsExceptionUnawaited">Un-awaited JS Exception</button>
+    <button @onclick="ThrowExceptionUnawaited" class="bg-danger">Un-awaited task throws</button>
+    <button @onclick="GcCollect">GC Collect</button>
+</div>
+
+@if (renderInvalidTree)
+{
+    <div><button @onclick="ThrowException" @qq="test">qwe</button></div>
+}
+
+@code {
+    private bool renderInvalidTree;
+
+    private static void GcCollect()
+    {
+        GC.Collect();
+    }
+
+    private void ThrowExceptionUnawaited()
+    {
+        _ = ThrowExceptionAsync();
+    }
+
+    private async Task ThrowExceptionAsync()
+    {
+        await Task.Delay(10);
+        throw new Exception("This is some ***async*** exception.");
+    }
+
+    private static void ThrowException()
+    {
+        throw new Exception("This is some unhandled exception.");
+    }
+
+    private async Task ThrowJsExceptionAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("throwException", "generic JS exception");
+    }
+
+    private void ThrowRenderTreeException()
+    {
+        renderInvalidTree = true;
+    }
+
+    private void ThrowJsExceptionUnawaited()
+    {
+        JsRuntime.InvokeVoidAsync("throwException", "un-awaited generic JS exception");
+    }
+}

@@ -1,0 +1,25 @@
+﻿@inherits PoeShared.Blazor.BlazorReactiveComponent<PoeShared.UI.WinForms.Blazor.MainCounterViewModel>
+
+<section style="border: 1px solid #d6d6d6; padding: 12px; background: #f8fbff;">
+    <h3>Counter Alt</h3>
+    <div><strong>Name:</strong> @DataContext.DisplayName</div>
+    <div><strong>Instance:</strong> @DataContext.InstanceId</div>
+    <div><strong>Count:</strong> @DataContext.Count</div>
+    <div style="margin-top: 12px;">
+        <button @onclick="IncrementCount">Increment</button>
+        <button @onclick="IncrementByFive" style="margin-left: 8px;">Increment +5</button>
+    </div>
+    <p style="margin-top: 12px;">This view is used to validate runtime `ViewType` switching without recreating the WinForms host.</p>
+</section>
+
+@code {
+    private void IncrementCount()
+    {
+        DataContext.Count++;
+    }
+
+    private void IncrementByFive()
+    {
+        DataContext.Count += 5;
+    }
+}
