@@ -3,9 +3,7 @@
 <div class="@Class" style="@Style">
     <div class="r-expander-header" >
         <ReactiveButton Class="btn border-0 d-flex gap-3 align-items-center" Command="ToggleIsExpanded">
-            <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.IsExpanded)))">
-                <i class="@SwitcherClassMapper"></i>
-            </ReactiveSection>
+            <i class="fa-solid @(currentIsExpanded ? "fa-angle-down" : "fa-angle-right")"></i>
 
             <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.Title, x => x.TitleContent)))">
                 @if (TitleContent != null)
@@ -29,17 +27,16 @@
     </div>
 
     <div id="@Id" class="r-expander-content">
-        <ReactiveSection Trackers="@(new ReactiveTrackerList().With(this.WhenAnyValue(x => x.IsExpanded)))">
-            @if (IsExpanded)
-            {
-                @ChildContent
-            }
-        </ReactiveSection>
+        @if (currentIsExpanded)
+        {
+            @ChildContent
+        }
     </div>
 </div>
 
 @code {
     [Parameter] public bool IsExpanded { get; set; } = true;
+    [Parameter] public EventCallback<bool> IsExpandedChanged { get; set; }
 
     [Parameter] public string? Title { get; set; }
 
@@ -47,21 +44,37 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public RenderFragment? TailContent { get; set; }
 
-    protected ClassMapper SwitcherClassMapper { get; } = new();
+    private bool currentIsExpanded;
+    private bool hasReceivedIsExpanded;
+    private bool lastReceivedIsExpanded;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
         Id = $"reactive-expander-container-{ComponentId}";
-        SwitcherClassMapper
-            .Add("fa-solid")
-            .Get(() => IsExpanded ? "fa-angle-down" : "fa-angle-right");
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (!hasReceivedIsExpanded || IsExpanded != lastReceivedIsExpanded)
+        {
+            currentIsExpanded = IsExpanded;
+            lastReceivedIsExpanded = IsExpanded;
+            hasReceivedIsExpanded = true;
+        }
     }
 
     private async Task ToggleIsExpanded()
     {
-        IsExpanded = !IsExpanded;
+        currentIsExpanded = !currentIsExpanded;
+
+        if (IsExpandedChanged.HasDelegate)
+        {
+            await IsExpandedChanged.InvokeAsync(currentIsExpanded);
+        }
     }
 
 }
