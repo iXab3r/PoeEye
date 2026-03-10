@@ -32,7 +32,7 @@ namespace PoeShared.Blazor.WinForms;
 /// Things to note:
 /// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
 /// </summary>
-internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow
+internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFormsBlazorWindow
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
 

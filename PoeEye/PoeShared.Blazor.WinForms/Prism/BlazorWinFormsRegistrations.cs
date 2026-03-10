@@ -14,6 +14,7 @@ public sealed class BlazorWinFormsRegistrations : UnityContainerExtension
     protected override void Initialize()
     {
         Container.RegisterType<IBlazorWindow, BlazorWindow>();
+        Container.RegisterType<IWinFormsBlazorWindow, BlazorWindow>();
         Container.RegisterSingleton<IStaticWebAssetsFileProvider, StaticWebAssetsFileProvider>();
         Container.RegisterSingleton<IWebViewAccessor>(_ => WebViewAccessor.Instance);
         Container.RegisterSingleton<IRootContentFileProvider, RootContentFileProvider>();

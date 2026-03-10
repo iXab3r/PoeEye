@@ -31,7 +31,7 @@ namespace PoeShared.Blazor.Wpf;
 /// Things to note:
 /// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
 /// </summary>
-internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IBlazorWindow, IBlazorWindowMetroController
+internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBlazorWindow, IBlazorWindowMetroController
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
 
