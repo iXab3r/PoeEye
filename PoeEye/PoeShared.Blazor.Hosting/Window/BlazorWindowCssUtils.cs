@@ -9,9 +9,9 @@ internal static class BlazorWindowCssUtils
 {
     public const string WindowCornerRadiusVariable = "--blazor-window-corner-radius";
 
-    public static string BuildSystemCornerRadiusStyle(IBlazorWindow window)
+    public static string BuildSystemCornerRadiusStyle(IBlazorWindow window, TitleBarDisplayMode effectiveTitleBarDisplayMode)
     {
-        if (window == null || window.TitleBarDisplayMode != TitleBarDisplayMode.System || window.WindowState == WindowState.Maximized)
+        if (window == null || effectiveTitleBarDisplayMode != TitleBarDisplayMode.System || window.WindowState == WindowState.Maximized)
         {
             return null;
         }

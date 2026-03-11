@@ -59,7 +59,7 @@ public abstract class ReactiveUserControl : UserControl, IDisposableReactiveObje
     }
 }
 
-public sealed partial class BlazorContentHost : ReactiveUserControl
+public sealed partial class BlazorContentHost : ReactiveUserControl, IBlazorContentHost
 {
     private static readonly GlobalIdProvider IdProvider = new();
     private static readonly Binder<BlazorContentHost> Binder = new();
@@ -234,6 +234,8 @@ public sealed partial class BlazorContentHost : ReactiveUserControl
 
                             serviceCollection.AddSingleton<IUnityContainer>(_ => state.ChildContainer!);
                             serviceCollection.AddSingleton<IWebViewAccessor>(_ => WebViewAccessor.Instance);
+                            serviceCollection.AddSingleton<IBlazorContentHost>(_ => this);
+                            serviceCollection.AddSingleton<IBlazorHostController>(_ => new Services.BlazorHostController(this));
                             serviceCollection.AddSingleton<IBlazorContentHostAccessor>(_ => new BlazorContentHostAccessor(this));
                             serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new ControlLocationTracker(this).AddTo(contentAnchors));
                             serviceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(() => WebView.WebView));

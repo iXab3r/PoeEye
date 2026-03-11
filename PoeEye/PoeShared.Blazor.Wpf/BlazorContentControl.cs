@@ -199,6 +199,8 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
                             serviceCollection.AddSingleton<IUnityContainer>(_ => state.ChildContainer!);
                             serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
+                            serviceCollection.AddSingleton<IBlazorContentControl>(_ => this);
+                            serviceCollection.AddSingleton<IBlazorHostController>(_ => new BlazorHostController(this));
                             serviceCollection.AddSingleton<IBlazorContentControlAccessor>(_ => new BlazorContentControlAccessor(this));
                             serviceCollection.AddSingleton<ICoreWebView2Accessor>(_ => new CoreWebView2Accessor(WebView.WebView));
                         },

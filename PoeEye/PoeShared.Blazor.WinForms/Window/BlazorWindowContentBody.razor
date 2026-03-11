@@ -1,8 +1,9 @@
 ﻿@namespace PoeShared.Blazor.WinForms
+@using PoeShared.Blazor.Wpf
 
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
-<div id="@(IBlazorWindow.WindowBody)" class="overflow-auto h-100" style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext)">
+<div id="@(IBlazorWindow.WindowBody)" class="overflow-auto h-100" style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWinForms())">
     @if (DataContext.Anchors.IsDisposed)
     {
         <div class="d-grid-center">
@@ -49,7 +50,7 @@
             .AddTo(Anchors);
     }
 
-    [Inject] public IBlazorContentHostAccessor BlazorContentHostAccessor { get; init; }
+    [Inject] public IBlazorHostController BlazorHostController { get; init; }
 
     public BlazorContentPresenter ContentPresenter { get; private set; }
 
@@ -67,7 +68,7 @@
                 }
                 else if (x.Key == Key.F12)
                 {
-                    await BlazorContentHostAccessor.Control.OpenDevTools();
+                    await BlazorHostController.OpenDevTools();
                     x.Handled = true;
                 }
             })

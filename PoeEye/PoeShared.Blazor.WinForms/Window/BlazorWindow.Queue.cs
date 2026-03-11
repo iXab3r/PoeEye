@@ -216,9 +216,9 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Updating {nameof(ResizeMode)} to {command.ResizeMode}");
                     window.ApplyResizeMode(command.ResizeMode);
-                    if (TitleBarDisplayMode == TitleBarDisplayMode.System)
+                    if (TitleBarDisplayMode.ResolveForWinForms() == TitleBarDisplayMode.System)
                     {
-                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode.System);
+                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode);
                     }
 
                     break;
@@ -227,6 +227,12 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Updating {nameof(ShowInTaskbar)} to {command.ShowInTaskbar}");
                     window.ShowInTaskbar = command.ShowInTaskbar;
+                    break;
+                }
+                case SetShowActivated command:
+                {
+                    Log.Debug($"Updating {nameof(ShowActivated)} to {command.ShowActivated}");
+                    window.ShowActivated = command.ShowActivated;
                     break;
                 }
                 case SetIsClickThrough command:
@@ -272,14 +278,15 @@ partial class BlazorWindow
                 case SetBorderThickness command:
                 {
                     Log.Debug($"Updating {nameof(BorderThickness)} to {command.BorderThickness}");
-                    if (command.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.None)
+                    var effectiveTitleBarDisplayMode = command.TitleBarDisplayMode.ResolveForWinForms();
+                    if (effectiveTitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.None)
                     {
                         window.BorderThickness = new Thickness(0);
                     }
-                    else if (command.TitleBarDisplayMode == TitleBarDisplayMode.System)
+                    else if (effectiveTitleBarDisplayMode == TitleBarDisplayMode.System)
                     {
                         window.BorderThickness = command.BorderThickness;
-                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode.System);
+                        window.UpdateTitleBarDisplayMode(command.TitleBarDisplayMode);
                     }
                     else
                     {
@@ -387,6 +394,7 @@ partial class BlazorWindow
             //we have to "guess" current DPI, then, when SourceInitialized will be called, it will be re-calculated again
             //best-case scenario - DPI won't change and there will be no blinking at all
             blazorWindow.HandleEvent(new SetShowInTaskbar(blazorWindow.ShowInTaskbar));
+            blazorWindow.HandleEvent(new SetShowActivated(blazorWindow.ShowActivated));
             blazorWindow.HandleEvent(new SetTopmostCommand(blazorWindow.Topmost));
             blazorWindow.HandleEvent(new SetAllowsTransparency(blazorWindow.AllowsTransparency));
             blazorWindow.HandleEvent(new SetBackgroundColor(blazorWindow.BackgroundColor));
@@ -510,6 +518,13 @@ partial class BlazorWindow
                 .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x.Value)))
+                .AddTo(anchors);
+
+            blazorWindow.showActivated
+                .Listen()
+                .Skip(1)
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
+                .Subscribe(x => observer.OnNext(new SetShowActivated(x.Value)))
                 .AddTo(anchors);
 
             Observable.CombineLatest(
@@ -1237,6 +1252,8 @@ partial class BlazorWindow
     private sealed record SetShowTitleBarCommand(TitleBarDisplayMode TitleBarDisplayMode, bool ShowCloseButton, bool ShowMinButton, bool ShowMaxButton) : IWindowCommand;
 
     private sealed record SetShowInTaskbar(bool ShowInTaskbar) : IWindowCommand;
+
+    private sealed record SetShowActivated(bool ShowActivated) : IWindowCommand;
 
     private sealed record SetIsClickThrough(bool IsClickThrough) : IWindowCommand;
 

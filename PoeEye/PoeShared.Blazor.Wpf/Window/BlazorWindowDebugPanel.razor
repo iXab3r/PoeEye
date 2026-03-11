@@ -11,7 +11,6 @@
 @using PoeShared.Blazor
 @using Microsoft.AspNetCore.Components.Forms
 @using PoeShared.Blazor.Services
-@using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Scaffolding
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
@@ -54,7 +53,7 @@
                     Activate
                 </button>
                 <button class="btn btn-secondary p-0 m-0 px-3"
-                        @onclick="@(() => BlazorContentControlAccessor.Control.OpenDevToolsCommand.ExecuteAsync())">
+                        @onclick="@(() => BlazorHostController.OpenDevToolsCommand.ExecuteAsync())">
                     DevTools
                 </button>
                 <span class="vr"></span>
@@ -335,7 +334,7 @@
                         <input id="ShowMinButton" type="checkbox"
                                @bind:get="@(DataContext.ShowMinButton)"
                                @bind:set="@(x => DataContext.ShowMinButton = x)"
-                               disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
+                               disabled="@(DataContext.TitleBarDisplayMode.ResolveForWpf() == TitleBarDisplayMode.System)"
                                @bind:event="oninput"/>
                         <label for="ShowMinButton" class="rcb-label">
                             Min
@@ -348,7 +347,7 @@
                         <input id="ShowMaxButton" type="checkbox"
                                @bind:get="@(DataContext.ShowMaxButton)"
                                @bind:set="@(x => DataContext.ShowMaxButton = x)"
-                               disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
+                               disabled="@(DataContext.TitleBarDisplayMode.ResolveForWpf() == TitleBarDisplayMode.System)"
                                @bind:event="oninput"/>
                         <label for="ShowMaxButton" class="rcb-label">
                             Max
@@ -361,7 +360,7 @@
                         <input id="ShowCloseButton" type="checkbox"
                                @bind:get="@(DataContext.ShowCloseButton)"
                                @bind:set="@(x => DataContext.ShowCloseButton = x)"
-                               disabled="@(DataContext.TitleBarDisplayMode == TitleBarDisplayMode.System)"
+                               disabled="@(DataContext.TitleBarDisplayMode.ResolveForWpf() == TitleBarDisplayMode.System)"
                                @bind:event="oninput"/>
                         <label for="ShowCloseButton" class="rcb-label">
                             Close
@@ -676,7 +675,7 @@
 
     private readonly SerialDisposable dragAnchor;
 
-    [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
+    [Inject] public IBlazorHostController BlazorHostController { get; init; }
 
     public BlazorWindowDebugPanel()
     {

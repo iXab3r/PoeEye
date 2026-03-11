@@ -39,6 +39,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     private readonly IUnityContainer unityContainer;
     private readonly Lazy<NativeWindow> windowSupplier;
     private bool allowsTransparency = true;
+    private TitleBarDisplayMode titleBarDisplayMode = TitleBarDisplayMode.Default;
 
     private readonly long windowId = BlazorWindowCounter.GetNext();
 
@@ -55,6 +56,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     private readonly PropertyValueHolder<bool> windowTopmost;
     private readonly PropertyValueHolder<bool> windowVisible;
     private readonly PropertyValueHolder<bool> showInTaskbar;
+    private readonly PropertyValueHolder<bool> showActivated;
     private readonly PropertyValueHolder<WindowState> windowState;
     private readonly PropertyValueHolder<bool> noActivate;
 
@@ -132,9 +134,11 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
         windowTopmost = new PropertyValueHolder<bool>(this, nameof(Topmost)).AddTo(Anchors);
         windowVisible = new PropertyValueHolder<bool>(this, nameof(IsVisible)).AddTo(Anchors);
         showInTaskbar = new PropertyValueHolder<bool>(this, nameof(ShowInTaskbar)).AddTo(Anchors);
+        showActivated = new PropertyValueHolder<bool>(this, nameof(ShowActivated)).AddTo(Anchors);
         noActivate = new PropertyValueHolder<bool>(this, nameof(NoActivate)).AddTo(Anchors);
         windowState = new PropertyValueHolder<WindowState>(this, nameof(WindowState)).AddTo(Anchors);
 
+        ShowActivated = false;
         ShowInTaskbar = true;
         Width = 300;
         Height = 200;
@@ -301,7 +305,24 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
 
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
 
-    public TitleBarDisplayMode TitleBarDisplayMode { get; set; } = TitleBarDisplayMode.Default;
+    public TitleBarDisplayMode TitleBarDisplayMode
+    {
+        get => titleBarDisplayMode;
+        set
+        {
+            if (titleBarDisplayMode == value)
+            {
+                return;
+            }
+
+            if (!TryPrepareTitleBarDisplayMode(value))
+            {
+                return;
+            }
+
+            RaiseAndSetIfChanged(ref titleBarDisplayMode, value);
+        }
+    }
 
     public bool AllowsTransparency
     {
@@ -313,7 +334,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
                 return;
             }
 
-            if (TitleBarDisplayMode == TitleBarDisplayMode.System && value)
+            if (TitleBarDisplayMode.ResolveForWinForms() == TitleBarDisplayMode.System && value)
             {
                 Log.Warn($"{nameof(AllowsTransparency)} cannot be enabled while {nameof(TitleBarDisplayMode)} is {TitleBarDisplayMode.System}");
                 return;
@@ -329,6 +350,24 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
         }
     }
 
+    private bool TryPrepareTitleBarDisplayMode(TitleBarDisplayMode value)
+    {
+        if (value.ResolveForWinForms() != TitleBarDisplayMode.System || !allowsTransparency)
+        {
+            return true;
+        }
+
+        if (windowSupplier.IsValueCreated && windowSupplier.Value.WindowHandle != IntPtr.Zero)
+        {
+            Log.Warn($"Ignoring change to {nameof(TitleBarDisplayMode)} after the native window handle is created because {nameof(AllowsTransparency)} is enabled");
+            return false;
+        }
+
+        Log.Debug($"Disabling {nameof(AllowsTransparency)} because effective {nameof(TitleBarDisplayMode)} is {TitleBarDisplayMode.System}");
+        RaiseAndSetIfChanged(ref allowsTransparency, false);
+        return true;
+    }
+
     public IBlazorContentControlConfigurator ControlConfigurator { get; set; }
 
     public IDisposable RegisterFileProvider(IFileProvider fileProvider)
@@ -340,6 +379,12 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     {
         get => showInTaskbar.State.Value;
         set => showInTaskbar.SetValue(value, TrackedPropertyUpdateSource.External);
+    }
+
+    public bool ShowActivated
+    {
+        get => showActivated.State.Value;
+        set => showActivated.SetValue(value, TrackedPropertyUpdateSource.External);
     }
 
     public WindowState WindowState

@@ -68,6 +68,7 @@ public static class Program
         var assemblyName = assembly.GetName();
         Log.Info($"Name: {assemblyName.Name}");
         Log.Info($"Version: {assemblyName.Version}");
+        Console.WriteLine($"{assemblyName.Name} {assemblyName.Version}");
     }
 
     private static void HandleRestart(RestartAppArguments args)

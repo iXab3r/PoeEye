@@ -16,7 +16,7 @@
      id="@(IBlazorWindow.WindowId)"
      style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
-        @if (DataContext.TitleBarDisplayMode != TitleBarDisplayMode.None)
+        @if (DataContext.TitleBarDisplayMode.ResolveForWpf() != TitleBarDisplayMode.None)
         {
             <div style="@(new CssBuilder().AddValue($"anchor-name: {IBlazorWindow.TitleBarAnchorName};").Build())">
                 <BlazorWindowContentTitleBar DataContext="@DataContext"/>
@@ -31,7 +31,7 @@
     <BlazorWindowContentBody DataContext="@DataContext"/>
 
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.BorderThickness)))">
-        @if (DataContext.TitleBarDisplayMode != TitleBarDisplayMode.System)
+        @if (DataContext.TitleBarDisplayMode.ResolveForWpf() != TitleBarDisplayMode.System)
         {
             var borderZIndex = 65535;
             var minThickness = 4;

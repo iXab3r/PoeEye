@@ -10,7 +10,7 @@
 
 <div class="d-flex w-100 align-items-center"
      id="@(IBlazorWindow.WindowTitleBarId)"
-     style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext)"
+     style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWpf())"
      @ref="@ElementRef">
     <ReactiveSection
         Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ViewTypeForTitleBar, x => x.Title)))">

@@ -196,9 +196,7 @@ internal partial class BlazorWindow
 
         public void UpdateTitleBarDisplayMode(TitleBarDisplayMode titleBarDisplayMode)
         {
-            var displayMode = titleBarDisplayMode == TitleBarDisplayMode.Default
-                ? TitleBarDisplayMode.Custom
-                : titleBarDisplayMode;
+            var displayMode = titleBarDisplayMode.ResolveForWinForms();
 
             switch (displayMode)
             {
@@ -300,9 +298,7 @@ internal partial class BlazorWindow
 
         private void ApplyNativeSystemChrome()
         {
-            var displayMode = owner.TitleBarDisplayMode == TitleBarDisplayMode.Default
-                ? TitleBarDisplayMode.Custom
-                : owner.TitleBarDisplayMode;
+            var displayMode = owner.TitleBarDisplayMode.ResolveForWinForms();
             if (displayMode != TitleBarDisplayMode.System || WindowHandle == IntPtr.Zero)
             {
                 return;
@@ -313,13 +309,13 @@ internal partial class BlazorWindow
 
         public void UpdateAllowsTransparency(bool allowsTransparency)
         {
-            if (owner.TitleBarDisplayMode == TitleBarDisplayMode.System && allowsTransparency)
+            if (owner.TitleBarDisplayMode.ResolveForWinForms() == TitleBarDisplayMode.System && allowsTransparency)
             {
                 owner.Log.Warn($"{nameof(AllowsTransparency)} cannot be enabled while {nameof(TitleBarDisplayMode)} is {TitleBarDisplayMode.System}");
                 return;
             }
 
-            TrySetAllowsTransparency(allowsTransparency, owner.TitleBarDisplayMode);
+            TrySetAllowsTransparency(allowsTransparency, owner.TitleBarDisplayMode.ResolveForWinForms());
         }
 
         private bool TrySetAllowsTransparency(bool allowsTransparency, TitleBarDisplayMode displayMode)

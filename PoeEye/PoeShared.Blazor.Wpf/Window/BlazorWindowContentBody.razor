@@ -3,7 +3,6 @@
 @using System.Windows.Input
 @using PoeShared.Blazor
 @using PoeShared.Blazor.Scaffolding
-@using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Scaffolding
 @using ReactiveUI
 @inherits BlazorReactiveComponent<IBlazorWindow>
@@ -13,7 +12,7 @@
     <link href="_content/PoeShared.Blazor.Wpf/css/blazor-window.css" rel="stylesheet"/>
 </HeadContent>
 
-<div id="@(IBlazorWindow.WindowBody)" class="overflow-auto h-100" style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext)">
+<div id="@(IBlazorWindow.WindowBody)" class="overflow-auto h-100" style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWpf())">
     @if (DataContext.Anchors.IsDisposed)
     {
         <div class="d-grid-center">
@@ -60,7 +59,7 @@
             .AddTo(Anchors);
     }
 
-    [Inject] public IBlazorContentControlAccessor BlazorContentControlAccessor { get; init; }
+    [Inject] public IBlazorHostController BlazorHostController { get; init; }
 
     public BlazorContentPresenter ContentPresenter { get; private set; }
 
@@ -78,7 +77,7 @@
                 }
                 else if (x.Key == Key.F12)
                 {
-                    await BlazorContentControlAccessor.Control.OpenDevTools();
+                    await BlazorHostController.OpenDevTools();
                     x.Handled = true;
                 }
             })

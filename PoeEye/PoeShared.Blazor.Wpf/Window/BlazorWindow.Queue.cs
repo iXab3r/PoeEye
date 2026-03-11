@@ -197,11 +197,15 @@ partial class BlazorWindow
                 case SetWindowPadding command:
                 {
                     Log.Debug($"Updating {nameof(Padding)} to {command.Padding}");
-                    //min padding must be at least 1px to accomodate for WPF rounding
-                    //otherwise browser content gets cropped in some cases
+                    // Keep a 1px safety margin on most edges to avoid WebView cropping caused by WPF rounding.
+                    // For frameless/custom titlebars, forcing a top margin creates a visible strip above the Blazor titlebar.
+                    var effectiveTitleBarDisplayMode = command.TitleBarDisplayMode.ResolveForWpf();
+                    var minTopPadding = effectiveTitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.None
+                        ? 0
+                        : 1;
                     window.ContentControl.Margin = new Thickness(
                         left: Math.Max(command.Padding.Left, 1),
-                        top: Math.Max(command.Padding.Top, 1),
+                        top: Math.Max(command.Padding.Top, minTopPadding),
                         right: Math.Max(command.Padding.Right, 1),
                         bottom: Math.Max(command.Padding.Bottom, 1)
                     );
@@ -211,9 +215,9 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Updating {nameof(ResizeMode)} to {command.ResizeMode}");
                     window.ResizeMode = command.ResizeMode;
-                    if (TitleBarDisplayMode == TitleBarDisplayMode.System)
+                    if (TitleBarDisplayMode.ResolveForWpf() == TitleBarDisplayMode.System)
                     {
-                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode.System);
+                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode);
                     }
                     break;
                 }
@@ -221,6 +225,12 @@ partial class BlazorWindow
                 {
                     Log.Debug($"Updating {nameof(ShowInTaskbar)} to {command.ShowInTaskbar}");
                     window.ShowInTaskbar = command.ShowInTaskbar;
+                    break;
+                }
+                case SetShowActivated command:
+                {
+                    Log.Debug($"Updating {nameof(ShowActivated)} to {command.ShowActivated}");
+                    window.ShowActivated = command.ShowActivated;
                     break;
                 }
                 case SetIsClickThrough command:
@@ -267,14 +277,15 @@ partial class BlazorWindow
                 case SetBorderThickness command:
                 {
                     Log.Debug($"Updating {nameof(BorderThickness)} to {command.BorderThickness}");
-                    if (command.TitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.None)
+                    var effectiveTitleBarDisplayMode = command.TitleBarDisplayMode.ResolveForWpf();
+                    if (effectiveTitleBarDisplayMode is TitleBarDisplayMode.Custom or TitleBarDisplayMode.None)
                     {
                         window.BorderThickness = new Thickness(0);
                     }
-                    else if (command.TitleBarDisplayMode == TitleBarDisplayMode.System)
+                    else if (effectiveTitleBarDisplayMode == TitleBarDisplayMode.System)
                     {
                         window.BorderThickness = command.BorderThickness;
-                        window.UpdateTitleBarDisplayMode(TitleBarDisplayMode.System);
+                        window.UpdateTitleBarDisplayMode(command.TitleBarDisplayMode);
                     }
                     else
                     {
@@ -377,11 +388,14 @@ partial class BlazorWindow
             var anchors = new CompositeDisposable();
             Disposable.Create(() => log.Debug("Window subscription is being disposed")).AddTo(anchors);
 
+            blazorWindow.TryPrepareTitleBarDisplayMode(blazorWindow.TitleBarDisplayMode);
+
             //SetupInitialState in Window is called BEFORE that SourceInitialized
             //so to set up proper initial size and position (for the very first frame)
             //we have to "guess" current DPI, then, when SourceInitialized will be called, it will be re-calculated again
             //best-case scenario - DPI won't change and there will be no blinking at all
             blazorWindow.HandleEvent(new SetShowInTaskbar(blazorWindow.ShowInTaskbar));
+            blazorWindow.HandleEvent(new SetShowActivated(blazorWindow.ShowActivated));
             blazorWindow.HandleEvent(new SetTopmostCommand(blazorWindow.Topmost));
             blazorWindow.HandleEvent(new SetAllowsTransparency(blazorWindow.AllowsTransparency));
             blazorWindow.HandleEvent(new SetBackgroundColor(blazorWindow.BackgroundColor));
@@ -527,6 +541,13 @@ partial class BlazorWindow
                 .Skip(1)
                 .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
                 .Subscribe(x => observer.OnNext(new SetShowInTaskbar(x.Value)))
+                .AddTo(anchors);
+
+            blazorWindow.showActivated
+                .Listen()
+                .Skip(1)
+                .Where(x => x.UpdateSource is TrackedPropertyUpdateSource.External)
+                .Subscribe(x => observer.OnNext(new SetShowActivated(x.Value)))
                 .AddTo(anchors);
 
             Observable.CombineLatest(
@@ -1188,6 +1209,8 @@ partial class BlazorWindow
     private sealed record SetShowTitleBarCommand(TitleBarDisplayMode TitleBarDisplayMode, bool ShowCloseButton, bool ShowMinButton, bool ShowMaxButton) : IWindowCommand;
 
     private sealed record SetShowInTaskbar(bool ShowInTaskbar) : IWindowCommand;
+
+    private sealed record SetShowActivated(bool ShowActivated) : IWindowCommand;
 
     private sealed record SetIsClickThrough(bool IsClickThrough) : IWindowCommand;
 

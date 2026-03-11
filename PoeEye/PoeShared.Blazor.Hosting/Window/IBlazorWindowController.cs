@@ -40,6 +40,11 @@ public interface IBlazorWindowController
     bool ShowInTaskbar { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the window should activate when shown.
+    /// </summary>
+    bool ShowActivated { get; set; }
+
+    /// <summary>
     /// Gets or sets the padding around the window content.
     /// </summary>
     Thickness Padding { get; set; }

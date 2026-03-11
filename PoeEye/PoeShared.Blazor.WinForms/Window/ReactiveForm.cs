@@ -13,6 +13,7 @@ internal delegate IntPtr FormMessageHook(IntPtr hwnd, int msg, IntPtr wParam, In
 
 internal class ReactiveForm : Form, IDisposableReactiveObject
 {
+    private bool showActivated = true;
     private WindowState windowState;
 
     public CompositeDisposable Anchors { get; } = new();
@@ -59,6 +60,21 @@ internal class ReactiveForm : Form, IDisposableReactiveObject
 
     public ResizeMode ResizeMode { get; set; } = ResizeMode.CanResizeWithGrip;
 
+    public bool ShowActivated
+    {
+        get => showActivated;
+        set
+        {
+            if (showActivated == value)
+            {
+                return;
+            }
+
+            showActivated = value;
+            RaisePropertyChanged(nameof(ShowActivated));
+        }
+    }
+
     public string Title
     {
         get => Text;
@@ -70,6 +86,8 @@ internal class ReactiveForm : Form, IDisposableReactiveObject
         get => TopMost;
         set => TopMost = value;
     }
+
+    protected override bool ShowWithoutActivation => !ShowActivated;
 
     protected override void Dispose(bool disposing)
     {
