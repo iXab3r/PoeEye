@@ -38,42 +38,4 @@
             <IncludeAssets>All</IncludeAssets>
         </PackageReference>
     </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="..\PoeShared.Blazor.Wpf\wwwroot\**\*">
-            <Link>wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <SharedStaticWebAsset>true</SharedStaticWebAsset>
-        </Content>
-    </ItemGroup>
-
-    <Target Name="ResolveSharedStaticWebAssets" BeforeTargets="ResolveProjectStaticWebAssets">
-        <ItemGroup>
-            <_SharedStaticWebAssetCandidate Include="@(Content)" Condition="'%(SharedStaticWebAsset)' == 'true'" />
-            <Content Remove="@(_SharedStaticWebAssetCandidate)" />
-        </ItemGroup>
-
-        <DefineStaticWebAssets
-            CandidateAssets="@(_SharedStaticWebAssetCandidate)"
-            FingerprintCandidates="$(StaticWebAssetsFingerprintContent)"
-            FingerprintPatterns="@(StaticWebAssetFingerprintPattern)"
-            RelativePathPattern="wwwroot/**"
-            SourceType="Discovered"
-            SourceId="$(PackageId)"
-            ContentRoot="$(SharedStaticWebAssetsRoot)"
-            BasePath="$(StaticWebAssetBasePath)"
-            AssetMergeSource="$(StaticWebAssetMergeTarget)">
-            <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
-            <Output TaskParameter="Assets" ItemName="_CurrentProjectStaticWebAsset" />
-        </DefineStaticWebAssets>
-
-        <ItemGroup>
-            <StaticWebAssetDiscoveryPattern Include="$(PackageId)\shared-wwwroot">
-                <Source>$(PackageId)</Source>
-                <BasePath>$(StaticWebAssetBasePath)</BasePath>
-                <ContentRoot>$(SharedStaticWebAssetsRoot)</ContentRoot>
-                <Pattern>**</Pattern>
-            </StaticWebAssetDiscoveryPattern>
-        </ItemGroup>
-    </Target>
-
 </Project>
