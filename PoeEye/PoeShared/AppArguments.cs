@@ -253,6 +253,11 @@ public class AppArguments : AppOptions, IAppArguments
                 parsedResult.Value.CopyPropertiesTo(instance);
                 return true;
             case NotParsed<AppOptions> notParsed:
+                if (notParsed.Errors.FirstOrDefault() is VersionRequestedError)
+                {
+                    Log.Info("Version requested");
+                    return true;
+                }
                 Log.Warn($"Parsing failed:\n\t{notParsed.Errors.DumpToTable()}");
                 return false;
             default:
