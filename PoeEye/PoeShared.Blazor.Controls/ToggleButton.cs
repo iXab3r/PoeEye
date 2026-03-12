@@ -12,6 +12,9 @@ partial class ToggleButton
     [Parameter]
     public bool IsChecked { get; set; }
     
+    [Parameter]
+    public string? Title { get; set; }
+
     [Parameter] 
     public EventCallback<bool> IsCheckedChanged { get; set; }
     
