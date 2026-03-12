@@ -19,6 +19,7 @@ using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 using Unity;
 using Color = System.Windows.Media.Color;
@@ -813,7 +814,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
 
             try
             {
-                window.Activate();
+                UnsafeNative.SetForegroundWindow(window.WindowHandle);
             }
             catch (InvalidOperationException e)
             {

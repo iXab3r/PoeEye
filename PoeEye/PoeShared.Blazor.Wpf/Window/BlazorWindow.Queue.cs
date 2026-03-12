@@ -614,6 +614,11 @@ partial class BlazorWindow
                     blazorWindow.WhenAnyValue(x => x.Opacity)
                         .Subscribe(x => observer.OnNext(new SetOpacity(x)))
                         .AddTo(anchors);
+
+                    if (blazorWindow.ShowActivated)
+                    {
+                        blazorWindow.Activate();
+                    }
                 })
                 .AddTo(anchors);
 

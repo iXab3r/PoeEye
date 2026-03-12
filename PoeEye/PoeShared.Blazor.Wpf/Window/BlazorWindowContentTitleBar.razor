@@ -74,7 +74,7 @@
             Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.ShowCloseButton)))">
             @if (DataContext.ShowCloseButton)
             {
-                <button class="btn btn-secondary-outline p-0 m-0 px-2"
+                <button class="btn btn-secondary-outline p-0 m-0 px-2 me-1"
                         @onclick="@(() => DataContext.Close())">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
