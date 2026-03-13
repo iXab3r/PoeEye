@@ -1,0 +1,135 @@
+<Project>
+  <!--
+    PoeShared frontend pipeline for the standard Blazor/esbuild project layout.
+
+    What problem this solves:
+    - Several projects had near-identical npm/MSBuild snippets copy-pasted into each .csproj.
+    - The copies drifted over time, making incremental behavior and troubleshooting harder.
+    - Local builds were doing extra work because install/build/test behavior was not managed consistently.
+
+    What this file centralizes:
+    - npm install/build/test orchestration
+    - incremental Inputs/Outputs tracking through stamp files
+    - standard content cleanup so package metadata and generated assets are not copied incorrectly
+    - consistent build logging for frontend steps
+
+    Default conventions assumed by this file:
+    - package.json, package-lock.json and tsconfig.json live in the project root
+    - source inputs live under wwwroot
+    - generated frontend artifacts end up under wwwroot/js
+    - npm scripts are named "build" and "test"
+
+    Getting started in a new project:
+    1. Import this file from the .csproj:
+       <Import Project="..\PoeShared.Blazor\build\PoeShared.Frontend.targets" />
+    2. Ensure package.json contains at least the scripts used by this pipeline.
+    3. If the project uses the standard folder layout, no further configuration is needed.
+    4. If the project differs, override the relevant properties in the .csproj before the import.
+
+    Common overrides:
+    - FrontendBuildCommand / FrontendTestCommand: custom npm script names
+    - FrontendBuildInputGlobs / FrontendBuildInputFiles: additional tracked inputs
+    - FrontendOutputGlob: output folder other than wwwroot/js
+    - RunFrontendTests: opt in local test execution when needed
+
+    Notes:
+    - The orchestration target exists mainly for readability in the build log.
+    - Incrementality lives in NPMInstall and NPMBuild, not in the wrapper target.
+    - BlazorMonacoEditor intentionally does not use this file because it has a different webpack-based layout.
+  -->
+
+  <!--
+    Default values are intentionally overridable from the importing project.
+    A project can set any of these properties before the Import to customize the pipeline.
+  -->
+  <PropertyGroup Label="PoeShared Frontend Defaults">
+    <RunFrontendTests Condition="'$(RunFrontendTests)' == ''">$(ContinuousIntegrationBuild)</RunFrontendTests>
+    <RunFrontendTests Condition="'$(RunFrontendTests)' == ''">false</RunFrontendTests>
+    <FrontendInstallCommand Condition="'$(FrontendInstallCommand)' == ''">npm install</FrontendInstallCommand>
+    <FrontendBuildCommand Condition="'$(FrontendBuildCommand)' == ''">npm run build</FrontendBuildCommand>
+    <FrontendTestCommand Condition="'$(FrontendTestCommand)' == ''">npm run test</FrontendTestCommand>
+    <NpmInstallStamp Condition="'$(NpmInstallStamp)' == ''">node_modules\.npm-install.stamp</NpmInstallStamp>
+    <FrontendBuildStamp Condition="'$(FrontendBuildStamp)' == ''">wwwroot\js\.frontend-build.stamp</FrontendBuildStamp>
+    <FrontendInstallInputFiles Condition="'$(FrontendInstallInputFiles)' == ''">package.json;package-lock.json</FrontendInstallInputFiles>
+    <FrontendBuildInputGlobs Condition="'$(FrontendBuildInputGlobs)' == ''">wwwroot\**\*</FrontendBuildInputGlobs>
+    <FrontendBuildInputExcludes Condition="'$(FrontendBuildInputExcludes)' == ''">wwwroot\js\**</FrontendBuildInputExcludes>
+    <FrontendBuildInputFiles Condition="'$(FrontendBuildInputFiles)' == ''">tsconfig.json;package.json;package-lock.json</FrontendBuildInputFiles>
+    <FrontendOutputGlob Condition="'$(FrontendOutputGlob)' == ''">wwwroot\js\**</FrontendOutputGlob>
+  </PropertyGroup>
+
+  <!--
+    Shared conventions applied to all importing projects:
+    - generated JS is re-added explicitly after build
+    - package metadata files are kept out of output/publish
+    - watch inputs cover TS/TSX files by default
+  -->
+  <ItemGroup Label="PoeShared Frontend Conventions">
+    <SupportedPlatform Include="browser" />
+    <Watch Include="**\*.ts" />
+    <Watch Include="**\*.tsx" />
+    <Content Remove="node_modules\**" />
+    <Content Remove="$(FrontendOutputGlob)" />
+    <Content Update="tsconfig.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="package-lock.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="package.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <NpmInstallInputs Include="$(FrontendInstallInputFiles)" />
+    <FrontendBuildInputs Include="$(FrontendBuildInputGlobs)" Exclude="$(FrontendBuildInputExcludes)" />
+    <FrontendBuildInputs Include="$(FrontendBuildInputFiles)" />
+  </ItemGroup>
+
+  <!--
+    This wrapper target makes the build log easier to follow.
+    The real skip logic lives in the child targets below via Inputs/Outputs.
+  -->
+  <Target Name="PoeSharedFrontendPipeline"
+          Label="PoeShared Frontend Pipeline"
+          AfterTargets="PreBuildEvent">
+    <Message Importance="high"
+             Text="[Frontend] $(MSBuildProjectName): shared pipeline enabled (tests=$(RunFrontendTests), build=$(FrontendBuildCommand))" />
+    <CallTarget Targets="NPMInstall;NPMBuild;NPMTest" />
+  </Target>
+
+  <!-- Re-run install only when dependency metadata changes or node_modules is missing. -->
+  <Target Name="NPMInstall"
+          Label="PoeShared Frontend Install"
+          Inputs="@(NpmInstallInputs)"
+          Outputs="$(NpmInstallStamp)">
+    <Message Importance="high" Text="[Frontend] $(MSBuildProjectName): $(FrontendInstallCommand)" />
+    <Exec Command="$(FrontendInstallCommand)" />
+    <Touch Files="$(NpmInstallStamp)" AlwaysCreate="true" />
+  </Target>
+
+  <!-- Re-run the frontend build only when tracked sources/configs change. -->
+  <Target Name="NPMBuild"
+          Label="PoeShared Frontend Build"
+          Inputs="@(FrontendBuildInputs)"
+          Outputs="$(FrontendBuildStamp)">
+    <Message Importance="high" Text="[Frontend] $(MSBuildProjectName): $(FrontendBuildCommand)" />
+    <Exec Command="$(FrontendBuildCommand)" />
+    <ItemGroup>
+      <JSFiles Include="$(FrontendOutputGlob)" Exclude="$(FrontendBuildStamp)" />
+      <Content Include="@(JSFiles)" />
+    </ItemGroup>
+    <Message Importance="normal"
+             Text="[Frontend] $(MSBuildProjectName): produced %(JSFiles.Identity)"
+             Condition="'$(FrontendVerbose)' == 'true' and '@(JSFiles)' != ''" />
+    <Touch Files="$(FrontendBuildStamp)" AlwaysCreate="true" />
+  </Target>
+
+  <!-- Tests stay opt-in for local work and are expected to run by default in CI. -->
+  <Target Name="NPMTest"
+          Label="PoeShared Frontend Test"
+          Condition="'$(RunFrontendTests)' == 'true'">
+    <Message Importance="high" Text="[Frontend] $(MSBuildProjectName): $(FrontendTestCommand)" />
+    <Exec Command="$(FrontendTestCommand)" />
+  </Target>
+</Project>

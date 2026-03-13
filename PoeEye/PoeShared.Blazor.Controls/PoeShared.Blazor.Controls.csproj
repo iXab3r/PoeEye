@@ -12,7 +12,6 @@
         <Nullable>enable</Nullable>
         <EnableDefaultContentItems>true<!-- Important for Blazor Scoped CSS --></EnableDefaultContentItems>
     </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
         <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
@@ -32,40 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <SupportedPlatform Include="browser"/>
-        <Watch Include="**\*.ts"/>
-        <Watch Include="**\*.tsx"/>
-        <Content Remove="node_modules\**">
-            <!-- Npm modules must be excluded from file list -->
-        </Content>
-        <Content Remove="wwwroot\js\**">
-            <!-- TypeScript JS output is in that directory, it will be included at later stages of compilation -->
-        </Content>
-        <Content Update="tsconfig.json">
-            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </Content>
-        <Content Update="package-lock.json">
-            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </Content>
-        <Content Update="package.json">
-            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </Content>
-        <Content Update="tsconfig.json">
-          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <TypeScriptCompile Include="wwwroot\ts\BootstrapTooltip.ts" />
-      <TypeScriptCompile Include="wwwroot\ts\placeholder.ts" />
-      <TypeScriptCompile Include="wwwroot\ts\SplitContainer.ts" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="tooltip\BootstrapTooltip.razor.css">
         <DependentUpon>BootstrapTooltip.razor</DependentUpon>
       </None>
@@ -80,32 +45,5 @@
       </Compile>
     </ItemGroup>
 
-    <Target Name="NPMInstall" AfterTargets="PreBuildEvent">
-        <Message Importance="high" Text="Running NPM Install" />
-        <Exec Command="npm install"/>
-        <Message Importance="high" Text="Completed NPM Install" />
-    </Target>
-
-    <Target Name="NPMBuild" AfterTargets="NPMInstall">
-        <Message Importance="high" Text="Running NPM Build" />
-        <Exec Command="npm run build"/>
-        <ItemGroup>
-            <JSFiles Include="wwwroot/js/**">
-                <!-- Include TypeScript JS into file list, this is needed to allow for StaticWebAssets resolution -->
-            </JSFiles>
-        </ItemGroup>
-        <!-- Loop through each file in the Content item group and print its identity -->
-        <Message Importance="high" Text="Transpiled File: %(JSFiles.Identity)" Condition="'@(JSFiles)' != ''"/>
-        <ItemGroup>
-            <Content Include="@(JSFiles)"/>
-        </ItemGroup>
-
-        <Message Importance="high" Text="Completed NPM Build" />
-    </Target>
-
-    <Target Name="NPMTest" AfterTargets="NPMBuild">
-        <Message Importance="high" Text="Running NPM Test" />
-        <Exec Command="npm run test"/>
-        <Message Importance="high" Text="Completed NPM Test" />
-    </Target>
+    <Import Project="..\PoeShared.Blazor\build\PoeShared.Frontend.targets" />
 </Project>
