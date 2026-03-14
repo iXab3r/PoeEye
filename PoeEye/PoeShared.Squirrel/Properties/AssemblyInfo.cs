@@ -7,5 +7,6 @@ using System.Windows;
 [assembly: AssemblyFileVersion("0.0.0.0")]
 [assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]
 [assembly: SupportedOSPlatform("windows")]
+[assembly: InternalsVisibleTo("EyeAuras")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

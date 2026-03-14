@@ -9,7 +9,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TargetFramework>net7-windows</TargetFramework>
-    
   </PropertyGroup>
   <ItemGroup>
     <SupportedPlatform Include="windows" />

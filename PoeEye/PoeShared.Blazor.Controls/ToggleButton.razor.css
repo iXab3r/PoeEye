@@ -1,10 +1,10 @@
 .toggle-wrapper {
-    position: relative;
-    display: inline-block;
+    position: relative !important;;
+    display: inline-block !important;;
 }
 
 .toggle-checkbox {
-    display: none;
+    display: none !important; 
 }
 
 .toggle-checkbox:not(:checked) + .btn:hover {

@@ -16,6 +16,7 @@ namespace PoeShared.Blazor.Controls;
 public partial class TreeView<TItem> : BlazorReactiveComponent
 {
     private readonly SourceCache<TreeViewNode<TItem>, long> nodesById = new(x => x.NodeId);
+    private readonly TreeViewDragDropScope<TItem> localDragDropScope = new();
 
     private readonly ClassMapper classMapper = new();
 
@@ -70,6 +71,8 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     [Parameter] public bool Disabled { get; set; }
     
     [Parameter] public bool AutoExpandParent { get; set; }
+
+    [Parameter] public TreeViewDragDropScope<TItem>? DragDropScope { get; set; }
 
     [Parameter] public string? SwitcherIcon { get; set; }
 
@@ -131,7 +134,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     public IObservableCache<TreeViewNode<TItem>, string> NodesByKey { get; }
 
-    internal IDictionary<(long, long), TreeViewDragDropInfo> DragDropStateByNodeIds { get; } = new Dictionary<(long, long), TreeViewDragDropInfo>();
+    internal IDictionary<(long, long), TreeViewDragDropInfo> DragDropStateByNodeIds => ActiveDragDropScope.DragDropStateByNodeIds;
 
     internal bool IsCtrlKeyDown { get; private set; }
 
@@ -140,13 +143,15 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
 
     internal List<TreeViewNode<TItem>> ChildNodes { get; } = new();
     
-    internal TreeViewNode<TItem>? DragDropNode { get; private set; }
-    internal TreeViewNode<TItem>? DragDropTargetContainerNode { get; private set; }
-    internal TreeViewNode<TItem>? DragDropTargetBelowNode { get; private set; }
-    internal TreeViewNode<TItem>? DragDropTargetNode { get; private set; }
+    internal TreeViewNode<TItem>? DragDropNode => ActiveDragDropScope.DragDropNode;
+    internal TreeViewNode<TItem>? DragDropTargetContainerNode => ActiveDragDropScope.DragDropTargetContainerNode;
+    internal TreeViewNode<TItem>? DragDropTargetBelowNode => ActiveDragDropScope.DragDropTargetBelowNode;
+    internal TreeViewNode<TItem>? DragDropTargetNode => ActiveDragDropScope.DragDropTargetNode;
 
     [Inject] internal IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; } = null!;
     [Inject] private IDomEventListener DomEventListener { get; init; } = null!;
+
+    private TreeViewDragDropScope<TItem> ActiveDragDropScope => DragDropScope ?? localDragDropScope;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -219,7 +224,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             return;
         }
 
-        DragDropTargetNode = node;
+        ActiveDragDropScope.DragDropTargetNode = node;
     }
     
     internal void SetDragDropTargetContainerNode(TreeViewNode<TItem>? node)
@@ -229,7 +234,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             return; 
         }
 
-        DragDropTargetContainerNode = node;
+        ActiveDragDropScope.DragDropTargetContainerNode = node;
     }
     
     internal void SetDragDropTargetBelowNode(TreeViewNode<TItem>? node)
@@ -239,22 +244,18 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
             return;
         }
 
-        DragDropTargetBelowNode = node;
+        ActiveDragDropScope.DragDropTargetBelowNode = node;
     }
 
     internal void NotifyDragStart(TreeViewNode<TItem> node)
     {
-        DragDropStateByNodeIds.Clear();
-        DragDropNode = node;
+        ActiveDragDropScope.Clear();
+        ActiveDragDropScope.DragDropNode = node;
     }
     
     internal void NotifyDragEnd()
     {
-        DragDropStateByNodeIds.Clear();
-        DragDropNode = null;
-        DragDropTargetNode = null;
-        DragDropTargetBelowNode = null;
-        DragDropTargetContainerNode = null;
+        ActiveDragDropScope.Clear();
     }
 
     protected override void OnInitialized()

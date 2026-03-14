@@ -219,3 +219,4 @@ ModelManifest.xml
 *.iml
 *.nuspec
 *.nuspec.bak
+.codex-obj

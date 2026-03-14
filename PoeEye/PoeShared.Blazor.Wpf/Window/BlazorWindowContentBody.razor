@@ -7,11 +7,6 @@
 @using ReactiveUI
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
-<HeadContent>
-    <link href="_content/PoeShared.Blazor.Wpf/PoeShared.Blazor.Wpf.bundle.scp.css" rel="stylesheet"/>
-    <link href="_content/PoeShared.Blazor.Wpf/css/blazor-window.css" rel="stylesheet"/>
-</HeadContent>
-
 <div id="@(IBlazorWindow.WindowBody)" class="overflow-auto h-100" style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWpf())">
     @if (DataContext.Anchors.IsDisposed)
     {
