@@ -45,4 +45,6 @@ public interface IApplicationAccessor : INotifyPropertyChanged
     void RestartAs(string processPath, string arguments = default, string verb = default);
 
     void RestartAsAdmin();
+
+    void Restart();
 }

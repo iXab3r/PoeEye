@@ -163,6 +163,13 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         RestartAsAdminUsingLauncher();
     }
 
+    public void Restart()
+    {
+        SharedLog.Instance.SwitchImmediateFlush(true);
+     
+        RestartUsingLauncher();
+    }
+
     public void ReplaceExecutable(string processPath, string arguments = default)
     {
         SharedLog.Instance.SwitchImmediateFlush(true);
@@ -263,6 +270,12 @@ internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicati
         Log.Info("Restarting current process with admin privileges using launcher");
         var arguments = StripBooleanArgumentFromCmdLine(appArguments.StartupArgs, "adminMode");
         StartUsingLauncher(Environment.ProcessPath, $"{arguments} --adminMode true", verb: "runas", LauncherMethod.StartApp);
+    }
+    
+    private void RestartUsingLauncher()
+    {
+        Log.Info("Restarting current process using launcher");
+        StartUsingLauncher(Environment.ProcessPath, $"{appArguments.StartupArgs}", verb: "runas", LauncherMethod.StartApp);
     }
 
     /// <summary>
