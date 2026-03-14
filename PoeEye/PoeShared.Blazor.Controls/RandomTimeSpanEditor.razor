@@ -9,16 +9,17 @@
             }
             <input type="number"
                    class="form-control"
-                   min="0"
+                   min="@MinimumMilliseconds"
+                   max="@MaximumMilliseconds"
                    step="@Step.TotalMilliseconds"
                    value="@Value.Min.TotalMilliseconds"
-                   oninput="@((ChangeEventArgs x) => ValueChanged.InvokeAsync(Value with {Min = ParseMs(x.Value)}))">
+                   oninput="@HandleMinChanged">
             <span class="input-group-text" style="min-width:50px;">ms</span>
             @if (CanRandomize || Value.Randomize)
             {
                 <ToggleButton
                     @bind-IsChecked="@IsRandom"
-                    @bind-IsChecked:after="@(() => ValueChanged.InvokeAsync(Value with {Randomize = IsRandom}))">
+                    @bind-IsChecked:after="@HandleRandomizeChanged">
                     <i class="fa fa-random"></i>
                 </ToggleButton>
             }
@@ -35,9 +36,10 @@
                 }
                 <input type="number" class="form-control"
                        step="@Step.TotalMilliseconds"
-                       min="@Value.Min.TotalMilliseconds"
+                       min="@UpperMinimumMilliseconds"
+                       max="@MaximumMilliseconds"
                        value="@Value.Max.TotalMilliseconds"
-                       oninput="@((ChangeEventArgs x) => ValueChanged.InvokeAsync(Value with {Max = ParseMs(x.Value)}))">
+                       oninput="@HandleMaxChanged">
                 <span class="input-group-text" style="min-width:50px;">ms</span>
                 <span style="visibility: hidden;">
                     <ToggleButton >
