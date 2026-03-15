@@ -24,6 +24,7 @@
         <PackageReference Remove="JetBrains.Annotations" />
         <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="all" />
+        <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All" ExcludeAssets="runtime"/>
     </ItemGroup>
 
     <ItemGroup>
