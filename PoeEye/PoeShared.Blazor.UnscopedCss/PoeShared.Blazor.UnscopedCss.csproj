@@ -9,13 +9,16 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
         <PackageId>PoeShared.Blazor.UnscopedCss</PackageId>
         <Version>1.0.2</Version>
         <Authors>Xab3r</Authors>
         <Description>Selective build-time post-processing for Blazor scoped CSS. Files flagged with PoeUnscopeAfterRewrite are unscoped after Blazor rewrites them and before styles.css bundling.</Description>
         <PackageTags>Blazor;ScopedCss;MSBuild;StaticWebAssets;CSS</PackageTags>
-        <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
