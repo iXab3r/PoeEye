@@ -1,0 +1,18 @@
+@namespace PoeShared.Blazor.Controls
+@typeparam TItem
+@typeparam TKey
+@inherits BlazorReactiveComponent
+
+@if (EmptyTemplate == null)
+{
+    <div id="@Id" class="@Class" style="@Style" @ref="@ElementRef"></div>
+}
+else
+{
+    <div class="poe-reactive-collection-shell">
+        <div id="@Id" class="@Class" style="@Style" @ref="@ElementRef" hidden="true"></div>
+        <div class="poe-reactive-collection-empty-state" @ref="@emptyStateElementRef">
+            @EmptyTemplate
+        </div>
+    </div>
+}

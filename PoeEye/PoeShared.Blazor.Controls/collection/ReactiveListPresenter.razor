@@ -1,0 +1,19 @@
+@namespace PoeShared.Blazor.Controls
+@typeparam TItem
+@typeparam TKey
+@inherits BlazorReactiveComponent
+
+<ReactiveCollectionPresenter TItem="TItem"
+                             TKey="TKey"
+                             Id="@Id"
+                             Class="@Class"
+                             Style="@Style"
+                             Frames="@NormalizedFrames"
+                             ItemTemplate="@ItemTemplate"
+                             EmptyTemplate="@EmptyTemplate"
+                             BatchDelay="@BatchDelay"
+                             ItemTagName="@ItemTagName"
+                             ItemClass="@ItemClass"
+                             ItemStyle="@ItemStyle"
+                             ItemClassSelector="@ItemClassSelector"
+                             ItemStyleSelector="@ItemStyleSelector" />

@@ -1,0 +1,50 @@
+@namespace PoeShared.Blazor.Controls
+@implements IAsyncDisposable
+
+@if (ItemContent != null)
+{
+    @ItemContent
+}
+
+@code {
+    /// <summary>
+    /// This identifier must be preregistered before the page is loaded so JS can resolve it.
+    /// </summary>
+    public const string ComponentIdentifier = "poe-reactive-collection-item";
+
+    [Parameter, EditorRequired] public string RegistrationId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Blazor needs a parameter change to force the existing root component to re-read the stored fragment.
+    /// The id stays stable so item updates do not recreate the root component.
+    /// </summary>
+    [Parameter] public long Version { get; set; }
+
+    [Inject] internal PoeShared.Blazor.Controls.Services.IReactiveCollectionItemRegistry ItemRegistry { get; init; } = default!;
+
+    private RenderFragment? ItemContent { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (string.IsNullOrWhiteSpace(RegistrationId))
+        {
+            throw new ArgumentException("RegistrationId must be set.", nameof(RegistrationId));
+        }
+
+        var storedItem = ItemRegistry.Get(RegistrationId);
+        ItemContent = storedItem.Content;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(RegistrationId))
+        {
+            ItemRegistry.Unregister(RegistrationId);
+        }
+
+        ItemContent = null;
+        return ValueTask.CompletedTask;
+    }
+}

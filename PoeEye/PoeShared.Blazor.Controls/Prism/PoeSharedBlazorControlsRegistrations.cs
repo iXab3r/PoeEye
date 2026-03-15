@@ -1,4 +1,7 @@
+using PoeShared.Blazor;
 using PoeShared.Blazor.Prism;
+using PoeShared.Blazor.Controls.Services;
+using Unity;
 using PoeShared.Scaffolding;
 using Unity.Extension;
 
@@ -9,5 +12,9 @@ public sealed class PoeSharedBlazorControlsRegistrations : UnityContainerExtensi
     protected override void Initialize()
     {
         Container.AsServiceCollection().AddPoeSharedBlazorControls();
+        if (Container.IsRegistered<IBlazorContentRepository>())
+        {
+            Container.Resolve<IBlazorContentRepository>().AddReactiveCollectionComponents();
+        }
     }
 }
