@@ -1,0 +1,117 @@
+@namespace PoeShared.Blazor.Controls
+@using Microsoft.JSInterop
+@inherits PoeShared.Blazor.BlazorReactiveComponent
+
+@if (IsOpen)
+{
+    <div class="reactive-popout__backdrop @(BackdropClass ?? string.Empty)"
+         style="@BackdropStyle"
+         @onpointerdown="@(EventUtil.AsNonRenderingEventHandler<PointerEventArgs>(HandleBackdropPointerDown))">
+        <div class="reactive-popout__panel @(PanelClass ?? string.Empty)"
+             style="@PanelStyle"
+             tabindex="0"
+             @ref="PanelRef"
+             @onpointerdown:stopPropagation="true"
+             @onkeydown="@(EventUtil.AsNonRenderingEventHandler<KeyboardEventArgs>(HandleKeyDown))"
+             @onkeydown:stopPropagation="true">
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly string JsFilePath = "./_content/PoeShared.Blazor.Controls/ReactivePopout.razor.js";
+
+    private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+    private bool previousIsOpen;
+    private bool shouldPosition;
+
+    public ReactivePopout()
+    {
+        moduleTask = new Lazy<Task<IJSObjectReference>>(() =>
+            JsRuntime.InvokeAsync<IJSObjectReference>("import", JsFilePath).AsTask());
+    }
+
+    [Parameter] public bool IsOpen { get; set; }
+
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter] public bool CloseOnBackdropPointerDown { get; set; } = true;
+
+    [Parameter] public bool CloseOnEscape { get; set; } = true;
+
+    [Parameter] public string? PanelClass { get; set; }
+
+    [Parameter] public string? PanelStyle { get; set; }
+
+    [Parameter] public string? BackdropClass { get; set; }
+
+    [Parameter] public string? BackdropStyle { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private ElementReference PanelRef { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (IsOpen && !previousIsOpen)
+        {
+            shouldPosition = true;
+        }
+
+        previousIsOpen = IsOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        var module = await moduleTask.Value;
+
+        if (firstRender)
+        {
+            await module.InvokeVoidAsync("ensureReactivePopoutTracking");
+        }
+
+        if (!IsOpen || !shouldPosition)
+        {
+            return;
+        }
+
+        shouldPosition = false;
+        await module.InvokeVoidAsync("positionReactivePopout", PanelRef);
+    }
+
+    private Task HandleBackdropPointerDown(PointerEventArgs _)
+    {
+        return CloseOnBackdropPointerDown ? CloseAsync() : Task.CompletedTask;
+    }
+
+    private Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        return CloseOnEscape && args.Key == "Escape"
+            ? CloseAsync()
+            : Task.CompletedTask;
+    }
+
+    private async Task CloseAsync()
+    {
+        if (IsOpenChanged.HasDelegate)
+        {
+            await IsOpenChanged.InvokeAsync(false);
+        }
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (moduleTask.IsValueCreated)
+        {
+            var module = await moduleTask.Value;
+            await module.DisposeJsSafeAsync();
+        }
+
+        await base.DisposeAsync();
+    }
+}

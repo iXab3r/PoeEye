@@ -1,0 +1,35 @@
+.reactive-popout__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1400;
+    background: transparent;
+}
+
+.reactive-popout__panel {
+    --reactive-popout-width: min(22rem, calc(100vw - 1rem));
+    --reactive-popout-height: min(37.5rem, calc(100vh - 1rem));
+    --reactive-popout-min-width: min(16rem, calc(100vw - 1rem));
+    --reactive-popout-min-height: min(18rem, calc(100vh - 1rem));
+    --reactive-popout-border: 1px solid rgba(120, 120, 120, 0.8);
+    --reactive-popout-radius: 0.35rem;
+    --reactive-popout-background: rgba(36, 39, 43, 0.98);
+    --reactive-popout-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.45);
+
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    opacity: 0;
+    width: var(--reactive-popout-width);
+    height: var(--reactive-popout-height);
+    min-width: var(--reactive-popout-min-width);
+    min-height: var(--reactive-popout-min-height);
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+    overflow: hidden;
+    border: var(--reactive-popout-border);
+    border-radius: var(--reactive-popout-radius);
+    background: var(--reactive-popout-background);
+    box-shadow: var(--reactive-popout-shadow);
+    outline: none;
+}
