@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net472;net8.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>true</IsPackable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
+
+        <PackageId>PoeShared.Blazor.UnscopedCss</PackageId>
+        <Version>1.0.2</Version>
+        <Authors>Xab3r</Authors>
+        <Description>Selective build-time post-processing for Blazor scoped CSS. Files flagged with PoeUnscopeAfterRewrite are unscoped after Blazor rewrites them and before styles.css bundling.</Description>
+        <PackageTags>Blazor;ScopedCss;MSBuild;StaticWebAssets;CSS</PackageTags>
+        <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Remove="JetBrains.Annotations" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+        <None Include="buildTransitive\PoeShared.Blazor.UnscopedCss.props" Pack="true" PackagePath="buildTransitive/PoeShared.Blazor.UnscopedCss.props" />
+        <None Include="buildTransitive\PoeShared.Blazor.UnscopedCss.targets" Pack="true" PackagePath="buildTransitive/PoeShared.Blazor.UnscopedCss.targets" />
+        <None Include="bin\$(Configuration)\net472\$(AssemblyName).dll" Pack="true" PackagePath="tasks/net472/" Visible="false" />
+        <None Include="bin\$(Configuration)\net472\$(AssemblyName).pdb" Pack="true" PackagePath="tasks/net472/" Visible="false" Condition="Exists('bin\$(Configuration)\net472\$(AssemblyName).pdb')" />
+        <None Include="bin\$(Configuration)\net472\$(AssemblyName).xml" Pack="true" PackagePath="tasks/net472/" Visible="false" Condition="Exists('bin\$(Configuration)\net472\$(AssemblyName).xml')" />
+        <None Include="bin\$(Configuration)\net8.0\$(AssemblyName).dll" Pack="true" PackagePath="tasks/net8.0/" Visible="false" />
+        <None Include="bin\$(Configuration)\net8.0\$(AssemblyName).pdb" Pack="true" PackagePath="tasks/net8.0/" Visible="false" Condition="Exists('bin\$(Configuration)\net8.0\$(AssemblyName).pdb')" />
+        <None Include="bin\$(Configuration)\net8.0\$(AssemblyName).xml" Pack="true" PackagePath="tasks/net8.0/" Visible="false" Condition="Exists('bin\$(Configuration)\net8.0\$(AssemblyName).xml')" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,50 @@
+<Project>
+
+    <PropertyGroup>
+        <_PoeUnscopedCssTaskFramework Condition="'$(MSBuildRuntimeType)' == 'Core'">net8.0</_PoeUnscopedCssTaskFramework>
+        <_PoeUnscopedCssTaskFramework Condition="'$(MSBuildRuntimeType)' != 'Core'">net472</_PoeUnscopedCssTaskFramework>
+    </PropertyGroup>
+
+    <UsingTask TaskName="PoeShared.Blazor.UnscopedCss.Tasks.UnscopeGeneratedScopedCssTask"
+               AssemblyFile="$(MSBuildThisFileDirectory)..\tasks\$(_PoeUnscopedCssTaskFramework)\PoeShared.Blazor.UnscopedCss.dll" />
+
+    <Target Name="Poe_UnscopeGeneratedScopedCss"
+            AfterTargets="_GenerateScopedCssFiles"
+            BeforeTargets="BundleScopedCssFiles;_AddGeneratedScopedCssFiles"
+            Condition="'$(DesignTimeBuild)' != 'true' and '$(PoeBlazorUnscopedCssEnabled)' == 'true' and '@(_ScopedCss)' != ''">
+
+        <ItemGroup>
+            <_PoeFlaggedScopedCssInput Include="@(None)"
+                                       Condition="$([System.String]::Copy('%(None.Identity)').ToLowerInvariant().EndsWith('.razor.css'))">
+                <OriginalItemSpec>%(None.Identity)</OriginalItemSpec>
+                <PoeUnscopeAfterRewrite>%(None.PoeUnscopeAfterRewrite)</PoeUnscopeAfterRewrite>
+                <ConfiguredCssScope>%(None.CssScope)</ConfiguredCssScope>
+            </_PoeFlaggedScopedCssInput>
+
+            <_PoeFlaggedScopedCssInput Include="@(Content)"
+                                       Condition="$([System.String]::Copy('%(Content.Identity)').ToLowerInvariant().EndsWith('.razor.css'))">
+                <OriginalItemSpec>%(Content.Identity)</OriginalItemSpec>
+                <PoeUnscopeAfterRewrite>%(Content.PoeUnscopeAfterRewrite)</PoeUnscopeAfterRewrite>
+                <ConfiguredCssScope>%(Content.CssScope)</ConfiguredCssScope>
+            </_PoeFlaggedScopedCssInput>
+
+            <_PoeFlaggedScopedCssInput Include="@(ScopedCssInput)"
+                                       Condition="$([System.String]::Copy('%(ScopedCssInput.Identity)').ToLowerInvariant().EndsWith('.razor.css'))">
+                <OriginalItemSpec>%(ScopedCssInput.Identity)</OriginalItemSpec>
+                <PoeUnscopeAfterRewrite>%(ScopedCssInput.PoeUnscopeAfterRewrite)</PoeUnscopeAfterRewrite>
+                <ConfiguredCssScope>%(ScopedCssInput.CssScope)</ConfiguredCssScope>
+            </_PoeFlaggedScopedCssInput>
+
+            <_PoeGeneratedScopedCssCandidate Include="@(_ScopedCss)">
+                <GeneratedOutputFile>%(_ScopedCss.OutputFile)</GeneratedOutputFile>
+                <OriginalItemSpec>%(_ScopedCss.Identity)</OriginalItemSpec>
+                <ConfiguredCssScope>%(_ScopedCss.CssScope)</ConfiguredCssScope>
+            </_PoeGeneratedScopedCssCandidate>
+        </ItemGroup>
+
+        <PoeShared.Blazor.UnscopedCss.Tasks.UnscopeGeneratedScopedCssTask Files="@(_PoeGeneratedScopedCssCandidate)"
+                                                                           FlaggedOriginalFiles="@(_PoeFlaggedScopedCssInput)"
+                                                                           Verbose="$(PoeBlazorUnscopedCssVerbose)" />
+    </Target>
+
+</Project>

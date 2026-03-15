@@ -1,0 +1,8 @@
+<Project>
+
+    <PropertyGroup>
+        <PoeBlazorUnscopedCssEnabled Condition="'$(PoeBlazorUnscopedCssEnabled)' == ''">true</PoeBlazorUnscopedCssEnabled>
+        <PoeBlazorUnscopedCssVerbose Condition="'$(PoeBlazorUnscopedCssVerbose)' == ''">false</PoeBlazorUnscopedCssVerbose>
+    </PropertyGroup>
+
+</Project>
