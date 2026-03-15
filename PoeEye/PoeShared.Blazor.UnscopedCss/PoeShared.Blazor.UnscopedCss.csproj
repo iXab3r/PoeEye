@@ -10,8 +10,6 @@
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
         <PackageId>PoeShared.Blazor.UnscopedCss</PackageId>
         <Version>1.0.2</Version>
