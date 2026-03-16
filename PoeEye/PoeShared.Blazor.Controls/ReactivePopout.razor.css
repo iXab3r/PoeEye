@@ -27,6 +27,7 @@
     max-width: calc(100vw - 1rem);
     max-height: calc(100vh - 1rem);
     overflow: hidden;
+    box-sizing: border-box;
     border: var(--reactive-popout-border);
     border-radius: var(--reactive-popout-radius);
     background: var(--reactive-popout-background);
