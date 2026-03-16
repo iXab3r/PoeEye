@@ -165,6 +165,17 @@ public interface IBlazorWindowController
     WindowStartupLocation WindowStartupLocation { get; set; }
 
     /// <summary>
+    /// Gets or sets the native owner window handle (HWND) for this window.
+    /// This is the Blazor-window equivalent of WPF's <c>Window.Owner</c>, but represented as a raw handle so
+    /// callers can explicitly point to either a Blazor-hosted window or any other native WPF/Win32 window.
+    /// Set this property before calling <c>Show()</c> or <c>ShowDialog()</c> if owner semantics are required.
+    /// A value of <see cref="IntPtr.Zero"/> means that no explicit owner is configured.
+    /// Implementations may ignore invalid handles, log the failure, and continue without an owner rather than throw.
+    /// Modal flows may also use this handle to temporarily disable and later re-enable the owner window.
+    /// </summary>
+    IntPtr OwnerHandle { get; set; }
+
+    /// <summary>
     /// Observable sequence for when a key is pressed while the window has focus.
     /// </summary>
     IObservable<KeyEventArgs> WhenKeyDown { get; }

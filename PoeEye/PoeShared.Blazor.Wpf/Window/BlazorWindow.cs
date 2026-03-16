@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using Microsoft.Extensions.FileProviders;
 using PoeShared.Blazor.Scaffolding;
@@ -67,6 +68,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
     private readonly ReactiveCompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
+    private IntPtr dialogOwnerHandle;
 
     // Logging throttling: limit certain verbose logs 
     private readonly Stopwatch logThrottleStopwatch = Stopwatch.StartNew();
@@ -300,6 +302,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
     public IUnityContainer Container { get; set; }
 
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.CenterOwner;
+
+    public IntPtr OwnerHandle { get; set; }
 
     public new IFluentLog Log => base.Log;
 
@@ -598,16 +602,28 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
     public void ShowDialog(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        Log.Debug("Showing window in blocking way");
-        EnqueueUpdate(new SetVisibleCommand(true));
+        Log.Debug($"Showing window in modal blocking way, current state: {{IsVisible={IsVisible}, StartupLocation={WindowStartupLocation}, Title={Title}}}");
+        var completionSource = new TaskCompletionSource<bool>();
+        EnqueueUpdate(new ShowDialogCommand(cancellationToken, completionSource));
         try
         {
             Log.Debug("Awaiting for the window to be closed");
-            isClosedTcs.Task.Wait(cancellationToken);
+            using var cancellationAnchor = cancellationToken.Register(() =>
+            {
+                Log.Debug("Cancellation requested while awaiting modal dialog completion");
+                completionSource.TrySetCanceled(cancellationToken);
+            });
+            completionSource.Task.GetAwaiter().GetResult();
+            Log.Debug("Modal dialog completed successfully");
         }
         catch (OperationCanceledException)
         {
             Log.Debug("Wait was cancelled");
+        }
+        catch (Exception e)
+        {
+            Log.Warn("Modal dialog failed while waiting for completion", e);
+            throw;
         }
     }
 
@@ -794,6 +810,118 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
 
         //do not add window to Anchors! It must be disposed by DisposeWindow command
         return window;
+    }
+
+    private void ShowDialogCore(NativeWindow window, CancellationToken cancellationToken)
+    {
+        uiDispatcher.VerifyAccess();
+
+        if (window.IsVisible)
+        {
+            Log.Warn("Cannot show modal dialog because the target window is already visible");
+            throw new InvalidOperationException("Cannot show a visible window as a dialog.");
+        }
+
+        dialogOwnerHandle = ResolveDialogOwnerHandle(window);
+        var ownerWasAlreadyDisabled = false;
+        try
+        {
+            if (dialogOwnerHandle != IntPtr.Zero)
+            {
+                Log.Debug($"Assigning dialog owner handle: {dialogOwnerHandle.ToHexadecimal()}");
+                var windowInteropHelper = new WindowInteropHelper(window);
+                windowInteropHelper.Owner = dialogOwnerHandle;
+                ownerWasAlreadyDisabled = UnsafeNative.EnableWindow(dialogOwnerHandle, false);
+                Log.Debug($"Disabled modal owner window: {dialogOwnerHandle.ToHexadecimal()}, previously disabled: {ownerWasAlreadyDisabled}");
+            }
+            else
+            {
+                Log.Debug("Showing modal dialog without owner handle");
+            }
+
+            using var cancellationAnchor = cancellationToken.Register(() =>
+            {
+                try
+                {
+                    Log.Debug("Cancellation requested while modal dialog is open, closing modal window");
+                    window.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                    {
+                        if (!window.IsDisposed)
+                        {
+                            Log.Debug("Closing modal window because cancellation token was cancelled");
+                            window.Close();
+                        }
+                        else
+                        {
+                            Log.Debug("Modal window was already disposed when cancellation was processed");
+                        }
+                    }));
+                }
+                catch (Exception e)
+                {
+                    Log.Warn("Failed to close modal window on cancellation", e);
+                }
+            });
+
+            Log.Debug("Entering native WPF ShowDialog()");
+            window.ShowDialog();
+            Log.Debug("Native WPF ShowDialog() has returned");
+        }
+        catch (Exception e)
+        {
+            Log.Warn("Failed to show modal window", e);
+            throw;
+        }
+        finally
+        {
+            if (dialogOwnerHandle != IntPtr.Zero)
+            {
+                if (ownerWasAlreadyDisabled)
+                {
+                    Log.Debug("Skipping owner re-enable because owner window was already disabled before ShowDialog()");
+                }
+                else
+                {
+                    UnsafeNative.EnableWindow(dialogOwnerHandle, true);
+                    Log.Debug($"Re-enabled modal owner window: {dialogOwnerHandle.ToHexadecimal()}");
+                }
+            }
+
+            Log.Debug("Clearing modal dialog owner handle state");
+            dialogOwnerHandle = IntPtr.Zero;
+        }
+    }
+
+    private IntPtr ResolveDialogOwnerHandle(NativeWindow window)
+    {
+        var ownerHandle = OwnerHandle;
+        if (ownerHandle == IntPtr.Zero)
+        {
+            Log.Debug("Modal dialog owner handle is not configured");
+            return IntPtr.Zero;
+        }
+
+        if (!PInvoke.User32.IsWindow(ownerHandle))
+        {
+            Log.Warn($"Configured owner handle is invalid, ignoring owner: {ownerHandle.ToHexadecimal()}");
+            return IntPtr.Zero;
+        }
+
+        try
+        {
+            if (window.WindowHandle != IntPtr.Zero && ownerHandle == window.WindowHandle)
+            {
+                Log.Debug("Configured owner handle points to the dialog window itself, ignoring owner");
+                return IntPtr.Zero;
+            }
+        }
+        catch
+        {
+            // ignored, handle may not exist before first show
+        }
+
+        Log.Debug($"Using configured owner handle for modal dialog: {ownerHandle.ToHexadecimal()}");
+        return ownerHandle;
     }
 
     private void ActivateWindowWhenReady(NativeWindow window, string reason)

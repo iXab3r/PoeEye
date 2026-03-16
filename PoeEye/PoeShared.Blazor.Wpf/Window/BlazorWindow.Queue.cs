@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -84,11 +85,35 @@ partial class BlazorWindow
                     Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}: {new {window.WindowState}}");
                     if (command.IsVisible)
                     {
+                        var ownerHandle = ResolveConfiguredOwnerHandle(window);
+                        if (ownerHandle != IntPtr.Zero)
+                        {
+                            Log.Debug($"Assigning owner handle before showing window: {ownerHandle.ToHexadecimal()}");
+                            var windowInteropHelper = new WindowInteropHelper(window);
+                            windowInteropHelper.Owner = ownerHandle;
+                        }
+
                         window.Show();
                     }
                     else
                     {
                         window.Hide();
+                    }
+
+                    break;
+                }
+                case ShowDialogCommand command:
+                {
+                    Log.Debug("Showing the window as a real modal dialog");
+                    try
+                    {
+                        ShowDialogCore(window, command.CancellationToken);
+                        command.CompletionSource.TrySetResult(true);
+                    }
+                    catch (Exception e)
+                    {
+                        command.CompletionSource.TrySetException(e);
+                        throw;
                     }
 
                     break;
@@ -908,32 +933,12 @@ partial class BlazorWindow
                 }
                 case WindowStartupLocation.CenterOwner:
                 {
-                    IntPtr owner;
-                    try
-                    {
-                        var currentProcess = Process.GetCurrentProcess();
-                        owner = currentProcess.MainWindowHandle;
-                    }
-                    catch (Exception e)
-                    {
-                        log.Warn("Failed to find main window of the current process", e);
-                        owner = IntPtr.Zero;
-                    }
-
-                    if (owner == IntPtr.Zero)
+                    if (!blazorWindow.TryGetOwnerBounds(out var windowBounds))
                     {
                         log.Warn("Owner handle is not set, centering within screen");
                         SetWindowStartupLocation(hwnd, WindowStartupLocation.CenterScreen);
                         return;
                     }
-
-                    if (!User32.GetWindowRect(owner, out var windowRect))
-                    {
-                        log.Warn($"Failed to set initial window size - could not get rect of owner window {owner.ToHexadecimal()}");
-                        break;
-                    }
-
-                    var windowBounds = Rectangle.FromLTRB(windowRect.left, windowRect.top, windowRect.right, windowRect.bottom);
                     log.Debug($"Centering window within window bounds {windowBounds}");
                     CenterWindowWithin(windowBounds);
                     break;
@@ -1137,19 +1142,41 @@ partial class BlazorWindow
     private bool TryGetOwnerBounds(out Rectangle ownerBounds)
     {
         IntPtr ownerHandle;
-        try
+        if (dialogOwnerHandle != IntPtr.Zero)
         {
-            ownerHandle = Process.GetCurrentProcess().MainWindowHandle;
+            ownerHandle = dialogOwnerHandle;
         }
-        catch (Exception e)
+        else
         {
-            Log.Warn("Failed to find main window of the current process for startup location update", e);
-            ownerBounds = default;
-            return false;
+            ownerHandle = OwnerHandle;
+            if (ownerHandle == IntPtr.Zero)
+            {
+                try
+                {
+                    ownerHandle = UnsafeNative.ResolveParentForDialogWindow();
+                    if (ownerHandle != IntPtr.Zero)
+                    {
+                        Log.Debug($"CenterOwner fallback resolved owner handle for startup location update: {ownerHandle.ToHexadecimal()}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Warn("Failed to resolve fallback owner handle for startup location update", e);
+                    ownerBounds = default;
+                    return false;
+                }
+            }
         }
 
         if (ownerHandle == IntPtr.Zero)
         {
+            ownerBounds = default;
+            return false;
+        }
+
+        if (!User32.IsWindow(ownerHandle))
+        {
+            Log.Warn($"Configured owner handle is invalid for startup location update: {ownerHandle.ToHexadecimal()}");
             ownerBounds = default;
             return false;
         }
@@ -1165,7 +1192,32 @@ partial class BlazorWindow
         return true;
     }
 
+    private IntPtr ResolveConfiguredOwnerHandle(NativeWindow window)
+    {
+        var ownerHandle = OwnerHandle;
+        if (ownerHandle == IntPtr.Zero)
+        {
+            return IntPtr.Zero;
+        }
+
+        if (!User32.IsWindow(ownerHandle))
+        {
+            Log.Warn($"Configured owner handle is invalid, ignoring owner: {ownerHandle.ToHexadecimal()}");
+            return IntPtr.Zero;
+        }
+
+        if (window.WindowHandle != IntPtr.Zero && ownerHandle == window.WindowHandle)
+        {
+            Log.Warn("Configured owner handle points to the target window itself, ignoring owner");
+            return IntPtr.Zero;
+        }
+
+        return ownerHandle;
+    }
+
     private sealed record WaitForIdleCommand(ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
+
+    private sealed record ShowDialogCommand(CancellationToken CancellationToken, TaskCompletionSource<bool> CompletionSource) : IWindowCommand;
 
     private sealed record InvokeCommand(Action ActionToExecute, ManualResetEventSlim ResetEvent, DateTimeOffset Timestamp) : IWindowCommand;
 
