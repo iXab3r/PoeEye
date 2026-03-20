@@ -74,7 +74,7 @@
     </ReactiveSection>
    
     <ReactiveSection
-        Trackers="@(new() { this.WhenAnyValue(x => x.SelfNode.IsDragTarget, x => x.SelfNode.IsTargetBelow) })">
+        Trackers="@(new ReactiveTrackerList() { this.WhenAnyValue(x => x.SelfNode.IsDragTarget, x => x.SelfNode.IsTargetBelow) })">
         @if (SelfNode.IsDragTarget)
         {
             <div class="ant-tree-drop-indicator"

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -88,10 +89,12 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     
     private void OnBlazorWebViewInitialized(object sender, BlazorWebViewInitializedEventArgs e)
     {
+        TryApplyDefaultBackgroundColor(e.WebView, CreateWebViewBackgroundColor(Background));
+
         this.Observe(BackgroundProperty)
-            .Select(x => Background)
-            .Select(x => x is SolidColorBrush solidColorBrush ? solidColorBrush.Color : default)
-            .Subscribe(x => { WebView.DefaultBackgroundColor = Color.FromArgb(x.A, x.R, x.G, x.B); })
+            .Select(_ => CreateWebViewBackgroundColor(Background))
+            .DistinctUntilChanged()
+            .Subscribe(color => TryApplyDefaultBackgroundColor(e.WebView, color))
             .AddTo(Anchors);
 
         e.WebView.GotFocus += WebViewOnGotFocus;
@@ -157,6 +160,38 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         Log.Debug($"Permission requested: {e.PermissionKind}, state: {e.State}");
         e.State = CoreWebView2PermissionState.Allow;
+    }
+
+    internal static Color CreateWebViewBackgroundColor(Brush background)
+    {
+        var mediaColor = background is SolidColorBrush solidColorBrush
+            ? solidColorBrush.Color
+            : default;
+        return NormalizeWebViewBackgroundColor(mediaColor);
+    }
+
+    internal static Color NormalizeWebViewBackgroundColor(System.Windows.Media.Color mediaColor)
+    {
+        // WebView2 only accepts fully transparent or fully opaque colors.
+        return mediaColor.A switch
+        {
+            0 => Color.Transparent,
+            byte.MaxValue => Color.FromArgb(mediaColor.A, mediaColor.R, mediaColor.G, mediaColor.B),
+            _ => Color.FromArgb(byte.MaxValue, mediaColor.R, mediaColor.G, mediaColor.B)
+        };
+    }
+
+    private void TryApplyDefaultBackgroundColor(WebView2 webView, Color color)
+    {
+        try
+        {
+            webView.DefaultBackgroundColor = color;
+            Log.Debug($"Applied WebView background color {color}");
+        }
+        catch (Exception e) when (e is ArgumentException or InvalidOperationException or ObjectDisposedException or COMException)
+        {
+            Log.Warn($"Failed to apply WebView background color {color}. WebView will continue with its existing background.", e);
+        }
     }
     
     public override IFileProvider CreateFileProvider(string contentRootDir)

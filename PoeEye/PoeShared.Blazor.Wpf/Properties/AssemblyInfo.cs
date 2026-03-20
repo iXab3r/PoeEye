@@ -8,3 +8,4 @@ using PoeShared.Blazor.Scaffolding;
 [assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]
 [assembly: AssemblyHasBlazorViews]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
+[assembly: InternalsVisibleTo("EyeAuras.Tests")]
