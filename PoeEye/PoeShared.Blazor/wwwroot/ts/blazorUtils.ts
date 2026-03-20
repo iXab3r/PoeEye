@@ -128,6 +128,29 @@ export async function setClipboardText(text: string): Promise<void> {
 }
 
 /**
+ * Downloads text content as a file using a temporary object URL.
+ * @param fileName Suggested file name.
+ * @param content File contents.
+ * @param contentType MIME type for the downloaded file.
+ */
+export function downloadTextFile(fileName: string, content: string, contentType: string = 'text/plain;charset=utf-8'): void {
+    try {
+        const blob = new Blob([content], {type: contentType});
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = fileName;
+        anchor.style.display = 'none';
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    } catch (error) {
+        logAndThrow(`Failed to download file '${fileName}'`, error);
+    }
+}
+
+/**
  * Displays a text alert using a custom alert library.
  * @param message The message to display in the alert.
  */

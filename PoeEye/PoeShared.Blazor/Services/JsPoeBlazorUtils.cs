@@ -40,6 +40,12 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         await module.InvokeVoidAsync("setClipboardText", text);
     }
 
+    public async Task DownloadTextFile(string fileName, string content, string contentType = "text/plain;charset=utf-8")
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("downloadTextFile", fileName, content, contentType);
+    }
+
     public async Task ShowAlert(string message)
     {
         var module = await GetModuleAsync();

@@ -27,6 +27,15 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     Task SetClipboardText(string text);
 
     /// <summary>
+    /// Downloads a UTF-8 text file in the browser.
+    /// </summary>
+    /// <param name="fileName">Suggested file name for the browser download.</param>
+    /// <param name="content">Text content to save.</param>
+    /// <param name="contentType">MIME type for the file.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task DownloadTextFile(string fileName, string content, string contentType = "text/plain;charset=utf-8");
+
+    /// <summary>
     /// Shows a text alert using SweetAlert.
     /// </summary>
     /// <param name="message">The message to display in the alert.</param>
