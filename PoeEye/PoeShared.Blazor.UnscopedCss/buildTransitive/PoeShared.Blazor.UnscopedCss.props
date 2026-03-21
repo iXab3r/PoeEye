@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <PoeBlazorUnscopedCssEnabled Condition="'$(PoeBlazorUnscopedCssEnabled)' == ''">true</PoeBlazorUnscopedCssEnabled>
-        <PoeBlazorUnscopedCssVerbose Condition="'$(PoeBlazorUnscopedCssVerbose)' == ''">false</PoeBlazorUnscopedCssVerbose>
+        <PoeBlazorUnscopedCssVerbose Condition="'$(PoeBlazorUnscopedCssVerbose)' == ''">true</PoeBlazorUnscopedCssVerbose>
     </PropertyGroup>
 
 </Project>

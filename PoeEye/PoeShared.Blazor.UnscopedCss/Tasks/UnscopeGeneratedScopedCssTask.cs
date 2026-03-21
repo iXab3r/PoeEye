@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,18 +22,14 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
 
     public bool Verbose { get; set; }
 
+    public string? PhaseName { get; set; }
+
     public override bool Execute()
     {
+        var stopwatch = Stopwatch.StartNew();
         var flaggedFiles = BuildFlaggedFileLookup();
         if (flaggedFiles.Count == 0)
         {
-            if (Verbose)
-            {
-                Log.LogMessage(
-                    MessageImportance.Low,
-                    "[PoeShared.Blazor.UnscopedCss] No flagged .razor.css files were found in the current project.");
-            }
-
             return true;
         }
 
@@ -54,12 +51,16 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
             }
         }
 
-        if (Verbose)
+        stopwatch.Stop();
+
+        if (Verbose && processedFiles > 0)
         {
-            Log.LogMessage(MessageImportance.High,
-                "[PoeShared.Blazor.UnscopedCss] Processed {0} flagged scoped CSS file(s), rewrote {1}.",
+            Log.LogMessage(
+                MessageImportance.High,
+                FormatMessage("Processed {0} flagged CSS output file(s), rewrote {1} in {2} ms."),
                 processedFiles,
-                rewrittenFiles);
+                rewrittenFiles,
+                stopwatch.ElapsedMilliseconds);
         }
 
         return !Log.HasLoggedErrors;
@@ -71,7 +72,7 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
 
         foreach (var item in FlaggedOriginalFiles)
         {
-            if (!ShouldUnscope(item.GetMetadata("PoeUnscopeAfterRewrite")))
+            if (!ShouldUnscope(GetUnscopeCssValue(item)))
             {
                 continue;
             }
@@ -111,8 +112,9 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
         {
             if (Verbose)
             {
-                Log.LogMessage(MessageImportance.Low,
-                    "[PoeShared.Blazor.UnscopedCss] Skipping '{0}' because no Blazor scope selector could be identified.",
+                Log.LogMessage(
+                    MessageImportance.High,
+                    FormatMessage("Skipping '{0}' because no Blazor scope selector could be identified."),
                     originalFile);
             }
 
@@ -129,8 +131,9 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
         {
             if (Verbose)
             {
-                Log.LogMessage(MessageImportance.Low,
-                    "[PoeShared.Blazor.UnscopedCss] '{0}' did not contain removable scope selectors after inspection.",
+                Log.LogMessage(
+                    MessageImportance.High,
+                    FormatMessage("'{0}' did not contain removable scope selectors after inspection."),
                     originalFile);
             }
 
@@ -141,8 +144,9 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
 
         if (Verbose)
         {
-            Log.LogMessage(MessageImportance.High,
-                "[PoeShared.Blazor.UnscopedCss] Unscoped '{0}' via generated file '{1}'. Removed selectors: {2}",
+            Log.LogMessage(
+                MessageImportance.High,
+                FormatMessage("Unscoped '{0}' via generated file '{1}'. Removed selectors: {2}"),
                 originalFile,
                 generatedFile,
                 string.Join(", ", scopeSelectors));
@@ -174,6 +178,27 @@ public sealed class UnscopeGeneratedScopedCssTask : Microsoft.Build.Utilities.Ta
         }
 
         return result;
+    }
+
+    private string GetUnscopeCssValue(ITaskItem item)
+    {
+        var value = item.GetMetadata("UnscopeCss");
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        return item.GetMetadata("LegacyUnscopeCss");
+    }
+
+    private string FormatMessage(string messageFormat)
+    {
+        if (string.IsNullOrWhiteSpace(PhaseName))
+        {
+            return "[PoeShared.Blazor.UnscopedCss] " + messageFormat;
+        }
+
+        return $"[PoeShared.Blazor.UnscopedCss:{PhaseName}] " + messageFormat;
     }
 
     private static bool ShouldUnscope(string value)

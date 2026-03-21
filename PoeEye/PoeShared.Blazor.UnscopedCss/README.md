@@ -4,20 +4,22 @@ Selective build-time post-processing for Blazor scoped CSS.
 
 ## What it does
 
-Blazor rewrites `.razor.css` files into generated scoped CSS and then bundles them into
-`{PackageId}.styles.css`. This package adds a build step between those two phases.
+Blazor rewrites scoped component CSS into generated outputs and then bundles them into
+`{PackageId}.styles.css`. This package adds build steps that can rewrite either the generated
+component CSS or the final bundle outputs.
 
-If a `.razor.css` file is marked with:
+If a CSS file is marked with:
 
 ```xml
 <None Update="EventViewer/AuraEventList.razor.css"
-      PoeUnscopeAfterRewrite="true" />
+      UnscopeCss="true" />
 ```
 
-the package rewrites the generated `*.rz.scp.css` file and removes the Blazor scope attribute
-selectors before the final bundle is produced.
+the package rewrites the matching generated CSS output and removes the Blazor scope attribute
+selectors.
 
-Everything else remains normal Blazor scoped CSS.
+This works for scoped source files like `*.razor.css` and generated bundle files like
+`{PackageId}.styles.css` or `{PackageId}.bundle.scp.css`.
 
 ## Consumer usage
 
@@ -32,7 +34,7 @@ Everything else remains normal Blazor scoped CSS.
 ```xml
 <ItemGroup>
   <None Update="EventViewer/AuraEventList.razor.css"
-        PoeUnscopeAfterRewrite="true" />
+        UnscopeCss="true" />
 </ItemGroup>
 ```
 
@@ -41,18 +43,28 @@ Optional:
 ```xml
 <None Update="EventViewer/AuraEventList.razor.css"
       CssScope="ea-event-log"
-      PoeUnscopeAfterRewrite="true" />
+      UnscopeCss="true" />
+```
+
+Bundle-level usage:
+
+```xml
+<None Update="MyApp.styles.css"
+      CssScope="ea-event-log"
+      UnscopeCss="true" />
 ```
 
 ## Notes
 
-- The package runs after Blazor generates `obj/.../scopedcss/.../*.rz.scp.css`.
-- The final `*.styles.css` bundle is still produced and linked by the normal Blazor pipeline.
-- The unscoping pass is intentionally selective: only files marked with `PoeUnscopeAfterRewrite`
-  are touched.
+- The package rewrites generated `obj/.../scopedcss/.../*.rz.scp.css` files before bundling and can
+  also rewrite bundled outputs like `*.styles.css` after bundling.
+- The unscoping pass is intentionally selective: only files marked with `UnscopeCss` are touched.
 - The package is delivered through `buildTransitive`, so adding the package reference is enough for
   consuming projects.
 - The task assembly is multi-targeted for both desktop MSBuild (`net472`) and `dotnet build`
   (`net8.0`).
-- If you toggle `PoeUnscopeAfterRewrite` on an existing file, do a clean rebuild once so the
+- Logging is enabled by default and includes task duration in milliseconds.
+- `PoeUnscopeAfterRewrite` is still accepted as a compatibility alias, but `UnscopeCss` is the
+  preferred metadata name.
+- If you toggle `UnscopeCss` on an existing file, do a clean rebuild once so the
   generated scoped CSS is regenerated from source before the post-processing step runs again.

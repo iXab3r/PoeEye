@@ -15,23 +15,29 @@
 
         <ItemGroup>
             <_PoeFlaggedScopedCssInput Include="@(None)"
-                                       Condition="$([System.String]::Copy('%(None.Identity)').ToLowerInvariant().EndsWith('.razor.css'))">
+                                       Condition="$([System.String]::Copy('%(None.Identity)').ToLowerInvariant().EndsWith('.css'))">
                 <OriginalItemSpec>%(None.Identity)</OriginalItemSpec>
-                <PoeUnscopeAfterRewrite>%(None.PoeUnscopeAfterRewrite)</PoeUnscopeAfterRewrite>
+                <UnscopeCss>%(None.UnscopeCss)</UnscopeCss>
+                <UnscopeCss Condition="'%(None.UnscopeCss)' == ''">%(None.PoeUnscopeAfterRewrite)</UnscopeCss>
+                <LegacyUnscopeCss>%(None.PoeUnscopeAfterRewrite)</LegacyUnscopeCss>
                 <ConfiguredCssScope>%(None.CssScope)</ConfiguredCssScope>
             </_PoeFlaggedScopedCssInput>
 
             <_PoeFlaggedScopedCssInput Include="@(Content)"
-                                       Condition="$([System.String]::Copy('%(Content.Identity)').ToLowerInvariant().EndsWith('.razor.css'))">
+                                       Condition="$([System.String]::Copy('%(Content.Identity)').ToLowerInvariant().EndsWith('.css'))">
                 <OriginalItemSpec>%(Content.Identity)</OriginalItemSpec>
-                <PoeUnscopeAfterRewrite>%(Content.PoeUnscopeAfterRewrite)</PoeUnscopeAfterRewrite>
+                <UnscopeCss>%(Content.UnscopeCss)</UnscopeCss>
+                <UnscopeCss Condition="'%(Content.UnscopeCss)' == ''">%(Content.PoeUnscopeAfterRewrite)</UnscopeCss>
+                <LegacyUnscopeCss>%(Content.PoeUnscopeAfterRewrite)</LegacyUnscopeCss>
                 <ConfiguredCssScope>%(Content.CssScope)</ConfiguredCssScope>
             </_PoeFlaggedScopedCssInput>
 
             <_PoeFlaggedScopedCssInput Include="@(ScopedCssInput)"
-                                       Condition="$([System.String]::Copy('%(ScopedCssInput.Identity)').ToLowerInvariant().EndsWith('.razor.css'))">
+                                       Condition="$([System.String]::Copy('%(ScopedCssInput.Identity)').ToLowerInvariant().EndsWith('.css'))">
                 <OriginalItemSpec>%(ScopedCssInput.Identity)</OriginalItemSpec>
-                <PoeUnscopeAfterRewrite>%(ScopedCssInput.PoeUnscopeAfterRewrite)</PoeUnscopeAfterRewrite>
+                <UnscopeCss>%(ScopedCssInput.UnscopeCss)</UnscopeCss>
+                <UnscopeCss Condition="'%(ScopedCssInput.UnscopeCss)' == ''">%(ScopedCssInput.PoeUnscopeAfterRewrite)</UnscopeCss>
+                <LegacyUnscopeCss>%(ScopedCssInput.PoeUnscopeAfterRewrite)</LegacyUnscopeCss>
                 <ConfiguredCssScope>%(ScopedCssInput.CssScope)</ConfiguredCssScope>
             </_PoeFlaggedScopedCssInput>
 
@@ -44,7 +50,54 @@
 
         <PoeShared.Blazor.UnscopedCss.Tasks.UnscopeGeneratedScopedCssTask Files="@(_PoeGeneratedScopedCssCandidate)"
                                                                            FlaggedOriginalFiles="@(_PoeFlaggedScopedCssInput)"
-                                                                           Verbose="$(PoeBlazorUnscopedCssVerbose)" />
+                                                                           Verbose="$(PoeBlazorUnscopedCssVerbose)"
+                                                                           PhaseName="generated" />
+    </Target>
+
+    <Target Name="Poe_UnscopeBundledCss"
+            AfterTargets="BundleScopedCssFiles"
+            Condition="'$(DesignTimeBuild)' != 'true' and '$(PoeBlazorUnscopedCssEnabled)' == 'true' and '$(DisableScopedCssBundling)' != 'true'">
+
+        <PropertyGroup>
+            <_PoeScopedCssIntermediatePath>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)scopedcss\))</_PoeScopedCssIntermediatePath>
+            <_PoeScopedCssBundleOutputPath>$(_PoeScopedCssIntermediatePath)bundle\$(PackageId).styles.css</_PoeScopedCssBundleOutputPath>
+            <_PoeScopedCssProjectBundleOutputPath>$(_PoeScopedCssIntermediatePath)projectbundle\$(PackageId).bundle.scp.css</_PoeScopedCssProjectBundleOutputPath>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <_PoeFlaggedBundleCssInput Include="@(None)"
+                                       Condition="$([System.String]::Copy('%(None.Identity)').ToLowerInvariant().EndsWith('.styles.css')) or $([System.String]::Copy('%(None.Identity)').ToLowerInvariant().EndsWith('.bundle.scp.css'))">
+                <OriginalItemSpec>%(None.Identity)</OriginalItemSpec>
+                <UnscopeCss>%(None.UnscopeCss)</UnscopeCss>
+                <UnscopeCss Condition="'%(None.UnscopeCss)' == ''">%(None.PoeUnscopeAfterRewrite)</UnscopeCss>
+                <LegacyUnscopeCss>%(None.PoeUnscopeAfterRewrite)</LegacyUnscopeCss>
+                <ConfiguredCssScope>%(None.CssScope)</ConfiguredCssScope>
+            </_PoeFlaggedBundleCssInput>
+
+            <_PoeFlaggedBundleCssInput Include="@(Content)"
+                                       Condition="$([System.String]::Copy('%(Content.Identity)').ToLowerInvariant().EndsWith('.styles.css')) or $([System.String]::Copy('%(Content.Identity)').ToLowerInvariant().EndsWith('.bundle.scp.css'))">
+                <OriginalItemSpec>%(Content.Identity)</OriginalItemSpec>
+                <UnscopeCss>%(Content.UnscopeCss)</UnscopeCss>
+                <UnscopeCss Condition="'%(Content.UnscopeCss)' == ''">%(Content.PoeUnscopeAfterRewrite)</UnscopeCss>
+                <LegacyUnscopeCss>%(Content.PoeUnscopeAfterRewrite)</LegacyUnscopeCss>
+                <ConfiguredCssScope>%(Content.CssScope)</ConfiguredCssScope>
+            </_PoeFlaggedBundleCssInput>
+
+            <_PoeGeneratedBundleCssCandidate Include="$(_PoeScopedCssBundleOutputPath)">
+                <GeneratedOutputFile>$(_PoeScopedCssBundleOutputPath)</GeneratedOutputFile>
+                <OriginalItemSpec>$(PackageId).styles.css</OriginalItemSpec>
+            </_PoeGeneratedBundleCssCandidate>
+
+            <_PoeGeneratedBundleCssCandidate Include="$(_PoeScopedCssProjectBundleOutputPath)">
+                <GeneratedOutputFile>$(_PoeScopedCssProjectBundleOutputPath)</GeneratedOutputFile>
+                <OriginalItemSpec>$(PackageId).bundle.scp.css</OriginalItemSpec>
+            </_PoeGeneratedBundleCssCandidate>
+        </ItemGroup>
+
+        <PoeShared.Blazor.UnscopedCss.Tasks.UnscopeGeneratedScopedCssTask Files="@(_PoeGeneratedBundleCssCandidate)"
+                                                                           FlaggedOriginalFiles="@(_PoeFlaggedBundleCssInput)"
+                                                                           Verbose="$(PoeBlazorUnscopedCssVerbose)"
+                                                                           PhaseName="bundled" />
     </Target>
 
 </Project>
