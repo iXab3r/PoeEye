@@ -1,71 +1,154 @@
 @using PoeShared.Blazor.Scaffolding
-@using JetBrains.Annotations
-@using PoeShared.Blazor.Scaffolding
+@using PoeShared.Blazor.Wpf
 @inherits ReactiveComponentBase
 
-<BlazorErrorBoundary @ref="errorBoundary" >
-    <ChildContent>
-        @if (ResolvedViewType != null)
-        {
-            @DynamicView
-        }
-        else
-        {
-            if (Content == null)
+@if (currentException == null)
+{
+    <BlazorErrorBoundary OnError="@HandleBoundaryErrorAsync">
+        <ChildContent>
+            @if (ResolvedViewType != null)
             {
-                <div>Content is not set</div>
+                @DynamicView
             }
             else
             {
-                if (NotFoundTemplate != null)
+                if (Content == null)
                 {
-                    @NotFoundTemplate
+                    <div>Content is not set</div>
                 }
                 else
                 {
-                    <div>View for @($"{Content.GetType()}") is not resolved</div>
+                    if (NotFoundTemplate != null)
+                    {
+                        @NotFoundTemplate
+                    }
+                    else
+                    {
+                        <div>View for @($"{Content.GetType()}") is not resolved</div>
+                    }
                 }
             }
-        }
-    </ChildContent>
-    <ErrorContent>
-        <div class="text-danger border-bottom border-danger">Component exception</div>
-        <button class="m-1" @onclick="Recover">Try to recover</button>
-        <div class="p-2 text-warning">
-            @if (errorBoundary.CurrentException != null)
+        </ChildContent>
+    </BlazorErrorBoundary>
+}
+else
+{
+    <div @key="currentException"
+         role="alert"
+         style="@FaultPanelStyle">
+        <div style="font-size: 0.95rem; font-weight: 700;">Component exception</div>
+        <div style="font-size: 0.82rem; opacity: 0.92;">This part of the editor failed to render.</div>
+
+        <div style="font-size: 0.82rem; line-height: 1.35;">
+            <strong>@currentException.GetType().Name</strong>: @currentException.Message
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <button type="button"
+                    style="@FaultButtonStyle"
+                    @onclick="Recover">
+                Try to recover
+            </button>
+
+            @if (BlazorHostController != null)
             {
-                var currentException = errorBoundary?.CurrentException;
-                if (currentException != null && !ReferenceEquals(lastLoggedException, currentException))
-                {
-                    Log.Error("BlazorContentPresenter encountered an error", currentException);
-                }
-                lastLoggedException = currentException;
-                
-                @errorBoundary.CurrentException
-            }
-            else
-            {
-                <div>$"Exception is not known"</div>
+                <button type="button"
+                        style="@FaultButtonStyle"
+                        @onclick="ReloadHost">
+                    Reload view
+                </button>
             }
         </div>
-    </ErrorContent>
-</BlazorErrorBoundary>
+
+        <details style="font-size: 0.78rem;">
+            <summary style="cursor: pointer;">Details</summary>
+            <div style="margin-top: 0.5rem;">
+                <div>View: @(ResolvedViewType?.FullName ?? ViewType?.FullName ?? "unknown")</div>
+                <div>Content: @(Content?.GetType().FullName ?? "unknown")</div>
+            </div>
+            <pre style="@FaultDetailsStyle">@currentException</pre>
+        </details>
+    </div>
+}
 
 @code {
-    private BlazorErrorBoundary errorBoundary;
+    private Exception currentException;
     private Exception lastLoggedException;
+    private object lastRecoveredContent;
+    private Type lastRecoveredViewType;
+    private object lastRecoveredViewTypeKey;
     
     [Parameter] public RenderFragment NotFoundTemplate { get; set; }
+    [Inject] public IBlazorHostController BlazorHostController { get; set; }
 
     protected override void OnParametersSet()
     {
-        errorBoundary?.Recover();
+        if (!HasRecoverableViewChanged())
+        {
+            return;
+        }
+
+        lastRecoveredContent = Content;
+        lastRecoveredViewType = ViewType;
+        lastRecoveredViewTypeKey = ViewTypeKey;
+        currentException = null;
+        lastLoggedException = null;
     }
 
     private void Recover()
     {
-        errorBoundary?.Recover();
+        currentException = null;
+        lastLoggedException = null;
     }
+
+    private async Task ReloadHost()
+    {
+        currentException = null;
+        lastLoggedException = null;
+        if (BlazorHostController != null)
+        {
+            await BlazorHostController.Reload();
+        }
+    }
+
+    private async Task HandleBoundaryErrorAsync(Exception exception)
+    {
+        currentException = exception;
+        TrackException(exception);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void TrackException(Exception exception)
+    {
+        if (exception == null || ReferenceEquals(lastLoggedException, exception))
+        {
+            return;
+        }
+
+        lastLoggedException = exception;
+        Log.Error("BlazorContentPresenter encountered an error", exception);
+    }
+
+    private bool HasRecoverableViewChanged()
+    {
+        return !ReferenceEquals(lastRecoveredContent, Content) ||
+               lastRecoveredViewType != ViewType ||
+               !Equals(lastRecoveredViewTypeKey, ViewTypeKey);
+    }
+
+    private const string FaultPanelStyle =
+        "display:block;width:100%;min-width:0;box-sizing:border-box;margin:0.5rem;padding:0.8rem 0.9rem;" +
+        "border:1px solid rgba(220,53,69,0.72);border-radius:0.5rem;background:rgba(70,18,24,0.96);" +
+        "color:#fff4f4;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03);";
+
+    private const string FaultButtonStyle =
+        "display:inline-flex;align-items:center;justify-content:center;padding:0.3rem 0.55rem;" +
+        "border:1px solid rgba(255,244,244,0.35);border-radius:0.35rem;background:rgba(255,255,255,0.06);" +
+        "color:inherit;font-size:0.8rem;line-height:1.2;";
+
+    private const string FaultDetailsStyle =
+        "margin:0.5rem 0 0;padding:0.55rem;background:rgba(0,0,0,0.22);border-radius:0.35rem;" +
+        "white-space:pre-wrap;overflow:auto;max-height:16rem;color:inherit;";
 
     public override ValueTask DisposeAsync()
     {
