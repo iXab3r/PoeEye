@@ -1,15 +1,19 @@
 ﻿@namespace PoeShared.Blazor.Wpf
+@using System.Collections.Generic
 @using System.Reactive.Disposables
 @using System.Windows
 @using PoeShared.Blazor
 @using PoeShared.Blazor.Scaffolding
+@using PoeShared.Blazor.Wpf.Automation
+@using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Scaffolding
 @using ReactiveUI
 @using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
-@inherits BlazorReactiveComponent<IBlazorWindow>
+@inherits BlazorWindowContentBase<IBlazorWindow>
 
 <div class="d-flex w-100 align-items-center"
      id="@(IBlazorWindow.WindowTitleBarId)"
+     @attributes="GetTitleBarAutomationAttributes()"
      style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWpf())"
      @ref="@ElementRef">
     <ReactiveSection
@@ -133,5 +137,17 @@
     private void HandleMouseDown(MouseEventArgs mouseEventArgs)
     {
         StartDrag();
+    }
+
+    private IReadOnlyDictionary<string, object> GetTitleBarAutomationAttributes()
+    {
+        var windowAutomationId = DataContext?.GetAutomationId();
+        var viewRole = BlazorWindowViewRole.TitleBar;
+        var titleBarAutomationId = DataContext?.GetViewAutomationId(viewRole);
+        var dictionary = new Dictionary<string, object>(CreateAutomationAttributes(titleBarAutomationId, DataContext?.DataContext));
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.WindowIdAttribute, windowAutomationId);
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.ViewIdAttribute, titleBarAutomationId);
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.ViewRoleAttribute, viewRole.ToAutomationSegment());
+        return dictionary;
     }
 }

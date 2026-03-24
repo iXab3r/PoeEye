@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
@@ -228,12 +229,12 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
     protected IFluentLog Log { get; }
 
-    private void OnInitialized(object sender, EventArgs e)
+    private void OnInitialized(object? sender, EventArgs e)
     {
         Log.Debug($"BlazorContentControl has been initialized");
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         Log.Debug($"BlazorContentControl has been loaded");
     }
@@ -425,10 +426,11 @@ public class BlazorContentControl : Control, IBlazorContentControl
         await Reload();
     }
 
-    private void BlazorWebViewInitializing(object sender, BlazorWebViewInitializingEventArgs e)
+    private void BlazorWebViewInitializing(object? sender, BlazorWebViewInitializingEventArgs e)
     {
         var appArguments = webViewServiceProvider.ServiceProvider.GetRequiredService<IAppArguments>();
         e.UserDataFolder = appArguments.TempDirectory;
+        Log.Debug($"Configured WebView2 user data folder for {globalId}/{ViewType}: {e.UserDataFolder}");
     }
     
     private void OnUnhandledException(object sender, WpfDispatcherUnhandlerExceptionEventArgs e)

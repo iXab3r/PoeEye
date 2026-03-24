@@ -13,10 +13,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.Wpf;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Core.Raw;
 using Microsoft.Web.WebView2.Wpf;
+using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
@@ -43,19 +45,22 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         {
             throw new InvalidStateException($"It is expected than inner WebView2 will be hosted as {WebViewTemplateChildName} inside visual tree of {this}, got nothing instead");
         }
+
         if (frameworkElementFactory.Type != typeof(WebView2))
         {
-            throw new InvalidStateException($"It is expected than inner WebView2 will be hosted as WPF version of WebView2 ({typeof(WebView2)}) {WebViewTemplateChildName} inside visual tree of {this}, got other control instead: {frameworkElementFactory.Type}");
+            throw new InvalidStateException(
+                $"It is expected than inner WebView2 will be hosted as WPF version of WebView2 ({typeof(WebView2)}) {WebViewTemplateChildName} inside visual tree of {this}, got other control instead: {frameworkElementFactory.Type}");
         }
+
         Template = new ControlTemplate
         {
             VisualTree = new FrameworkElementFactory(typeof(WebView2Ex), WebViewTemplateChildName)
         };
-        
+
         this.BlazorWebViewInitializing += OnBlazorWebViewInitializing;
         this.BlazorWebViewInitialized += OnBlazorWebViewInitialized;
     }
-        
+
     public IFileProvider FileProvider
     {
         get => proxyFileProvider.FileProvider;
@@ -66,27 +71,60 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         base.OnApplyTemplate();
 
-        
-        webView2Ex = (WebView2Ex)Template.FindName(WebViewTemplateChildName, this) ?? throw new InvalidStateException($"Failed to find web view control {WebViewTemplateChildName}");
-        
+
+        webView2Ex = (WebView2Ex) Template.FindName(WebViewTemplateChildName, this) ?? throw new InvalidStateException($"Failed to find web view control {WebViewTemplateChildName}");
+
         /*
          * This is an attempt to fix flickering problem described here:
          * https://github.com/MicrosoftEdge/WebView2Feedback/issues/1412
          * and here
          * https://www.cnblogs.com/liwuqingxin/p/16266683.html
-         * The idea is to temporarily relocate webview until it will be fully loaded 
+         * The idea is to temporarily relocate webview until it will be fully loaded
          */
         webView2Ex.RenderTransform = new TranslateTransform(-int.MaxValue, -int.MaxValue);
     }
 
     private void OnBlazorWebViewInitializing(object sender, BlazorWebViewInitializingEventArgs e)
     {
-        e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
+        e.EnvironmentOptions ??= new CoreWebView2EnvironmentOptions();
+
+        var requestedAdditionalBrowserArguments = e.EnvironmentOptions.AdditionalBrowserArguments ?? string.Empty;
+        var automationOptionsProvider = Services?.GetService<IBlazorWebViewAutomationOptionsProvider>();
+        var automationOptions = automationOptionsProvider?.GetOptions() ?? new BlazorWebViewAutomationOptions();
+        if (automationOptions.EnableAutomation)
         {
-            AdditionalBrowserArguments = "",
-        };
+            if (!automationOptions.BrowserDebugPort.IsBetween(1, 65535, true))
+            {
+                Log.Warn($"WebView2 Remote-debugging port is {automationOptions.BrowserDebugPort}, it is not between 1 and 65535, ignoring");
+            }
+            else
+            {
+                requestedAdditionalBrowserArguments = AppendBrowserArgument(requestedAdditionalBrowserArguments, $"--remote-debugging-port={automationOptions.BrowserDebugPort}");
+            }
+        }
+
+        var environmentController = Services?.GetService<IWebView2EnvironmentController>();
+        if (environmentController == null)
+        {
+            e.EnvironmentOptions.AdditionalBrowserArguments = requestedAdditionalBrowserArguments;
+            return;
+        }
+
+        var resolution = environmentController.ApplyRequestedSpec(new WebView2EnvironmentSpec(
+            BrowserExecutableFolder: e.BrowserExecutableFolder,
+            AdditionalBrowserArguments: requestedAdditionalBrowserArguments));
+
+        e.BrowserExecutableFolder = resolution.EffectiveSpec.BrowserExecutableFolder;
+        e.EnvironmentOptions.AdditionalBrowserArguments = resolution.EffectiveSpec.AdditionalBrowserArguments;
+
+        if (resolution.RestartRequired)
+        {
+            return;
+        }
+
+        Log.Debug(resolution.Message);
     }
-    
+
     private void OnBlazorWebViewInitialized(object sender, BlazorWebViewInitializedEventArgs e)
     {
         TryApplyDefaultBackgroundColor(e.WebView, CreateWebViewBackgroundColor(Background));
@@ -101,11 +139,11 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         e.WebView.LostFocus += WebViewOnLostFocus;
         e.WebView.NavigationCompleted += WebViewOnNavigationCompleted;
         e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
-        #if !DEBUG
+#if !DEBUG
         e.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false; //disables Ctrl+F, Ctrl+P, etc. DOES NOT DISABLE Ctrl+A/C/V
-        #endif
-        e.WebView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; 
-        e.WebView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false; 
+#endif
+        e.WebView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
+        e.WebView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
         e.WebView.PreviewKeyDown += WebViewOnPreviewKeyDown;
         e.WebView.CoreWebView2.WebMessageReceived += CoreWebView2OnWebMessageReceived;
         var drives = LogicalDriveListProvider.Instance.Drives.Items.ToArray();
@@ -126,6 +164,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
                 Log.Warn($"Failed to update virtual mapping for drive {rootDirectory.FullName}", ex);
                 continue;
             }
+
             e.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping(driveLetter, rootDirectory.FullName, CoreWebView2HostResourceAccessKind.Allow);
         }
     }
@@ -134,7 +173,6 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         if (e.AdditionalObjects != null)
         {
-            
         }
     }
 
@@ -193,7 +231,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
             Log.Warn($"Failed to apply WebView background color {color}. WebView will continue with its existing background.", e);
         }
     }
-    
+
     public override IFileProvider CreateFileProvider(string contentRootDir)
     {
         var contentRoot = new DirectoryInfo(contentRootDir);
@@ -226,5 +264,26 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    private static string AppendBrowserArgument(string existingArguments, string argument)
+    {
+        if (string.IsNullOrWhiteSpace(argument))
+        {
+            return existingArguments ?? string.Empty;
+        }
+
+        if (string.IsNullOrWhiteSpace(existingArguments))
+        {
+            return argument;
+        }
+
+        var existing = existingArguments.Trim();
+        if (existing.Contains(argument, StringComparison.OrdinalIgnoreCase))
+        {
+            return existing;
+        }
+
+        return $"{existing} {argument}";
     }
 }

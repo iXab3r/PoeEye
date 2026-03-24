@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shell;
+using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -21,13 +23,18 @@ internal partial class BlazorWindow
         private readonly Border bodyHost;
         private readonly Border titleBarHost;
         private readonly ContentControl titleBarContentHost;
+        private readonly SerialDisposable bodyAutomationRegistrationAnchor;
+        private readonly SerialDisposable titleBarAutomationRegistrationAnchor;
 
         public NativeWindow(BlazorWindow owner)
         {
             this.owner = owner;
             BodyContentControl = CreateBlazorContentControl(typeof(BlazorWindowContent));
             TitleBarContentControl = CreateBlazorContentControl(typeof(BlazorWindowContentHeader));
+            bodyAutomationRegistrationAnchor = new SerialDisposable().AddTo(Anchors);
+            titleBarAutomationRegistrationAnchor = new SerialDisposable().AddTo(Anchors);
             InitializeContainerBinding();
+            InitializeAutomationBinding();
             (rootPanel, titleBarHost, titleBarContentHost, bodyHost) = CreateLayout();
             InitializeNativeChromeBinding();
             Content = rootPanel;
@@ -87,6 +94,40 @@ internal partial class BlazorWindow
                 .FromEventPattern<EventHandler, EventArgs>(h => SourceInitialized += h, h => SourceInitialized -= h)
                 .Subscribe(_ => ApplyNativeSystemChrome())
                 .AddTo(Anchors);
+        }
+
+        private void InitializeAutomationBinding()
+        {
+            Observable.CombineLatest(
+                    this.WhenAnyValue(x => x.ChildContainer),
+                    owner.WhenAnyValue(x => x.AutomationId),
+                    (container, automationId) => new
+                    {
+                        Container = container,
+                        AutomationId = automationId?.Trim() ?? string.Empty
+                    })
+                .SubscribeSafe(x => UpdateAutomationRegistration(x.Container, x.AutomationId), Log.HandleUiException)
+                .AddTo(Anchors);
+        }
+
+        private void UpdateAutomationRegistration(IUnityContainer container, string automationId)
+        {
+            bodyAutomationRegistrationAnchor.Disposable = Disposable.Empty;
+            titleBarAutomationRegistrationAnchor.Disposable = Disposable.Empty;
+
+            if (string.IsNullOrWhiteSpace(automationId) || container == null)
+            {
+                return;
+            }
+
+            if (!container.IsRegistered<IBlazorWindowViewRegistryRegistrar>())
+            {
+                return;
+            }
+
+            var registrar = container.Resolve<IBlazorWindowViewRegistryRegistrar>();
+            bodyAutomationRegistrationAnchor.Disposable = registrar.Register(new BlazorWindowViewHandle(BodyContentControl, automationId, BlazorWindowViewRole.Body));
+            titleBarAutomationRegistrationAnchor.Disposable = registrar.Register(new BlazorWindowViewHandle(TitleBarContentControl, automationId, BlazorWindowViewRole.TitleBar));
         }
 
         private (DockPanel RootPanel, Border TitleBarHost, ContentControl TitleBarContentHost, Border BodyHost) CreateLayout()

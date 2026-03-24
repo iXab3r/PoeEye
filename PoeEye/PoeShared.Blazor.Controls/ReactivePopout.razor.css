@@ -5,6 +5,10 @@
     background: transparent;
 }
 
+.reactive-popout__backdrop--hidden {
+    display: none;
+}
+
 .reactive-popout__panel {
     --reactive-popout-width: min(22rem, calc(100vw - 1rem));
     --reactive-popout-height: min(37.5rem, calc(100vh - 1rem));

@@ -1,13 +1,19 @@
 ﻿@namespace PoeShared.Blazor.Wpf
+@using System.Collections.Generic
 @using System.Reactive.Disposables
 @using System.Windows.Input
 @using PoeShared.Blazor
 @using PoeShared.Blazor.Scaffolding
+@using PoeShared.Blazor.Wpf.Automation
+@using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Scaffolding
 @using ReactiveUI
-@inherits BlazorReactiveComponent<IBlazorWindow>
+@inherits BlazorWindowContentBase<IBlazorWindow>
 
-<div id="@(IBlazorWindow.WindowBody)" class="overflow-auto h-100" style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWpf())">
+<div id="@(IBlazorWindow.WindowBody)"
+     class="overflow-auto h-100"
+     @attributes="GetBodyAutomationAttributes()"
+     style="@BlazorWindowCssUtils.BuildSystemCornerRadiusStyle(DataContext, DataContext.TitleBarDisplayMode.ResolveForWpf())">
     @if (DataContext.Anchors.IsDisposed)
     {
         <div class="d-grid-center">
@@ -77,5 +83,17 @@
                 }
             })
             .AddTo(Anchors);
+    }
+
+    private IReadOnlyDictionary<string, object> GetBodyAutomationAttributes()
+    {
+        var windowAutomationId = DataContext?.GetAutomationId();
+        var viewRole = BlazorWindowViewRole.Body;
+        var bodyAutomationId = DataContext?.GetViewAutomationId(viewRole);
+        var dictionary = new Dictionary<string, object>(CreateAutomationAttributes(bodyAutomationId, DataContext?.DataContext));
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.WindowIdAttribute, windowAutomationId);
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.ViewIdAttribute, bodyAutomationId);
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.ViewRoleAttribute, viewRole.ToAutomationSegment());
+        return dictionary;
     }
 }

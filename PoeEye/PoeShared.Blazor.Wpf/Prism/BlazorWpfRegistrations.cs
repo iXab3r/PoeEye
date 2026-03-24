@@ -1,4 +1,5 @@
 ﻿using PoeShared.Blazor.Prism;
+using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -15,6 +16,10 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
     {
         Container.RegisterType<IWpfBlazorWindow, BlazorWindow>();
         Container.RegisterType<IBlazorWindow, BlazorWindow>();
+        Container.RegisterSingleton<IBlazorWindowViewRegistry, BlazorWindowViewRegistry>();
+        Container.RegisterSingleton<IBlazorWindowViewRegistryRegistrar>(x => (BlazorWindowViewRegistry) x.Resolve<IBlazorWindowViewRegistry>());
+        Container.RegisterSingleton<IWebView2EnvironmentController, WebView2EnvironmentController>();
+        Container.RegisterSingleton<IBlazorWebViewAutomationOptionsProvider, DefaultBlazorWebViewAutomationOptionsProvider>();
         
         Container.RegisterSingleton<IStaticWebAssetsFileProvider, StaticWebAssetsFileProvider>();
         Container.RegisterSingleton<IWebViewAccessor>(x => WebViewAccessor.Instance);

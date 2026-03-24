@@ -16,6 +16,7 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using Microsoft.Extensions.FileProviders;
 using PoeShared.Blazor.Scaffolding;
+using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
@@ -33,7 +34,7 @@ namespace PoeShared.Blazor.Wpf;
 /// Things to note:
 /// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
 /// </summary>
-internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBlazorWindow, IBlazorWindowMetroController
+internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBlazorWindow, IBlazorWindowMetroController, IBlazorWindowAutomationIdentity
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
 
@@ -300,6 +301,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
     }
 
     public IUnityContainer Container { get; set; }
+
+    public string AutomationId { get; set; }
 
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.CenterOwner;
 

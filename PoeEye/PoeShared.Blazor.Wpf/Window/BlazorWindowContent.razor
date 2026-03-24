@@ -1,4 +1,5 @@
 ﻿@namespace PoeShared.Blazor.Wpf
+@using System.Collections.Generic
 @using System.Reactive.Disposables
 @using System.Windows
 @using BlazorComponentUtilities
@@ -7,12 +8,14 @@
 @using ReactiveUI
 @using PoeShared.Blazor
 @using PoeShared.Blazor.Services
+@using PoeShared.Blazor.Wpf.Automation
 @using PoeShared.Blazor.Wpf.Services
 @using PoeShared.Native
-@inherits BlazorReactiveComponent<IBlazorWindow>
+@inherits BlazorWindowContentBase<IBlazorWindow>
 
 <div class="d-grid h-100 w-100 overflow-hidden position-relative"
      @ref="@ElementRef"
+     @attributes="GetWindowAutomationAttributes()"
      id="@(IBlazorWindow.WindowId)"
      style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
@@ -245,6 +248,18 @@
                 }
             })
             .AddTo(Anchors);
+    }
+
+    private IReadOnlyDictionary<string, object> GetWindowAutomationAttributes()
+    {
+        var windowAutomationId = DataContext?.GetAutomationId();
+        var viewRole = BlazorWindowViewRole.Body;
+        var viewAutomationId = DataContext?.GetViewAutomationId(viewRole);
+        var dictionary = new Dictionary<string, object>(CreateAutomationAttributes(viewAutomationId, DataContext?.DataContext));
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.WindowIdAttribute, windowAutomationId);
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.ViewIdAttribute, viewAutomationId);
+        SetAutomationAttribute(dictionary, WellKnownAutomationIds.ViewRoleAttribute, viewRole.ToAutomationSegment());
+        return dictionary;
     }
 
     private void StartResize(WindowResizeDirection direction)
