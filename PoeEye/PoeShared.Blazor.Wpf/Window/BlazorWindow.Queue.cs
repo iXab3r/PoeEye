@@ -502,6 +502,17 @@ partial class BlazorWindow
                 .Subscribe(x => observer.OnNext(new WindowStateChangedEvent(x)))
                 .AddTo(anchors);
 
+            // Track visibility from the managed WPF window lifecycle so the state stays correct
+            // even if the native hook misses the initial show/hide transition.
+            Observable
+                .FromEventPattern<DependencyPropertyChangedEventHandler, DependencyPropertyChangedEventArgs>(
+                    h => window.IsVisibleChanged += h,
+                    h => window.IsVisibleChanged -= h)
+                .Select(_ => window.IsVisible)
+                .DistinctUntilChanged()
+                .Subscribe(x => observer.OnNext(new IsVisibleChangedEvent(x)))
+                .AddTo(anchors);
+
             //size/location-related events are handled in a special way - to avoid blinking, they are set BEFORE form is loaded
             blazorWindow.windowLeft
                 .Listen()
@@ -950,14 +961,16 @@ partial class BlazorWindow
 
     private IntPtr WindowHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (handled || lParam == IntPtr.Zero)
+        var msg = (User32.WindowMessage) msgRaw;
+        // WM_SHOWWINDOW uses lParam == 0 for normal show/hide transitions, so filtering all
+        // zero lParam messages would leave the tracked IsVisible state stale.
+        if (handled || (lParam == IntPtr.Zero && msg != User32.WindowMessage.WM_SHOWWINDOW))
         {
             return IntPtr.Zero;
         }
 
         try
         {
-            var msg = (User32.WindowMessage) msgRaw;
             switch (msg)
             {
                 case User32.WindowMessage.WM_SHOWWINDOW:
