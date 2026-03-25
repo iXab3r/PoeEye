@@ -1,12 +1,18 @@
-.reactive-popout__backdrop {
+.reactive-popout__host {
     position: fixed;
     inset: 0;
     z-index: 1400;
-    background: transparent;
+    pointer-events: none;
 }
 
-.reactive-popout__backdrop--hidden {
-    display: none;
+.reactive-popout__anchor {
+    position: fixed;
+    left: 50vw;
+    top: 50vh;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .reactive-popout__panel {
@@ -20,8 +26,8 @@
     --reactive-popout-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.45);
 
     position: fixed;
-    display: flex;
-    flex-direction: column;
+    inset: auto;
+    margin: 0;
     visibility: hidden;
     opacity: 0;
     width: var(--reactive-popout-width);
@@ -37,4 +43,9 @@
     background: var(--reactive-popout-background);
     box-shadow: var(--reactive-popout-shadow);
     outline: none;
+}
+
+.reactive-popout__panel:popover-open {
+    display: flex;
+    flex-direction: column;
 }

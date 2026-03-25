@@ -1,22 +1,19 @@
 @namespace PoeShared.Blazor.Controls
 @using Microsoft.JSInterop
-@using PoeShared.Blazor.Services
 @inherits PoeShared.Blazor.BlazorReactiveComponent
 
 @if (HideViaCss || IsOpen)
 {
-    <div class="reactive-popout__backdrop @(HideViaCss && !IsOpen ? HiddenBackdropClass : string.Empty) @(BackdropClass ?? string.Empty)"
-         style="@BackdropStyle"
-         aria-hidden="@(!IsOpen)"
-         @ref="BackdropRef"
-         @onpointerdown="@(EventUtil.AsNonRenderingEventHandler<PointerEventArgs>(HandleBackdropPointerDown))">
+    <div class="reactive-popout__host @(BackdropClass ?? string.Empty)"
+         style="@BackdropStyle">
+        <div class="reactive-popout__anchor"
+             aria-hidden="true"
+             @ref="AnchorRef"></div>
         <div class="reactive-popout__panel @(PanelClass ?? string.Empty)"
              style="@PanelStyle"
+             popover="manual"
              tabindex="0"
-             @ref="PanelRef"
-             @onpointerdown:stopPropagation="true"
-             @onkeydown="@(EventUtil.AsNonRenderingEventHandler<KeyboardEventArgs>(HandleKeyDown))"
-             @onkeydown:stopPropagation="true">
+             @ref="PanelRef">
             @ChildContent
         </div>
     </div>
@@ -24,12 +21,11 @@
 
 @code {
     private static readonly string JsFilePath = "./_content/PoeShared.Blazor.Controls/ReactivePopout.razor.js";
-    private const string HiddenBackdropClass = "reactive-popout__backdrop--hidden";
 
     private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+    private DotNetObjectReference<ReactivePopout>? dotNetRef;
     private bool previousIsOpen;
     private bool shouldSkipRender;
-    private bool shouldPosition;
     private bool shouldSyncVisibility;
 
     public ReactivePopout()
@@ -58,9 +54,7 @@
 
     [Parameter] public bool HideViaCss { get; set; }
 
-    [Inject] internal IJsPoeBlazorUtils JsUtils { get; init; } = default!;
-
-    private ElementReference BackdropRef { get; set; }
+    private ElementReference AnchorRef { get; set; }
 
     private ElementReference PanelRef { get; set; }
 
@@ -68,15 +62,14 @@
     {
         base.OnParametersSet();
 
-        if (IsOpen && !previousIsOpen)
-        {
-            shouldPosition = true;
-        }
-
-        if (HideViaCss && IsComponentRendered && IsOpen != previousIsOpen)
+        if (IsOpen != previousIsOpen)
         {
             shouldSyncVisibility = true;
-            shouldSkipRender = true;
+
+            if (HideViaCss && IsComponentRendered)
+            {
+                shouldSkipRender = true;
+            }
         }
 
         previousIsOpen = IsOpen;
@@ -117,34 +110,25 @@
             await module.InvokeVoidAsync("ensureReactivePopoutTracking");
         }
 
-        if (HideViaCss)
+        if (shouldSyncVisibility)
         {
-            if (firstRender)
-            {
-                await SyncVisibilityAsync();
-            }
+            shouldSyncVisibility = false;
+            await SyncVisibilityAsync();
             return;
         }
 
-        if (!IsOpen || !shouldPosition)
+        if (!IsOpen)
         {
             return;
         }
 
-        shouldPosition = false;
-        await module.InvokeVoidAsync("positionReactivePopout", PanelRef);
+        await module.InvokeVoidAsync("repositionReactivePopout", PanelRef, AnchorRef);
     }
 
-    private Task HandleBackdropPointerDown(PointerEventArgs _)
+    [JSInvokable]
+    public Task HandleJsCloseRequest()
     {
-        return CloseOnBackdropPointerDown ? CloseAsync() : Task.CompletedTask;
-    }
-
-    private Task HandleKeyDown(KeyboardEventArgs args)
-    {
-        return CloseOnEscape && args.Key == "Escape"
-            ? CloseAsync()
-            : Task.CompletedTask;
+        return CloseAsync();
     }
 
     private async Task CloseAsync()
@@ -157,30 +141,42 @@
 
     private async Task SyncVisibilityAsync()
     {
-        if (IsOpen)
-        {
-            if (shouldPosition)
-            {
-                shouldPosition = false;
-                var module = await moduleTask.Value;
-                await module.InvokeVoidAsync("positionReactivePopout", PanelRef);
-            }
-            
-            await JsUtils.RemoveClass(BackdropRef, HiddenBackdropClass);
-            await JsUtils.SetAttribute(BackdropRef, "aria-hidden", "false");
-            return;
-        }
+        dotNetRef ??= DotNetObjectReference.Create(this);
+        var module = await moduleTask.Value;
 
-        shouldPosition = false;
-        await JsUtils.SetAttribute(BackdropRef, "aria-hidden", "true");
-        await JsUtils.AddClass(BackdropRef, HiddenBackdropClass);
+        await module.InvokeVoidAsync(
+            "syncReactivePopout",
+            PanelRef,
+            AnchorRef,
+            IsOpen,
+            dotNetRef,
+            new
+            {
+                closeOnBackdropPointerDown = CloseOnBackdropPointerDown,
+                closeOnEscape = CloseOnEscape,
+            });
     }
 
     public override async ValueTask DisposeAsync()
     {
+        dotNetRef?.Dispose();
+
         if (moduleTask.IsValueCreated)
         {
             var module = await moduleTask.Value;
+            try
+            {
+                await module.InvokeVoidAsync("disposeReactivePopout", PanelRef);
+            }
+            catch (JSException)
+            {
+                // The element might already be gone if the component was removed by a parent render.
+            }
+            catch (InvalidOperationException)
+            {
+                // ElementReference is no longer available during teardown, which is safe to ignore here.
+            }
+
             await module.DisposeJsSafeAsync();
         }
 
