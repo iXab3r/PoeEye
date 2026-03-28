@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
 using PoeShared.Blazor.Services;
+using PoeShared.Blazor.Wpf;
 using ReactiveUI;
 using PoeShared.Scaffolding;
 using System;
@@ -15,6 +17,12 @@ namespace PoeShared.Blazor;
 partial class BlazorContentPresenter
 {
     private static readonly Binder<BlazorContentPresenter> Binder = new();
+    
+    /// <summary>
+    /// IBlazorHostController is WPF/WinForms/etc implementation of the host. Browser DOES NOT have that
+    /// </summary>
+    private IBlazorHostController blazorHostController;
+    private bool blazorHostControllerResolved;
 
     [Parameter] public object Content { get; set; }
 
@@ -23,6 +31,8 @@ partial class BlazorContentPresenter
     [Parameter] public object ViewTypeKey { get; set; }
     
     [Inject] public IBlazorViewRepository ViewRepository { get; set; }
+    
+    [Inject] public IServiceProvider ServiceProvider { get; set; }
 
     public Type ResolvedViewType { get; [UsedImplicitly] private set; }
     
@@ -113,6 +123,18 @@ partial class BlazorContentPresenter
             .SubscribeAsync(x => Refresh($"Content has been updated to {x}"))
             .AddTo(Anchors);
         Binder.Attach(this).AddTo(Anchors);
+    }
+
+    private IBlazorHostController GetBlazorHostController()
+    {
+        if (blazorHostControllerResolved)
+        {
+            return blazorHostController;
+        }
+
+        blazorHostControllerResolved = true;
+        blazorHostController = ServiceProvider?.GetService<IBlazorHostController>();
+        return blazorHostController;
     }
 
     private sealed class ViewResolver : DisposableReactiveObject

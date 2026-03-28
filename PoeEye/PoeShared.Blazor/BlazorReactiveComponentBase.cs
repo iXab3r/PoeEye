@@ -12,7 +12,6 @@ using Microsoft.JSInterop.Infrastructure;
 using PoeShared.Blazor.Internals;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
-using PropertyBinder;
 using ReactiveUI;
 
 namespace PoeShared.Blazor;

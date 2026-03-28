@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using PoeShared.Scaffolding;
-using PropertyBinder;
 using ReactiveUI;
 
 namespace PoeShared.Blazor;
@@ -14,12 +13,6 @@ public abstract class BlazorReactiveComponent : BlazorReactiveComponentBase
 
 public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponent where TContext : class
 {
-    private static readonly Binder<BlazorReactiveComponent<TContext>> Binder = new();
-    
-    static BlazorReactiveComponent()
-    {
-    }
-
     public new TContext DataContext
     {
         get
@@ -48,8 +41,6 @@ public abstract class BlazorReactiveComponent<TContext> : BlazorReactiveComponen
             .Do(_ => { })
             .Subscribe(WhenRefresh)
             .AddTo(Anchors);
-        
-        Binder.Attach(this).AddTo(Anchors);
     }
 
     [Obsolete("Replaced with ReactiveSections")]

@@ -50,7 +50,7 @@ else
                 Try to recover
             </button>
 
-            @if (BlazorHostController != null)
+            @if (blazorHostController != null)
             {
                 <button type="button"
                         style="@FaultButtonStyle"
@@ -79,7 +79,6 @@ else
     private object lastRecoveredViewTypeKey;
     
     [Parameter] public RenderFragment NotFoundTemplate { get; set; }
-    [Inject] public IBlazorHostController BlazorHostController { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -105,15 +104,17 @@ else
     {
         currentException = null;
         lastLoggedException = null;
-        if (BlazorHostController != null)
+        var hostController = blazorHostController ?? GetBlazorHostController();
+        if (hostController != null)
         {
-            await BlazorHostController.Reload();
+            await hostController.Reload();
         }
     }
 
     private async Task HandleBoundaryErrorAsync(Exception exception)
     {
         currentException = exception;
+        _ = GetBlazorHostController();
         TrackException(exception);
         await InvokeAsync(StateHasChanged);
     }

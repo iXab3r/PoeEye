@@ -13,6 +13,7 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+        <ProjectReference Include="..\PropertyBinder\PropertyBinder.csproj" />
     </ItemGroup>
 
     <ItemGroup>
