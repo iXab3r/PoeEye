@@ -19,8 +19,6 @@ internal sealed class PoeConfigConverterMigrationService : DisposableReactiveObj
 
     public PoeConfigConverterMigrationService(IAssemblyTracker assemblyTracker)
     {
-        Log.AddSuffix("Config Migrations");
-
         this.WhenAnyValue(x => x.AutomaticallyLoadConverters)
             .Select(x => x
                 ? assemblyTracker.Assemblies.WhenAdded
