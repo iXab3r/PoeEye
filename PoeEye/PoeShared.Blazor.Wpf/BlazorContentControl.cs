@@ -24,6 +24,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Scaffolding;
+using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
@@ -188,6 +189,8 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         State = state,
                         RegisterHostServices = serviceCollection =>
                         {
+                            var automationOptionsProvider = state.ChildContainer!.Resolve<IBlazorWebViewAutomationOptionsProvider>();
+
                             serviceCollection.AddBlazorWebView();
                             serviceCollection.AddWpfBlazorWebView();
                             serviceCollection.AddBlazorWebViewDeveloperTools();
@@ -199,6 +202,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
                             serviceCollection.AddTransient(typeof(BlazorContentPresenterWrapper), _ => CreateContentPresenter(contentAnchors, timestampUpdated));
 
                             serviceCollection.AddSingleton<IUnityContainer>(_ => state.ChildContainer!);
+                            serviceCollection.AddSingleton(automationOptionsProvider);
                             serviceCollection.AddSingleton<IBlazorControlLocationTracker>(_ => new FrameworkElementLocationTracker(this).AddTo(contentAnchors));
                             serviceCollection.AddSingleton<IBlazorContentControl>(_ => this);
                             serviceCollection.AddSingleton<IBlazorHostController>(_ => new BlazorHostController(this));

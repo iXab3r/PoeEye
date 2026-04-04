@@ -35,6 +35,13 @@ public static class WellKnownAutomationIds
     public const string ViewIdAttribute = "data-ea-view-id";
 
     /// <summary>
+    /// Gets the attribute name used for stable semantic markers inside a resolved browser view.
+    /// This follows the common web testing convention so standard browser tooling can target EyeAuras UI elements
+    /// without a custom selector translation layer.
+    /// </summary>
+    public const string TestIdAttribute = "data-testid";
+
+    /// <summary>
     /// Gets the attribute name that describes the semantic role of the hosting browser view.
     /// Typical values include roles such as <c>body</c> or <c>titlebar</c>, allowing automation and diagnostics
     /// to distinguish different WebView surfaces that belong to the same logical EyeAuras window.

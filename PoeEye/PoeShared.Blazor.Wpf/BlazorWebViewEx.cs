@@ -91,6 +91,8 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         var requestedAdditionalBrowserArguments = e.EnvironmentOptions.AdditionalBrowserArguments ?? string.Empty;
         var automationOptionsProvider = Services?.GetService<IBlazorWebViewAutomationOptionsProvider>();
         var automationOptions = automationOptionsProvider?.GetOptions() ?? new BlazorWebViewAutomationOptions();
+        Log.Info(
+            $"Initializing WebView2 automation: Provider={automationOptionsProvider?.GetType().FullName ?? "<null>"}, EnableAutomation={automationOptions.EnableAutomation}, BrowserDebugPort={automationOptions.BrowserDebugPort}, RequestedAdditionalBrowserArguments='{requestedAdditionalBrowserArguments}'");
         if (automationOptions.EnableAutomation)
         {
             if (!automationOptions.BrowserDebugPort.IsBetween(1, 65535, true))
@@ -107,6 +109,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
         if (environmentController == null)
         {
             e.EnvironmentOptions.AdditionalBrowserArguments = requestedAdditionalBrowserArguments;
+            Log.Info($"WebView2 environment controller is not registered, using browser arguments '{requestedAdditionalBrowserArguments}'");
             return;
         }
 
@@ -119,10 +122,11 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 
         if (resolution.RestartRequired)
         {
+            Log.Warn($"WebView2 environment restart is required: {resolution.Message}");
             return;
         }
 
-        Log.Debug(resolution.Message);
+        Log.Info($"WebView2 environment resolved: {resolution.Message}");
     }
 
     private void OnBlazorWebViewInitialized(object sender, BlazorWebViewInitializedEventArgs e)
