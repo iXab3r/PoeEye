@@ -99,6 +99,18 @@
     line-height: inherit;
 }
 
+.ant-tabs-tab {
+    font-size: inherit;
+}
+
+.ant-tabs-left > .ant-tabs-nav .ant-tabs-tab,
+.ant-tabs-right > .ant-tabs-nav .ant-tabs-tab,
+.ant-tabs-left > div > .ant-tabs-nav .ant-tabs-tab,
+.ant-tabs-right > div > .ant-tabs-nav .ant-tabs-tab {
+    padding: 0 0.5em;
+    text-align: center;
+}
+
 .ant-tabs-top > .ant-tabs-nav::before, .ant-tabs-bottom > .ant-tabs-nav::before, .ant-tabs-top > div > .ant-tabs-nav::before, .ant-tabs-bottom > div > .ant-tabs-nav::before {
     position: absolute;
     right: 0;
@@ -437,10 +449,12 @@ textarea,
 
 .ant-timeline{
     color: inherit;
+    font-size: inherit;
 }
 
 .ant-timeline-item{
     padding-bottom: 10px;
+    font-size: inherit;
 }
 
 .ant-notification  {
