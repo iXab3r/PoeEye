@@ -11,6 +11,8 @@ public sealed record UpdateSettingsConfig : IPoeEyeConfigVersioned
 
     public string UpdateSourceId { get; set; }
 
+    public string PreferredChangelogLanguageId { get; set; } = "en";
+
     public bool IgnoreDeltaUpdates { get; set; } = true;
     
     public bool AutomaticallyDownloadUpdates { get; set; } = false;
