@@ -1,6 +1,9 @@
 @inherits PoeShared.Blazor.BlazorReactiveComponent
 
-<span>
+<span @onclick:stopPropagation="true"
+      @onmousedown:stopPropagation="true"
+      @onmouseup:stopPropagation="true"
+      @ondblclick:stopPropagation="true">
     <input type="checkbox"
            id="@Id"
            class="toggle-checkbox"
