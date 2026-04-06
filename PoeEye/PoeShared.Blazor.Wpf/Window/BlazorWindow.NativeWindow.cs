@@ -195,7 +195,6 @@ internal partial class BlazorWindow
             titleBarHost.Height = 0;
             titleBarHost.Margin = default;
             bodyHost.Margin = default;
-            BodyContentControl.ViewType = typeof(BlazorWindowContent);
         }
 
         private void ApplySystemMode()
@@ -215,7 +214,7 @@ internal partial class BlazorWindow
             var resizeBorderThickness = GetResizeBorderThickness(owner.BorderThickness, owner.ResizeMode);
 
             WindowStyle = WindowStyle.None;
-            BodyContentControl.ViewType = typeof(BlazorWindowContentBody);
+            // Keep the same body presenter alive; only the title host moves between Blazor and native WPF.
             titleBarContentHost.Content = TitleBarContentControl;
             titleBarHost.Visibility = Visibility.Visible;
             titleBarHost.Height = GetTitleBarHeight();

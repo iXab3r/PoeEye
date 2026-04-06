@@ -19,7 +19,7 @@
      id="@(IBlazorWindow.WindowId)"
      style="@(new CssBuilder().AddValue("grid-template-rows: auto 1fr;").AddValue($"anchor-name: {IBlazorWindow.WindowAnchorName};").Build())">
     <ReactiveSection Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.TitleBarDisplayMode)))">
-        @if (DataContext.TitleBarDisplayMode.ResolveForWpf() != TitleBarDisplayMode.None)
+        @if (DataContext.TitleBarDisplayMode.ResolveForWpf() == TitleBarDisplayMode.Custom)
         {
             <div style="@(new CssBuilder().AddValue($"anchor-name: {IBlazorWindow.TitleBarAnchorName};").Build())">
                 <BlazorWindowContentTitleBar DataContext="@DataContext"/>
