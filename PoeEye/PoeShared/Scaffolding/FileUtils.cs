@@ -20,6 +20,28 @@ public static class FileUtils
         return DirectoryMirror.Mirror(source, destination);
     }
 
+    /// <summary>
+    /// Extracts a ZIP archive into the destination directory.
+    /// Existing files may be overwritten, but files outside the archive are left untouched.
+    /// </summary>
+    /// <param name="archive">Archive file to extract.</param>
+    /// <param name="destination">Destination directory for extraction.</param>
+    public static void ExtractArchive(FileInfo archive, DirectoryInfo destination)
+    {
+        ArchiveMirror.Extract(archive, destination);
+    }
+
+    /// <summary>
+    /// Mirrors a ZIP archive into the destination directory.
+    /// The destination is cleaned to the archive contents and marked complete after success.
+    /// </summary>
+    /// <param name="archive">Archive file to mirror.</param>
+    /// <param name="destination">Destination directory to mirror into.</param>
+    public static bool MirrorArchive(FileInfo archive, DirectoryInfo destination)
+    {
+        return ArchiveMirror.Mirror(archive, destination);
+    }
+
     public static void RemoveEverythingInside(this DirectoryInfo directory)
     {
         if (!directory.Exists) 
