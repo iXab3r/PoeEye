@@ -9,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using PoeShared.Logging;
@@ -148,7 +149,8 @@ public sealed class BlazorWindowViewHandle
                     CurrentUrl: ContentControl.WebView?.WebView?.Source?.ToString(),
                     ViewType: ContentControl.ViewType?.FullName,
                     DataContextType: (ContentControl.Content as IBlazorWindow)?.DataContext?.GetType().FullName,
-                    HasUnhandledException: ContentControl.UnhandledException != null),
+                    HasUnhandledException: ContentControl.UnhandledException != null,
+                    ScreenBounds: TryGetScreenBounds(ContentControl)),
                 cancellationToken)
             .ConfigureAwait(false);
     }
@@ -260,6 +262,29 @@ public sealed class BlazorWindowViewHandle
         }
 
         return builder.ToString();
+    }
+
+    private static BlazorWindowScreenBounds? TryGetScreenBounds(BlazorContentControl contentControl)
+    {
+        if (!contentControl.IsLoaded || contentControl.ActualWidth <= 0 || contentControl.ActualHeight <= 0)
+        {
+            return null;
+        }
+
+        try
+        {
+            var topLeft = contentControl.PointToScreen(new Point(0, 0));
+            var bottomRight = contentControl.PointToScreen(new Point(contentControl.ActualWidth, contentControl.ActualHeight));
+            return new BlazorWindowScreenBounds(
+                Left: (int) Math.Round(topLeft.X),
+                Top: (int) Math.Round(topLeft.Y),
+                Width: Math.Max(0, (int) Math.Round(bottomRight.X - topLeft.X)),
+                Height: Math.Max(0, (int) Math.Round(bottomRight.Y - topLeft.Y)));
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
 

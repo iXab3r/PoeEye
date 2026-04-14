@@ -1076,8 +1076,9 @@ partial class BlazorWindow
 
                 case User32.WindowMessage.WM_MOVE:
                 {
-                    var x = lParam.LoWord();
-                    var y = lParam.HiWord();
+                    // WM_MOVE carries signed screen coordinates, so negative monitor positions must stay negative.
+                    var x = lParam.SignedLoWord();
+                    var y = lParam.SignedHiWord();
                     EnqueueUpdate(new WindowPosChangedEvent(new Point(x, y)));
                     break;
                 }

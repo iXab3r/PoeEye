@@ -39,6 +39,9 @@ namespace PoeShared.Blazor.Wpf.Automation;
 /// <param name="HasUnhandledException">
 /// Indicates whether the hosting control has recorded an unhandled exception for the current view instance.
 /// </param>
+/// <param name="ScreenBounds">
+/// On-screen bounds of the hosting control in physical screen pixels when they can be resolved.
+/// </param>
 public sealed record BlazorWindowViewDescriptor(
     string WindowAutomationId,
     string ViewAutomationId,
@@ -49,4 +52,14 @@ public sealed record BlazorWindowViewDescriptor(
     string? CurrentUrl,
     string? ViewType,
     string? DataContextType,
-    bool HasUnhandledException);
+    bool HasUnhandledException,
+    BlazorWindowScreenBounds? ScreenBounds);
+
+/// <summary>
+/// Describes one EyeAuras browser view rectangle in physical screen pixels.
+/// </summary>
+public sealed record BlazorWindowScreenBounds(
+    int Left,
+    int Top,
+    int Width,
+    int Height);

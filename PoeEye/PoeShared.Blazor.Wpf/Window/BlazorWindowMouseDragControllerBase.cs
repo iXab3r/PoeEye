@@ -26,8 +26,9 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
         ContentControl = contentControl;
 
         StartPoint = GetCursorPosition();
-        WindowInitialPosition = new Point(blazorWindow.Left, blazorWindow.Top);
-        WindowInitialSize = new Size(blazorWindow.Width, blazorWindow.Height);
+        var initialWindowRect = blazorWindow.GetWindowRect();
+        WindowInitialPosition = initialWindowRect.Location;
+        WindowInitialSize = initialWindowRect.Size;
 
         if (!ContentControl.CaptureMouse())
         {

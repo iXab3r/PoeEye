@@ -17,4 +17,14 @@ public static class IntPtrExtensions
     {
         return (ushort)((value.ToInt64() >> 16) & 0xFFFF);
     }
+
+    public static short SignedLoWord(this IntPtr value)
+    {
+        return unchecked((short)(value.ToInt64() & 0xFFFF));
+    }
+
+    public static short SignedHiWord(this IntPtr value)
+    {
+        return unchecked((short)((value.ToInt64() >> 16) & 0xFFFF));
+    }
 }
