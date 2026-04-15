@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Extensions.FileProviders;
+using PInvoke;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf;
 using PoeShared.Blazor.Wpf.Services;
@@ -73,7 +74,6 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     private long lastSetPosLogMs;
     private long lastSetSizeLogMs;
     private long lastSetRectLogMs;
-
     public BlazorWindow(
         IUnityContainer unityContainer,
         [OptionalDependency] Dispatcher dispatcher = null)
@@ -622,8 +622,19 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     {
         EnsureNotDisposed();
         Log.Debug("Starts dragging the window");
+        // Keep drag start serialized with the rest of the window command queue, but hand the actual move loop to the OS.
         var anchor = new CompositeDisposable();
         EnqueueUpdate(new StartDragCommand(anchor));
+        return anchor;
+    }
+
+    public IDisposable EnableResize(WindowResizeDirection direction)
+    {
+        EnsureNotDisposed();
+        Log.Debug($"Starts resizing the window from {direction}");
+        // Keep resize start serialized with the rest of the window command queue, but hand the actual resize loop to the OS.
+        var anchor = new CompositeDisposable();
+        EnqueueUpdate(new StartResizeCommand(direction, anchor));
         return anchor;
     }
 
@@ -633,6 +644,70 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     {
         var window = GetWindowOrThrow();
         return window.WindowHandle;
+    }
+
+    private void StartNativeDragMoveCore()
+    {
+        var hwnd = GetWindowHandle();
+        var cursorPosition = UnsafeNative.GetCursorPosition();
+        // Hand off to the OS non-client move loop so dragging stays smooth even if the Blazor/WinForms UI thread is busy.
+        Log.Debug($"Starting native move loop. Cursor={cursorPosition}, WindowRect={UnsafeNative.GetWindowRect(hwnd)}");
+        User32.ReleaseCapture();
+        User32.SendMessage(
+            hwnd,
+            User32.WindowMessage.WM_NCLBUTTONDOWN,
+            (IntPtr) NativeWindowHitTest.Caption,
+            UnsafeNative.MakeLParam(cursorPosition.X, cursorPosition.Y));
+    }
+
+    private void StartNativeResizeCore(WindowResizeDirection direction)
+    {
+        if (direction == WindowResizeDirection.None)
+        {
+            Log.Debug("Ignoring resize request because direction is None");
+            return;
+        }
+
+        var hwnd = GetWindowHandle();
+        var cursorPosition = UnsafeNative.GetCursorPosition();
+        var hitTest = ToNativeHitTest(direction);
+        // Use the OS non-client resize loop for the same reason as dragging: it keeps mouse capture/release semantics reliable under load.
+        Log.Debug($"Starting native resize loop from {direction}. Cursor={cursorPosition}, WindowRect={UnsafeNative.GetWindowRect(hwnd)}");
+        User32.ReleaseCapture();
+        User32.SendMessage(
+            hwnd,
+            User32.WindowMessage.WM_NCLBUTTONDOWN,
+            (IntPtr) hitTest,
+            UnsafeNative.MakeLParam(cursorPosition.X, cursorPosition.Y));
+    }
+
+    private static NativeWindowHitTest ToNativeHitTest(WindowResizeDirection direction)
+    {
+        return direction switch
+        {
+            WindowResizeDirection.Left => NativeWindowHitTest.Left,
+            WindowResizeDirection.Top => NativeWindowHitTest.Top,
+            WindowResizeDirection.Right => NativeWindowHitTest.Right,
+            WindowResizeDirection.Bottom => NativeWindowHitTest.Bottom,
+            WindowResizeDirection.TopLeft => NativeWindowHitTest.TopLeft,
+            WindowResizeDirection.TopRight => NativeWindowHitTest.TopRight,
+            WindowResizeDirection.BottomLeft => NativeWindowHitTest.BottomLeft,
+            WindowResizeDirection.BottomRight => NativeWindowHitTest.BottomRight,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Unsupported resize direction")
+        };
+    }
+
+    private enum NativeWindowHitTest
+    {
+        Caption = 2,
+        Left = 10,
+        Right = 11,
+        Top = 12,
+        TopLeft = 13,
+        TopRight = 14,
+        Bottom = 15,
+        BottomLeft = 16,
+        BottomRight = 17
     }
 
     public Rectangle GetWindowRect()

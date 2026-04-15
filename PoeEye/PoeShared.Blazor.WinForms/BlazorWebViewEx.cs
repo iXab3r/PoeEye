@@ -47,7 +47,7 @@ public sealed class BlazorWebViewEx : BlazorWebView
         };
     }
 
-    private static void OnBlazorWebViewInitialized(object? sender, BlazorWebViewInitializedEventArgs e)
+    private void OnBlazorWebViewInitialized(object? sender, BlazorWebViewInitializedEventArgs e)
     {
         e.WebView.CoreWebView2.PermissionRequested += CoreWebView2OnPermissionRequested;
 #if !DEBUG

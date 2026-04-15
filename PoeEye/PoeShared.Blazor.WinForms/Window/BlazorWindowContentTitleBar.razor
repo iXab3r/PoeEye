@@ -79,12 +79,9 @@
 </div>
 
 @code {
-    private readonly SerialDisposable dragAnchor;
-
     public BlazorWindowContentTitleBar()
     {
         Anchors.Add(() => TitleBarContentPresenter = null);
-        dragAnchor = new SerialDisposable().AddTo(Anchors);
 
         ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.TitleBarDisplayMode));
         ChangeTrackers.Add(this.WhenAnyValue(x => x.DataContext.WindowState));
@@ -116,17 +113,8 @@
         }
     }
 
-    private void StartDrag()
-    {
-        dragAnchor.Disposable = new CompositeDisposable()
-        {
-            Disposable.Create(() => { }),
-            DataContext.EnableDragMove()
-        };
-    }
-
     private void HandleMouseDown(MouseEventArgs mouseEventArgs)
     {
-        StartDrag();
+        DataContext.EnableDragMove();
     }
 }

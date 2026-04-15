@@ -180,8 +180,33 @@ partial class BlazorWindow
                 case StartDragCommand command:
                 {
                     Log.Debug($"Starting dragging the window");
-                    dragAnchor.Disposable = null;
-                    dragAnchor.Disposable = new BlazorWindowMouseDragController(this, window.ContentControl).AddTo(command.Anchor);
+                    dragAnchor.Disposable = command.Anchor;
+                    try
+                    {
+                        StartNativeDragMoveCore();
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error("Failed to start native window dragging", e);
+                        dragAnchor.Disposable = null;
+                        throw;
+                    }
+                    break;
+                }
+                case StartResizeCommand command:
+                {
+                    Log.Debug($"Starting resizing the window from {command.Direction}");
+                    dragAnchor.Disposable = command.Anchor;
+                    try
+                    {
+                        StartNativeResizeCore(command.Direction);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"Failed to start native window resizing from {command.Direction}", e);
+                        dragAnchor.Disposable = null;
+                        throw;
+                    }
                     break;
                 }
                 case SetWindowSizeCommand command:
@@ -933,20 +958,25 @@ partial class BlazorWindow
 
     private IntPtr WindowHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (handled || lParam == IntPtr.Zero)
+        var msg = (User32.WindowMessage) msgRaw;
+        if (handled || (lParam == IntPtr.Zero && msg is not User32.WindowMessage.WM_SHOWWINDOW and not User32.WindowMessage.WM_EXITSIZEMOVE))
         {
             return IntPtr.Zero;
         }
 
         try
         {
-            var msg = (User32.WindowMessage) msgRaw;
             switch (msg)
             {
                 case User32.WindowMessage.WM_SHOWWINDOW:
                     var isVisible = wParam != IntPtr.Zero;
                     EnqueueUpdate(new IsVisibleChangedEvent(isVisible));
                     break;
+                case User32.WindowMessage.WM_EXITSIZEMOVE:
+                {
+                    dragAnchor.Disposable = null;
+                    break;
+                }
                 case User32.WindowMessage.WM_GETICON:
                 {
                     handled = true;
@@ -1231,6 +1261,8 @@ partial class BlazorWindow
     private sealed record SetWindowRectCommand(Rectangle Rect) : IWindowCommand;
 
     private sealed record StartDragCommand(CompositeDisposable Anchor) : IWindowCommand;
+
+    private sealed record StartResizeCommand(WindowResizeDirection Direction, CompositeDisposable Anchor) : IWindowCommand;
 
     private sealed record SetWindowPosCommand(Point Location) : IWindowCommand;
 

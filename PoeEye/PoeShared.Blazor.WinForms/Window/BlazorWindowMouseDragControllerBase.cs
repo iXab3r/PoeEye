@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Windows.Forms;
 using PoeShared.Scaffolding;
@@ -13,11 +14,17 @@ namespace PoeShared.Blazor.WinForms;
 /// </summary>
 public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveObject
 {
+    private static readonly TimeSpan DragGapWarningThreshold = TimeSpan.FromMilliseconds(120);
+
     private bool changedCursor;
     private bool draggingStarted;
     private bool changedCursorBack;
     private Cursor originalCursor;
     private Point dragStartPoint;
+    private Point lastCursorPosition;
+    private bool hasLastCursorPosition;
+    private DateTimeOffset lastMouseMoveAt = DateTimeOffset.MinValue;
+    private long mouseMoveCount;
 
     public BlazorWindowMouseDragControllerBase(IBlazorWindow blazorWindow, BlazorContentHost contentControl)
     {
@@ -128,6 +135,34 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
     private void HandleMouseMove()
     {
         var current = GetCursorPosition();
+        var now = DateTimeOffset.UtcNow;
+        var moveIndex = ++mouseMoveCount;
+
+        if (draggingStarted && !IsPrimaryButtonPressed())
+        {
+            BlazorWindow.Log.Warn(
+                $"Primary mouse button is no longer pressed while drag controller is still active. " +
+                $"Stopping drag defensively. MoveCount={moveIndex}, Cursor={current}, WindowRect={BlazorWindow.GetWindowRect()}, Capture={ContentControl.Capture}");
+            Dispose();
+            return;
+        }
+
+        if (draggingStarted && lastMouseMoveAt != DateTimeOffset.MinValue)
+        {
+            var gap = now - lastMouseMoveAt;
+            if (gap >= DragGapWarningThreshold)
+            {
+                var cursorDelta = hasLastCursorPosition
+                    ? new Size(current.X - lastCursorPosition.X, current.Y - lastCursorPosition.Y)
+                    : Size.Empty;
+                BlazorWindow.Log.Warn(
+                    $"Drag move dispatch gap detected: GapMs={gap.TotalMilliseconds:F0}, MoveCount={moveIndex}, Cursor={current}, CursorDelta={cursorDelta}, WindowRect={BlazorWindow.GetWindowRect()}, Capture={ContentControl.Capture}");
+            }
+        }
+
+        lastMouseMoveAt = now;
+        lastCursorPosition = current;
+        hasLastCursorPosition = true;
 
         switch (draggingStarted)
         {
@@ -154,7 +189,13 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
             }
         }
 
+        var sw = Stopwatch.StartNew();
         HandleMove(current);
+        if (sw.Elapsed >= DragGapWarningThreshold)
+        {
+            BlazorWindow.Log.Warn(
+                $"Drag move handling itself was slow: ElapsedMs={sw.Elapsed.TotalMilliseconds:F0}, MoveCount={moveIndex}, Cursor={current}, WindowRect={BlazorWindow.GetWindowRect()}");
+        }
     }
 
     private void ControlOnMouseMove(object sender, MouseEventArgs e)
@@ -164,11 +205,18 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
 
     private void ControlOnMouseUp(object sender, MouseEventArgs e)
     {
+        BlazorWindow.Log.Debug(
+            $"MouseUp observed by drag controller. Disposing drag session. Cursor={GetCursorPosition()}, WindowRect={BlazorWindow.GetWindowRect()}, Capture={ContentControl.Capture}");
         Dispose();
     }
 
     private static Point GetCursorPosition()
     {
         return System.Windows.Forms.Cursor.Position;
+    }
+
+    private static bool IsPrimaryButtonPressed()
+    {
+        return (Control.MouseButtons & MouseButtons.Left) == MouseButtons.Left;
     }
 }

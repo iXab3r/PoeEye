@@ -407,4 +407,13 @@ public interface IBlazorWindowController
     /// </code>
     /// </example>
     IDisposable EnableDragMove();
+
+    /// <summary>
+    /// Enables interactive resizing of the current window from the specified edge or corner.
+    /// </summary>
+    /// <param name="direction">The edge or corner that should drive the resize interaction.</param>
+    /// <returns>
+    /// An <see cref="IDisposable"/> instance reserved for compatibility with existing callers.
+    /// </returns>
+    IDisposable EnableResize(WindowResizeDirection direction);
 }

@@ -194,7 +194,6 @@
         dragAnchor = new SerialDisposable().AddTo(Anchors);
     }
 
-    [Inject] public IBlazorContentHostAccessor BlazorContentHostAccessor { get; init; }
     [Inject] public IBlazorWindowAccessor BlazorWindowAccessor { get; init; }
     [Inject] public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
 
@@ -249,10 +248,7 @@
 
     private void StartResize(WindowResizeDirection direction)
     {
-        dragAnchor.Disposable = new BlazorWindowEdgeResizeController(
-            BlazorWindowAccessor.Window,
-            BlazorContentHostAccessor.Control,
-            direction);
+        dragAnchor.Disposable = BlazorWindowAccessor.Window.EnableResize(direction);
     }
 
 }
