@@ -291,8 +291,14 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
             var sw = ValueStopwatch.StartNew();
             var configuratorType = windowConfigurator.GetType();
             Log.Debug($"Invoking {nameof(IBlazorWindowConfigurator)} {configuratorType.FullName}");
-            windowConfigurator.Configure(this);
-            Log.Debug($"{nameof(IBlazorWindowConfigurator)} {configuratorType.FullName} completed in {sw.ElapsedMilliseconds}ms");
+            try
+            {
+                windowConfigurator.Configure(this);
+            }
+            finally
+            {
+                Log.Debug($"{nameof(IBlazorWindowConfigurator)} {configuratorType.FullName} completed in {sw.ElapsedMilliseconds}ms");
+            }
         }
     }
 
