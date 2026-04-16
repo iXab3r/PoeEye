@@ -88,7 +88,7 @@ public static class FileProviderExtensions
     /// <param name="subpath">The provider-relative directory to enumerate.</param>
     /// <param name="searchPattern">The file name pattern to match. Defaults to <c>*</c>.</param>
     /// <returns>An array containing the matching file entries.</returns>
-    public static IFileInfo[] GetFiles(this IFileProvider fileProvider, string subpath, string searchPattern = "*")
+    public static IFileInfo[] GetFiles(this IFileProvider fileProvider, string subpath = "", string searchPattern = "*")
     {
         return GetFiles(fileProvider, subpath, searchPattern, new EnumerationOptions());
     }

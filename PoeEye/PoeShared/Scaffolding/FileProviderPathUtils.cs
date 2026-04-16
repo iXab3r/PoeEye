@@ -226,6 +226,18 @@ internal sealed class PathAwareFileInfo : IFileInfo, IFileProviderPathInfo
     public string Name => FileProviderPathUtils.GetLeafName(Subpath);
 
     public string PhysicalPath => source.PhysicalPath;
+
+    public override string ToString()
+    {
+        var builder = new ToStringBuilder(this);
+        builder.AppendParameter(nameof(Subpath), Subpath);
+        builder.AppendParameter(nameof(Name), Name);
+        builder.AppendParameter(nameof(Exists), Exists);
+        builder.AppendParameter(nameof(IsDirectory), IsDirectory);
+        builder.AppendParameter(nameof(Length), Length);
+        builder.AppendParameterIfNotDefault(nameof(PhysicalPath), PhysicalPath);
+        return builder.ToString();
+    }
 }
 
 internal sealed class PathAwareNotFoundFileInfo : IFileInfo, IFileProviderPathInfo
@@ -253,4 +265,15 @@ internal sealed class PathAwareNotFoundFileInfo : IFileInfo, IFileProviderPathIn
     public string Name => FileProviderPathUtils.GetLeafName(Subpath);
 
     public string PhysicalPath => null;
+
+    public override string ToString()
+    {
+        var builder = new ToStringBuilder(this);
+        builder.AppendParameter(nameof(Subpath), Subpath);
+        builder.AppendParameter(nameof(Name), Name);
+        builder.AppendParameter(nameof(Exists), Exists);
+        builder.AppendParameter(nameof(IsDirectory), IsDirectory);
+        builder.AppendParameter(nameof(Length), Length);
+        return builder.ToString();
+    }
 }
