@@ -79,6 +79,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
     private long lastSetRectLogMs;
     public BlazorWindow(
         IUnityContainer unityContainer,
+        [OptionalDependency] IBlazorWindowConfigurator windowConfigurator = null,
         [OptionalDependency] Dispatcher dispatcher = null)
     {
         Log.AddSuffix($"BWnd#{windowId}");
@@ -284,6 +285,15 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
             DataContext = null;
             ControlConfigurator = null;
         }).AddTo(Anchors);
+
+        if (windowConfigurator != null)
+        {
+            var sw = ValueStopwatch.StartNew();
+            var configuratorType = windowConfigurator.GetType();
+            Log.Debug($"Invoking {nameof(IBlazorWindowConfigurator)} {configuratorType.FullName}");
+            windowConfigurator.Configure(this);
+            Log.Debug($"{nameof(IBlazorWindowConfigurator)} {configuratorType.FullName} completed in {sw.ElapsedMilliseconds}ms");
+        }
     }
 
     public Type ViewType { get; set; }
