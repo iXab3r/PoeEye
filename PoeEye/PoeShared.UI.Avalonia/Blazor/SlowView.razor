@@ -1,0 +1,19 @@
+@using System.Threading
+
+<section data-testid="slow-view" style="border: 1px solid #d6d6d6; padding: 12px; background: #fffef0;">
+    <h3 data-testid="slow-title">Slow View</h3>
+    <p data-testid="slow-description">This view blocks during initialization on purpose.</p>
+    <div data-testid="slow-status">@Status</div>
+</section>
+
+@code {
+    public string Status { get; private set; } = "waiting";
+
+    protected override void OnInitialized()
+    {
+        Status = ".OnInitialized: entering";
+        Thread.Sleep(3000);
+        base.OnInitialized();
+        Status = ".OnInitialized: exiting";
+    }
+}

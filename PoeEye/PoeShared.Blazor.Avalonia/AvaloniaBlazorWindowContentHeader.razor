@@ -1,0 +1,141 @@
+@inherits AvaloniaBlazorWindowComponentBase
+
+<header data-testid="window-titlebar"
+        @attributes="GetTitleBarAutomationAttributes()"
+        id="@(IBlazorWindow.WindowTitleBarId)"
+        style="@BuildTitleBarStyle()">
+    @if (DataContext.ViewTypeForTitleBar != null)
+    {
+        <div style="flex:1 1 auto;min-width:0;display:flex;align-items:center;">
+            <AvaloniaBlazorContentPresenter
+                Content="@(DataContext.DataContext)"
+                ViewType="@(DataContext.ViewTypeForTitleBar)">
+            </AvaloniaBlazorContentPresenter>
+        </div>
+    }
+    else
+    {
+        <button data-testid="window-titlebar-drag-region"
+                type="button"
+                title="Drag window"
+                @ondblclick="ToggleWindowState"
+                @onmousedown:preventDefault="true"
+                @onmousedown="BeginDragMove"
+                style="@BuildDragRegionStyle()">
+            <span data-testid="window-titlebar-text">@DataContext.Title</span>
+        </button>
+    }
+
+    <div style="display:flex;align-items:stretch;gap:4px;padding:4px 6px 4px 0;">
+        @if (DataContext.ShowMinButton && CanMinimize())
+        {
+            <button data-testid="window-titlebar-minimize-button"
+                    type="button"
+                    title="Minimize"
+                    @onclick="@(() => DataContext.Minimize())"
+                    style="@BuildCaptionButtonStyle()">
+                _
+            </button>
+        }
+
+        @if (DataContext.ShowMaxButton && CanMaximize())
+        {
+            <button data-testid="window-titlebar-maximize-button"
+                    type="button"
+                    title="Toggle maximize"
+                    @onclick="ToggleWindowState"
+                    style="@BuildCaptionButtonStyle()">
+                @(DataContext.WindowState == System.Windows.WindowState.Maximized ? "[]" : "[ ]")
+            </button>
+        }
+
+        @if (DataContext.ShowCloseButton)
+        {
+            <button data-testid="window-titlebar-close-button"
+                    type="button"
+                    title="Close"
+                    @onclick="@(() => DataContext.Close())"
+                    style="@BuildCaptionButtonStyle(isCloseButton: true)">
+                X
+            </button>
+        }
+    </div>
+</header>
+
+@code {
+    private void BeginDragMove()
+    {
+        DataContext.EnableDragMove();
+    }
+
+    private void ToggleWindowState()
+    {
+        if (!CanMaximize())
+        {
+            return;
+        }
+
+        if (DataContext.WindowState == System.Windows.WindowState.Maximized)
+        {
+            DataContext.Restore();
+            return;
+        }
+
+        DataContext.Maximize();
+    }
+
+    private bool CanMinimize()
+    {
+        return DataContext.ResizeMode is System.Windows.ResizeMode.CanResize or
+               System.Windows.ResizeMode.CanResizeWithGrip or
+               System.Windows.ResizeMode.CanMinimize;
+    }
+
+    private bool CanMaximize()
+    {
+        return DataContext.ResizeMode is System.Windows.ResizeMode.CanResize or
+               System.Windows.ResizeMode.CanResizeWithGrip;
+    }
+
+    private string BuildTitleBarStyle()
+    {
+        return
+            $"display:flex;align-items:stretch;gap:6px;min-height:40px;width:100%;box-sizing:border-box;" +
+            $"background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));" +
+            $"border-bottom:1px solid rgba(255,255,255,0.08);";
+    }
+
+    private static string BuildDragRegionStyle()
+    {
+        return
+            "appearance:none;border:none;background:transparent;color:inherit;" +
+            "display:flex;align-items:center;justify-content:flex-start;flex:1 1 auto;min-width:0;" +
+            "padding:0 14px;font-size:13px;font-weight:600;letter-spacing:0.01em;" +
+            "cursor:grab;user-select:none;text-align:left;";
+    }
+
+    private static string BuildCaptionButtonStyle(bool isCloseButton = false)
+    {
+        var hoverColor = isCloseButton
+            ? "rgba(220,53,69,0.88)"
+            : "rgba(255,255,255,0.12)";
+
+        return
+            $"appearance:none;border:1px solid rgba(255,255,255,0.08);" +
+            $"background:{hoverColor};color:inherit;min-width:40px;padding:0 10px;" +
+            $"display:flex;align-items:center;justify-content:center;border-radius:8px;" +
+            $"font-size:12px;font-family:Consolas, monospace;";
+    }
+
+    private IReadOnlyDictionary<string, object> GetTitleBarAutomationAttributes()
+    {
+        const string viewRole = "titlebar";
+        var windowAutomationId = GetWindowAutomationId();
+        var titleBarAutomationId = GetViewAutomationId(viewRole);
+        var attributes = new Dictionary<string, object>(CreateAutomationAttributes(titleBarAutomationId, DataContext?.DataContext));
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.WindowIdAttribute, windowAutomationId);
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.ViewIdAttribute, titleBarAutomationId);
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.ViewRoleAttribute, viewRole);
+        return attributes;
+    }
+}

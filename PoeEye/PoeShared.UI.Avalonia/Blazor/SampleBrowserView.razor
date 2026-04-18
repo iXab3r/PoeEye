@@ -1,0 +1,193 @@
+@implements IDisposable
+@inject AvaloniaSampleWindowService Windows
+@using Microsoft.AspNetCore.Components.Web
+@using PoeShared.Blazor.Wpf
+
+<section data-testid="sample-browser-root" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; font-family: Segoe UI, system-ui, sans-serif;">
+    <div data-testid="sample-browser-controls" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <label for="sample-view-select">View type</label>
+        <select id="sample-view-select" data-testid="view-type-select" value="@selectedViewKey" @onchange="OnSelectedViewChanged">
+            @foreach (var option in viewOptions)
+            {
+                <option value="@option.Key">@option.DisplayName</option>
+            }
+        </select>
+
+        <button data-testid="replace-content-button" type="button" @onclick="ReplaceContent">Replace Content</button>
+        <button data-testid="increment-count-button" type="button" @onclick="IncrementCount">Increment Count</button>
+        <button data-testid="reload-host-button" type="button" @onclick="ReloadHost">Reload Host</button>
+        <button data-testid="open-devtools-button" type="button" @onclick="OpenDevTools">Open DevTools</button>
+        <button data-testid="open-window-button" type="button" @onclick="OpenWindow">Open Window</button>
+        <button data-testid="open-dialog-window-button" type="button" @onclick="OpenDialogWindow">Open Modal Window</button>
+        <button data-testid="close-all-windows-button" type="button" @onclick="CloseAllWindows">Close All Windows</button>
+
+        <label style="display: inline-flex; align-items: center; gap: 4px;">
+            <input data-testid="share-content-checkbox" type="checkbox" @bind="shareContent" />
+            Share host content
+        </label>
+    </div>
+
+    <div data-testid="status-label">@BuildStatusText()</div>
+    <div data-testid="resize-status" style="display: none;">@resizeStatus</div>
+    <div data-testid="window-handle" style="display: none;">@Windows.GetOwnerWindowHandleHex()</div>
+    <div data-testid="bounds-apply-status" style="display: none;">@Windows.GetBoundsApplyStatus()</div>
+    <button data-testid="grow-window-button" type="button" style="display: none;" @onclick="GrowWindow">Grow Window</button>
+
+    <section data-testid="host-panel" style="position: relative; border: 1px solid #d9d9d9; min-height: 280px; padding: 12px; background: #ffffff;">
+        <DynamicComponent Type="@selectedDefinition.ViewType" Parameters="@BuildHostParameters()" @key="hostRenderVersion" />
+        <div data-testid="window-resize-grip"
+             @onmousedown="BeginResizeBottomRight"
+             style="position: absolute; right: 8px; bottom: 8px; z-index: 10; width: 18px; height: 18px; cursor: nwse-resize; background: rgba(160, 160, 160, 0.55); border-radius: 3px; user-select: none; touch-action: none;"></div>
+    </section>
+</section>
+
+@code {
+    private readonly IReadOnlyList<AvaloniaSampleDefinition> viewOptions = AvaloniaSampleRegistry.All;
+    private AvaloniaSampleDefinition selectedDefinition = AvaloniaSampleRegistry.Resolve(AvaloniaAppOptions.SampleCounter);
+    private MainCounterViewModel viewModel = new("Counter content #1");
+    private string selectedViewKey = AvaloniaAppOptions.SampleCounter;
+    private int contentVersion = 2;
+    private int hostRenderVersion = 1;
+    private bool shareContent;
+    private bool launchedSecondaryWindow;
+    private string resizeStatus = "idle";
+
+    [Parameter]
+    public string? InitialSampleViewKey { get; set; }
+
+    [Parameter]
+    public string? AutoLaunchWindowMode { get; set; }
+
+    protected override void OnInitialized()
+    {
+        selectedDefinition = AvaloniaSampleRegistry.Resolve(InitialSampleViewKey);
+        selectedViewKey = selectedDefinition.Key;
+        viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        Windows.WindowsChanged += OnWindowsChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        var resolved = AvaloniaSampleRegistry.Resolve(InitialSampleViewKey);
+        if (!string.Equals(resolved.Key, selectedDefinition.Key, StringComparison.OrdinalIgnoreCase))
+        {
+            selectedDefinition = resolved;
+            selectedViewKey = resolved.Key;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender || launchedSecondaryWindow || string.IsNullOrWhiteSpace(AutoLaunchWindowMode))
+        {
+            return;
+        }
+
+        launchedSecondaryWindow = true;
+        if (string.Equals(AutoLaunchWindowMode, "dialog", StringComparison.OrdinalIgnoreCase))
+        {
+            OpenDialogWindow();
+            return;
+        }
+
+        OpenWindow();
+    }
+
+    public void Dispose()
+    {
+        Windows.WindowsChanged -= OnWindowsChanged;
+        viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        viewModel.Dispose();
+    }
+
+    private IDictionary<string, object?> BuildHostParameters()
+    {
+        var parameters = new Dictionary<string, object?>();
+        if (selectedDefinition.AcceptsDataContext)
+        {
+            parameters[nameof(MainCounterView.DataContext)] = viewModel;
+        }
+
+        return parameters;
+    }
+
+    private string BuildStatusText()
+    {
+        return
+            $"Host View: {selectedDefinition.DisplayName} | Content: {viewModel.DisplayName} | Count: {viewModel.Count} | Instance: {viewModel.InstanceId.ToString("N")[..8]} | Windows: {Windows.ActiveWindowCount}";
+    }
+
+    private void ReplaceContent()
+    {
+        viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        viewModel.Dispose();
+
+        viewModel = new MainCounterViewModel($"Counter content #{contentVersion++}");
+        viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        ReloadHost();
+    }
+
+    private void IncrementCount()
+    {
+        viewModel.Count++;
+    }
+
+    private void ReloadHost()
+    {
+        hostRenderVersion++;
+        StateHasChanged();
+    }
+
+    private void OpenDevTools()
+    {
+        Windows.ShowDevTools();
+    }
+
+    private void GrowWindow()
+    {
+        Windows.GrowMainWindow();
+    }
+
+    private Task BeginResizeBottomRight(MouseEventArgs args)
+    {
+        resizeStatus = $"native-begin:{args.ScreenX},{args.ScreenY}";
+        Windows.BeginResize(
+            WindowResizeDirection.BottomRight,
+            (int)Math.Round(args.ScreenX),
+            (int)Math.Round(args.ScreenY));
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private void OpenWindow()
+    {
+        Windows.OpenWindow(selectedDefinition, viewModel, shareContent, isModal: false);
+    }
+
+    private void OpenDialogWindow()
+    {
+        Windows.OpenWindow(selectedDefinition, viewModel, shareContent, isModal: true);
+    }
+
+    private void CloseAllWindows()
+    {
+        Windows.CloseAllWindows();
+    }
+
+    private void OnSelectedViewChanged(ChangeEventArgs args)
+    {
+        selectedDefinition = AvaloniaSampleRegistry.Resolve(args.Value?.ToString());
+        selectedViewKey = selectedDefinition.Key;
+        ReloadHost();
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnWindowsChanged(object? sender, EventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+}

@@ -1,0 +1,89 @@
+@implements IDisposable
+@inherits AvaloniaBlazorWindowComponentBase
+
+<section data-testid="window-shell"
+         @attributes="GetWindowAutomationAttributes()"
+         class="@BuildShellClassName()"
+         id="@(IBlazorWindow.WindowId)"
+         style="@BuildShellStyle()">
+    @if (DataContext.TitleBarDisplayMode.ResolveForAvalonia() == TitleBarDisplayMode.Custom)
+    {
+        <AvaloniaBlazorWindowContentHeader DataContext="@DataContext" />
+    }
+
+    <AvaloniaBlazorWindowContentBody DataContext="@DataContext" />
+</section>
+
+@code {
+    private IDisposable? activatedSubscription;
+    private IDisposable? deactivatedSubscription;
+    private bool isActive;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        activatedSubscription?.Dispose();
+        deactivatedSubscription?.Dispose();
+
+        isActive = UnsafeNative.GetForegroundWindow() == DataContext.GetWindowHandle();
+        activatedSubscription = DataContext.WhenActivated.Subscribe(_eventArgs =>
+        {
+            isActive = true;
+            _ = InvokeAsync(StateHasChanged);
+        });
+        deactivatedSubscription = DataContext.WhenDeactivated.Subscribe(_eventArgs =>
+        {
+            isActive = false;
+            _ = InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public override void Dispose()
+    {
+        activatedSubscription?.Dispose();
+        deactivatedSubscription?.Dispose();
+        base.Dispose();
+    }
+
+    private string BuildShellClassName()
+    {
+        return isActive
+            ? "poe-window-shell"
+            : "poe-window-shell poe-window-shell-inactive";
+    }
+
+    private string BuildShellStyle()
+    {
+        var effectiveTitleBarDisplayMode = DataContext.TitleBarDisplayMode.ResolveForAvalonia();
+        var cornerRadiusStyle = AvaloniaBlazorWindowStyleUtils.BuildSystemCornerRadiusStyle(DataContext, effectiveTitleBarDisplayMode);
+        var backgroundColor = AvaloniaBlazorWindowStyleUtils.BuildCssColor(DataContext.BackgroundColor);
+        var borderColor = AvaloniaBlazorWindowStyleUtils.BuildCssColor(DataContext.BorderColor);
+        var borderThickness = DataContext.BorderThickness;
+        var shadowOpacity = isActive ? "0.18" : "0.08";
+
+        return
+            $"display:grid;" +
+            $"grid-template-rows:{(effectiveTitleBarDisplayMode == TitleBarDisplayMode.Custom ? "auto 1fr" : "1fr")};" +
+            $"width:100%;height:100%;overflow:hidden;box-sizing:border-box;" +
+            $"background:{backgroundColor};" +
+            $"border-style:solid;" +
+            $"border-color:{borderColor};" +
+            $"border-width:{borderThickness.Left}px {borderThickness.Top}px {borderThickness.Right}px {borderThickness.Bottom}px;" +
+            $"box-shadow:0 0 0 1px rgba(255,255,255,0.03), 0 12px 30px rgba(0,0,0,{shadowOpacity});" +
+            $"color:#f5f5f5;" +
+            $"{cornerRadiusStyle}";
+    }
+
+    private IReadOnlyDictionary<string, object> GetWindowAutomationAttributes()
+    {
+        const string viewRole = "body";
+        var windowAutomationId = GetWindowAutomationId();
+        var viewAutomationId = GetViewAutomationId(viewRole);
+        var attributes = new Dictionary<string, object>(CreateAutomationAttributes(viewAutomationId, DataContext?.DataContext));
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.WindowIdAttribute, windowAutomationId);
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.ViewIdAttribute, viewAutomationId);
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.ViewRoleAttribute, viewRole);
+        return attributes;
+    }
+}

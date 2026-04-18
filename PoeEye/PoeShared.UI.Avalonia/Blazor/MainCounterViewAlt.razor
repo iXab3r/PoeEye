@@ -1,0 +1,26 @@
+<section data-testid="counter-alt-view" style="border: 1px solid #d6d6d6; padding: 12px; background: #fffaf5;">
+    <h3 data-testid="counter-alt-title">Counter Alt</h3>
+    <div><strong>Name:</strong> <span data-testid="counter-alt-display-name">@DataContext.DisplayName</span></div>
+    <div><strong>Instance:</strong> <span data-testid="counter-alt-instance-id">@DataContext.InstanceId</span></div>
+    <div><strong>Count:</strong> <span data-testid="counter-alt-value">@DataContext.Count</span></div>
+    <div style="margin-top: 12px;">
+        <button data-testid="counter-alt-increment-button" type="button" @onclick="IncrementCount">Increment</button>
+        <button data-testid="counter-alt-increment-five-button" type="button" @onclick="IncrementByFive" style="margin-left: 8px;">Increment +5</button>
+    </div>
+    <p data-testid="counter-alt-note" style="margin-top: 12px;">This view validates runtime ViewType switching.</p>
+</section>
+
+@code {
+    [Parameter]
+    public MainCounterViewModel DataContext { get; set; } = new("Counter Alt content");
+
+    private void IncrementCount()
+    {
+        DataContext.Count++;
+    }
+
+    private void IncrementByFive()
+    {
+        DataContext.Count += 5;
+    }
+}

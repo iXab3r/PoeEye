@@ -1,0 +1,21 @@
+<section data-testid="blazor-root" style="border: 1px solid #d6d6d6; padding: 12px; background: #f8fbff;">
+    <h1 data-testid="counter-title">Counter</h1>
+
+    <p>Content: <span data-testid="counter-display-name">@DataContext.DisplayName</span></p>
+    <p>Instance: <span data-testid="counter-instance-id">@DataContext.InstanceId</span></p>
+    <p>The current count is: <span data-testid="counter-value">@DataContext.Count</span></p>
+
+    <button data-testid="increment-button" type="button" @onclick="IncrementCount">Count</button>
+
+    <div data-testid="reactive-counter" style="margin-top: 12px;">Reactive @DataContext.Count</div>
+</section>
+
+@code {
+    [Parameter]
+    public MainCounterViewModel DataContext { get; set; } = new("Counter content");
+
+    private void IncrementCount()
+    {
+        DataContext.Count++;
+    }
+}

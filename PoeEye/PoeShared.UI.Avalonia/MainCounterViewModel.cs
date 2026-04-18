@@ -1,9 +1,8 @@
-﻿using System;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.WinForms.Blazor;
+namespace PoeShared.UI.Avalonia;
 
-public class MainCounterViewModel : DisposableReactiveObject
+public sealed class MainCounterViewModel : DisposableReactiveObject
 {
     public MainCounterViewModel(string? displayName = null)
     {

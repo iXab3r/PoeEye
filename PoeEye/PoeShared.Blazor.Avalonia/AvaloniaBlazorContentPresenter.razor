@@ -1,0 +1,85 @@
+@using System.Reflection
+
+@if (ViewType == null)
+{
+    <div data-testid="avalonia-window-presenter-missing-view">No Blazor view was configured.</div>
+}
+else
+{
+    <ErrorBoundary @ref="errorBoundary">
+        <ChildContent>
+            <DynamicComponent Type="@ViewType"
+                              Parameters="@BuildParameters()" />
+        </ChildContent>
+        <ErrorContent>
+            <div data-testid="avalonia-window-presenter-error"
+                 style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid rgba(220,53,69,0.5);border-radius:10px;background:rgba(70,18,24,0.92);color:#fff4f4;">
+                <div style="font-weight:700;">Component exception</div>
+                <div>This window view failed to render.</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button data-testid="avalonia-window-presenter-recover-button"
+                            type="button"
+                            @onclick="Recover"
+                            style="@BuildActionButtonStyle()">
+                        Try to recover
+                    </button>
+                    @if (BlazorHostController != null)
+                    {
+                        <button data-testid="avalonia-window-presenter-devtools-button"
+                                type="button"
+                                @onclick="OpenDevToolsAsync"
+                                style="@BuildActionButtonStyle()">
+                            Open DevTools
+                        </button>
+                    }
+                </div>
+            </div>
+        </ErrorContent>
+    </ErrorBoundary>
+}
+
+@code {
+    private const string DataContextParameterName = "DataContext";
+    private ErrorBoundary? errorBoundary;
+
+    [Parameter] public object? Content { get; set; }
+    [Parameter] public Type? ViewType { get; set; }
+    [Parameter] public IReadOnlyDictionary<string, object?>? AdditionalParameters { get; set; }
+
+    [Inject] public IBlazorHostController? BlazorHostController { get; set; }
+
+    private Dictionary<string, object?> BuildParameters()
+    {
+        var parameters = AdditionalParameters != null
+            ? new Dictionary<string, object?>(AdditionalParameters)
+            : new Dictionary<string, object?>();
+
+        if (ViewType?.GetProperty(DataContextParameterName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy) is { SetMethod: not null } &&
+            !parameters.ContainsKey(DataContextParameterName))
+        {
+            parameters[DataContextParameterName] = Content;
+        }
+
+        return parameters;
+    }
+
+    private void Recover()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private async Task OpenDevToolsAsync()
+    {
+        if (BlazorHostController != null)
+        {
+            await BlazorHostController.OpenDevTools();
+        }
+    }
+
+    private static string BuildActionButtonStyle()
+    {
+        return
+            "appearance:none;border:1px solid rgba(255,255,255,0.24);border-radius:8px;" +
+            "background:rgba(255,255,255,0.08);color:inherit;padding:6px 10px;";
+    }
+}

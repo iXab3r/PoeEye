@@ -1,0 +1,119 @@
+@inherits AvaloniaBlazorWindowComponentBase
+
+<section data-testid="window-debug-panel"
+         style="display:flex;flex-direction:column;gap:16px;padding:16px;border-radius:12px;background:rgba(20,20,20,0.82);color:#f5f5f5;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div>
+            <div style="font-size:18px;font-weight:700;">Window Debug Panel</div>
+            <div style="font-size:12px;opacity:0.75;">Avalonia-backed `IBlazorWindow` diagnostics</div>
+        </div>
+        <button data-testid="window-debug-exit-button"
+                type="button"
+                @onclick="@(() => DataContext.IsDebugMode = false)"
+                style="@BuildButtonStyle()">
+            Exit debug mode
+        </button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;">
+        <label style="display:flex;flex-direction:column;gap:4px;">
+            <span>Title</span>
+            <input data-testid="window-debug-title-input"
+                   type="text"
+                   value="@DataContext.Title"
+                   @oninput="HandleTitleChanged"
+                   style="@BuildInputStyle()" />
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:4px;">
+            <span>Resize mode</span>
+            <select data-testid="window-debug-resize-mode"
+                    value="@DataContext.ResizeMode.ToString()"
+                    @onchange="HandleResizeModeChanged"
+                    style="@BuildInputStyle()">
+                @foreach (var resizeMode in Enum.GetValues<System.Windows.ResizeMode>())
+                {
+                    <option value="@resizeMode.ToString()">@resizeMode</option>
+                }
+            </select>
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:4px;">
+            <span>Title bar</span>
+            <select data-testid="window-debug-titlebar-mode"
+                    value="@DataContext.TitleBarDisplayMode.ToString()"
+                    @onchange="HandleTitleBarModeChanged"
+                    style="@BuildInputStyle()">
+                @foreach (var mode in Enum.GetValues<TitleBarDisplayMode>())
+                {
+                    <option value="@mode.ToString()">@mode</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button data-testid="window-debug-drag-button" type="button" @onmousedown="BeginDragMove" style="@BuildButtonStyle()">Drag</button>
+        <button data-testid="window-debug-show-button" type="button" @onclick="@(() => DataContext.Show())" style="@BuildButtonStyle()">Show</button>
+        <button data-testid="window-debug-activate-button" type="button" @onclick="@(() => DataContext.Activate())" style="@BuildButtonStyle()">Activate</button>
+        <button data-testid="window-debug-devtools-button" type="button" @onclick="@(() => DataContext.ShowDevTools())" style="@BuildButtonStyle()">DevTools</button>
+        <button data-testid="window-debug-minimize-button" type="button" @onclick="@(() => DataContext.Minimize())" style="@BuildButtonStyle()">Minimize</button>
+        <button data-testid="window-debug-maximize-button" type="button" @onclick="@(() => DataContext.Maximize())" style="@BuildButtonStyle()">Maximize</button>
+        <button data-testid="window-debug-restore-button" type="button" @onclick="@(() => DataContext.Restore())" style="@BuildButtonStyle()">Restore</button>
+        <button data-testid="window-debug-close-button" type="button" @onclick="@(() => DataContext.Close())" style="@BuildButtonStyle(isDanger: true)">Close</button>
+    </div>
+
+    <div data-testid="window-debug-status"
+         style="font-family:Consolas, monospace;font-size:12px;line-height:1.5;white-space:pre-wrap;background:rgba(0,0,0,0.22);padding:12px;border-radius:10px;">
+Title: @DataContext.Title
+Bounds: @DataContext.Left,@DataContext.Top @DataContext.Width x @DataContext.Height
+State: @DataContext.WindowState
+ResizeMode: @DataContext.ResizeMode
+TitleBar: @DataContext.TitleBarDisplayMode
+Topmost: @DataContext.Topmost
+Visible: @DataContext.IsVisible
+        </div>
+</section>
+
+@code {
+    private void BeginDragMove()
+    {
+        DataContext.EnableDragMove();
+    }
+
+    private void HandleTitleChanged(ChangeEventArgs args)
+    {
+        DataContext.Title = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private void HandleResizeModeChanged(ChangeEventArgs args)
+    {
+        if (args.Value is string value && Enum.TryParse<System.Windows.ResizeMode>(value, out var resizeMode))
+        {
+            DataContext.ResizeMode = resizeMode;
+        }
+    }
+
+    private void HandleTitleBarModeChanged(ChangeEventArgs args)
+    {
+        if (args.Value is string value && Enum.TryParse<TitleBarDisplayMode>(value, out var mode))
+        {
+            DataContext.TitleBarDisplayMode = mode;
+        }
+    }
+
+    private static string BuildButtonStyle(bool isDanger = false)
+    {
+        var background = isDanger ? "rgba(220,53,69,0.86)" : "rgba(255,255,255,0.08)";
+        return
+            $"appearance:none;border:1px solid rgba(255,255,255,0.18);border-radius:8px;" +
+            $"background:{background};color:inherit;padding:6px 10px;";
+    }
+
+    private static string BuildInputStyle()
+    {
+        return
+            "appearance:none;border:1px solid rgba(255,255,255,0.18);border-radius:8px;" +
+            "background:rgba(0,0,0,0.18);color:inherit;padding:6px 8px;";
+    }
+}

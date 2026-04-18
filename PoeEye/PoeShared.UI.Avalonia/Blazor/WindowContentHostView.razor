@@ -1,0 +1,66 @@
+@using System.Reflection
+
+<section data-testid="window-root" style="padding: 20px; font-family: Segoe UI, system-ui, sans-serif;">
+    <h1 data-testid="window-title">@WindowTitle</h1>
+
+    <p>Kind: <span data-testid="window-kind">@KindLabel</span></p>
+    <p>Content: <span data-testid="window-display-name">@DataContext?.DisplayName</span></p>
+    <p>Instance: <span data-testid="window-instance-id">@DataContext?.InstanceId</span></p>
+    <p>The current count is: <span data-testid="window-counter">@DataContext?.Count</span></p>
+
+    <button data-testid="window-increment-button" type="button" @onclick="IncrementCount">Count</button>
+    <button data-testid="window-close-button" type="button" @onclick="CloseWindow">Close</button>
+
+    <div data-testid="reactive-counter" style="margin-top: 12px;">Reactive @DataContext?.Count</div>
+
+    @if (SampleViewType != null)
+    {
+        <div data-testid="window-sample-host" style="margin-top: 16px;">
+            <DynamicComponent Type="@SampleViewType" Parameters="@BuildParameters()" />
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public string WindowTitle { get; set; } = "Avalonia Window";
+
+    [Parameter]
+    public string KindLabel { get; set; } = "Modeless";
+
+    [Parameter]
+    public Type? SampleViewType { get; set; }
+
+    [Parameter]
+    public bool SampleAcceptsDataContext { get; set; }
+
+    [Parameter]
+    public MainCounterViewModel? DataContext { get; set; }
+
+    [Parameter]
+    public Action? RequestClose { get; set; }
+
+    private Dictionary<string, object?> BuildParameters()
+    {
+        var parameters = new Dictionary<string, object?>();
+        if (SampleAcceptsDataContext && SampleViewType?.GetProperty(nameof(DataContext), BindingFlags.Public | BindingFlags.Instance) != null)
+        {
+            parameters[nameof(DataContext)] = DataContext;
+        }
+
+        return parameters;
+    }
+
+    private void IncrementCount()
+    {
+        if (DataContext != null)
+        {
+            DataContext.Count++;
+        }
+    }
+
+    private void CloseWindow()
+    {
+        RequestClose?.Invoke();
+    }
+}

@@ -1,0 +1,33 @@
+<section data-testid="broken-view" style="border: 1px solid #d6d6d6; padding: 12px; background: #fff5f5;">
+    <h3 data-testid="broken-title">Broken View</h3>
+
+    <p data-testid="broken-description">This view is intentionally unstable and exists to test exception handling inside the host.</p>
+
+    <div data-testid="broken-without-boundary">Without error boundary: <ExceptionPanel TestIdPrefix="broken-outside" /></div>
+
+    <ErrorBoundary @ref="errorBoundary">
+        <ChildContent>
+            <div data-testid="broken-with-boundary">With error boundary: <ExceptionPanel TestIdPrefix="broken-inside" /></div>
+        </ChildContent>
+        <ErrorContent>
+            <div data-testid="broken-error-content">
+                Something has gone wrong - this component crashed.
+                <button data-testid="broken-recover-button" type="button" @onclick="Recover">Try to recover</button>
+            </div>
+        </ErrorContent>
+    </ErrorBoundary>
+</section>
+
+@code {
+    private ErrorBoundary? errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private void Recover()
+    {
+        errorBoundary?.Recover();
+    }
+}

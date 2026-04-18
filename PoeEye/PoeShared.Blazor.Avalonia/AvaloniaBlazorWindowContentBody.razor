@@ -1,0 +1,77 @@
+@inherits AvaloniaBlazorWindowComponentBase
+
+<section data-testid="window-body"
+         @attributes="GetBodyAutomationAttributes()"
+         tabindex="0"
+         @onkeydown="HandleKeyDownAsync"
+         id="@(IBlazorWindow.WindowBody)"
+         style="@BuildBodyStyle()">
+    @if (DataContext.Anchors.IsDisposed)
+    {
+        <div data-testid="window-body-disposed"
+             style="display:grid;place-items:center;min-height:140px;gap:8px;">
+            <div class="spinner-border"></div>
+            <div>Disposed</div>
+        </div>
+    }
+    else if (DataContext.IsDebugMode)
+    {
+        <AvaloniaBlazorWindowDebugPanel DataContext="@DataContext" />
+    }
+    else
+    {
+        <AvaloniaBlazorContentPresenter
+            Content="@(DataContext.DataContext)"
+            AdditionalParameters="@(BuildBodyParameters())"
+            ViewType="@(DataContext.ViewType)">
+        </AvaloniaBlazorContentPresenter>
+    }
+</section>
+
+@code {
+    [Inject] public IBlazorHostController BlazorHostController { get; set; } = default!;
+
+    private IReadOnlyDictionary<string, object?>? BuildBodyParameters()
+    {
+        return DataContext is AvaloniaBlazorWindow window && window.ViewParameters.Count > 0
+            ? window.ViewParameters
+            : null;
+    }
+
+    private string BuildBodyStyle()
+    {
+        var effectiveTitleBarDisplayMode = DataContext.TitleBarDisplayMode.ResolveForAvalonia();
+        var cornerRadiusStyle = AvaloniaBlazorWindowStyleUtils.BuildSystemCornerRadiusStyle(DataContext, effectiveTitleBarDisplayMode);
+        return
+            $"display:block;width:100%;height:100%;min-height:0;overflow:auto;box-sizing:border-box;" +
+            $"padding:{AvaloniaBlazorWindowStyleUtils.BuildCssPadding(DataContext.Padding)};" +
+            $"background:transparent;" +
+            $"{cornerRadiusStyle}";
+    }
+
+    private IReadOnlyDictionary<string, object> GetBodyAutomationAttributes()
+    {
+        const string viewRole = "body";
+        var windowAutomationId = GetWindowAutomationId();
+        var bodyAutomationId = GetViewAutomationId(viewRole);
+        var attributes = new Dictionary<string, object>(CreateAutomationAttributes(bodyAutomationId, DataContext?.DataContext));
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.WindowIdAttribute, windowAutomationId);
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.ViewIdAttribute, bodyAutomationId);
+        SetAutomationAttribute(attributes, WellKnownAutomationIds.ViewRoleAttribute, viewRole);
+        return attributes;
+    }
+
+    private async Task HandleKeyDownAsync(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "F8":
+                DataContext.IsDebugMode = !DataContext.IsDebugMode;
+                await InvokeAsync(StateHasChanged);
+                break;
+            case "F12":
+                await BlazorHostController.OpenDevTools();
+                break;
+        }
+    }
+}

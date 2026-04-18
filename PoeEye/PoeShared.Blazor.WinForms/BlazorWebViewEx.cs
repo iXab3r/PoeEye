@@ -3,9 +3,11 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.WindowsForms;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
 using PoeShared.Blazor.Wpf.Services;
+using PoeShared.Blazor.WinForms.Automation;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using CompositeFileProvider = Microsoft.Extensions.FileProviders.CompositeFileProvider;
@@ -41,10 +43,23 @@ public sealed class BlazorWebViewEx : BlazorWebView
 
     private static void OnBlazorWebViewInitializing(object? sender, BlazorWebViewInitializingEventArgs e)
     {
-        e.EnvironmentOptions = new CoreWebView2EnvironmentOptions
+        e.EnvironmentOptions = new CoreWebView2EnvironmentOptions();
+
+        if (sender is not BlazorWebViewEx webView)
         {
-            AdditionalBrowserArguments = string.Empty,
-        };
+            return;
+        }
+
+        var automationOptionsProvider = webView.Services?.GetService<IBlazorWebViewAutomationOptionsProvider>();
+        var automationOptions = automationOptionsProvider?.GetOptions() ?? new BlazorWebViewAutomationOptions();
+        if (!automationOptions.EnableAutomation || !automationOptions.BrowserDebugPort.IsBetween(1, 65535, inclusive: true))
+        {
+            return;
+        }
+
+        e.EnvironmentOptions.AdditionalBrowserArguments = AppendBrowserArgument(
+            e.EnvironmentOptions.AdditionalBrowserArguments,
+            $"--remote-debugging-port={automationOptions.BrowserDebugPort}");
     }
 
     private void OnBlazorWebViewInitialized(object? sender, BlazorWebViewInitializedEventArgs e)
@@ -83,5 +98,14 @@ public sealed class BlazorWebViewEx : BlazorWebView
     {
         Log.Debug($"Permission requested: {e.PermissionKind}, state: {e.State}");
         e.State = CoreWebView2PermissionState.Allow;
+    }
+
+    private static string AppendBrowserArgument(string? existingArguments, string newArgument)
+    {
+        return string.IsNullOrWhiteSpace(existingArguments)
+            ? newArgument
+            : existingArguments.Contains(newArgument, StringComparison.OrdinalIgnoreCase)
+                ? existingArguments
+                : $"{existingArguments} {newArgument}";
     }
 }
