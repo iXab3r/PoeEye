@@ -44,6 +44,9 @@
                 Math.Max(borderThickness.Top, minThickness),
                 Math.Max(borderThickness.Right, minThickness),
                 Math.Max(borderThickness.Bottom, minThickness));
+            // WPF/WebView can clip the last rendered pixel column/row on the far edges.
+            var rightEdgeOffset = 1;
+            var bottomEdgeOffset = 1;
 
             var borderColor = DataContext.BorderColor;
             var borderColorAsHtmlColor = $"#{borderColor.R:X2}{borderColor.G:X2}{borderColor.B:X2}{borderColor.A:X2}";
@@ -60,7 +63,7 @@
             var rightBorderStyle = new CssBuilder()
                 .AddValue($"height: calc(100% - {borderThickness.Top}px - {borderThickness.Bottom}px);")
                 .AddValue($"width: {borderThickness.Right}px;")
-                .AddValue($"right: 0;")
+                .AddValue($"right: {rightEdgeOffset}px;")
                 .AddValue($"top: {borderThickness.Top}px;")
                 .AddValue($"background-color: {borderColorAsHtmlColor};")
                 .AddValue($"z-index: {borderZIndex};");
@@ -69,7 +72,7 @@
                 .AddValue($"width: calc(100% - {borderThickness.Left}px - {borderThickness.Right}px);")
                 .AddValue($"height: {borderThickness.Bottom}px;")
                 .AddValue($"left: {borderThickness.Left}px;")
-                .AddValue($"bottom: 0;")
+                .AddValue($"bottom: {bottomEdgeOffset}px;")
                 .AddValue($"background-color: {borderColorAsHtmlColor};")
                 .AddValue($"z-index: {borderZIndex};");
 
@@ -93,7 +96,7 @@
             var rightBorderResizeStyle = new CssBuilder()
                 .AddValue($"height: calc(100% - {resizeBorderThickness.Top}px - {resizeBorderThickness.Bottom}px);")
                 .AddValue($"width: {resizeBorderThickness.Right}px;")
-                .AddValue($"right: 0;")
+                .AddValue($"right: {rightEdgeOffset}px;")
                 .AddValue($"top: {resizeBorderThickness.Top}px;")
                 .AddValue($"background-color: transparent;")
                 .AddValue($"z-index: {borderZIndex + 1};")
@@ -103,7 +106,7 @@
                 .AddValue($"width: calc(100% - {resizeBorderThickness.Left}px - {resizeBorderThickness.Right}px);")
                 .AddValue($"height: {resizeBorderThickness.Bottom}px;")
                 .AddValue($"left: {resizeBorderThickness.Left}px;")
-                .AddValue($"bottom: 0;")
+                .AddValue($"bottom: {bottomEdgeOffset}px;")
                 .AddValue($"background-color: transparent;")
                 .AddValue($"z-index: {borderZIndex + 1};")
                 .AddValue($"cursor: s-resize;");
@@ -132,17 +135,17 @@
 
             var topRightCornerStyle = new CssBuilder(cornerBase.ToString())
                 .AddValue($"top: 0;")
-                .AddValue($"right: 0;")
+                .AddValue($"right: {rightEdgeOffset}px;")
                 .AddValue("cursor: nesw-resize;");
 
             var bottomLeftCornerStyle =new CssBuilder(cornerBase.ToString())
-                .AddValue($"bottom: 0;")
+                .AddValue($"bottom: {bottomEdgeOffset}px;")
                 .AddValue($"left: 0;")
                 .AddValue("cursor: nesw-resize;");
 
             var bottomRightCornerStyle =new CssBuilder(cornerBase.ToString())
-                .AddValue($"bottom: 0;")
-                .AddValue($"right: 0;")
+                .AddValue($"bottom: {bottomEdgeOffset}px;")
+                .AddValue($"right: {rightEdgeOffset}px;")
                 .AddValue("cursor: nwse-resize;");
             
             <!-- Border -->
