@@ -8,8 +8,16 @@ using PInvoke;
 namespace PoeShared.Native;
 
 /// <summary>
-/// Provides a handle to a window.
+/// PoeShared wrapper around a Win32 <c>HWND</c> with window, process, and
+/// geometry helpers.
 /// </summary>
+/// <remarks>
+/// Implementations expose the native handle through <see cref="IWin32Window"/>
+/// and lazily query related metadata such as title, process id, class name,
+/// DWM bounds, owner, and parent. The underlying window can disappear while the
+/// wrapper is still referenced, so callers that depend on liveness should check
+/// <see cref="IsWindow"/>.
+/// </remarks>
 public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHandle>
 {
     /// <summary>
@@ -44,6 +52,9 @@ public interface IWindowHandle : IWin32Window, IDisposable, IEquatable<IWindowHa
     /// </summary>
     WinRect TitleBarRect { get; }
     
+    /// <summary>
+    /// Gets the window rectangle adjusted for the current DPI settings.
+    /// </summary>
     RECT AdjustWindowRectForDpi { get; }
 
     /// <summary>
