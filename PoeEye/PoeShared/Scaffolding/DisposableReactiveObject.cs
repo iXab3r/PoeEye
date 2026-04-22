@@ -6,9 +6,16 @@ using JetBrains.Annotations;
 namespace PoeShared.Scaffolding;
 
 /// <summary>
-/// Represents an object that supports both disposability and reactive property changes.
+/// Base class for objects that own disposable resources and publish property change notifications.
 /// FIXME ConcurrentNpcEventInvoker, which it uses, provides an extra layer of safety in case of heavy multithreaded usage, BUT it costs extra memory (~1mb per 1000 instances)
 /// </summary>
+/// <remarks>
+/// Add subscriptions, handles, timers, child objects, and other owned resources to <see cref="Anchors"/>.
+/// Disposing the object disposes the whole anchor set. Property changes can be raised explicitly through
+/// <see cref="RaisePropertyChanged(string)"/> or helper setters such as <see cref="RaiseAndSetIfChanged{TRet}"/>.
+/// The internal event invoker is designed for safer concurrent notification delivery, but it has a higher
+/// per-instance memory cost than a plain event field.
+/// </remarks>
 public abstract class DisposableReactiveObject : IDisposableReactiveObject
 {
     private readonly INpcEventInvoker propertyChanged;
