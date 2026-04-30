@@ -11,6 +11,7 @@ using System.Reactive.Subjects;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -191,6 +192,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                         Header = cmd.Label,
                         IsEnabled = cmd.Enabled
                     };
+                    ApplyAutomationMetadata(mi, item);
 
                     if (cmd.IconFactory != null)
                     {
@@ -220,6 +222,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                         IsCheckable = true,
                         IsChecked = cb.IsChecked
                     };
+                    ApplyAutomationMetadata(mi, item);
                     Wire(item, mi, cb.OnToggleAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
@@ -233,6 +236,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                         IsCheckable = true,
                         IsChecked = r.IsChecked
                     };
+                    ApplyAutomationMetadata(mi, item);
                     Wire(item, mi, r.OnSelectAsync, ctx, notificationService);
                     target.Add(mi);
                     break;
@@ -240,11 +244,20 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
                 case CmSubmenu sm:
                 {
                     var mi = new MenuItem {Header = sm.Label, IsEnabled = sm.Enabled};
+                    ApplyAutomationMetadata(mi, item);
                     Populate(mi.Items, sm.Children.AsSpan(), ctx, notificationService);
                     target.Add(mi);
                     break;
                 }
             }
+        }
+    }
+
+    private static void ApplyAutomationMetadata(MenuItem menuItem, BlazorContextMenuItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Id))
+        {
+            AutomationProperties.SetAutomationId(menuItem, item.Id);
         }
     }
 
