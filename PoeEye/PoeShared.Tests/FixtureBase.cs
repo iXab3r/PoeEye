@@ -23,7 +23,9 @@ public abstract class FixtureBase
 
     protected FixtureBase()
     {
-        Log = GetType().PrepareLogger().WithSuffix(() => runIdx);
+        Log = GetType().PrepareLogger()
+            .WithAction(tuple => TestContext.WriteLine($"{tuple.Message}"))
+            .WithSuffix(() => runIdx);
     }
 
     [OneTimeSetUp]
