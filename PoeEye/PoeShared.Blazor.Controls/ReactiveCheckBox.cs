@@ -20,6 +20,9 @@ partial class ReactiveCheckBox
     
     [Parameter]
     public bool Disabled { get; set; }
+    
+    [Parameter]
+    public string Title { get; set; }
 
     public ReactiveCheckBox()
     {
