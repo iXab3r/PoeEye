@@ -1,0 +1,59 @@
+@namespace PoeShared.Blazor.Controls.Services
+@implements IAsyncDisposable
+@if (ComponentType != null && ComponentParameters != null)
+{
+    <DynamicComponent Type="@ComponentType" Parameters="@ComponentParameters"/>
+}
+else
+{
+    <div>Not initialized</div>
+}
+
+@code {
+
+    [Parameter] public DynamicComponentId Id { get; set; }
+
+    public Type? ComponentType { get; private set; }
+
+    public IDictionary<string, object?>? ComponentParameters { get; private set; }
+
+    [Inject] public required IDynamicComponentParameterStorage ParameterStorage { get; init; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var storage = GetStorageOrThrow();
+        if (string.IsNullOrEmpty(Id.ToString()))
+        {
+            throw new ArgumentException("Id must be set");
+        }
+
+        var registration = storage.Get(Id);
+
+        ComponentType = registration.ComponentType;
+        ComponentParameters = registration.ComponentParameters;
+    }
+    
+    private IDynamicComponentParameterStorage GetStorageOrThrow()
+    {
+        if (ParameterStorage == null)
+        {
+            throw new InvalidOperationException("ParameterStorage is not ready yet, wait until it is loaded");
+        }
+
+        return ParameterStorage;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Id != default)
+        {
+            var storage = GetStorageOrThrow();
+            storage.Unregister(Id);
+        }
+
+        ComponentParameters = null;
+        ComponentType = null;
+    }
+
+}

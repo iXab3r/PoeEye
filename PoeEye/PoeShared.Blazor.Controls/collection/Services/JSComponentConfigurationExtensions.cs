@@ -8,4 +8,9 @@ public static class JSComponentConfigurationExtensions
     {
         configuration.RegisterForJavaScript(typeof(ReactiveCollectionItemHost), ReactiveCollectionItemHost.ComponentIdentifier);
     }
+
+    public static void AddDynamicComponents(this IJSComponentConfiguration configuration)
+    {
+        configuration.RegisterForJavaScript(typeof(DynamicComponentContainer), "blazor-dynamic-component");
+    }
 }

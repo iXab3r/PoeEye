@@ -15,6 +15,7 @@ public sealed class PoeSharedBlazorControlsRegistrations : UnityContainerExtensi
         if (Container.IsRegistered<IBlazorContentRepository>())
         {
             Container.Resolve<IBlazorContentRepository>().AddReactiveCollectionComponents();
+            Container.Resolve<IBlazorContentRepository>().AddDynamicComponents();
         }
     }
 }
