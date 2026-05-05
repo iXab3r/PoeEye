@@ -9,6 +9,7 @@ import {
     ItemType,
     LayoutConfig,
     LayoutManager,
+    SizeUnitEnum,
     Stack
 } from 'golden-layout';
 import {addRootComponent, ComponentParameters} from "./BlazorFacade";
@@ -50,6 +51,21 @@ interface IGoldenLayoutLocationInfo {
     index?: number;
 }
 
+interface IContentItemSizeSnapshot {
+    item: ContentItem;
+    size: number;
+    sizeUnit: SizeUnitEnum;
+}
+
+interface IHiddenContentItemState {
+    item: ContentItem;
+    parent: ContentItem;
+    index: number;
+    size: number;
+    sizeUnit: SizeUnitEnum;
+    siblingSizes: IContentItemSizeSnapshot[];
+}
+
 type GoldenLayoutHeaderDragStartPrototype = Header & {
     _componentDragStartEvent?: (x: number, y: number, dragListener: unknown, componentItem: ComponentItem) => void;
     handleTabInitiatedDragStartEvent?: (x: number, y: number, dragListener: unknown, componentItem: ComponentItem) => void;
@@ -88,6 +104,7 @@ class GoldenLayoutInterop {
     private readonly target: HTMLElement;
     private readonly goldenLayout?: GoldenLayout;
     private hookRefs: Map<number, DotNetObjectReference> = new Map<number, DotNetObjectReference>();
+    private hiddenContentItemsById: Map<string, IHiddenContentItemState> = new Map<string, IHiddenContentItemState>();
     private lastNotifiedFocusComponentId?: string;
     private pendingFocusComponentId?: string;
     private isDispatchingFocus = false;
@@ -227,6 +244,16 @@ class GoldenLayoutInterop {
         componentItem.remove()
     }
 
+    public setItemVisible(id: string, visible: boolean) {
+        log.debug(`Setting GoldenLayout item visibility, id: ${id}, visible: ${visible}`);
+        if (visible) {
+            this.showItemById(id);
+        } else {
+            this.hideItemById(id);
+        }
+        this.getGoldenLayout().updateSizeFromContainer();
+    }
+
     public addChildItem(parentId: string, state: IRfComponentState): IGoldenLayoutLocationInfo {
         log.info(`Adding new GoldenLayout component, parentId: ${parentId}, state: ${JSON.stringify(state)}`)
         this.ensureReady();
@@ -321,6 +348,76 @@ class GoldenLayoutInterop {
         }
         const stack: Stack = contentItem as Stack;
         return stack.addItem(newItemConfig);
+    }
+
+    private hideItemById(id: string) {
+        if (this.hiddenContentItemsById.has(id)) {
+            return;
+        }
+
+        const contentItem = this.findFirstContentItemById(id);
+        if (!contentItem) {
+            throw `Could not find GoldenLayout item by Id ${id}`;
+        }
+
+        const parent = contentItem.parent;
+        if (!parent) {
+            throw `Cannot hide GoldenLayout item without a parent, id: ${id}`;
+        }
+
+        const index = parent.contentItems.indexOf(contentItem);
+        if (index < 0) {
+            throw `Cannot hide GoldenLayout item because parent does not contain it, id: ${id}`;
+        }
+
+        const siblingSizes = parent.contentItems.map(item => ({
+            item: item,
+            size: item.size,
+            sizeUnit: item.sizeUnit
+        }));
+
+        this.hiddenContentItemsById.set(id, {
+            item: contentItem,
+            parent: parent,
+            index: index,
+            size: contentItem.size,
+            sizeUnit: contentItem.sizeUnit,
+            siblingSizes: siblingSizes
+        });
+
+        contentItem.element.style.display = 'none';
+        parent.removeChild(contentItem, true);
+        parent.updateSize(true);
+    }
+
+    private showItemById(id: string) {
+        const hiddenState = this.hiddenContentItemsById.get(id);
+        if (!hiddenState) {
+            const contentItem = this.findFirstContentItemById(id);
+            if (!contentItem) {
+                throw `Could not find visible or hidden GoldenLayout item by Id ${id}`;
+            }
+
+            contentItem.element.style.display = '';
+            contentItem.updateSize(true);
+            return;
+        }
+
+        const targetIndex = Math.min(hiddenState.index, hiddenState.parent.contentItems.length);
+        hiddenState.parent.addChild(hiddenState.item, targetIndex, true);
+
+        for (const siblingSize of hiddenState.siblingSizes) {
+            siblingSize.item.size = siblingSize.size;
+            siblingSize.item.sizeUnit = siblingSize.sizeUnit;
+        }
+
+        hiddenState.item.size = hiddenState.size;
+        hiddenState.item.sizeUnit = hiddenState.sizeUnit;
+        hiddenState.item.element.style.display = '';
+        this.hiddenContentItemsById.delete(id);
+
+        hiddenState.parent.updateSize(true);
+        hiddenState.item.updateSize(true);
     }
 
     private async handleFocus(focused: ComponentItem | undefined) {

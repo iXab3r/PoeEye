@@ -61,6 +61,7 @@ public interface IGoldenLayoutFacade : IJSObjectReference
     ValueTask LoadLayout(object config);
 
     ValueTask RemoveItemById(string id);
+    ValueTask SetItemVisible(string id, bool visible);
     ValueTask<GLLocationInfo> AddBlazorChildItem(string parentId, GLBlazorComponentState state);
     ValueTask<GLLocationInfo> AddBlazorItem(GLBlazorComponentState state);
     ValueTask<GLLocationInfo> AddBlazorItemAtLocation(GLBlazorComponentState state, params GoldenLayoutLocationSelector[] selectors);
@@ -185,6 +186,11 @@ internal sealed class GoldenLayoutFacade : IGoldenLayoutFacade
     public async ValueTask RemoveItemById(string id)
     {
         await jsObjectReference.InvokeVoidAsync("removeItemById", id);
+    }
+
+    public async ValueTask SetItemVisible(string id, bool visible)
+    {
+        await jsObjectReference.InvokeVoidAsync("setItemVisible", id, visible);
     }
 
     public async ValueTask<GLLocationInfo> AddBlazorChildItem(string parentId, GLBlazorComponentState state)
