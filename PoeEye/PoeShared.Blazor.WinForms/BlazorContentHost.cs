@@ -22,7 +22,6 @@ using Microsoft.Web.WebView2.Core;
 using PoeShared.Blazor.Prism;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf;
-using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Blazor.WinForms.Services;
 using PoeShared.Logging;
@@ -216,7 +215,6 @@ public sealed partial class BlazorContentHost : ReactiveUserControl, IBlazorCont
                         Configurator = configurator,
                         WebViewServiceProvider = webViewServiceProvider,
                         RootComponents = WebView.RootComponents,
-                        RootComponentsStore = WebView.RootComponents.JSComponents,
                         AdditionalFileProvider = state.AdditionalFileProvider,
                         AdditionalFiles = state.AdditionalFiles,
                         IndexFileSubpath = "_content/PoeShared.Blazor.WinForms/index.html",

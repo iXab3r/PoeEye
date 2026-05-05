@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Blazor.Scaffolding;
 
 namespace PoeShared.Blazor.Controls.Services;
 
@@ -6,11 +7,15 @@ public static class JSComponentConfigurationExtensions
 {
     public static void AddReactiveCollectionComponents(this IJSComponentConfiguration configuration)
     {
-        configuration.RegisterForJavaScript(typeof(ReactiveCollectionItemHost), ReactiveCollectionItemHost.ComponentIdentifier);
+        configuration.RegisterForJavaScriptIfMissing(
+            typeof(ReactiveCollectionItemHost),
+            ReactiveCollectionItemHost.ComponentIdentifier);
     }
 
     public static void AddDynamicComponents(this IJSComponentConfiguration configuration)
     {
-        configuration.RegisterForJavaScript(typeof(DynamicComponentContainer), "blazor-dynamic-component");
+        configuration.RegisterForJavaScriptIfMissing(
+            typeof(DynamicComponentContainer),
+            DynamicComponentContainer.ComponentIdentifier);
     }
 }

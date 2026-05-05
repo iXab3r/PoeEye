@@ -69,7 +69,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
     private readonly SerialDisposable activeContentAnchors;
     private readonly SerialDisposable activeViewAnchors;
     private readonly WebViewServiceProvider webViewServiceProvider;
-    private readonly JSComponentConfigurationStoreAccessor jsComponentConfigurationStoreAccessor;
     private readonly DispatcherScheduler uiScheduler;
     private readonly DateTimeOffset timestampCreated;
     private readonly string globalId = IdProvider.Next("BCC");
@@ -179,7 +178,6 @@ public class BlazorContentControl : Control, IBlazorContentControl
                         Configurator = configurator,
                         WebViewServiceProvider = webViewServiceProvider,
                         RootComponents = WebView.RootComponents,
-                        RootComponentsStore = WebView.RootComponents.JSComponents,
                         AdditionalFileProvider = state.AdditionalFileProvider,
                         AdditionalFiles = state.AdditionalFiles,
                         IndexFileSubpath = "_content/PoeShared.Blazor.Wpf/index.html",

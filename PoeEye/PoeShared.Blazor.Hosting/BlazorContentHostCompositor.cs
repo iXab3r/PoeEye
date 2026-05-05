@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using PoeShared.Blazor.Scaffolding;
-using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
@@ -84,17 +83,14 @@ internal static class BlazorContentHostCompositor
         var indexFileContent = BlazorContentHostUtilities.PrepareIndexFileContext(indexFileContentTemplate, additionalFiles);
         publicInMemoryFileProvider.FilesByName.Edit(updater => updater.AddOrUpdate(new InMemoryFileInfo(context.GeneratedIndexFileName, Encoding.UTF8.GetBytes(indexFileContent), DateTimeOffset.Now)));
 
-        var jsComponentsAccessor = new JSComponentConfigurationStoreAccessor(blazorContentRepository.JSComponents);
-        var webRootComponentsAccessor = new JSComponentConfigurationStoreAccessor(context.RootComponentsStore);
-        foreach (var kvp in jsComponentsAccessor.JsComponentTypesByIdentifier)
+        foreach (var kvp in blazorContentRepository.GetRegisteredJavaScriptComponents())
         {
-            if (webRootComponentsAccessor.JsComponentTypesByIdentifier.ContainsKey(kvp.Key))
+            if (!context.RootComponents.RegisterForJavaScriptIfMissing(kvp.Value, kvp.Key))
             {
                 continue;
             }
 
             context.Log.Debug($"Registering RootComponent: {kvp}");
-            webRootComponentsAccessor.RegisterForJavaScript(kvp.Value, kvp.Key);
         }
 
         context.Log.Debug("Notifying visitor everything is up and ready for work");
@@ -122,8 +118,6 @@ internal sealed class BlazorContentHostCompositionContext
     public required WebViewServiceProvider WebViewServiceProvider { get; init; }
 
     public required IJSComponentConfiguration RootComponents { get; init; }
-
-    public required JSComponentConfigurationStore RootComponentsStore { get; init; }
 
     public required string IndexFileSubpath { get; init; }
 
