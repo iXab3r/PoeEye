@@ -158,6 +158,13 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
         string methodName) where THandler : class;
     
     Task RemoveKeyboardHook(ElementReference elementRef);
+
+    /// <summary>
+    /// Suppresses well-known browser/WebView shortcuts such as Ctrl+A, Ctrl+P, and F5 at the DOM level.
+    /// </summary>
+    /// <param name="options">Optional shortcut and matching behavior overrides.</param>
+    /// <returns>An async-disposable registration that removes the DOM listener when disposed.</returns>
+    Task<JsBrowserShortcutSuppressionRef> SuppressWellKnownBrowserShortcuts(JsBrowserShortcutSuppressionOptions? options = null);
     
     /// <summary>
     /// Adds one or more CSS classes to the element specified by a selector or DOM reference.

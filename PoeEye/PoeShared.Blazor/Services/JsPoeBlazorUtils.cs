@@ -142,6 +142,13 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         await module.InvokeVoidAsync("removeKeyboardHook", elementRef);
     }
 
+    public async Task<JsBrowserShortcutSuppressionRef> SuppressWellKnownBrowserShortcuts(JsBrowserShortcutSuppressionOptions? options = null)
+    {
+        var module = await GetModuleAsync();
+        var suppressionRef = await module.InvokeAsync<IJSObjectReference>("suppressWellKnownBrowserShortcuts", options);
+        return new JsBrowserShortcutSuppressionRef(suppressionRef);
+    }
+
     public async Task<ElementKeyboardHookRef> AddKeyboardHook<THandler>(ElementReference elementRef, THandler handler, string methodName) where THandler : class
     {
         var hook = await ElementKeyboardHookRef.Create(this, elementRef, handler, methodName);
