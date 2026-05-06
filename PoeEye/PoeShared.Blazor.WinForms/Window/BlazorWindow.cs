@@ -21,6 +21,7 @@ using PoeShared.Blazor.Wpf.Services;
 using PoeShared.Blazor.WinForms.Services;
 using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 using Unity;
 using Color = System.Windows.Media.Color;
@@ -300,6 +301,8 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWinFo
     public IUnityContainer Container { get; set; }
 
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.CenterOwner;
+
+    public IntPtr OwnerHandle { get; set; }
 
     public new IFluentLog Log => base.Log;
 

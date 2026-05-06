@@ -20,7 +20,7 @@ public static class JsObjectReferenceExtensions
         {
             await jsObjectReference.InvokeVoidAsync(identifier, args);
         }
-        catch (Exception e) when (e.IsJSException())
+        catch (Exception e) when (e.IsJSException() || e is ObjectDisposedException)
         {
             // During disposal ignore such errors because there is a chance that browser context is already disposed
         }

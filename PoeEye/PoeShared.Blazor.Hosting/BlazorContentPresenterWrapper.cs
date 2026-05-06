@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -49,7 +50,7 @@ internal sealed class BlazorContentPresenterWrapper : ReactiveComponentBase
                 Log.Debug($"ContentPresenter view has been updated: {x}");
                 if (x.Previous is IDisposable disposableView)
                 {
-                    disposableView.Dispose();
+                    disposableView.DisposeJsSafe();
                 }
             })
             .AddTo(Anchors);

@@ -100,7 +100,7 @@
             {
                 if (x.Previous is IDisposable disposableView)
                 {
-                    disposableView.Dispose();
+                    disposableView.DisposeJsSafe();
                 }
             })
             .AddTo(Anchors);
@@ -129,7 +129,7 @@
     {
         if (titleBarGestureHandler is { } handler)
         {
-            await handler.DisposeAsync();
+            await handler.DisposeJsSafeAsync();
         }
 
         await base.DisposeAsync();

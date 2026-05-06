@@ -42,8 +42,15 @@ public readonly record struct ElementKeyboardHookRef : IAsyncDisposable
     {
         if (anchors?.IsDisposed == false)
         {
-            await blazorUtils.RemoveKeyboardHook(ElementRef);
+            try
+            {
+                await blazorUtils.RemoveKeyboardHook(ElementRef);
+            }
+            catch (Exception e) when (e.IsJSException() || e is ObjectDisposedException)
+            {
+                // Browser context may already be gone while a Blazor window is closing.
+            }
         }
-        anchors?.Dispose();
+        anchors?.DisposeJsSafe();
     }
 }

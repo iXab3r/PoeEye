@@ -46,7 +46,7 @@ internal sealed class BlazorWindowTitleBarGestureHandler : IAsyncDisposable
         catch (Exception e) when (e.IsJSException() || e is ObjectDisposedException)
         {
             window.Log.Warn("Failed to register Blazor window titlebar gestures", e);
-            await handler.DisposeAsync();
+            await handler.DisposeJsSafeAsync();
             return null;
         }
     }
@@ -108,7 +108,7 @@ internal sealed class BlazorWindowTitleBarGestureHandler : IAsyncDisposable
         isDisposed = true;
         if (registration is { } registrationRef)
         {
-            await registrationRef.DisposeAsync();
+            await registrationRef.DisposeJsSafeAsync();
         }
 
         dotNetObjectReference.DisposeJsSafe();

@@ -18,6 +18,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Core.Raw;
 using Microsoft.Web.WebView2.Wpf;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Blazor.Wpf.Services;
@@ -252,7 +253,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     {
         if (disposing)
         {
-            Anchors?.Dispose();
+            Anchors?.DisposeJsSafe();
         }
     }
 

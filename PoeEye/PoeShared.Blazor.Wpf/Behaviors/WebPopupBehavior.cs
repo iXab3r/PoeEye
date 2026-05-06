@@ -8,6 +8,7 @@ using System.Windows.Interactivity;
 using System.Windows.Interop;
 using Microsoft.Web.WebView2.Wpf;
 using PInvoke;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Scaffolding;
 
@@ -81,7 +82,7 @@ public sealed class WebPopupBehavior : Behavior<Popup>
             .FromEventPattern(h => AssociatedObject.Closed += h, h => AssociatedObject.Closed -= h)
             .Subscribe(x =>
             {
-                anchors.Dispose();
+                anchors.DisposeJsSafe();
             })
             .AddTo(anchors);
 

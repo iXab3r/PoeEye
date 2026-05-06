@@ -41,7 +41,7 @@ public abstract class ReactiveUserControl : UserControl, IDisposableReactiveObje
     {
         if (disposing)
         {
-            Anchors.Dispose();
+            Anchors.DisposeJsSafe();
             GC.SuppressFinalize(this);
         }
 

@@ -26,4 +26,15 @@
     {
         await JsRuntime.InvokeVoidAsync("scrollTo", 0, 0);
     }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (moduleTask.IsValueCreated)
+        {
+            var module = await moduleTask.Value;
+            await module.DisposeJsSafeAsync();
+        }
+
+        await base.DisposeAsync();
+    }
 }

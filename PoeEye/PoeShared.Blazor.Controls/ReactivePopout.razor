@@ -159,18 +159,14 @@
 
     public override async ValueTask DisposeAsync()
     {
-        dotNetRef?.Dispose();
+        dotNetRef?.DisposeJsSafe();
 
         if (moduleTask.IsValueCreated)
         {
             var module = await moduleTask.Value;
             try
             {
-                await module.InvokeVoidAsync("disposeReactivePopout", PanelRef);
-            }
-            catch (JSException)
-            {
-                // The element might already be gone if the component was removed by a parent render.
+                await module.InvokeVoidSafeAsync("disposeReactivePopout", PanelRef);
             }
             catch (InvalidOperationException)
             {

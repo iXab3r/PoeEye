@@ -115,15 +115,8 @@
         
         if (handler != null)
         {
-            try
-            {
-                await handler.InvokeVoidAsync("dispose");
-                await handler.DisposeJsSafeAsync();
-            }
-            catch (Exception e) when (e.IsJSException())
-            {
-                // During disposal ignore such errors because there is a chance that browser context is already disposed
-            }
+            await handler.InvokeVoidSafeAsync("dispose");
+            await handler.DisposeJsSafeAsync();
         }
 
         thisRef?.DisposeJsSafe();

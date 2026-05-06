@@ -119,7 +119,7 @@ public partial class ReactiveCollectionPresenter<TItem, TKey> : BlazorReactiveCo
 
             if (sessionReference != null)
             {
-                await sessionReference.InvokeVoidAsync("dispose");
+                await sessionReference.InvokeVoidSafeAsync("dispose");
                 await sessionReference.DisposeJsSafeAsync();
                 sessionReference = null;
             }

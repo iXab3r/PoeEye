@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.Extensions.FileProviders;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf;
 using PInvoke;
 using PoeShared.Logging;
@@ -65,7 +66,7 @@ partial class BlazorWindow
 
             Log.Debug($"Disposing the window: {new {window}}");
             window.Close();
-            window.Dispose();
+            window.DisposeJsSafe();
         }
         else if (windowEvent is WaitForIdleCommand waitForIdleCommand)
         {
@@ -676,7 +677,7 @@ partial class BlazorWindow
                 if (!window.IsDisposed)
                 {
                     blazorWindow.Log.Debug($"Disposing native window");
-                    window.Dispose();
+                    window.DisposeJsSafe();
                 }
 
                 blazorWindow.Closed?.Invoke(blazorWindow, args);

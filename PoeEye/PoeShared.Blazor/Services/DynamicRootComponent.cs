@@ -3,7 +3,7 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.JSInterop;
-using PoeShared.Logging;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Services;
@@ -17,8 +17,6 @@ public interface IDynamicRootComponent : IAsyncDisposable
 
 internal sealed class DynamicRootComponent : DisposableReactiveObject, IDynamicRootComponent
 {
-    private static readonly IFluentLog Log = typeof(DynamicRootComponent).PrepareLogger();
-
     private readonly IJSObjectReference jsObjectReference;
 
     internal DynamicRootComponent(IJSObjectReference jsObjectReference, string elementId, string componentIdentifier)
@@ -49,15 +47,8 @@ internal sealed class DynamicRootComponent : DisposableReactiveObject, IDynamicR
     
     public async ValueTask DisposeAsync()
     {
-        Anchors.Dispose();
-        //FIXME Important! If circuit/JSRuntime is disposed, object disposal hangs
-        try
-        {
-            await jsObjectReference.InvokeVoidAsync("dispose");
-        }
-        catch (Exception e)
-        {
-            Log.Error($"Failed to dispose dynamic root component, elementId: {ElementId}, component identifier: {ComponentIdentifier}", e);
-        }
+        Anchors.DisposeJsSafe();
+        await jsObjectReference.InvokeVoidSafeAsync("dispose");
+        await jsObjectReference.DisposeJsSafeAsync();
     }
 }

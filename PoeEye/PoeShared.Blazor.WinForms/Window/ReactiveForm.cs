@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 
@@ -93,7 +94,7 @@ internal class ReactiveForm : Form, IDisposableReactiveObject
     {
         if (disposing)
         {
-            Anchors.Dispose();
+            Anchors.DisposeJsSafe();
             GC.SuppressFinalize(this);
         }
 

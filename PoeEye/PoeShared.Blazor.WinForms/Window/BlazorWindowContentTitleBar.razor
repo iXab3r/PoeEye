@@ -1,5 +1,6 @@
 ﻿@namespace PoeShared.Blazor.WinForms
 @using System.Windows
+@using PoeShared.Blazor.Scaffolding
 @using PoeShared.Blazor.Services
 @using PoeShared.Blazor.Wpf
 @inherits BlazorReactiveComponent<IBlazorWindow>
@@ -93,7 +94,7 @@
             {
                 if (x.Previous is IDisposable disposableView)
                 {
-                    disposableView.Dispose();
+                    disposableView.DisposeJsSafe();
                 }
             })
             .AddTo(Anchors);
@@ -122,7 +123,7 @@
     {
         if (titleBarGestureHandler is { } handler)
         {
-            await handler.DisposeAsync();
+            await handler.DisposeJsSafeAsync();
         }
 
         await base.DisposeAsync();

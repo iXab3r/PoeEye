@@ -24,17 +24,7 @@ public readonly record struct JsWindowTitleBarGestureRef : IAsyncDisposable
             return;
         }
 
-        try
-        {
-            await jsObjectReference.InvokeVoidAsync("dispose");
-        }
-        catch (Exception e) when (e.IsJSException() || e is ObjectDisposedException)
-        {
-            // Browser context can disappear before component disposal runs.
-        }
-        finally
-        {
-            await jsObjectReference.DisposeJsSafeAsync();
-        }
+        await jsObjectReference.InvokeVoidSafeAsync("dispose");
+        await jsObjectReference.DisposeJsSafeAsync();
     }
 }

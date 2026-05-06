@@ -457,7 +457,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
     public void Dispose()
     {
-        Anchors.Dispose();
+        Anchors.DisposeJsSafe();
         GC.SuppressFinalize(this);
     }
 

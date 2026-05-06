@@ -44,7 +44,7 @@
             {
                 if (x.Previous is IDisposable disposableView)
                 {
-                    disposableView.Dispose();
+                    disposableView.DisposeJsSafe();
                 }
             })
             .AddTo(Anchors);

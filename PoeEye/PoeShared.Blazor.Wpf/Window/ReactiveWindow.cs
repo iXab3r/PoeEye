@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Interop;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -27,7 +28,7 @@ internal class ReactiveWindow : Window, IDisposableReactiveObject
 
     public void Dispose()
     {
-        Anchors.Dispose();
+        Anchors.DisposeJsSafe();
         GC.SuppressFinalize(this);
     }
 

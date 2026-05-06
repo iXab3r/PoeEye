@@ -7,6 +7,7 @@ using AntDesign.JsInterop;
 using DynamicData;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Services;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -161,7 +162,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     public override ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        DomEventListener?.Dispose();
+        DomEventListener?.DisposeJsSafe();
         return base.DisposeAsync();
     }
     

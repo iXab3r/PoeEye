@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -150,7 +151,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
     /// </summary>
     public void Dispose()
     {
-        Anchors.Dispose();
+        Anchors.DisposeJsSafe();
         GC.SuppressFinalize(this);
     }
     
@@ -392,7 +393,7 @@ public abstract class ReactiveComponentBase : ComponentBase, IReactiveComponent
         
         public void Dispose()
         {
-            anchor.Dispose();
+            anchor.DisposeJsSafe();
         }
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using PoeShared.Blazor.Services;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf;
 using ReactiveUI;
 using PoeShared.Scaffolding;
@@ -89,7 +90,7 @@ partial class BlazorContentPresenter
             {
                 if (x.Previous is IDisposable disposableView)
                 {
-                    disposableView.Dispose();
+                    disposableView.DisposeJsSafe();
                 }
             })
             .AddTo(Anchors);

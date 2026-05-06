@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Reflection;
+using PoeShared.Blazor.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using PropertyBinder;
@@ -196,7 +197,7 @@ internal sealed class ChangeTracker<TContext, TOut> : IChangeTracker where TCont
 
     public void Dispose()
     {
-        anchors?.Dispose();
+        anchors?.DisposeJsSafe();
     }
 
     private static bool IsParameterUsedAtLeastOnce(Expression<Func<TContext, TOut>> expression)
