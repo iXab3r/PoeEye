@@ -149,6 +149,20 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         return new JsBrowserShortcutSuppressionRef(suppressionRef);
     }
 
+    public async Task<JsWindowTitleBarGestureRef> RegisterWindowTitleBarGestures<THandler>(
+        ElementReference elementRef,
+        DotNetObjectReference<THandler> dotNetObjectReference,
+        double? dragThresholdPixels = null) where THandler : class
+    {
+        var module = await GetModuleAsync();
+        var gestureRef = await module.InvokeAsync<IJSObjectReference>(
+            "registerWindowTitleBarGestures",
+            elementRef,
+            dotNetObjectReference,
+            dragThresholdPixels);
+        return new JsWindowTitleBarGestureRef(gestureRef);
+    }
+
     public async Task<ElementKeyboardHookRef> AddKeyboardHook<THandler>(ElementReference elementRef, THandler handler, string methodName) where THandler : class
     {
         var hook = await ElementKeyboardHookRef.Create(this, elementRef, handler, methodName);

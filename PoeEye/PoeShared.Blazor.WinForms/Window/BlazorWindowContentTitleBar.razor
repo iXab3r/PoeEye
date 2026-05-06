@@ -1,6 +1,7 @@
 ﻿@namespace PoeShared.Blazor.WinForms
 @using System.Windows
-@using MouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
+@using PoeShared.Blazor.Services
+@using PoeShared.Blazor.Wpf
 @inherits BlazorReactiveComponent<IBlazorWindow>
 
 <div class="d-flex w-100 align-items-center"
@@ -23,9 +24,7 @@
         else
         {
             <span class="p-1 py-2 w-100 flex-grow-1"
-                  style="user-select: none;"
-                  @ondblclick="ToggleWindowState"
-                  @onmousedown="HandleMouseDown">
+                  style="user-select: none;">
                 <ReactiveSection
                     Trackers="@(new ReactiveTrackerList().With(DataContext.WhenAnyValue(x => x.Title)))">
                     @DataContext.Title
@@ -79,6 +78,8 @@
 </div>
 
 @code {
+    private BlazorWindowTitleBarGestureHandler? titleBarGestureHandler;
+
     public BlazorWindowContentTitleBar()
     {
         Anchors.Add(() => TitleBarContentPresenter = null);
@@ -98,23 +99,32 @@
             .AddTo(Anchors);
     }
 
+    [Inject] public IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; }
+
     public BlazorContentPresenter TitleBarContentPresenter { get; private set; }
 
-    private void ToggleWindowState()
+    protected override async Task OnAfterFirstRenderAsync()
     {
-        //FIXME Does not work - due to StartDrag intercepting the focus, need to implement DOM event listener + Drag distance analysis
-        if (DataContext.WindowState == WindowState.Normal)
+        await base.OnAfterFirstRenderAsync();
+
+        if (DataContext == null)
         {
-            DataContext.Maximize();
+            return;
         }
-        else if (DataContext.WindowState == WindowState.Maximized)
-        {
-            DataContext.Restore();
-        }
+
+        titleBarGestureHandler = await BlazorWindowTitleBarGestureHandler.TryRegisterAsync(
+            DataContext,
+            JsPoeBlazorUtils,
+            ElementRef);
     }
 
-    private void HandleMouseDown(MouseEventArgs mouseEventArgs)
+    public override async ValueTask DisposeAsync()
     {
-        DataContext.EnableDragMove();
+        if (titleBarGestureHandler is { } handler)
+        {
+            await handler.DisposeAsync();
+        }
+
+        await base.DisposeAsync();
     }
 }

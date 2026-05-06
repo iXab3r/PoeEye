@@ -165,6 +165,22 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <param name="options">Optional shortcut and matching behavior overrides.</param>
     /// <returns>An async-disposable registration that removes the DOM listener when disposed.</returns>
     Task<JsBrowserShortcutSuppressionRef> SuppressWellKnownBrowserShortcuts(JsBrowserShortcutSuppressionOptions? options = null);
+
+    /// <summary>
+    /// Registers DOM-side title bar gesture handling for a Blazor window.
+    /// </summary>
+    /// <typeparam name="THandler">The .NET callback owner type.</typeparam>
+    /// <param name="elementRef">The title bar root element.</param>
+    /// <param name="dotNetObjectReference">
+    /// Callback object exposing <c>HandleTitleBarDragStart</c>, <c>HandleTitleBarDoubleClick</c>,
+    /// and <c>HandleTitleBarContextMenu</c> JS-invokable methods.
+    /// </param>
+    /// <param name="dragThresholdPixels">Optional movement threshold before native drag starts.</param>
+    /// <returns>An async-disposable registration that removes the DOM listeners when disposed.</returns>
+    Task<JsWindowTitleBarGestureRef> RegisterWindowTitleBarGestures<THandler>(
+        ElementReference elementRef,
+        DotNetObjectReference<THandler> dotNetObjectReference,
+        double? dragThresholdPixels = null) where THandler : class;
     
     /// <summary>
     /// Adds one or more CSS classes to the element specified by a selector or DOM reference.

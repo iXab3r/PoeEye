@@ -65,6 +65,9 @@ public partial class UnsafeNative
     private static extern IntPtr GetSystemMenu(IntPtr hwnd, bool revert);
 
     [DllImport("user32.dll", SetLastError = true)]
+    private static extern int TrackPopupMenuEx(IntPtr menu, uint flags, int x, int y, IntPtr hwnd, IntPtr trackPopupMenuParams);
+
+    [DllImport("user32.dll", SetLastError = true)]
     private static extern int EnableMenuItem(IntPtr hMenu, uint itemId, uint enable);
 
     [DllImport("user32.dll", SetLastError = true)]
@@ -79,6 +82,8 @@ public partial class UnsafeNative
     }
 
     private const int DwmWindowCornerPreferenceAttribute = 33;
+    private const uint TpmRightButton = 0x0002;
+    private const uint TpmReturnCommand = 0x0100;
     
     
     /// <summary>Determines whether a window is maximized.</summary>
@@ -525,6 +530,37 @@ public partial class UnsafeNative
         {
             Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
         }
+    }
+
+    public static bool ShowSystemMenuAt(IntPtr hwnd, Point screenLocation)
+    {
+        Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
+        var systemMenu = GetSystemMenu(hwnd, revert: false);
+        if (systemMenu == IntPtr.Zero)
+        {
+            var error = Kernel32.GetLastError();
+            Log.Warn($"Failed to get system menu for {hwnd.ToHexadecimal()}, error: {error}");
+            return false;
+        }
+
+        Log.Debug($"[{hwnd.ToHexadecimal()}] Showing SystemMenu at {screenLocation}");
+        User32.SetForegroundWindow(hwnd);
+        var command = TrackPopupMenuEx(systemMenu, TpmRightButton | TpmReturnCommand, screenLocation.X, screenLocation.Y, hwnd, IntPtr.Zero);
+        if (command == 0)
+        {
+            Log.Debug($"SystemMenu for {hwnd.ToHexadecimal()} was cancelled or no command was selected");
+            return false;
+        }
+
+        var commandCursorPosition = GetCursorPosition();
+        Log.Debug($"[{hwnd.ToHexadecimal()}] Sending SystemMenu command 0x{command:X} at {commandCursorPosition}");
+        User32.SendMessage(
+            hwnd,
+            (User32.WindowMessage)0x0112,
+            (IntPtr)command,
+            MakeLParam(commandCursorPosition.X, commandCursorPosition.Y));
+        return true;
     }
 
     public static bool IsTopmost(IntPtr hwnd)
