@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Windows.Input;
+using System.Windows.Threading;
 using PoeShared.Scaffolding;
 using Control = System.Windows.Forms.Control;
 using MouseButtons = System.Windows.Forms.MouseButtons;
@@ -18,6 +19,7 @@ namespace PoeShared.Blazor.Wpf;
 public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveObject
 {
     private static readonly TimeSpan DragGapWarningThreshold = TimeSpan.FromMilliseconds(120);
+    private static readonly TimeSpan DragPollingInterval = TimeSpan.FromMilliseconds(16);
 
     private bool changedCursor;
     private bool draggingStarted;
@@ -28,6 +30,7 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
     private bool hasLastCursorPosition;
     private DateTimeOffset lastMouseMoveAt = DateTimeOffset.MinValue;
     private long mouseMoveCount;
+    private readonly DispatcherTimer dragTimer;
 
     public BlazorWindowMouseDragControllerBase(IBlazorWindow blazorWindow, BlazorContentControl contentControl)
     {
@@ -41,16 +44,26 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
 
         if (!ContentControl.CaptureMouse())
         {
-            throw new ApplicationException($"Failed to capture mouse inside window {blazorWindow}");
+            blazorWindow.Log.Warn($"Failed to capture mouse inside window {blazorWindow}; cursor polling will drive the drag session");
         }
 
         originalCursor = Cursor.Current;
         ContentControl.MouseUp += ControlOnMouseUp;
         ContentControl.MouseMove += ControlOnMouseMove;
+
+        dragTimer = new DispatcherTimer(DispatcherPriority.Input, ContentControl.Dispatcher)
+        {
+            Interval = DragPollingInterval
+        };
+        dragTimer.Tick += DragTimerOnTick;
+        dragTimer.Start();
+
         HandleMouseMove();
 
         Disposable.Create(() =>
         {
+            dragTimer.Stop();
+            dragTimer.Tick -= DragTimerOnTick;
             ContentControl.MouseUp -= ControlOnMouseUp;
             ContentControl.MouseMove -= ControlOnMouseMove;
 
@@ -140,15 +153,30 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
 
     private void HandleMouseMove()
     {
+        if (Anchors.IsDisposed)
+        {
+            return;
+        }
+
         var current = GetCursorPosition();
         var now = DateTimeOffset.UtcNow;
         var moveIndex = ++mouseMoveCount;
 
-        if (draggingStarted && !IsPrimaryButtonPressed())
+        if (!IsPrimaryButtonPressed())
         {
-            BlazorWindow.Log.Warn(
-                $"Primary mouse button is no longer pressed while drag controller is still active. " +
-                $"Stopping drag defensively. MoveCount={moveIndex}, Cursor={current}, WindowRect={BlazorWindow.GetWindowRect()}, MouseCaptured={ContentControl.IsMouseCaptured}");
+            if (draggingStarted)
+            {
+                BlazorWindow.Log.Warn(
+                    $"Primary mouse button is no longer pressed while drag controller is still active. " +
+                    $"Stopping drag defensively. MoveCount={moveIndex}, Cursor={current}, WindowRect={BlazorWindow.GetWindowRect()}, MouseCaptured={ContentControl.IsMouseCaptured}");
+            }
+            else
+            {
+                BlazorWindow.Log.Debug(
+                    $"Primary mouse button was released before drag threshold was reached. Stopping drag session. " +
+                    $"MoveCount={moveIndex}, Cursor={current}, WindowRect={BlazorWindow.GetWindowRect()}, MouseCaptured={ContentControl.IsMouseCaptured}");
+            }
+
             Dispose();
             return;
         }
@@ -205,6 +233,11 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
     }
 
     private void ControlOnMouseMove(object sender, MouseEventArgs e)
+    {
+        HandleMouseMove();
+    }
+
+    private void DragTimerOnTick(object sender, EventArgs e)
     {
         HandleMouseMove();
     }

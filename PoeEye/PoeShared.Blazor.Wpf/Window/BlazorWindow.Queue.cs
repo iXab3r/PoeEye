@@ -198,11 +198,11 @@ partial class BlazorWindow
                     dragAnchor.Disposable = command.Anchor;
                     try
                     {
-                        StartNativeDragMoveCore();
+                        new BlazorWindowMouseDragController(this, window.ContentControl).AddTo(command.Anchor);
                     }
                     catch (Exception e)
                     {
-                        Log.Error("Failed to start native window dragging", e);
+                        Log.Error("Failed to start window dragging", e);
                         dragAnchor.Disposable = null;
                         throw;
                     }
@@ -214,11 +214,11 @@ partial class BlazorWindow
                     dragAnchor.Disposable = command.Anchor;
                     try
                     {
-                        StartNativeResizeCore(command.Direction);
+                        new BlazorWindowEdgeResizeController(this, window.ContentControl, command.Direction).AddTo(command.Anchor);
                     }
                     catch (Exception e)
                     {
-                        Log.Error($"Failed to start native window resizing from {command.Direction}", e);
+                        Log.Error($"Failed to start window resizing from {command.Direction}", e);
                         dragAnchor.Disposable = null;
                         throw;
                     }
