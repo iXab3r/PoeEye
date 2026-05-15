@@ -52,7 +52,6 @@ public class SharedLog : DisposableReactiveObject
 
         var startupInfo =
             $"Logging for app {GlobalContext.Properties["APPNAME"]} in '{GlobalContext.Properties["CONFIGURATION"]}' mode initialized";
-        Console.WriteLine(startupInfo);
         Trace.WriteLine(startupInfo);
     }
 
