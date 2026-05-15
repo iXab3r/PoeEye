@@ -8,20 +8,56 @@
                               xmlns:converters="clr-namespace:PoeShared.Blazor.Wpf.Converters"
                               mc:Ignorable="d">
     <ControlTemplate x:Key="BlazorContentControlErrorTemplate" TargetType="{x:Type wpf:BlazorContentControl}">
-        <Border>
-            <StackPanel Orientation="Vertical">
-                <Border BorderBrush="IndianRed" BorderThickness="0 0 0 1">
-                    <TextBlock Foreground="IndianRed" Text="Render exception" />
-                </Border>
-                <Button
-                    Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}"
-                    Content="Try to recover" HorizontalAlignment="Left" />
-                <Border Padding="5">
+        <Border BorderBrush="IndianRed"
+                BorderThickness="1"
+                ClipToBounds="True"
+                SnapsToDevicePixels="True"
+                Background="#461218">
+            <Grid Margin="0"
+                  ClipToBounds="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0"
+                      MinHeight="18"
+                      Margin="3 1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Foreground="MistyRose"
+                               FontWeight="SemiBold"
+                               FontSize="11"
+                               VerticalAlignment="Center"
+                               Text="Render exception"
+                               TextTrimming="CharacterEllipsis" />
+                    <Button Grid.Column="1"
+                            MinHeight="18"
+                            Margin="4 0 0 0"
+                            Padding="4 0"
+                            FontSize="11"
+                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ReloadCommand}"
+                            Content="Try to recover" />
+                    <Button Grid.Column="2"
+                            MinHeight="18"
+                            Margin="4 0 0 0"
+                            Padding="4 0"
+                            FontSize="11"
+                            Command="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CloseHostWindowCommand}"
+                            Content="Close window" />
+                </Grid>
+                <Border Grid.Row="1"
+                        MinHeight="0"
+                        Padding="3 2 3 3">
                     <TextBox
                         IsReadOnly="True"
                         Background="Transparent"
                         BorderThickness="0"
                         Height="NaN"
+                        MinHeight="0"
                         Width="NaN"
                         VerticalScrollBarVisibility="Auto"
                         VerticalContentAlignment="Stretch"
@@ -29,7 +65,7 @@
                         Foreground="Coral"
                         Text="{Binding  RelativeSource={RelativeSource TemplatedParent}, Path=UnhandledExceptionMessage, Mode=OneWay}" />
                 </Border>
-            </StackPanel>
+            </Grid>
         </Border>
     </ControlTemplate>
 

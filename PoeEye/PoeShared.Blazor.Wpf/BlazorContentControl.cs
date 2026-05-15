@@ -101,6 +101,7 @@ public class BlazorContentControl : Control, IBlazorContentControl
         WebView.Services = webViewServiceProvider;
 
         ReloadCommand = BlazorCommandWrapper.Create<object>(ReloadExecuted);
+        CloseHostWindowCommand = BlazorCommandWrapper.Create(CloseHostWindow);
         OpenDevToolsCommand = BlazorCommandWrapper.Create(OpenDevTools);
         ZoomInCommand = BlazorCommandWrapper.Create(ZoomIn);
         ZoomOutCommand = BlazorCommandWrapper.Create(ZoomOut);
@@ -347,6 +348,8 @@ public class BlazorContentControl : Control, IBlazorContentControl
 
     public ICommandWrapper ReloadCommand { get; }
 
+    public ICommandWrapper CloseHostWindowCommand { get; }
+
     public ICommandWrapper OpenDevToolsCommand { get; }
 
     public ICommandWrapper ZoomInCommand { get; }
@@ -426,6 +429,17 @@ public class BlazorContentControl : Control, IBlazorContentControl
         }
 
         await Reload();
+    }
+
+    private void CloseHostWindow()
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.InvokeAsync(CloseHostWindow);
+            return;
+        }
+
+        Window.GetWindow(this)?.Close();
     }
 
     private void BlazorWebViewInitializing(object? sender, BlazorWebViewInitializingEventArgs e)

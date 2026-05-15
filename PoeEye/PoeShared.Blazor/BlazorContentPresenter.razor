@@ -34,40 +34,53 @@
 else
 {
     <div @key="currentException"
+         class="blazor-content-fault-host"
          role="alert"
-         style="@FaultPanelStyle">
-        <div style="font-size: 0.95rem; font-weight: 700;">Component exception</div>
-        <div style="font-size: 0.82rem; opacity: 0.92;">This part of the editor failed to render.</div>
+         tabindex="0"
+         aria-label="@FaultTooltip"
+         title="@FaultTooltip">
+        <div class="blazor-content-fault">
+            <div class="blazor-content-fault__bar">
+                <span class="blazor-content-fault__icon" aria-hidden="true">!</span>
 
-        <div style="font-size: 0.82rem; line-height: 1.35;">
-            <strong>@currentException.GetType().Name</strong>: @currentException.Message
-        </div>
+                <div class="blazor-content-fault__summary">
+                    <div class="blazor-content-fault__title">Component exception</div>
+                    <div class="blazor-content-fault__message">
+                        <strong>@currentException.GetType().Name</strong>: @currentException.Message
+                    </div>
+                </div>
 
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <button type="button"
-                    style="@FaultButtonStyle"
-                    @onclick="Recover">
-                Try to recover
-            </button>
+                <div class="blazor-content-fault__actions">
+                    <button type="button"
+                            class="blazor-content-fault__button"
+                            @onclick="Recover">
+                        Recover
+                    </button>
 
-            @if (blazorHostController != null)
-            {
-                <button type="button"
-                        style="@FaultButtonStyle"
-                        @onclick="ReloadHost">
-                    Reload view
-                </button>
-            }
-        </div>
-
-        <details style="font-size: 0.78rem;">
-            <summary style="cursor: pointer;">Details</summary>
-            <div style="margin-top: 0.5rem;">
-                <div>View: @(ResolvedViewType?.FullName ?? ViewType?.FullName ?? "unknown")</div>
-                <div>Content: @(Content?.GetType().FullName ?? "unknown")</div>
+                    @if (blazorHostController != null)
+                    {
+                        <button type="button"
+                                class="blazor-content-fault__button"
+                                @onclick="ReloadHost">
+                            Reload
+                        </button>
+                    }
+                </div>
             </div>
-            <pre style="@FaultDetailsStyle">@currentException</pre>
-        </details>
+
+            <div class="blazor-content-fault__description">
+                This part of the editor failed to render.
+            </div>
+
+            <details class="blazor-content-fault__details">
+                <summary>Details</summary>
+                <div class="blazor-content-fault__metadata">
+                    <div>View: @(ResolvedViewType?.FullName ?? ViewType?.FullName ?? "unknown")</div>
+                    <div>Content: @(Content?.GetType().FullName ?? "unknown")</div>
+                </div>
+                <pre class="blazor-content-fault__stack">@currentException</pre>
+            </details>
+        </div>
     </div>
 }
 
@@ -137,19 +150,9 @@ else
                !Equals(lastRecoveredViewTypeKey, ViewTypeKey);
     }
 
-    private const string FaultPanelStyle =
-        "display:block;width:100%;min-width:0;box-sizing:border-box;margin:0.5rem;padding:0.8rem 0.9rem;" +
-        "border:1px solid rgba(220,53,69,0.72);border-radius:0.5rem;background:rgba(70,18,24,0.96);" +
-        "color:#fff4f4;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03);";
-
-    private const string FaultButtonStyle =
-        "display:inline-flex;align-items:center;justify-content:center;padding:0.3rem 0.55rem;" +
-        "border:1px solid rgba(255,244,244,0.35);border-radius:0.35rem;background:rgba(255,255,255,0.06);" +
-        "color:inherit;font-size:0.8rem;line-height:1.2;";
-
-    private const string FaultDetailsStyle =
-        "margin:0.5rem 0 0;padding:0.55rem;background:rgba(0,0,0,0.22);border-radius:0.35rem;" +
-        "white-space:pre-wrap;overflow:auto;max-height:16rem;color:inherit;";
+    private string FaultTooltip => currentException == null
+        ? string.Empty
+        : $"{currentException.GetType().Name}: {currentException.Message}";
 
     public override ValueTask DisposeAsync()
     {
