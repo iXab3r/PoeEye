@@ -46,6 +46,10 @@ export interface BrowserShortcutSuppressionHandle {
     dispose(): void;
 }
 
+export interface WindowTitleBarGestureHandle {
+    dispose(): void;
+}
+
 interface NormalizedBrowserShortcut {
     key: string;
     ctrlKey: boolean;
@@ -65,6 +69,7 @@ interface NormalizedBrowserShortcutSuppressionOptions {
 interface PendingTitleBarDrag {
     startClientX: number;
     startClientY: number;
+    pointerId: number;
 }
 
 type BrowserShortcutKeyboardEvent = Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'shiftKey' | 'altKey' | 'metaKey' | 'defaultPrevented'> & {
@@ -151,7 +156,7 @@ export function suppressWellKnownBrowserShortcuts(options?: BrowserShortcutSuppr
 export function registerWindowTitleBarGestures(
     element: HTMLElement,
     dotNetReference: DotNet.DotNetObject,
-    dragThresholdPixels?: number): Disposable {
+    dragThresholdPixels?: number): WindowTitleBarGestureHandle {
 
     if (!(element instanceof HTMLElement)) {
         throw new Error('Titlebar element is not an HTMLElement');
@@ -162,27 +167,33 @@ export function registerWindowTitleBarGestures(
     let disposed = false;
 
     const clearPendingDrag = () => {
+        const pointerId = pendingDrag?.pointerId;
         pendingDrag = null;
-        document.removeEventListener('mousemove', handleDocumentMouseMove, true);
-        document.removeEventListener('mouseup', handleDocumentMouseUp, true);
+        if (pointerId != null && element.hasPointerCapture(pointerId)) {
+            element.releasePointerCapture(pointerId);
+        }
     };
 
-    const beginPotentialDrag = (event: MouseEvent) => {
-        if (disposed || event.button !== 0 || !isTitleBarSurfaceEvent(event, element)) {
+    const beginPotentialDrag = (event: PointerEvent) => {
+        if (disposed || !isPrimaryPointerButton(event) || !isTitleBarSurfaceEvent(event, element)) {
             return;
+        }
+
+        try {
+            element.setPointerCapture(event.pointerId);
+        } catch (error) {
+            log.debug('Failed to capture titlebar pointer', error);
         }
 
         pendingDrag = {
             startClientX: event.clientX,
-            startClientY: event.clientY
+            startClientY: event.clientY,
+            pointerId: event.pointerId
         };
-        document.addEventListener('mousemove', handleDocumentMouseMove, true);
-        document.addEventListener('mouseup', handleDocumentMouseUp, true);
     };
 
-    function handleDocumentMouseMove(event: MouseEvent) {
-        if (pendingDrag == null) {
-            clearPendingDrag();
+    function handlePointerMove(event: PointerEvent) {
+        if (pendingDrag == null || pendingDrag.pointerId !== event.pointerId) {
             return;
         }
 
@@ -204,8 +215,10 @@ export function registerWindowTitleBarGestures(
             .catch(error => log.warn('Failed to start titlebar drag', error));
     }
 
-    function handleDocumentMouseUp() {
-        clearPendingDrag();
+    function handlePointerEnd(event: PointerEvent) {
+        if (pendingDrag != null && pendingDrag.pointerId === event.pointerId) {
+            clearPendingDrag();
+        }
     }
 
     const handleDoubleClick = (event: MouseEvent) => {
@@ -232,7 +245,11 @@ export function registerWindowTitleBarGestures(
             .catch(error => log.warn('Failed to handle titlebar context menu', error));
     };
 
-    element.addEventListener('mousedown', beginPotentialDrag, true);
+    element.addEventListener('pointerdown', beginPotentialDrag, true);
+    element.addEventListener('pointermove', handlePointerMove, true);
+    element.addEventListener('pointerup', handlePointerEnd, true);
+    element.addEventListener('pointercancel', handlePointerEnd, true);
+    element.addEventListener('lostpointercapture', handlePointerEnd, true);
     element.addEventListener('dblclick', handleDoubleClick, true);
     element.addEventListener('contextmenu', handleContextMenu, true);
 
@@ -240,7 +257,11 @@ export function registerWindowTitleBarGestures(
         dispose: () => {
             disposed = true;
             clearPendingDrag();
-            element.removeEventListener('mousedown', beginPotentialDrag, true);
+            element.removeEventListener('pointerdown', beginPotentialDrag, true);
+            element.removeEventListener('pointermove', handlePointerMove, true);
+            element.removeEventListener('pointerup', handlePointerEnd, true);
+            element.removeEventListener('pointercancel', handlePointerEnd, true);
+            element.removeEventListener('lostpointercapture', handlePointerEnd, true);
             element.removeEventListener('dblclick', handleDoubleClick, true);
             element.removeEventListener('contextmenu', handleContextMenu, true);
         }
@@ -371,6 +392,10 @@ function safeClosest(element: { closest?: (selector: string) => unknown }, selec
         log.warn(`Invalid shortcut suppression selector '${selector}'`, error);
         return null;
     }
+}
+
+function isPrimaryPointerButton(event: PointerEvent): boolean {
+    return event.isPrimary !== false && event.button === 0;
 }
 
 function isTitleBarSurfaceEvent(
