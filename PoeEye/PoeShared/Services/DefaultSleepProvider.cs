@@ -9,6 +9,15 @@ internal sealed class DefaultSleepProvider : ISleepProvider
 
     public void Sleep(double timeoutMs, CancellationToken token = default)
     {
-        token.WaitHandle.WaitOne((int)timeoutMs);
+        if (timeoutMs <= 0)
+        {
+            token.WaitHandle.WaitOne(0);
+            return;
+        }
+
+        var timeout = timeoutMs >= int.MaxValue
+            ? int.MaxValue
+            : Math.Max(1, (int)Math.Ceiling(timeoutMs));
+        token.WaitHandle.WaitOne(timeout);
     }
 }
