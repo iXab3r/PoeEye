@@ -14,6 +14,9 @@ public class AppOptions : DisposableReactiveObject
     [Option( "appName", Default = null, HelpText = "Application name override - displayed in title, used for naming log files, etc")]
     public string AppName { get; set; }
 
+    [Option("appVersion", Default = null, HelpText = "Application version override - displayed in title and exposed via app config")]
+    public string AppVersion { get; set; }
+
     [Option(AutostartFlagValue, Default = false)]
     public bool IsAutostart { get; set; }
     
@@ -49,7 +52,7 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string AppTitle => $"{(Profile != DefaultProfileName ? $"[{Profile.ToUpper()}]" : string.Empty)}{AppName} v{Version}".ToUpper();
 
-    public Version Version { get; }
+    public Version Version { get; private set; }
 
     public string AppSupportMail { get; set; } = "";
 
@@ -94,7 +97,7 @@ public class AppArguments : AppOptions, IAppArguments
         }
         
         var entryAssembly = Assembly.GetEntryAssembly() ?? throw new InvalidOperationException("Entry assembly is not specified");
-        Version = entryAssembly.GetName().Version;
+        Version = ResolveVersion(this, entryAssembly.GetName().Version);
        
         if (string.IsNullOrEmpty(AppName))
         {
@@ -188,6 +191,11 @@ public class AppArguments : AppOptions, IAppArguments
                     {
                         AppName = appOptionsFromFile.AppName;
                     }
+
+                    if (DataFolder != null && TryResolveVersion(appOptionsFromFile, out var startupVersion))
+                    {
+                        Version = startupVersion;
+                    }
                 }
             }
         }
@@ -266,12 +274,37 @@ public class AppArguments : AppOptions, IAppArguments
         } 
     }
 
+    private static Version ResolveVersion(AppOptions options, Version defaultVersion)
+    {
+        return TryResolveVersion(options, out var overrideVersion)
+            ? overrideVersion
+            : defaultVersion;
+    }
+
+    private static bool TryResolveVersion(AppOptions options, out Version version)
+    {
+        var versionText = options.AppVersion;
+        if (string.IsNullOrWhiteSpace(versionText))
+        {
+            version = default;
+            return false;
+        }
+
+        if (!Version.TryParse(versionText, out version))
+        {
+            throw new ApplicationException($"Failed to parse application version override: {versionText}");
+        }
+
+        return true;
+    }
+
     protected override void FormatToString(ToStringBuilder builder)
     {
         base.FormatToString(builder);
         builder.Append(new
         {
             AppName,
+            Version,
             Profile,
             IsAutostart,
             AutostartFlag,
