@@ -102,10 +102,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
         {
             try
             {
-                if (!isClosedTcs.TrySetResult())
-                {
-                    Log.Debug($"Could not notify about window disposal, tcs: {isClosedTcs}");
-                }
+                MarkWindowAsClosingOrClosed("window disposal");
 
                 if (!windowSupplier.IsValueCreated)
                 {
@@ -826,6 +823,14 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
             }
 
             throw;
+        }
+    }
+
+    private void MarkWindowAsClosingOrClosed(string reason)
+    {
+        if (!isClosedTcs.TrySetResult())
+        {
+            Log.Debug($"Could not mark window as closing or closed ({reason}), tcs: {isClosedTcs}");
         }
     }
 

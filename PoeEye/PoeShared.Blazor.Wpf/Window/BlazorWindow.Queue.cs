@@ -78,6 +78,17 @@ partial class BlazorWindow
                 return;
             }
 
+            if (isClosedTcs.Task.IsCompleted)
+            {
+                Log.Debug($"Ignoring command - window is closing or already closed, command: {windowEvent}");
+                if (windowEvent is ShowDialogCommand showDialogCommand)
+                {
+                    showDialogCommand.CompletionSource.TrySetResult(true);
+                }
+
+                return;
+            }
+
             var window = GetOrCreate();
             switch (windowEvent)
             {
@@ -745,6 +756,8 @@ partial class BlazorWindow
                 .Subscribe(x =>
                 {
                     blazorWindow.Log.Debug($"Native Window has been closed");
+                    blazorWindow.MarkWindowAsClosingOrClosed("native window closed");
+
                     if (!window.IsDisposed)
                     {
                         blazorWindow.Log.Debug($"Disposing native window");
@@ -752,17 +765,20 @@ partial class BlazorWindow
                     }
 
                     blazorWindow.Closed?.Invoke(blazorWindow, x);
-                    if (!blazorWindow.isClosedTcs.TrySetResult())
-                    {
-                        blazorWindow.Log.Debug($"Could not notify about window closure, tcs: {blazorWindow.isClosedTcs}");
-                    }
                 })
                 .AddTo(anchors);
 
             Observable
                 .FromEventPattern<CancelEventHandler, CancelEventArgs>(h => window.Closing += h, h => window.Closing -= h)
                 .Select(x => x.EventArgs)
-                .Subscribe(x => blazorWindow.Closing?.Invoke(blazorWindow, x))
+                .Subscribe(x =>
+                {
+                    blazorWindow.Closing?.Invoke(blazorWindow, x);
+                    if (!x.Cancel)
+                    {
+                        blazorWindow.MarkWindowAsClosingOrClosed("native window closing");
+                    }
+                })
                 .AddTo(anchors);
 
             Observable
