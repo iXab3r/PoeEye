@@ -56,6 +56,13 @@ partial class BlazorWindow
                 return;
             }
 
+            if (isNativeWindowClosingOrClosed)
+            {
+                Log.Debug($"Native window is already closing or closed - disposing without calling Close: {new {window}}");
+                window.DisposeJsSafe();
+                return;
+            }
+
             Log.Debug($"Disposing the window: {new {window}}");
             window.Close();
             window.DisposeJsSafe();
@@ -756,6 +763,7 @@ partial class BlazorWindow
                 .Subscribe(x =>
                 {
                     blazorWindow.Log.Debug($"Native Window has been closed");
+                    blazorWindow.isNativeWindowClosingOrClosed = true;
                     blazorWindow.MarkWindowAsClosingOrClosed("native window closed");
 
                     if (!window.IsDisposed)
@@ -773,11 +781,16 @@ partial class BlazorWindow
                 .Select(x => x.EventArgs)
                 .Subscribe(x =>
                 {
+                    var wasNativeWindowClosingOrClosed = blazorWindow.isNativeWindowClosingOrClosed;
+                    blazorWindow.isNativeWindowClosingOrClosed = true;
                     blazorWindow.Closing?.Invoke(blazorWindow, x);
-                    if (!x.Cancel)
+                    if (x.Cancel)
                     {
-                        blazorWindow.MarkWindowAsClosingOrClosed("native window closing");
+                        blazorWindow.isNativeWindowClosingOrClosed = wasNativeWindowClosingOrClosed;
+                        return;
                     }
+
+                    blazorWindow.MarkWindowAsClosingOrClosed("native window closing");
                 })
                 .AddTo(anchors);
 

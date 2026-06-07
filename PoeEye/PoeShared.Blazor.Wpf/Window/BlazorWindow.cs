@@ -71,6 +71,7 @@ internal partial class BlazorWindow : DisposableReactiveObjectWithLogger, IWpfBl
     private readonly SerialDisposable additionalFileProviderAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
     private IntPtr dialogOwnerHandle;
+    private bool isNativeWindowClosingOrClosed;
 
     // Logging throttling: limit certain verbose logs 
     private readonly Stopwatch logThrottleStopwatch = Stopwatch.StartNew();
