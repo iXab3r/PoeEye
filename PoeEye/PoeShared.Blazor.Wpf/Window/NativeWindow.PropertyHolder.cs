@@ -6,14 +6,14 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal partial class BlazorWindow
+internal partial class NativeWindow
 {
     private sealed record PropertyValueHolder<TValue> : DisposableReactiveRecord
     {
         private readonly BehaviorSubject<PropertyState<TValue>> stateSubject;
 
         public PropertyValueHolder(
-            BlazorWindow owner,
+            NativeWindow owner,
             string propertyToRaise)
         {
             PropertyToRaise = propertyToRaise;

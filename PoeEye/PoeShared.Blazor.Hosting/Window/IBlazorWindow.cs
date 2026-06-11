@@ -11,8 +11,10 @@ namespace PoeShared.Blazor.Wpf;
 
 /// <summary>
 /// Defines the contract for a Blazor window with configurable UI properties, event-driven lifecycle, and window state operations.
+/// Specialization of <see cref="INativeWindow"/> which hosts Blazor content (body + title bar views) instead of
+/// caller-supplied WPF content - <see cref="INativeWindow.ContentFactory"/> is not supported by Blazor windows.
 /// </summary>
-public interface IBlazorWindow : IBlazorWindowController, IDisposableReactiveObject, IBlazorWindowNativeController
+public interface IBlazorWindow : INativeWindow
 {
     public const string TitleBarAnchorName = $"--blazor-window-titlebar";
     public const string WindowAnchorName = $"--blazor-window";

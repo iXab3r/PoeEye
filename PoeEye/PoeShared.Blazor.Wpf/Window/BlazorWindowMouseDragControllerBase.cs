@@ -9,11 +9,13 @@ using Control = System.Windows.Forms.Control;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 using Cursor = System.Windows.Forms.Cursor;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using UIElement = System.Windows.UIElement;
 
 namespace PoeShared.Blazor.Wpf;
 
 /// <summary>
-/// Base class for implementing mouse-based window dragging behavior in a Blazor-integrated window.
+/// Base class for implementing mouse-based window dragging behavior in a window which follows
+/// the thread-safe windowing model (<see cref="INativeWindow"/>, including Blazor-hosted windows).
 /// Manages mouse capture, drag threshold detection, and cursor changes during drag operations.
 /// </summary>
 public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveObject
@@ -32,7 +34,7 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
     private long mouseMoveCount;
     private readonly DispatcherTimer dragTimer;
 
-    public BlazorWindowMouseDragControllerBase(IBlazorWindow blazorWindow, BlazorContentControl contentControl)
+    public BlazorWindowMouseDragControllerBase(INativeWindow blazorWindow, UIElement contentControl)
     {
         BlazorWindow = blazorWindow;
         ContentControl = contentControl;
@@ -85,14 +87,14 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
     }
 
     /// <summary>
-    /// Gets the associated Blazor window being dragged.
+    /// Gets the associated window being dragged.
     /// </summary>
-    public IBlazorWindow BlazorWindow { get; }
+    public INativeWindow BlazorWindow { get; }
 
     /// <summary>
     /// Gets the content control where mouse interaction is captured.
     /// </summary>
-    public BlazorContentControl ContentControl { get; }
+    public UIElement ContentControl { get; }
 
     /// <summary>
     ///  Gets the dimensions in pixels, of the rectangle that a drag operation must

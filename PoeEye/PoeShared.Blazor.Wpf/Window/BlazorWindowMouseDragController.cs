@@ -6,14 +6,14 @@ using PoeShared.Scaffolding;
 namespace PoeShared.Blazor.Wpf;
 
 /// <summary>
-/// Implements the default window drag behavior for a <see cref="IBlazorWindow"/>, enabling the window
+/// Implements the default window drag behavior for a <see cref="INativeWindow"/>, enabling the window
 /// to be repositioned via mouse dragging
 /// </summary>
 public class BlazorWindowMouseDragController : BlazorWindowMouseDragControllerBase
 {
     public BlazorWindowMouseDragController(
-        IBlazorWindow blazorWindow, 
-        BlazorContentControl contentControl) : base(blazorWindow, contentControl)
+        INativeWindow blazorWindow,
+        System.Windows.UIElement contentControl) : base(blazorWindow, contentControl)
     {
         DragSize = SystemInformation.DragSize;
         blazorWindow.Log.Debug($"Window dragging has been started: {new { StartPoint, WindowInitialPosition, DragSize }}");

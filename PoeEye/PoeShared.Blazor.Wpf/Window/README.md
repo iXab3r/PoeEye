@@ -6,6 +6,14 @@
 - separate properties for Left/Top/Width/Height
 - anything (own Window events / user driver events) come through the same Channel
 
+# Class structure
+- `NativeWindow` (`INativeWindow`) - Blazor-agnostic core: dispatcher, command channel (Queue), timestamped
+  property mirror (PropertyHolder), lifecycle, title bar chrome/transparency logic (WindowView).
+  Hosts arbitrary WPF content supplied via `ContentFactory` (invoked on the window's own UI thread).
+- `BlazorWindow` (`IBlazorWindow : INativeWindow`) - specialization which hosts Blazor/WebView2 content
+  (body + title bar `BlazorContentControl`s), child Unity container, file providers, dev tools and
+  automation registrar wiring. `ContentFactory` is not supported there - it throws, use `ViewType`.
+
 # Problems
 - race condition when window notifies about its own properties update (e.g. dragging/resizing) + user sets value.
 Solved by timestamping and IDing all events. Last always wins. 

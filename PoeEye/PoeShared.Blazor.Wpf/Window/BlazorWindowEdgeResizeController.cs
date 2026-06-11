@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace PoeShared.Blazor.Wpf;
 
 /// <summary>
-/// Implements the default window resize behavior for a <see cref="IBlazorWindow"/>, enabling the window
+/// Implements the default window resize behavior for a <see cref="INativeWindow"/>, enabling the window
 /// to be resized by dragging edges/corners
 /// </summary>
 public class BlazorWindowEdgeResizeController : BlazorWindowMouseDragControllerBase
@@ -13,8 +13,8 @@ public class BlazorWindowEdgeResizeController : BlazorWindowMouseDragControllerB
     private readonly WindowResizeDirection direction;
 
     public BlazorWindowEdgeResizeController(
-        IBlazorWindow blazorWindow,
-        BlazorContentControl contentControl,
+        INativeWindow blazorWindow,
+        System.Windows.UIElement contentControl,
         WindowResizeDirection direction)
         : base(blazorWindow, contentControl)
     {

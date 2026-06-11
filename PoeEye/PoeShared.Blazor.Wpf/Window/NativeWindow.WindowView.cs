@@ -1,91 +1,69 @@
-﻿using System;
-using System.Reactive.Disposables;
+using System;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shell;
-using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Logging;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
-using ReactiveUI;
-using Unity;
 
 namespace PoeShared.Blazor.Wpf;
 
-internal partial class BlazorWindow
+internal partial class NativeWindow
 {
-    private sealed class NativeWindow : ReactiveWindow
+    /// <summary>
+    /// Blazor-agnostic inner WPF window: layout (title bar host + body host), title bar chrome
+    /// (System/Custom/None display modes), transparency rules and native chrome wiring.
+    /// Body content is supplied by subclasses - they must assign <see cref="BodyHost"/>.Child
+    /// and then call <see cref="ApplyInitialTitleBarDisplayMode"/> at the end of their constructor.
+    /// </summary>
+    internal abstract class WindowView : ReactiveWindow
     {
-        private readonly BlazorWindow owner;
+        private readonly NativeWindow owner;
         private readonly DockPanel rootPanel;
         private readonly Border bodyHost;
         private readonly Border titleBarHost;
         private readonly ContentControl titleBarContentHost;
-        private readonly SerialDisposable bodyAutomationRegistrationAnchor;
-        private readonly SerialDisposable titleBarAutomationRegistrationAnchor;
 
-        public NativeWindow(BlazorWindow owner)
+        private protected WindowView(NativeWindow owner)
         {
             this.owner = owner;
-            BodyContentControl = CreateBlazorContentControl(typeof(BlazorWindowContent));
-            TitleBarContentControl = CreateBlazorContentControl(typeof(BlazorWindowContentHeader));
-            bodyAutomationRegistrationAnchor = new SerialDisposable().AddTo(Anchors);
-            titleBarAutomationRegistrationAnchor = new SerialDisposable().AddTo(Anchors);
-            InitializeContainerBinding();
-            InitializeAutomationBinding();
             (rootPanel, titleBarHost, titleBarContentHost, bodyHost) = CreateLayout();
             InitializeNativeChromeBinding();
             Content = rootPanel;
-            UpdateTitleBarDisplayMode(owner.TitleBarDisplayMode);
-
-            Anchors.Add(() => 
-            {
-                owner.Log.Debug("Disposed native window");
-                Container = null;
-                ChildContainer = null;
-                BodyContentControl.Container = null;
-                TitleBarContentControl.Container = null;
-            });
         }
 
-        public BlazorContentControl BodyContentControl { get; }
+        /// <summary>
+        /// The element which hosts the window content - receives content padding and mouse capture for drag/resize operations.
+        /// </summary>
+        public abstract FrameworkElement ContentControl { get; }
 
-        public BlazorContentControl TitleBarContentControl { get; }
-
-        public BlazorContentControl ContentControl => BodyContentControl;
-
-        public IUnityContainer Container { get; set; }
-        
-        public IUnityContainer ChildContainer { get; private set; }
-        
         public IFluentLog Log => owner.Log;
 
-        private void InitializeContainerBinding()
-        {
-            this.WhenAnyValue(x => x.Container)
-                .Select(x => x ?? owner.unityContainer)
-                .Subscribe(parentContainer =>
-                {
-                    //that is a very shady moment - child container has to be kept alive for the entire period
-                    //kept alive = managed via Parent Anchors, not its own
-                    //otherwise, when _current_ window gets disposed, the entire container will be disposed
-                    //maybe move registrations to another nested container to avoid this?
-                    var childContainer = parentContainer.CreateChildContainer().AddTo(owner.Anchors);
-                    childContainer.RegisterSingleton<IBlazorWindowController>(_ => owner);
-                    childContainer.RegisterSingleton<IBlazorWindowAccessor>(_ => new BlazorWindowAccessor(owner));
-                    ChildContainer = childContainer;
-                })
-                .AddTo(Anchors);
+        /// <summary>
+        /// The controller which owns this view. Intentionally NOT named Owner to avoid clashing with WPF Window.Owner.
+        /// </summary>
+        private protected NativeWindow OwnerController => owner;
 
-            this.WhenAnyValue(x => x.ChildContainer)
-                .Subscribe(container =>
-                {
-                    BodyContentControl.Container = container;
-                    TitleBarContentControl.Container = container;
-                })
-                .AddTo(Anchors);
+        private protected Border BodyHost => bodyHost;
+
+        /// <summary>
+        /// Replaces the hosted user content. Invoked on the window's own UI thread via the command queue.
+        /// </summary>
+        public abstract void UpdateHostedContent(Func<INativeWindow, UIElement> contentFactory);
+
+        /// <summary>
+        /// Content which is shown inside the title bar area when the System title bar display mode is active.
+        /// </summary>
+        private protected virtual object GetTitleBarContent()
+        {
+            return null;
+        }
+
+        private protected void ApplyInitialTitleBarDisplayMode()
+        {
+            UpdateTitleBarDisplayMode(owner.TitleBarDisplayMode);
         }
 
         private void InitializeNativeChromeBinding()
@@ -94,40 +72,6 @@ internal partial class BlazorWindow
                 .FromEventPattern<EventHandler, EventArgs>(h => SourceInitialized += h, h => SourceInitialized -= h)
                 .Subscribe(_ => ApplyNativeSystemChrome())
                 .AddTo(Anchors);
-        }
-
-        private void InitializeAutomationBinding()
-        {
-            Observable.CombineLatest(
-                    this.WhenAnyValue(x => x.ChildContainer),
-                    owner.WhenAnyValue(x => x.AutomationId),
-                    (container, automationId) => new
-                    {
-                        Container = container,
-                        AutomationId = automationId?.Trim() ?? string.Empty
-                    })
-                .SubscribeSafe(x => UpdateAutomationRegistration(x.Container, x.AutomationId), Log.HandleUiException)
-                .AddTo(Anchors);
-        }
-
-        private void UpdateAutomationRegistration(IUnityContainer container, string automationId)
-        {
-            bodyAutomationRegistrationAnchor.Disposable = Disposable.Empty;
-            titleBarAutomationRegistrationAnchor.Disposable = Disposable.Empty;
-
-            if (string.IsNullOrWhiteSpace(automationId) || container == null)
-            {
-                return;
-            }
-
-            if (!container.IsRegistered<IBlazorWindowViewRegistryRegistrar>())
-            {
-                return;
-            }
-
-            var registrar = container.Resolve<IBlazorWindowViewRegistryRegistrar>();
-            bodyAutomationRegistrationAnchor.Disposable = registrar.Register(new BlazorWindowViewHandle(BodyContentControl, automationId, BlazorWindowViewRole.Body));
-            titleBarAutomationRegistrationAnchor.Disposable = registrar.Register(new BlazorWindowViewHandle(TitleBarContentControl, automationId, BlazorWindowViewRole.TitleBar));
         }
 
         private (DockPanel RootPanel, Border TitleBarHost, ContentControl TitleBarContentHost, Border BodyHost) CreateLayout()
@@ -157,8 +101,7 @@ internal partial class BlazorWindow
 
             var body = new Border()
             {
-                Background = Brushes.Transparent,
-                Child = BodyContentControl
+                Background = Brushes.Transparent
             };
             root.Children.Add(body);
 
@@ -214,8 +157,8 @@ internal partial class BlazorWindow
             var resizeBorderThickness = GetResizeBorderThickness(owner.BorderThickness, owner.ResizeMode);
 
             WindowStyle = WindowStyle.None;
-            // Keep the same body presenter alive; only the title host moves between Blazor and native WPF.
-            titleBarContentHost.Content = TitleBarContentControl;
+            // Keep the same body presenter alive; only the title host moves between content and native WPF.
+            titleBarContentHost.Content = GetTitleBarContent();
             titleBarHost.Visibility = Visibility.Visible;
             titleBarHost.Height = GetTitleBarHeight();
             ApplySystemContentMargins(resizeBorderThickness);
@@ -321,16 +264,35 @@ internal partial class BlazorWindow
             AllowsTransparency = allowsTransparency;
             return true;
         }
+    }
 
-        private BlazorContentControl CreateBlazorContentControl(Type viewType)
+    /// <summary>
+    /// Plain WPF window view - hosts arbitrary caller-supplied WPF content produced by <see cref="INativeWindow.ContentFactory"/>.
+    /// No Blazor/WebView2 involvement whatsoever.
+    /// </summary>
+    private sealed class NativeWindowView : WindowView
+    {
+        private readonly ContentPresenter contentHost;
+
+        public NativeWindowView(NativeWindow owner) : base(owner)
         {
-            return new BlazorContentControl()
+            contentHost = new ContentPresenter();
+            BodyHost.Child = contentHost;
+            ApplyInitialTitleBarDisplayMode();
+
+            Anchors.Add(() =>
             {
-                ViewType = viewType,
-                AdditionalFileProvider = owner.compositeFileProvider,
-                Configurator = owner.ControlConfigurator,
-                Content = owner
-            }.AddTo(Anchors);
+                Log.Debug("Disposed native window view");
+                contentHost.Content = null;
+            });
+        }
+
+        public override FrameworkElement ContentControl => contentHost;
+
+        public override void UpdateHostedContent(Func<INativeWindow, UIElement> contentFactory)
+        {
+            Dispatcher.VerifyAccess();
+            contentHost.Content = contentFactory?.Invoke(OwnerController);
         }
     }
 }

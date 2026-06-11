@@ -16,6 +16,7 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
     {
         Container.RegisterType<IWpfBlazorWindow, BlazorWindow>();
         Container.RegisterType<IBlazorWindow, BlazorWindow>();
+        Container.RegisterType<INativeWindow, NativeWindow>();
         Container.RegisterSingleton<IBlazorWindowViewRegistry, BlazorWindowViewRegistry>();
         Container.RegisterSingleton<IBlazorWindowViewRegistryRegistrar>(x => (BlazorWindowViewRegistry) x.Resolve<IBlazorWindowViewRegistry>());
         Container.RegisterSingleton<IWebView2EnvironmentController, WebView2EnvironmentController>();
