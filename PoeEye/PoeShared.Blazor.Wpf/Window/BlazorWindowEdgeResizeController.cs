@@ -1,4 +1,3 @@
-﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,7 +5,13 @@ namespace PoeShared.Blazor.Wpf;
 
 /// <summary>
 /// Implements the default window resize behavior for a <see cref="INativeWindow"/>, enabling the window
-/// to be resized by dragging edges/corners
+/// to be resized by dragging edges/corners.
+/// <para>
+/// While SHIFT is held during the drag, the new size is constrained to the aspect ratio the window had
+/// when the drag started (corner drags scale proportionally, edge drags derive the other dimension);
+/// releasing SHIFT mid-drag returns to free resizing. Min/Max window size limits are always honored,
+/// and the edges opposite to the dragged ones stay anchored (see <see cref="WindowResizeMath"/>).
+/// </para>
 /// </summary>
 public class BlazorWindowEdgeResizeController : BlazorWindowMouseDragControllerBase
 {
@@ -36,56 +41,22 @@ public class BlazorWindowEdgeResizeController : BlazorWindowMouseDragControllerB
 
     protected override void HandleMove(int deltaX, int deltaY)
     {
-        var dx = deltaX;
-        var dy = deltaY;
-        var rect = new Rectangle(
+        var initialBounds = new Rectangle(
             WindowInitialPosition.X,
             WindowInitialPosition.Y,
             WindowInitialSize.Width,
             WindowInitialSize.Height
         );
 
-        switch (direction)
-        {
-            case WindowResizeDirection.Left:
-                rect.X += dx;
-                rect.Width -= dx;
-                break;
-            case WindowResizeDirection.Right:
-                rect.Width += dx;
-                break;
-            case WindowResizeDirection.Top:
-                rect.Y += dy;
-                rect.Height -= dy;
-                break;
-            case WindowResizeDirection.Bottom:
-                rect.Height += dy;
-                break;
-            case WindowResizeDirection.TopLeft:
-                rect.X += dx;
-                rect.Width -= dx;
-                rect.Y += dy;
-                rect.Height -= dy;
-                break;
-            case WindowResizeDirection.TopRight:
-                rect.Width += dx;
-                rect.Y += dy;
-                rect.Height -= dy;
-                break;
-            case WindowResizeDirection.BottomLeft:
-                rect.X += dx;
-                rect.Width -= dx;
-                rect.Height += dy;
-                break;
-            case WindowResizeDirection.BottomRight:
-                rect.Width += dx;
-                rect.Height += dy;
-                break;
-        }
-
-        // Prevent collapsing to negative or zero size
-        rect.Width = Math.Max(BlazorWindow.MinWidth, rect.Width);
-        rect.Height = Math.Max(BlazorWindow.MinHeight, rect.Height);
+        var keepAspectRatio = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
+        var rect = WindowResizeMath.CalculateBounds(
+            initialBounds,
+            direction,
+            deltaX,
+            deltaY,
+            keepAspectRatio,
+            minSize: new Size(BlazorWindow.MinWidth, BlazorWindow.MinHeight),
+            maxSize: new Size(BlazorWindow.MaxWidth, BlazorWindow.MaxHeight));
         BlazorWindow.SetWindowRect(rect);
     }
 }
