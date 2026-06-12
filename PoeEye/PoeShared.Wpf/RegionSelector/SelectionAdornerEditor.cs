@@ -55,6 +55,9 @@ public class SelectionAdornerEditor : ReactiveControl
     public static readonly DependencyProperty IsBoxSelectionEnabledProperty = DependencyProperty.Register(
         nameof(IsBoxSelectionEnabled), typeof(bool), typeof(SelectionAdornerEditor), new FrameworkPropertyMetadata(true));
 
+    public static readonly DependencyProperty ResetOnFocusLossProperty = DependencyProperty.Register(
+        nameof(ResetOnFocusLoss), typeof(bool), typeof(SelectionAdornerEditor), new PropertyMetadata(true));
+
     public static readonly DependencyProperty ViewTransformProperty = DependencyProperty.Register(
         nameof(ViewTransform), typeof(Matrix), typeof(SelectionAdornerEditor), new PropertyMetadata(default(Matrix)));
 
@@ -156,6 +159,18 @@ public class SelectionAdornerEditor : ReactiveControl
         set => SetValue(IsBoxSelectionEnabledProperty, value);
     }
 
+    /// <summary>
+    /// When true (default, legacy behavior) the editor leaves edit mode as soon as keyboard focus leaves it -
+    /// suitable for editors embedded into a larger window where clicking elsewhere means "never mind".
+    /// Standalone selection OSD windows (e.g. region selection over another application's window) must set this
+    /// to false: there a stray click into another window would otherwise silently cancel the whole selection.
+    /// </summary>
+    public bool ResetOnFocusLoss
+    {
+        get => (bool) GetValue(ResetOnFocusLossProperty);
+        set => SetValue(ResetOnFocusLossProperty, value);
+    }
+
     public Matrix ViewTransform
     {
         get => (Matrix) GetValue(ViewTransformProperty);
@@ -185,7 +200,9 @@ public class SelectionAdornerEditor : ReactiveControl
             PreviewMouseUp += OnPreviewMouseUp;
             PreviewKeyDown += OnPreviewKeyDown;
             Focus();
-            CaptureMouse();
+            // note: the mouse is captured per-drag (button down => up), NOT for the whole edit session -
+            // a blanket capture would redirect clicks aimed at OTHER windows into this editor and turn them
+            // into bogus selections (critical for partial-screen selection OSDs which cover only one window)
 
             return Disposable.Create(() =>
             {
@@ -210,6 +227,9 @@ public class SelectionAdornerEditor : ReactiveControl
             .AddTo(Anchors);
 
         isInEditModeSource
+            .CombineLatest(
+                this.Observe(ResetOnFocusLossProperty, x => x.ResetOnFocusLoss),
+                (isInEditMode, resetOnFocusLoss) => isInEditMode && resetOnFocusLoss)
             .Select(x => x ? keyboardFocusLost : Observable.Empty<bool>())
             .Switch()
             .Subscribe(Reset)
@@ -257,13 +277,13 @@ public class SelectionAdornerEditor : ReactiveControl
             {
                 case MouseButton.Left:
                     e.Handled = true;
-                    
+
                     UpdateSelection();
                     SetCurrentValue(SelectionProjectedProperty, SelectionProjectedTemp);
                     break;
                 case MouseButton.Right:
                     e.Handled = true;
-                    
+
                     Reset();
                     break;
             }
@@ -271,6 +291,7 @@ public class SelectionAdornerEditor : ReactiveControl
         finally
         {
             AnchorPoint = default;
+            ReleaseMouseCapture();
         }
     }
 
@@ -282,8 +303,10 @@ public class SelectionAdornerEditor : ReactiveControl
                 e.Handled = true;
 
                 AnchorPoint = GetMousePosition(e);
+                // capture for the duration of the drag so moves outside the editor keep updating the selection
+                CaptureMouse();
                 UpdateSelection();
-                if (IsBoxSelectionEnabled == false) 
+                if (IsBoxSelectionEnabled == false)
                 {
                     SetCurrentValue(SelectionProjectedProperty, SelectionProjectedTemp);
                 }
@@ -347,6 +370,7 @@ public class SelectionAdornerEditor : ReactiveControl
     {
         AnchorPoint = default;
         IsInEditMode = false;
+        ReleaseMouseCapture();
     }
 
     private static WinRect ToWinRegion(WpfRect rect)
