@@ -70,6 +70,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private readonly SerialDisposable dragAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
     private IntPtr dialogOwnerHandle;
+    private bool isNativeWindowClosingOrClosed;
 
     // Logging throttling: limit certain verbose logs
     private readonly Stopwatch logThrottleStopwatch = Stopwatch.StartNew();
