@@ -8,5 +8,6 @@ using System.Windows;
 [assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]
 [assembly: SupportedOSPlatform("windows")]
 [assembly: InternalsVisibleTo("EyeAuras")]
+[assembly: InternalsVisibleTo("EyeAuras.UI")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
