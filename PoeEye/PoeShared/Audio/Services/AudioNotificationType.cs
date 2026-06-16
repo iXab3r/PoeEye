@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Audio.Services;
+namespace PoeShared.Audio.Services;
 
 public enum AudioNotificationType
 {
