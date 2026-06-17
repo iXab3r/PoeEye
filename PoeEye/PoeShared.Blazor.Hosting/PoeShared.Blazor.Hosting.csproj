@@ -27,7 +27,6 @@
         </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="[7.0.2,)" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
-        <PackageReference Include="System.Management" Version="8.0.0" />
         <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
     </ItemGroup>
 

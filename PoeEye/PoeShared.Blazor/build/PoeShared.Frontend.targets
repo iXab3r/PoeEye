@@ -55,6 +55,7 @@
     <FrontendBuildInputExcludes Condition="'$(FrontendBuildInputExcludes)' == ''">wwwroot\js\**</FrontendBuildInputExcludes>
     <FrontendBuildInputFiles Condition="'$(FrontendBuildInputFiles)' == ''">tsconfig.json;package.json;package-lock.json</FrontendBuildInputFiles>
     <FrontendOutputGlob Condition="'$(FrontendOutputGlob)' == ''">wwwroot\js\**</FrontendOutputGlob>
+    <FrontendRuntimeContentExcludes Condition="'$(FrontendRuntimeContentExcludes)' == ''">wwwroot\**\*.map;wwwroot\**\*.ts;wwwroot\**\*.tsx;wwwroot\**\*.less;wwwroot\**\*.scss;wwwroot\**\*.sass;wwwroot\**\.frontend-build.stamp</FrontendRuntimeContentExcludes>
   </PropertyGroup>
 
   <!--
@@ -69,6 +70,7 @@
     <Watch Include="**\*.tsx" />
     <Content Remove="node_modules\**" />
     <Content Remove="$(FrontendOutputGlob)" />
+    <Content Remove="$(FrontendRuntimeContentExcludes)" />
     <Content Update="tsconfig.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
@@ -116,13 +118,21 @@
     <Message Importance="high" Text="[Frontend] $(MSBuildProjectName): $(FrontendBuildCommand)" />
     <Exec Command="$(FrontendBuildCommand)" />
     <ItemGroup>
-      <JSFiles Include="$(FrontendOutputGlob)" Exclude="$(FrontendBuildStamp)" />
+      <JSFiles Include="$(FrontendOutputGlob)" Exclude="$(FrontendBuildStamp);$(FrontendRuntimeContentExcludes)" />
       <Content Include="@(JSFiles)" />
     </ItemGroup>
     <Message Importance="normal"
              Text="[Frontend] $(MSBuildProjectName): produced %(JSFiles.Identity)"
              Condition="'$(FrontendVerbose)' == 'true' and '@(JSFiles)' != ''" />
     <Touch Files="$(FrontendBuildStamp)" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="PoeSharedFrontendTrimStaticWebAssetDiscoveryPatterns"
+          Label="PoeShared Frontend Static Web Asset Cleanup"
+          AfterTargets="ResolveProjectStaticWebAssets">
+    <ItemGroup>
+      <StaticWebAssetDiscoveryPattern Remove="$(PackageId)\wwwroot" />
+    </ItemGroup>
   </Target>
 
   <!-- Tests stay opt-in for local work and are expected to run by default in CI. -->

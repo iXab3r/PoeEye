@@ -35,8 +35,6 @@
             <ExcludeAssets>runtime</ExcludeAssets>
             <IncludeAssets>All</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Management" Version="8.0.0">
-        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
