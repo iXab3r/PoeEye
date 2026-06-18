@@ -15,7 +15,6 @@ using PInvoke;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Logging;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using Color = System.Windows.Media.Color;
@@ -301,7 +300,7 @@ partial class NativeWindow
                         break;
                     }
 
-                    var overlayMode = command.IsClickThrough ? OverlayMode.Transparent : OverlayMode.Layered;
+                    var overlayMode = command.IsClickThrough ? BlazorWindowOverlayMode.Transparent : BlazorWindowOverlayMode.Layered;
                     Log.Debug($"Updating OverlayMode to {overlayMode}");
                     window.SetOverlayMode(overlayMode);
                     break;

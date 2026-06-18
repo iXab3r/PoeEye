@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Services;
-using PoeShared.Native;
 
 namespace PoeShared.Blazor.Wpf;
 

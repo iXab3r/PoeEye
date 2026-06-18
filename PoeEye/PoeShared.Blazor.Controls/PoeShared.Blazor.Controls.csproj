@@ -14,6 +14,7 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj" />
+        <ProjectReference Include="..\PropertyBinder\PropertyBinder.csproj" />
         <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     </ItemGroup>
 

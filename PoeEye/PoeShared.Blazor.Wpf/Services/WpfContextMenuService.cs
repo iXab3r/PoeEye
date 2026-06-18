@@ -24,7 +24,6 @@ using PoeShared.Blazor.Controls.Scaffolding;
 using PoeShared.Blazor.Services;
 using PoeShared.Blazor.Wpf.Scaffolding;
 using PoeShared.Logging;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 using Image = System.Windows.Controls.Image;
 using MenuItem = System.Windows.Controls.MenuItem;

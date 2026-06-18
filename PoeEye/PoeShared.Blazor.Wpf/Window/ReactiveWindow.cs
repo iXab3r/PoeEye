@@ -6,7 +6,6 @@ using System.Windows.Automation.Peers;
 using System.Windows.Interop;
 using PoeShared.Blazor.Scaffolding;
 using PoeShared.Blazor.Wpf.Scaffolding;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf;
@@ -94,19 +93,19 @@ internal class ReactiveWindow : Window, IDisposableReactiveObject
         }
     }
 
-    public void SetOverlayMode(OverlayMode mode)
+    public void SetOverlayMode(BlazorWindowOverlayMode mode)
     {
-        if (AllowsTransparencyAfterLoad == false && mode == OverlayMode.Transparent)
+        if (AllowsTransparencyAfterLoad == false && mode == BlazorWindowOverlayMode.Transparent)
         {
             throw new InvalidOperationException("Transparent mode requires AllowsTransparency to be set to True");
         }
 
         switch (mode)
         {
-            case OverlayMode.Layered:
+            case BlazorWindowOverlayMode.Layered:
                 MakeLayered();
                 break;
-            case OverlayMode.Transparent:
+            case BlazorWindowOverlayMode.Transparent:
                 MakeTransparent();
                 break;
         }

@@ -8,6 +8,7 @@
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <UseWpf>true</UseWpf>
+        <UseWindowsForms>true</UseWindowsForms>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <RazorClassLibrary>true</RazorClassLibrary>
         <EnableDefaultContentItems>true<!-- Important for Blazor Scoped CSS --></EnableDefaultContentItems>
@@ -18,7 +19,6 @@
         <ProjectReference Include="..\maui\src\BlazorWebView\src\Wpf\Microsoft.AspNetCore.Components.WebView.Wpf.csproj"/>
         <ProjectReference Include="..\PoeShared.Blazor.Controls\PoeShared.Blazor.Controls.csproj" />
         <ProjectReference Include="..\PoeShared.Blazor\PoeShared.Blazor.csproj"/>
-        <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj"/>
         <ProjectReference Include="..\PoeShared\PoeShared.csproj"/>
         <ProjectReference Include="..\PoeShared.Blazor.Hosting\PoeShared.Blazor.Hosting.csproj" />
     </ItemGroup>
@@ -31,6 +31,8 @@
         </PackageReference>
         <PackageReference Include="PInvoke.SHCore" Version="0.6.49">
         </PackageReference>
+        <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
+        <PackageReference Include="Windows-Forms-Aero" Version="3.1.1" />
         <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" PrivateAssets="All">
             <ExcludeAssets>runtime</ExcludeAssets>
             <IncludeAssets>All</IncludeAssets>

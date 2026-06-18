@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shell;
 using PoeShared.Logging;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf;

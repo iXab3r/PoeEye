@@ -1,42 +1,33 @@
 ﻿using System;
-using JetBrains.Annotations;
 using Microsoft.Web.WebView2.Core;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
-using PropertyBinder;
 
 namespace PoeShared.Blazor.Wpf;
 
 internal sealed class WebViewAccessor : DisposableReactiveObject, IWebViewAccessor
 {
-    private static readonly Binder<WebViewAccessor> Binder = new();
-
     private static readonly Lazy<WebViewAccessor> InstanceSupplier = new();
     private static readonly IFluentLog Log = typeof(WebViewAccessor).PrepareLogger();
-
-    static WebViewAccessor()
-    {
-        Binder.Bind(x => GetInstallTypeFromVersion(x.AvailableBrowserVersion)).To(x => x.InstallType);
-        Binder.Bind(x => x.InstallType != WebViewInstallType.NotInstalled).To(x => x.IsInstalled);
-    }
 
     public WebViewAccessor()
     {
         Refresh();
-        Binder.Attach(this).AddTo(Anchors);
     }
 
     public static WebViewAccessor Instance => InstanceSupplier.Value;
 
-    public bool IsInstalled { get; [UsedImplicitly] set; }
+    public bool IsInstalled { get; private set; }
 
-    public string AvailableBrowserVersion { get; [UsedImplicitly] private set; }
+    public string AvailableBrowserVersion { get; private set; }
 
-    public WebViewInstallType InstallType { get; [UsedImplicitly] private set; }
+    public WebViewInstallType InstallType { get; private set; }
 
     public void Refresh()
     {
         AvailableBrowserVersion = GetAvailableBrowserVersionString();
+        InstallType = GetInstallTypeFromVersion(AvailableBrowserVersion);
+        IsInstalled = InstallType != WebViewInstallType.NotInstalled;
     }
 
     public static WebViewInstallType GetInstallTypeFromVersion(string version)
