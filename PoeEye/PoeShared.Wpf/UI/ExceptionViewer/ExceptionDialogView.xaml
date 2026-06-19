@@ -3,172 +3,302 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:eye="clr-namespace:PoeShared.UI"
         xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
-        xmlns:st="http://schemas.spicytaco.io/"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        xmlns:eyeConverters="clr-namespace:PoeShared.Converters"
         mc:Ignorable="d"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Foreground="{DynamicResource PrimaryHueMidBrush}"
+        FontFamily="Segoe UI"
+        FontSize="13"
+        Foreground="#FF1F2933"
+        Background="#FFF7F8FA"
         ResizeMode="CanResize"
         WindowStyle="SingleBorderWindow"
         ShowActivated="True"
         WindowStartupLocation="CenterOwner"
         WindowState="Normal"
         SizeToContent="Manual"
-        MinWidth="400"
-        MinHeight="200"
-        Width="700"
-        Height="400"
-        Title="{Binding Title}" d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
+        MinWidth="640"
+        MinHeight="380"
+        Width="860"
+        Height="520"
+        Title="{Binding Title}"
+        d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
     <Window.Icon>
         <BitmapImage UriSource="pack://application:,,,/PoeShared.Wpf;component/Resources/exception.png" />
     </Window.Icon>
+
     <Window.Resources>
-        <eye:SharedResourceDictionary>
-            <eye:SharedResourceDictionary.MergedDictionaries>
-                <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
-            </eye:SharedResourceDictionary.MergedDictionaries>
+        <SolidColorBrush x:Key="DialogBackgroundBrush" Color="#FFF7F8FA" />
+        <SolidColorBrush x:Key="DialogSurfaceBrush" Color="#FFFFFFFF" />
+        <SolidColorBrush x:Key="DialogSubtleSurfaceBrush" Color="#FFF1F3F6" />
+        <SolidColorBrush x:Key="DialogBorderBrush" Color="#FFD4D9E2" />
+        <SolidColorBrush x:Key="DialogAccentBrush" Color="#FF0A84FF" />
+        <SolidColorBrush x:Key="DialogAccentHoverBrush" Color="#FF006DDB" />
+        <SolidColorBrush x:Key="DialogAccentPressedBrush" Color="#FF005CB8" />
+        <SolidColorBrush x:Key="DialogForegroundBrush" Color="#FF1F2933" />
+        <SolidColorBrush x:Key="DialogMutedForegroundBrush" Color="#FF627183" />
+        <SolidColorBrush x:Key="DialogButtonHoverBrush" Color="#FFE8F2FF" />
 
-            <DataTemplate x:Key="ExceptionDialogItemPreview" DataType="{x:Type eye:ExceptionDialogSelectableItem}">
-                <Grid>
-                    <ScrollViewer CanContentScroll="True" 
-                                  VerticalScrollBarVisibility="Auto" 
-                                  HorizontalScrollBarVisibility="Auto"
-                                  x:Name="SelectedItemDescription">
-                        <TextBox
-                            Height="NaN"
-                            VerticalContentAlignment="Stretch"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            IsReadOnly="True"
-                            IsReadOnlyCaretVisible="True"
-                            Text="{Binding Item.Description, Mode=OneWay}" />
+        <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
+        <eyeConverters:DataSizeToHumanReadableStringConverter x:Key="DataSizeToHumanReadableStringConverter" />
+        <BooleanToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter" />
+
+        <Style x:Key="DialogTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{StaticResource DialogForegroundBrush}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="DialogSecondaryTextBlockStyle"
+               TargetType="{x:Type TextBlock}"
+               BasedOn="{StaticResource DialogTextBlockStyle}">
+            <Setter Property="Foreground" Value="{StaticResource DialogMutedForegroundBrush}" />
+        </Style>
+
+        <Style x:Key="DialogTextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="{StaticResource DialogForegroundBrush}" />
+            <Setter Property="Background" Value="{StaticResource DialogSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource DialogBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+
+        <Style x:Key="DialogButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="MinWidth" Value="88" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Padding" Value="12,4" />
+            <Setter Property="Foreground" Value="{StaticResource DialogForegroundBrush}" />
+            <Setter Property="Background" Value="{StaticResource DialogSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource DialogBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource DialogButtonHoverBrush}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource DialogAccentBrush}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FFDCEBFF" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Cursor" Value="Arrow" />
+                    <Setter Property="Opacity" Value="0.55" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DialogPrimaryButtonStyle"
+               TargetType="{x:Type Button}"
+               BasedOn="{StaticResource DialogButtonStyle}">
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="Background" Value="{StaticResource DialogAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource DialogAccentBrush}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource DialogAccentHoverBrush}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource DialogAccentHoverBrush}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource DialogAccentPressedBrush}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource DialogAccentPressedBrush}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Cursor" Value="Arrow" />
+                    <Setter Property="Opacity" Value="0.55" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DialogListBoxStyle" TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="{StaticResource DialogSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource DialogBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+
+        <Style x:Key="DialogListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <DataTemplate x:Key="ExceptionDialogItemPreview"
+                      DataType="{x:Type eye:ExceptionDialogSelectableItem}">
+            <Grid Background="{StaticResource DialogSurfaceBrush}">
+                <ScrollViewer x:Name="SelectedItemDescription"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Auto">
+                    <TextBox Style="{StaticResource DialogTextBoxStyle}"
+                             Margin="0"
+                             BorderThickness="0"
+                             IsReadOnly="True"
+                             IsReadOnlyCaretVisible="True"
+                             Text="{Binding Item.Description, Mode=OneWay}" />
+                </ScrollViewer>
+                <Border x:Name="SelectedItemImageHost"
+                        Background="{StaticResource DialogSurfaceBrush}"
+                        Visibility="Collapsed">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Auto">
+                        <Image Margin="8"
+                               MinWidth="128"
+                               MinHeight="128"
+                               Stretch="Uniform"
+                               Source="{Binding Item.Attachment.FullName}" />
                     </ScrollViewer>
-                    <Image x:Name="SelectedItemImage" Margin="1" MinWidth="128" MinHeight="128" />
-                </Grid>
-                <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding IsImage}" Value="True">
-                        <Setter TargetName="SelectedItemImage" Property="Source" Value="{Binding Item.Attachment.FullName}" />
-                        <Setter TargetName="SelectedItemDescription" Property="Visibility" Value="Collapsed" />
-                        <Setter TargetName="SelectedItemImage" Property="Visibility" Value="Visible" />
-                    </DataTrigger>
-                </DataTemplate.Triggers>
-            </DataTemplate>
-
-            <!-- Custom template for CommentTextBox to ensure proper scrollbars in this dialog -->
-            <ControlTemplate x:Key="ExceptionDialogTextBoxTemplate" TargetType="{x:Type TextBox}">
-                <Border BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        Background="{TemplateBinding Background}"
-                        SnapsToDevicePixels="True">
-                    <ScrollViewer x:Name="PART_ContentHost"
-                                  Focusable="False"
-                                  HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                                  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
                 </Border>
-            </ControlTemplate>
-        </eye:SharedResourceDictionary>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsImage}" Value="True">
+                    <Setter TargetName="SelectedItemDescription" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="SelectedItemImageHost" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ExceptionDialogAttachmentTemplate"
+                      DataType="{x:Type eye:ExceptionDialogSelectableItem}">
+            <Grid Background="Transparent"
+                  ToolTip="{Binding Item.Attachment.Length, Converter={StaticResource DataSizeToHumanReadableStringConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Column="0"
+                          Margin="8,5,6,5"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding IsChecked}" />
+                <StackPanel Grid.Column="1" Margin="0,5,8,5">
+                    <TextBlock Style="{StaticResource DialogTextBlockStyle}"
+                               Text="{Binding Item.Attachment.Name}" />
+                    <TextBlock Style="{StaticResource DialogSecondaryTextBlockStyle}"
+                               FontSize="11"
+                               Text="{Binding Item.Attachment.Length, Converter={StaticResource DataSizeToHumanReadableStringConverter}}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
 
-    <Grid Margin="5">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" MinHeight="55" />
-            <RowDefinition Height="*" MinHeight="120" />
+            <RowDefinition Height="84" />
+            <RowDefinition Height="*" MinHeight="180" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <st:StackPanel Orientation="Horizontal">
-            <TextBlock Text="Comment on what were you doing when the problem occurred" />
-            <TextBlock st:StackPanel.Fill="Fill"
-                       Text="{Binding Config.Timestamp}"
-                       HorizontalAlignment="Right" />
-        </st:StackPanel>
-
-        <Border Grid.Row="1" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Margin="0,5">
-            <TextBox wpf:FocusHelper.IsFocused="True"
-                     x:Name="CommentTextBox"
-                     Template="{StaticResource ExceptionDialogTextBoxTemplate}"
-                     AcceptsReturn="True"
-                     TextWrapping="Wrap"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Stretch"
-                     VerticalContentAlignment="Stretch"
-                     Height="60"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     Text="{Binding Comment, Mode=TwoWay}" />
-        </Border>
-
-        <Grid Grid.Row="2" IsEnabled="{Binding SaveReportCommand.IsBusy, Converter={StaticResource NotConverter}}">
+        <Grid Grid.Row="0" Margin="0,0,0,6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MinWidth="100" MaxWidth="300" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       Style="{StaticResource DialogTextBlockStyle}"
+                       Text="What were you doing when this problem occurred?" />
+            <TextBlock Grid.Column="1"
+                       Style="{StaticResource DialogSecondaryTextBlockStyle}"
+                       Margin="16,0,0,0"
+                       Text="{Binding Config.Timestamp}" />
+        </Grid>
+
+        <TextBox Grid.Row="1"
+                 wpf:FocusHelper.IsFocused="True"
+                 x:Name="CommentTextBox"
+                 Style="{StaticResource DialogTextBoxStyle}"
+                 Text="{Binding Comment, Mode=TwoWay}" />
+
+        <Grid Grid.Row="2"
+              Margin="0,10,0,10"
+              IsEnabled="{Binding SaveReportCommand.IsBusy, Converter={StaticResource NotConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" MinWidth="180" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" MinWidth="220" />
             </Grid.ColumnDefinitions>
 
-            <ListBox Grid.Column="0" ItemsSource="{Binding Attachments}"
-                     SelectedItem="{Binding SelectedItem}"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     Grid.IsSharedSizeScope="True">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type eye:ExceptionDialogSelectableItem}">
-                        <Grid Background="Transparent" ToolTip="{Binding Item.Attachment.Length, Converter={StaticResource DataSizeToHumanReadableStringConverter}}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" SharedSizeGroup="FileName" />
-                            </Grid.ColumnDefinitions>
+            <ListBox Grid.Column="0"
+                     Style="{StaticResource DialogListBoxStyle}"
+                     ItemContainerStyle="{StaticResource DialogListBoxItemStyle}"
+                     ItemTemplate="{StaticResource ExceptionDialogAttachmentTemplate}"
+                     ItemsSource="{Binding Attachments}"
+                     SelectedItem="{Binding SelectedItem}" />
 
-                            <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" />
-                            <TextBlock Grid.Column="1" Text="{Binding Item.Attachment.Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <GridSplitter Grid.Column="1"
+                          Width="8"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          Background="Transparent" />
 
-            <Border Grid.Column="1" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1">
-                <eye:CachedContentControl Content="{Binding SelectedItem}"
-                                          ContentTemplate="{StaticResource ExceptionDialogItemPreview}" />
+            <Border Grid.Column="2"
+                    Background="{StaticResource DialogSurfaceBrush}"
+                    BorderBrush="{StaticResource DialogBorderBrush}"
+                    BorderThickness="1">
+                <ContentControl Content="{Binding SelectedItem}"
+                                ContentTemplate="{StaticResource ExceptionDialogItemPreview}" />
             </Border>
         </Grid>
 
-        <st:StackPanel Grid.Row="3" Orientation="Horizontal" MarginBetweenChildren="5" Margin="5">
-            <ProgressBar Style="{StaticResource FastCircularProgressBar}"
-                         Value="0"
-                         Width="22"
-                         st:StackPanel.Fill="Auto"
-                         HorizontalAlignment="Left" VerticalAlignment="Center"
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ProgressBar Grid.Column="0"
+                         Width="120"
+                         Height="6"
+                         Margin="0,0,10,0"
+                         VerticalAlignment="Center"
+                         Foreground="{StaticResource DialogAccentBrush}"
+                         Background="{StaticResource DialogSubtleSurfaceBrush}"
+                         BorderBrush="{StaticResource DialogBorderBrush}"
                          IsIndeterminate="True"
                          Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
-            <eye:ButtonEx
-                Command="{Binding CopyStatusToClipboard}"
-                HideIfDisabled="True"
-                ToolTip="Copy to clipboard"
-                Icon="&#xf0c5;" />
-            <TextBlock Text="{Binding Status}" 
-                       TextTrimming="CharacterEllipsis"
-                       FontWeight="Bold"
-                       st:StackPanel.Fill="Fill" />
-            <eye:ButtonEx
-                MinWidth="80"
-                HideIfDisabled="True"
-                Command="{Binding SaveReportCommand}"
-                Icon="&#xf0c7;"
-                Content="Save..." />
-            <eye:ButtonEx
-                MinWidth="100"
-                HideIfDisabled="True"
-                Command="{Binding SendReportCommand}"
-                Icon="&#xf1d8;"
-                Content="Send" />
-            <eye:ButtonEx Command="{Binding CloseCommand}"
-                          MinWidth="100"
-                          Content="Close" />
-        </st:StackPanel>
+
+            <TextBlock Grid.Column="1"
+                       Style="{StaticResource DialogSecondaryTextBlockStyle}"
+                       FontWeight="SemiBold"
+                       Text="{Binding Status}" />
+
+            <Button Grid.Column="2"
+                    Style="{StaticResource DialogButtonStyle}"
+                    MinWidth="76"
+                    Content="Copy"
+                    Command="{Binding CopyStatusToClipboard}" />
+
+            <Button Grid.Column="3"
+                    Style="{StaticResource DialogButtonStyle}"
+                    Content="Save..."
+                    Command="{Binding SaveReportCommand}" />
+
+            <Button Grid.Column="4"
+                    Style="{StaticResource DialogPrimaryButtonStyle}"
+                    Content="Send"
+                    Command="{Binding SendReportCommand}" />
+
+            <Button Grid.Column="5"
+                    Style="{StaticResource DialogButtonStyle}"
+                    Content="Close"
+                    IsCancel="True"
+                    Click="CloseButton_OnClick" />
+        </Grid>
     </Grid>
 </Window>
