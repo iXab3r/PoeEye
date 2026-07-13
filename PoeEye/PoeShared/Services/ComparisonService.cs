@@ -7,7 +7,6 @@ namespace PoeShared.Services;
 
 internal sealed class ComparisonService : IComparisonService
 {
-    private readonly IConfigSerializer configSerializer;
     private static readonly IFluentLog Log = typeof(ComparisonService).PrepareLogger();
 
     private readonly ComparisonConfig diffLogicConfig = new ComparisonConfig
@@ -37,7 +36,7 @@ internal sealed class ComparisonService : IComparisonService
 
     public ComparisonService(IConfigSerializer configSerializer)
     {
-        this.configSerializer = configSerializer;
+        _ = configSerializer;
         diffLogic = new CompareLogic(diffLogicConfig);
     }
 
@@ -48,19 +47,10 @@ internal sealed class ComparisonService : IComparisonService
             var result = diffLogic.Compare(first, second);
             return result;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            var extendedLogger = Log.WithMaxLineLength(int.MaxValue);
-            try
-            {
-                extendedLogger.Warn($"Failed to perform comparison of two objects:\nFirst({first.GetType()}):\n{first}\n\nSecond({second.GetType()}):\n{second}");
-                extendedLogger.Warn($"JSON dump of first object:\n{configSerializer.Serialize(first)}");
-                extendedLogger.Warn($"JSON dump of second object:\n{configSerializer.Serialize(second)}");
-            }
-            catch (Exception exception)
-            {
-                extendedLogger.Warn("Failed to perform dump of failed comparison", exception);
-            }
+            Log.Warn(
+                $"Failed to compare objects of types '{first?.GetType().FullName ?? "NULL"}' and '{second?.GetType().FullName ?? "NULL"}', error type: '{exception.GetType().FullName}'");
             throw;
         }
     }
@@ -74,9 +64,10 @@ internal sealed class ComparisonService : IComparisonService
             var diff = new CompareLogic(config);
             return diff.Compare(first, second);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            Log.Error($"Failed to perform comparison of two objects with custom configuration:\nFirst({first.GetType()}):\n{first}\n\nSecond({second.GetType()}):\n{second}", e);
+            Log.Error(
+                $"Failed to compare objects with custom configuration, types: '{first?.GetType().FullName ?? "NULL"}' and '{second?.GetType().FullName ?? "NULL"}', error type: '{exception.GetType().FullName}'");
             throw;
         }
     }
