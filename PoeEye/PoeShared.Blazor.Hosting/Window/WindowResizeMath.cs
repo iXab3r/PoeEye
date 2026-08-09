@@ -15,8 +15,8 @@ public static class WindowResizeMath
     /// <list type="number">
     /// <item>The edges referenced by <paramref name="direction"/> are moved by the deltas.</item>
     /// <item>When <paramref name="keepAspectRatio"/> is set, the size is constrained to the aspect ratio of
-    /// <paramref name="initialBounds"/>: corner drags scale proportionally along the dominant axis, edge drags
-    /// derive the other dimension from the dragged one.</item>
+    /// <paramref name="initialBounds"/>: corner drags use width for landscape bounds and height for portrait bounds,
+    /// while edge drags derive the other dimension from the dragged one.</item>
     /// <item>The size is clamped to <paramref name="minSize"/>/<paramref name="maxSize"/> (components &lt;= 0 mean "no limit";
     /// size never collapses below 1x1).</item>
     /// <item>The edges NOT being dragged are anchored: e.g. dragging the left edge keeps the right edge in place
@@ -88,7 +88,7 @@ public static class WindowResizeMath
     /// <summary>
     /// Constrains <paramref name="size"/> to the aspect ratio of <paramref name="initialSize"/>:
     /// for edge drags the dragged dimension wins and the other one is derived from it,
-    /// for corner drags both dimensions are scaled proportionally along the dominant (most-changed) axis.
+    /// while corner drags use width for landscape bounds and height for portrait bounds.
     /// </summary>
     public static Size ConstrainAspectRatio(Size size, Size initialSize, WindowResizeDirection direction)
     {
@@ -119,7 +119,7 @@ public static class WindowResizeMath
             {
                 var scaleX = size.Width / (double) initialSize.Width;
                 var scaleY = size.Height / (double) initialSize.Height;
-                var scale = Math.Abs(scaleX - 1) >= Math.Abs(scaleY - 1) ? scaleX : scaleY;
+                var scale = aspectRatio >= 1 ? scaleX : scaleY;
                 return new Size(
                     Math.Max(1, (int) Math.Round(initialSize.Width * scale)),
                     Math.Max(1, (int) Math.Round(initialSize.Height * scale)));

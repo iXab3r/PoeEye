@@ -183,6 +183,12 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
             return;
         }
 
+        if (hasLastCursorPosition && current == lastCursorPosition)
+        {
+            lastMouseMoveAt = now;
+            return;
+        }
+
         if (draggingStarted && lastMouseMoveAt != DateTimeOffset.MinValue)
         {
             var gap = now - lastMouseMoveAt;
