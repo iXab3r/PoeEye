@@ -36,7 +36,7 @@ namespace PoeShared.Blazor.Wpf;
 /// Things to note:
 /// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
 /// </summary>
-internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativeWindow, IBlazorWindowMetroController, IBlazorWindowAutomationIdentity
+internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativeWindow, IWindowAspectRatioController, IBlazorWindowMetroController, IBlazorWindowAutomationIdentity
 {
     private static readonly Color DefaultBackgroundColor = Color.FromArgb(0xFF, 0x42, 0x42, 0x42);
 
@@ -50,6 +50,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private readonly PropertyValueHolder<int> windowWidth;
     private readonly PropertyValueHolder<int> windowTop;
     private readonly PropertyValueHolder<int> windowHeight;
+    private readonly PropertyValueHolder<double?> windowTargetAspectRatio;
     private readonly PropertyValueHolder<string> windowTitle;
 
     private readonly PropertyValueHolder<int> windowMinWidth;
@@ -121,6 +122,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         windowTop = new PropertyValueHolder<int>(this, nameof(Top)).AddTo(Anchors);
         windowWidth = new PropertyValueHolder<int>(this, nameof(Width)).AddTo(Anchors);
         windowHeight = new PropertyValueHolder<int>(this, nameof(Height)).AddTo(Anchors);
+        windowTargetAspectRatio = new PropertyValueHolder<double?>(this, nameof(TargetAspectRatio)).AddTo(Anchors);
         windowTitle = new PropertyValueHolder<string>(this, nameof(Title)).AddTo(Anchors);
         windowMinWidth = new PropertyValueHolder<int>(this, nameof(MinWidth)).AddTo(Anchors);
         windowMinHeight = new PropertyValueHolder<int>(this, nameof(MinHeight)).AddTo(Anchors);
@@ -435,13 +437,52 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     public int Width
     {
         get => windowWidth.State.Value;
-        set => windowWidth.SetValue(value, TrackedPropertyUpdateSource.External);
+        set
+        {
+            var aspectRatio = TargetAspectRatio;
+            if (aspectRatio is > 0 && value > 0)
+            {
+                SetAspectConstrainedSize(new Size(value, Math.Max(1, (int) Math.Round(value / aspectRatio.Value))));
+                return;
+            }
+
+            windowWidth.SetValue(value, TrackedPropertyUpdateSource.External);
+        }
     }
 
     public int Height
     {
         get => windowHeight.State.Value;
-        set => windowHeight.SetValue(value, TrackedPropertyUpdateSource.External);
+        set
+        {
+            var aspectRatio = TargetAspectRatio;
+            if (aspectRatio is > 0 && value > 0)
+            {
+                SetAspectConstrainedSize(new Size(Math.Max(1, (int) Math.Round(value * aspectRatio.Value)), value));
+                return;
+            }
+
+            windowHeight.SetValue(value, TrackedPropertyUpdateSource.External);
+        }
+    }
+
+    public double? TargetAspectRatio
+    {
+        get => windowTargetAspectRatio.State.Value;
+        set
+        {
+            var normalizedValue = value is > 0 && double.IsFinite(value.Value) ? value : null;
+            if (windowTargetAspectRatio.State.Value == normalizedValue)
+            {
+                return;
+            }
+
+            windowTargetAspectRatio.SetValue(normalizedValue, TrackedPropertyUpdateSource.Internal);
+            if (normalizedValue is > 0 && Width > 0)
+            {
+                SetAspectConstrainedSize(new Size(Width, Math.Max(1, (int) Math.Round(Width / normalizedValue.Value))));
+            }
+        }
     }
 
     public int MinWidth
@@ -663,6 +704,21 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         windowWidth.SetValue(windowSize.Width, TrackedPropertyUpdateSource.Internal);
         windowHeight.SetValue(windowSize.Height, TrackedPropertyUpdateSource.Internal);
         EnqueueUpdate(new SetWindowSizeCommand(windowSize));
+    }
+
+    private void SetAspectConstrainedSize(Size windowSize)
+    {
+        if (Width == windowSize.Width && Height == windowSize.Height)
+        {
+            return;
+        }
+
+        windowWidth.SetValue(windowSize.Width, TrackedPropertyUpdateSource.Internal);
+        windowHeight.SetValue(windowSize.Height, TrackedPropertyUpdateSource.Internal);
+        if (windowSupplier.IsValueCreated)
+        {
+            EnqueueUpdate(new SetWindowSizeCommand(windowSize));
+        }
     }
 
     public void SetWindowPos(Point windowPos)

@@ -7,9 +7,10 @@ namespace PoeShared.Blazor.Wpf;
 /// Implements the default window resize behavior for a <see cref="INativeWindow"/>, enabling the window
 /// to be resized by dragging edges/corners.
 /// <para>
-/// While SHIFT is held during the drag, the new size is constrained to the aspect ratio the window had
-/// when the drag started (corner drags scale proportionally, edge drags derive the other dimension);
-/// releasing SHIFT mid-drag returns to free resizing. Min/Max window size limits are always honored,
+/// The new size is constrained to the aspect ratio the window had when the drag started while SHIFT is held,
+/// or whenever the window exposes an enabled <see cref="IWindowAspectRatioController"/>. Corner drags scale
+/// proportionally and edge drags derive the other dimension; releasing SHIFT mid-drag returns to free resizing
+/// when no window-level constraint is enabled. Min/Max window size limits are always honored,
 /// and the edges opposite to the dragged ones stay anchored (see <see cref="WindowResizeMath"/>).
 /// </para>
 /// </summary>
@@ -48,7 +49,8 @@ public class BlazorWindowEdgeResizeController : BlazorWindowMouseDragControllerB
             WindowInitialSize.Height
         );
 
-        var keepAspectRatio = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
+        var keepAspectRatio = BlazorWindow is IWindowAspectRatioController { TargetAspectRatio: > 0 }
+                              || (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
         var rect = WindowResizeMath.CalculateBounds(
             initialBounds,
             direction,
