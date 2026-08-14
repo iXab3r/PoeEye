@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -20,6 +21,7 @@ internal partial class BlazorWindow
         private readonly BlazorWindow owner;
         private readonly SerialDisposable bodyAutomationRegistrationAnchor;
         private readonly SerialDisposable titleBarAutomationRegistrationAnchor;
+        private bool wasMinimized;
 
         public BlazorWindowView(BlazorWindow owner) : base(owner)
         {
@@ -32,6 +34,7 @@ internal partial class BlazorWindow
             InitializeAutomationBinding();
             BodyHost.Child = BodyContentControl;
             ApplyInitialTitleBarDisplayMode();
+            InitializeWebViewRestoreRecovery();
 
             Anchors.Add(() =>
             {
@@ -101,6 +104,41 @@ internal partial class BlazorWindow
                     })
                 .SubscribeSafe(x => UpdateAutomationRegistration(x.Container, x.AutomationId), Log.HandleUiException)
                 .AddTo(Anchors);
+        }
+
+        private void InitializeWebViewRestoreRecovery()
+        {
+            Observable
+                .FromEventPattern<EventHandler, EventArgs>(h => StateChanged += h, h => StateChanged -= h)
+                .Select(_ => WindowState)
+                .Subscribe(windowState =>
+                {
+                    if (windowState == WindowState.Minimized)
+                    {
+                        wasMinimized = true;
+                        return;
+                    }
+
+                    if (!wasMinimized)
+                    {
+                        return;
+                    }
+
+                    wasMinimized = false;
+                    Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ResynchronizeWebViewHosts));
+                })
+                .AddTo(Anchors);
+        }
+
+        private void ResynchronizeWebViewHosts()
+        {
+            if (Anchors.IsDisposed || WindowState == WindowState.Minimized)
+            {
+                return;
+            }
+
+            BodyContentControl.WebView.WebView?.UpdateWindowPos();
+            TitleBarContentControl.WebView.WebView?.UpdateWindowPos();
         }
 
         private void UpdateAutomationRegistration(IUnityContainer container, string automationId)
