@@ -442,8 +442,8 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             var aspectRatio = TargetAspectRatio;
             if (aspectRatio is > 0 && value > 0)
             {
-                SetAspectConstrainedSize(new Size(value, Math.Max(1, (int) Math.Round(value / aspectRatio.Value))));
-                return;
+                var derivedHeight = Math.Max(1, (int) Math.Round(value / aspectRatio.Value));
+                windowHeight.SetValue(derivedHeight, TrackedPropertyUpdateSource.Internal);
             }
 
             windowWidth.SetValue(value, TrackedPropertyUpdateSource.External);
@@ -458,8 +458,8 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             var aspectRatio = TargetAspectRatio;
             if (aspectRatio is > 0 && value > 0)
             {
-                SetAspectConstrainedSize(new Size(Math.Max(1, (int) Math.Round(value * aspectRatio.Value)), value));
-                return;
+                var derivedWidth = Math.Max(1, (int) Math.Round(value * aspectRatio.Value));
+                windowWidth.SetValue(derivedWidth, TrackedPropertyUpdateSource.Internal);
             }
 
             windowHeight.SetValue(value, TrackedPropertyUpdateSource.External);
@@ -477,10 +477,10 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
                 return;
             }
 
-            windowTargetAspectRatio.SetValue(normalizedValue, TrackedPropertyUpdateSource.Internal);
+            windowTargetAspectRatio.SetValue(normalizedValue, TrackedPropertyUpdateSource.External);
             if (normalizedValue is > 0 && Width > 0)
             {
-                SetAspectConstrainedSize(new Size(Width, Math.Max(1, (int) Math.Round(Width / normalizedValue.Value))));
+                ApplyInternallyConstrainedSize(new Size(Width, Math.Max(1, (int) Math.Round(Width / normalizedValue.Value))));
             }
         }
     }
@@ -706,13 +706,15 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         EnqueueUpdate(new SetWindowSizeCommand(windowSize));
     }
 
-    private void SetAspectConstrainedSize(Size windowSize)
+    private void ApplyInternallyConstrainedSize(Size windowSize)
     {
         if (Width == windowSize.Width && Height == windowSize.Height)
         {
             return;
         }
 
+        // This full size is policy-derived, so this method owns its single native command.
+        // Scalar Width/Height setters must keep the requested axis External instead.
         windowWidth.SetValue(windowSize.Width, TrackedPropertyUpdateSource.Internal);
         windowHeight.SetValue(windowSize.Height, TrackedPropertyUpdateSource.Internal);
         if (windowSupplier.IsValueCreated)
