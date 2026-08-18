@@ -2,7 +2,6 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Threading;
 using PoeShared.Blazor.Wpf.Automation;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -21,7 +20,7 @@ internal partial class BlazorWindow
         private readonly BlazorWindow owner;
         private readonly SerialDisposable bodyAutomationRegistrationAnchor;
         private readonly SerialDisposable titleBarAutomationRegistrationAnchor;
-        private bool wasMinimized;
+        private bool webViewsHiddenForMinimize;
 
         public BlazorWindowView(BlazorWindow owner) : base(owner)
         {
@@ -108,6 +107,8 @@ internal partial class BlazorWindow
 
         private void InitializeWebViewRestoreRecovery()
         {
+            // WebView2 child HWNDs do not receive top-level minimize/restore notifications.
+            // Changing effective WPF visibility makes HwndHost hide and show them explicitly.
             Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => StateChanged += h, h => StateChanged -= h)
                 .Select(_ => WindowState)
@@ -115,30 +116,30 @@ internal partial class BlazorWindow
                 {
                     if (windowState == WindowState.Minimized)
                     {
-                        wasMinimized = true;
+                        if (!webViewsHiddenForMinimize)
+                        {
+                            webViewsHiddenForMinimize = true;
+                            SetWebViewVisibility(Visibility.Hidden);
+                        }
+
                         return;
                     }
 
-                    if (!wasMinimized)
+                    if (!webViewsHiddenForMinimize)
                     {
                         return;
                     }
 
-                    wasMinimized = false;
-                    Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ResynchronizeWebViewHosts));
+                    webViewsHiddenForMinimize = false;
+                    SetWebViewVisibility(Visibility.Visible);
                 })
                 .AddTo(Anchors);
         }
 
-        private void ResynchronizeWebViewHosts()
+        private void SetWebViewVisibility(Visibility visibility)
         {
-            if (Anchors.IsDisposed || WindowState == WindowState.Minimized)
-            {
-                return;
-            }
-
-            BodyContentControl.WebView.WebView?.UpdateWindowPos();
-            TitleBarContentControl.WebView.WebView?.UpdateWindowPos();
+            BodyContentControl.WebView.Visibility = visibility;
+            TitleBarContentControl.WebView.Visibility = visibility;
         }
 
         private void UpdateAutomationRegistration(IUnityContainer container, string automationId)
