@@ -61,6 +61,7 @@
     }
 
     [Inject] public IBlazorHostController BlazorHostController { get; init; }
+    [Inject] public IBlazorWindowAccessor BlazorWindowAccessor { get; init; }
 
     public BlazorContentPresenter ContentPresenter { get; private set; }
 
@@ -71,6 +72,11 @@
         DataContext.WhenPreviewKeyDown
             .SubscribeAsync(async x =>
             {
+                if (BlazorWindowAccessor.AreWindowShortcutsSuppressed)
+                {
+                    return;
+                }
+
                 if (x.Key == Key.F8)
                 {
                     DataContext.IsDebugMode = !DataContext.IsDebugMode;
