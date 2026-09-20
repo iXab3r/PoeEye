@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -66,6 +66,8 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly Dispatcher uiDispatcher;
+    private readonly bool suppressActivation;
+    private bool EffectiveNoActivate => suppressActivation || NoActivate;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
@@ -78,16 +80,18 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private long lastSetSizeLogMs;
     private long lastSetRectLogMs;
 
-    public NativeWindow([OptionalDependency] Dispatcher dispatcher = null) : this("NWnd", dispatcher)
+    public NativeWindow([OptionalDependency] Dispatcher dispatcher = null,
+        [OptionalDependency] NativeWindowActivationPolicy activationPolicy = null) : this("NWnd", dispatcher, activationPolicy)
     {
     }
 
-    private protected NativeWindow(string logPrefix, Dispatcher dispatcher)
+    private protected NativeWindow(string logPrefix, Dispatcher dispatcher, NativeWindowActivationPolicy activationPolicy)
     {
         Log.AddSuffix($"{logPrefix}#{windowId}");
         Log.Debug("New window is being created");
         isClosedTcs = new TaskCompletionSource();
         this.uiDispatcher = dispatcher ?? BlazorDispatcherProvider.Instance.GetOrAdd("BlazorWindow").Dispatcher;
+        suppressActivation = activationPolicy?.SuppressActivation == true;
         windowSupplier = new Lazy<WindowView>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
@@ -875,15 +879,13 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             throw new InvalidOperationException("Cannot show a visible window as a dialog.");
         }
 
-        dialogOwnerHandle = ResolveDialogOwnerHandle(window);
+        dialogOwnerHandle = PrepareOwnership(window);
         var ownerWasAlreadyDisabled = false;
         try
         {
             if (dialogOwnerHandle != IntPtr.Zero)
             {
                 Log.Debug($"Assigning dialog owner handle: {dialogOwnerHandle.ToHexadecimal()}");
-                var windowInteropHelper = new WindowInteropHelper(window);
-                windowInteropHelper.Owner = dialogOwnerHandle;
                 ownerWasAlreadyDisabled = UnsafeNative.EnableWindow(dialogOwnerHandle, false);
                 Log.Debug($"Disabled modal owner window: {dialogOwnerHandle.ToHexadecimal()}, previously disabled: {ownerWasAlreadyDisabled}");
             }
@@ -945,38 +947,6 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         }
     }
 
-    private IntPtr ResolveDialogOwnerHandle(WindowView window)
-    {
-        var ownerHandle = OwnerHandle;
-        if (ownerHandle == IntPtr.Zero)
-        {
-            Log.Debug("Modal dialog owner handle is not configured");
-            return IntPtr.Zero;
-        }
-
-        if (!PInvoke.User32.IsWindow(ownerHandle))
-        {
-            Log.Warn($"Configured owner handle is invalid, ignoring owner: {ownerHandle.ToHexadecimal()}");
-            return IntPtr.Zero;
-        }
-
-        try
-        {
-            if (window.WindowHandle != IntPtr.Zero && ownerHandle == window.WindowHandle)
-            {
-                Log.Debug("Configured owner handle points to the dialog window itself, ignoring owner");
-                return IntPtr.Zero;
-            }
-        }
-        catch
-        {
-            // ignored, handle may not exist before first show
-        }
-
-        Log.Debug($"Using configured owner handle for modal dialog: {ownerHandle.ToHexadecimal()}");
-        return ownerHandle;
-    }
-
     private void ActivateWindowWhenReady(WindowView window, string reason)
     {
         uiDispatcher.VerifyAccess();
@@ -988,7 +958,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
         void ActivateCore()
         {
-            if (window.IsDisposed || !window.IsVisible || NoActivate)
+            if (window.IsDisposed || !window.IsVisible || EffectiveNoActivate)
             {
                 return;
             }
