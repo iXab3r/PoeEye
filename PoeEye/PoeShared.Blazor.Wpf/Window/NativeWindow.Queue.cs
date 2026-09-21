@@ -106,6 +106,7 @@ partial class NativeWindow
                     }
                     else
                     {
+                        if (modalPresentationPending) modalPresentationCancelled = true;
                         window.Hide();
                     }
 

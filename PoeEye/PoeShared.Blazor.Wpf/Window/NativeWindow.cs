@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -906,9 +907,11 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
         PreparePresentation(window);
         modalPresentationPending = true;
+        modalPresentationCancelled = false;
         var dialogOwnerHandle = Volatile.Read(ref appliedOwnerHandle);
         NativeWindowRegistry.Instance.TryGetWindow(dialogOwnerHandle, out var registeredOwner);
         var ownerWasAlreadyDisabled = false;
+        var disabledThreadWindows = new List<NativeWindow>();
         try
         {
             if (dialogOwnerHandle != IntPtr.Zero)
@@ -923,6 +926,20 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             else
             {
                 Log.Debug("Showing modal dialog without owner handle");
+            }
+
+            // Hide/Close/Dispose may have run while another dispatcher's owner was being acquired.
+            if (modalPresentationCancelled || RegistryClosed) return;
+
+            // WPF disables visible thread siblings too. Include already-disabled registered windows
+            // so overlapping thread-modal and owner-modal lifetimes share the same restoration count.
+            // Do not yield between this snapshot and ShowDialog: WPF must see this set disabled.
+            foreach (var sibling in NativeWindowRegistry.Instance.GetWindows())
+            {
+                if (ReferenceEquals(sibling, this) || ReferenceEquals(sibling, registeredOwner)
+                    || sibling.uiDispatcher != uiDispatcher || !User32.IsWindowVisible(sibling.RegistryHandle)) continue;
+                sibling.UpdateModalDisable(1);
+                disabledThreadWindows.Add(sibling);
             }
 
             using var cancellationAnchor = cancellationToken.Register(() =>
@@ -954,14 +971,10 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             window.ShowDialog();
             Log.Debug("Native WPF ShowDialog() has returned");
         }
-        catch (Exception e)
-        {
-            Log.Warn("Failed to show modal window", e);
-            throw;
-        }
         finally
         {
             Volatile.Write(ref modalShow, 0);
+            foreach (var sibling in disabledThreadWindows) sibling.UpdateModalDisable(-1);
             if (dialogOwnerHandle != IntPtr.Zero)
             {
                 if (registeredOwner != null)

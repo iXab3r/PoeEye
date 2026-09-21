@@ -13,6 +13,7 @@ partial class NativeWindow
     private IntPtr registryHandle;
     private long modalShow;
     private bool modalPresentationPending;
+    private bool modalPresentationCancelled;
     private bool automaticOwnerResolved;
     private WeakReference<NativeWindow> automaticOwner;
     private bool hasBeenPresented;
@@ -91,19 +92,22 @@ partial class NativeWindow
     {
         if (RegistryClosed || uiDispatcher.HasShutdownStarted) return Task.CompletedTask;
         // Never synchronously enter another window's dispatcher. Its modal loop may be waiting on ours.
-        return uiDispatcher.InvokeAsync(() =>
+        return uiDispatcher.InvokeAsync(() => UpdateModalDisable(delta)).Task;
+    }
+
+    private void UpdateModalDisable(int delta)
+    {
+        uiDispatcher.VerifyAccess();
+        if (RegistryClosed || !User32.IsWindow(RegistryHandle)) return;
+        if (delta > 0)
         {
-            if (RegistryClosed || !User32.IsWindow(RegistryHandle)) return;
-            if (delta > 0)
-            {
-                if (modalDisableCount++ == 0)
-                    modalOwnerWasDisabled = UnsafeNative.EnableWindow(RegistryHandle, false);
-            }
-            else if (--modalDisableCount == 0 && !modalOwnerWasDisabled)
-            {
-                UnsafeNative.EnableWindow(RegistryHandle, true);
-            }
-        }).Task;
+            if (modalDisableCount++ == 0)
+                modalOwnerWasDisabled = UnsafeNative.EnableWindow(RegistryHandle, false);
+        }
+        else if (--modalDisableCount == 0 && !modalOwnerWasDisabled)
+        {
+            UnsafeNative.EnableWindow(RegistryHandle, true);
+        }
     }
 
     private async Task CompleteModalShowAsync(WindowView window, ShowDialogCommand command)
@@ -115,7 +119,6 @@ partial class NativeWindow
         }
         catch (Exception error)
         {
-            Log.Warn("Modal presentation failed", error);
             command.CompletionSource.TrySetException(error);
         }
     }
