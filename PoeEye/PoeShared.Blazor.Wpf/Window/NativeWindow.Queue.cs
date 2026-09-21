@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -100,14 +100,7 @@ partial class NativeWindow
                     Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}: {new {window.WindowState}}");
                     if (command.IsVisible)
                     {
-                        var ownerHandle = ResolveConfiguredOwnerHandle(window);
-                        if (ownerHandle != IntPtr.Zero)
-                        {
-                            Log.Debug($"Assigning owner handle before showing window: {ownerHandle.ToHexadecimal()}");
-                            var windowInteropHelper = new WindowInteropHelper(window);
-                            windowInteropHelper.Owner = ownerHandle;
-                        }
-
+                        PrepareOwnership(window);
                         window.Show();
                     }
                     else
@@ -289,7 +282,7 @@ partial class NativeWindow
                 case SetShowActivated command:
                 {
                     Log.Debug($"Updating {nameof(ShowActivated)} to {command.ShowActivated}");
-                    window.ShowActivated = command.ShowActivated;
+                    window.ShowActivated = command.ShowActivated && !EffectiveNoActivate;
                     break;
                 }
                 case SetIsClickThrough command:
@@ -353,16 +346,21 @@ partial class NativeWindow
 
                     break;
                 }
+                case ReconcileTopmostCommand:
+                    ReconcileTopmost(window);
+                    break;
                 case SetTopmostCommand command:
                 {
                     Log.Debug($"Updating {nameof(Topmost)} to {command.Topmost}");
-                    window.Topmost = command.Topmost;
+                    requestedNativeTopmost = command.Topmost;
+                    ReconcileTopmost(window);
                     break;
                 }
                 case SetNoActivate command:
                 {
                     Log.Debug($"Updating {nameof(NoActivate)} to {command.NoActivate}");
-                    window.SetActivation(command.NoActivate == false);
+                    window.SetActivation(!EffectiveNoActivate);
+                    window.ShowActivated = ShowActivated && !EffectiveNoActivate;
                     break;
                 }
                 case SetContentCommand command:
@@ -510,6 +508,8 @@ partial class NativeWindow
                             throw new InvalidOperationException("HwndSource must be initialized at this point");
                         }
 
+                        InitializeOwnership(window);
+                        window.SetActivation(!EffectiveNoActivate);
                         UpdateWindowBoundsFromMonitor(windowHandle);
                     }
                     catch (Exception e)
@@ -708,7 +708,7 @@ partial class NativeWindow
                         .Subscribe(x => observer.OnNext(new SetOpacity(x)))
                         .AddTo(anchors);
 
-                    if (ShowActivated)
+                    if (ShowActivated && !EffectiveNoActivate)
                     {
                         Activate();
                     }
@@ -1049,7 +1049,7 @@ partial class NativeWindow
                 }
                 case User32.WindowMessage.WM_MOUSEACTIVATE:
                 {
-                    if (NoActivate)
+                    if (EffectiveNoActivate)
                     {
                         handled = true;
                         return new IntPtr(MA_NOACTIVATE);
@@ -1209,32 +1209,7 @@ partial class NativeWindow
 
     private bool TryGetOwnerBounds(out Rectangle ownerBounds)
     {
-        IntPtr ownerHandle;
-        if (dialogOwnerHandle != IntPtr.Zero)
-        {
-            ownerHandle = dialogOwnerHandle;
-        }
-        else
-        {
-            ownerHandle = OwnerHandle;
-            if (ownerHandle == IntPtr.Zero)
-            {
-                try
-                {
-                    ownerHandle = UnsafeNative.ResolveParentForDialogWindow();
-                    if (ownerHandle != IntPtr.Zero)
-                    {
-                        Log.Debug($"CenterOwner fallback resolved owner handle for startup location update: {ownerHandle.ToHexadecimal()}");
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Warn("Failed to resolve fallback owner handle for startup location update", e);
-                    ownerBounds = default;
-                    return false;
-                }
-            }
-        }
+        var ownerHandle = dialogOwnerHandle != IntPtr.Zero ? dialogOwnerHandle : OwnerHandle;
 
         if (ownerHandle == IntPtr.Zero)
         {

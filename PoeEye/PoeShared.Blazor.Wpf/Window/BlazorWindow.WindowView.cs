@@ -77,6 +77,7 @@ internal partial class BlazorWindow
                     //maybe move registrations to another nested container to avoid this?
                     var childContainer = parentContainer.CreateChildContainer().AddTo(owner.Anchors);
                     childContainer.RegisterSingleton<IBlazorWindowController>(_ => owner);
+                    childContainer.RegisterSingleton<IBlazorWindowHandle>(_ => owner);
                     childContainer.RegisterSingleton<IBlazorWindowAccessor>(_ => new BlazorWindowAccessor(owner));
                     ChildContainer = childContainer;
                 })

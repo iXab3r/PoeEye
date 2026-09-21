@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -66,6 +66,8 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly Dispatcher uiDispatcher;
+    private bool suppressActivation;
+    private bool EffectiveNoActivate => suppressActivation || NoActivate;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
@@ -292,6 +294,26 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.CenterOwner;
 
     public IntPtr OwnerHandle { get; set; }
+
+    public bool SuppressActivation
+    {
+        get => suppressActivation;
+        set
+        {
+            if (suppressActivation == value)
+            {
+                return;
+            }
+
+            if (windowSupplier.IsValueCreated && windowSupplier.Value.WindowHandle != IntPtr.Zero)
+            {
+                Log.Warn($"Ignoring change to {nameof(SuppressActivation)} after the native window handle is created");
+                return;
+            }
+
+            RaiseAndSetIfChanged(ref suppressActivation, value);
+        }
+    }
 
     public new IFluentLog Log => base.Log;
 
@@ -875,15 +897,13 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             throw new InvalidOperationException("Cannot show a visible window as a dialog.");
         }
 
-        dialogOwnerHandle = ResolveDialogOwnerHandle(window);
+        dialogOwnerHandle = PrepareOwnership(window);
         var ownerWasAlreadyDisabled = false;
         try
         {
             if (dialogOwnerHandle != IntPtr.Zero)
             {
                 Log.Debug($"Assigning dialog owner handle: {dialogOwnerHandle.ToHexadecimal()}");
-                var windowInteropHelper = new WindowInteropHelper(window);
-                windowInteropHelper.Owner = dialogOwnerHandle;
                 ownerWasAlreadyDisabled = UnsafeNative.EnableWindow(dialogOwnerHandle, false);
                 Log.Debug($"Disabled modal owner window: {dialogOwnerHandle.ToHexadecimal()}, previously disabled: {ownerWasAlreadyDisabled}");
             }
@@ -945,38 +965,6 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         }
     }
 
-    private IntPtr ResolveDialogOwnerHandle(WindowView window)
-    {
-        var ownerHandle = OwnerHandle;
-        if (ownerHandle == IntPtr.Zero)
-        {
-            Log.Debug("Modal dialog owner handle is not configured");
-            return IntPtr.Zero;
-        }
-
-        if (!PInvoke.User32.IsWindow(ownerHandle))
-        {
-            Log.Warn($"Configured owner handle is invalid, ignoring owner: {ownerHandle.ToHexadecimal()}");
-            return IntPtr.Zero;
-        }
-
-        try
-        {
-            if (window.WindowHandle != IntPtr.Zero && ownerHandle == window.WindowHandle)
-            {
-                Log.Debug("Configured owner handle points to the dialog window itself, ignoring owner");
-                return IntPtr.Zero;
-            }
-        }
-        catch
-        {
-            // ignored, handle may not exist before first show
-        }
-
-        Log.Debug($"Using configured owner handle for modal dialog: {ownerHandle.ToHexadecimal()}");
-        return ownerHandle;
-    }
-
     private void ActivateWindowWhenReady(WindowView window, string reason)
     {
         uiDispatcher.VerifyAccess();
@@ -988,7 +976,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
         void ActivateCore()
         {
-            if (window.IsDisposed || !window.IsVisible || NoActivate)
+            if (window.IsDisposed || !window.IsVisible || EffectiveNoActivate)
             {
                 return;
             }

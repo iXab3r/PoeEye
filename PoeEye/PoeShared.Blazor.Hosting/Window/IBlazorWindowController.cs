@@ -75,7 +75,8 @@ public interface IBlazorWindowController
     string Title { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the window should remain on top of other windows.
+    /// Gets or sets this window's requested pin. NativeWindow also inherits the effective pin of its
+    /// explicit owner (transitively); inheritance never changes this property. Applies to Show and ShowDialog.
     /// </summary>
     bool Topmost { get; set; }
     
@@ -170,6 +171,9 @@ public interface IBlazorWindowController
     /// callers can explicitly point to either a Blazor-hosted window or any other native WPF/Win32 window.
     /// Set this property before calling <c>Show()</c> or <c>ShowDialog()</c> if owner semantics are required.
     /// A value of <see cref="IntPtr.Zero"/> means that no explicit owner is configured.
+    /// Ownership is reapplied on each Show/ShowDialog; Hide, assign zero, Show detaches an existing owner.
+    /// No foreground-window fallback is used. Ownership must be acyclic. Owned windows inherit the owner's
+    /// effective topmost layer while preserving their own requested pin; presentation does not activate the owner.
     /// Implementations may ignore invalid handles, log the failure, and continue without an owner rather than throw.
     /// Modal flows may also use this handle to temporarily disable and later re-enable the owner window.
     /// </summary>

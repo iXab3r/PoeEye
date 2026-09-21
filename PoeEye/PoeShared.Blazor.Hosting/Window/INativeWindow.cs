@@ -18,6 +18,14 @@ namespace PoeShared.Blazor.Wpf;
 public interface INativeWindow : IBlazorWindowController, IDisposableReactiveObject, IBlazorWindowNativeController
 {
     /// <summary>
+    /// Prevents activation regardless of per-window NoActivate, ShowActivated or Activate requests.
+    /// Configure before native handle creation, which can precede Show/ShowDialog.
+    /// Like AllowsTransparency, changes after the native handle is created are ignored with a warning.
+    /// Hosts may configure this default through their window registrations.
+    /// </summary>
+    bool SuppressActivation { get; set; }
+
+    /// <summary>
     /// Gets or sets the factory which produces the WPF content hosted inside the window.
     /// <para>
     /// Threading contract: the factory is ALWAYS invoked on the window's own UI (dispatcher) thread, never on the

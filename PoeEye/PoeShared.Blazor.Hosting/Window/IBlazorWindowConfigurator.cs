@@ -85,6 +85,8 @@ public interface IBlazorWindowConfigurator
     /// <remarks>
     /// This method may be called for every new window created from a container scope. Implementations should
     /// assume that callers may still override any configured values afterwards.
+    /// Runs in the controller constructor, before container property injection. Configure defaults
+    /// and resources only: do not create/show the inner WPF window or rely on injected host defaults.
     /// </remarks>
     void Configure(IBlazorWindow window);
 }
