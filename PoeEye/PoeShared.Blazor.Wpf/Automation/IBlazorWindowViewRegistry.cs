@@ -67,9 +67,8 @@ internal interface IBlazorWindowViewRegistryRegistrar
     /// <summary>
     /// Registers a live browser view handle and returns a disposable registration token that removes it from the registry.
     /// </summary>
-    /// <param name="viewHandle">
-    /// Handle describing the live browser view to register.
-    /// </param>
+    /// <param name="window">Window that owns the registered browser views.</param>
+    /// <param name="views">Body and title-bar capabilities for this registration.</param>
     /// <returns>
     /// A disposable token that unregisters the supplied handle when disposed.
     /// </returns>

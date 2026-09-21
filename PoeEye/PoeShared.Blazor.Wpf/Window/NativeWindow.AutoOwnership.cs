@@ -13,7 +13,8 @@ partial class NativeWindow
     private IntPtr registryHandle;
     private long modalShow;
     private bool modalPresentationPending;
-    private bool modalPresentationCancelled;
+    // A Hide ends the modal presentation; retain subsequent Show/Hide until its blockers are released.
+    private bool? visibilityAfterModal;
     private bool automaticOwnerResolved;
     private WeakReference<NativeWindow> automaticOwner;
     private bool hasBeenPresented;

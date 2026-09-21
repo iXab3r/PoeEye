@@ -907,7 +907,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
         PreparePresentation(window);
         modalPresentationPending = true;
-        modalPresentationCancelled = false;
+        visibilityAfterModal = null;
         var dialogOwnerHandle = Volatile.Read(ref appliedOwnerHandle);
         NativeWindowRegistry.Instance.TryGetWindow(dialogOwnerHandle, out var registeredOwner);
         var ownerWasAlreadyDisabled = false;
@@ -928,8 +928,8 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
                 Log.Debug("Showing modal dialog without owner handle");
             }
 
-            // Hide/Close/Dispose may have run while another dispatcher's owner was being acquired.
-            if (modalPresentationCancelled || RegistryClosed) return;
+            // Hide/Close/Dispose may have run while the owner was being acquired.
+            if (visibilityAfterModal.HasValue || RegistryClosed) return;
 
             // WPF disables visible thread siblings too. Include already-disabled registered windows
             // so overlapping thread-modal and owner-modal lifetimes share the same restoration count.
@@ -993,6 +993,9 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             }
 
             modalPresentationPending = false;
+            var showAfterModal = visibilityAfterModal == true;
+            visibilityAfterModal = null;
+            if (showAfterModal) HandleEvent(new SetVisibleCommand(true));
         }
     }
 
