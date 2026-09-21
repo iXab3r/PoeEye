@@ -66,9 +66,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly Dispatcher uiDispatcher;
-    private readonly object activationConfigurationGate = new();
-    private volatile bool suppressActivation;
-    private bool activationConfigurationFrozen;
+    private bool suppressActivation;
     private bool EffectiveNoActivate => suppressActivation || NoActivate;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
@@ -302,14 +300,18 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         get => suppressActivation;
         set
         {
-            lock (activationConfigurationGate)
+            if (suppressActivation == value)
             {
-                if (activationConfigurationFrozen && value != suppressActivation)
-                {
-                    throw new InvalidOperationException("Activation suppression cannot change after native window creation begins.");
-                }
-                suppressActivation = value;
+                return;
             }
+
+            if (windowSupplier.IsValueCreated && windowSupplier.Value.WindowHandle != IntPtr.Zero)
+            {
+                Log.Warn($"Ignoring change to {nameof(SuppressActivation)} after the native window handle is created");
+                return;
+            }
+
+            RaiseAndSetIfChanged(ref suppressActivation, value);
         }
     }
 
@@ -868,11 +870,6 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private WindowView CreateWindow()
     {
         uiDispatcher.VerifyAccess();
-        // Freeze before constructing the view: IsValueCreated is still false here.
-        lock (activationConfigurationGate)
-        {
-            activationConfigurationFrozen = true;
-        }
 
         var window = CreateWindowView();
         window.WindowStartupLocation = WindowStartupLocation;

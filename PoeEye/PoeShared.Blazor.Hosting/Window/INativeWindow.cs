@@ -19,9 +19,9 @@ public interface INativeWindow : IBlazorWindowController, IDisposableReactiveObj
 {
     /// <summary>
     /// Prevents activation regardless of per-window NoActivate, ShowActivated or Activate requests.
-    /// Configure before inner WPF window creation begins, which can precede Show/ShowDialog.
-    /// Once creation starts, changing the value throws InvalidOperationException; assigning the
-    /// current value is allowed. Hosts may configure this default through their window registrations.
+    /// Configure before native handle creation, which can precede Show/ShowDialog.
+    /// Like AllowsTransparency, changes after the native handle is created are ignored with a warning.
+    /// Hosts may configure this default through their window registrations.
     /// </summary>
     bool SuppressActivation { get; set; }
 
