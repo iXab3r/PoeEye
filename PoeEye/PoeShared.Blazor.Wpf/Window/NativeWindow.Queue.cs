@@ -100,7 +100,8 @@ partial class NativeWindow
                     Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}: {new {window.WindowState}}");
                     if (command.IsVisible)
                     {
-                        PrepareOwnership(window);
+                        if (modalPresentationPending) break;
+                        PreparePresentation(window);
                         window.Show();
                     }
                     else
@@ -113,16 +114,7 @@ partial class NativeWindow
                 case ShowDialogCommand command:
                 {
                     Log.Debug("Showing the window as a real modal dialog");
-                    try
-                    {
-                        ShowDialogCore(window, command.CancellationToken);
-                        command.CompletionSource.TrySetResult(true);
-                    }
-                    catch (Exception e)
-                    {
-                        command.CompletionSource.TrySetException(e);
-                        throw;
-                    }
+                    CompleteModalShowAsync(window, command).AndForget();
 
                     break;
                 }
@@ -1209,7 +1201,7 @@ partial class NativeWindow
 
     private bool TryGetOwnerBounds(out Rectangle ownerBounds)
     {
-        var ownerHandle = dialogOwnerHandle != IntPtr.Zero ? dialogOwnerHandle : OwnerHandle;
+        var ownerHandle = hasBeenPresented ? Volatile.Read(ref appliedOwnerHandle) : OwnerHandle;
 
         if (ownerHandle == IntPtr.Zero)
         {
@@ -1240,7 +1232,8 @@ partial class NativeWindow
         var ownerHandle = OwnerHandle;
         if (ownerHandle == IntPtr.Zero)
         {
-            return IntPtr.Zero;
+            ownerHandle = ResolveAutomaticOwner();
+            if (ownerHandle == IntPtr.Zero) return IntPtr.Zero;
         }
 
         if (!User32.IsWindow(ownerHandle))

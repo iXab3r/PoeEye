@@ -19,7 +19,6 @@ internal partial class BlazorWindow
     {
         private readonly BlazorWindow owner;
         private readonly SerialDisposable bodyAutomationRegistrationAnchor;
-        private readonly SerialDisposable titleBarAutomationRegistrationAnchor;
         private bool webViewsHiddenForMinimize;
 
         public BlazorWindowView(BlazorWindow owner) : base(owner)
@@ -28,7 +27,6 @@ internal partial class BlazorWindow
             BodyContentControl = CreateBlazorContentControl(typeof(BlazorWindowContent));
             TitleBarContentControl = CreateBlazorContentControl(typeof(BlazorWindowContentHeader));
             bodyAutomationRegistrationAnchor = new SerialDisposable().AddTo(Anchors);
-            titleBarAutomationRegistrationAnchor = new SerialDisposable().AddTo(Anchors);
             InitializeContainerBinding();
             InitializeAutomationBinding();
             BodyHost.Child = BodyContentControl;
@@ -77,7 +75,6 @@ internal partial class BlazorWindow
                     //maybe move registrations to another nested container to avoid this?
                     var childContainer = parentContainer.CreateChildContainer().AddTo(owner.Anchors);
                     childContainer.RegisterSingleton<IBlazorWindowController>(_ => owner);
-                    childContainer.RegisterSingleton<IBlazorWindowHandle>(_ => owner);
                     childContainer.RegisterSingleton<IBlazorWindowAccessor>(_ => new BlazorWindowAccessor(owner));
                     ChildContainer = childContainer;
                 })
@@ -146,7 +143,6 @@ internal partial class BlazorWindow
         private void UpdateAutomationRegistration(IUnityContainer container, string automationId)
         {
             bodyAutomationRegistrationAnchor.Disposable = Disposable.Empty;
-            titleBarAutomationRegistrationAnchor.Disposable = Disposable.Empty;
 
             if (string.IsNullOrWhiteSpace(automationId) || container == null)
             {
@@ -159,8 +155,11 @@ internal partial class BlazorWindow
             }
 
             var registrar = container.Resolve<IBlazorWindowViewRegistryRegistrar>();
-            bodyAutomationRegistrationAnchor.Disposable = registrar.Register(new BlazorWindowViewHandle(BodyContentControl, automationId, BlazorWindowViewRole.Body));
-            titleBarAutomationRegistrationAnchor.Disposable = registrar.Register(new BlazorWindowViewHandle(TitleBarContentControl, automationId, BlazorWindowViewRole.TitleBar));
+            bodyAutomationRegistrationAnchor.Disposable = registrar.Register(owner, new[]
+            {
+                new BlazorWindowViewHandle(BodyContentControl, automationId, BlazorWindowViewRole.Body),
+                new BlazorWindowViewHandle(TitleBarContentControl, automationId, BlazorWindowViewRole.TitleBar)
+            });
         }
 
         private BlazorContentControl CreateBlazorContentControl(Type viewType)

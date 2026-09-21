@@ -76,7 +76,7 @@ public interface IBlazorWindowController
 
     /// <summary>
     /// Gets or sets this window's requested pin. NativeWindow also inherits the effective pin of its
-    /// explicit owner (transitively); inheritance never changes this property. Applies to Show and ShowDialog.
+    /// owner (transitively); inheritance never changes this property. Applies to Show and ShowDialog.
     /// </summary>
     bool Topmost { get; set; }
     
@@ -169,15 +169,22 @@ public interface IBlazorWindowController
     /// Gets or sets the native owner window handle (HWND) for this window.
     /// This is the Blazor-window equivalent of WPF's <c>Window.Owner</c>, but represented as a raw handle so
     /// callers can explicitly point to either a Blazor-hosted window or any other native WPF/Win32 window.
-    /// Set this property before calling <c>Show()</c> or <c>ShowDialog()</c> if owner semantics are required.
-    /// A value of <see cref="IntPtr.Zero"/> means that no explicit owner is configured.
-    /// Ownership is reapplied on each Show/ShowDialog; Hide, assign zero, Show detaches an existing owner.
-    /// No foreground-window fallback is used. Ownership must be acyclic. Owned windows inherit the owner's
+    /// A nonzero value overrides automatic selection exactly. Zero uses <see cref="AutoOwner"/>.
+    /// Ownership is reapplied when shown after Hide; zero with AutoOwner disabled detaches an existing owner.
+    /// Ownership must be acyclic. Owned windows inherit the owner's
     /// effective topmost layer while preserving their own requested pin; presentation does not activate the owner.
-    /// Implementations may ignore invalid handles, log the failure, and continue without an owner rather than throw.
     /// Modal flows may also use this handle to temporarily disable and later re-enable the owner window.
     /// </summary>
     IntPtr OwnerHandle { get; set; }
+
+    /// <summary>
+    /// Defaults to true. Selects an application owner at first automatic presentation when OwnerHandle is zero,
+    /// for both Show and ShowDialog: active application window, otherwise the host's configured main root,
+    /// following a disabled owner's direct modal blockers within that family.
+    /// The automatic choice, including no owner, survives Hide/Show. Explicit nonzero OwnerHandle takes precedence.
+    /// Set false and OwnerHandle to zero before showing to make an independent window or detach a hidden window.
+    /// </summary>
+    bool AutoOwner { get; set; }
 
     /// <summary>
     /// Observable sequence for when a key is pressed while the window has focus.

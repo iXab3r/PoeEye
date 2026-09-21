@@ -71,7 +71,6 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
     private readonly SerialDisposable windowSubscriptionAnchor;
-    private IntPtr dialogOwnerHandle;
     private bool isNativeWindowClosingOrClosed;
 
     // Logging throttling: limit certain verbose logs
@@ -94,6 +93,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
         windowSubscriptionAnchor = new SerialDisposable().AddTo(Anchors);
+        NativeWindowRegistry.Instance.Register(this).AddTo(Anchors);
 
         Disposable.Create(() =>
         {
@@ -294,6 +294,8 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.CenterOwner;
 
     public IntPtr OwnerHandle { get; set; }
+
+    public bool AutoOwner { get; set; } = true;
 
     public bool SuppressActivation
     {
@@ -640,11 +642,16 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         try
         {
             Log.Debug("Awaiting for the window to be closed");
-            using var cancellationAnchor = cancellationToken.Register(() =>
+            // A modal call on a UI dispatcher must keep pumping, including when the actual
+            // dialog belongs to another dispatcher. Completion includes restoring its owner.
+            var callerDispatcher = Dispatcher.FromThread(Thread.CurrentThread);
+            if (!completionSource.Task.IsCompleted && callerDispatcher != null)
             {
-                Log.Debug("Cancellation requested while awaiting modal dialog completion");
-                completionSource.TrySetCanceled(cancellationToken);
-            });
+                var frame = new DispatcherFrame();
+                _ = completionSource.Task.ContinueWith(_ =>
+                    callerDispatcher.BeginInvoke(new Action(() => frame.Continue = false)), TaskScheduler.Default);
+                Dispatcher.PushFrame(frame);
+            }
             completionSource.Task.GetAwaiter().GetResult();
             Log.Debug("Modal dialog completed successfully");
         }
@@ -887,24 +894,30 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         return new NativeWindowView(this);
     }
 
-    private void ShowDialogCore(WindowView window, CancellationToken cancellationToken)
+    private async Task ShowDialogCore(WindowView window, CancellationToken cancellationToken)
     {
         uiDispatcher.VerifyAccess();
 
-        if (window.IsVisible)
+        if (window.IsVisible || modalPresentationPending)
         {
             Log.Warn("Cannot show modal dialog because the target window is already visible");
             throw new InvalidOperationException("Cannot show a visible window as a dialog.");
         }
 
-        dialogOwnerHandle = PrepareOwnership(window);
+        PreparePresentation(window);
+        modalPresentationPending = true;
+        var dialogOwnerHandle = Volatile.Read(ref appliedOwnerHandle);
+        NativeWindowRegistry.Instance.TryGetWindow(dialogOwnerHandle, out var registeredOwner);
         var ownerWasAlreadyDisabled = false;
         try
         {
             if (dialogOwnerHandle != IntPtr.Zero)
             {
                 Log.Debug($"Assigning dialog owner handle: {dialogOwnerHandle.ToHexadecimal()}");
-                ownerWasAlreadyDisabled = UnsafeNative.EnableWindow(dialogOwnerHandle, false);
+                if (registeredOwner != null)
+                    await registeredOwner.UpdateModalDisableAsync(1);
+                else
+                    ownerWasAlreadyDisabled = UnsafeNative.EnableWindow(dialogOwnerHandle, false);
                 Log.Debug($"Disabled modal owner window: {dialogOwnerHandle.ToHexadecimal()}, previously disabled: {ownerWasAlreadyDisabled}");
             }
             else
@@ -937,6 +950,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
             });
 
             Log.Debug("Entering native WPF ShowDialog()");
+            Volatile.Write(ref modalShow, Interlocked.Increment(ref nextModalShow));
             window.ShowDialog();
             Log.Debug("Native WPF ShowDialog() has returned");
         }
@@ -947,9 +961,14 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
         }
         finally
         {
+            Volatile.Write(ref modalShow, 0);
             if (dialogOwnerHandle != IntPtr.Zero)
             {
-                if (ownerWasAlreadyDisabled)
+                if (registeredOwner != null)
+                {
+                    await registeredOwner.UpdateModalDisableAsync(-1);
+                }
+                else if (ownerWasAlreadyDisabled)
                 {
                     Log.Debug("Skipping owner re-enable because owner window was already disabled before ShowDialog()");
                 }
@@ -960,8 +979,7 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
                 }
             }
 
-            Log.Debug("Clearing modal dialog owner handle state");
-            dialogOwnerHandle = IntPtr.Zero;
+            modalPresentationPending = false;
         }
     }
 

@@ -1,7 +1,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,8 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using PoeShared.Logging;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Blazor.Wpf.Automation;
 
@@ -76,7 +73,7 @@ internal interface IBlazorWindowViewRegistryRegistrar
     /// <returns>
     /// A disposable token that unregisters the supplied handle when disposed.
     /// </returns>
-    IDisposable Register(BlazorWindowViewHandle viewHandle);
+    IDisposable Register(BlazorWindow window, BlazorWindowViewHandle[] views);
 }
 
 /// <summary>
@@ -290,37 +287,33 @@ public sealed class BlazorWindowViewHandle
 
 internal sealed class BlazorWindowViewRegistry : IBlazorWindowViewRegistry, IBlazorWindowViewRegistryRegistrar
 {
-    private static readonly IFluentLog Log = typeof(BlazorWindowViewRegistry).PrepareLogger();
+    private long nextRegistration;
 
-    private readonly ConcurrentDictionary<string, BlazorWindowViewHandle> viewHandles = new(StringComparer.OrdinalIgnoreCase);
+    private IEnumerable<BlazorWindowViewHandle> GetViews() => NativeWindowRegistry.Instance.GetWindows()
+        .OfType<BlazorWindow>()
+        .Select(x => x.AutomationRegistration)
+        .Where(x => x != null && ReferenceEquals(x.Registry, this))
+        .OrderByDescending(x => x!.Sequence)
+        .SelectMany(x => x!.Views)
+        .DistinctBy(x => x.ViewAutomationId, StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Registers a live browser view handle and returns a token that removes it when disposed.
     /// </summary>
-    /// <param name="viewHandle">
-    /// Live browser view handle to register.
-    /// </param>
+    /// <param name="window">Window that owns these capabilities.</param>
+    /// <param name="views">Body and title-bar capabilities for this registration.</param>
     /// <returns>
     /// A disposable token that unregisters the handle when disposed.
     /// </returns>
-    public IDisposable Register(BlazorWindowViewHandle viewHandle)
+    public IDisposable Register(BlazorWindow window, BlazorWindowViewHandle[] views)
     {
-        ArgumentNullException.ThrowIfNull(viewHandle);
-
-        if (string.IsNullOrWhiteSpace(viewHandle.ViewAutomationId))
-        {
-            return Disposable.Empty;
-        }
-
-        viewHandles[viewHandle.ViewAutomationId] = viewHandle;
-        Log.Debug($"Registered Blazor window view: {viewHandle.ViewAutomationId}");
+        var registration = new BlazorWindowViewRegistration(this, Interlocked.Increment(ref nextRegistration), views);
+        window.AutomationRegistration = registration;
+        var weakWindow = new WeakReference<BlazorWindow>(window);
         return Disposable.Create(() =>
         {
-            if (viewHandles.TryGetValue(viewHandle.ViewAutomationId, out var existing) && ReferenceEquals(existing, viewHandle))
-            {
-                viewHandles.TryRemove(viewHandle.ViewAutomationId, out _);
-                Log.Debug($"Unregistered Blazor window view: {viewHandle.ViewAutomationId}");
-            }
+            if (weakWindow.TryGetTarget(out var target) && ReferenceEquals(target.AutomationRegistration, registration))
+                target.AutomationRegistration = null;
         });
     }
 
@@ -335,7 +328,7 @@ internal sealed class BlazorWindowViewRegistry : IBlazorWindowViewRegistry, IBla
     /// </returns>
     public async Task<IReadOnlyList<BlazorWindowViewDescriptor>> ListViewsAsync(CancellationToken cancellationToken = default)
     {
-        var handles = viewHandles.Values
+        var handles = GetViews()
             .OrderBy(x => x.ViewAutomationId, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -391,6 +384,10 @@ internal sealed class BlazorWindowViewRegistry : IBlazorWindowViewRegistry, IBla
             return false;
         }
 
-        return viewHandles.TryGetValue(viewAutomationId.Trim(), out viewHandle);
+        viewHandle = GetViews().FirstOrDefault(x => string.Equals(x.ViewAutomationId, viewAutomationId.Trim(), StringComparison.OrdinalIgnoreCase));
+        return viewHandle != null;
     }
 }
+
+/// <summary>Browser capabilities belong to their window; discovery retains only the registry's weak window reference.</summary>
+internal sealed record BlazorWindowViewRegistration(IBlazorWindowViewRegistryRegistrar Registry, long Sequence, BlazorWindowViewHandle[] Views);
