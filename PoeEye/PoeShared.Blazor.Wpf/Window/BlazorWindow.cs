@@ -20,8 +20,9 @@ namespace PoeShared.Blazor.Wpf;
 /// Things to note:
 /// - if Application is Shutting down, windows WILL NOT be created, this is in Window code. Need to track it.
 /// </summary>
-internal partial class BlazorWindow : NativeWindow, IWpfBlazorWindow, IBlazorWindowHandle
+internal partial class BlazorWindow : NativeWindow, IWpfBlazorWindow
 {
+    internal PoeShared.Blazor.Wpf.Automation.BlazorWindowViewRegistration AutomationRegistration { get; set; }
     private readonly IUnityContainer unityContainer;
     private readonly ReactiveCompositeFileProvider compositeFileProvider;
     private readonly SerialDisposable additionalFileProviderAnchor;
@@ -66,8 +67,6 @@ internal partial class BlazorWindow : NativeWindow, IWpfBlazorWindow, IBlazorWin
     }
 
     public Type ViewType { get; set; }
-
-    IntPtr IBlazorWindowHandle.Handle => GetWindowHandle();
 
     public Type ViewTypeForTitleBar { get; set; }
 

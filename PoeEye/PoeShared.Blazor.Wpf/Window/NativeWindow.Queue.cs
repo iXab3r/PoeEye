@@ -25,6 +25,9 @@ namespace PoeShared.Blazor.Wpf;
 
 partial class NativeWindow
 {
+    // Native Show/Hide can synchronously notify callers that request the opposite visibility.
+    private bool? applyingVisibility;
+
     /// <summary>
     /// Does not activate the window, and does not discard the mouse message.
     /// </summary>
@@ -75,15 +78,9 @@ partial class NativeWindow
         }
         else if (windowEvent is IWindowCommand)
         {
-            if (Anchors.IsDisposed)
+            if (Anchors.IsDisposed || isClosedTcs.Task.IsCompleted)
             {
-                Log.Debug($"Ignoring command - already disposed, command: {windowEvent}");
-                return;
-            }
-
-            if (isClosedTcs.Task.IsCompleted)
-            {
-                Log.Debug($"Ignoring command - window is closing or already closed, command: {windowEvent}");
+                Log.Debug($"Ignoring command - window is disposed, closing or already closed, command: {windowEvent}");
                 if (windowEvent is ShowDialogCommand showDialogCommand)
                 {
                     showDialogCommand.CompletionSource.TrySetResult(true);
@@ -97,15 +94,41 @@ partial class NativeWindow
             {
                 case SetVisibleCommand command:
                 {
-                    Log.Debug($"Updating {nameof(IsVisible)} to {command.IsVisible}: {new {window.WindowState}}");
-                    if (command.IsVisible)
+                    if (applyingVisibility.HasValue)
                     {
-                        PrepareOwnership(window);
-                        window.Show();
+                        applyingVisibility = command.IsVisible;
+                        break;
                     }
-                    else
+                    applyingVisibility = command.IsVisible;
+                    try
                     {
-                        window.Hide();
+                        bool visible;
+                        do
+                        {
+                            if (Anchors.IsDisposed || RegistryClosed) break;
+                            visible = applyingVisibility.Value;
+                            Log.Debug($"Updating {nameof(IsVisible)} to {visible}: {new {window.WindowState}}");
+                            if (visible)
+                            {
+                                if (modalPresentationPending)
+                                {
+                                    if (visibilityAfterModal.HasValue) visibilityAfterModal = true;
+                                    break;
+                                }
+                                PreparePresentation(window);
+                                window.Show();
+                            }
+                            else
+                            {
+                                if (modalPresentationPending) visibilityAfterModal = false;
+                                window.Hide();
+                            }
+                        }
+                        while (applyingVisibility != visible);
+                    }
+                    finally
+                    {
+                        applyingVisibility = null;
                     }
 
                     break;
@@ -113,16 +136,7 @@ partial class NativeWindow
                 case ShowDialogCommand command:
                 {
                     Log.Debug("Showing the window as a real modal dialog");
-                    try
-                    {
-                        ShowDialogCore(window, command.CancellationToken);
-                        command.CompletionSource.TrySetResult(true);
-                    }
-                    catch (Exception e)
-                    {
-                        command.CompletionSource.TrySetException(e);
-                        throw;
-                    }
+                    CompleteModalShowAsync(window, command).AndForget();
 
                     break;
                 }
@@ -1209,7 +1223,7 @@ partial class NativeWindow
 
     private bool TryGetOwnerBounds(out Rectangle ownerBounds)
     {
-        var ownerHandle = dialogOwnerHandle != IntPtr.Zero ? dialogOwnerHandle : OwnerHandle;
+        var ownerHandle = hasBeenPresented ? Volatile.Read(ref appliedOwnerHandle) : OwnerHandle;
 
         if (ownerHandle == IntPtr.Zero)
         {
@@ -1240,7 +1254,8 @@ partial class NativeWindow
         var ownerHandle = OwnerHandle;
         if (ownerHandle == IntPtr.Zero)
         {
-            return IntPtr.Zero;
+            ownerHandle = ResolveAutomaticOwner();
+            if (ownerHandle == IntPtr.Zero) return IntPtr.Zero;
         }
 
         if (!User32.IsWindow(ownerHandle))

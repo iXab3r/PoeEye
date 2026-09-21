@@ -11,6 +11,15 @@ namespace PoeShared.Blazor.Wpf.Prism;
 
 public sealed class BlazorWpfRegistrations : UnityContainerExtension
 {
+    /// <summary>
+    /// Identifies the desktop application's main native window for automatic ownership when no application window
+    /// is active. Called once by the host; registration is weak and does not create or activate the window.
+    /// </summary>
+    public void ConfigureMainWindow(INativeWindow window)
+    {
+        NativeWindowRegistry.Instance.SetMainWindow((NativeWindow)window);
+    }
+
     private static readonly IFluentLog Log = typeof(BlazorWpfRegistrations).PrepareLogger();
 
     protected override void Initialize()

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
@@ -13,7 +12,6 @@ partial class NativeWindow
 {
     // Requested pin belongs to the controller. The WPF property is the effective native policy.
     // Registered windows expose scalar snapshots only: never enter an owner's dispatcher from a child.
-    private static readonly ConcurrentDictionary<IntPtr, NativeWindow> PolicyWindows = new();
     private IntPtr appliedOwnerHandle;
     private volatile bool requestedNativeTopmost;
     private int topmostReconciliationPending;
@@ -24,12 +22,12 @@ partial class NativeWindow
     {
         var handle = window.WindowHandle;
         var source = HwndSource.FromHwnd(handle);
-        PolicyWindows[handle] = this;
+        Volatile.Write(ref registryHandle, handle);
         source.AddHook(OwnershipHook);
         window.Anchors.Add(ownerObservation);
         window.Anchors.Add(Disposable.Create(() =>
         {
-            PolicyWindows.TryRemove(handle, out _);
+            Volatile.Write(ref registryHandle, IntPtr.Zero);
             source.RemoveHook(OwnershipHook);
         }));
     }
@@ -43,7 +41,7 @@ partial class NativeWindow
         for (var ancestor = nextOwner; ancestor != IntPtr.Zero;)
         {
             if (!visited.Add(ancestor)) throw new InvalidOperationException("Window ownership must be acyclic.");
-            ancestor = PolicyWindows.TryGetValue(ancestor, out var registered)
+            ancestor = NativeWindowRegistry.Instance.TryGetWindow(ancestor, out var registered)
                 ? Volatile.Read(ref registered.appliedOwnerHandle)
                 : User32.GetWindow(ancestor, User32.GetWindowCommands.GW_OWNER);
         }
@@ -85,7 +83,7 @@ partial class NativeWindow
         if (requestedNativeTopmost) return true;
         var owner = Volatile.Read(ref appliedOwnerHandle);
         if (owner == IntPtr.Zero || !visited.Add(owner)) return false;
-        return PolicyWindows.TryGetValue(owner, out var registered)
+        return NativeWindowRegistry.Instance.TryGetWindow(owner, out var registered)
             ? registered.CalculateEffectiveTopmost(visited)
             : ReadNativeTopmost(owner);
     }
@@ -102,6 +100,8 @@ partial class NativeWindow
             // No SHOWWINDOW: showing belongs to Show/ShowDialog. No activation or geometry changes.
             // HWND_NOTOPMOST is a no-op once the bit is already clear. Reorder within the normal
             // band with HWND_TOP in that case, otherwise a child can remain behind its owner.
+            // Allow Win32 to normalize the owned group: NOOWNERZORDER can leave a demoted
+            // descendant below its owner even when SetWindowPos succeeds.
             var insertAfter = target ? User32.SpecialWindowHandles.HWND_TOPMOST
                 : ReadNativeTopmost(handle) ? User32.SpecialWindowHandles.HWND_NOTOPMOST
                 : User32.SpecialWindowHandles.HWND_TOP;
@@ -109,12 +109,11 @@ partial class NativeWindow
                     insertAfter,
                     0, 0, 0, 0,
                     User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE |
-                    User32.SetWindowPosFlags.SWP_NOACTIVATE | User32.SetWindowPosFlags.SWP_NOOWNERZORDER))
+                    User32.SetWindowPosFlags.SWP_NOACTIVATE))
             {
                 throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "Failed to apply window topmost policy");
             }
         }
-
     }
 
     private static bool ReadNativeTopmost(IntPtr handle) =>
