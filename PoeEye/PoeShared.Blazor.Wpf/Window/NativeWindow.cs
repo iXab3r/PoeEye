@@ -66,7 +66,9 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
 
     private readonly BlockingCollection<IWindowEvent> eventQueue;
     private readonly Dispatcher uiDispatcher;
-    private readonly bool suppressActivation;
+    private readonly object activationConfigurationGate = new();
+    private volatile bool suppressActivation;
+    private bool activationConfigurationFrozen;
     private bool EffectiveNoActivate => suppressActivation || NoActivate;
     private readonly TaskCompletionSource isClosedTcs;
     private readonly SerialDisposable dragAnchor;
@@ -80,18 +82,16 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private long lastSetSizeLogMs;
     private long lastSetRectLogMs;
 
-    public NativeWindow([OptionalDependency] Dispatcher dispatcher = null,
-        [OptionalDependency] NativeWindowActivationPolicy activationPolicy = null) : this("NWnd", dispatcher, activationPolicy)
+    public NativeWindow([OptionalDependency] Dispatcher dispatcher = null) : this("NWnd", dispatcher)
     {
     }
 
-    private protected NativeWindow(string logPrefix, Dispatcher dispatcher, NativeWindowActivationPolicy activationPolicy)
+    private protected NativeWindow(string logPrefix, Dispatcher dispatcher)
     {
         Log.AddSuffix($"{logPrefix}#{windowId}");
         Log.Debug("New window is being created");
         isClosedTcs = new TaskCompletionSource();
         this.uiDispatcher = dispatcher ?? BlazorDispatcherProvider.Instance.GetOrAdd("BlazorWindow").Dispatcher;
-        suppressActivation = activationPolicy?.SuppressActivation == true;
         windowSupplier = new Lazy<WindowView>(() => CreateWindow());
         eventQueue = new BlockingCollection<IWindowEvent>();
         dragAnchor = new SerialDisposable().AddTo(Anchors);
@@ -296,6 +296,22 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     public WindowStartupLocation WindowStartupLocation { get; set; } = WindowStartupLocation.CenterOwner;
 
     public IntPtr OwnerHandle { get; set; }
+
+    public bool SuppressActivation
+    {
+        get => suppressActivation;
+        set
+        {
+            lock (activationConfigurationGate)
+            {
+                if (activationConfigurationFrozen && value != suppressActivation)
+                {
+                    throw new InvalidOperationException("Activation suppression cannot change after native window creation begins.");
+                }
+                suppressActivation = value;
+            }
+        }
+    }
 
     public new IFluentLog Log => base.Log;
 
@@ -852,6 +868,11 @@ internal partial class NativeWindow : DisposableReactiveObjectWithLogger, INativ
     private WindowView CreateWindow()
     {
         uiDispatcher.VerifyAccess();
+        // Freeze before constructing the view: IsValueCreated is still false here.
+        lock (activationConfigurationGate)
+        {
+            activationConfigurationFrozen = true;
+        }
 
         var window = CreateWindowView();
         window.WindowStartupLocation = WindowStartupLocation;

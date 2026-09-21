@@ -29,8 +29,7 @@ internal partial class BlazorWindow : NativeWindow, IWpfBlazorWindow, IBlazorWin
     public BlazorWindow(
         IUnityContainer unityContainer,
         [OptionalDependency] IBlazorWindowConfigurator windowConfigurator = null,
-        [OptionalDependency] Dispatcher dispatcher = null,
-        [OptionalDependency] NativeWindowActivationPolicy activationPolicy = null) : base("BWnd", dispatcher, activationPolicy)
+        [OptionalDependency] Dispatcher dispatcher = null) : base("BWnd", dispatcher)
     {
         this.unityContainer = unityContainer;
         compositeFileProvider = new ReactiveCompositeFileProvider().AddTo(Anchors);

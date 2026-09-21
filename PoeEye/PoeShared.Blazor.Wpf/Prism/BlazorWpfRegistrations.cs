@@ -5,6 +5,7 @@ using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using Unity;
 using Unity.Extension;
+using Unity.Injection;
 
 namespace PoeShared.Blazor.Wpf.Prism;
 
@@ -14,9 +15,7 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
 
     protected override void Initialize()
     {
-        Container.RegisterType<IWpfBlazorWindow, BlazorWindow>();
-        Container.RegisterType<IBlazorWindow, BlazorWindow>();
-        Container.RegisterType<INativeWindow, NativeWindow>();
+        ConfigureActivationSuppression(false);
         Container.RegisterSingleton<IBlazorWindowViewRegistry, BlazorWindowViewRegistry>();
         Container.RegisterSingleton<IBlazorWindowViewRegistryRegistrar>(x => (BlazorWindowViewRegistry) x.Resolve<IBlazorWindowViewRegistry>());
         Container.RegisterSingleton<IWebView2EnvironmentController, WebView2EnvironmentController>();
@@ -27,5 +26,20 @@ public sealed class BlazorWpfRegistrations : UnityContainerExtension
         Container.RegisterSingleton<IRootContentFileProvider, RootContentFileProvider>();
         
         Container.AsServiceCollection().AddWpfContextMenuService(Container);
+    }
+
+    /// <summary>
+    /// Sets the activation-suppression default for subsequently resolved native and Blazor windows.
+    /// Call during host setup, before resolving windows. Property injection leaves scoped Blazor
+    /// configurators intact and completes before a window is returned to its caller.
+    /// </summary>
+    public void ConfigureActivationSuppression(bool suppressActivation)
+    {
+        Container.RegisterType<IWpfBlazorWindow, BlazorWindow>(
+            new InjectionProperty(nameof(INativeWindow.SuppressActivation), suppressActivation));
+        Container.RegisterType<IBlazorWindow, BlazorWindow>(
+            new InjectionProperty(nameof(INativeWindow.SuppressActivation), suppressActivation));
+        Container.RegisterType<INativeWindow, NativeWindow>(
+            new InjectionProperty(nameof(INativeWindow.SuppressActivation), suppressActivation));
     }
 }
