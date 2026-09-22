@@ -101,7 +101,9 @@ public class BlazorContentControl : Control, IBlazorContentControl
         WebView.Services = webViewServiceProvider;
 
         ReloadCommand = BlazorCommandWrapper.Create<object>(ReloadExecuted);
-        CloseHostWindowCommand = BlazorCommandWrapper.Create(CloseHostWindow);
+        // WPF command notifications must use this control's dispatcher, including in secondary windows.
+        CloseHostWindowCommand = BlazorCommandWrapper.FromReactiveCommand(
+            ReactiveCommand.Create(CloseHostWindow, outputScheduler: uiScheduler));
         OpenDevToolsCommand = BlazorCommandWrapper.Create(OpenDevTools);
         ZoomInCommand = BlazorCommandWrapper.Create(ZoomIn);
         ZoomOutCommand = BlazorCommandWrapper.Create(ZoomOut);
