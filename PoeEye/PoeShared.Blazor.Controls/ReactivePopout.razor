@@ -27,6 +27,7 @@
     private bool previousIsOpen;
     private bool shouldSkipRender;
     private bool shouldSyncVisibility;
+    private bool isDisposing;
 
     public ReactivePopout()
     {
@@ -79,7 +80,7 @@
     {
         await base.OnParametersSetAsync();
 
-        if (!HideViaCss || !IsComponentRendered || !shouldSyncVisibility)
+        if (isDisposing || !HideViaCss || !IsComponentRendered || !shouldSyncVisibility)
         {
             return;
         }
@@ -103,11 +104,25 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
+        if (isDisposing)
+        {
+            return;
+        }
+
         var module = await moduleTask.Value;
+        if (isDisposing)
+        {
+            return;
+        }
 
         if (firstRender)
         {
             await module.InvokeVoidAsync("ensureReactivePopoutTracking");
+        }
+
+        if (isDisposing)
+        {
+            return;
         }
 
         if (shouldSyncVisibility)
@@ -133,7 +148,7 @@
 
     private async Task CloseAsync()
     {
-        if (IsOpenChanged.HasDelegate)
+        if (!isDisposing && IsOpenChanged.HasDelegate)
         {
             await IsOpenChanged.InvokeAsync(false);
         }
@@ -141,9 +156,18 @@
 
     private async Task SyncVisibilityAsync()
     {
-        dotNetRef ??= DotNetObjectReference.Create(this);
-        var module = await moduleTask.Value;
+        if (isDisposing)
+        {
+            return;
+        }
 
+        var module = await moduleTask.Value;
+        if (isDisposing)
+        {
+            return;
+        }
+
+        dotNetRef ??= DotNetObjectReference.Create(this);
         await module.InvokeVoidAsync(
             "syncReactivePopout",
             PanelRef,
@@ -159,23 +183,35 @@
 
     public override async ValueTask DisposeAsync()
     {
-        dotNetRef?.DisposeJsSafe();
-
-        if (moduleTask.IsValueCreated)
+        if (isDisposing)
         {
-            var module = await moduleTask.Value;
-            try
-            {
-                await module.InvokeVoidSafeAsync("disposeReactivePopout", PanelRef);
-            }
-            catch (InvalidOperationException)
-            {
-                // ElementReference is no longer available during teardown, which is safe to ignore here.
-            }
-
-            await module.DisposeJsSafeAsync();
+            return;
         }
 
+        // Blazor can resume an earlier render while asynchronous teardown is in progress.
+        isDisposing = true;
         await base.DisposeAsync();
+
+        try
+        {
+            if (moduleTask.IsValueCreated)
+            {
+                var module = await moduleTask.Value;
+                try
+                {
+                    await module.InvokeVoidSafeAsync("disposeReactivePopout", PanelRef);
+                }
+                catch (InvalidOperationException)
+                {
+                    // ElementReference is no longer available during teardown, which is safe to ignore here.
+                }
+
+                await module.DisposeJsSafeAsync();
+            }
+        }
+        finally
+        {
+            dotNetRef?.DisposeJsSafe();
+        }
     }
 }
