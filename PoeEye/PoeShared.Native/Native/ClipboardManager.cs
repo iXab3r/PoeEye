@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Reactive.Concurrency;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -37,7 +39,9 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
 
     public bool ContainsImage()
     {
-        return Clipboard.ContainsImage();
+        var data = Clipboard.GetDataObject();
+        return data?.GetDataPresent("PNG", false) == true
+               || data?.GetDataPresent(DataFormats.Bitmap, true) == true;
     }
 
     public bool ContainsText()
@@ -62,12 +66,47 @@ internal sealed class ClipboardManager : DisposableReactiveObjectWithLogger, ICl
 
     public void SetImage(Image image)
     {
-        Clipboard.SetImage(image);
+        if (image == null)
+        {
+            throw new ArgumentNullException(nameof(image));
+        }
+
+        using var png = new MemoryStream();
+        image.Save(png, ImageFormat.Png);
+        png.Position = 0;
+
+        var data = new DataObject();
+        data.SetData("PNG", false, png);
+        data.SetData(DataFormats.Bitmap, true, image);
+        Clipboard.SetDataObject(data, true);
     }
     
     public Image GetImage()
     {
-        return Clipboard.GetImage();
+        var data = Clipboard.GetDataObject();
+        if (data?.GetData("PNG", false) is Stream stream)
+        {
+            var position = stream.CanSeek ? stream.Position : 0;
+            try
+            {
+                using var decoded = Image.FromStream(stream);
+                // Clone preserves straight-alpha RGB and detaches the result from the borrowed stream.
+                return (Image) decoded.Clone();
+            }
+            catch (ArgumentException ex) when (data.GetDataPresent(DataFormats.Bitmap, true))
+            {
+                Log.Warn("Could not decode clipboard PNG, falling back to Bitmap", ex);
+            }
+            finally
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Position = position;
+                }
+            }
+        }
+
+        return data?.GetData(DataFormats.Bitmap, true) as Image;
     }
 
     public void SetDataObject(object dataObject)
