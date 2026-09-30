@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Windows.Input;
 using System.Windows.Threading;
 using PoeShared.Scaffolding;
-using Control = System.Windows.Forms.Control;
-using MouseButtons = System.Windows.Forms.MouseButtons;
+using PInvoke;
 using Cursor = System.Windows.Forms.Cursor;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using UIElement = System.Windows.UIElement;
@@ -264,6 +263,11 @@ public abstract class BlazorWindowMouseDragControllerBase : DisposableReactiveOb
 
     private static bool IsPrimaryButtonPressed()
     {
-        return (Control.MouseButtons & MouseButtons.Left) == MouseButtons.Left;
+        // Cursor.Position is current, so the button state must also be current rather than
+        // GetKeyState/Control.MouseButtons' last processed UI message under dispatcher load.
+        var physicalButton = System.Windows.Forms.SystemInformation.MouseButtonsSwapped
+            ? User32.VirtualKey.VK_RBUTTON
+            : User32.VirtualKey.VK_LBUTTON;
+        return (User32.GetAsyncKeyState((int)physicalButton) & 0x8000) != 0;
     }
 }
