@@ -1,8 +1,13 @@
 using System.Collections.Generic;
+using ReactiveUI;
 
 namespace PoeShared.Blazor.Controls;
 
-public sealed class TreeViewDragDropScope<TItem>
+/// <summary>
+/// Shared reactive drag state for one or more tree views. Node binders observe this
+/// scope directly so receiving indicators, drop destination and clearing stay in sync.
+/// </summary>
+public sealed class TreeViewDragDropScope<TItem> : ReactiveObject
 {
     internal IDictionary<(long, long), TreeViewDragDropInfo> DragDropStateByNodeIds { get; } = new Dictionary<(long, long), TreeViewDragDropInfo>();
 

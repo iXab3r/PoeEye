@@ -152,7 +152,7 @@ public partial class TreeView<TItem> : BlazorReactiveComponent
     [Inject] internal IJsPoeBlazorUtils JsPoeBlazorUtils { get; init; } = null!;
     [Inject] private IDomEventListener DomEventListener { get; init; } = null!;
 
-    private TreeViewDragDropScope<TItem> ActiveDragDropScope => DragDropScope ?? localDragDropScope;
+    internal TreeViewDragDropScope<TItem> ActiveDragDropScope => DragDropScope ?? localDragDropScope;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
