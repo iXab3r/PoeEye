@@ -31,9 +31,9 @@ public partial class TreeViewNode<TItem> : BlazorReactiveComponent
     {
         Binder.Bind(x => x.Expanded && !x.IsLeaf).To(x => x.IsSwitcherOpen);
         Binder.Bind(x => !x.Expanded && !x.IsLeaf).To(x => x.IsSwitcherClose);
-        Binder.Bind(x => ReferenceEquals(x.TreeComponent.DragDropTargetContainerNode, x)).To(x => x.IsTargetContainer);
-        Binder.Bind(x => ReferenceEquals(x.TreeComponent.DragDropTargetBelowNode, x)).To(x => x.IsTargetBelow);
-        Binder.Bind(x => ReferenceEquals(x.TreeComponent.DragDropTargetNode, x)).To(x => x.IsDragTarget);
+        Binder.Bind(x => ReferenceEquals(x.TreeComponent.ActiveDragDropScope.DragDropTargetContainerNode, x)).To(x => x.IsTargetContainer);
+        Binder.Bind(x => ReferenceEquals(x.TreeComponent.ActiveDragDropScope.DragDropTargetBelowNode, x)).To(x => x.IsTargetBelow);
+        Binder.Bind(x => ReferenceEquals(x.TreeComponent.ActiveDragDropScope.DragDropTargetNode, x)).To(x => x.IsDragTarget);
 
         Binder.Bind(x => x.TreeComponent.Draggable && !x.Disabled && x.Draggable).To(x => x.IsDraggable);
         Binder.Bind(x => x.TreeComponent.Draggable && !x.Disabled && x.Droppable).To(x => x.IsDroppable);
