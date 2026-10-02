@@ -27,7 +27,10 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
 
     public FileInfo ShowDialog(IntPtr hwndOwner)
     {
-        throw new NotSupportedException("Using Owner is not supported");
+        var owner = HwndSource.FromHwnd(hwndOwner)?.RootVisual as Window
+            ?? throw new ArgumentException("A live WPF owner window is required", nameof(hwndOwner));
+        owner.Dispatcher.VerifyAccess();
+        return ShowSaveDialog(owner);
     }
 
     public FileInfo LastFile { get; private set; }
@@ -96,7 +99,9 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
         return files;
     }
 
-    FileInfo ISaveFileDialog.ShowDialog()
+    FileInfo ISaveFileDialog.ShowDialog() => ShowSaveDialog();
+
+    private FileInfo ShowSaveDialog(Window owner = null)
     {
         Log.Info($"Showing Save file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
         var dialog = new SaveFileDialog
@@ -109,7 +114,7 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
             Filter = Filter
         };
         
-        if (dialog.ShowDialog() != true)
+        if ((owner == null ? dialog.ShowDialog() : dialog.ShowDialog(owner)) != true)
         {
             Log.Info("User cancelled Save file dialog");
             return default;
