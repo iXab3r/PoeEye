@@ -1,3 +1,5 @@
+using System.Windows;
+using System.Windows.Interop;
 using PoeShared.Scaffolding;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
@@ -30,7 +32,17 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
 
     public FileInfo LastFile { get; private set; }
     
-    FileInfo IOpenFileDialog.ShowDialog()
+    FileInfo IOpenFileDialog.ShowDialog() => ShowOpenDialog();
+
+    FileInfo IOpenFileDialog.ShowDialog(IntPtr hwndOwner)
+    {
+        var owner = HwndSource.FromHwnd(hwndOwner)?.RootVisual as Window
+            ?? throw new ArgumentException("A live WPF owner window is required", nameof(hwndOwner));
+        owner.Dispatcher.VerifyAccess();
+        return ShowOpenDialog(owner);
+    }
+
+    private FileInfo ShowOpenDialog(Window owner = null)
     {
         Log.Info($"Showing Open file dialog, parameters: {new { Title, InitialDirectory, Filter, FileName = InitialFileName, LastSavedFile = LastFile }}");
         var dialog = new OpenFileDialog()
@@ -43,7 +55,7 @@ public sealed class WpfFileDialog : DisposableReactiveObjectWithLogger, ISaveFil
             Filter = Filter,
         };
         
-        if (dialog.ShowDialog() != true)
+        if ((owner == null ? dialog.ShowDialog() : dialog.ShowDialog(owner)) != true)
         {
             Log.Info("User cancelled Open file dialog");
             return default;
