@@ -269,6 +269,18 @@ public interface IJsPoeBlazorUtils : IAsyncDisposable
     /// <param name="elementRef">Reference to the target DOM element.</param>
     /// <param name="name">Attribute name to remove.</param>
     Task RemoveAttribute(ElementReference elementRef, string name);
+
+    /// <summary>
+    /// Claims the connected ancestor of an element using an exclusive context-menu marker.
+    /// Returns its unique selector; missing or already claimed ancestors fail explicitly.
+    /// </summary>
+    Task<string> RegisterAncestorContextMenuTarget(ElementReference elementRef, string ancestorSelector, string registrationId);
+
+    /// <summary>
+    /// Releases only the specified context-menu marker. Detached targets or a changed marker
+    /// are harmless; another registration's element is never cleared.
+    /// </summary>
+    Task UnregisterAncestorContextMenuTarget(string targetSelector, string registrationId);
     
     /// <summary>
     /// Returns the list of DOM elements present at the given viewport coordinates along with their breadcrumb paths

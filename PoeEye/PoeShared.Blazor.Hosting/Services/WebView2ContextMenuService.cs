@@ -53,6 +53,18 @@ internal sealed class WebView2ContextMenuService : IBlazorContextMenuService
         });
     }
 
+    public async Task<IDisposable> RegisterAncestorAsync(ElementReference elementRef, string ancestorSelector, Action<IList<BlazorContextMenuItem>> handler)
+    {
+        var cmId = $"CM-{Guid.NewGuid()}";
+        var target = await poeBlazorUtils.RegisterAncestorContextMenuTarget(elementRef, ancestorSelector, cmId);
+        managersById[cmId] = new ContextMenuManager(elementRef, cmId, handler);
+        return Disposable.Create(() =>
+        {
+            managersById.TryRemove(cmId, out _);
+            poeBlazorUtils.UnregisterAncestorContextMenuTarget(target, cmId).AndForget(ignoreExceptions: true);
+        });
+    }
+
     public Task ShowContextMenu(IList<BlazorContextMenuItem> items)
     {
         throw new NotImplementedException();

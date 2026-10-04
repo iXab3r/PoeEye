@@ -523,3 +523,24 @@ export function removeAttribute(target: string | HTMLElement, name: string): voi
         logAndThrow(`Error removing attribute '${attrName}'`, error);
     }
 }
+
+/** Claims the actual ancestor of this rendered component, preserving native event routing. */
+export function registerAncestorContextMenuTarget(child: HTMLElement, ancestorSelector: string, registrationId: string): string {
+    const target = resolveElement(child).closest(ancestorSelector);
+    if (!(target instanceof HTMLElement) || !target.isConnected) {
+        logAndThrow(`Connected context-menu ancestor '${ancestorSelector}' not found`);
+    }
+    if (target.hasAttribute('data-cm-id')) {
+        logAndThrow('Context-menu ancestor is already registered');
+    }
+    target.setAttribute('data-cm-id', registrationId);
+    return `[data-cm-id="${CSS.escape(registrationId)}"]`;
+}
+
+/** Removes this generation's marker only; a destroyed or replaced host requires no cleanup. */
+export function unregisterAncestorContextMenuTarget(targetSelector: string, registrationId: string): void {
+    const target = document.querySelector(targetSelector);
+    if (target?.getAttribute('data-cm-id') === registrationId) {
+        target.removeAttribute('data-cm-id');
+    }
+}

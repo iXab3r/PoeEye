@@ -13,6 +13,13 @@ public interface IBlazorContextMenuService
 
     Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<BlazorContextMenuItem>> handler);
 
+    /// <summary>
+    /// Registers a menu on the connected ancestor of this component's element. The returned
+    /// handle owns an exclusive DOM marker; dispose it with the component. An occupied or
+    /// missing ancestor fails registration rather than selecting another element.
+    /// </summary>
+    Task<IDisposable> RegisterAncestorAsync(ElementReference elementRef, string ancestorSelector, Action<IList<BlazorContextMenuItem>> handler);
+
     Task ShowContextMenu(IList<BlazorContextMenuItem> items);
 }
 
