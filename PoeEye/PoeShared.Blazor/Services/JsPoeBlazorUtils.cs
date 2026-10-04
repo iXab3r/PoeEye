@@ -223,6 +223,18 @@ internal sealed class JsPoeBlazorUtils : IJsPoeBlazorUtils
         await module.InvokeVoidAsync("removeAttribute", elementRef, name);
     }
     
+    public async Task<string> RegisterAncestorContextMenuTarget(ElementReference elementRef, string ancestorSelector, string registrationId)
+    {
+        var module = await GetModuleAsync();
+        return await module.InvokeAsync<string>("registerAncestorContextMenuTarget", elementRef, ancestorSelector, registrationId);
+    }
+
+    public async Task UnregisterAncestorContextMenuTarget(string targetSelector, string registrationId)
+    {
+        var module = await GetModuleAsync();
+        await module.InvokeVoidAsync("unregisterAncestorContextMenuTarget", targetSelector, registrationId);
+    }
+
     public async Task AddClass(string selectorOrElementId, params string[] classNames)
     {
         var module = await GetModuleAsync();

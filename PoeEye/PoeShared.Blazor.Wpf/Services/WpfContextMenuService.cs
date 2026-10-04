@@ -35,16 +35,19 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
     private static readonly IFluentLog Log = typeof(WpfContextMenuService).PrepareLogger();
 
     private readonly INotificationService notificationService;
+    private readonly IJsPoeBlazorUtils poeBlazorUtils;
     private readonly ConcurrentDictionary<string, ContextMenuManager> managersById = new();
     private readonly Subject<IList<BlazorContextMenuItem>> itemsSink = new();
     private readonly DispatcherScheduler scheduler;
 
     public WpfContextMenuService(
         IDomEventListener domEventListener,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IJsPoeBlazorUtils poeBlazorUtils)
     {
         DomEventListener = domEventListener;
         this.notificationService = notificationService;
+        this.poeBlazorUtils = poeBlazorUtils;
         scheduler = DispatcherScheduler.Current;
     }
 
@@ -52,7 +55,33 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
 
     public IDomEventListener DomEventListener { get; }
 
-    public async Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<BlazorContextMenuItem>> handler)
+    public Task<IDisposable> RegisterAsync(ElementReference elementRef, Action<IList<BlazorContextMenuItem>> handler)
+    {
+        return RegisterTargetAsync(elementRef, handler);
+    }
+
+    public async Task<IDisposable> RegisterAncestorAsync(ElementReference elementRef, string ancestorSelector, Action<IList<BlazorContextMenuItem>> handler)
+    {
+        var registrationId = $"CM-WPF-Target-{Guid.NewGuid()}";
+        var target = await poeBlazorUtils.RegisterAncestorContextMenuTarget(elementRef, ancestorSelector, registrationId);
+        IDisposable registration;
+        try
+        {
+            registration = await RegisterTargetAsync(target, handler, throwOnFailure: true);
+        }
+        catch
+        {
+            await poeBlazorUtils.UnregisterAncestorContextMenuTarget(target, registrationId);
+            throw;
+        }
+        return Disposable.Create(() =>
+        {
+            registration.Dispose(); // Disable the callback before releasing the marker.
+            poeBlazorUtils.UnregisterAncestorContextMenuTarget(target, registrationId).AndForget(ignoreExceptions: true);
+        });
+    }
+
+    private async Task<IDisposable> RegisterTargetAsync(object elementRef, Action<IList<BlazorContextMenuItem>> handler, bool throwOnFailure = false)
     {
         var cmId = $"CM-WPF-{Guid.NewGuid()}";
         try
@@ -69,6 +98,11 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
         catch (Exception e)
         {
             Log.Warn($"Failed to register context menu for {elementRef}", e);
+            if (throwOnFailure)
+            {
+                if (managersById.TryRemove(cmId, out var failedManager)) failedManager.Dispose();
+                throw;
+            }
             return Disposable.Empty;
         }
 
@@ -382,7 +416,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
     {
         private static readonly Action<IList<BlazorContextMenuItem>> EmptyAction = _ => { };
 
-        public ContextMenuManager(ElementReference ElementRef, string DataCmId, Action<IList<BlazorContextMenuItem>> Handler)
+        public ContextMenuManager(object ElementRef, string DataCmId, Action<IList<BlazorContextMenuItem>> Handler)
         {
             this.ElementRef = ElementRef;
             this.DataCmId = DataCmId;
@@ -399,7 +433,7 @@ internal sealed class WpfContextMenuService : IBlazorContextMenuService
             Handler = EmptyAction; //there is a problem with DomEventListener.RemoveExclusive - it leaks, this allows to GC the handler at least
         }
 
-        public ElementReference ElementRef { get; init; }
+        public object ElementRef { get; init; }
         public string DataCmId { get; init; }
         public bool IsDisposed { get; private set; }
         public Action<IList<BlazorContextMenuItem>> Handler { get; private set; }
