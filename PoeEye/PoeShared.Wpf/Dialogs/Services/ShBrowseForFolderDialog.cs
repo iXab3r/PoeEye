@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Interop;
 using PInvoke;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -12,7 +13,17 @@ internal sealed class ShBrowseForFolderDialog : DisposableReactiveObjectWithLogg
 {
     private const int MAX_PATH = 256;
 
-    public DirectoryInfo ShowDialog()
+    public DirectoryInfo ShowDialog() => ShowDialogCore(null);
+
+    public DirectoryInfo ShowDialog(IntPtr hwndOwner)
+    {
+        var owner = HwndSource.FromHwnd(hwndOwner)?.RootVisual as System.Windows.Window
+            ?? throw new ArgumentException("A live WPF owner window is required", nameof(hwndOwner));
+        owner.Dispatcher.VerifyAccess();
+        return ShowDialogCore(hwndOwner);
+    }
+
+    private DirectoryInfo ShowDialogCore(IntPtr? hwndOwner)
     {
         Log.Info($"Showing Open folder dialog, parameters: {new {Title, InitialDirectory, LastDirectory = SelectedPath}}");
 
@@ -23,7 +34,7 @@ internal sealed class ShBrowseForFolderDialog : DisposableReactiveObjectWithLogg
             pszDisplayName = !string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory)
                 ? InitialDirectory
                 : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-            hwndOwner = UnsafeNative.ResolveParentForDialogWindow(),
+            hwndOwner = hwndOwner ?? UnsafeNative.ResolveParentForDialogWindow(),
             ulFlags = BrowseInfoFlag.BIF_STATUSTEXT | BrowseInfoFlag.BIF_EDITBOX | BrowseInfoFlag.BIF_NEWDIALOGSTYLE
         };
         var pidl = SHBrowseForFolder(ref bi);
