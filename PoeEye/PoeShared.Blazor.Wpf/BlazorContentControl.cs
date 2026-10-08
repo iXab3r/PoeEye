@@ -420,6 +420,8 @@ public class BlazorContentControl : Control, IBlazorContentControl
         }
 
         await webView.EnsureCoreWebView2Async();
+        // Reload must follow the initial host navigation, otherwise it can reload about:blank.
+        await WebView.WaitForInitialNavigationAsync();
         webView.Reload();
     }
 
