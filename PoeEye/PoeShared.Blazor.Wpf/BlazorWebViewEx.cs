@@ -38,6 +38,7 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
     protected CompositeDisposable Anchors { get; } = new();
     private WebView2Ex webView2Ex;
     private readonly ProxyFileProvider proxyFileProvider = new();
+    private readonly TaskCompletionSource<bool> initialNavigationCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public BlazorWebViewEx()
     {
@@ -60,7 +61,11 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 
         this.BlazorWebViewInitializing += OnBlazorWebViewInitializing;
         this.BlazorWebViewInitialized += OnBlazorWebViewInitialized;
+        Disposable.Create(() => initialNavigationCompletion.TrySetCanceled()).AddTo(Anchors);
     }
+
+    /// <summary>Waits for the first loaded host page; cancellation follows this view's lifetime.</summary>
+    internal Task WaitForInitialNavigationAsync() => initialNavigationCompletion.Task;
 
     public IFileProvider FileProvider
     {
@@ -180,6 +185,11 @@ public class BlazorWebViewEx : BlazorWebView, IDisposable
 
     private void WebViewOnNavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
     {
+        if (e.IsSuccess && webView2Ex.CoreWebView2.Source is { Length: > 0 } source && source != "about:blank")
+        {
+            initialNavigationCompletion.TrySetResult(true);
+        }
+
         webView2Ex.RenderTransform = new TranslateTransform(0, 0);
     }
 
