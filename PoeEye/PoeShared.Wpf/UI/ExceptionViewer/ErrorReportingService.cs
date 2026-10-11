@@ -110,13 +110,13 @@ internal sealed class ErrorReportingService : DisposableReactiveObject, IErrorRe
 
     public void ReportProblem(Exception error = null)
     {
-        ShowExceptionDialog(error);
+        ReportProblem(new ExceptionDialogConfig { Exception = error });
     }
 
-    private void ShowExceptionDialog(Exception exception)
+    public void ReportProblem(ExceptionDialogConfig config)
     {
-        Log.Info($"Preparing config for exception {exception}");
-        var config = PrepareConfigSafe(exception);
+        Log.Info($"Preparing config for exception {config.Exception}");
+        config = PrepareConfigSafe(config);
 
         Log.Info("Creating report items aggregator");
         using var itemsAggregator = reportItemsAggregatorFactory.Create(config);
@@ -209,28 +209,29 @@ internal sealed class ErrorReportingService : DisposableReactiveObject, IErrorRe
         Dispatcher.CurrentDispatcher.UnhandledException -= DispatcherOnUnhandledException;
 
 
-        ShowExceptionDialog(exception);
+        ReportProblem(exception);
 
         Log.Warn("Shutting down...");
         applicationAccessor.Terminate(-1);
     }
 
-    private ExceptionDialogConfig PrepareConfigSafe(Exception exception)
+    private ExceptionDialogConfig PrepareConfigSafe(ExceptionDialogConfig config)
     {
-        var basicConfig = new ExceptionDialogConfig
+        var basicConfig = config with
         {
-            AppName = appArguments.AppName,
-            Title = $"{appArguments.AppTitle} Error Report",
-            Timestamp = clock.Now,
-            ReportHandler = reportHandler,
-            Exception = exception
+            AppName = config.AppName ?? appArguments.AppName,
+            Title = config.Title ?? $"{appArguments.AppTitle} Error Report",
+            Timestamp = config.Timestamp == default ? clock.Now : config.Timestamp,
+            ReportHandler = config.ReportHandler ?? reportHandler
         };
 
         try
         {
             return basicConfig with
             {
-                ItemProviders = reportItemProviders.Items.ToArray()
+                ItemProviders = reportItemProviders.Items
+                    .Concat(config.ItemProviders ?? Array.Empty<IErrorReportItemProvider>())
+                    .ToArray()
             };
         }
         catch (Exception e)

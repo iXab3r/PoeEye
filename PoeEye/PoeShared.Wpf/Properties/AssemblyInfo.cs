@@ -20,6 +20,7 @@ using RestEase;
 
 [assembly: AssemblyVersion("0.0.0.0")]
 [assembly: AssemblyFileVersion("0.0.0.0")]
+[assembly: TypeForwardedTo(typeof(PoeShared.UI.ExceptionDialogConfig))]
 [assembly: Guid("6079CD25-FF46-4BEE-BC14-02AE4BDC7BB0")]
 [assembly: InternalsVisibleTo("EyeAuras.Tests")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
