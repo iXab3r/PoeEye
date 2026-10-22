@@ -26,7 +26,7 @@ Solved by timestamping and IDing all events. Last always wins.
 - we have a single Channel through which all changes are happening - Show/Hide requests, property updates by user,
 event updates by window itself
 - each property value is stored inside its own reactive container
-tracks its last update timestamp, revision and update source (system or user)
+tracks its last update timestamp, revision and routing origin (`Internal` or `External`). These origins describe command-routing and notification semantics, not whether a person caused the change; see [the project instructions](../AGENTS.md).
 - each property is being subscribed to after window is first shown. If property changes
 then a special command is put into Channel
 - Channel analyses update/command notifications on a separate dispatcher
