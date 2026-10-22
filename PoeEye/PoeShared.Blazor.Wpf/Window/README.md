@@ -7,7 +7,7 @@
 - anything (own Window events / user driver events) come through the same Channel
 
 # Class structure
-- `NativeWindow` (`INativeWindow`) - Blazor-agnostic core: dispatcher, command channel (Queue), timestamped
+- `NativeWindow` (`INativeWindow`) - Blazor-agnostic core: dispatcher, command channel (Queue), revisioned
   property mirror (PropertyHolder), lifecycle, title bar chrome/transparency logic (WindowView).
   Hosts arbitrary WPF content supplied via `ContentFactory` (invoked on the window's own UI thread).
 - `BlazorWindow` (`IBlazorWindow : INativeWindow`) - specialization which hosts Blazor/WebView2 content
@@ -16,7 +16,7 @@
 
 # Problems
 - race condition when window notifies about its own properties update (e.g. dragging/resizing) + user sets value.
-Solved by timestamping and IDing all events. Last always wins. 
+Property state records a revision and routing origin. Preserve notification and command ordering as specified in [the project instructions](../AGENTS.md).
 
 # How it works
 - inner WPF window is not even created initially
@@ -26,7 +26,7 @@ Solved by timestamping and IDing all events. Last always wins.
 - we have a single Channel through which all changes are happening - Show/Hide requests, property updates by user,
 event updates by window itself
 - each property value is stored inside its own reactive container
-tracks its last update timestamp, revision and update source (system or user)
+tracks its value, revision and routing origin (`Internal` or `External`). These origins describe command-routing and notification semantics, not whether a person caused the change; see [the project instructions](../AGENTS.md).
 - each property is being subscribed to after window is first shown. If property changes
 then a special command is put into Channel
 - Channel analyses update/command notifications on a separate dispatcher

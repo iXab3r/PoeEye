@@ -1,6 +1,6 @@
 # PoeShared.Tests Instructions
 
-These instructions apply to `Sources/PoeShared.Tests` unless a deeper `AGENTS.md` overrides them.
+These instructions apply to this directory and its descendants unless a deeper `AGENTS.md` overrides them.
 
 ## C# Test Structure
 
