@@ -47,6 +47,9 @@ public static class Program
             handler.AddHandler(nameof(LauncherMethod.Version), HandleVersion);
             handler.AddHandler<RestartAppArguments>(nameof(LauncherMethod.StartApp), HandleRestart);
             handler.AddHandler<SwapAppArguments>(nameof(LauncherMethod.SwapApp), HandleSwapApp);
+            handler.AddHandler<DirectoryUpdateArguments>(nameof(LauncherMethod.DirectoryUpdate), arguments =>
+                DirectoryUpdateHandoff.RunHelperAsync(arguments.PlanPath, arguments.PlanSha256,
+                    arguments.PipeName, arguments.InstallPayload).GetAwaiter().GetResult());
             if (!handler.TryHandle(args))
             {
                 return;
@@ -58,6 +61,7 @@ public static class Program
         catch (Exception e)
         {
             Log.Error("Operation failed", e);
+            if (args.Method == nameof(LauncherMethod.DirectoryUpdate)) Environment.Exit(1);
             throw;
         }
     }

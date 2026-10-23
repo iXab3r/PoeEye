@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using CommandLine;
 using PoeShared.Modularity;
@@ -76,19 +78,8 @@ public class AppArguments : AppOptions, IAppArguments
         IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 #endif
         
-        var arguments = CommandLineSplitter.Instance.Split(Environment.CommandLine).ToArray();
-        var cmdLineArgs = arguments.Skip(1).ToArray();
-        if (cmdLineArgs.Length == 1)
-        {
-            if (cmdLineArgs.Length == 1 && StringUtils.IsHexGzip(cmdLineArgs[0]))
-            {
-                Log.Info($"Decompressing arguments: {cmdLineArgs[0]}");
-                //compressed arg list
-                var decompressed = StringUtils.FromHexGzip(cmdLineArgs[0]);
-                Log.Info($"Decompressed arguments: {decompressed}");
-                cmdLineArgs = CommandLineSplitter.Instance.Split(decompressed).ToArray();
-            }
-        }
+        var arguments = Environment.GetCommandLineArgs();
+        var cmdLineArgs = DecodeCommandLineArguments(arguments.Skip(1).ToArray());
         var parsed = Parse(cmdLineArgs);
         if (!parsed)
         {
@@ -213,6 +204,34 @@ public class AppArguments : AppOptions, IAppArguments
 
     public string StartupArgs { get; }
     
+    /// <summary>Decodes the protected launcher's existing GH transport with the native process-token quoting rules on Windows.</summary>
+    internal static string[] DecodeCommandLineArguments(string[] arguments)
+    {
+        if (arguments.Length != 1 || !StringUtils.IsHexGzip(arguments[0])) return arguments;
+        Log.Info($"Decompressing arguments: {arguments[0]}");
+        var decompressed = StringUtils.FromHexGzip(arguments[0]);
+        Log.Info($"Decompressed arguments: {decompressed}");
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return CommandLineSplitter.Instance.Split(decompressed).ToArray();
+
+        // argv[0] follows special Windows parsing rules, so prepend an ordinary executable token.
+        var nativeArguments = ParseWindowsCommandLine("PoeShared.exe " + decompressed, out var count);
+        if (nativeArguments == IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error());
+        try
+        {
+            return Enumerable.Range(1, count - 1)
+                .Select(index => Marshal.PtrToStringUni(Marshal.ReadIntPtr(nativeArguments, index * IntPtr.Size)))
+                .ToArray();
+        }
+        finally { LocalFree(nativeArguments); }
+    }
+
+    [DllImport("shell32.dll", EntryPoint = "CommandLineToArgvW", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern IntPtr ParseWindowsCommandLine(string commandLine, out int argumentCount);
+
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr LocalFree(IntPtr memory);
+
     public string[] CommandLineArguments { get; }
     
     public string[] CommandLineArgumentsEx { get; }

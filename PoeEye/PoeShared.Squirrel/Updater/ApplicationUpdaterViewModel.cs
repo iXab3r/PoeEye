@@ -2,12 +2,15 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using ByteSizeLib;
 using DynamicData;
@@ -40,6 +43,18 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     private readonly IMessageBoxService messageBoxService;
     private readonly ISharedResourceLatch isBusyLatch;
     private readonly ISharedResourceLatch applyLatch;
+    private readonly ApplicationUpdateHandlerRegistrator registeredUpdater;
+    private readonly ReadOnlyObservableCollection<IReleaseEntry> nativeAvailableReleases;
+    private readonly ReadOnlyObservableCollection<IReleaseEntry> emptyAvailableReleases = new(new ObservableCollection<IReleaseEntry>());
+    private IPoeUpdateInfo nativeLatestUpdate;
+    private IPoeUpdateInfo observedGenericNativeUpdate;
+    private bool nativeCanUpdateToLatest;
+    private bool nativeHasUpdatesToInstall;
+    private bool nativeIsBusy;
+    private bool nativeIsInErrorStatus;
+    private string nativeStatusText;
+    private long updateSourceGeneration;
+    private long nativeProjectionGeneration;
 
     static ApplicationUpdaterViewModel()
     {
@@ -50,14 +65,15 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             .OnScheduler(x => x.uiScheduler)
             .To(x => x.CanUpdateToLatest);
 
-        Binder.Bind(x => x.LatestUpdate != null && x.LatestUpdate.ReleasesToApply.EmptyIfNull().Any())
+        Binder.Bind(x => x.LatestUpdate)
             .OnScheduler(x => x.uiScheduler)
-            .To(x => x.HasUpdatesToInstall);
+            .To((x, update) => x.HasUpdatesToInstall = update != null && update.ReleasesToApply.EmptyIfNull().Any());
     }
 
     public ApplicationUpdaterViewModel(
         IFactory<IUpdaterWindowDisplayer> updateWindowDisplayer,
         IApplicationUpdaterModel updaterModel,
+        ApplicationUpdateHandlerRegistrator registeredUpdater,
         IApplicationAccessor applicationAccessor,
         IConfigProvider<UpdateSettingsConfig> configProvider,
         IMessageBoxService messageBoxService,
@@ -73,14 +89,60 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
         this.updateWindowDisplayer = updateWindowDisplayer;
         this.updaterModel = updaterModel;
+        this.registeredUpdater = registeredUpdater;
         this.messageBoxService = messageBoxService;
         this.uiScheduler = uiScheduler;
         this.isBusyLatch = new SharedResourceLatch().AddTo(Anchors);
         applyLatch = new SharedResourceLatch().AddTo(Anchors);
 
+        registeredUpdater.HandedOff += PublishHandoff;
+        Disposable.Create(() => registeredUpdater.HandedOff -= PublishHandoff).AddTo(Anchors);
+
+        Observable.FromEvent(handler => registeredUpdater.Changed += handler, handler => registeredUpdater.Changed -= handler)
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(() =>
+            {
+                // HandedOff has its own synchronous dispatcher publication. Queued progress
+                // or reentrant source/disposal notifications cannot publish it a second time.
+                if (registeredUpdater.Phase == ApplicationUpdatePhase.HandedOff)
+                {
+                    this.RaisePropertyChanged(nameof(IsInErrorStatus));
+                    this.RaisePropertyChanged(nameof(StatusText));
+                    return;
+                }
+                var nativeUpdate = registeredUpdater.NativeUpdate;
+                var generation = Interlocked.Read(ref updateSourceGeneration);
+                if (nativeUpdate != null && !ReferenceEquals(nativeUpdate, observedGenericNativeUpdate) &&
+                    ReferenceEquals(nativeUpdate, updaterModel.LatestUpdate) && HasCurrentNativeProjection())
+                {
+                    availableReleasesSource.EditDiff(nativeUpdate.RemoteReleases);
+                    // A collection consumer may choose a different source or native result synchronously.
+                    if (generation != Interlocked.Read(ref updateSourceGeneration) ||
+                        ReferenceEquals(nativeUpdate, observedGenericNativeUpdate) ||
+                        !ReferenceEquals(nativeUpdate, registeredUpdater.NativeUpdate) ||
+                        !ReferenceEquals(nativeUpdate, updaterModel.LatestUpdate)) return;
+                    LatestUpdate = nativeUpdate;
+                }
+                // Forward live getters, never a captured state that could outlive source invalidation.
+                this.RaisePropertyChanged(nameof(LatestUpdate));
+                this.RaisePropertyChanged(nameof(AvailableReleases));
+                this.RaisePropertyChanged(nameof(SelectedUpdate));
+                this.RaisePropertyChanged(nameof(InstalledVersionText));
+                this.RaisePropertyChanged(nameof(TargetVersionText));
+                this.RaisePropertyChanged(nameof(Phase));
+                this.RaisePropertyChanged(nameof(CanApplyPreparedUpdate));
+                this.RaisePropertyChanged(nameof(ProgressStage));
+                this.RaisePropertyChanged(nameof(ProgressPercent));
+                this.RaisePropertyChanged(nameof(IsProgressIndeterminate));
+                this.RaisePropertyChanged(nameof(IsBusy));
+                this.RaisePropertyChanged(nameof(IsInErrorStatus));
+                this.RaisePropertyChanged(nameof(StatusText));
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
+
         var checkForUpdatesCommandSink = new Subject<Unit>();
         CheckForUpdatesCommand = CommandWrapper
-            .Create<object>(async x => { checkForUpdatesCommandSink.OnNext(Unit.Default); }, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid));
+            .Create<object>(async x => { checkForUpdatesCommandSink.OnNext(Unit.Default); }, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x?.IsValid == true));
 
         CheckForUpdatesCommand
             .ThrownExceptions
@@ -100,7 +162,33 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             .Bind(out var availableReleases)
             .SubscribeToErrors(Log.HandleUiException)
             .AddTo(Anchors);
-        AvailableReleases = availableReleases;
+        nativeAvailableReleases = availableReleases;
+
+        updaterModel.WhenAnyValue(x => x.UpdateSource)
+            .Select(_ => Interlocked.Increment(ref updateSourceGeneration))
+            .ObserveOn(uiScheduler)
+            .SubscribeSafe(generation =>
+            {
+                if (generation != Interlocked.Read(ref updateSourceGeneration)) return;
+                LatestUpdate = null;
+                CanUpdateToLatest = false;
+                HasUpdatesToInstall = false;
+                SetStatus(string.Empty);
+                availableReleasesSource.Clear();
+                // Collection/property consumers may choose another source during cleanup.
+                if (generation != Interlocked.Read(ref updateSourceGeneration)) return;
+                Interlocked.Exchange(ref nativeProjectionGeneration, generation);
+
+                // Only the cleared UI-owned projection can become current for this source.
+                this.RaisePropertyChanged(nameof(LatestUpdate));
+                this.RaisePropertyChanged(nameof(CanUpdateToLatest));
+                this.RaisePropertyChanged(nameof(HasUpdatesToInstall));
+                this.RaisePropertyChanged(nameof(AvailableReleases));
+                this.RaisePropertyChanged(nameof(StatusText));
+                this.RaisePropertyChanged(nameof(IsInErrorStatus));
+                this.RaisePropertyChanged(nameof(ProgressPercent));
+            }, Log.HandleUiException)
+            .AddTo(Anchors);
 
         this.ObservableForProperty(x => x.CheckForUpdates, skipInitial: true).ToUnit()
             .ObserveOn(uiScheduler)
@@ -180,9 +268,16 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                     .Select(x => new {open = true, silent = false, reason = $"settings changed, {nameof(AutomaticallyDownloadUpdates)} enabled"}),
                 checkForUpdatesCommandSink.Select(_ => new {open = true, silent = false, reason = $"user requested update"}))
             .ObserveOn(uiIdleScheduler)
+            .Where(x => updaterModel.UpdateSource?.IsValid == true)
             .Do(x => Log.Debug($"Checking for updates: {x}"))
             .Where(x => !IsBusy)
-            .SubscribeAsync(async x => { await CheckForUpdate(open: x.open, silent: x.silent); })
+            .SubscribeAsync(async x =>
+            {
+                if (registeredUpdater.RoutesCurrentSource)
+                    await registeredUpdater.CheckAsync(CancellationToken.None, preservePrepared: !x.open);
+                else
+                    await CheckForUpdate(open: x.open, silent: x.silent);
+            })
             .AddTo(Anchors);
 
         ShowUpdaterCommand = CommandWrapper.Create<object>(ShowUpdaterCommandExecuted);
@@ -195,6 +290,53 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     }
 
     public string UpdateInfo => LatestUpdate?.ReleasesToApply.EmptyIfNull().Select(x => $"{x.Version} (delta: {x.IsDelta})").JoinStrings(" => ");
+
+#nullable enable
+    public IApplicationUpdateInfo? SelectedUpdate => registeredUpdater.SelectedUpdate;
+    public string InstalledVersionText => registeredUpdater.InstalledVersionText;
+    public string TargetVersionText => registeredUpdater.TargetVersionText;
+    public ApplicationUpdatePhase Phase => registeredUpdater.Phase;
+    public bool CanApplyPreparedUpdate => registeredUpdater.CanApplyPreparedUpdate;
+    public string ProgressStage => registeredUpdater.ProgressStage;
+    public bool IsProgressIndeterminate => registeredUpdater.IsProgressIndeterminate;
+
+    public Task<UpdateOperationOutcome> CheckAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (nativeIsBusy) return Task.FromResult(UpdateOperationOutcome.Busy);
+        return registeredUpdater.CheckAsync(cancellationToken);
+    }
+
+    public Task<UpdateOperationOutcome> DownloadAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (nativeIsBusy) return Task.FromResult(UpdateOperationOutcome.Busy);
+        return registeredUpdater.DownloadAsync(cancellationToken);
+    }
+
+    /// <summary>Dispatches a prepared target through application-owned installation acceptance.</summary>
+    public Task<UpdateOperationOutcome> ApplyAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (nativeIsBusy) return Task.FromResult(UpdateOperationOutcome.Busy);
+        return registeredUpdater.ApplyAsync(cancellationToken);
+    }
+
+    public Task<ApplicationUpdateChangelog> GetChangelogAsync(CultureInfo culture, CancellationToken cancellationToken)
+    {
+        return registeredUpdater.GetChangelogAsync(culture, cancellationToken);
+    }
+
+    private void PublishHandoff()
+    {
+        this.RaisePropertyChanged(nameof(SelectedUpdate));
+        this.RaisePropertyChanged(nameof(InstalledVersionText));
+        this.RaisePropertyChanged(nameof(TargetVersionText));
+        this.RaisePropertyChanged(nameof(CanApplyPreparedUpdate));
+        this.RaisePropertyChanged(nameof(IsBusy));
+        this.RaisePropertyChanged(nameof(Phase));
+    }
+#nullable restore
 
     public bool IsDeltaUpdate => LatestUpdate?.ReleasesToApply?.EmptyIfNull().Any(x => x.IsDelta) ?? false;
 
@@ -210,23 +352,87 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public CommandWrapper ShowUpdaterCommand { get; }
 
-    public bool IsInErrorStatus { get; private set; }
+    // Native setter equality uses its backing value: the public getter can already
+    // project the registered owner's state during a legacy setter invocation.
+    [PropertyChanged.DoNotNotify]
+    public bool IsInErrorStatus
+    {
+        get => registeredUpdater.UsesGenericProjection ? registeredUpdater.IsInErrorStatus : HasCurrentNativeProjection() && nativeIsInErrorStatus;
+        private set
+        {
+            if (nativeIsInErrorStatus == value) return;
+            nativeIsInErrorStatus = value;
+            this.RaisePropertyChanged(nameof(IsInErrorStatus));
+        }
+    }
 
-    public bool CanUpdateToLatest { get; [UsedImplicitly] private set; }
+    // Compare native backing values: a superseded-source getter can already project false
+    // while the queued UI operation still needs to clear the old native value.
+    [PropertyChanged.DoNotNotify]
+    public bool CanUpdateToLatest
+    {
+        get => HasCurrentNativeProjection() && nativeCanUpdateToLatest;
+        [UsedImplicitly] private set
+        {
+            if (nativeCanUpdateToLatest == value) return;
+            nativeCanUpdateToLatest = value;
+            this.RaisePropertyChanged(nameof(CanUpdateToLatest));
+        }
+    }
 
-    public bool HasUpdatesToInstall { get; [UsedImplicitly] private set; }
+    [PropertyChanged.DoNotNotify]
+    public bool HasUpdatesToInstall
+    {
+        get => HasCurrentNativeProjection() && nativeHasUpdatesToInstall;
+        [UsedImplicitly] private set
+        {
+            if (nativeHasUpdatesToInstall == value) return;
+            nativeHasUpdatesToInstall = value;
+            this.RaisePropertyChanged(nameof(HasUpdatesToInstall));
+        }
+    }
 
     public bool AutomaticallyDownloadUpdates { get; private set; }
 
-    public string StatusText { get; private set; }
+    [PropertyChanged.DoNotNotify]
+    public string StatusText
+    {
+        get => registeredUpdater.UsesGenericProjection ? registeredUpdater.StatusText : HasCurrentNativeProjection() ? nativeStatusText : string.Empty;
+        private set
+        {
+            if (nativeStatusText == value) return;
+            nativeStatusText = value;
+            this.RaisePropertyChanged(nameof(StatusText));
+        }
+    }
 
     public bool IsOpen { get; set; }
 
-    public ReadOnlyObservableCollection<IReleaseEntry> AvailableReleases { get; }
+    public ReadOnlyObservableCollection<IReleaseEntry> AvailableReleases => HasCurrentNativeProjection() ? nativeAvailableReleases : emptyAvailableReleases;
 
     public bool CheckForUpdates { get; set; }
 
-    public IPoeUpdateInfo LatestUpdate { get; private set; }
+    // Preserve backing-value equality even when the public superseded-source projection is already null.
+    [PropertyChanged.DoNotNotify]
+    public IPoeUpdateInfo LatestUpdate
+    {
+        get
+        {
+            if (!HasCurrentNativeProjection()) return null;
+            var nativeUpdate = registeredUpdater.NativeUpdate;
+            return nativeUpdate != null && !ReferenceEquals(nativeUpdate, observedGenericNativeUpdate) &&
+                ReferenceEquals(nativeUpdate, updaterModel.LatestUpdate) ? nativeUpdate : nativeLatestUpdate;
+        }
+        private set
+        {
+            // A later legitimate legacy setter wins over an already observed generic native result,
+            // including force-update results that do not replace the model's LatestUpdate property.
+            observedGenericNativeUpdate = registeredUpdater.NativeUpdate;
+            if (Equals(nativeLatestUpdate, value)) return;
+            nativeLatestUpdate = value;
+            this.RaisePropertyChanged(nameof(LatestUpdate));
+        }
+    }
 
     public Version LatestAppliedVersion => updaterModel.LatestAppliedVersion;
 
@@ -234,9 +440,24 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public UpdateSourceInfo UpdateSource => updaterModel.UpdateSource;
 
-    public int ProgressPercent => updaterModel.ProgressPercent;
+    public int ProgressPercent => registeredUpdater.UsesGenericProjection ? registeredUpdater.ProgressPercent :
+        registeredUpdater.NativeProgressPercent ?? (HasCurrentNativeProjection() ? updaterModel.ProgressPercent : 0);
 
-    public bool IsBusy { get; private set; }
+    private bool HasCurrentNativeProjection() => !registeredUpdater.UsesGenericProjection &&
+        updaterModel.UpdateSource != null &&
+        Interlocked.Read(ref nativeProjectionGeneration) == Interlocked.Read(ref updateSourceGeneration);
+
+    [PropertyChanged.DoNotNotify]
+    public bool IsBusy
+    {
+        get => registeredUpdater.IsBusy || nativeIsBusy;
+        private set
+        {
+            if (nativeIsBusy == value) return;
+            nativeIsBusy = value;
+            this.RaisePropertyChanged(nameof(IsBusy));
+        }
+    }
 
     public CommandWrapper OpenUri { get; }
 
@@ -244,11 +465,21 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
 
     public Task<IReleaseEntry> FetchUpdate(Version targetVersion)
     {
-        return updaterModel.CheckForUpdate(targetVersion);
+        return registeredUpdater.TrackNativeOperation(() => updaterModel.CheckForUpdate(targetVersion),
+            () => Task.FromException<IReleaseEntry>(new InvalidOperationException("An incompatible operation already owns the updater.")));
     }
 
-    public async Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry targetRelease)
+    /// <summary>Keeps native force-preparation ownership through its actual task and synchronous notifications.</summary>
+    public Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry targetRelease)
     {
+        return registeredUpdater.TrackNativeOperation(() => PrepareForceUpdateCore(targetRelease),
+            () => Task.FromException<IPoeUpdateInfo>(new InvalidOperationException("An incompatible operation already owns the updater.")));
+    }
+
+    private async Task<IPoeUpdateInfo> PrepareForceUpdateCore(IReleaseEntry targetRelease)
+    {
+        // Force preparation has no model Busy entry to retire a prior generic Download's progress.
+        registeredUpdater.RetireCompletedNativeProgress();
         Log.Debug($"Force update preparation requested, target: {new {targetRelease.Version, targetRelease.Filename, targetRelease.Filesize}}");
         var result = await updaterModel.PrepareForceUpdate(targetRelease);
         LatestUpdate = result;
@@ -257,7 +488,14 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         return result;
     }
 
-    public async Task DownloadUpdate(bool applyAutomatically)
+    /// <summary>Keeps native task ownership independent of queued UI Busy notifications.</summary>
+    public Task DownloadUpdate(bool applyAutomatically)
+    {
+        return registeredUpdater.TrackNativeOperation(() => DownloadUpdateCore(applyAutomatically),
+            () => Task.FromException(new InvalidOperationException("An incompatible operation already owns the updater.")));
+    }
+
+    private async Task DownloadUpdateCore(bool applyAutomatically)
     {
         Log.Debug($"Applying update {LatestVersion} (updated version: {LatestAppliedVersion})");
         if (applyLatch.IsBusy)
@@ -396,22 +634,24 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             return;
         }
 
+        var checkGeneration = Interlocked.Read(ref updateSourceGeneration);
         Log.Debug($"Update check requested, source: {updaterModel.UpdateSource}");
-        SetStatus("Checking for updates...");
+        if (Phase != ApplicationUpdatePhase.ReadyToApply) SetStatus("Checking for updates...");
 
-        using var isBusyRent = isBusyLatch.Rent();
         if (open)
         {
             IsOpen = true;
             await Task.Delay(UiConstants.ArtificialShortDelay);
         }
 
+        if (checkGeneration != Interlocked.Read(ref updateSourceGeneration)) return;
         try
         {
             var sw = Stopwatch.StartNew();
-            updaterModel.Reset();
-
-            await updaterModel.CheckForUpdates();
+            var outcome = await registeredUpdater.CheckAsync(CancellationToken.None, preservePrepared: !open);
+            if (checkGeneration != Interlocked.Read(ref updateSourceGeneration)) return;
+            if (outcome != UpdateOperationOutcome.Completed || Phase == ApplicationUpdatePhase.ReadyToApply) return;
+            var selectedTarget = SelectedUpdate;
 
             var timeToWait = sw.Elapsed - UiConstants.ArtificialShortDelay;
             if (timeToWait > TimeSpan.Zero)
@@ -420,20 +660,29 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
                 await Task.Delay(UiConstants.ArtificialShortDelay);
             }
 
-            var newVersion = updaterModel.LatestUpdate;
+            if (checkGeneration != Interlocked.Read(ref updateSourceGeneration) || !ReferenceEquals(selectedTarget, SelectedUpdate)) return;
+            var newVersion = registeredUpdater.NativeUpdate;
             if (newVersion == null)
             {
                 throw new ApplicationException($"Failed to get latest update info");
             }
 
             availableReleasesSource.EditDiff(newVersion.RemoteReleases);
+            // Public collection consumers may change the source synchronously.
+            if (checkGeneration != Interlocked.Read(ref updateSourceGeneration) || !ReferenceEquals(selectedTarget, SelectedUpdate)) return;
             LatestUpdate = newVersion;
             if (newVersion.ReleasesToApply.Any())
             {
                 SetStatus($"New version v{LatestVersion} is available");
-                if (AutomaticallyDownloadUpdates)
+                if (AutomaticallyDownloadUpdates && checkGeneration == Interlocked.Read(ref updateSourceGeneration) &&
+                    selectedTarget != null && ReferenceEquals(selectedTarget, SelectedUpdate) && Phase == ApplicationUpdatePhase.UpdateAvailable)
                 {
-                    await ApplyUpdateCommandExecuted(applyRelease: false);
+                    SetStatus($"Downloading v{LatestVersion} ({ByteSize.FromBytes(newVersion.ReleasesToApply.EmptyIfNull().Sum(x => x.Filesize)).MegaBytes:F0} MB)...");
+                    if (checkGeneration != Interlocked.Read(ref updateSourceGeneration) || !ReferenceEquals(selectedTarget, SelectedUpdate)) return;
+                    var download = await DownloadAsync(CancellationToken.None);
+                    if (download == UpdateOperationOutcome.Completed && checkGeneration == Interlocked.Read(ref updateSourceGeneration) &&
+                        ReferenceEquals(selectedTarget, SelectedUpdate) && Phase == ApplicationUpdatePhase.ReadyToApply)
+                        SetStatus($"Downloaded v{LatestVersion}");
                 }
             }
             else
@@ -443,6 +692,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
         }
         catch (Exception ex)
         {
+            if (checkGeneration != Interlocked.Read(ref updateSourceGeneration)) return;
             Log.HandleException(ex);
             SetError($"Failed to check for updates, UpdateSource: {UpdateSource} - {ex.Message}");
             if (!silent)

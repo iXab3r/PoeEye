@@ -17,4 +17,6 @@ public enum LauncherMethod
     /// 5) Terminates itself
     /// </summary>
     SwapApp,
+    /// <summary>Bind a fixed directory plan, acknowledge its parent, and install/restart only after commit and parent exit.</summary>
+    DirectoryUpdate,
 }

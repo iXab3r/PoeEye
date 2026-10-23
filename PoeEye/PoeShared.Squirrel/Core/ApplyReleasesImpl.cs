@@ -29,6 +29,21 @@ internal class ApplyReleasesImpl : IEnableLogger
     {
         this.rootAppDirectory = rootAppDirectory;
     }
+
+    /// <summary>
+    /// Materializes downloaded native releases into a unique staging directory without publishing
+    /// local RELEASES, replacing version directories, or changing shell/launcher integration.
+    /// </summary>
+    internal async Task<string> StageReleases(IPoeUpdateInfo updateInfo)
+    {
+        var release = await UnpackRelease(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
+        if (release == null) throw new InvalidOperationException("A native installation requires a downloaded release.");
+        var staging = Path.Combine(rootAppDirectory, ".updater", "staging", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(staging);
+        await ReleasePackage.ExtractZipForInstall(Path.Combine(updateInfo.PackageDirectory, release.Filename),
+            staging, rootAppDirectory);
+        return staging;
+    }
     
     public async Task<string> ApplyReleases(
         IPoeUpdateInfo updateInfo,

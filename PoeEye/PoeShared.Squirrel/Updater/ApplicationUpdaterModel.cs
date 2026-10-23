@@ -6,11 +6,13 @@ using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Launcher;
 using PoeShared.Services;
 using PoeShared.Squirrel.Core;
 using Polly;
@@ -20,7 +22,7 @@ using Squirrel;
 
 namespace PoeShared.Squirrel.Updater;
 
-internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
+internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel, INativeApplicationInstallation
 {
     private static readonly IFluentLog Log = typeof(ApplicationUpdaterModel).PrepareLogger();
     private static readonly Binder<ApplicationUpdaterModel> Binder = new();
@@ -30,6 +32,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     private readonly IAppArguments appArguments;
     private readonly IApplicationAccessor applicationAccessor;
     private readonly IApplicationUpdaterInstallationInfoProvider installationInfoProvider;
+    private long updateSourceGeneration;
 
     static ApplicationUpdaterModel()
     {
@@ -48,6 +51,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         Log.Info($"Application startup data: { new { Environment.ProcessPath, appArguments.ApplicationExecutableName, AppRootDirectory, RunningExecutable, LauncherExecutable } }");
 
         MostRecentVersionAppFolder = LauncherExecutable.Directory;
+        DirectoryUpdateHandoff.CleanupCompletedHelpers(Path.Combine(appArguments.AppDataDirectory, ".updater", "handoffs"));
         if (IsSquirrel == false)
         {
             CleanupUpdateRelatedFiles(MostRecentVersionAppFolder);
@@ -58,7 +62,13 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             .WithPrevious()
             .SubscribeSafe(x =>
             {
+                Interlocked.Increment(ref updateSourceGeneration);
                 Log.Debug($"Update source changed: {x}");
+                if (x.Current == null)
+                {
+                    LatestUpdate = null;
+                    ProgressPercent = 0;
+                }
                 UpdateSource = x.Current;
             }, Log.HandleUiException)
             .AddTo(Anchors);
@@ -219,6 +229,82 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         }
     }
 
+    async Task<IPoeUpdateInfo> INativeApplicationInstallation.CheckAsync(UpdateSourceInfo source, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var checkGeneration = Interlocked.Read(ref updateSourceGeneration);
+        var ignoreDeltaUpdates = IgnoreDeltaUpdates;
+        Reset();
+        using var busy = CreateIsBusyAnchor();
+        using var manager = await CreateManager(source).ConfigureAwait(false);
+        var result = await manager.CheckForUpdate(ignoreDeltaUpdates, CheckUpdateProgress).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (checkGeneration == Interlocked.Read(ref updateSourceGeneration) && Equals(UpdateSource, source))
+            LatestUpdate = result;
+        return result;
+    }
+
+    async Task INativeApplicationInstallation.DownloadAsync(IPoeUpdateInfo update, UpdateSourceInfo source,
+        IProgressReporter progress, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var downloadGeneration = Interlocked.Read(ref updateSourceGeneration);
+        using var busy = CreateIsBusyAnchor();
+        using var manager = await CreateManager(source).ConfigureAwait(false);
+        // The native engine has no cancellation parameter. Its actual task and manager remain
+        // owned until completion even when the caller or selected source changes meanwhile.
+        await manager.DownloadReleases(update.ReleasesToApply, value =>
+        {
+            if (downloadGeneration == Interlocked.Read(ref updateSourceGeneration)) ProgressPercent = value;
+            if (progress is IApplicationUpdateProgressReporter stages) stages.ReportStage("Downloading", value);
+            else progress.Update(value);
+        }).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    async Task<NativeApplicationInstallation> INativeApplicationInstallation.PrepareAsync(IPoeUpdateInfo update,
+        UpdateSourceInfo source, IProgressReporter progress, CancellationToken cancellationToken)
+    {
+        Guard.ArgumentNotNull(update, nameof(update));
+        cancellationToken.ThrowIfCancellationRequested();
+        if (appArguments.IsDebugMode)
+            throw new NotSupportedException("Generic native installation requires a real non-debug application; simulation is not installation.");
+
+        var installed = IsSquirrel;
+        var executableName = LauncherExecutable.Name;
+        var preparationGeneration = Interlocked.Read(ref updateSourceGeneration);
+        var installationDirectory = installed
+            ? Path.Combine(AppRootDirectory.FullName, "app-" + update.FutureReleaseEntry.Version)
+            : LauncherExecutable.DirectoryName;
+        using var busy = CreateIsBusyAnchor();
+        // Preparation may materialize package/delta cache and an isolated snapshot only. Full
+        // ApplyReleases also publishes RELEASES and shell integration, so it belongs after acceptance.
+        var payloadDirectory = await new ApplyReleasesImpl(AppRootDirectory.FullName)
+            .StageReleases(update).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(payloadDirectory))
+            throw new InvalidOperationException("The native engine returned no installation directory.");
+        payloadDirectory = Path.GetFullPath(payloadDirectory);
+        if (!File.Exists(Path.Combine(payloadDirectory, executableName)))
+            throw new InvalidOperationException($"The native release does not contain its launcher {executableName}.");
+        return new NativeApplicationInstallation(payloadDirectory, executableName, installationDirectory, async () =>
+        {
+            using var manager = await CreateManager(source).ConfigureAwait(false);
+            // Retain the existing native full/delta installation engine. The second extraction
+            // deliberately leaves the helper's immutable staging files untouched. No caller token
+            // can interrupt native metadata/shell finalization after application-owned acceptance.
+            var appliedDirectory = await manager.ApplyReleases(update, value =>
+            {
+                if (preparationGeneration == Interlocked.Read(ref updateSourceGeneration)) ProgressPercent = value;
+                if (progress is IApplicationUpdateProgressReporter stages) stages.ReportStage("Finalizing installation", value);
+                else progress.Update(value);
+            }).ConfigureAwait(false);
+            if (installed && !string.Equals(Path.GetFullPath(appliedDirectory), Path.GetFullPath(installationDirectory),
+                    StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The native engine finalized a different installation directory.");
+        });
+    }
+
     public void Reset()
     {
         LatestUpdate = null;
@@ -243,6 +329,7 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
     /// <returns>True if application was updated</returns>
     public async Task CheckForUpdates()
     {
+        var checkGeneration = Interlocked.Read(ref updateSourceGeneration);
         Log.Debug("Update check requested");
         using var unused = CreateIsBusyAnchor();
         Reset();
@@ -250,7 +337,16 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         using var mgr = await CreateManager();
         Log.Debug($"Checking for updates @ {UpdateSource}, {nameof(IgnoreDeltaUpdates)}: {IgnoreDeltaUpdates}...");
 
-        var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, CheckUpdateProgress);
+        var updateInfo = await mgr.CheckForUpdate(IgnoreDeltaUpdates, progress =>
+        {
+            if (checkGeneration == Interlocked.Read(ref updateSourceGeneration))
+                CheckUpdateProgress(progress);
+        });
+        if (checkGeneration != Interlocked.Read(ref updateSourceGeneration))
+        {
+            Log.Debug("Ignoring native check result from a superseded source");
+            return;
+        }
         Log.Debug($"UpdateInfo:\r\n{updateInfo.DumpToString().TakeChars(300)}");
         LatestUpdate = updateInfo;
     }
@@ -307,33 +403,44 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         applicationAccessor.ReplaceExecutable(executable.FullName, appArguments.StartupArgs);
     }
 
-    private async Task<IPoeUpdateManager> CreateManager()
+    private Task<IPoeUpdateManager> CreateManager() => CreateManager(UpdateSource);
+
+    private Task<IPoeUpdateManager> CreateManager(UpdateSourceInfo source)
     {
-        var manager = new ResilientUpdateManager(
-            UpdateSource.Uris,
+        Guard.ArgumentNotNull(source, nameof(source));
+        // Freeze credentials and manager roots before the asynchronous mirror factories run.
+        // A later source selection must not combine the old URI with new credentials.
+        var uris = source.Uris.ToArray();
+        var username = source.Username?.ToUnsecuredString();
+        var password = source.Password?.ToUnsecuredString();
+        var installed = IsSquirrel;
+        var rootDirectory = new DirectoryInfo(RootDirectory.FullName);
+        var applicationName = appArguments.AppName;
+        var managers = new CompositeDisposable();
+        var resilient = new ResilientUpdateManager(
+            uris,
             async uri =>
             {
                 Log.Debug($"Creating manager for URL {uri}");
-                var manager = await CreateManager(uri);
+                var manager = await CreateManager(uri, username, password, installed, rootDirectory, applicationName).ConfigureAwait(false);
+                managers.Add(manager);
                 Log.Debug($"Created manager: {manager}");
                 return manager;
             }
         );
-        return manager;
+        managers.AddTo(resilient.Anchors);
+        return Task.FromResult<IPoeUpdateManager>(resilient);
     }
-    private async Task<IPoeUpdateManager> CreateManager(string updateUrl)
+    private static async Task<IPoeUpdateManager> CreateManager(string updateUrl, string username, string password,
+        bool installed, DirectoryInfo rootDirectory, string applicationName)
     {
-        Log.Debug($"Using update source: {UpdateSource.DumpToString()}");
-
         var downloader = new BasicAuthFileDownloader(
-            new NetworkCredential(
-                UpdateSource.Username?.ToUnsecuredString(),
-                UpdateSource.Password?.ToUnsecuredString()));
+            new NetworkCredential(username, password));
         if (updateUrl.Contains("github"))
         {
-            Log.Debug($"Using GitHub source: {UpdateSource.DumpToString()}");
+            Log.Debug($"Using GitHub source: {updateUrl}");
 
-            if (IsSquirrel == false)
+            if (installed == false)
             {
                 throw new NotSupportedException("Non-local app-data installation is not supported by github update manager");
             }
@@ -341,26 +448,26 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
             var mgr = await PoeUpdateManager.GitHubUpdateManager(
                 updateUrl,
                 downloader,
-                appArguments.AppName,
-                RootDirectory.FullName);
+                applicationName,
+                rootDirectory.FullName);
             return mgr;
         }
         else
         {
-            Log.Debug($"Using BasicHTTP source: {UpdateSource.DumpToString()}");
+            Log.Debug($"Using BasicHTTP source: {updateUrl}");
 
-            if (IsSquirrel)
+            if (installed)
             {
                 var mgr = new PoeUpdateManager(
                     updateUrl, 
                     downloader,
-                    appArguments.AppName, 
-                    RootDirectory.FullName);
+                    applicationName,
+                    rootDirectory.FullName);
                 return mgr;
             }
             else
             {
-                var mgr = new PortableUpdateManager(updateUrl, downloader, RootDirectory);
+                var mgr = new PortableUpdateManager(updateUrl, downloader, rootDirectory);
                 return mgr;
             }
         }
