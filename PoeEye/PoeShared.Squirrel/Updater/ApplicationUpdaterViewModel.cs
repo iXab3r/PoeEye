@@ -274,7 +274,8 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             .SubscribeAsync(async x =>
             {
                 if (registeredUpdater.RoutesCurrentSource)
-                    await registeredUpdater.CheckAsync(CancellationToken.None, preservePrepared: !x.open);
+                    await registeredUpdater.CheckAsync(CancellationToken.None, preservePrepared: !x.open,
+                        downloadAutomatically: () => AutomaticallyDownloadUpdates);
                 else
                     await CheckForUpdate(open: x.open, silent: x.silent);
             })

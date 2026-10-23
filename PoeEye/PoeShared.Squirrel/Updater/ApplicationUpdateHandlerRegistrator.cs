@@ -180,8 +180,9 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
         });
     }
 
-    internal Task<UpdateOperationOutcome> CheckAsync(CancellationToken cancellationToken, bool preservePrepared = false) =>
-        RunAsync(OperationKind.Check, cancellationToken, preservePrepared);
+    internal Task<UpdateOperationOutcome> CheckAsync(CancellationToken cancellationToken, bool preservePrepared = false,
+        Func<bool>? downloadAutomatically = null) =>
+        RunAsync(OperationKind.Check, cancellationToken, preservePrepared, downloadAutomatically);
 
     internal Task<UpdateOperationOutcome> DownloadAsync(CancellationToken cancellationToken) => RunAsync(OperationKind.Download, cancellationToken);
 
@@ -255,11 +256,13 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
         return result!;
     }
 
-    private async Task<UpdateOperationOutcome> RunAsync(OperationKind kind, CancellationToken cancellationToken, bool preservePrepared = false)
+    private async Task<UpdateOperationOutcome> RunAsync(OperationKind kind, CancellationToken cancellationToken,
+        bool preservePrepared = false, Func<bool>? downloadAutomatically = null, State? expectedState = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Operation operation;
         IApplicationUpdateInfo? selectedTarget;
+        State? committedCheckState = null;
         List<Operation> invalidate;
         lock (gate)
         {
@@ -273,6 +276,12 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
             {
                 return UpdateOperationOutcome.NotConfigured;
             }
+            // Automatic preparation belongs to the exact completed Check, even if another
+            // Check or registration used the same source URI in the meantime.
+            if (expectedState != null && (!ReferenceEquals(state, expectedState) ||
+                !ReferenceEquals(expectedState.Selection, selection) || !ReferenceEquals(expectedState.Binding, binding) ||
+                expectedState.Phase != ApplicationUpdatePhase.UpdateAvailable))
+                return UpdateOperationOutcome.Invalidated;
             var selected = ReferenceEquals(state.Selection, selection) && ReferenceEquals(state.Binding, binding)
                 ? state : EmptyState(selection, binding);
             // A recurring request must not discard the same source's verified payload while waiting for explicit Apply.
@@ -349,7 +358,7 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         if (IsCurrentLocked(operation))
-                            state = new State(operation.Selection, operation.Binding, available ? target : null,
+                            state = committedCheckState = new State(operation.Selection, operation.Binding, available ? target : null,
                                 installed, version, available ? ApplicationUpdatePhase.UpdateAvailable : ApplicationUpdatePhase.Idle,
                                 null, ProgressSnapshot.Empty, nativeUpdate);
                     }
@@ -405,6 +414,10 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
         if (!IsCurrent(operation)) return UpdateOperationOutcome.Invalidated;
         if (callerCancelled) throw new OperationCanceledException(cancellationToken);
         if (failure != null) ExceptionDispatchInfo.Capture(failure).Throw();
+        // Read the application setting outside the owner lock, after the Check handler and
+        // cancellation callbacks have drained. Admission below revalidates the captured state.
+        if (committedCheckState?.Phase == ApplicationUpdatePhase.UpdateAvailable && downloadAutomatically?.Invoke() == true)
+            return await RunAsync(OperationKind.Download, cancellationToken, expectedState: committedCheckState).ConfigureAwait(false);
         return UpdateOperationOutcome.Completed;
     }
 
