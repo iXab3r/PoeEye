@@ -133,12 +133,15 @@ public static class Program
             throw new ArgumentException(nameof(executablePath), $"Executable path must be specified");
         }
         Log.Info($"Spawning new process @ '{executablePath}' (exists: {File.Exists(executablePath)}), args: '{arguments}'");
+        var fullExecutablePath = Path.GetFullPath(executablePath);
         
         var startInfo = new ProcessStartInfo()
         {
             UseShellExecute = true,
             Arguments = arguments ?? string.Empty,
-            FileName = executablePath,
+            FileName = fullExecutablePath,
+            // A restarted installed app must not keep the retired version open as its working directory.
+            WorkingDirectory = Path.GetDirectoryName(fullExecutablePath),
             Verb = verb ?? string.Empty
         };
         var newProcess = Process.Start(startInfo);
