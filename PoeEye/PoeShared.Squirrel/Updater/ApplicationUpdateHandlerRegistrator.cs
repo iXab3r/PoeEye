@@ -373,18 +373,21 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
             {
                 if (operation.Accepted) state = state with { Error = error.Message };
                 if (!operation.Accepted && IsCurrentLocked(operation))
-                    state = EmptyState(operation.Selection, operation.Binding) with
+                    state = (kind == OperationKind.Download && error is not OperationCanceledException && !cancellationToken.IsCancellationRequested
+                        ? state : EmptyState(operation.Selection, operation.Binding)) with
                     {
                         Phase = error is OperationCanceledException && cancellationToken.IsCancellationRequested
                             // Apply remains in progress until the admitted cancellation callbacks drain below.
                             ? kind == OperationKind.Apply ? ApplicationUpdatePhase.Applying : ApplicationUpdatePhase.Idle
                             : ApplicationUpdatePhase.Failed,
-                        Error = error is OperationCanceledException && cancellationToken.IsCancellationRequested ? null : error.Message
+                        Error = error is OperationCanceledException && cancellationToken.IsCancellationRequested ? null : error.Message,
+                        Progress = ProgressSnapshot.Empty,
+                        NativeProgressVisible = false
                     };
                 invalidate = RefreshSelection();
             }
-            // Clearing the target invalidates its notes before waiting for mutation
-            // callbacks: those callbacks may themselves be awaiting the obsolete notes.
+            // A failed Download retains its exact target for explicit retry. When the target
+            // is cleared, invalidate obsolete notes before callbacks that may await them drain.
             Invalidate(invalidate);
             Changed?.Invoke();
         }
