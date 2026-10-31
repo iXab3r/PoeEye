@@ -37,8 +37,10 @@ internal sealed class NativeApplicationUpdateHandler : IApplicationUpdateHandler
         };
         var result = await NativeInstallation.CheckAsync(capturedSource, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
-        return new NativeUpdateInfo(result, app.Version, capturedSource);
+        return CreateUpdateInfo(result, capturedSource);
     }
+
+    internal NativeUpdateInfo CreateUpdateInfo(IPoeUpdateInfo result, UpdateSourceInfo source) => new(result, app.Version, source);
 
     public Task<ApplicationUpdateChangelog> GetChangelogAsync(IApplicationUpdateInfo update, CultureInfo culture, CancellationToken cancellationToken)
     {

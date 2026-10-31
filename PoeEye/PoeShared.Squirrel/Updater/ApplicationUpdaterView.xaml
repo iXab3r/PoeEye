@@ -51,6 +51,7 @@
                         Background="{StaticResource PositiveBrush}"
                         CornerRadius="2"
                         Command="{Binding ApplyUpdateCommand}"
+                        AutomationProperties.AutomationId="native-updater-install"
                         Icon="&#xF0ED;"
                         ToolTip="{Binding UpdateInfo}">
                         <eye:ButtonEx.Content>

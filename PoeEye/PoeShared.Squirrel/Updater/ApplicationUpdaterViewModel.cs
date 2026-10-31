@@ -481,11 +481,20 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
     {
         // Force preparation has no model Busy entry to retire a prior generic Download's progress.
         registeredUpdater.RetireCompletedNativeProgress();
+        var generation = Interlocked.Read(ref updateSourceGeneration);
+        var selection = registeredUpdater.CaptureNativeSelection();
+        bool IsCurrentSelection() => generation == Interlocked.Read(ref updateSourceGeneration) &&
+            (!selection.HasValue || registeredUpdater.IsCurrentNativeSelection(selection.Value.Selection));
         Log.Debug($"Force update preparation requested, target: {new {targetRelease.Version, targetRelease.Filename, targetRelease.Filesize}}");
         var result = await updaterModel.PrepareForceUpdate(targetRelease);
+        if (!IsCurrentSelection()) return result;
         LatestUpdate = result;
+        if (!IsCurrentSelection()) return result;
         updaterModel.Reset();
-        SetStatus($"Ready to update to v{LatestVersion}");
+        if (!IsCurrentSelection()) return result;
+        if (selection.HasValue) registeredUpdater.SelectNativeUpdate(selection.Value, result);
+        if (IsCurrentSelection() && ReferenceEquals(LatestUpdate, result))
+            SetStatus($"Ready to update to v{LatestVersion}");
         return result;
     }
 
@@ -513,7 +522,7 @@ internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IA
             throw new InvalidOperationException("Latest update must be specified");
         }
 
-        var currentVersion = LatestAppliedVersion;
+        var currentVersion = LatestAppliedVersion ?? registeredUpdater.NativeUpdate?.CurrentlyInstalledVersion?.Version.Version;
         var targetVersion = LatestVersion;
         var isDowngrade = currentVersion > targetVersion;
         Log.Info($"Validating update: {currentVersion} => {targetVersion} (downgrade: {isDowngrade})");

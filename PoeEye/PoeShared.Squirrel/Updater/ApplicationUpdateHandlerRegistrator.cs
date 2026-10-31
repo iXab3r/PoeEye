@@ -92,7 +92,53 @@ internal sealed class ApplicationUpdateHandlerRegistrator : DisposableReactiveOb
 
     private bool IsBusyLocked() => active != null || nativeOperationsStarting != 0 || nativeOperations.Any(x => !x.IsCompleted);
     internal IApplicationUpdateInfo? SelectedUpdate => ReadState().Target;
+    // Retain the last native Check's complete catalog and installed package baseline across forced selections.
+    // A force result contains only its selected release; its opaque target belongs in SelectedUpdate.
     internal IPoeUpdateInfo? NativeUpdate => ReadState().NativeUpdate;
+
+    /// <summary>Captures the native source epoch and transport settings before legacy force preparation starts.</summary>
+    internal (UpdateSourceSelection Selection, UpdateSourceInfo Source)? CaptureNativeSelection()
+    {
+        lock (gate)
+        {
+            var selection = sources.Selection;
+            if (active != null || !ReferenceEquals(FindBinding(selection), nativeBinding)) return null;
+            return (selection, selection.Source with
+            {
+                Uris = selection.Source.Uris?.ToArray(),
+                Username = selection.Source.Username?.Copy(), Password = selection.Source.Password?.Copy()
+            });
+        }
+    }
+
+    internal bool IsCurrentNativeSelection(UpdateSourceSelection captured)
+    {
+        lock (gate) return ReferenceEquals(sources.Selection, captured) && ReferenceEquals(FindBinding(captured), nativeBinding);
+    }
+
+    /// <summary>Publishes one actual force result only to its captured native source, retiring superseded target notes.</summary>
+    internal void SelectNativeUpdate((UpdateSourceSelection Selection, UpdateSourceInfo Source) captured, IPoeUpdateInfo result)
+    {
+        var target = ((NativeApplicationUpdateHandler)nativeBinding.Handler).CreateUpdateInfo(result, captured.Source);
+        List<Operation> invalidate;
+        lock (gate)
+        {
+            if (active != null || !ReferenceEquals(sources.Selection, captured.Selection) ||
+                !ReferenceEquals(FindBinding(captured.Selection), nativeBinding)) return;
+            var current = ReferenceEquals(state.Selection, captured.Selection) && ReferenceEquals(state.Binding, nativeBinding)
+                ? state : EmptyState(captured.Selection, nativeBinding);
+            state = current with
+            {
+                Target = target.IsUpdateAvailable ? target : null, Installed = target.InstalledVersionText,
+                Version = target.IsUpdateAvailable ? target.TargetVersionText : string.Empty,
+                Phase = target.IsUpdateAvailable ? ApplicationUpdatePhase.UpdateAvailable : ApplicationUpdatePhase.Idle,
+                Error = null, Progress = ProgressSnapshot.Empty, NativeProgressVisible = false
+            };
+            invalidate = RefreshSelection();
+        }
+        Invalidate(invalidate);
+        Changed?.Invoke();
+    }
     internal int? NativeProgressPercent
     {
         get

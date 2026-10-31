@@ -65,6 +65,7 @@
                             </eye:ButtonEx.Content>
                         </eye:ButtonEx>
                         <CheckBox x:Name="ShowAdvanced"
+                                  AutomationProperties.AutomationId="native-updater-advanced"
                                   HorizontalAlignment="Center"
                                   IsChecked="{Binding ShowAdvanced}"
                                   Content="Advanced" />
@@ -81,6 +82,7 @@
                                        IsEnabled="{Binding UpdateSourceProvider.KnownSources.Count, Converter={StaticResource NullToFalseConverter}}">
                             <TextBlock Text="Update channel:" Width="350" TextAlignment="Right" />
                             <ComboBox st:StackPanel.Fill="Fill"
+                                      AutomationProperties.AutomationId="native-updater-channel"
                                       ItemsSource="{Binding UpdateSourceProvider.KnownSources}"
                                       DisplayMemberPath="Name"
                                       SelectedValuePath="Id"
@@ -91,6 +93,7 @@
                                        IsEnabled="{Binding ApplicationUpdater.AvailableReleases.Count, Converter={StaticResource NullToFalseConverter}}">
                             <TextBlock Text="Specify version:" Width="350" TextAlignment="Right" />
                             <ComboBox st:StackPanel.Fill="Fill"
+                                      AutomationProperties.AutomationId="native-updater-release"
                                       ItemsSource="{Binding ApplicationUpdater.AvailableReleases}"
                                       DisplayMemberPath="Version"
                                       SelectedItem="{Binding SelectedReleaseEntry}" />

@@ -100,6 +100,8 @@ public interface IApplicationUpdaterViewModel : IDisposableReactiveObject
     /// Prepares a native release while retaining its operation lifetime independently of queued UI notifications.
     /// While an author Download or any Apply owns the updater, returns a faulted Task with InvalidOperationException
     /// without throwing synchronously, starting native preparation or queuing work.
+    /// A completed native selection updates the common target and notes for that same source epoch.
+    /// The last Check's complete release catalog and installed package baseline remain available.
     /// </summary>
     Task<IPoeUpdateInfo> PrepareForceUpdate(IReleaseEntry targetRelease);
     
