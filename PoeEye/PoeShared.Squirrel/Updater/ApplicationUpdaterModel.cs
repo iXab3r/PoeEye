@@ -56,6 +56,10 @@ internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IAppli
         {
             CleanupUpdateRelatedFiles(MostRecentVersionAppFolder);
         }
+        else
+        {
+            PoeUpdateManager.CleanupDeadAppFolders(AppRootDirectory, LauncherExecutable.Directory);
+        }
 
         updateSourceProvider
             .WhenAnyValue(x => x.UpdateSource)

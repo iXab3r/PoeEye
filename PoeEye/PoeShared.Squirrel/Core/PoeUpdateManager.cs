@@ -184,6 +184,82 @@ public sealed partial class PoeUpdateManager : DisposableReactiveObject, IPoeUpd
         installHelpers.KillAllProcessesBelongingToPackage();
     }
 
+    /// <summary>
+    /// Retries removal of already retired installed versions without touching current releases.
+    /// A higher dead version must not hide the current application's Squirrel uninstall hooks.
+    /// </summary>
+    internal static void CleanupDeadAppFolders(DirectoryInfo appRoot, DirectoryInfo launcherDirectory)
+    {
+        try
+        {
+            if (!appRoot.Exists || (appRoot.Attributes & FileAttributes.ReparsePoint) != 0 ||
+                !launcherDirectory.Exists || (launcherDirectory.Attributes & FileAttributes.ReparsePoint) != 0 ||
+                !string.Equals(launcherDirectory.Parent?.FullName, appRoot.FullName, StringComparison.OrdinalIgnoreCase) ||
+                !launcherDirectory.Name.StartsWith("app-", StringComparison.OrdinalIgnoreCase) ||
+                !SemanticVersion.TryParse(launcherDirectory.Name.Substring(4), out _))
+            {
+                return;
+            }
+
+            using var updateLock = AcquireUpdateLock(appRoot.FullName);
+            var currentReleaseFolders = Utility.LoadLocalReleases(Utility.LocalReleaseFileForAppDir(appRoot.FullName))
+                .Select(x => Utility.AppDirForRelease(appRoot.FullName, x))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (!currentReleaseFolders.Contains(launcherDirectory.FullName))
+            {
+                Log.Warn("Skipping retired-version cleanup: local releases do not identify the running installation");
+                return;
+            }
+
+            var runningProcesses = UnsafeUtility.EnumerateProcesses().ToArray();
+            foreach (var folder in appRoot.GetDirectories("app-*", SearchOption.TopDirectoryOnly))
+            {
+                var deadMarker = Path.Combine(folder.FullName, ".dead");
+                if ((folder.Attributes & FileAttributes.ReparsePoint) != 0 ||
+                    !SemanticVersion.TryParse(folder.Name.Substring(4), out _) ||
+                    string.Equals(folder.FullName, launcherDirectory.FullName, StringComparison.OrdinalIgnoreCase) ||
+                    currentReleaseFolders.Contains(folder.FullName) || !File.Exists(deadMarker))
+                {
+                    continue;
+                }
+
+                var processPrefix = folder.FullName + Path.DirectorySeparatorChar;
+                if (runningProcesses.Any(x => x.Item1 != null && x.Item1.StartsWith(processPrefix, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                byte[] deadMarkerContents = null;
+                try
+                {
+                    deadMarkerContents = File.ReadAllBytes(deadMarker);
+                    Log.Info($"Removing retired installed version @ {folder.FullName}");
+                    Directory.Delete(folder.FullName, recursive: true);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Could not remove retired installed version @ {folder.FullName}", ex);
+                    // Recursive deletion can remove the marker before encountering a locked file.
+                    if (deadMarkerContents != null && Directory.Exists(folder.FullName) && !File.Exists(deadMarker))
+                    {
+                        try
+                        {
+                            File.WriteAllBytes(deadMarker, deadMarkerContents);
+                        }
+                        catch (Exception markerException)
+                        {
+                            Log.Warn($"Could not restore retired-version marker @ {deadMarker}", markerException);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warn("Could not clean retired installed versions during startup", ex);
+        }
+    }
+
     private IDisposable AcquireUpdateLock()
     {
         return AcquireUpdateLock(RootAppDirectory);
