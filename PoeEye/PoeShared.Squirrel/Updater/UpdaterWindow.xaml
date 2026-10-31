@@ -86,7 +86,13 @@
                                       ItemsSource="{Binding UpdateSourceProvider.KnownSources}"
                                       DisplayMemberPath="Name"
                                       SelectedValuePath="Id"
-                                      SelectedValue="{Binding UpdateSourceProvider.UpdateSourceId}"/>
+                                      SelectedValue="{Binding UpdateSourceProvider.UpdateSourceId}">
+                                <ComboBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource FastComboBoxItemStyle}">
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                                    </Style>
+                                </ComboBox.ItemContainerStyle>
+                            </ComboBox>
                         </st:StackPanel>
 
                         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5" Height="30"
@@ -96,7 +102,13 @@
                                       AutomationProperties.AutomationId="native-updater-release"
                                       ItemsSource="{Binding ApplicationUpdater.AvailableReleases}"
                                       DisplayMemberPath="Version"
-                                      SelectedItem="{Binding SelectedReleaseEntry}" />
+                                      SelectedItem="{Binding SelectedReleaseEntry}">
+                                <ComboBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource FastComboBoxItemStyle}">
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Version}" />
+                                    </Style>
+                                </ComboBox.ItemContainerStyle>
+                            </ComboBox>
                         </st:StackPanel>
                     </st:StackPanel>
 
