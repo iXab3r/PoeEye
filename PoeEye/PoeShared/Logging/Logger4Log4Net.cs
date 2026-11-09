@@ -51,7 +51,7 @@ public sealed class Logger4Log4Net : ILogger
  
     public bool IsEnabled(LogLevel logLevel)
     {
-        if (MinimumLevel < logLevel)
+        if (logLevel < MinimumLevel)
         {
             return false;
         }
